@@ -46,14 +46,14 @@ public sealed partial class GameEngine
     private IEnumerable<EquipmentSlot> HappyBoneAvailableSlots(int holder) => Enum.GetValues<EquipmentSlot>().Where(s => !_players[holder].EquipmentAreaAbolished && _players[holder].EquipmentSlotCapacity(s) > 0);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 42300)] private void ObserveHappyWeiYanFirstEquipment(IGameEvent fact)
     {
-        if (fact is not CardUseDeclaredEvent declared || !EquipmentCatalog.IsEquipment(declared.CardKind) ||
+        if (fact is not CardUseDeclaredEvent declared || !EquipmentRules.IsEquipment(declared.CardKind) ||
             !_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveHappyWeiYanZigu) || _turnNumber <= 0 || _turnProgression.TurnNumber != _turnNumber ||
             LifecycleCardUse(declared.ResolutionId) is not { Action: { Type: CardActionType.Use } action } use ||
             ProgramEventHistory<HappyWeiYanFirstEquipmentEvent>().Any(e => e.ActualTurn == _turnNumber && e.Actor == use.SourceSeat)) return;
         AdvanceEventRulesAndQueueFact(new HappyWeiYanFirstEquipmentEvent(_turnNumber, use.SourceSeat, use.Id, action.ActionId));
     }
     private CardUseFrame? HappyZiguFirstEquipment(int owner, ProgramSkillWindowContext context) => context.CardUse is { } info && LifecycleCardUse(info.ParentCardUseFrameId) is { Action: { Type: CardActionType.Use } action } use &&
-        use.SourceSeat == owner && action.ActionId == info.CardActionId && EquipmentCatalog.IsEquipment(use.CardKind) &&
+        use.SourceSeat == owner && action.ActionId == info.CardActionId && EquipmentRules.IsEquipment(use.CardKind) &&
         ProgramEventHistory<HappyWeiYanFirstEquipmentEvent>().Count(e => e == new HappyWeiYanFirstEquipmentEvent(_turnNumber, owner, use.Id, action.ActionId)) == 1 ? use : null;
     private bool TryHappyWeiYanEquipmentCommitted(long id, Card equipment)
     {
@@ -154,7 +154,7 @@ public sealed partial class GameEngine
         {
             var slot = Enum.Parse<EquipmentSlot>(chosen.Parameters["option"][5..]);
             ReplaceRuntimeTop(frame = frame with { HappyWeiYan = receipt with { Slot = slot } });
-            var occupied = GetEquipment(receipt.Target).Where(c => (HappyBoneSlot(c) ?? EquipmentCatalog.Get(c.Kind).Slot) == slot).ToArray();
+            var occupied = GetEquipment(receipt.Target).Where(c => (HappyBoneSlot(c) ?? EquipmentRules.Get(c.Kind).Slot) == slot).ToArray();
             if (occupied.Length >= _players[receipt.Target].EquipmentSlotCapacity(slot)) { PayHappyWeiYanMove(frame, HappyWeiYanStage.Replacing, occupied[0], CardLocation.Equipment(receipt.Target), CardLocation.DiscardPile, HappyBoneReplace); ContinueHappyWeiYan(frame.Id); return; }
             PlaceHappyBone(frame); return;
         }

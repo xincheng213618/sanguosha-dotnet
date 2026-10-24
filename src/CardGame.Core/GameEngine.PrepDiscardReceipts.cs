@@ -15,7 +15,7 @@ public sealed partial class GameEngine
         var primary = records.Where(m => p.CardIds.Contains(m.CardId)).ToArray();
         if (primary.Length != p.CardIds.Count || p.CardIds.Where((id, index) => primary.Count(m => m.CardId == id &&
                 m.From == p.From[index] && m.To == CardLocation.DiscardPile && m.Reason.Value == reason) != 1).Any() ||
-            primary.Count(m => !EquipmentCatalog.IsEquipment(m.CardKind)) != p.NonEquipmentCount) return false;
+            primary.Count(m => !EquipmentRules.IsEquipment(m.CardKind)) != p.NonEquipmentCount) return false;
         // A real WoodenOx removal may discard its private stored entities as a
         // separate native cleanup; those are not extra selected costs or N.
         if (records.Except(primary).Any(m => m.From != CardLocation.Grain(p.PayerSeat) || m.To != CardLocation.DiscardPile ||

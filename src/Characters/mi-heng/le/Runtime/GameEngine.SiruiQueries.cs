@@ -120,7 +120,7 @@ public sealed partial class GameEngine
         _ = TryReadConversionSource(choice.Parameters, out var source);
         var from = _cardZones.GetLocation(card.Id);
         var excluded = from == CardLocation.Equipment(actor.Seat) &&
-            EquipmentCatalog.Get(card.Kind).Slot == EquipmentSlot.Weapon ? card.Id : (int?)null;
+            EquipmentRules.Get(card.Kind).Slot == EquipmentSlot.Weapon ? card.Id : (int?)null;
         // The coarse native request may exist because Sirui can reach this
         // target. Its unconverted sibling choice must still prove its own range.
         return CanUseSlashTarget(actor, target, card, source, kind, physicalCardIds: [card.Id],

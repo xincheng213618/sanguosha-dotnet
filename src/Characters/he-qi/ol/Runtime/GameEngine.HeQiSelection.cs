@@ -10,7 +10,7 @@ public sealed partial class GameEngine
         public int AttackRange(int seat) => engine.GetAttackRange(seat);
         public int EquipmentSlotCapacity(int seat, EquipmentSlot slot) => engine._players[seat].EquipmentSlotCapacity(slot);
         public int EquipmentCountInSlot(int seat, EquipmentSlot slot) =>
-            engine.GetEquipment(engine._players[seat]).Count(card => EquipmentCatalog.Get(card.Kind).Slot == slot);
+            engine.GetEquipment(engine._players[seat]).Count(card => engine.EquipmentRules.Get(card.Kind).Slot == slot);
     }
 
 }

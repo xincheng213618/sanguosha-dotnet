@@ -172,7 +172,7 @@ public sealed partial class GameEngine
                 else if (kind is CardKind.Snatch or CardKind.Dismantlement) hint = hint with { TargetValueAdjustment = -8 };
                 else if (kind is CardKind.Indulgence or CardKind.SupplyShortage or CardKind.Intoxication) hint = hint with { TargetValueAdjustment = -12 };
                 else if (kind == CardKind.IronChain) hint = hint with { TargetValueAdjustment = snapshot.Players.Single(x => x.Seat == t).IsChained ? 6 : -6 };
-                else if (EquipmentCatalog.IsEquipment(kind)) hint = hint with { TargetValueAdjustment = 12 };
+                else if (EquipmentRules.IsEquipment(kind)) hint = hint with { TargetValueAdjustment = 12 };
                 else if (kind is CardKind.Alcohol or CardKind.RealgarWine) hint = hint with { TargetValueAdjustment = 5 };
                 return brain.ScoreProgramTarget(snapshot, t, hint);
             });

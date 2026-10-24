@@ -66,7 +66,7 @@ public sealed partial class GameEngine
             ReplaceRuntimeTop(current with { DamageTargetObtain = current.DamageTargetObtain! with
             { ObtainMovementSequence = record.Sequence, Receipt = record.To == CardLocation.Hand(d.OwnerSeat) ||
                     IsHappyWeiYanRedirectedGain(record, CardLocation.Hand(d.OwnerSeat)) ?
-                new(record.Sequence,record.CardId,record.CardKind,record.From,record.To,record.Reason.Value,EquipmentCatalog.IsEquipment(record.CardKind)) : null } });
+                new(record.Sequence,record.CardId,record.CardKind,record.From,record.To,record.Reason.Value,EquipmentRules.IsEquipment(record.CardKind)) : null } });
         });
         if (!TryBeginCardsMovedProgramWindow()) ReturnRuntimeProgramMovement(f.Id);
     }
@@ -93,7 +93,7 @@ public sealed partial class GameEngine
         return d.Stage != ProgramDamageTargetObtainStage.SelectingCard && r.Reason == DamageTargetObtainReason &&
             r.From.OwnerSeat == d.VictimSeat && DamageTargetMountZones.Contains(r.From.Zone) &&
             (r.To == CardLocation.Hand(d.OwnerSeat) || IsHappyWeiYanRedirectedGain(movement, CardLocation.Hand(d.OwnerSeat))) &&
-            r.IsEquipment == EquipmentCatalog.IsEquipment(r.PrintedKind) && _cardMovements.Any(m => m.Sequence == r.MovementSequence &&
+            r.IsEquipment == EquipmentRules.IsEquipment(r.PrintedKind) && _cardMovements.Any(m => m.Sequence == r.MovementSequence &&
                 m.CardId == r.CardId && m.CardKind == r.PrintedKind && m.From == r.From && m.To == r.To && m.Reason.Value == r.Reason);
     }
     [ProgramContinuation(ProgramContinuationKind.Resume, 830)]

@@ -101,7 +101,7 @@ public sealed partial class GameEngine
     {
         public int NextRandom(int count) => engine._random.Next(count);
         public void PublishState() => engine.AdvanceRulesAndPublishState();
-        public void LogEquipment(int seat,CardKind weapon,CardKind armor) => engine.AddLog("Fuzai",$"{engine._players[seat].Name} 的覆载装备为【{EquipmentCatalog.Get(weapon).DisplayName}】、【{EquipmentCatalog.Get(armor).DisplayName}】。",seat);
+        public void LogEquipment(int seat,CardKind weapon,CardKind armor) => engine.AddLog("Fuzai",$"{engine._players[seat].Name} 的覆载装备为【{engine.EquipmentRules.Get(weapon).DisplayName}】、【{engine.EquipmentRules.Get(armor).DisplayName}】。",seat);
         public void Finish(ProgramSkillFrame f) => engine.FinishProgramSkill(f,true);
         public bool Drain(ProgramSkillFrame f) => engine.TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement) ||
             engine.TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program) || engine.TryBeginAdvancedSkillsChanged(f.Id) ||

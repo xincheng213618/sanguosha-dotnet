@@ -7,9 +7,9 @@ public sealed partial class GameEngine
         if (!IsValidPlayerSeat(owner) || !IsValidPlayerSeat(target) || owner == target || !_players[owner].IsAlive || !_players[target].IsAlive || _players[target].EquipmentAreaAbolished) return [];
         return GetHand(_players[owner]).Select(c => (Card: c, From: CardLocation.Hand(owner)))
             .Concat(_cardZones.CardsAt(CardLocation.DiscardPile).Select(c => (Card: c, From: CardLocation.DiscardPile)))
-            .Where(p => EquipmentCatalog.IsEquipment(p.Card.Kind) && !p.Card.IsGeneralWeapon &&
+            .Where(p => EquipmentRules.IsEquipment(p.Card.Kind) && !p.Card.IsGeneralWeapon &&
                 !IsActiveProgramSourceEquipmentCard(owner, MouHuangYueyingMobileComposition.Qicai, GetRuntimeSkillInstanceId(_players[owner], MouHuangYueyingMobileComposition.Qicai), p.Card) &&
-                _players[target].EquipmentSlotCapacity(EquipmentCatalog.Get(p.Card.Kind).Slot) > 0).ToArray();
+                _players[target].EquipmentSlotCapacity(EquipmentRules.Get(p.Card.Kind).Slot) > 0).ToArray();
     }
     private int MouHyQicaiPhaseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => ProgramEventHistory<MouHuangYueyingQicaiReservedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Phase == phase);
     [ProgramPhaseUsedProjection(90)]
@@ -45,7 +45,7 @@ public sealed partial class GameEngine
         if (!HasRuntimeSkillInstance(_players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_players[f.OwnerSeat].IsAlive || !_players[r.RecipientSeat].IsAlive)
         { FinishMouHy(f); return; }
         var pair = MouHyEquipmentChoices(f.OwnerSeat, r.RecipientSeat).Single(p => p.Card.Id == c.Cards.Single()); var card = pair.Card; var from = pair.From;
-        var slot = EquipmentCatalog.Get(card.Kind).Slot; var current = GetEquipment(_players[r.RecipientSeat]).Where(x => EquipmentCatalog.Get(x.Kind).Slot == slot).ToArray();
+        var slot = EquipmentRules.Get(card.Kind).Slot; var current = GetEquipment(_players[r.RecipientSeat]).Where(x => EquipmentRules.Get(x.Kind).Slot == slot).ToArray();
         var replaced = current.Length >= _players[r.RecipientSeat].EquipmentSlotCapacity(slot) ? current[0] : null; var before = _movementSequence;
         ReplaceRuntimeTop(f = f with { MouHuangYueyingMobile = r = r with { Stage = MouHuangYueyingMobileStage.MovementChildren, Paid = true, CardId = card.Id, From = from, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         if (replaced is not null) { CopyFirstReplacedWeapon(card, replaced); MoveCard(replaced, CardLocation.Equipment(r.RecipientSeat), CardLocation.DiscardPile, CardMoveReasons.EquipmentReplace); }

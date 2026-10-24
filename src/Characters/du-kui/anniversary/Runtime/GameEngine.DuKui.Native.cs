@@ -41,7 +41,7 @@ public sealed partial class GameEngine
         var useId = BeginCardUse(card, actor.Seat, targets, card.Kind, physicalCardIds: [card.Id],
             designatedTargetSeats: card.Kind == CardKind.BorrowedSword ? action.TargetSeats.Where((_, i) => i % 2 == 0).ToArray() : null);
         if (LifecycleCardUse(useId)?.DuKuiOrigin is null) throw new InvalidOperationException("Fanyin must freeze the true native use before resolving any effect.");
-        if (EquipmentCatalog.IsEquipment(card.Kind))
+        if (EquipmentRules.IsEquipment(card.Kind))
         {
             if (!TryBeginEquipmentTargetPrograms(actor, card, useId)) CompleteEquipmentUse(actor, card, useId); return;
         }

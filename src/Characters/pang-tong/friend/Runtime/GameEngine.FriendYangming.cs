@@ -75,7 +75,7 @@ public sealed partial class GameEngine
             else if (kind == CardKind.Alcohol && !actor.HasAlcoholEffect && !HasSelfCardTargetProhibition(actor.Seat) &&
                 !IsCardTargetProhibited(actor, kind, suit, red))
                 actions.Add(new(LegalActionKind.Alcohol, card.Id, null, "使用【酒】（无次数限制）", kind));
-            else if (EquipmentCatalog.IsEquipment(kind) && actor.EquipmentSlotCapacity(EquipmentCatalog.Get(kind).Slot) > 0 &&
+            else if (EquipmentRules.IsEquipment(kind) && actor.EquipmentSlotCapacity(EquipmentRules.Get(kind).Slot) > 0 &&
                 !IsSelfTargetForbiddenAction(actor, kind, [actor.Seat]))
                 actions.Add(new(LegalActionKind.Equip, card.Id, null, $"使用【{card.DisplayName}】", kind));
             else if (IsOrdinaryTrick(kind) && kind != CardKind.Nullification)
@@ -113,8 +113,8 @@ public sealed partial class GameEngine
             UsedSuits = receipt.UsedSuits.Append(card.Suit).ToArray() } });
         UpdateLifecycleCardUse(id, current => current with { FriendYangmingReturn = ret, UnlimitedUse = true, QuotaOnlyUseLimitExemption = true });
         AdvanceEventRulesAndQueueFact(new FriendYangmingUseIssuedEvent(id, actor.Seat, ret));
-        MoveCard(card, FriendYangmingLocation(frame), CardLocation.Processing, EquipmentCatalog.IsEquipment(kind) ? CardMoveReasons.EquipmentUse : CardMoveReasons.Use);
-        if (EquipmentCatalog.IsEquipment(kind))
+        MoveCard(card, FriendYangmingLocation(frame), CardLocation.Processing, EquipmentRules.IsEquipment(kind) ? CardMoveReasons.EquipmentUse : CardMoveReasons.Use);
+        if (EquipmentRules.IsEquipment(kind))
         { if (!TryBeginEquipmentTargetPrograms(actor, card, id)) CompleteEquipmentUse(actor, card, id); return; }
         if (kind == CardKind.Peach) { BeginSimpleCardUse(id, new(card.Id, SimpleCardUseEffect.Recovery)); return; }
         if (kind == CardKind.Alcohol) { BeginSimpleCardUse(id, new(card.Id, SimpleCardUseEffect.Alcohol)); return; }

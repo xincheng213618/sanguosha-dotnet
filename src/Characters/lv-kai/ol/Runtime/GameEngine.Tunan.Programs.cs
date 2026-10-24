@@ -20,7 +20,7 @@ public sealed partial class GameEngine
         }
         var canUse = card.Kind == CardKind.Slash ||
             card.Kind == CardKind.Peach && !IsCardUseForbidden(user, CardKind.Peach, CardActionType.Use) ||
-            EquipmentCatalog.IsEquipment(card.Kind);
+            EquipmentRules.IsEquipment(card.Kind);
         var slashVictims = _players.Where(player => player.IsAlive && player.Seat != user &&
             GetSeatDistance(user, player.Seat) <= GetAttackRange(user)).Select(player => player.Seat).ToArray();
         if (!canUse && slashVictims.Length == 0)
@@ -92,7 +92,7 @@ public sealed partial class GameEngine
             ExecuteTunanPeachUse(frame, card, user);
             return;
         }
-        if (branch == "use" && EquipmentCatalog.IsEquipment(card.Kind))
+        if (branch == "use" && EquipmentRules.IsEquipment(card.Kind))
         {
             ExecuteTunanEquipmentUse(frame, card, user);
             return;

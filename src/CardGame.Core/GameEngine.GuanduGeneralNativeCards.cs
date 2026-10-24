@@ -91,7 +91,7 @@ public sealed partial class GameEngine
 
     private IReadOnlyList<PromptChoice> GuanduGiftChoices(ProgramSkillFrame f, bool nonEquipment)
     {
-        var cards = GetHand(_players[f.OwnerSeat]).Where(c => !nonEquipment || !EquipmentCatalog.IsEquipment(c.Kind));
+        var cards = GetHand(_players[f.OwnerSeat]).Where(c => !nonEquipment || !EquipmentRules.IsEquipment(c.Kind));
         return cards.SelectMany(c => _players.Where(p => p.IsAlive).Select(p => GuanduChoice(f, "gift",
             $"将【{c.DisplayName}】交给 {p.Name}", [c.Id], [p.Seat])))
             .Append(GuanduChoice(f, "skip", "不执行")).ToArray();

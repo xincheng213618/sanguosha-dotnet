@@ -74,7 +74,7 @@ public sealed partial class GameEngine
         return use.CardKind switch
         {
             CardKind.IronChain => true,
-            CardKind.BorrowedSword => GetEquipment(target).Any(card => EquipmentCatalog.Get(card.Kind).Slot == EquipmentSlot.Weapon) &&
+            CardKind.BorrowedSword => GetEquipment(target).Any(card => EquipmentRules.Get(card.Kind).Slot == EquipmentSlot.Weapon) &&
                 _players.Any(victim => IsLegalBorrowedSwordSlashTarget(target, victim)),
             CardKind.Duel => targetSeat != actor.Seat,
             CardKind.FireAttack => GetHand(target).Count > 0,

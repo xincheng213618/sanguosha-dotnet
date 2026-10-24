@@ -14,7 +14,7 @@ public sealed partial class GameEngine
             _cardZones.Count(CardLocation.DrawPile) > 0 && GuanduDiscardable(gate.OwnerSeat, gate.OwnerSeat).Length > 0;
         if (gate.SkillId == "guandu:zezhu") return _players[gate.OwnerSeat].SkillGrants.Grants.Any(g =>
             g.SkillId == gate.SkillId && GuanduGeneralGrantQualified(_players[gate.OwnerSeat], g));
-        if (gate.SkillId == "guandu:yuanlve") return GetHand(_players[gate.OwnerSeat]).Any(c => !EquipmentCatalog.IsEquipment(c.Kind));
+        if (gate.SkillId == "guandu:yuanlve") return GetHand(_players[gate.OwnerSeat]).Any(c => !EquipmentRules.IsEquipment(c.Kind));
         if (gate.SkillId == "guandu:moushi") return GetHand(_players[gate.OwnerSeat]).Count > 0;
         return true;
     }

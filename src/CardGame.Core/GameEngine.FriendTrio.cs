@@ -30,7 +30,7 @@ public sealed partial class GameEngine
         HasRuntimeSkill(owner, "friend:gongli-xu-shu") && HasFriendTrioAlly(owner, "pang-tong");
     private static bool IsFriendTrioOperation(SkillProgramEffectOp op) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_FriendTrio.IsFriendTrioOperation(op);
-    private PlayerMarkerKind FriendCategoryMarker(CardKind kind) => EquipmentCatalog.IsEquipment(kind) ? PlayerMarkerKind.QihuiEquipment :
+    private PlayerMarkerKind FriendCategoryMarker(CardKind kind) => EquipmentRules.IsEquipment(kind) ? PlayerMarkerKind.QihuiEquipment :
         MatchesProgramCardCategory(kind, [SkillProgramCardCategory.Basic]) ? PlayerMarkerKind.QihuiBasic : PlayerMarkerKind.QihuiTrick;
     private bool IsFriendActualCardUse(CardActionContext? action) => action is not null &&
         (action.Type == CardActionType.Use || action.Type == CardActionType.Response && (action.ActorSeat == action.ProviderSeat || IsShiLsAutonomousResponse(action)) && action.RequesterSeat is null &&
@@ -248,7 +248,7 @@ public sealed partial class GameEngine
         var stage = frame.FriendTrio?.Stage;
         if (stage == FriendTrioStage.Benefit)
             return decision.Choices.First(c => c.Parameters["value"] == (_players[frame.OwnerSeat].Hp <= 1 ? "recover" : "draw"));
-        if (stage == FriendTrioStage.Branch && GetHand(_players[frame.OwnerSeat]).Count(c => c.Kind == CardKind.DrawTwo || c.Kind == CardKind.Alcohol || EquipmentCatalog.IsEquipment(c.Kind)) >= 2)
+        if (stage == FriendTrioStage.Branch && GetHand(_players[frame.OwnerSeat]).Count(c => c.Kind == CardKind.DrawTwo || c.Kind == CardKind.Alcohol || EquipmentRules.IsEquipment(c.Kind)) >= 2)
             return decision.Choices.Single(c => c.Parameters["value"] == "predict");
         if (stage == FriendTrioStage.Prediction)
         {

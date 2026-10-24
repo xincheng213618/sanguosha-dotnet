@@ -87,8 +87,8 @@ public sealed partial class GameEngine
             f.TriggerId is not null ||r.TurnNumber!=_turnNumber ||f.SelectedTargetSeats is not [var target] ||target!=r.RecipientSeat ||target==f.OwnerSeat ||
             !set.CardIds.SequenceEqual([r.CardId]) ||!set.SourceLocations.SequenceEqual([r.OriginalFrom]) ||!f.SelectedCardIds.SequenceEqual(set.CardIds) ||
             r.OriginalFrom.OwnerSeat!=f.OwnerSeat ||r.OriginalFrom.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) ||
-            GetAdvancedCard(r.CardId).IsGeneralWeapon ||!EquipmentCatalog.IsEquipment(GetAdvancedCard(r.CardId).Kind) ||
-            EquipmentCatalog.Get(GetAdvancedCard(r.CardId).Kind).Slot!=r.Slot ||!Enum.IsDefined(r.Stage) ||r.SequenceAfter<=r.SequenceBefore ||
+            GetAdvancedCard(r.CardId).IsGeneralWeapon ||!EquipmentRules.IsEquipment(GetAdvancedCard(r.CardId).Kind) ||
+            EquipmentRules.Get(GetAdvancedCard(r.CardId).Kind).Slot!=r.Slot ||!Enum.IsDefined(r.Stage) ||r.SequenceAfter<=r.SequenceBefore ||
             r.SequenceBefore<0 ||r.Stage==CapturedEquipmentDrawStage.Placed &&(r.DrawSequenceBefore!=0 ||r.DrawSequenceAfter!=0 ||r.ActualDrawCount!=0) ||
             r.EntryMovementSequence<=r.SequenceBefore ||r.EntryMovementSequence>r.SequenceAfter ||
             _cardMovements.Count(m=>m.Sequence==r.EntryMovementSequence &&m.CardId==r.CardId &&m.From==r.OriginalFrom &&
@@ -104,7 +104,7 @@ public sealed partial class GameEngine
         {
             if(replacements is not [var movement] ||movement.CardId!=replaced ||replaced==r.CardId ||
                 GetAdvancedCard(replaced).IsGeneralWeapon!=r.ReplacedGeneralWeapon ||movement.To!=NormalizeEphemeralCardDestination(GetAdvancedCard(r.ReplacedCardId!.Value), CardLocation.Equipment(target), (r.ReplacedGeneralWeapon ? CardLocation.OutsideGame : CardLocation.DiscardPile)) ||
-                !EquipmentCatalog.IsEquipment(movement.CardKind) ||EquipmentCatalog.Get(movement.CardKind).Slot!=r.Slot)
+                !EquipmentRules.IsEquipment(movement.CardKind) ||EquipmentRules.Get(movement.CardKind).Slot!=r.Slot)
                 throw new InvalidOperationException("Captured equipment placement lost its first replaced physical/generated identity.");
         }
         else if(replacements.Length>0 ||r.ReplacedGeneralWeapon)throw new InvalidOperationException("An unoccupied original slot cannot carry a replacement receipt.");

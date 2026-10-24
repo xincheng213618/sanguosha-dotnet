@@ -39,8 +39,8 @@ public sealed partial class GameEngine
                 r.Stage == HuoJunFenruiStage.NativeEquipment)
                 throw new InvalidOperationException("Fenrui cannot synthesize an equipment use or return without one actual random deck entity.");
         }
-        else if (r.NativeActionId <= 0 || r.EquipmentCardId is not { } equipment || r.EquipmentKind is not { } kind || !EquipmentCatalog.IsEquipment(kind) ||
-            r.RestoredSlot != EquipmentCatalog.Get(kind).Slot || issued is not [var issue] || issue.Source != r.Source || issue.CardId != equipment ||
+        else if (r.NativeActionId <= 0 || r.EquipmentCardId is not { } equipment || r.EquipmentKind is not { } kind || !EquipmentRules.IsEquipment(kind) ||
+            r.RestoredSlot != EquipmentRules.Get(kind).Slot || issued is not [var issue] || issue.Source != r.Source || issue.CardId != equipment ||
             issue.CardKind != kind || issue.NativeUseId != r.NativeUseId || issue.NativeActionId != r.NativeActionId || issue.Slot != r.RestoredSlot ||
             (r.Stage == HuoJunFenruiStage.NativeEquipment ? returned.Length != 0 : returned is not [var done] || done.NativeUseId != r.NativeUseId || done.NativeActionId != r.NativeActionId))
             throw new InvalidOperationException("Fenrui must preserve one exact actual native equipment action and its unique completed return.");

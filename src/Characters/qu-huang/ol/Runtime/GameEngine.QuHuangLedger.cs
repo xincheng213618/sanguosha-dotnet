@@ -11,7 +11,7 @@ public sealed partial class GameEngine
         foreach(var owner in batch.Movements.Where(m=>m.From.Zone==CardZoneKind.Equipment&&m.To==CardLocation.DiscardPile).Select(m=>m.From.OwnerSeat!.Value).Distinct())
         {
             if(!HasRuntimeSkill(_players[owner],"ol:nishou"))continue;
-            var cards=batch.Movements.Where(m=>m.From==CardLocation.Equipment(owner)&&m.To==CardLocation.DiscardPile&&_cardMovements.Contains(m)&&EquipmentCatalog.IsEquipment(m.CardKind)).ToArray();if(cards.Length==0)continue;
+            var cards=batch.Movements.Where(m=>m.From==CardLocation.Equipment(owner)&&m.To==CardLocation.DiscardPile&&_cardMovements.Contains(m)&&EquipmentRules.IsEquipment(m.CardKind)).ToArray();if(cards.Length==0)continue;
             var selected=(originProgram?.SelectedCardPayment?.CardIds??originProgram?.SelectedCardIds??[]).Where(id=>cards.Any(m=>m.CardId==id)).ToArray();
             // A peer chooses its own matching-recast materials in receipt order;
             // the program's ordinary SelectedCardIds remain the initiating player's cost.

@@ -56,8 +56,8 @@ public sealed partial class GameEngine
         if (!ownRecipient && (active.SelectedTargetSeats is not [var selected] || selected != targetSeat))
             throw new InvalidOperationException("Random equipment lost its exact selected participant.");
         var candidates = target.IsAlive
-            ? _cardZones.CardsAt(CardLocation.DrawPile).Where(c => EquipmentCatalog.IsEquipment(c.Kind) &&
-                target.EquipmentSlotCapacity(EquipmentCatalog.Get(c.Kind).Slot) > 0 &&
+            ? _cardZones.CardsAt(CardLocation.DrawPile).Where(c => EquipmentRules.IsEquipment(c.Kind) &&
+                target.EquipmentSlotCapacity(EquipmentRules.Get(c.Kind).Slot) > 0 &&
                 !IsCardUseForbidden(targetSeat, c.Kind, CardActionType.Use) &&
                 !IsSelfTargetForbiddenAction(target, c.Kind, [targetSeat]) &&
                 !IsResponseEntityRestricted(targetSeat, c.Id) &&
@@ -113,9 +113,9 @@ public sealed partial class GameEngine
                 return observer.Window == (beneath is HpChangedTriggerWindowFrame ? SkillProgramTriggerWindow.AfterHpRecovered : SkillProgramTriggerWindow.CardsMoved);
         }
         if (ride is ProgramSkillFrame { WindowContext: { } context } && beneath is ProgramCardTriggerWindowFrame window)
-            return context.ParentFrameId == window.Id && context.CardUse?.ParentCardUseFrameId == window.ParentFrameId && EquipmentCatalog.IsEquipment(window.Action.EffectiveKind);
+            return context.ParentFrameId == window.Id && context.CardUse?.ParentCardUseFrameId == window.ParentFrameId && EquipmentRules.IsEquipment(window.Action.EffectiveKind);
         if (ride is ProgramCardTriggerWindowFrame cardWindow && beneath is CardUseFrame use)
-            return cardWindow.ParentFrameId == use.Id && cardWindow.Action.ActionId == use.Action?.ActionId && EquipmentCatalog.IsEquipment(use.CardKind);
+            return cardWindow.ParentFrameId == use.Id && cardWindow.Action.ActionId == use.Action?.ActionId && EquipmentRules.IsEquipment(use.CardKind);
         if (ride is not CardUseFrame equipment || beneath is not ProgramSkillFrame parent || parent.PendingMovementContinuation is not { } pending || equipment.Action is not { } action)
             return false;
         var plan = ProgramInstructionResolver.Default.Resolve(parent, _contentRegistry.GetSkill(parent.SkillId).Program!);
@@ -123,7 +123,7 @@ public sealed partial class GameEngine
             return false;
         var target = effect.TargetReference?.Kind == ProgramParticipantRef.Owner
             ? parent.OwnerSeat : parent.SelectedTargetSeats.Count == 1 ? parent.SelectedTargetSeats[0] : -1;
-        if (target < 0 || pending.SubjectSeat != target || action.ActorSeat != target || !EquipmentCatalog.IsEquipment(action.EffectiveKind) ||
+        if (target < 0 || pending.SubjectSeat != target || action.ActorSeat != target || !EquipmentRules.IsEquipment(action.EffectiveKind) ||
             parent.CardSetBindings.SingleOrDefault(b => b.Name == bind) is not { CardIds: [var cardId] } || cardId != equipment.CardId)
             return false;
         return action.ConversionChain.Any(source => source.OwnerSeat == parent.OwnerSeat && source.SkillId == parent.SkillId && source.BindingId == GetProgramBindingId(parent) && source.SkillInstanceId == parent.SkillInstanceId);
@@ -156,7 +156,7 @@ public sealed partial class GameEngine
         var completions = history.OfType<CardUseFinishedEvent>().Where(e => e.ResolutionId == useId).ToArray();
         var equipmentChanges = history.OfType<EquipmentChangedEvent>().Where(e => e.ResolutionId == useId).ToArray();
         if (declarations is not [var declared] || declared.CardId != cardId || declared.SourceSeat != target ||
-            !EquipmentCatalog.IsEquipment(declared.CardKind) || completions is not [var completed] ||
+            !EquipmentRules.IsEquipment(declared.CardKind) || completions is not [var completed] ||
             completed.CardId != cardId || completed.CardKind != declared.CardKind || equipmentChanges is not [var changed] ||
             changed.PlayerSeat != target || changed.CardId != cardId || changed.CardKind != declared.CardKind) return false;
         var declarationIndex = Array.IndexOf(history, declared); var completionIndex = Array.IndexOf(history, completed);

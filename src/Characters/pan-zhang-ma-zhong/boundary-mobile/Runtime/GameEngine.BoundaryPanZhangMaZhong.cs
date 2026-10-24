@@ -8,7 +8,7 @@ public sealed partial class GameEngine
     private bool CanOfferBoundaryPanZhangMaZhong(ProgramTriggerLegalityContext gate)
     {
         if(gate.SkillId==BoundaryPanZhangMaZhongComposition.Duodao)
-            return gate.Context.SourceSeat is{}source&&IsValidPlayerSeat(source)&&GetEquipment(source).Any(c=>EquipmentCatalog.IsEquipment(c.Kind)&&EquipmentCatalog.Get(c.Kind).Slot==EquipmentSlot.Weapon);
+            return gate.Context.SourceSeat is{}source&&IsValidPlayerSeat(source)&&GetEquipment(source).Any(c=>EquipmentRules.IsEquipment(c.Kind)&&EquipmentRules.Get(c.Kind).Slot==EquipmentSlot.Weapon);
         if(gate.SkillId!=BoundaryPanZhangMaZhongComposition.Anjian)return true;
         return gate.Context is{Window:SkillProgramTriggerWindow.CardUseTargetsFinalized,TargetSeat:{}target,CardUse:{}card}&&
             target!=gate.OwnerSeat&&IsValidPlayerSeat(target)&&_players[target].IsAlive&&card.ActorSeat==gate.OwnerSeat&&

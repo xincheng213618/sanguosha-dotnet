@@ -22,7 +22,7 @@ public sealed partial class GameEngine
             frame.EquipmentRecast is not { } receipt) return false;
         var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!);
         if (frame.InstructionIndex != receipt.InstructionIndex || receipt.InstructionIndex < 1 ||
-            receipt.InstructionIndex > plan.Instructions.Count || !EquipmentCatalog.IsEquipment(receipt.CardKind) ||
+            receipt.InstructionIndex > plan.Instructions.Count || !EquipmentRules.IsEquipment(receipt.CardKind) ||
             plan.Instructions[receipt.InstructionIndex - 1].Op != SkillProgramEffectOp.RecastSelectedEquipment)
             throw new InvalidOperationException("A paid equipment recast lost its exact owning instruction.");
         if (TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.Program) ||

@@ -10,7 +10,7 @@ public sealed partial class GameEngine
     private readonly HashSet<int> _weaponCopyConsumed = [];
     private int GetWeaponAttackRange(CharacterState owner, Card weapon) =>
         weapon.Kind == CardKind.RedBloodBlade && !EnabledContentSkillIds(owner).Contains("ol:shenyu", StringComparer.Ordinal)
-            ? 0 : weapon.PrintedAttackRange ?? EquipmentCatalog.Get(weapon.Kind).WeaponAttackRange ?? 1;
+            ? 0 : weapon.PrintedAttackRange ?? EquipmentRules.Get(weapon.Kind).WeaponAttackRange ?? 1;
 
     private SkillProgramStepOutcome ExecuteAdvancedLifecycle(SkillProgramEffect effect, ProgramSkillFrame frame, int targetSeat)
     {
@@ -104,7 +104,7 @@ public sealed partial class GameEngine
                 return BeginWeaponReclaim(frame, effect);
             case SkillProgramEffectOp.InheritWeapon:
                 var weapons = _players.Where(player => player.IsAlive).SelectMany(GetEquipment)
-                    .Concat(GetHand(owner)).Where(card => EquipmentCatalog.IsEquipment(card.Kind) && FieldEquipmentSlot(card) == EquipmentSlot.Weapon)
+                    .Concat(GetHand(owner)).Where(card => EquipmentRules.IsEquipment(card.Kind) && FieldEquipmentSlot(card) == EquipmentSlot.Weapon)
                     .DistinctBy(card => card.Id).Select(card => card.Id.ToString()).ToArray();
                 return BeginAdvancedSelection(frame, effect, weapons);
             default: throw new InvalidOperationException("Unsupported advanced lifecycle operation.");

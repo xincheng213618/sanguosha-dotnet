@@ -25,7 +25,7 @@ public sealed partial class GameEngine
             !_cardZones.CardsAt(location).Any(item => item.Id == cardId))
             throw new InvalidOperationException("The Jushou cost card left the owner's hand.");
         var card = _cardZones.CardsAt(location).Single(item => item.Id == cardId);
-        if (EquipmentCatalog.IsEquipment(card.Kind))
+        if (EquipmentRules.IsEquipment(card.Kind))
         {
             var owner = _players[frame.OwnerSeat];
             var source = new CardConversionSource(frame.SkillId, GetProgramBindingId(frame), frame.OwnerSeat,

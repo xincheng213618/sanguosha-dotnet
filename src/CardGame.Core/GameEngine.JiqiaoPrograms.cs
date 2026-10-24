@@ -18,7 +18,7 @@ public sealed partial class GameEngine
         var f=GetActiveProgramFrame(input.Id);
         if(f.JiqiaoPaid is not null || f.WindowContext is not {Window:SkillProgramTriggerWindow.PlayPhaseStarting,SourceSeat:{} actor} w || actor!=f.OwnerSeat || actor!=_currentSeat)throw new InvalidOperationException("Jiqiao needs its unpaid genuine own Play-start.");
         var cost=GetProgramCardSet(f,effect.SourceBind!);var ids=cost.CardIds;
-        if(ids.Distinct().Count()!=ids.Count || ids.Any(id=>_cardZones.GetLocation(id) is not {OwnerSeat:{} s,Zone:CardZoneKind.Hand or CardZoneKind.Equipment} || s!=f.OwnerSeat || !EquipmentCatalog.IsEquipment(JiqiaoCard(id).Kind) || JiqiaoCard(id).IsGeneralWeapon || IsSelfHandCategoryDiscardForbidden(f.OwnerSeat,JiqiaoCard(id),_cardZones.GetLocation(id),OwnedCardMoveIntent.Discard)))throw new InvalidOperationException("Jiqiao selected cards ceased to be actual owner equipment.");
+        if(ids.Distinct().Count()!=ids.Count || ids.Any(id=>_cardZones.GetLocation(id) is not {OwnerSeat:{} s,Zone:CardZoneKind.Hand or CardZoneKind.Equipment} || s!=f.OwnerSeat || !EquipmentRules.IsEquipment(JiqiaoCard(id).Kind) || JiqiaoCard(id).IsGeneralWeapon || IsSelfHandCategoryDiscardForbidden(f.OwnerSeat,JiqiaoCard(id),_cardZones.GetLocation(id),OwnedCardMoveIntent.Discard)))throw new InvalidOperationException("Jiqiao selected cards ceased to be actual owner equipment.");
         if(ids.Count==0){SetProgramCardSet(f.Id,effect.ResultBind!,[],SkillProgramCardSetVisibility.Public);return SkillProgramStepOutcome.Continue;}
         var before=_movementSequence;
         var invoice=new JiqiaoPaidInvoice(new(f.SkillId,GetProgramBindingId(f),f.OwnerSeat,f.SkillInstanceId),f.GameplayHash,w.ParentFrameId,_turnNumber,_cardUseDebitPhaseInstanceId,f.InstructionIndex,effect.SourceBind!,effect.ResultBind!,ids.Count,before,before);
@@ -50,7 +50,7 @@ public sealed partial class GameEngine
         var remaining=GetProgramCardSet(f,r.Invoice.RevealBind).CardIds.Where(cid=>_cardZones.GetLocation(cid)==CardLocation.Processing).ToArray();
         if(r.Stage==JiqiaoPaidStage.RevealChildren)
         {
-            var claim=_players[f.OwnerSeat].IsAlive?remaining.Where(cid=>!EquipmentCatalog.IsEquipment(JiqiaoCard(cid).Kind)).ToArray():[];
+            var claim=_players[f.OwnerSeat].IsAlive?remaining.Where(cid=>!EquipmentRules.IsEquipment(JiqiaoCard(cid).Kind)).ToArray():[];
             ReplaceRuntimeTop(f=f with{JiqiaoPaid=r with{Stage=JiqiaoPaidStage.ClaimChildren,Before=before,After=before,ActualCount=claim.Length,ClaimedCount=claim.Length}});
             if(claim.Length>0)MoveProgramCardsFromMultipleSources(claim,CardLocation.Hand(f.OwnerSeat),new(JiqiaoClaimReason));
             ReplaceRuntimeTop(f=GetActiveProgramFrame(id)with{JiqiaoPaid=f.JiqiaoPaid!with{After=_movementSequence}});IssueJiqiaoStage(f);AdvanceRuntimeProgram(id);return true;

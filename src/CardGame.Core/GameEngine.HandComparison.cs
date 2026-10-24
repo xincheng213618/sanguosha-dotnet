@@ -63,7 +63,7 @@ public sealed partial class GameEngine
    yield return new FiniteRuleQueryContribution("persistent:"+g.Key,SkillRuleOperation.Add,g.Sum(e=>e.Amount),0);
  }
  private bool HasSelfCardTargetProhibition(int seat)=>ProgramEventHistory<ProgramSelfCardTargetsProhibitedEvent>().Any(e=>e.OwnerSeat==seat&&e.TurnNumber==_turnNumber&&e.TurnSeat==_currentSeat&&HasRuntimeSkillInstance(_players[seat],e.SkillId,e.SkillInstanceId));
- private bool IsImplicitSelfCardUse(CardKind kind)=>kind is CardKind.Peach or CardKind.Alcohol or CardKind.DrawTwo or CardKind.Lightning||EquipmentCatalog.IsEquipment(kind);
+ private bool IsImplicitSelfCardUse(CardKind kind)=>kind is CardKind.Peach or CardKind.Alcohol or CardKind.DrawTwo or CardKind.Lightning||EquipmentRules.IsEquipment(kind);
  private bool IsSelfTargetForbiddenAction(CharacterState actor,CardKind kind,IReadOnlyList<int> targets)
  {
   if(!HasSelfCardTargetProhibition(actor.Seat))return false;

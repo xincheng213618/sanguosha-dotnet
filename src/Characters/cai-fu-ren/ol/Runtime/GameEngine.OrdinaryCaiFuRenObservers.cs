@@ -23,7 +23,7 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("Ordinary Qieting must issue exactly one option before its native children.");
         if (r.Option == "equipment")
         {
-            if (r.Stage != OrdinaryQietingStage.MovementChildren || r.CardId is not { } id || r.PrintedKind is not { } kind || !EquipmentCatalog.IsEquipment(kind) || r.DrawOutcome is not null || option.Before != r.Before || ProgramEventHistory<OrdinaryQietingEquipmentMovedEvent>().Where(e => e.FrameId == f.Id).ToArray() is not [var moved] || moved.CardId != id || moved.PrintedKind != kind || moved.From != CardLocation.Equipment(r.Qualification.TurnOwnerSeat) || moved.To != CardLocation.Equipment(f.OwnerSeat) || !_cardMovements.Any(m => m.Sequence == moved.MovementSequence && IsOrdinaryQietingPaidMovement(f, m)))
+            if (r.Stage != OrdinaryQietingStage.MovementChildren || r.CardId is not { } id || r.PrintedKind is not { } kind || !EquipmentRules.IsEquipment(kind) || r.DrawOutcome is not null || option.Before != r.Before || ProgramEventHistory<OrdinaryQietingEquipmentMovedEvent>().Where(e => e.FrameId == f.Id).ToArray() is not [var moved] || moved.CardId != id || moved.PrintedKind != kind || moved.From != CardLocation.Equipment(r.Qualification.TurnOwnerSeat) || moved.To != CardLocation.Equipment(f.OwnerSeat) || !_cardMovements.Any(m => m.Sequence == moved.MovementSequence && IsOrdinaryQietingPaidMovement(f, m)))
                 throw new InvalidOperationException("Ordinary Qieting lost its one real equipment placement without replacement.");
         }
         else if (r.Option == "draw")

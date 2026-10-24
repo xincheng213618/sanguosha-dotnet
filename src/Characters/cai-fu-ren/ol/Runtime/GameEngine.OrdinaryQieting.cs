@@ -10,7 +10,7 @@ public sealed partial class GameEngine
     {
         var peer = f.OrdinaryQieting!.Qualification.TurnOwnerSeat;
         return !card.IsGeneralWeapon && CanPlaceOwnedEquipment(peer, f.OwnerSeat, card, CardLocation.Equipment(peer)) &&
-            GetEquipment(_players[f.OwnerSeat]).All(c => EquipmentCatalog.Get(c.Kind).Slot != EquipmentCatalog.Get(card.Kind).Slot);
+            GetEquipment(_players[f.OwnerSeat]).All(c => EquipmentRules.Get(c.Kind).Slot != EquipmentRules.Get(card.Kind).Slot);
     }
     private SkillProgramStepOutcome BeginOrdinaryQieting(ProgramSkillFrame supplied)
     {
@@ -69,7 +69,7 @@ public sealed partial class GameEngine
                 AdvanceEventRulesAndQueueFact(new OrdinaryQietingEquipmentMovedEvent(f.Id, movement.CardId, movement.CardKind, from, movement.To, movement.Sequence));
             });
             var current = GetActiveProgramFrame(f.Id); ReplaceRuntimeTop(f = current with { OrdinaryQieting = current.OrdinaryQieting! with { After = _movementSequence } });
-            AdvanceEventRulesAndQueueFact(new EquipmentChangedEvent(f.Id, f.OwnerSeat, EquipmentCatalog.Get(card.Kind).Slot, card.Id, card.Kind, null));
+            AdvanceEventRulesAndQueueFact(new EquipmentChangedEvent(f.Id, f.OwnerSeat, EquipmentRules.Get(card.Kind).Slot, card.Id, card.Kind, null));
             AddLog("EquipmentChanged", $"{_players[f.OwnerSeat].Name} 发动窃听，将【{card.DisplayName}】置入自己的装备区。", f.OwnerSeat);
         }
         ContinueOrdinaryQieting(f.Id);

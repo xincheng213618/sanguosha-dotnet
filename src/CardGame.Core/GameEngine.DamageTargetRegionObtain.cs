@@ -57,7 +57,7 @@ public sealed partial class GameEngine
                     SequenceAfter = actual.Max(movement => movement.Sequence), MovementBatchId = batchId, Paid = true,
                     Movements = actual.Select(movement => new ProgramDamageTargetObtainReceipt(movement.Sequence,
                         movement.CardId, movement.CardKind, movement.From, movement.To, movement.Reason.Value,
-                        EquipmentCatalog.IsEquipment(movement.CardKind))).ToArray()
+                        EquipmentRules.IsEquipment(movement.CardKind))).ToArray()
                 };
                 ReplaceRuntimeTop(current with { DamageTargetObtain = current.DamageTargetObtain! with { RegionObtain = paid } });
                 AdvanceEventRulesAndQueueFact(new DamageTargetRegionObtainPaidEvent(frame.Id,
@@ -92,7 +92,7 @@ public sealed partial class GameEngine
         {
             if (item.MovementSequence <= receipt.SequenceBefore || item.MovementSequence > receipt.SequenceAfter ||
                 item.From != new CardLocation(receipt.SelectedZone, draft.VictimSeat) || item.Reason != DamageTargetObtainReason ||
-                item.IsEquipment != EquipmentCatalog.IsEquipment(item.PrintedKind) ||
+                item.IsEquipment != EquipmentRules.IsEquipment(item.PrintedKind) ||
                 item.To != CardLocation.Hand(draft.OwnerSeat) &&
                     !_cardMovements.Any(move => move.Sequence == item.MovementSequence &&
                         IsHappyWeiYanRedirectedGain(move, CardLocation.Hand(draft.OwnerSeat))) &&
@@ -107,7 +107,7 @@ public sealed partial class GameEngine
         // hooks run. This interval must be precisely that complete ordered batch.
         return _cardMovements.Where(move => move.Sequence > receipt.SequenceBefore && move.Sequence <= receipt.SequenceAfter)
             .Select(move => new ProgramDamageTargetObtainReceipt(move.Sequence, move.CardId, move.CardKind,
-                move.From, move.To, move.Reason.Value, EquipmentCatalog.IsEquipment(move.CardKind)))
+                move.From, move.To, move.Reason.Value, EquipmentRules.IsEquipment(move.CardKind)))
             .SequenceEqual(receipt.Movements) &&
             CompleteProgramEventHistory().OfType<DamageTargetRegionObtainPaidEvent>().Count(fact =>
             fact.ProgramFrameId == frame.Id && fact.Source == new CardConversionSource(frame.SkillId, GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) &&
@@ -149,7 +149,7 @@ public sealed partial class GameEngine
                 draw.Reason.Value == DamageTargetBenefitReason && _cardMovements.Contains(draw);
         return draft.Stage == ProgramDamageTargetObtainStage.ObtainChildren && first.Batch.Id == receipt.MovementBatchId &&
             first.Batch.Movements.Select(move => new ProgramDamageTargetObtainReceipt(move.Sequence, move.CardId,
-                move.CardKind, move.From, move.To, move.Reason.Value, EquipmentCatalog.IsEquipment(move.CardKind)))
+                move.CardKind, move.From, move.To, move.Reason.Value, EquipmentRules.IsEquipment(move.CardKind)))
                 .SequenceEqual(receipt.Movements);
     }
 
@@ -184,7 +184,7 @@ public sealed partial class GameEngine
             var zone = Enum.Parse<CardZoneKind>(choice.Parameters["source-zone"]);
             var cards = _cardZones.CardsAt(new(zone, draft.VictimSeat));
             return zone == CardZoneKind.Hand ? cards.Count * 8d : cards.Sum(card =>
-                card.IsGeneralWeapon ? 0d : EquipmentCatalog.IsEquipment(card.Kind) ? 10d : 8d);
+                card.IsGeneralWeapon ? 0d : EquipmentRules.IsEquipment(card.Kind) ? 10d : 8d);
         }).ThenBy(choice => choice.Id.Value, StringComparer.Ordinal).First();
     }
 }

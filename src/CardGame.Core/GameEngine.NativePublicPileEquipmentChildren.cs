@@ -19,7 +19,7 @@ public sealed partial class GameEngine
     private bool IsNativePublicPileEquipmentOwner(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) =>
         continuation.Kind == RecoveryPaidCardUseKind.EquipmentUse && continuation.SourceSeat == use.SourceSeat &&
         continuation.CardId == use.CardId && continuation.EquipmentSlot is { } slot &&
-        CardCatalog.Get(use.CardKind).CategoryName == "装备牌" && EquipmentCatalog.Get(use.CardKind).Slot == slot &&
+        CardCatalog.Get(use.CardKind).CategoryName == "装备牌" && EquipmentRules.Get(use.CardKind).Slot == slot &&
         use.NativePublicPilePayment is { SequenceAfter: > 0 } payment && payment.OwnerFrameId == use.Id &&
         use.Action is { Type: CardActionType.Use, PhysicalCards: [var cost] } action &&
         payment.ActionId == action.ActionId && cost.CardId == use.CardId &&
@@ -61,7 +61,7 @@ public sealed partial class GameEngine
             move.From == CardLocation.Equipment(use.SourceSeat) && move.Reason == CardMoveReasons.EquipmentReplace &&
             move.Sequence > payment.SequenceAfter &&
             (move.To == CardLocation.DiscardPile || move.To == CardLocation.OutsideGame) &&
-            EquipmentCatalog.Get(move.CardKind).Slot == continuation.EquipmentSlot;
+            EquipmentRules.Get(move.CardKind).Slot == continuation.EquipmentSlot;
         return batch.Movements.All(move => move.Sequence > 0 && move.Sequence <= _cardMovements.Count &&
             _cardMovements[move.Sequence - 1] == move && move.TurnNumber == batch.TurnNumber &&
             (move.Sequence == payment.SequenceAfter && move.CardId == use.CardId &&

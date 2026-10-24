@@ -116,7 +116,7 @@ public sealed partial class GameEngine
                 if (normal.Length >= 4) for (var i = 0; i < normal.Length; i += 2) Add(normal.Where((_, j) => j != i && j != i + 1).ToArray());
                 continue;
             }
-            if (EquipmentCatalog.IsEquipment(kind) || kind is CardKind.Indulgence or CardKind.SupplyShortage or CardKind.Lightning) continue;
+            if (EquipmentRules.IsEquipment(kind) || kind is CardKind.Indulgence or CardKind.SupplyShortage or CardKind.Lightning) continue;
             var possible = kind is CardKind.BarbarianAssault or CardKind.ArrowBarrage or CardKind.PeachGarden or CardKind.FiveGrains
                 ? normal : _players.Where(p => CanBeExtraTargetAdjustmentTarget(actor, p, action, kind, suit) &&
                     !(p.Seat == actor.Seat && action.ConversionSource is { } source && ViewAsRule(source)?.ExcludeOwnerEffects == true)).Select(p => p.Seat);

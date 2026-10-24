@@ -22,7 +22,7 @@ public sealed partial class GameEngine
                 placementFacts.Length == 0 && r.Discard is null && r.Draw is null && !r.RecoveryIssued && r.ActualRecoveryRequest == 0 && r.WeaponTargetSeat is null && f.PendingMovementContinuation is null;
         if (r.Stage is PlacedEquipmentBenefitStage.EquipmentChoice or PlacedEquipmentBenefitStage.RecipientChoice ||
             p.CardId != r.SelectedCardId || p.From != r.SelectedFrom || !IsValidPlayerSeat(p.RecipientSeat) || p.CardId <= 0 ||
-            !EquipmentCatalog.IsEquipment(p.PrintedKind) || p.Slot != EquipmentCatalog.Get(p.PrintedKind).Slot ||
+            !EquipmentRules.IsEquipment(p.PrintedKind) || p.Slot != EquipmentRules.Get(p.PrintedKind).Slot ||
             p.From == CardLocation.Equipment(p.RecipientSeat) || p.SequenceBefore < 0 || p.SequenceAfter <= p.SequenceBefore ||
             placementFacts is not [var placementFact] || placementFact.Payment != p || !ValidPlacedEquipmentLedger(p)) return false;
         if (r.WeaponTargetSeat is { } target && (!IsValidPlayerSeat(target) || target == p.RecipientSeat) ||
@@ -72,7 +72,7 @@ public sealed partial class GameEngine
         if (p.ReplacedCardId is { } replaced)
         {
             if (replaced == p.CardId || replacements is not [var replacement] || replacement.CardId != replaced ||
-                GetAdvancedCard(replaced).IsGeneralWeapon != p.ReplacedGeneralWeapon || !EquipmentCatalog.IsEquipment(replacement.CardKind) ||
+                GetAdvancedCard(replaced).IsGeneralWeapon != p.ReplacedGeneralWeapon || !EquipmentRules.IsEquipment(replacement.CardKind) ||
                 replacement.To != (p.ReplacedGeneralWeapon ? CardLocation.OutsideGame : CardLocation.DiscardPile)) return false;
         }
         else if (p.ReplacedGeneralWeapon || replacements.Length != 0) return false;

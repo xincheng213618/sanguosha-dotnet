@@ -52,8 +52,8 @@ public sealed partial class GameEngine
     // This is a destination replacement before ownership is changed, not a second gain or a later theft.
     private CardLocation NormalizeHappyWeiYanGainDestination(Card card, CardLocation from, CardLocation to, CardMoveReason reason)
     {
-        if (to is not { Zone: CardZoneKind.Hand, OwnerSeat: { } recipient } || !IsValidPlayerSeat(recipient) || !EquipmentCatalog.IsEquipment(card.Kind)) return to;
-        var slot = EquipmentCatalog.Get(card.Kind).Slot;
+        if (to is not { Zone: CardZoneKind.Hand, OwnerSeat: { } recipient } || !IsValidPlayerSeat(recipient) || !EquipmentRules.IsEquipment(card.Kind)) return to;
+        var slot = EquipmentRules.Get(card.Kind).Slot;
         if (!_players[recipient].EquipmentAreaAbolished && _players[recipient].EquipmentSlotCapacity(slot) > 0) return to;
         foreach (var owner in _players.Where(p => p.IsAlive && p.HappyWeiYanGujing is not null).OrderBy(p => RelativeTableOrder(_currentSeat, p.Seat)))
         {

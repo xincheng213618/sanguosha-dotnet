@@ -89,7 +89,7 @@ public sealed partial class GameEngine
             }
             // Placement cards retain their legal target
             // contract; their actual use still consumes the next-card grant.
-            if (EquipmentCatalog.IsEquipment(kind) || kind is
+            if (EquipmentRules.IsEquipment(kind) || kind is
                 CardKind.Indulgence or CardKind.SupplyShortage or CardKind.Lightning or CardKind.BorrowedSword) continue;
             var possible = action.Kind is LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage or
                 LegalActionKind.PeachGarden or LegalActionKind.FiveGrains ? normal : _players

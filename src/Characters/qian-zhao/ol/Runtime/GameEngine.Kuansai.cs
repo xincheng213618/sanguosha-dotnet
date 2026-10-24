@@ -12,7 +12,7 @@ public sealed partial class GameEngine
     private CardUseFrame? KuansaiUse(ProgramSkillWindowContext context) => context is
         { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } c } && LifecycleCardUse(c.ParentCardUseFrameId) is
         { Action: { Type: CardActionType.Use } action } use && action.ActionId == c.CardActionId && action.EffectiveKind == use.CardKind &&
-        !EquipmentCatalog.IsEquipment(use.CardKind) && _resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Any(w =>
+        !EquipmentRules.IsEquipment(use.CardKind) && _resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Any(w =>
             w.Id == context.ParentFrameId && w.ParentFrameId == use.Id && w.Action.ActionId == action.ActionId) ? use : null;
     private static IReadOnlyList<int> KuansaiActualTargets(CardUseFrame use) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_qian_zhao_ol_Kuansai.KuansaiActualTargets(use);

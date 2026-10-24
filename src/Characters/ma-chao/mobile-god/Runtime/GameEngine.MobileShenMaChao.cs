@@ -93,7 +93,7 @@ public sealed partial class GameEngine
             .Select(c => PromptChoiceProjection.Freeze(c with { Id = new($"mobile-ma-chao.{f.Id}.gift.{c.Id.Value}"),
                 Parameters = new Dictionary<string, string>(c.Parameters) { ["program-action"] = "mobile-ma-chao", ["option"] = "gift" } })).ToArray());
         if (r.Stage != MobileMaChaoStage.Options) return [];
-        var gift = GetHand(_players[r.Target]).Concat(GetEquipment(_players[r.Target])).Any(c => EquipmentCatalog.IsEquipment(c.Kind) && !c.IsGeneralWeapon);
+        var gift = GetHand(_players[r.Target]).Concat(GetEquipment(_players[r.Target])).Any(c => EquipmentRules.IsEquipment(c.Kind) && !c.IsGeneralWeapon);
         var discard = MobileMaChaoDiscardable(f.OwnerSeat, r.Target).Length > 0;
         var names = new[] { "非锁定技失效至下回合结束", "交给神马超一张装备牌", "此牌对自己伤害+1", "随机弃置一张牌" };
         return Array.AsReadOnly(Enumerable.Range(0, 16).Where(mask => (gift || (mask & 2) == 0) && (discard || (mask & 8) == 0))

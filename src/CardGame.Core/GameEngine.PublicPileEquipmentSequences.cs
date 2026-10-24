@@ -29,15 +29,15 @@ public sealed partial class GameEngine
         var source=EnsurePublicPileSource(f,int.MaxValue);
         ReplaceRuntimeTop(f=f with{PileEquipment=new(e.Op==SkillProgramEffectOp.StoreArbitraryOwnedPublicPile?"store-choice":"gain",source.Location,source.SkillInstanceId,[])});
         if(e.Op==SkillProgramEffectOp.StoreArbitraryOwnedPublicPile){PublishDomainChoice(f);return SkillProgramStepOutcome.AwaitChoice;}
-        var ids=PublicPileCards(source).Where(c=>!EquipmentCatalog.IsEquipment(c.Kind)).Select(c=>c.Id).ToArray();
+        var ids=PublicPileCards(source).Where(c=>!EquipmentRules.IsEquipment(c.Kind)).Select(c=>c.Id).ToArray();
         ReplaceRuntimeTop(f=f with{PileEquipment=f.PileEquipment! with{Stage="recipient"},PendingMovementContinuation=new(f.OwnerSeat,0,null)});
         if(ids.Length>0)MoveCards(ids.Select(id=>_cardZones.CardsAt(source.Location).Single(c=>c.Id==id)).ToArray(),source.Location,CardLocation.Hand(f.OwnerSeat),new("skill-program.public-pile.non-equipment-gain"));
         if(!TryBeginCardsMovedProgramWindow())ReturnRuntimeProgramMovement(f.Id);return SkillProgramStepOutcome.AwaitChild;
     }
     private bool CanUseSequenceEquipment(ProgramSkillFrame f,int seat,Card card)
     {
-        var actor=_players[seat];return actor.IsAlive&&actor.Hp>0&&EquipmentCatalog.IsEquipment(card.Kind)&&_cardZones.GetLocation(card.Id)==f.PileEquipment!.PileLocation&&
-            actor.EquipmentSlotCapacity(EquipmentCatalog.Get(card.Kind).Slot)>0&&!IsCardUseForbidden(seat,card.Kind,CardActionType.Use)&&!IsSelfTargetForbiddenAction(actor,card.Kind,[seat])&&!IsResponseEntityRestricted(seat,card.Id)&&!IsPlayPhasePhysicalCardRestricted(actor,card);
+        var actor=_players[seat];return actor.IsAlive&&actor.Hp>0&&EquipmentRules.IsEquipment(card.Kind)&&_cardZones.GetLocation(card.Id)==f.PileEquipment!.PileLocation&&
+            actor.EquipmentSlotCapacity(EquipmentRules.Get(card.Kind).Slot)>0&&!IsCardUseForbidden(seat,card.Kind,CardActionType.Use)&&!IsSelfTargetForbiddenAction(actor,card.Kind,[seat])&&!IsResponseEntityRestricted(seat,card.Id)&&!IsPlayPhasePhysicalCardRestricted(actor,card);
     }
     private IReadOnlyList<PromptChoice> DomainChoices(ProgramSkillFrame f)
     {
@@ -148,7 +148,7 @@ public sealed partial class GameEngine
     }
     private bool PileEquipmentFrameRidesOn(ResolutionFrame ride,ResolutionFrame beneath)=>
         ride is CardUseFrame {Action:{} action} use&&beneath is ProgramSkillFrame {PileEquipment:{Stage:"equipment-use",ActiveUseFrameId:{} id,ActiveCardId:{} card,RecipientSeat:{} recipient}} parent&&
-        use.Id==id&&use.CardId==card&&action.ActorSeat==recipient&&EquipmentCatalog.IsEquipment(action.EffectiveKind)&&
+        use.Id==id&&use.CardId==card&&action.ActorSeat==recipient&&EquipmentRules.IsEquipment(action.EffectiveKind)&&
         action.PhysicalCards is [var cost]&&cost.CardId==card&&cost.From==parent.PileEquipment.PileLocation&&
         action.ConversionChain.Any(s=>s.OwnerSeat==parent.OwnerSeat&&s.SkillId==parent.SkillId&&s.SkillInstanceId==parent.SkillInstanceId&&s.BindingId==GetProgramBindingId(parent));
     [ProgramAiChoice(

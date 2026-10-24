@@ -25,7 +25,7 @@ public sealed partial class GameEngine
             CancelProgramBindingAndCleanup(frame, "展示后的角色或技能来源已失效，未付后继体力成本。");
             return SkillProgramStepOutcome.AwaitChild;
         }
-        var loses = !EquipmentCatalog.IsEquipment(revealed.Kind) && _players[target].Hp != _players[frame.OwnerSeat].Hp;
+        var loses = !EquipmentRules.IsEquipment(revealed.Kind) && _players[target].Hp != _players[frame.OwnerSeat].Hp;
         AdvanceEventRulesAndQueueFact(new RevealedCardHpComparedEvent(frame.Id, frame.InstructionIndex - 1,
             new(frame.SkillId, GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash,
             id, revealed.Kind, target, _players[frame.OwnerSeat].Hp, _players[target].Hp, loses));
@@ -68,7 +68,7 @@ public sealed partial class GameEngine
             e.OwnerSeat == root.OwnerSeat && e.Bind == "drawn");
         var comparisons = history.OfType<RevealedCardHpComparedEvent>().Where(e => e.ProgramFrameId == root.Id).ToArray();
         var losses = history.OfType<ProgramSkillHpLostEvent>().Where(e => e.FrameId == root.Id).ToArray();
-        if (reveal is not { Cards: [var shown] } || shown.Id != cardId || EquipmentCatalog.IsEquipment(shown.Kind) ||
+        if (reveal is not { Cards: [var shown] } || shown.Id != cardId || EquipmentRules.IsEquipment(shown.Kind) ||
             comparisons is not [var compared] || losses is not [var loss] ||
             compared.InstructionIndex != root.InstructionIndex - 1 || compared.GameplayHash != root.GameplayHash ||
             compared.Source != new CardConversionSource(root.SkillId, GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId) ||

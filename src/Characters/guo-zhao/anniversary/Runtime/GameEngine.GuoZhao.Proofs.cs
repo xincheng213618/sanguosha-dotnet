@@ -33,7 +33,7 @@ public sealed partial class GameEngine
         var r = f.AnniversaryGuoZhao!;
         var issued = ProgramEventHistory<AnniversaryGuoZhaoEquipmentIssuedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Ordinal).ToArray();
         var returned = ProgramEventHistory<AnniversaryGuoZhaoEquipmentReturnedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Ordinal).ToArray();
-        if (issued.Length > r.Cursor + 1 || returned.Length != r.Cursor || issued.Where((e, i) => e.Ordinal != i || e.UseId <= f.Id || e.ActionId <= 0 || !EquipmentCatalog.IsEquipment(e.Kind)).Any() ||
+        if (issued.Length > r.Cursor + 1 || returned.Length != r.Cursor || issued.Where((e, i) => e.Ordinal != i || e.UseId <= f.Id || e.ActionId <= 0 || !EquipmentRules.IsEquipment(e.Kind)).Any() ||
             returned.Where((e, i) => e.Ordinal != i || issued.Length <= i || e.UseId != issued[i].UseId || e.ActionId != issued[i].ActionId ||
                 ProgramEventHistory<CardUseFinishedEvent>().Count(done => done.ResolutionId == e.UseId && done.CardId == issued[i].CardId) != 1).Any()) return false;
         if (r.Equipment is not { } paid) return r.Cursor == 0 && r.Stage is AnniversaryGuoZhaoStage.EquipmentNext or AnniversaryGuoZhaoStage.Completed;

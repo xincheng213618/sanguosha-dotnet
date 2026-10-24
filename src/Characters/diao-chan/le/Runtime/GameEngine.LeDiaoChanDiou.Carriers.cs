@@ -13,7 +13,7 @@ public sealed partial class GameEngine
         fact.Source.SkillId == DiouSkill && fact.Source.BindingId == DiouBinding &&
         IsValidPlayerSeat(fact.Source.OwnerSeat) &&
         _contentRegistry.GetSkill(fact.Source.SkillId).Program?.GameplayHash == fact.GameplayHash &&
-        (EquipmentCatalog.IsEquipment(fact.Kind) || IsDelayedCard(fact.Kind)) &&
+        (EquipmentRules.IsEquipment(fact.Kind) || IsDelayedCard(fact.Kind)) &&
         GetAdvancedCard(id) is { Suit: Suit.None, Rank: 0 } card && card.Kind == fact.Kind;
 
     private CardLocation NormalizeDiouCarrierDestination(Card card, CardLocation from, CardLocation to)

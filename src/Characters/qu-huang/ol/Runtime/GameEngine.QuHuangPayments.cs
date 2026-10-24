@@ -9,7 +9,7 @@ public sealed partial class GameEngine
             batch.NativeDrawInvocation is not null||batch.NativeBuZhiDiscardInvocation is not null||batch.TurnNumber!=_turnNumber||
             batch.Movements.Count==0||batch.Movements.Count!=a.PhysicalCards.Count||batch.Movements.Select(m=>m.CardId).Distinct().Count()!=batch.Movements.Count||
             !batch.SourceCounts.Any(c=>c.Location==CardLocation.Hand(a.ProviderSeat)&&c.CountBefore>0&&c.CountAfter==0))return false;
-        var equipment=EquipmentCatalog.IsEquipment(use.CardKind)&&a.PhysicalCards is[var nativeEquipment]&&nativeEquipment.CardKind==use.CardKind&&nativeEquipment.From.Zone is CardZoneKind.Hand or CardZoneKind.WoodenOxGrain;
+        var equipment=EquipmentRules.IsEquipment(use.CardKind)&&a.PhysicalCards is[var nativeEquipment]&&nativeEquipment.CardKind==use.CardKind&&nativeEquipment.From.Zone is CardZoneKind.Hand or CardZoneKind.WoodenOxGrain;
         var expectedReason=equipment?CardMoveReasons.EquipmentUse:CardMoveReasons.Use;
         foreach(var m in batch.Movements)
         {
@@ -47,7 +47,7 @@ public sealed partial class GameEngine
             RecoveryPaidCardUseKind.CommittedSlash=>IsSlashCard(use.CardKind),
             RecoveryPaidCardUseKind.Trick=>continuation.CardId==use.CardId&&continuation.ActionKind is not null&&continuation.TargetSeats is{}targets&&targets.SequenceEqual(use.TargetSeats)&&(continuation.PlayedCardKind??use.CardKind)==use.CardKind,
             RecoveryPaidCardUseKind.Simple=>continuation.CardId==use.CardId&&continuation.Simple?.CardId==use.CardId,
-            RecoveryPaidCardUseKind.EquipmentUse=>continuation.CardId==use.CardId&&EquipmentCatalog.IsEquipment(use.CardKind)&&continuation.EquipmentSlot==EquipmentCatalog.Get(use.CardKind).Slot,
+            RecoveryPaidCardUseKind.EquipmentUse=>continuation.CardId==use.CardId&&EquipmentRules.IsEquipment(use.CardKind)&&continuation.EquipmentSlot==EquipmentRules.Get(use.CardKind).Slot,
             _=>false
         };
     }

@@ -26,7 +26,7 @@ public sealed partial class GameEngine
         bool allowSkip = true, bool nonEquipment = false, bool handOnly = false)
     {
         var cards = discard ? GuanduDiscardable(seat, seat) : handOnly ? GetHand(_players[seat]).ToArray() : GuanduOwnedCards(seat);
-        var choices = cards.Where(c => !nonEquipment || !EquipmentCatalog.IsEquipment(c.Kind))
+        var choices = cards.Where(c => !nonEquipment || !EquipmentRules.IsEquipment(c.Kind))
             .Select(c => GuanduChoice(f, option, $"{(discard ? "弃置" : "交出")}【{c.DisplayName}】", [c.Id], [seat])).ToList();
         if (allowSkip) choices.Add(GuanduChoice(f, "skip", "不执行"));
         return Array.AsReadOnly(choices.ToArray());

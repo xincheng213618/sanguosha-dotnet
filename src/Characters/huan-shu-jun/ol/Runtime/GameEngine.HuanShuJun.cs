@@ -63,7 +63,7 @@ public sealed partial class GameEngine
         {
             if (WenyiTargetCanReceivePeach(f)) choices.Add(Choice("wenyi-peach", "对其使用一张桃"));
             if (r.TargetSeat != f.OwnerSeat && _players[r.TargetSeat].IsAlive)
-                foreach (var card in GetHand(_players[f.OwnerSeat]).Concat(GetEquipment(_players[f.OwnerSeat])).Where(card => EquipmentCatalog.IsEquipment(card.Kind) && !card.IsGeneralWeapon))
+                foreach (var card in GetHand(_players[f.OwnerSeat]).Concat(GetEquipment(_players[f.OwnerSeat])).Where(card => EquipmentRules.IsEquipment(card.Kind) && !card.IsGeneralWeapon))
                     choices.Add(Choice("wenyi-equipment", "交给其并令其使用" + card.DisplayName, [card.Id], card.Id.ToString(CultureInfo.InvariantCulture)));
             choices.Add(Choice("cancel", "取消温宜"));
         }

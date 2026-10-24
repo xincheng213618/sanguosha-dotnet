@@ -62,9 +62,9 @@ public sealed partial class GameEngine
                 ReplaceRuntimeTop(f with { ShenMaChao = r with { Stage = ShenMaChaoStage.StartingMount, Cursor = r.Cursor + 1, CardId = 0, UseId = 0 }, PendingMovementContinuation = null }); continue;
             }
             var seat = r.Seats[r.Cursor]; var target = _players[seat];
-            var candidates = target.IsAlive ? _cardZones.CardsAt(CardLocation.DrawPile).Where(c => EquipmentCatalog.IsEquipment(c.Kind) &&
-                EquipmentCatalog.Get(c.Kind).Slot is EquipmentSlot.OffensiveHorse or EquipmentSlot.DefensiveHorse &&
-                target.EquipmentSlotCapacity(EquipmentCatalog.Get(c.Kind).Slot) > 0 && !IsCardUseForbidden(seat, c.Kind, CardActionType.Use) &&
+            var candidates = target.IsAlive ? _cardZones.CardsAt(CardLocation.DrawPile).Where(c => EquipmentRules.IsEquipment(c.Kind) &&
+                EquipmentRules.Get(c.Kind).Slot is EquipmentSlot.OffensiveHorse or EquipmentSlot.DefensiveHorse &&
+                target.EquipmentSlotCapacity(EquipmentRules.Get(c.Kind).Slot) > 0 && !IsCardUseForbidden(seat, c.Kind, CardActionType.Use) &&
                 !IsSelfTargetForbiddenAction(target, c.Kind, [seat]) && !IsResponseEntityRestricted(seat, c.Id) && !IsPlayPhasePhysicalCardRestricted(target, c)).OrderBy(c => c.Id).ToArray() : [];
             if (candidates.Length == 0)
             { ReplaceRuntimeTop(f with { ShenMaChao = r with { Cursor = r.Cursor + 1 } }); continue; }
@@ -91,7 +91,7 @@ public sealed partial class GameEngine
         child is CardUseFrame use && use.Id == r.UseId && use.CardId == r.CardId && use.SourceSeat == r.Seats[r.Cursor] &&
         use.Action is { } a && a.ActorSeat == use.SourceSeat && a.ConversionChain.SequenceEqual([r.Source]) &&
         a.PhysicalCards is [{ CardId: var cardId, From: var from }] && cardId == r.CardId && from == CardLocation.DrawPile &&
-        EquipmentCatalog.IsEquipment(use.CardKind) && EquipmentCatalog.Get(use.CardKind).Slot is EquipmentSlot.OffensiveHorse or EquipmentSlot.DefensiveHorse &&
+        EquipmentRules.IsEquipment(use.CardKind) && EquipmentRules.Get(use.CardKind).Slot is EquipmentSlot.OffensiveHorse or EquipmentSlot.DefensiveHorse &&
         r.Source == ShenMcSource(f);
     [ProgramNativeDrawReturn(SkillProgramEffectOp.DrawHengwuFieldSuitEquipment)] private void ReturnHengwuDraw(ProgramSkillFrame supplied, NativeDrawOutcome o)
     {

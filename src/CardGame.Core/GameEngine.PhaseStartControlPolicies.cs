@@ -46,7 +46,7 @@ public sealed partial class GameEngine
         if (!HasExactPhaseStartCardControl(f) || f.PhaseStartCardControl is not
                 { Kind: PhaseStartCardControlKind.StartingEquipment, Stage: PhaseStartCardControlStage.GrantChildren,
                   ArmorAcquired: true, Payment: { } p } r || p.To != CardLocation.Hand(f.OwnerSeat) ||
-            p.From.Zone != CardZoneKind.Equipment || EquipmentCatalog.Get(p.Kind).Slot != EquipmentSlot.Armor ||
+            p.From.Zone != CardZoneKind.Equipment || EquipmentRules.Get(p.Kind).Slot != EquipmentSlot.Armor ||
             f.PendingMovementContinuation is not null)
             throw new InvalidOperationException("Starting equipment control requires its actual paid armor acquisition.");
         var ban = _turnCardUseEffects.GrantActionProhibition(r.ActualTurnNumber, r.ActualTurnOwnerSeat, f.Id, f.InstructionIndex - 1,

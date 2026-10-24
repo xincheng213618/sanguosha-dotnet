@@ -94,7 +94,7 @@ public sealed partial class GameEngine
             if (moves[i].CardId != d.PaidCardIds[i] || moves[i].From != d.PaidFrom[i] || moves[i].From.OwnerSeat != d.Identity.TargetSeat ||
                 moves[i].From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) ||
                 moves[i].To != NormalizeEphemeralCardDestination(GetAttackCard(moves[i].CardId), moves[i].From, (moves[i].From.Zone == CardZoneKind.Equipment && GetAttackCard(moves[i].CardId).IsGeneralWeapon ? CardLocation.OutsideGame : CardLocation.DiscardPile)) ||
-                moves[i].Reason.Value != reason || d.Recast && (!EquipmentCatalog.IsEquipment(moves[i].CardKind) || moves[i].From.Zone != CardZoneKind.Equipment)) return false;
+                moves[i].Reason.Value != reason || d.Recast && (!EquipmentRules.IsEquipment(moves[i].CardKind) || moves[i].From.Zone != CardZoneKind.Equipment)) return false;
         return CompleteProgramEventHistory().OfType<SlashTargetPenaltyPaidEvent>().Count(e => e.ProgramFrameId == f.Id &&
             e.CardUseFrameId == d.Identity.CardUseFrameId && e.ActorSeat == d.Identity.ActorSeat && e.TargetSeat == d.Identity.TargetSeat &&
             e.Recast == d.Recast && e.CardIds.SequenceEqual(d.PaidCardIds) && e.SequenceBefore == d.SequenceBefore && e.SequenceAfter == d.SequenceAfter) == 1;

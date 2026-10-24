@@ -355,7 +355,7 @@ public sealed partial class GameEngine
         var ranked = YujueAiAbolishPreference
             .Where(slot => owner.EquipmentSlotCapacity(slot) > 0)
             .Select((slot, index) => (Slot: slot, Index: index,
-                Equipped: GetEquipment(owner).Any(card => EquipmentCatalog.Get(card.Kind).Slot == slot)))
+                Equipped: GetEquipment(owner).Any(card => EquipmentRules.Get(card.Kind).Slot == slot)))
             .OrderBy(entry => entry.Equipped ? 1 : 0)
             .ThenBy(entry => entry.Index)
             .First();

@@ -16,7 +16,7 @@ public sealed partial class GameEngine
                 !EventsSinceLastBoundary(item => item is TurnStartedEvent).OfType<CardMovedEvent>().Any(item => item.Reason == CardMoveReasons.Reshuffle)) return false;
             if (effect.Op == SkillProgramEffectOp.InheritWeapon &&
                 !_players.Where(player => player.IsAlive).SelectMany(GetEquipment).Concat(GetHand(owner))
-                    .Any(card => EquipmentCatalog.IsEquipment(card.Kind) && EquipmentCatalog.Get(card.Kind).Slot == EquipmentSlot.Weapon)) return false;
+                    .Any(card => EquipmentRules.IsEquipment(card.Kind) && EquipmentRules.Get(card.Kind).Slot == EquipmentSlot.Weapon)) return false;
             if (effect.Op == SkillProgramEffectOp.ReclaimNamedWeapon && !CanReclaimNamedWeapon(owner, effect)) return false;
         }
         return true;

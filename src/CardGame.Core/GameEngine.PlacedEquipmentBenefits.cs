@@ -14,7 +14,7 @@ public sealed partial class GameEngine
         !t.Effects.Any(e => e.Op == SkillProgramEffectOp.PlaceOwnedEquipmentThenResolveSlotBenefit) ||
         context.Window == SkillProgramTriggerWindow.TurnEnding && c.OwnerSeat == _currentSeat &&
         GetHand(_players[c.OwnerSeat]).Concat(GetEquipment(_players[c.OwnerSeat])).Any(card =>
-            EquipmentCatalog.IsEquipment(card.Kind) && !IsActiveProgramSourceEquipmentCard(c.OwnerSeat, c.SkillId, c.SkillInstanceId, card) && CanPlaceBenefitEquipment(c.OwnerSeat, card, _cardZones.GetLocation(card.Id)));
+            EquipmentRules.IsEquipment(card.Kind) && !IsActiveProgramSourceEquipmentCard(c.OwnerSeat, c.SkillId, c.SkillInstanceId, card) && CanPlaceBenefitEquipment(c.OwnerSeat, card, _cardZones.GetLocation(card.Id)));
     private bool PlacedEquipmentParentMatches(ProgramSkillFrame f)
     {
         if (f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || f.TriggerId is null ||
@@ -44,7 +44,7 @@ public sealed partial class GameEngine
         }
         if (r.Stage == PlacedEquipmentBenefitStage.EquipmentChoice)
             AddOwned(BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment],
-                OwnedCardMoveIntent.Transfer, canSelect: (_, c) => EquipmentCatalog.IsEquipment(c.Kind) &&
+                OwnedCardMoveIntent.Transfer, canSelect: (_, c) => EquipmentRules.IsEquipment(c.Kind) &&
                     CanPlaceBenefitEquipment(f.OwnerSeat, c, _cardZones.GetLocation(c.Id))), "equipment");
         else if (r.Stage == PlacedEquipmentBenefitStage.RecipientChoice && r.SelectedCardId is { } id && r.SelectedFrom is { } from)
             foreach (var target in _players.Where(p => p.IsAlive && CanPlaceOwnedEquipment(f.OwnerSeat, p.Seat, GetAdvancedCard(id), from)).OrderBy(p => p.Seat))

@@ -5,7 +5,7 @@ public sealed partial class GameEngine
     // A physical card's printed category is unchanged when a rule places it as
     // a bone. Slot occupancy and printed equipment abilities are separate facts.
     private EquipmentSlot FieldEquipmentSlot(Card card) =>
-        HappyBoneSlot(card) ?? EquipmentCatalog.Get(card.Kind).Slot;
+        HappyBoneSlot(card) ?? EquipmentRules.Get(card.Kind).Slot;
 
     private bool HasHappyWeiYanPotentialCancellation(int seat) =>
         HasHappyWeiYanEzhiCapability && GetEquipment(seat).Any(card => IsHappyWeiYanBone(card.Id));

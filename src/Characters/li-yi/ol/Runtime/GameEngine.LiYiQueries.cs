@@ -6,7 +6,7 @@ public sealed partial class GameEngine
 {
  private const string ChanshuangDiscardReason="skill-program.li-yi.chanshuang.discard";
  private bool HasLiYiCapability=>_contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveChanshuangSimultaneousChoices)||_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveChanshuangEnding);
- private bool HasLiYiVirtualStoneAxe(CharacterState player,int? excludedEquipmentId=null,EquipmentSlot? excludedEquipmentSlot=null)=>player.IsAlive&&HasCardPolicy(player,SkillProgramCardPolicyKind.EmptyWeaponStoneAxe)&&!GetEquipment(player).Any(c=>c.Id!=excludedEquipmentId&&(excludedEquipmentSlot is null||EquipmentCatalog.Get(c.Kind).Slot!=excludedEquipmentSlot)&&EquipmentCatalog.Get(c.Kind).Slot==EquipmentSlot.Weapon);
+ private bool HasLiYiVirtualStoneAxe(CharacterState player,int? excludedEquipmentId=null,EquipmentSlot? excludedEquipmentSlot=null)=>player.IsAlive&&HasCardPolicy(player,SkillProgramCardPolicyKind.EmptyWeaponStoneAxe)&&!GetEquipment(player).Any(c=>c.Id!=excludedEquipmentId&&(excludedEquipmentSlot is null||EquipmentRules.Get(c.Kind).Slot!=excludedEquipmentSlot)&&EquipmentRules.Get(c.Kind).Slot==EquipmentSlot.Weapon);
  private CardConversionSource ChanshuangSource(ProgramSkillFrame f)=>new(f.SkillId,GetProgramBindingId(f),f.OwnerSeat,f.SkillInstanceId);
  private static string ChanshuangHash<T>(T value) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_li_yi_ol_LiYiQueries.ChanshuangHash<T>(value);

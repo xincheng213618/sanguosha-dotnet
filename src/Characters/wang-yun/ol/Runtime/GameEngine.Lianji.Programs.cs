@@ -33,7 +33,7 @@ public sealed partial class GameEngine
     {
         var r=f.WangYunPlan!;var actor=_players[r.Actor];
         if(!_players[f.OwnerSeat].IsAlive || !actor.IsAlive || _winner!=Winner.None){FinishWangYun(f);return;}
-        var weapons=_cardZones.CardsAt(CardLocation.DrawPile).Where(c=>EquipmentCatalog.IsEquipment(c.Kind) && EquipmentCatalog.Get(c.Kind).Slot==EquipmentSlot.Weapon &&
+        var weapons=_cardZones.CardsAt(CardLocation.DrawPile).Where(c=>EquipmentRules.IsEquipment(c.Kind) && EquipmentRules.Get(c.Kind).Slot==EquipmentSlot.Weapon &&
             actor.EquipmentSlotCapacity(EquipmentSlot.Weapon)>0 && !IsCardUseForbidden(actor.Seat,c.Kind,CardActionType.Use) && !IsSelfTargetForbiddenAction(actor,c.Kind,[actor.Seat]) &&
             !IsResponseEntityRestricted(actor.Seat,c.Id) && !IsPlayPhasePhysicalCardRestricted(actor,c)).OrderBy(c=>c.Id).ToArray();
         if(weapons.Length==0){ReplaceRuntimeTop(f=f with{WangYunPlan=r with{Stage="target"}});PublishWangYun(f);return;}
@@ -82,7 +82,7 @@ public sealed partial class GameEngine
             }
             Add("transfer","transfer","不使用【杀】，令王允转移你装备区的武器",[],[]);
         }
-        if(r.Stage=="transfer")foreach(var card in GetEquipment(actor).Where(c=>EquipmentCatalog.Get(c.Kind).Slot==EquipmentSlot.Weapon))foreach(var p in _players.Where(p=>p.IsAlive))
+        if(r.Stage=="transfer")foreach(var card in GetEquipment(actor).Where(c=>EquipmentRules.Get(c.Kind).Slot==EquipmentSlot.Weapon))foreach(var p in _players.Where(p=>p.IsAlive))
             Add("give-weapon",$"give-{card.Id}-{p.Seat}",$"将【{card.DisplayName}】交给 {p.Name}",[card.Id],[p.Seat]);
         return Array.AsReadOnly(choices.ToArray());
     }

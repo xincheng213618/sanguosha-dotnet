@@ -21,7 +21,7 @@ public sealed partial class GameEngine
     private void MoCaoCaoVirtualWeaponRange(ProgramAttackRangeQuery q,List<RuleQueryBaseTerm> terms)
     {
         if(q.ExcludedEquipmentSlot!=EquipmentSlot.Weapon && MoCaoCaoEquipment.VirtualKind(q.Player.Seat,EquipmentSlot.Weapon) is { } weapon &&
-            EquipmentCatalog.Get(weapon).WeaponAttackRange is { } range && terms[0].Value<range)
+            EquipmentRules.Get(weapon).WeaponAttackRange is { } range && terms[0].Value<range)
             terms[0]=new RuleQueryBaseTerm($"skill:{q.Player.Seat}:mo-fuzai:{weapon}:attack-range",range);
     }
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption,33800)]
@@ -55,6 +55,6 @@ public sealed partial class GameEngine
         _players[attack.TargetSeat].HasHpValue && _players[attack.TargetSeat].Hp==_players[attack.TargetSeat].MaxHp ? 1 : 0;
     private string? MoCaoCaoEquipmentDescription(int seat) =>
         MoCaoCaoEquipment.VirtualKind(seat,EquipmentSlot.Weapon) is { } weapon && MoCaoCaoEquipment.VirtualKind(seat,EquipmentSlot.Armor) is { } armor ?
-            $"视为装备【{EquipmentCatalog.Get(weapon).DisplayName}】、【{EquipmentCatalog.Get(armor).DisplayName}】。真实装备区非空时暂停；体力变化重新签发。" : null;
+            $"视为装备【{EquipmentRules.Get(weapon).DisplayName}】、【{EquipmentRules.Get(armor).DisplayName}】。真实装备区非空时暂停；体力变化重新签发。" : null;
     private bool MoCaoCaoHasHandPrivilege(int seat) => GetHand(_players[seat]).Any(c=>MoCaoCaoEquipment.HasHandPrivilege(seat,[c.Id]));
 }

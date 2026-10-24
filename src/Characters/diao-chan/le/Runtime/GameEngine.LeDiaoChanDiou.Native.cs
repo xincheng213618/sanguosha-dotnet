@@ -63,9 +63,9 @@ public sealed partial class GameEngine
             var actions = new List<LegalAction>(); AddGuanduPhysicalOrConvertedActions(actions, actor, neutral, kind, source);
             foreach (var a in actions) Add(a.Kind, a.TargetSeats, a.Description);
         }
-        else if (EquipmentCatalog.IsEquipment(kind) && kind != CardKind.GeneralWeapon)
+        else if (EquipmentRules.IsEquipment(kind) && kind != CardKind.GeneralWeapon)
         {
-            if (actor.EquipmentSlotCapacity(EquipmentCatalog.Get(kind).Slot) > 0 && !HasSelfCardTargetProhibition(actor.Seat) &&
+            if (actor.EquipmentSlotCapacity(EquipmentRules.Get(kind).Slot) > 0 && !HasSelfCardTargetProhibition(actor.Seat) &&
                 !IsCardTargetProhibited(actor, kind, Suit.None) && !IsDirectedCardTargetProhibited(actor.Seat, actor.Seat, kind) &&
                 !HasBeneficiarySuitShield(actor.Seat, actor.Seat, Suit.None))
                 Add(LegalActionKind.Equip, [actor.Seat], $"视为使用并装备【{neutral.DisplayName}】");
@@ -96,7 +96,7 @@ public sealed partial class GameEngine
             p.TargetCardId, p.RequiredKind, p.Adjusted, p.Targets.Count));
         for (var i = 0; i < p.Targets.Count; i++) AdvanceEventRulesAndQueueFact(new DiouTargetAcceptedEvent(f.Id, i, p.Targets[i]));
         Card card;
-        if (EquipmentCatalog.IsEquipment(p.Kind) || IsDelayedCard(p.Kind))
+        if (EquipmentRules.IsEquipment(p.Kind) || IsDelayedCard(p.Kind))
         {
             var id = checked(CreateCardZoneDiagnostics().Select(c => c.CardId).DefaultIfEmpty(0).Max() + 1);
             card = new(id, p.Kind, Suit.None, 0);
@@ -124,7 +124,7 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("Diou must bind its distinct zero-material issuance before native effects.");
         if (card.Id > 0)
             MoveCard(card, CardLocation.OutsideGame, CardLocation.Processing, new("skill-program.le-diao-chan.diou.carrier"));
-        if (EquipmentCatalog.IsEquipment(p.Kind))
+        if (EquipmentRules.IsEquipment(p.Kind))
         { if (!TryBeginEquipmentTargetPrograms(actor, card, useId)) CompleteEquipmentUse(actor, card, useId); return; }
         if (p.Kind == CardKind.Alcohol)
         { RecordMouZhaJiangAwareAlcoholDebit(useId, actor); BeginSimpleCardUse(useId, new(0, SimpleCardUseEffect.Alcohol)); return; }

@@ -115,7 +115,7 @@ public sealed partial class GameEngine
         var location = _cardZones.GetLocation(cardId);
         if (FieldEquipmentSlot(card) != EquipmentSlot.Weapon || location.Zone != CardZoneKind.Equipment && location != CardLocation.Hand(frame.OwnerSeat))
             throw new InvalidOperationException("Only an equipped weapon or owner's hand weapon can be inherited.");
-        var range = location.OwnerSeat is { } seat ? GetWeaponAttackRange(_players[seat], card) : EquipmentCatalog.Get(card.Kind).WeaponAttackRange ?? 1;
+        var range = location.OwnerSeat is { } seat ? GetWeaponAttackRange(_players[seat], card) : EquipmentRules.Get(card.Kind).WeaponAttackRange ?? 1;
         _inheritedWeaponAbilities[frame.OwnerSeat] = (_inheritedWeaponAbilities.GetValueOrDefault(frame.OwnerSeat) ?? [])
             .Concat(GetWeaponAbilityKinds(card)).Distinct().ToArray();
         var skills = card.GrantedSkillIds.Concat(_copiedWeaponSkills.GetValueOrDefault(card.Id) ?? [])

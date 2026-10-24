@@ -24,7 +24,7 @@ public sealed partial class GameEngine
         .Select(e => e.Phase.ActorSeat).Distinct().Count();
     private int JiguEmptySlotCount(CharacterState owner) => Enum.GetValues<EquipmentSlot>()
         .Sum(slot => Math.Max(0, owner.EquipmentSlotCapacity(slot) -
-            GetEquipment(owner).Count(c => EquipmentCatalog.Get(c.Kind).Slot == slot)));
+            GetEquipment(owner).Count(c => EquipmentRules.Get(c.Kind).Slot == slot)));
     private int JiguUseCount(int owner, int round) => ProgramEventHistory<JiguActivationPaidEvent>()
         .Count(e => e.Source.OwnerSeat == owner && e.Source.SkillId == "le:jigu" && e.RoundNumber == round);
     private bool JiguRoundDisabled(int owner, int round) => ProgramEventHistory<JiguActivationPaidEvent>()

@@ -10,13 +10,13 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(f=f with { HanFu=r with { Stage=HanFuStage.BoardChildren,Board=m },PendingMovementContinuation=new(f.OwnerSeat,0,null) });
         if (destination.Zone==CardZoneKind.Equipment)
         {
-            var old=GetEquipment(_players[r.TargetSeat]).SingleOrDefault(c=>EquipmentCatalog.Get(c.Kind).Slot==EquipmentCatalog.Get(card.Kind).Slot); replacedId=old?.Id;
+            var old=GetEquipment(_players[r.TargetSeat]).SingleOrDefault(c=>EquipmentRules.Get(c.Kind).Slot==EquipmentRules.Get(card.Kind).Slot); replacedId=old?.Id;
             if(old is not null) MoveCard(old,destination,CardLocation.DiscardPile,CardMoveReasons.EquipmentReplace);
         }
         MoveProgramCardsFromMultipleSources([m.CardId],destination,new(ShuziBoardReason));
         var movement=_cardMovements.Single(move=>move.Sequence>before && move.CardId==m.CardId && move.Reason.Value==ShuziBoardReason);
         AdvanceEventRulesAndQueueFact(new HanFuMaterialPaidEvent(f.Id,HanFuStage.BoardChildren,0,m,destination,movement.Sequence));
-        if(destination.Zone==CardZoneKind.Equipment) AdvanceEventRulesAndQueueFact(new EquipmentChangedEvent(f.Id,r.TargetSeat,EquipmentCatalog.Get(card.Kind).Slot,card.Id,card.Kind,replacedId));
+        if(destination.Zone==CardZoneKind.Equipment) AdvanceEventRulesAndQueueFact(new EquipmentChangedEvent(f.Id,r.TargetSeat,EquipmentRules.Get(card.Kind).Slot,card.Id,card.Kind,replacedId));
         RecordHanFuMovement(f.Id,HanFuStage.BoardChildren,ShuziBoardReason,before,1);
     }
 }

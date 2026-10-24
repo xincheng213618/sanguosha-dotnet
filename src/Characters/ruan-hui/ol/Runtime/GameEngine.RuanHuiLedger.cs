@@ -92,7 +92,7 @@ public sealed partial class GameEngine
         return false;
     }
     private bool JingzhongAbolishedEquipmentUse(JingzhongUseEntityEvent fact,CardMovementRecord move)=>!fact.Response&&move.Reason.Value=="area.abolished.equipment"&&
-        LifecycleCardUse(fact.UseId)is{Action:{Type:CardActionType.Use}action}use&&action.ActionId==fact.ActionId&&EquipmentCatalog.IsEquipment(use.CardKind)&&
+        LifecycleCardUse(fact.UseId)is{Action:{Type:CardActionType.Use}action}use&&action.ActionId==fact.ActionId&&EquipmentRules.IsEquipment(use.CardKind)&&
         action.PhysicalCards.Any(c=>c.CardId==fact.CardId&&c.CardKind==fact.PhysicalKind&&c.From==fact.OriginalFrom)&&use.PhysicalCardIds?.Contains(fact.CardId)==true;
     private void CaptureRuanHuiMovementBatch(CardMovementBatchContext batch)
     {

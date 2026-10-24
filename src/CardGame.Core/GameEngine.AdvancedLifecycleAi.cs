@@ -62,7 +62,7 @@ public sealed partial class GameEngine
                 if (finish is not null && (draft.Selected.Count >= 3 || best.Score <= 0)) return finish;
                 return best.Choice;
             case SkillProgramEffectOp.InheritWeapon:
-                return candidates.OrderByDescending(choice => CardFor(choice).PrintedAttackRange ?? EquipmentCatalog.Get(CardFor(choice).Kind).WeaponAttackRange ?? 1)
+                return candidates.OrderByDescending(choice => CardFor(choice).PrintedAttackRange ?? EquipmentRules.Get(CardFor(choice).Kind).WeaponAttackRange ?? 1)
                     .ThenByDescending(choice => GetWeaponAbilityKinds(CardFor(choice)).Count())
                     .ThenBy(choice => CardFor(choice).Id).First();
             default:

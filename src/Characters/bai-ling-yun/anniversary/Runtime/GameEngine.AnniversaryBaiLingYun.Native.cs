@@ -23,7 +23,7 @@ public sealed partial class GameEngine
         var id = BeginCardUse(card, actor.Seat, a.TargetSeats, card.Kind, physicalCardIds: [card.Id],
             designatedTargetSeats: card.Kind == CardKind.BorrowedSword ? a.TargetSeats.Where((_, i) => i % 2 == 0).ToArray() : null);
         if (LifecycleCardUse(id)?.AnniversaryBlyUse is null) throw new InvalidOperationException("Linghui lost its actual declared physical use.");
-        if (EquipmentCatalog.IsEquipment(card.Kind)) { if (!TryBeginEquipmentTargetPrograms(actor, card, id)) CompleteEquipmentUse(actor, card, id); return; }
+        if (EquipmentRules.IsEquipment(card.Kind)) { if (!TryBeginEquipmentTargetPrograms(actor, card, id)) CompleteEquipmentUse(actor, card, id); return; }
         if (card.Kind == CardKind.Peach) { BeginSimpleCardUse(id, new(card.Id, SimpleCardUseEffect.Recovery)); return; }
         if (card.Kind == CardKind.Alcohol) { BeginSimpleCardUse(id, new(card.Id, SimpleCardUseEffect.Alcohol)); return; }
         if (card.Kind == CardKind.Lightning && !HasSoleTargetProtectionCapability && TryBeginDelayedCardUsePrograms(id)) return;

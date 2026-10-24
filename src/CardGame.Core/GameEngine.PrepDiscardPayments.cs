@@ -182,7 +182,7 @@ public sealed partial class GameEngine
             var paidRecords = records.Where(m => payment.CardIds.Contains(m.CardId) && m.From.OwnerSeat == payer &&
                 m.To == CardLocation.DiscardPile && m.Reason.Value == reason).ToArray();
             var paid = payment with { SequenceAfter = PrepDiscardSequence, ActualCount = paidRecords.Length,
-                NonEquipmentCount = paidRecords.Count(m => !EquipmentCatalog.IsEquipment(m.CardKind)) };
+                NonEquipmentCount = paidRecords.Count(m => !EquipmentRules.IsEquipment(m.CardKind)) };
             // Movement can queue SilverLion replacement onto this exact owner.
             // Merge into its fresh frame; never overwrite those queued fields.
             var current = GetActiveProgramFrame(f.Id);

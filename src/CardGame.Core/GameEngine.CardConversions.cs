@@ -31,7 +31,7 @@ public sealed partial class GameEngine
         var physical = action.PhysicalCards[0];
         var modifiers = new NuzhanModifiers(
             IgnoresSlashLimit: CardCatalog.Get(physical.CardKind).CategoryName == "锦囊牌",
-            DamageBonus: EquipmentCatalog.IsEquipment(physical.CardKind) ? 1 : 0,
+            DamageBonus: EquipmentRules.IsEquipment(physical.CardKind) ? 1 : 0,
             PhysicalCardId: physical.CardId);
         if (!modifiers.IgnoresSlashLimit && modifiers.DamageBonus == 0) return default;
 

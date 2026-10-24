@@ -9,7 +9,7 @@ public sealed partial class GameEngine
         public SkillProgram? Program(string id)=>e._contentRegistry.Skills.GetValueOrDefault(id)?.Program;public IEnumerable<T> History<T>()where T:IGameEvent=>e.ProgramEventHistory<T>();
         public bool Parent(ProgramSkillFrame f)=>e.MouCaParent(f);
         public int LostEquipmentOwner(ProgramSkillFrame f)=>f.WindowContext?.MovementBatch is{}batch&&f.WindowContext.MovementIndex is{}index&&index>=0&&index<batch.Movements.Count&&batch.Movements[index]is{From.Zone:CardZoneKind.Equipment}m&&m.To!=m.From&&e._cardMovements.Contains(m)?m.From.OwnerSeat??-1:-1;
-        public int EmptySlots(int seat)=>Enum.GetValues<EquipmentSlot>().Sum(slot=>Math.Max(0,e._players[seat].EquipmentSlotCapacity(slot)-e.GetEquipment(seat).Count(c=>EquipmentCatalog.Get(c.Kind).Slot==slot)));
+        public int EmptySlots(int seat)=>Enum.GetValues<EquipmentSlot>().Sum(slot=>Math.Max(0,e._players[seat].EquipmentSlotCapacity(slot)-e.GetEquipment(seat).Count(c=>e.EquipmentRules.Get(c.Kind).Slot==slot)));
         public IReadOnlyList<MouCaEntity> Equipment(int seat)=>Array.AsReadOnly(e.GetEquipment(seat).Where(c=>!e.IsForeignEquipmentDiscardPrevented(seat,c,CardLocation.Equipment(seat),OwnedCardMoveIntent.Discard)).Select(c=>new MouCaEntity(c.Id,c.Kind,CardLocation.Equipment(seat))).ToArray());
         public IReadOnlyList<MouCaPair> Pairs(ProgramSkillFrame f)=>e.MouCaPairs(f);public IReadOnlyList<LegalAction> Plans(ProgramSkillFrame f)=>f.MouCaoAng is{}r?e.MouCaPlans(f,r.Actor,r.CardId):[];
         public CardKind Kind(int id)=>e.GetAdvancedCard(id).Kind;

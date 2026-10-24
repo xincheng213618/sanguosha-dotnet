@@ -16,7 +16,7 @@ public sealed partial class GameEngine
             var weaponId = f.ActivationId == "discard-weapon" ? f.SelectedCardIds.Single() : (int?)null;
             var from = weaponId is { } id ? _cardZones.GetLocation(id) : (CardLocation?)null;
             if (weaponId is { } weapon && (from!.Value.OwnerSeat != f.OwnerSeat ||
-                from.Value.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || EquipmentCatalog.Get(GetAttackCard(weapon).Kind).Slot != EquipmentSlot.Weapon))
+                from.Value.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || EquipmentRules.Get(GetAttackCard(weapon).Kind).Slot != EquipmentSlot.Weapon))
                 throw new InvalidOperationException("S5 Qiangxi requires its actual selected owner weapon.");
             ReplaceRuntimeTop(f with { ShanheS5Qiangxi = new(new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId),
                 f.GameplayHash, target, _roundNumber, _turnNumber, _cardUseDebitPhaseInstanceId, checked(prior + 1),

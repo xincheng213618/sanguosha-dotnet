@@ -20,7 +20,7 @@ public sealed partial class GameEngine
         cards = PrepareWenheActivityDeck(cards);
         cards = PrepareDragonBoatDeck(cards);
         cards = PrepareGuanduDeck(cards);
-        return cards.Select(card => card.Kind).Where(kind => !EquipmentCatalog.IsEquipment(kind))
+        return cards.Select(card => card.Kind).Where(kind => !EquipmentRules.IsEquipment(kind))
             .Distinct().Order().ToArray();
     }
 }

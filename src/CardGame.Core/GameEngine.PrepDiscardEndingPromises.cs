@@ -30,7 +30,7 @@ public sealed partial class GameEngine
             m.From.OwnerSeat == p.TargetSeat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment &&
             m.To == CardLocation.DiscardPile && m.Reason.Value == PrepDiscardTargetReason).ToArray();
         return records.Length == paid[0].ActualCount && records.Select(m => m.CardId).Distinct().Count() == records.Length &&
-            records.Count(m => !EquipmentCatalog.IsEquipment(m.CardKind)) == p.Count;
+            records.Count(m => !EquipmentRules.IsEquipment(m.CardKind)) == p.Count;
     }
     private void IssuePrepDiscardEnding(ProgramSkillFrame supplied, string endingBinding)
     {

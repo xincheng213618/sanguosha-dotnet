@@ -72,7 +72,7 @@ public sealed partial class GameEngine
         if (location.OwnerSeat != owner.Seat || location.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
             throw new InvalidOperationException("Equipment recast requires a real owned hand/equipment entity.");
         var card = _cardZones.CardsAt(location).Single(c => c.Id == id);
-        if (!EquipmentCatalog.IsEquipment(card.Kind))
+        if (!EquipmentRules.IsEquipment(card.Kind))
             throw new InvalidOperationException("Recast entity is not equipment.");
         frame = BeginFrameNativeRecastInvocation(frame, owner.Seat, [card.Id]);
         MoveCard(card, location, CardLocation.DiscardPile, CardMoveReasons.RecastDiscard);

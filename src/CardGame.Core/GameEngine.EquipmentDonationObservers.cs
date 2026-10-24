@@ -39,7 +39,7 @@ public sealed partial class GameEngine
         {
             if (movement.Count(m => m.Sequence == fact.MovementSequence && m.CardId == fact.CardId &&
                 m.From == CardLocation.Equipment(f.OwnerSeat) && m.To == CardLocation.Processing &&
-                EquipmentCatalog.IsEquipment(m.CardKind) && m.Reason.Value == EquipmentDonationMoveReason) != 1) return false;
+                EquipmentRules.IsEquipment(m.CardKind) && m.Reason.Value == EquipmentDonationMoveReason) != 1) return false;
             if (fact.Delivered != (movement.Count(m => m.CardId == fact.CardId && m.From == CardLocation.Processing &&
                 m.To == CardLocation.Hand(recipient) && m.Reason.Value == EquipmentDonationMoveReason) == 1)) return false;
         }
@@ -82,7 +82,7 @@ public sealed partial class GameEngine
                 if (fact.ReplacedEquipmentCardId is { } replaced)
                 {
                     if (replaced == fact.EquipmentCardId || replacements is not [var replacement] || replacement.CardId != replaced ||
-                        !EquipmentCatalog.IsEquipment(replacement.CardKind) ||
+                        !EquipmentRules.IsEquipment(replacement.CardKind) ||
                         GetAdvancedCard(replaced).IsGeneralWeapon != fact.ReplacedGeneralWeapon ||
                         replacement.To != (fact.ReplacedGeneralWeapon ? CardLocation.OutsideGame : CardLocation.DiscardPile)) return false;
                 }

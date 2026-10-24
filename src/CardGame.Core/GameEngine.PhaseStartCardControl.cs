@@ -136,7 +136,7 @@ public sealed partial class GameEngine
             p.SequenceAfter > p.SequenceBefore && p.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment &&
             (r.Kind == PhaseStartCardControlKind.OtherPlayRestriction ? p.From.OwnerSeat == f.OwnerSeat && !r.ArmorAcquired &&
                 p.To == NormalizeEphemeralCardDestination(GetAdvancedCard(p.CardId),p.From,p.Kind == CardKind.GeneralWeapon && p.From.Zone == CardZoneKind.Equipment ? CardLocation.OutsideGame : CardLocation.DiscardPile) :
-                p.From.Zone == CardZoneKind.Equipment && (r.ArmorAcquired ? p.To == NormalizeEphemeralCardDestination(GetAdvancedCard(p.CardId),p.From,CardLocation.Hand(f.OwnerSeat)) && EquipmentCatalog.Get(p.Kind).Slot == EquipmentSlot.Armor :
+                p.From.Zone == CardZoneKind.Equipment && (r.ArmorAcquired ? p.To == NormalizeEphemeralCardDestination(GetAdvancedCard(p.CardId),p.From,CardLocation.Hand(f.OwnerSeat)) && EquipmentRules.Get(p.Kind).Slot == EquipmentSlot.Armor :
                     p.From.OwnerSeat != f.OwnerSeat && p.To == NormalizeEphemeralCardDestination(GetAdvancedCard(p.CardId),p.From,p.Kind == CardKind.GeneralWeapon ? CardLocation.OutsideGame : CardLocation.DiscardPile))) &&
             _cardMovements.Count(m => m.CardId == p.CardId && m.CardKind == p.Kind && m.From == p.From && m.To == p.To &&
                 m.Sequence > p.SequenceBefore && m.Sequence <= p.SequenceAfter && m.Reason.Value == PhaseStartControlReason(r.Kind)) == 1 &&

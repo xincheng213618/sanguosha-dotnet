@@ -62,14 +62,14 @@ public sealed partial class GameEngine
         paid.Need.RequestOp == r.Op && paid.Need.ActorSeat == f.OwnerSeat && paid.Need.ProviderSeat == f.OwnerSeat &&
         paid.OutputKind == CardKind.Peach && paid.TargetSeat == r.TargetSeat && paid.Need.Targets.SequenceEqual([r.TargetSeat]) &&
         ValidWeijiePayment(paid) && WenyiRemaining(f.OwnerSeat) > 0;
-    private bool CanWenyiUseEquipment(int recipient, Card c) => IsValidPlayerSeat(recipient) && _players[recipient].IsAlive && EquipmentCatalog.IsEquipment(c.Kind) && !c.IsGeneralWeapon &&
-        _players[recipient].EquipmentSlotCapacity(EquipmentCatalog.Get(c.Kind).Slot) > 0 && !IsCardUseForbidden(recipient, c.Kind, CardActionType.Use) &&
+    private bool CanWenyiUseEquipment(int recipient, Card c) => IsValidPlayerSeat(recipient) && _players[recipient].IsAlive && EquipmentRules.IsEquipment(c.Kind) && !c.IsGeneralWeapon &&
+        _players[recipient].EquipmentSlotCapacity(EquipmentRules.Get(c.Kind).Slot) > 0 && !IsCardUseForbidden(recipient, c.Kind, CardActionType.Use) &&
         !IsTurnHandCardRestricted(_players[recipient], c) && !IsTurnPhysicalUseForbidden(recipient, [c.Id]) && !HasSelfCardTargetProhibition(recipient) &&
         !IsCardTargetProhibited(_players[recipient], c.Kind, EffectiveSuit(_players[recipient], c)) && !HasBeneficiarySuitShield(recipient, recipient, EffectiveSuit(_players[recipient], c));
     private void GiveWenyiEquipment(ProgramSkillFrame f, int cardId)
     {
         var r = f.HuanShuJun!; var owner = _players[f.OwnerSeat]; var from = _cardZones.GetLocation(cardId); var card = _cardZones.CardsAt(from).Single(c => c.Id == cardId);
-        if (r.Paid || r.Stage != HuanShuJunStage.WenyiChoice || WenyiRemaining(f.OwnerSeat) == 0 || !owner.IsAlive || !HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId) || r.TargetSeat == f.OwnerSeat || !_players[r.TargetSeat].IsAlive || from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !EquipmentCatalog.IsEquipment(card.Kind) || card.IsGeneralWeapon) throw new InvalidOperationException("Wenyi cannot give a changed or unowned equipment entity.");
+        if (r.Paid || r.Stage != HuanShuJunStage.WenyiChoice || WenyiRemaining(f.OwnerSeat) == 0 || !owner.IsAlive || !HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId) || r.TargetSeat == f.OwnerSeat || !_players[r.TargetSeat].IsAlive || from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !EquipmentRules.IsEquipment(card.Kind) || card.IsGeneralWeapon) throw new InvalidOperationException("Wenyi cannot give a changed or unowned equipment entity.");
         ReplaceRuntimeTop(f = f with { HuanShuJun = r = r with { Paid = true, Kind = card.Kind, Materials = [new(card.Id, card.Kind, from)], Stage = HuanShuJunStage.EquipmentGiftChildren, Before = _movementSequence, After = _movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         AdvanceEventRulesAndQueueFact(new WenyiPaidEvent(f.Id, f.OwnerSeat, r.TargetSeat, r.WindowId, "equipment"));
         MoveCard(card, from, CardLocation.Hand(r.TargetSeat), new("skill-program.huan-shu-jun.wenyi.give"), NativeGiveCompletion(f.Id,f.OwnerSeat,r.TargetSeat,[card.Id],_movementSequence,m => AdvanceEventRulesAndQueueFact(new WenyiEquipmentGivenEvent(f.Id, card.Id, r.TargetSeat, m.Sequence))));

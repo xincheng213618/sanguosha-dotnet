@@ -177,7 +177,7 @@ public sealed partial class GameEngine
                     if (moved is null || moved.Sequence <= r.SequenceBefore || moved.CardKind != cost.CardKind ||
                         moved.From != cost.From || moved.To != CardLocation.Processing ||
                         !(IsCardSupplyCompletionEntry(action, use.Id, _resolutionStack[at - 1].Id, cost, moved) ||
-                          EquipmentCatalog.IsEquipment(use.CardKind) && moved.Reason == CardMoveReasons.EquipmentUse ||
+                          EquipmentRules.IsEquipment(use.CardKind) && moved.Reason == CardMoveReasons.EquipmentUse ||
                           use.CardKind == CardKind.IronChain && moved.Reason == CardMoveReasons.IronChainUse) || !expected.Add(cost.CardId))
                         throw new InvalidOperationException("A nested Douyu native Use cannot claim an unpaid, stale or ancestor processing entity.");
                 }

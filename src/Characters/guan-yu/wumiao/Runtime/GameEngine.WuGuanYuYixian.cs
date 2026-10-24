@@ -85,7 +85,7 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("Yixian cannot pay an expired or already-consumed limited activation.");
         var ids = branch == YixianBranch.Field
             ? _players.SelectMany(p => GetEquipment(p)).Select(c => c.Id).ToArray()
-            : _cardZones.CardsAt(CardLocation.DiscardPile).Where(c => EquipmentCatalog.IsEquipment(c.Kind)).Select(c => c.Id).ToArray();
+            : _cardZones.CardsAt(CardLocation.DiscardPile).Where(c => EquipmentRules.IsEquipment(c.Kind)).Select(c => c.Id).ToArray();
         var before = _movementSequence;
         ReplaceRuntimeTop(f = f with { Yixian = f.Yixian! with { Paid = true, Branch = branch,
             Stage = YixianStage.EquipmentChildren, SequenceBefore = before, SequenceAfter = before },
@@ -195,7 +195,7 @@ public sealed partial class GameEngine
         var r = f.Yixian!;
         if (r.Stage == YixianStage.BranchChoice)
         {
-            var field = _players.Sum(p => GetEquipment(p).Count); var discard = _cardZones.CardsAt(CardLocation.DiscardPile).Count(c => EquipmentCatalog.IsEquipment(c.Kind));
+            var field = _players.Sum(p => GetEquipment(p).Count); var discard = _cardZones.CardsAt(CardLocation.DiscardPile).Count(c => EquipmentRules.IsEquipment(c.Kind));
             return decision.Choices.Single(c => c.Parameters["branch"] == (field >= discard ? "field" : "discard"));
         }
         var recipient = r.Recipients[r.Cursor]; var view = CreateSnapshot(f.OwnerSeat);

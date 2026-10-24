@@ -54,7 +54,7 @@ public sealed partial class GameEngine
         var valid=FinalTargetGiftChoices(frame).SingleOrDefault(c=>c.Id==selected.Id) ?? throw new InvalidOperationException("Final gift no longer names legal payment/recipient.");
         var from=new CardLocation(Enum.Parse<CardZoneKind>(valid.Parameters["source-zone"]),frame.OwnerSeat);
         var card=_cardZones.CardsAt(from)[int.Parse(valid.Parameters["slot-index"],System.Globalization.CultureInfo.InvariantCulture)];
-        var recipient=valid.Targets.Single();var to=CardLocation.Hand(recipient);var reward=EquipmentCatalog.IsEquipment(card.Kind)?2:1;
+        var recipient=valid.Targets.Single();var to=CardLocation.Hand(recipient);var reward=EquipmentRules.IsEquipment(card.Kind)?2:1;
         ClearPendingDecision();ReplaceRuntimeTop(frame with{FinalTargetGift=draft with{Stage="gift-movement",RecipientSeat=recipient,CardId=card.Id,Reward=reward}});
         var beforeOrdinal=_movementSequence;
         MoveCard(card, from, to, new("skill-program.final-target-gift.give"), NativeGiveCompletion(frame.Id,frame.OwnerSeat,recipient,[card.Id],_movementSequence,null));

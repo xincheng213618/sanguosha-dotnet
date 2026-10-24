@@ -6,7 +6,7 @@ public sealed partial class GameEngine
     {
         if (!_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiDengAiGain) ||
             _resolutionStack.LastOrDefault() is not CardUseFrame { Action: { Type: CardActionType.Use } action } use || batch.ParentFrameId != use.Id ||
-            !EquipmentCatalog.IsEquipment(use.CardKind) || action.EffectiveKind != use.CardKind) return;
+            !EquipmentRules.IsEquipment(use.CardKind) || action.EffectiveKind != use.CardKind) return;
         if (use.ShiDengAiEquipmentLoss is { } captured)
         {
             if (!ValidShiDaEquipmentLoss(use, captured)) throw new InvalidOperationException("Tuntian's equipment transfer lost its original native material.");
@@ -37,10 +37,10 @@ public sealed partial class GameEngine
             e.Source.OwnerSeat == movement.From.OwnerSeat && e.Source.SkillId == ShiDaTuntian && _contentRegistry.GetSkill(ShiDaTuntian).Program?.GameplayHash == e.Hash &&
             (LifecycleCardUse(e.UseId) is { Action: { } action, ShiDengAiEquipmentLoss: { } receipt } ? action.ActionId == e.ActionId && receipt.ActionId == e.ActionId && receipt.PaymentSequence == e.PaymentSequence && ValidShiDaEquipmentLoss(LifecycleCardUse(e.UseId)!, receipt) :
                 ProgramEventHistory<ShiDaEquipmentLossSettledEvent>().Any(s => s.UseId == e.UseId && s.ActionId == e.ActionId && s.CardId == e.CardId && s.PaymentSequence == e.PaymentSequence)) &&
-            ProgramEventHistory<CardUseDeclaredEvent>().Any(d => d.ResolutionId == e.UseId && d.CardId == e.CardId && EquipmentCatalog.IsEquipment(d.CardKind) && d.SourceSeat == e.Source.OwnerSeat));
+            ProgramEventHistory<CardUseDeclaredEvent>().Any(d => d.ResolutionId == e.UseId && d.CardId == e.CardId && EquipmentRules.IsEquipment(d.CardKind) && d.SourceSeat == e.Source.OwnerSeat));
     private bool ValidShiDaEquipmentLoss(CardUseFrame use, ShiDaEquipmentLossReceipt receipt) =>
         receipt.UseId == use.Id && use.Action is { Type: CardActionType.Use, PhysicalCards: [var cost] } action && receipt.ActionId == action.ActionId &&
-        EquipmentCatalog.IsEquipment(use.CardKind) && action.EffectiveKind == use.CardKind && use.CardId == receipt.CardId && use.PhysicalCardIds is [var id] && id == receipt.CardId &&
+        EquipmentRules.IsEquipment(use.CardKind) && action.EffectiveKind == use.CardKind && use.CardId == receipt.CardId && use.PhysicalCardIds is [var id] && id == receipt.CardId &&
         cost.CardId == receipt.CardId && cost.CardKind == receipt.PrintedKind && cost.From == receipt.From && receipt.From.OwnerSeat == receipt.Source.OwnerSeat &&
         action.ProviderSeat == receipt.Source.OwnerSeat && ShiDaOwns(receipt.From, receipt.Source.OwnerSeat) && !ShiDaDamageCard(receipt.PrintedKind) &&
         receipt.Source.SkillId == ShiDaTuntian && receipt.Source.BindingId == "non-damage-loss" && !string.IsNullOrWhiteSpace(receipt.Source.SkillInstanceId) &&

@@ -3,7 +3,7 @@ namespace CardGame.Core;
 public sealed partial class GameEngine
 {
     private bool CanHulaoWeaponRecast(Card card) => _modeDefinition.HulaoActivity is not null &&
-        EquipmentCatalog.IsEquipment(card.Kind) && EquipmentCatalog.Get(card.Kind).Slot == EquipmentSlot.Weapon;
+        EquipmentRules.IsEquipment(card.Kind) && EquipmentRules.Get(card.Kind).Slot == EquipmentSlot.Weapon;
     // This signal never crosses the command session or persists in a checkpoint.
     // It unwinds synchronous draw/damage callers before they can open further
     // effects belonging to the interrupted form. The accepted command commits

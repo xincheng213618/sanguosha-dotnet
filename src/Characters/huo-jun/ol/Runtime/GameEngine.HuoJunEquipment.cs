@@ -7,8 +7,8 @@ public sealed partial class GameEngine
         var r = f.HuoJunFenrui!; var actor = _players[f.OwnerSeat];
         if (r.RestoredSlot is not { } slot || r.Stage != HuoJunFenruiStage.RestoreChildren)
             throw new InvalidOperationException("Fenrui equipment must follow its one actually restored native slot.");
-        var candidates = actor.IsAlive && actor.Hp > 0 ? _cardZones.CardsAt(CardLocation.DrawPile).Where(c => EquipmentCatalog.IsEquipment(c.Kind) &&
-            !c.IsGeneralWeapon && EquipmentCatalog.Get(c.Kind).Slot == slot && actor.EquipmentSlotCapacity(slot) > 0 &&
+        var candidates = actor.IsAlive && actor.Hp > 0 ? _cardZones.CardsAt(CardLocation.DrawPile).Where(c => EquipmentRules.IsEquipment(c.Kind) &&
+            !c.IsGeneralWeapon && EquipmentRules.Get(c.Kind).Slot == slot && actor.EquipmentSlotCapacity(slot) > 0 &&
             !IsCardUseForbidden(actor.Seat, c.Kind, CardActionType.Use) && !IsSelfTargetForbiddenAction(actor, c.Kind, [actor.Seat]) &&
             !IsResponseEntityRestricted(actor.Seat, c.Id) && !IsPlayPhasePhysicalCardRestricted(actor, c)).OrderBy(c => c.Id).ToArray() : [];
         if (candidates.Length == 0)
@@ -31,7 +31,7 @@ public sealed partial class GameEngine
         if (ride is not CardUseFrame use || beneath is not ProgramSkillFrame { HuoJunFenrui: { Stage: HuoJunFenruiStage.NativeEquipment } r } f ||
             r.Source != HuoJunSource(f) || r.NativeUseId != use.Id || r.NativeActionId != use.Action?.ActionId ||
             r.EquipmentCardId != use.CardId || r.EquipmentKind != use.CardKind || r.RestoredSlot is not { } slot ||
-            EquipmentCatalog.Get(use.CardKind).Slot != slot || use.Action is not { Type: CardActionType.Use } action ||
+            EquipmentRules.Get(use.CardKind).Slot != slot || use.Action is not { Type: CardActionType.Use } action ||
             action.ActorSeat != f.OwnerSeat || action.ProviderSeat != f.OwnerSeat || action.EffectiveKind != use.CardKind ||
             action.PhysicalCards is not [var cost] || cost.CardId != use.CardId || cost.CardKind != use.CardKind || cost.From != CardLocation.DrawPile ||
             !action.ConversionChain.Contains(r.Source)) return false;

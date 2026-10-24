@@ -15,7 +15,7 @@ public sealed partial class GameEngine
     private CardUseFrame NonFinalTargetUse(ProgramSkillFrame frame)
     {
         if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } use } ||
-            use.ActorSeat != frame.OwnerSeat || _currentSeat != frame.OwnerSeat || EquipmentCatalog.IsEquipment(use.EffectiveKind) ||
+            use.ActorSeat != frame.OwnerSeat || _currentSeat != frame.OwnerSeat || EquipmentRules.IsEquipment(use.EffectiveKind) ||
             _resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == use.ParentCardUseFrameId) is not { Action: { Type: CardActionType.Use } action } parent ||
             action.ActionId != use.CardActionId || action.ActorSeat != frame.OwnerSeat || action.EffectiveKind != use.EffectiveKind)
             throw new InvalidOperationException("Non-final-target payment lost its actual own-turn non-equipment use.");
@@ -24,7 +24,7 @@ public sealed partial class GameEngine
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.AfterInitialPayments, 40, SkillProgramEffectOp.DiscardNonFinalTargetCardThenDraw)]
     private bool CanOfferNonFinalTargetPayment(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) =>
         context.CardUse is { ActorSeat: var actor, EffectiveKind: var kind } use && actor == candidate.OwnerSeat && actor == _currentSeat &&
-        !EquipmentCatalog.IsEquipment(kind) && !NamedTurnActionAlreadyCommitted(actor, candidate.SkillId, use.CardActionId) &&
+        !EquipmentRules.IsEquipment(kind) && !NamedTurnActionAlreadyCommitted(actor, candidate.SkillId, use.CardActionId) &&
         GetProgramTargetSeats(actor, SkillProgramTargetKind.CurrentCardUseTargets, context) is { } targets &&
         _players.Any(p => p.IsAlive && !targets.Contains(p.Seat) && HasDiscardableHeBy(actor, p.Seat));
     private IReadOnlyList<PromptChoice> NonFinalTargetChoices(ProgramSkillFrame frame)

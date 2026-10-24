@@ -6,7 +6,7 @@ public sealed partial class GameEngine
         if (use.Action is not { Type: CardActionType.Use } a || IsSlashCard(use.CardKind) || use.CardKind != a.EffectiveKind || use.SourceSeat != a.ActorSeat ||
             b.ParentFrameId != use.Id || b.ParentBatchId is not null || b.AwaitingProgramFrameId is not null || b.NativeDrawInvocation is not null || b.NativeBuZhiDiscardInvocation is not null ||
             b.TurnNumber != _turnNumber || b.Movements.Count == 0 || b.Movements.Count != a.PhysicalCards.Count || b.Movements.Select(m => m.CardId).Distinct().Count() != b.Movements.Count) return false;
-        var reason = EquipmentCatalog.IsEquipment(use.CardKind) ? CardMoveReasons.EquipmentUse : CardMoveReasons.Use;
+        var reason = EquipmentRules.IsEquipment(use.CardKind) ? CardMoveReasons.EquipmentUse : CardMoveReasons.Use;
         foreach (var m in b.Movements)
         {
             var cost = a.PhysicalCards.SingleOrDefault(c => c.CardId == m.CardId);
@@ -42,7 +42,7 @@ public sealed partial class GameEngine
         return continuation.Kind switch {
             RecoveryPaidCardUseKind.Trick => continuation.CardId == use.CardId && continuation.ActionKind is not null && continuation.TargetSeats is { } targets && targets.SequenceEqual(use.TargetSeats) && (continuation.PlayedCardKind ?? use.CardKind) == use.CardKind,
             RecoveryPaidCardUseKind.Simple => continuation.CardId == use.CardId && continuation.Simple?.CardId == use.CardId,
-            RecoveryPaidCardUseKind.EquipmentUse => continuation.CardId == use.CardId && EquipmentCatalog.IsEquipment(use.CardKind) && continuation.EquipmentSlot == EquipmentCatalog.Get(use.CardKind).Slot,
+            RecoveryPaidCardUseKind.EquipmentUse => continuation.CardId == use.CardId && EquipmentRules.IsEquipment(use.CardKind) && continuation.EquipmentSlot == EquipmentRules.Get(use.CardKind).Slot,
             _ => false
         };
     }

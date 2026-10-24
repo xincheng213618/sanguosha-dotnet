@@ -27,8 +27,8 @@ public sealed partial class GameEngine
     private Card[] GuoZhaoEquipmentCandidates(ProgramSkillFrame f)
     {
         var owner = _players[f.OwnerSeat];
-        return !owner.IsAlive || _winner != Winner.None ? [] : _cardZones.CardsAt(CardLocation.DrawPile).Where(c => EquipmentCatalog.IsEquipment(c.Kind) && !c.IsGeneralWeapon &&
-            owner.EquipmentSlotCapacity(EquipmentCatalog.Get(c.Kind).Slot) > 0 &&
+        return !owner.IsAlive || _winner != Winner.None ? [] : _cardZones.CardsAt(CardLocation.DrawPile).Where(c => EquipmentRules.IsEquipment(c.Kind) && !c.IsGeneralWeapon &&
+            owner.EquipmentSlotCapacity(EquipmentRules.Get(c.Kind).Slot) > 0 &&
             !IsCardUseForbidden(owner.Seat, c.Kind, CardActionType.Use) && !IsSelfTargetForbiddenAction(owner, c.Kind, [owner.Seat]) &&
             !IsResponseEntityRestricted(owner.Seat, c.Id) && !IsPlayPhasePhysicalCardRestricted(owner, c)).OrderBy(c => c.Id).ToArray();
     }

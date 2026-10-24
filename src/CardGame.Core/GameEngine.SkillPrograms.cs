@@ -123,7 +123,7 @@ public sealed partial class GameEngine
                         .Where(card => CanSelectProgramActivationCard(plan, card, owner.Seat, program.Id))
                         .Where(card => ProgramSelections.AllowsCard(ProgramSelectionStage.CardAfterDeclaration, selection, card))
                         .Where(card => activation.EquipmentSlots.Count == 0 ||
-                            EquipmentCatalog.IsEquipment(card.Kind) &&
+                            EquipmentRules.IsEquipment(card.Kind) &&
                             activation.EquipmentSlots.Contains(FieldEquipmentSlot(card)))
                         .Select(card => card.Id).Distinct().Order().ToArray();
                 if (!ProgramSelections.Apply(ProgramSelectionStage.AfterCards, selection, candidates)) continue;
@@ -270,7 +270,7 @@ public sealed partial class GameEngine
     {
         var occupiedSlots = GetEquipment(target)
             .Select(item => FieldEquipmentSlot(item)).ToHashSet();
-        return GetHand(owner).Any(card => EquipmentCatalog.IsEquipment(card.Kind) &&
+        return GetHand(owner).Any(card => EquipmentRules.IsEquipment(card.Kind) &&
             !occupiedSlots.Contains(FieldEquipmentSlot(card)));
     }
 
@@ -760,7 +760,7 @@ public sealed partial class GameEngine
             cancel("赠出的牌已离开用牌者手牌，使用步骤取消。");
             return SkillProgramStepOutcome.AwaitChild;
         }
-        if (!EquipmentCatalog.IsEquipment(card.Kind))
+        if (!EquipmentRules.IsEquipment(card.Kind))
             throw new InvalidOperationException(
                 "A bound-card use requires an equipment card.");
         ClearPendingDecision();

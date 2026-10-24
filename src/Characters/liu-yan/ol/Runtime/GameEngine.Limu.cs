@@ -23,8 +23,8 @@ public sealed partial class GameEngine
         if(!HasLiuYanCapability)return false;
         var materials=(ids??(physical is {Id:>0}?[physical.Id]:[])).ToHashSet();
         var equipment=GetEquipment(actor).Where(c=>materials.Contains(c.Id)).ToArray();
-        excludedId??=equipment.FirstOrDefault(c=>EquipmentCatalog.Get(c.Kind).Slot==EquipmentSlot.Weapon)?.Id;
-        if(excludedSlot is null&&equipment.Any(c=>EquipmentCatalog.Get(c.Kind).Slot==EquipmentSlot.OffensiveHorse))excludedSlot=EquipmentSlot.OffensiveHorse;
+        excludedId??=equipment.FirstOrDefault(c=>EquipmentRules.Get(c.Kind).Slot==EquipmentSlot.Weapon)?.Id;
+        if(excludedSlot is null&&equipment.Any(c=>EquipmentRules.Get(c.Kind).Slot==EquipmentSlot.OffensiveHorse))excludedSlot=EquipmentSlot.OffensiveHorse;
         return HasLiuYanLimuTargetAllowance(actor,target,excludedId,excludedSlot);
     }
 

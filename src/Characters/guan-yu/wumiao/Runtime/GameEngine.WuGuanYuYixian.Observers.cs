@@ -48,7 +48,7 @@ public sealed partial class GameEngine
         if (entities.Length != r.Entities.Count || !entities.Select((fact, i) =>
             fact == new YixianEntityObtainedEvent(f.Id, i, r.Entities[i].CardId, r.Entities[i].PrintedKind,
                 r.Entities[i].From, r.Entities[i].To, r.Entities[i].MovementSequence)).All(v => v) ||
-            r.Entities.Any(e => !EquipmentCatalog.IsEquipment(e.PrintedKind) ||
+            r.Entities.Any(e => !EquipmentRules.IsEquipment(e.PrintedKind) ||
                 (branch == YixianBranch.Field ? e.From.Zone != CardZoneKind.Equipment || e.From.OwnerSeat is not { } owner || !IsValidPlayerSeat(owner)
                     : e.From != CardLocation.DiscardPile) ||
                 e.To != CardLocation.Hand(f.OwnerSeat) && e.To != CardLocation.OutsideGame ||

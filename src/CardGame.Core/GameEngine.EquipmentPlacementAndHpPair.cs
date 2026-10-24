@@ -7,7 +7,7 @@ public sealed partial class GameEngine
         IsValidPlayerSeat(ownerSeat) && IsValidPlayerSeat(targetSeat) &&
         _players[ownerSeat].IsAlive && _players[targetSeat].IsAlive &&
         source.OwnerSeat == ownerSeat && source.Zone is CardZoneKind.Hand or CardZoneKind.Equipment &&
-        _cardZones.GetLocation(card.Id) == source && EquipmentCatalog.IsEquipment(card.Kind) &&
+        _cardZones.GetLocation(card.Id) == source && EquipmentRules.IsEquipment(card.Kind) &&
         source != CardLocation.Equipment(targetSeat) && !_players[targetSeat].EquipmentAreaAbolished &&
         _players[targetSeat].EquipmentSlotCapacity(FieldEquipmentSlot(card)) > 0;
 
@@ -77,7 +77,7 @@ public sealed partial class GameEngine
                     from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) ||
                     binding.CardIds.Count != 1 || !binding.CardIds.SequenceEqual(payment.CardIds) ||
                     binding.SourceLocations.Single() != from ||
-                    !EquipmentCatalog.IsEquipment(GetAdvancedCard(binding.CardIds[0]).Kind) ||
+                    !EquipmentRules.IsEquipment(GetAdvancedCard(binding.CardIds[0]).Kind) ||
                     frame.SelectedTargetSeats is not [var seat] || seat != payment.RecipientSeat ||
                     from == CardLocation.Equipment(seat))
                     throw new InvalidOperationException("Equipment placement lost its frozen physical cost origin.");

@@ -27,7 +27,7 @@ public sealed partial class GameEngine
     {
         var at=_cardZones.GetLocation(c.CardId);
         return at.Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile ||
-            at==CardLocation.Equipment(a.ActorSeat) && EquipmentCatalog.IsEquipment(a.EffectiveKind) &&
+            at==CardLocation.Equipment(a.ActorSeat) && EquipmentRules.IsEquipment(a.EffectiveKind) &&
             CompleteProgramEventHistory().OfType<EquipmentChangedEvent>().Any(e=>e.ResolutionId==parentFrameId&&e.PlayerSeat==a.ActorSeat&&e.CardId==c.CardId&&e.CardKind==a.EffectiveKind);
     }).Select(c=>c.CardId).Distinct().ToArray();
     private bool HasPhaseSuitAllowance(int seat,Suit? suit)=>suit is { } s && s!=Suit.None && _phase==TurnPhase.Play && seat==_currentSeat &&

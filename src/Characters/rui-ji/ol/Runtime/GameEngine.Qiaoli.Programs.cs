@@ -215,7 +215,7 @@ public sealed partial class GameEngine
         for (var index = 0; index < gains; index++)
         {
             var candidates = _cardZones.CardsAt(CardLocation.DrawPile)
-                .Where(card => EquipmentCatalog.IsEquipment(card.Kind)).OrderBy(card => card.Id).ToArray();
+                .Where(card => EquipmentRules.IsEquipment(card.Kind)).OrderBy(card => card.Id).ToArray();
             if (candidates.Length == 0)
             {
                 AddLog("SkillEffect", $"{owner.Name} 巧力：牌堆中没有装备牌，随机获得落空。", owner.Seat);
