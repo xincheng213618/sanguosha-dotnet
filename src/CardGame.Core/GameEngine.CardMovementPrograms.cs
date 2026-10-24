@@ -334,6 +334,7 @@ public sealed partial class GameEngine
                 if (candidate.SkillId == HappyZuoCiComposition.Huanshu && candidate.BindingId == "foreign-phantom") continue;
                 if (candidate.SkillId == AnniversaryGuoZhaoComposition.Pianchong && candidate.BindingId == "lost-color-benefit") continue;
                 if (trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMouJuShouMuwang) || IsMouCaFengmin(trigger) || IsMouHqGiveTrigger(trigger) || trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveYuandiDiscardNames)) continue;
+                if (IsShiPxRiderTrigger(trigger)) continue;
                 if (IsWuZishengMovementTrigger(trigger) || IsGuYinDiscardTrigger(trigger) || IsBeifenLossTrigger(trigger) || IsHellZhiwangTrigger(trigger) || IsNianJingjueTrigger(trigger) || IsTangTangZhiyiTrigger(trigger) || trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveJieyanOppositeEndDrawPair) || IsXiangxuMinimumTrigger(trigger) || IsQuHuangMovementTrigger(trigger) || trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.OfferNativeBatchHandGainOrCardLossBenefit) || IsBiriTrigger(trigger) || IsLingkongGainTrigger(trigger) || IsQimeiEqualityTrigger(trigger) || IsNeighborDiscardTopTrigger(trigger) || IsThirdPartyHandGainTrigger(trigger) ||
                     IsOwnerSourceHandGainTrigger(trigger) || IsOtherLastHandLossTrigger(trigger) || IsBianFuRenWanweiTrigger(trigger) || IsSunRuOlChishiTrigger(trigger) || IsDuFuRenYiseTrigger(trigger) || IsFeiYiSingletonTrigger(trigger) || IsQingyuanGainTrigger(trigger) || IsMouFaZhengGainTrigger(trigger) || IsMouLuSuGainTrigger(trigger) || IsMouGuoHuaiGainTrigger(trigger) || trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ClaimLiubingUndamagingSlash)) continue;
                 if (!IsGainPhaseQualified(trigger, ownerSeat, batch.MovementTiming)) continue;
@@ -375,6 +376,7 @@ public sealed partial class GameEngine
                 candidates.AddRange(occurrences.Select(index => candidate with { OccurrenceIndex = index }));
             }
         }
+        candidates.AddRange(CollectShiPxRiderCandidates(batch));
         candidates.AddRange(CollectOwnTurnEnemyHandGainCandidates(batch));
         candidates.AddRange(CollectMouJsMovementCandidates(batch));
         candidates.AddRange(CollectMouCaEquipmentCandidates(batch));

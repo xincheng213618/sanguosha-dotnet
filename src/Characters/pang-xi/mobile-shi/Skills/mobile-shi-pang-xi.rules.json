@@ -1,0 +1,81 @@
+{
+ "schemaVersion": 62,
+ "skills": [
+  {
+   "id": "mobile:shi-xuye",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "xuye-damage",
+     "window": "afterDamageApplied",
+     "subject": "any",
+     "damageOccurrence": "perDamage",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiPxXuye",
+       "target": "owner"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mobile:shi-kuangxiang",
+   "revision": 1,
+   "activations": [
+    {
+     "id": "kuangxiang-swap",
+     "minCards": 0,
+     "maxCards": 0,
+     "minTargets": 1,
+     "maxTargets": 1,
+     "targetKind": "otherLiving",
+     "usesPerTurn": null,
+     "usesPerPhase": 1,
+     "condition": {
+      "kind": "always"
+     },
+     "effects": [
+      {
+       "op": "resolveShiPxKuangxiang",
+       "target": "owner"
+      }
+     ]
+    }
+   ],
+   "triggers": [
+    {
+     "id": "kuangxiang-loss",
+     "window": "cardsMoved",
+     "subject": "owner",
+     "sourceZones": ["hand"],
+     "movementOccurrence": "perOwnerBatch",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiPxRider",
+       "target": "owner"
+      }
+     ]
+    },
+    {
+     "id": "kuangxiang-sweep",
+     "window": "playPhaseStarting",
+     "subject": "owner",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiPxSweep",
+       "target": "owner"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
