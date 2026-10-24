@@ -44,7 +44,7 @@ public sealed partial class GameEngine
             !_players[ownerSeat].IsAlive || !HasRuntimeSkillInstance(_players[ownerSeat], grant.Source.SkillId, grant.Source.SkillInstanceId) ||
             _contentRegistry.GetSkill(grant.Source.SkillId).Program?.GameplayHash != grant.GameplayHash ||
             GetProgramBooleanState(ownerSeat, grant.Source.SkillId, grant.Source.SkillInstanceId, grant.DisabledStateId)) return null;
-        return grant;
+        return IsBoundaryJianYongAdjustmentCurrent(grant) ? grant : null;
     }
 
     private bool HasNextActualUseAdjustment(CharacterState owner) => CurrentNextActualUseAdjustment(owner.Seat) is not null;
@@ -75,6 +75,7 @@ public sealed partial class GameEngine
         }
         else return;
         if (CurrentNextActualUseAdjustment(actor) is not { } grant) return;
+        if (!BoundaryJianYongAdjustmentConsumes(grant, kind)) return;
         AdvanceEventRulesAndQueueFact(new NextActualUseTargetAdjustmentConsumedEvent(
             grant.ProgramFrameId, _turnNumber, _currentSeat, grant.Source, frameId, actionId, kind, nullification));
     }

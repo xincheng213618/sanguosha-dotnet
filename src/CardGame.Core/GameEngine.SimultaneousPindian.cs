@@ -190,6 +190,7 @@ public sealed partial class GameEngine
                 var claims = FreezeSimultaneousClaims(f,pair); ReplaceRuntimeTop(f = f with { SimultaneousPindian = r = r with { Claims = claims } });
                 AdvanceEventRulesAndQueueFact(new SimultaneousPindianClaimsIssuedEvent(f.Id,r.ComparisonIndex,claims));
             }
+            if (TryBeginBoundaryJianYongSimultaneousZongshi(f)) return true;
             if (OfferSimultaneousClaim(f)) return true;
             f = GetActiveProgramFrame(f.Id); r = f.SimultaneousPindian!;
             var losers = SimultaneousNonwinners(pair);

@@ -14,6 +14,7 @@
     <Compile Include="..\Shared\BoundarySunLuBanScenario.cs" Link="BoundarySunLuBanScenario.cs" />
     <Compile Include="..\Shared\BoundaryGuYongScenario.cs" Link="BoundaryGuYongScenario.cs" />
     <Compile Include="..\Shared\BoundaryCaoZhenScenario.cs" Link="BoundaryCaoZhenScenario.cs" />
+    <Compile Include="..\Shared\BoundaryCaiFuRenScenario.cs" Link="BoundaryCaiFuRenScenario.cs" />
     <Compile Include="..\CardGame.Core.Tests\BoundaryZhuZhiChecks.cs" Link="BoundaryZhuZhiChecks.cs" />
     <Compile Include="..\Shared\BoundaryYiJiScenario.cs" Link="BoundaryYiJiScenario.cs" />
     <Compile Include="..\CardGame.Core.Tests\BoundaryCaoXiuMobileChecks.cs" Link="BoundaryCaoXiuMobileChecks.cs" />

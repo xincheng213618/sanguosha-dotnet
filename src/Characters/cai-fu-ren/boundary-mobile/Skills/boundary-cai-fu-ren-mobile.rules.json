@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:qieting-mobile", "revision": 1,
+      "triggers": [{ "id": "mobile-turn-end", "window": "afterTurnEnded", "subject": "owner", "turnOwnerScope": "otherLiving", "optional": true,
+        "effects": [{ "op": "resolveBoundaryMobileQieting", "target": "owner" }] }] },
+    { "id": "boundary:xianzhou-mobile", "revision": 1,
+      "activations": [{ "id": "all-equipment-donation", "minCards": 0, "maxCards": 0, "minTargets": 1, "maxTargets": 1, "targetKind": "otherLiving", "usesPerTurn": null,
+        "effects": [{ "op": "donateAllEquipmentAndOfferRecipientBenefits", "target": "owner", "stateId": "limited-donation" }] }] }
+  ]
+}

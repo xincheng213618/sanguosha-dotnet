@@ -301,7 +301,7 @@ public sealed partial class GameEngine
                 frame.EquipmentDonation is not null && IsValidAllEquipmentDonation(frame),
             SkillProgramEffectOp.ResolveOrdinaryCaiFuRenXianzhou =>
                 IsIssuedOrdinaryCaiFuRenXianzhou(frame) && IsValidAllEquipmentDonation(frame),
-            SkillProgramEffectOp.ResolveOrdinaryCaiFuRenQieting =>
+            SkillProgramEffectOp.ResolveOrdinaryCaiFuRenQieting or SkillProgramEffectOp.ResolveBoundaryMobileQieting =>
                 CanContinueIssuedOrdinaryCaiFuRen(frame),
             SkillProgramEffectOp.ChooseEquipmentOrDrawAfterOtherActualTurn =>
                 frame.ActualEndedEquipment is not null && IsValidActualEndedEquipment(frame),

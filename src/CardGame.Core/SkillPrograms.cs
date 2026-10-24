@@ -303,6 +303,10 @@ public enum SkillProgramEffectOp
     PrepareBoundaryBuLianShiAnxu = 55900,
     SelectBoundaryBuLianShiAnxuLeast = 55901,
     ResolveBoundaryChengPuLihuo = 56200,
+    PrepareBoundaryGuoHuaiJingce = 56400,
+    RecordBoundaryJianYongQiaoshuiFailure = 56500,
+    ResolveBoundaryJianYongZongshi = 56501,
+    ResolveBoundaryMobileQieting = 56600,
     ResolveBoundaryCaoXiuQingxi = 51100,
     ResolveBoundaryQuanCongYaoming = 51200,
     SelectMobileShiKaijiTargets = 47400,
@@ -3427,9 +3431,10 @@ public sealed class SkillProgramCatalog
             foreach (var activation in activations)
                 foreach (var grant in activation.Effects.Where(e => e.Op == SkillProgramEffectOp.GrantNextActualUseTargetAdjustment))
                     if (!booleanStates.Any(s => s.Id == grant.StateId && !s.InitialValue &&
-                            s.Visibility == SkillProgramStateVisibility.Public && s.ResetScope == SkillProgramStateResetScope.Turn) ||
+                            s.Visibility == SkillProgramStateVisibility.Public && s.ResetScope ==
+                                (id == "boundary:qiaoshui-mobile" ? SkillProgramStateResetScope.PlayPhase : SkillProgramStateResetScope.Turn)) ||
                         activation.Condition is not { Kind: SkillProgramConditionKind.BooleanState, ExpectedValue: false } gate || gate.StateId != grant.StateId)
-                        Fail(skillPath, "next actual-use adjustment requires its initially-false public Turn state and matching enabled activation condition");
+                        Fail(skillPath, "next actual-use adjustment requires its initially-false public state with the admitted lifetime and matching enabled activation condition");
             var declaredStateIds = booleanStates.Select(item => item.Id).ToHashSet(StringComparer.Ordinal);
             foreach (var trigger in triggers)
                 foreach (var condition in EnumerateTriggerConditions(trigger.Condition))
@@ -4853,7 +4858,7 @@ public sealed class SkillProgramCatalog
         var requiredPolarity = node.TryGetProperty("requiredPolarity", out _)
             ? EnumValue<SkillPolarity>(node, "requiredPolarity", path) : (SkillPolarity?)null;
         if (window == SkillProgramTriggerWindow.PindianBeforeReveal && skillId != "ol:douyu" ||
-            window == SkillProgramTriggerWindow.PindianResultDetermined && skillId is not ("ol:douyu" or "mobile:zhiti") ||
+            window == SkillProgramTriggerWindow.PindianResultDetermined && skillId is not ("ol:douyu" or "mobile:zhiti" or "boundary:zongshih-mobile") ||
             window == SkillProgramTriggerWindow.DuelResponseFailed && skillId != "mobile:zhiti")
             Fail(path, "native contest windows require their complete admitted program");
         bool? requireNoCardConversion = null;

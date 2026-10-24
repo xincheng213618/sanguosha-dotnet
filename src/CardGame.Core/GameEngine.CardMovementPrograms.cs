@@ -166,6 +166,7 @@ public sealed partial class GameEngine
         CaptureNativePublicPilePaymentBatch(completed);
         CaptureMouGszHuPaymentBatch(completed);
         CaptureNativeTrueUseProcessingEntries(completed);
+        CaptureBoundaryGuoHuaiDiscardBatch(completed);
         CaptureShanheStartingResourceUseEntries(completed);
         CaptureMouHuLieUsedDiscard(completed);
         CaptureMouJsMovementBatch(completed);

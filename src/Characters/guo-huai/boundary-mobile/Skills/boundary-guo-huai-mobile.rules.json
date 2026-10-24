@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "boundary:jingce-mobile", "revision": 1,
+    "triggers": [
+      { "id": "record-native-response-materials", "window": "cardResponseCompleted", "ownerRelation": "observer", "optional": false, "isSkillInvocation": false,
+        "effects": [{ "op": "prepareBoundaryGuoHuaiJingce", "target": "owner" }] },
+      { "id": "actual-turn-discard-count", "window": "turnEnding", "subject": "owner", "turnOwnerScope": "own", "optional": true,
+        "effects": [{ "op": "prepareBoundaryGuoHuaiJingce", "target": "owner" }, { "op": "draw", "target": "owner", "amount": 2 }] }
+    ] }]
+}

@@ -229,6 +229,7 @@ public sealed partial class GameEngine
         var frames = _resolutionStack.OfType<PindianFrame>().ToArray();
         foreach (var owned in frames) AssertOwnedPilePindianSource(owned);
         if (frames.Length == 0) return;
+        if (frames.Length == 1 && IsBoundaryJianYongZongshiSubtree(frames[0])) return;
         if (frames.Length == 1 && IsMobileZhitiContestSubtree(frames[0])) return;
         if (frames.Length == 1 && IsWuLuKangPairSubtree(frames[0])) { AssertWuLuKangWindows(); AssertWuLuKangPairProcessing(frames[0]); return; }
         if (frames.Length == 1 && IsDouyuPairSubtree(frames[0])) { AssertDouyuWindows(); AssertDouyuPairSubtreeProcessing(frames[0]); return; }

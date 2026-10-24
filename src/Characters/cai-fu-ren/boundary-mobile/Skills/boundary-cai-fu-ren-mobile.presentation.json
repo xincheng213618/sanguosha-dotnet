@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:qieting-mobile": {
+      "name": "窃听", "description": "其他角色的回合结束后，若其没有于此回合内对另一名角色造成过伤害，则你可以选择一项：1.观看其两张手牌并获得其中一张牌；2.将其装备区里的一张牌置入你的装备区；3.摸一张牌。",
+      "triggerChoices": { "mobile-turn-end": "选择观看手牌、置入装备或摸一张牌" }
+    },
+    "boundary:xianzhou-mobile": {
+      "name": "献州", "description": "限定技，出牌阶段，将全部装备牌交给另一名角色，由其选择令你回复实际交给牌数的体力，或对其攻击范围内至多等量角色各造成1点伤害。",
+      "activationLabels": { "all-equipment-donation": "交出全部装备，由接收者选择回复或伤害" }
+    }
+  }
+}

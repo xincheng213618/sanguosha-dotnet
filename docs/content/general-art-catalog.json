@@ -2,6 +2,57 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "key": "boundary-guo-huai-mobile",
+      "characterName": "界郭淮",
+      "defaultSkinId": "54100",
+      "skins": [
+        {
+          "id": "54100",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-392.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/54100.jpg",
+          "sha256": "4272bbcd5655e5428f73fe1748b1921dca39e11da9fd3113e200fbb4c077f3c5",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-guo-huai-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-jian-yong-mobile",
+      "characterName": "界简雍",
+      "defaultSkinId": "53300",
+      "skins": [
+        {
+          "id": "53300",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-385.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/53300.jpg",
+          "sha256": "ef4a7f940b49396ef4a27dae9c0cb3dcb309eac229b775faea44e5f4512ba082",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-jian-yong-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-cai-fu-ren-mobile",
+      "characterName": "界蔡夫人",
+      "defaultSkinId": "60100",
+      "skins": [
+        {
+          "id": "60100",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-433.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/60100.jpg",
+          "sha256": "ba3c1eb67dbf8051de8effe283bd80a9c14f24fbf85dd049c56eba7305226c23",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-cai-fu-ren-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
       "key": "boundary-cai-wen-ji-mobile",
       "characterName": "界蔡文姬",
       "defaultSkinId": "47400",

@@ -1,0 +1,4 @@
+{
+  "schemaVersion": 3,
+  "skills": { "boundary:jingce-mobile": { "name": "精策", "description": "结束阶段，若此回合内因使用或打出而置入弃牌堆的牌数量不小于你的体力值，则你可以摸两张牌。" } }
+}

@@ -5,8 +5,8 @@ namespace CardGame.Core;
 public sealed record OrdinaryQietingTurnContext(int ActualTurn, int TurnOwnerSeat, long HistoryCutoff, bool UsedOnAnother);
 public sealed record OrdinaryQietingActualUseEvent(int ActualTurn, int TurnOwnerSeat, long NativeUseId,
     long? ActionId, int ActorSeat, bool UsedOnAnother, int DesignatedTargetCount) : IGameEvent;
-public enum OrdinaryQietingStage { Choice, MovementChildren, Draw, DrawChildren, Complete }
-public sealed record OrdinaryQietingReceipt(CardConversionSource Source, string GameplayHash,
+public enum OrdinaryQietingStage { Choice, MovementChildren, Draw, DrawChildren, Complete, Viewing }
+public sealed partial record OrdinaryQietingReceipt(CardConversionSource Source, string GameplayHash,
     OrdinaryQietingTurnContext Qualification, long WindowId, int OccurrenceIndex, OrdinaryQietingStage Stage)
 {
     public bool Paid { get; init; }

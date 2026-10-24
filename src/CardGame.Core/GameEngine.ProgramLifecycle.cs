@@ -2638,7 +2638,9 @@ public sealed partial class GameEngine
                 slashFrame.Candidates.Any(item => item.OwnerSeat == candidate.OwnerSeat &&
                     item.SkillId == candidate.SkillId && item.SkillInstanceId == candidate.SkillInstanceId &&
                     item.TriggerId == candidate.BindingId && item.GameplayHash == candidate.GameplayHash),
-            SkillProgramTriggerWindow.PindianResultDetermined or SkillProgramTriggerWindow.DuelResponseFailed =>
+            SkillProgramTriggerWindow.PindianResultDetermined =>
+                MobileZhitiContestCandidateMatches(candidate, context) || IsBoundaryJianYongZongshiCandidate(candidate, context),
+            SkillProgramTriggerWindow.DuelResponseFailed =>
                 MobileZhitiContestCandidateMatches(candidate, context),
             SkillProgramTriggerWindow.DiscardPhaseStarting =>
                 context.SourceSeat == _currentSeat && _phase == TurnPhase.Discard &&

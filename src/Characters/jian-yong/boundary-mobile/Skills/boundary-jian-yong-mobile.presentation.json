@@ -1,0 +1,4 @@
+{"schemaVersion":3,"skills":{
+ "boundary:qiaoshui-mobile":{"name":"巧说","description":"每出牌阶段限一次拼点；赢后可为本阶段下一张基本牌或普通锦囊增减一个目标且无距离限制；没赢只在本阶段不能使用锦囊。","activationLabels":{"contest":"与一名其他角色拼点"}},
+ "boundary:zongshih-mobile":{"name":"纵适","description":"自己参与的拼点结束后，私看牌堆顶一张牌，可获得顶牌或较小点数拼点牌；平局可任选一张拼点牌。"}
+}}
