@@ -961,6 +961,8 @@ var tests = new (string Name, Action Body)[]
     ("Shi Zhang Ren: FuAn arms zero range draws and records suits per round", ShiZhangRenChecks.FuAnArmsZeroRangeDrawAndRecordsPerRound),
     ("Shi Zhang Ren: FuAn strikes without distance and seals until next turn end", ShiZhangRenChecks.FuAnStrikesWithoutDistanceAndSealsUntilNextTurnEnd),
     ("Shi Zhang Ren: YinXian adds farthest damage and bonus range", ShiZhangRenChecks.YinXianAddsFarthestDamageAndBonusRange),
+    ("Shi Lou Gui: GuanSha replaces every card with random basics and raises this turn's hand limit", ShiLouGuiChecks.GuanShaReplacesAllCardsWithBasicsAndRaisesTurnHandLimit),
+    ("Shi Lou Gui: JiYu gains other categories and re-arms after using every gained card", ShiLouGuiChecks.JiYuGainsOtherCategoriesAndReArmsAfterUsingEveryGain),
     ("Wang Kuang: BothDoWhileOrdersPrivateDiscardAndNativeExhaustionCold", WangKuangChecks.BothDoWhileOrdersPrivateDiscardAndNativeExhaustionCold),
     ("Cao Xi: NonbasicValuesCapWeaponsAndNativeSlashQuotaCold", CaoXiChecks.NonbasicValuesCapWeaponsAndNativeSlashQuotaCold),
     ("Hu Jin Ding: QingyuanOpeningFirstDamageRandomMarkedHandsAndQuotaCold", HuJinDingChecks.QingyuanOpeningFirstDamageRandomMarkedHandsAndQuotaCold),

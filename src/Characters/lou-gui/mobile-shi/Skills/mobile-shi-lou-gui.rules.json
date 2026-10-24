@@ -1,0 +1,53 @@
+{
+ "schemaVersion": 62,
+ "skills": [
+  {
+   "id": "mobile:shi-guansha",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "guansha-play-ending",
+     "window": "playEnding",
+     "subject": "owner",
+     "optional": false,
+     "isSkillInvocation": false,
+     "usageScope": "game",
+     "usageLimit": 1,
+     "effects": [
+      {
+       "op": "resolveShiLgGuanSha",
+       "target": "owner"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mobile:shi-jiyu",
+   "revision": 1,
+   "activations": [
+    {
+     "id": "jiyu-use",
+     "minCards": 0,
+     "maxCards": 0,
+     "minTargets": 0,
+     "maxTargets": 0,
+     "targetKind": "anyLiving",
+     "usesPerTurn": null,
+     "usesPerPhase": null,
+     "condition": {
+      "kind": "always"
+     },
+     "effects": [
+      {
+       "op": "resolveShiLgJiYu",
+       "target": "owner"
+      }
+     ]
+    }
+   ],
+   "triggers": []
+  }
+ ]
+}
