@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:shenxing-mobile", "revision": 1, "activations": [
+      { "id": "discard-pair", "minCards": 2, "maxCards": 2, "sourceZones": ["hand", "equipment"],
+        "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving", "usesPerTurn": null, "effects": [
+          { "op": "prepareBoundaryGuYongShenxing", "target": "owner", "resultBind": "paid-colors" },
+          { "op": "discardSelected", "target": "owner", "amount": 2 },
+          { "op": "draw", "target": "owner", "amount": 2, "condition": { "kind": "choiceIs", "sourceBind": "paid-colors", "optionId": "different" } },
+          { "op": "draw", "target": "owner", "amount": 1, "condition": { "kind": "choiceIs", "sourceBind": "paid-colors", "optionId": "same" } }
+        ] }
+    ] },
+    { "id": "boundary:bingyi-mobile", "revision": 1, "triggers": [
+      { "id": "ending-reveal-share", "window": "turnEnding", "subject": "owner", "optional": true,
+        "condition": { "kind": "compare", "left": { "kind": "currentHandCount" }, "operator": "greaterThanOrEqual", "right": { "kind": "integerConstant", "value": 1 } },
+        "effects": [
+          { "op": "selectOwnedCards", "target": "owner", "numberExpression": "allOwnedZoneCards", "zones": ["hand"], "resultBind": "shown-hand" },
+          { "op": "prepareBoundaryGuYongBingyi", "target": "owner", "sourceBind": "shown-hand" },
+          { "op": "selectTargets", "target": "owner", "targetKind": "anyLiving", "minimumTargets": 0, "maximumTargets": 8, "numberExpression": "boundCardCount", "sourceBind": "shown-hand", "targetAiOrder": "stable" },
+          { "op": "draw", "target": "selectedTargets", "amount": 1 }
+        ] }
+    ] }
+  ]
+}

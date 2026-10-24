@@ -1,0 +1,6 @@
+{
+  "schemaVersion":3,"skills":{
+    "boundary:fenli-mobile":{"name":"奋励","description":"若你的手牌数为全场最多，你可以跳过摸牌阶段；若你的体力值为全场最多，你可以跳过出牌阶段；若你的装备区里有牌且数量为全场最多，你可以跳过弃牌阶段。"},
+    "boundary:pingkou-mobile":{"name":"平寇","description":"回合结束后，你可以对至多X名其他角色各造成1点伤害（X为你本回合跳过的阶段数），若如此做，你从牌堆中随机获得一张装备牌。"}
+  }
+}

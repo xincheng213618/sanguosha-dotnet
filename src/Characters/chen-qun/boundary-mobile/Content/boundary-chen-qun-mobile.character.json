@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:chen-qun",
+  "skills": [
+    { "registrationOrder": 53600, "programBundle": "boundary-chen-qun-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:dingpin-mobile", "name": "定品", "description": "出牌阶段，你可以弃置一张本回合未使用或弃置过类型的牌并选择一名角色，令其判定。若结果为：黑色，其摸X张牌（X为其当前体力值且至多为3），然后你本回合不能再对其发动定品；红桃，本次定品弃置的牌不计入弃置过的类型；方块，你翻面。", "actionForms": "Active" } },
+    { "registrationOrder": 53601, "programBundle": "boundary-chen-qun-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:faen-mobile", "name": "法恩", "description": "当一名角色翻面或进入连环状态后，你可以令其摸一张牌。", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 53602, "pools": { "current": 53602 },
+    "definition": { "id": "boundary:chen-qun-mobile", "name": "界陈群·移动版", "portraitKey": "boundary-chen-qun-mobile", "skillId": "boundary:dingpin-mobile", "additionalSkillIds": ["boundary:faen-mobile"], "factionId": "wei", "baseHp": 3, "gender": "Male", "characterId": "character:chen-qun", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile" } }]
+}

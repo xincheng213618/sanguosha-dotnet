@@ -590,6 +590,7 @@ internal static class ProgramCompositionValidator
                         var minimum = selection?.MinimumTargets ?? initialTargetSetCount;
                         var maximum = selection?.MaximumTargets ?? initialTargetSetMaximum;
                         if (read.AllowEmptyChainedDraw && minimum == 0 &&
+                            !BoundaryGuYongComposition.AllowsEmptyRecipientDraw(effects, index, window) &&
                             (index == 0 || !ReferenceEquals(selection, effects[index - 1]) || selection is not
                                 { Op: SkillProgramEffectOp.SelectTargets, TargetKind: SkillProgramTargetKind.AnyLivingChained,
                                     MinimumTargets: 0, ReplaceSelection: true }))

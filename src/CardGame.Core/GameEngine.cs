@@ -3406,6 +3406,7 @@ public sealed partial class GameEngine
         if (_pendingTurnDelayedEffects.HasFlag(DelayedTurnEffects.SkipJudgmentPhase))
         {
             RecordShanheS5ActualPhaseSkip(current.Seat, SkillProgramTurnPhase.Judgment);
+            RecordBoundaryZhuHuanSkippedPhase(current.Seat, SkillProgramTurnPhase.Judgment);
             CompleteTurnStart(current, _pendingTurnDelayedEffects);
         }
         else

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:shenxing-mobile": {
+      "name": "慎行", "description": "出牌阶段限当前体力值次，弃置两张手牌或装备牌；异色摸两张，否则摸一张。",
+      "activationLabels": { "discard-pair": "慎行：弃置两张牌" }
+    },
+    "boundary:bingyi-mobile": {
+      "name": "秉壹", "description": "结束阶段展示所有手牌；颜色相同或类型相同，可选至多等同展示手牌数的角色各摸一张，允许自己。",
+      "triggerChoices": { "ending-reveal-share": "秉壹：展示所有手牌" }
+    }
+  }
+}

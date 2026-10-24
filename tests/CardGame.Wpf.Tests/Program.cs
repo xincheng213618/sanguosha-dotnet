@@ -123,6 +123,9 @@ internal static class Program
             Check("Mobile boundary batch 45 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
                 new HashSet<string>(StringComparer.Ordinal) { "boundary:zhou-cang-mobile", "boundary:cao-zhen-mobile", "boundary:sun-xiu-mobile" }));
             Check("Mobile boundary Cao Zhen UI: secret targets and owner-only forecast progress", () => BoundaryCaoZhenUiChecks.SecretForecastActualTargetsAndOwnerOnlyProgress(output));
+            Check("Mobile boundary batch 46 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
+                new HashSet<string>(StringComparer.Ordinal) { "boundary:chen-qun-mobile", "boundary:gu-yong-mobile", "boundary:zhu-huan-mobile" }));
+            Check("Mobile boundary Gu Yong UI: mixed-color reveal and native self recipient draft", () => BoundaryGuYongUiChecks.MixedColorSameTypeRevealAndNativeSelfRecipientDraft(output));
             Check("Edition general gallery: namespaced portraits and real details", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output));
             Check("God editions UI: formal portraits complete details and actual edition labels", () => MobileGodGalleryChecks.GodSeriesPortraitsAndDetails(output));
             Check("Shouli field mount UI: published foreign conversion and native payment", () => ShouliFieldMountUiChecks.ForeignMountUsesPublishedConversion(output));

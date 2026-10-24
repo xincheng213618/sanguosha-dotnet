@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:dingpin-mobile": { "name": "定品", "description": "出牌阶段，你可以弃置一张本回合未使用或弃置过类型的牌并选择一名角色，令其判定。若结果为：黑色，其摸X张牌（X为其当前体力值且至多为3），然后你本回合不能再对其发动定品；红桃，本次定品弃置的牌不计入弃置过的类型；方块，你翻面。", "activationLabels": { "judge-unused-category": "弃牌定品" } },
+    "boundary:faen-mobile": { "name": "法恩", "description": "当一名角色翻面或进入连环状态后，你可以令其摸一张牌。" }
+  }
+}

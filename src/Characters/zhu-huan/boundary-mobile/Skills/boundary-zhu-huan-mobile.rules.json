@@ -1,0 +1,10 @@
+{
+  "schemaVersion":62,"skills":[
+    {"id":"boundary:fenli-mobile","revision":1,"triggers":[
+      {"id":"skip-draw-most-hand","window":"drawPhaseStarting","subject":"owner","optional":true,"effects":[{"op":"skipBoundaryZhuHuanDraw","target":"owner"}]},
+      {"id":"skip-play-most-hp","window":"afterNormalDraw","subject":"owner","optional":true,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]},
+      {"id":"skip-discard-most-equipment","window":"discardPhaseStarting","subject":"owner","optional":true,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["discard"]}]}
+    ]},
+    {"id":"boundary:pingkou-mobile","revision":1,"triggers":[{"id":"actual-ended-skips","window":"afterTurnEnded","subject":"owner","turnOwnerScope":"own","optional":true,"effects":[{"op":"resolveBoundaryZhuHuanPingkou","target":"owner"}]}]}
+  ]
+}

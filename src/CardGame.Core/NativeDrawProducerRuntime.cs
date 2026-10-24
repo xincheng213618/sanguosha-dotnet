@@ -49,6 +49,7 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
     }
 
     internal static bool IsCommittedEmptyTargetDraw(ProgramSkillFrame frame, ProgramExecutionPlan plan, int amount) =>
+        BoundaryGuYongComposition.IsCommittedEmptyRecipientDraw(frame, plan, amount) ||
         frame.SelectedTargetSeats.Count == 0 && frame.NativeDraw is null && amount > 0 &&
         frame.InstructionIndex >= 2 && frame.InstructionIndex <= plan.Instructions.Count &&
         plan.BindingId == (frame.TriggerId ?? frame.ActivationId) &&

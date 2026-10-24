@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:dingpin-mobile", "revision": 1,
+      "activations": [{ "id": "judge-unused-category", "minCards": 1, "maxCards": 1, "sourceZones": ["hand", "equipment"], "minTargets": 1, "maxTargets": 1, "targetKind": "anyLiving", "usesPerTurn": null,
+        "effects": [
+          { "op": "prepareBoundaryChenQunDingpin", "target": "owner" },
+          { "op": "captureSelectedCards", "target": "owner", "resultBind": "dingpin-cost" },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "dingpin-cost", "destination": "discardPile", "awaitMovementTriggers": true },
+          { "op": "startJudgment", "target": "selectedTarget", "judgmentReason": "skill.boundary.dingpin-mobile", "resultBind": "dingpin-card", "outcomeBind": "dingpin-outcome", "visibility": "public" },
+          { "op": "resolveBoundaryChenQunDingpin", "target": "owner" },
+          { "op": "turnOver", "target": "owner", "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "dingpin-outcome", "suits": ["diamond"] } },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "dingpin-card", "destination": "discardPile", "awaitMovementTriggers": true }
+        ] }] },
+    { "id": "boundary:faen-mobile", "revision": 1,
+      "triggers": [
+        { "id": "turn-over-benefit", "window": "characterTurnedOver", "subject": "any", "optional": true,
+          "effects": [{ "op": "selectTarget", "target": "owner", "targetKind": "eventTarget" }, { "op": "draw", "target": "selectedTarget", "amount": 1 }] },
+        { "id": "chain-entry-benefit", "window": "characterEnteredChain", "subject": "any", "optional": true,
+          "effects": [{ "op": "selectTarget", "target": "owner", "targetKind": "eventTarget" }, { "op": "draw", "target": "selectedTarget", "amount": 1 }] }
+      ] }
+  ]
+}
