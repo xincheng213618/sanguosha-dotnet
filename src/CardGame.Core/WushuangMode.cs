@@ -43,6 +43,9 @@ public sealed record WushuangSnapshot(int Seat, int Level, int Experience, int E
     public IReadOnlyList<string> ReplaceableOriginalSkillIds { get; init; } = Array.AsReadOnly(Array.Empty<string>());
     public WushuangShopPhase Phase { get; init; }
     public long WindowId { get; init; }
+    /// <summary>Configured native action turns remaining; no hidden opponent state.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public int? RemainingTurns { get; init; }
     public bool IsLocked { get; init; }
     public IReadOnlyList<WushuangShopOffer> PurchasedOffers { get; init; } = Array.AsReadOnly(Array.Empty<WushuangShopOffer>());
     public IReadOnlyList<int> TacticIds { get; init; } = Array.AsReadOnly(Array.Empty<int>());

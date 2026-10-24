@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:jieyong", "revision": 1,
+      "viewAs": [
+        { "id": "last-red-hand-slash", "inputKinds": [], "inputSuits": ["heart", "diamond"], "sourceZones": ["hand"], "outputKind": "slash", "forPlay": true, "forResponse": true, "allowSameKind": true, "useEffectiveInputSuit": true }
+      ]
+    }
+  ]
+}

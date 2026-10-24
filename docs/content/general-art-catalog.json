@@ -2,6 +2,57 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "key": "boundary-guan-ping",
+      "characterName": "界关平",
+      "defaultSkinId": "76600",
+      "skins": [
+        {
+          "id": "76600",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.com/news/20260529_8264_4513",
+          "imageUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/big/static/76600.png",
+          "sha256": "90cb8d0eff4083dbdc213e5639c8f876f0c418732034ab8ae470f4c43258b9eb",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-guan-ping.png",
+          "pixelWidth": 815,
+          "pixelHeight": 1080
+        }
+      ]
+    },
+    {
+      "key": "boundary-yuan-shu-mobile",
+      "characterName": "界袁术",
+      "defaultSkinId": "21500",
+      "skins": [
+        {
+          "id": "21500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-63.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/21500.jpg",
+          "sha256": "6061c1a0bf61cecd58a2faeadd663c45bfd5365b95071bfc49b01821a4fae479",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-yuan-shu-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-yu-fan-mobile",
+      "characterName": "界虞翻",
+      "defaultSkinId": "53400",
+      "skins": [
+        {
+          "id": "53400",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-386.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/53400.jpg",
+          "sha256": "dc391663e5f280ff1c55d911dd5405b8732e2dd6b3deae2a4ff1aabcbc6d1d6e",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-yu-fan-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
       "key": "boundary-yu-ji-mobile",
       "characterName": "界于吉",
       "defaultSkinId": "3300",

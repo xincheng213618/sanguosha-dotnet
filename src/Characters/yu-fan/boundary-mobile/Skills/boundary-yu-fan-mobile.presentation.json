@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3, "skills": {
+    "boundary:zongxuan-mobile": { "name": "纵玄", "description": "自己的牌因弃置进入弃牌堆后，可选其中任意张按顺序置于牌堆顶。出牌阶段限一次，先摸一张牌，再将一张手牌或装备牌置于牌堆顶。", "triggerChoices": { "discard-to-top": "纵玄：将本次弃置的牌置于牌堆顶" } },
+    "boundary:zhiyan-mobile": { "name": "直言", "description": "结束阶段可令任一角色摸一张并展示；若为装备牌，其实际使用之并回复1点体力。", "triggerChoices": { "draw-reveal-equip": "直言：选择摸牌并展示的角色" } }
+  }
+}

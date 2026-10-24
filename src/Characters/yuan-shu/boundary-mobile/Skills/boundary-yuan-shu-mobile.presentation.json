@@ -1,0 +1,5 @@
+{"schemaVersion":3,"skills":{
+ "boundary:yongsi-mobile":{"name":"庸肆","description":"摸牌阶段改摸全场势力数张牌；弃牌阶段开始，弃一张牌或失去1点体力。","optionLabels":{"discard":"弃置一张手牌或装备牌","loss":"失去1点体力"}},
+ "boundary:jixi-mobile":{"name":"觊玺","description":"连续三个自己的回合没有失去体力后，加1体力上限、回复1体力，选择获得妄尊或摸两张牌并获得主公的主公技。","optionLabels":{"wangzun":"获得妄尊","lord":"摸两张牌，获得主公的主公技"}},
+ "boundary:wangzun-mobile":{"name":"妄尊","description":"主公准备阶段，你可以摸一张牌，令其本回合手牌上限-1。","triggerChoices":{"lord-preparation":"摸一张牌，令主公本回合手牌上限-1。"}}
+}}

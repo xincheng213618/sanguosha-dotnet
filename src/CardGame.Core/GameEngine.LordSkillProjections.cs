@@ -60,7 +60,8 @@ public sealed partial class GameEngine
         // The menu uses the same stable instance that execution resolves. Do not let another grant authorize it.
         instance ??= PreferredQualifiedPrintedLordInstance(owner, skillId) ?? GetSkillBindingShard(owner).ActiveGrants.Where(g => g.SkillId == skillId)
             .OrderBy(g => g.SkillInstanceId, StringComparer.Ordinal).Select(g => g.SkillInstanceId).FirstOrDefault();
-        return owner.SkillGrants.Grants.Any(g => g.SkillId == skillId && g.SkillInstanceId == instance && g.IsEnabled && (IsPrintedLordGrantQualified(owner, g) || g.LordProjection is not null && IsProjectedGrantQualified(owner, g)));
+        return owner.SkillGrants.Grants.Any(g => g.SkillId == skillId && g.SkillInstanceId == instance && g.IsEnabled && (IsPrintedLordGrantQualified(owner, g) || g.LordProjection is not null && IsProjectedGrantQualified(owner, g))) ||
+            IsBoundaryYuanShuLordGrantQualified(owner, skillId, instance);
     }
 
     // Preserve the established local ownership semantics for ordinary grants. A retained,

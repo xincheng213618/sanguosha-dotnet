@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 62, "skills": [
+    { "id": "boundary:zongxuan-mobile", "revision": 1,
+      "activations": [{ "id": "draw-then-top", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0,
+        "targetKind": "anyLiving", "usesPerTurn": null, "usesPerPhase": 1,
+        "effects": [
+          { "op": "draw", "target": "owner", "amount": 1 },
+          { "op": "awaitOwnedCardMovement", "target": "owner" },
+          { "op": "selectOwnedCards", "target": "owner", "zones": ["hand", "equipment"], "minimumCards": 1, "maximumCards": 1, "resultBind": "top-card" },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "top-card", "destination": "drawPileTop", "awaitMovementTriggers": true }
+        ] }],
+      "triggers": [{ "id": "discard-to-top", "window": "cardsMoved", "subject": "owner",
+        "sourceZones": ["hand", "equipment"], "movementOccurrence": "perOwnerBatch", "movementDiscardOnly": true,
+        "optional": true, "effects": [{ "op": "putDiscardedCardsOnDrawPileTop", "target": "owner" }] }]
+    },
+    { "id": "boundary:zhiyan-mobile", "revision": 1,
+      "triggers": [{ "id": "draw-reveal-equip", "window": "turnEnding", "subject": "owner", "optional": true,
+        "effects": [
+          { "op": "selectTarget", "target": "owner", "targetKind": "anyLiving" },
+          { "op": "draw", "target": "selectedTarget", "amount": 1, "resultBind": "drawn" },
+          { "op": "revealBoundCards", "target": "owner", "sourceBind": "drawn" },
+          { "op": "filterBoundCards", "target": "owner", "sourceBind": "drawn", "resultBind": "equipment", "categories": ["equipment"] },
+          { "op": "useBoundCardByTarget", "target": "selectedTarget", "sourceBind": "equipment", "condition": { "kind": "boundCardsMatchCategories", "sourceBind": "equipment", "cardCategories": ["equipment"] } },
+          { "op": "recover", "target": "selectedTarget", "amount": 1, "condition": { "kind": "boundCardsMatchCategories", "sourceBind": "equipment", "cardCategories": ["equipment"] } }
+        ] }]
+    }
+  ]
+}

@@ -82,6 +82,9 @@ public static class GeneralGalleryCatalog
     {
         var groups = new Dictionary<string, string>(StringComparer.Ordinal);
         groups.Add("boundary:yu-ji-mobile", "boundary");
+        groups.Add("boundary:yuan-shu-mobile", "boundary");
+        groups.Add("boundary:yu-fan-mobile", "boundary-fame");
+        groups.Add("boundary:guan-ping", "boundary-fame");
         groups.Add("boundary:zuo-ci-mobile", "boundary");
         groups.Add("boundary:zhong-hui-mobile", "boundary-fame");
         groups.Add("boundary:cao-pi-mobile", "boundary-fame");

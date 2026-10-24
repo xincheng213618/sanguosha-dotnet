@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:guan-ping",
+  "skills": [
+    { "registrationOrder": 55400, "programBundle": "boundary-guan-ping", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:jieyong", "name": "竭勇", "description": "你可将手牌中最后一张红色牌当【杀】使用或打出。", "executionForms": "Trigger" } }
+  ],
+  "generals": [
+    { "registrationOrder": 55401, "pools": { "current": 55401 },
+      "definition": { "id": "boundary:guan-ping", "name": "界关平", "portraitKey": "boundary-guan-ping", "skillId": "classic:longyin", "additionalSkillIds": ["boundary:jieyong"], "factionId": "shu", "baseHp": 4, "gender": "Male", "characterId": "character:guan-ping", "variantId": "boundary", "rulesetId": "sanguosha-ol" } }
+  ]
+}

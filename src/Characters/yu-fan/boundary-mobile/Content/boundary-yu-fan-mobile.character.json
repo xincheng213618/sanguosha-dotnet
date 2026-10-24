@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:yu-fan",
+  "skills": [
+    { "registrationOrder": 55300, "programBundle": "boundary-yu-fan-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:zongxuan-mobile", "name": "纵玄", "description": "当你的牌因弃置而置入弃牌堆后，你可以将其中任意张牌置于牌堆顶。出牌阶段限一次，你可以摸一张牌，然后将一张牌置于牌堆顶。", "actionForms": "Active", "executionForms": "Trigger" } },
+    { "registrationOrder": 55301, "programBundle": "boundary-yu-fan-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:zhiyan-mobile", "name": "直言", "description": "结束阶段，你可以令一名角色摸一张牌并展示之，若此牌为装备牌，其使用此牌并回复1点体力。", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 55302, "pools": { "current": 55302 }, "definition": {
+    "id": "boundary:yu-fan-mobile", "name": "界虞翻·移动版", "portraitKey": "boundary-yu-fan-mobile", "skillId": "boundary:zongxuan-mobile", "additionalSkillIds": ["boundary:zhiyan-mobile"],
+    "factionId": "wu", "baseHp": 3, "gender": "Male", "characterId": "character:yu-fan", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

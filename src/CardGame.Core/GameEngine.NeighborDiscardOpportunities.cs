@@ -97,7 +97,12 @@ public sealed partial class GameEngine
         var paused = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!)
             .GetPausedInstruction(frame.InstructionIndex).Effect;
         if (paused.Op != SkillProgramEffectOp.PutOwnOrPreviousFirstDiscardOnTop)
-            return GetProgramDiscardSource(move)?.OwnerSeat == frame.OwnerSeat;
+        {
+            var source = GetProgramDiscardSource(move);
+            var zones = GetProgramTrigger(frame).SourceZones;
+            return source is { } discarded && discarded.OwnerSeat == frame.OwnerSeat &&
+                (zones.Count == 0 || zones.Contains(discarded.Zone));
+        }
         if (frame.WindowContext?.MovementBatch is not { } batch || NeighborDiscardFact(batch, frame.OwnerSeat) is not { } fact ||
             frame.WindowContext.Facts?.FrozenPreviousLivingSeat != fact.PreviousLivingSeat) return false;
         return NeighborDiscardIndexes(batch, frame.OwnerSeat).Any(index => batch.Movements[index] == move);
