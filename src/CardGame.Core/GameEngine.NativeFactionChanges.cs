@@ -16,8 +16,6 @@ public sealed partial class GameEngine
         string GeneralId, string? SkillId, string? SelectedFactionId);
     private sealed record NativeFactionObservation(string? FactionId, NativeFactionAvatar? Avatar);
     private readonly Dictionary<int, NativeFactionObservation> _nativeFactionObservations = [];
-    private static readonly IReadOnlyList<string> NativeEffectiveFactionIds =
-        Array.AsReadOnly(new[] { "wei", "shu", "wu", "qun", "jin" });
     private long _nativeFactionRevision;
     private long _nativeFactionQualificationStamp;
     private (long Base, long Revision) _nativeFactionQualificationDependencies;
@@ -29,13 +27,13 @@ public sealed partial class GameEngine
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShiZhHuiYunan);
 
     private IReadOnlyList<string> AvailableEffectiveFactionIds() =>
-        IsNationalWarMode ? Array.Empty<string>() : NativeEffectiveFactionIds;
+        ModeAllegiancePolicy.NativeFactionChoices;
 
     private bool HasNativeEffectiveFactionDeclaration(CharacterState player) =>
         TracksNativeEffectiveFactionChanges && player.NativeEffectiveFactionWasDeclared;
 
     private NativeFactionAvatar? CaptureNativeFactionAvatar(CharacterState player) =>
-        player.GeneralSelected && !IsNationalWarMode && EffectiveGeneralLibrary(player) is { } library
+        player.GeneralSelected && ModeAllegiancePolicy.AllowsAvatarFactionChanges && EffectiveGeneralLibrary(player) is { } library
             ? new(library.Source, library.RevealedGeneralId!, library.DeclaredSkillId, library.SelectedFactionId)
             : null;
 
@@ -45,7 +43,7 @@ public sealed partial class GameEngine
     private void CompleteNativeAvatarFactionDeclaration(ProgramSkillFrame frame,
         CharacterState player, string? previous)
     {
-        if (!TracksNativeEffectiveFactionChanges || IsNationalWarMode ||
+        if (!TracksNativeEffectiveFactionChanges || !ModeAllegiancePolicy.AllowsAvatarFactionChanges ||
             frame.GeneralLibraryDraft?.Source != EffectiveGeneralLibrary(player)?.Source) return;
         // A real declaration replaces an earlier explicit change even when the
         // same avatar/skill is selected. Acquiring an unused avatar does not.

@@ -14857,7 +14857,7 @@ public sealed partial class GameEngine
         {
             foreach (var ironChain in allPhysicalCardCandidates.Where(card =>
                          !HasProgramCardIdentity(actor, card) &&
-                         (card.Kind == CardKind.IronChain || GetHand(actor).Any(h => h.Id == card.Id) && (CanHulaoWeaponRecast(card) || CanHellDitingMountRecast(actor, card)))))
+                         (card.Kind == CardKind.IronChain || GetHand(actor).Any(h => h.Id == card.Id) && (CanModeHandEquipmentRecast(card) || CanHellDitingMountRecast(actor, card)))))
             {
                 actions.Add(new LegalAction(
                     LegalActionKind.Recast,

@@ -26,7 +26,7 @@ public sealed partial class GameEngine
     internal const string IdentityConcealedGeneralId=global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_IdentityConcealment.IdentityConcealedGeneralId;
     private static GeneralDefinition IdentityConcealedGeneral() =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_IdentityConcealment.IdentityConcealedGeneral();
-    private bool GeneralHasIdentityConcealment(GeneralDefinition general)=>_modeDefinition.ModeKind==ContentModeKind.Identity &&
+    private bool GeneralHasIdentityConcealment(GeneralDefinition general)=>ModeAllegiancePolicy.AllowsIdentityConcealment &&
         general.Skills.Select(s=>s.ContentId).OfType<string>().Any(id=>_contentRegistry!.Skills.GetValueOrDefault(id)?.Program?.Triggers.Any(t=>
             t.Window==SkillProgramTriggerWindow.IdentityGeneralAppeared && t.Effects.Any(e=>e.Op==SkillProgramEffectOp.AfterActualIdentityAppearanceRecover))==true);
     private void InitializeSelectedIdentityConcealment(CharacterState player)

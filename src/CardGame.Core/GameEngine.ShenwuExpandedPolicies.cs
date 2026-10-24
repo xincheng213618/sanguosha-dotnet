@@ -8,8 +8,7 @@ public sealed partial class GameEngine
             ? new FiniteRuleQueryContribution($"turn:{query.Actor.Seat}:shenwu:juyuan", SkillRuleOperation.Add, 1)
             : null;
 
-    private int ShenwuReplacementDrawBonus(int seat) => _modeDefinition.ShenwuActivity is { Edition: 2020, EnemyTier: >= 4 } &&
-        !IsShenwuPlayerSlot(seat) ? 1 : 0;
+    private int ShenwuReplacementDrawBonus(int seat) => ShenwuBattleRules?.ReplacementDrawBonus(seat) ?? 0;
 
     private (int Turn, int Seat, TurnPhase Phase, long Grants, bool Alive, bool Revealed)? _shenwuFengdongDependencies;
     private long _shenwuFengdongStamp;

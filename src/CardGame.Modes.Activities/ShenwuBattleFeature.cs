@@ -27,8 +27,18 @@ internal sealed class ShenwuBattleFeature : IShenwuBattleFeature, IMatchModeNume
     public IReadOnlyList<ModeRuntimeHookRegistration> RuntimeHooks { get; }
     private int Seat(int offset) => (Math.Max(0, _options.HumanSeat) + offset) % _options.PlayerCount;
     private int LeaderSeat => Seat(_activity.LeaderSeatOffset);
-    private bool IsPlayerSlot(int seat) => _activity.PlayerSeatOffsets.Contains(
+    public bool IsPlayerSlot(int seat) => _activity.PlayerSeatOffsets.Contains(
         (seat - Math.Max(0, _options.HumanSeat) + _options.PlayerCount) % _options.PlayerCount);
+
+    public int ReplacementDrawBonus(int seat) => _activity is { Edition: 2020, EnemyTier: >= 4 } &&
+        !IsPlayerSlot(seat) ? 1 : 0;
+
+    public bool AllowsTierTrigger(int seat, string skillId) => _activity.Edition > 0 && (skillId switch
+    {
+        "shenwu:enemy-tier" => !IsPlayerSlot(seat) && _activity.EnemyTier >= 2,
+        "shenwu:player-tier-2020" => IsPlayerSlot(seat) && _activity.PlayerTier >= 2,
+        _ => false
+    });
 
     public void OnMatchStart(ModeMatchStartPhase phase)
     {

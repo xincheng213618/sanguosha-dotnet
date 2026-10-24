@@ -16,8 +16,8 @@ public sealed partial class GameEngine
         return values.Length == 0 ? null : Array.AsReadOnly(values);
     }
     private static readonly PlayerMarkerKind[] FriendCategoryMarkers = [PlayerMarkerKind.QihuiBasic, PlayerMarkerKind.QihuiTrick, PlayerMarkerKind.QihuiEquipment];
-    private bool HasFriendTrioAlly(CharacterState owner, string id) => _modeDefinition.ModeKind == ContentModeKind.Team && owner.TeamId is { } team &&
-        _players.Any(p => p.IsAlive && p.Seat != owner.Seat && p.TeamId == team && (p.General.Id == "friend:" + id || p.SecondaryGeneral?.Id == "friend:" + id));
+    private bool HasFriendTrioAlly(CharacterState owner, string id) => ModeAllegiancePolicy.AllowsPublicTeamSkillSynergy &&
+        _players.Any(p => p.IsAlive && p.Seat != owner.Seat && SamePublicTeam(owner, p) && (p.General.Id == "friend:" + id || p.SecondaryGeneral?.Id == "friend:" + id));
     private bool ValidWholeHandSuitConversion(CharacterState owner, IReadOnlyList<Card> cards, CardConversionSource source)
     {
         if (cards.Count == 0 || cards.Any(c => _cardZones.GetLocation(c.Id) != CardLocation.Hand(owner.Seat))) return false;

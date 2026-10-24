@@ -12,10 +12,11 @@ public sealed partial class GameEngine
     private SignedDamageProfile CaptureSignedDamageProfile(int ownerSeat, int otherSeat, SkillProgramEffect effect)
     {
         var p = effect.PublicDeathDamageCost!; var owner = _players[ownerSeat];
-        // National-war's placeholder Role is not a public identity death.
-        var roles = _modeDefinition.ModeKind == ContentModeKind.Identity
-            ? _players.Where(c => !c.IsAlive && c.RoleRevealed && c.Role is Role.Loyalist or Role.Rebel or Role.Renegade).Select(c => c.Role).Distinct().ToArray()
-            : [];
+        // Prove public death before exposing its role to the mode policy.
+        // National-war's placeholder Role is not an identity death benefit.
+        var roles = _players.Where(c => !c.IsAlive && c.RoleRevealed)
+            .Select(c => ModeAllegiancePolicy.PublicIdentityDeathRole(new(c.Role, c.IsAlive, c.RoleRevealed)))
+            .OfType<Role>().Distinct().ToArray();
         var enabled = HasRuntimeSkill(owner, p.QualifierSkillId);
         return new(owner.Hp, _players[otherSeat].Hp, enabled && roles.Any(p.WaiveHpDeadRoles.Contains),
             enabled && roles.Any(p.AnyColorDeadRoles.Contains), enabled && roles.Any(p.AllowEquipmentDeadRoles.Contains),

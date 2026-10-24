@@ -39,7 +39,7 @@ public sealed partial class GameEngine
     private bool LibraryBaseLordProjectionLive(CharacterState owner,SkillGrant grant)
     {
         if(grant.LordProjection is not {} p)return true;
-        if(!owner.IsAlive||IsTeamMode||IsNationalWarMode||!IsValidPlayerSeat(p.LordSeat)||p.LordSeat==owner.Seat)return false;
+        if(!owner.IsAlive||!ModeAllegiancePolicy.AllowsLordSkillProjection||!IsValidPlayerSeat(p.LordSeat)||p.LordSeat==owner.Seat)return false;
         var lord=_players[p.LordSeat];if(!lord.IsAlive||lord.Role!=Role.Lord)return false;
         return owner.SkillGrants.Grants.Any(g=>g.GrantId==p.CapabilityGrantId&&g.SkillInstanceId==p.CapabilitySkillInstanceId&&g.LordProjection is null&&LibraryBaseGrantLive(owner,g)&&
             _contentRegistry.GetSkill(g.SkillId).Program?.LordSkillProjection==true&&

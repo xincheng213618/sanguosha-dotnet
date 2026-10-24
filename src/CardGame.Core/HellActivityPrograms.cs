@@ -44,16 +44,7 @@ public sealed partial class GameEngine
     private bool AllowsHellActivityTier(ProgramTriggerLegalityContext gate)
     {
         if (gate.SkillId is not ("hell:player-tier" or "hell:boss-tier")) return true;
-        if (_modeDefinition.HellActivity is not { } hell) return false;
-        if (gate.SkillId == "hell:player-tier") return !IsHellNpc(gate.Owner);
-        if (!IsHellNpc(gate.Owner)) return false;
-        return gate.Candidate.BindingId switch
-        {
-            "arrival-equipment" => hell.BossTier >= 2,
-            "arrival-assault" => hell.BossTier == 5,
-            "turn-slash" => hell.BossTier >= 3,
-            _ => false
-        };
+        return HellFeature?.AllowsTierTrigger(gate.SkillId, gate.Candidate.BindingId, gate.Owner.TeamId) ?? false;
     }
     private SkillProgramStepOutcome ExecuteHellActivity(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
@@ -62,7 +53,7 @@ public sealed partial class GameEngine
         switch (operation)
         {
             case SkillProgramEffectOp.GainHellTurnSlash:
-                if (_modeDefinition.HellActivity is not { BossTier: >= 3 } || !IsHellNpc(owner) ||
+                if (HellFeature?.AllowsTierTrigger("hell:boss-tier", "turn-slash", owner.TeamId) != true ||
                     frame.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow ||
                     _turnProgression.OwnerSeat != owner.Seat) throw new InvalidOperationException("Hell tier Slash lost its actual turn owner.");
                 var slash = _cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(card => card.Kind == CardKind.Slash) ??

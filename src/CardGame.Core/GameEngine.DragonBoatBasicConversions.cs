@@ -6,10 +6,11 @@ public sealed partial class GameEngine
     private void AddDragonBoatBasicConversionActions(List<LegalAction> actions, CharacterState actor,
         IReadOnlyList<Card> playable, int? selectedPhysicalCardId = null)
     {
-        if (_modeDefinition.DragonBoatActivity is null) return;
+        if (!_modeRules.Cards.AllowsBasicPlayConversion(CardKind.Zong) &&
+            !_modeRules.Cards.AllowsBasicPlayConversion(CardKind.RealgarWine)) return;
         foreach (var card in playable.Concat(GetEquipment(actor)).DistinctBy(card => card.Id)
             .Where(card => (selectedPhysicalCardId is null || card.Id == selectedPhysicalCardId) && !IsTurnHandCardRestricted(actor, card)))
-        foreach (var kind in new[] { CardKind.Zong, CardKind.RealgarWine })
+        foreach (var kind in new[] { CardKind.Zong, CardKind.RealgarWine }.Where(_modeRules.Cards.AllowsBasicPlayConversion))
         foreach (var source in GetProgramViewAsConversions(actor, card, kind, false))
             AddDragonBoatPhysicalOrConvertedActions(actions, actor, card, kind, source);
     }

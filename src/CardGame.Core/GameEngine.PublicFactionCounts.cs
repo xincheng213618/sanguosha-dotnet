@@ -6,8 +6,8 @@ public sealed partial class GameEngine
     // public event, game-usage key or native decision. Existing queries keep
     // their historical contracts.
     private string? GetPublicEffectiveFactionId(CharacterState player) =>
-        IsNationalWarMode && !player.FactionRevealed || !IsNationalWarMode && !player.GeneralRevealed
-            ? null : GetEffectiveFactionId(player);
+        ModeAllegiancePolicy.IsPublicFactionVisible(new(player.GeneralRevealed, player.FactionRevealed))
+            ? GetEffectiveFactionId(player) : null;
     private int GetPublicLivingFactionCount() => _players.Where(p => p.IsAlive)
         .Select(GetPublicEffectiveFactionId).OfType<string>().Distinct(StringComparer.Ordinal).Count();
 }

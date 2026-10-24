@@ -39,9 +39,9 @@ public sealed partial class GameEngine
     {
         _selectedUseConversion = null;
         _hasSelectedUseConversionChoice = false;
-        if (IsGuanduActivity && card.Kind == CardKind.UnitedEffort && playedCardKind is null)
+        if (playedCardKind is null && _modeRules.Cards.AllowsNativePhysicalRecast(card.Kind, card.Kind))
         { BeginEquipmentRecast(actor, card, card.Kind); return; }
-        if (playedCardKind is null && (CanHulaoWeaponRecast(card) || CanHellDitingMountRecast(actor, card)) &&
+        if (playedCardKind is null && (CanModeHandEquipmentRecast(card) || CanHellDitingMountRecast(actor, card)) &&
             FindOwnedCardLocation(actor, card) == CardLocation.Hand(actor.Seat))
         { BeginEquipmentRecast(actor, card, card.Kind); return; }
         if ((playedCardKind is null && card.Kind != CardKind.IronChain) ||

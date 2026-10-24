@@ -22,6 +22,21 @@ internal sealed class HellEncounterFeature : IHellEncounterFeature, IMatchModeRu
     public IReadOnlyList<ModeRuntimeHookRegistration> RuntimeHooks { get; }
     public IReadOnlyList<ModeDamageRuleRegistration> DamageRules { get; }
     public int Order => 60;
+
+    public bool IsNpcTeam(string? teamId) => teamId == _mode.BossActivity!.EnemyTeamId;
+
+    public bool AllowsTierTrigger(string skillId, string bindingId, string? teamId)
+    {
+        if (skillId == "hell:player-tier") return !IsNpcTeam(teamId);
+        if (skillId != "hell:boss-tier" || !IsNpcTeam(teamId)) return false;
+        return bindingId switch
+        {
+            "arrival-equipment" => _mode.HellActivity!.BossTier >= 2,
+            "arrival-assault" => _mode.HellActivity!.BossTier == 5,
+            "turn-slash" => _mode.HellActivity!.BossTier >= 3,
+            _ => false
+        };
+    }
     private int ArrivalDamageBonus(ModeDamageFacts damage)
     {
         if (_mode.HellActivity!.BossTier != 5 || damage.IsChainPropagation || damage.IsSourceLess ||

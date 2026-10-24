@@ -6,7 +6,7 @@ public sealed partial class GameEngine
     private void AddGuanduBasicConversionActions(List<LegalAction> actions, CharacterState actor,
         IReadOnlyList<Card> playable, int? selectedPhysicalCardId = null)
     {
-        if (!IsGuanduActivity) return;
+        if (!_modeRules.Cards.AllowsBasicPlayConversion(CardKind.Intoxication)) return;
         foreach (var card in playable.Concat(GetEquipment(actor)).DistinctBy(card => card.Id)
             .Where(card => (selectedPhysicalCardId is null || card.Id == selectedPhysicalCardId) && !IsTurnHandCardRestricted(actor, card)))
         foreach (var source in GetProgramViewAsConversions(actor, card, CardKind.Intoxication, false))

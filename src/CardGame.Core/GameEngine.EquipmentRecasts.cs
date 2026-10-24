@@ -22,8 +22,8 @@ public sealed partial class GameEngine
     {
         var cost = FindOwnedCardLocation(actor, card);
         if (_resolutionStack.Count != 0 || cost != CardLocation.Equipment(actor.Seat) &&
-            !(cost == CardLocation.Hand(actor.Seat) && (CanHulaoWeaponRecast(card) || CanHellDitingMountRecast(actor, card) ||
-                IsGuanduActivity && effectiveKind == CardKind.UnitedEffort && card.Kind == CardKind.UnitedEffort)))
+            !(cost == CardLocation.Hand(actor.Seat) && (CanModeHandEquipmentRecast(card) || CanHellDitingMountRecast(actor, card) ||
+                _modeRules.Cards.AllowsNativePhysicalRecast(card.Kind, effectiveKind))))
             throw new InvalidOperationException("Equipment recast requires its fresh play boundary and owned equipment cost.");
         var frame = new EquipmentRecastFrame(++_resolutionSequence, actor.Seat, card.Id, effectiveKind);
         frame = frame with { NativeRecastInvocation = CaptureNativeRecastInvocation(actor.Seat, actor.Seat, [card.Id], frame.Id) };

@@ -25,7 +25,7 @@ public sealed partial class GameEngine
     {
         if (!IsCurrentTurnSkillGrantQualified(owner,grant)) return false;
         if (grant.LordProjection is not {} source) return true;
-        if (!owner.IsAlive || IsTeamMode || IsNationalWarMode || !IsValidPlayerSeat(source.LordSeat) || source.LordSeat == owner.Seat) return false;
+        if (!owner.IsAlive || !ModeAllegiancePolicy.AllowsLordSkillProjection || !IsValidPlayerSeat(source.LordSeat) || source.LordSeat == owner.Seat) return false;
         var lord = _players[source.LordSeat];
         return lord.IsAlive && lord.Role == Role.Lord &&
             EffectiveUnprojectedGrants(owner).Any(g => g.GrantId == source.CapabilityGrantId && g.SkillInstanceId == source.CapabilitySkillInstanceId && _contentRegistry.GetSkill(g.SkillId).Program?.LordSkillProjection == true) &&
@@ -79,7 +79,7 @@ public sealed partial class GameEngine
         try
         {
             CharacterState? lord = null;
-            if (!IsTeamMode && !IsNationalWarMode)
+            if (ModeAllegiancePolicy.AllowsLordSkillProjection)
                 for (var i = 0; i < _players.Count; i++)
                 {
                     var player = _players[i];

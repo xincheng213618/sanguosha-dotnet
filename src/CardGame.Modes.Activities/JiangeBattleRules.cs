@@ -11,6 +11,14 @@ internal sealed class JiangeBattleRules(GameOptions options, ContentModeDefiniti
     private static bool SameTeam(StandardBattlePlayerFacts first, StandardBattlePlayerFacts second) =>
         first.TeamId is not null && first.TeamId == second.TeamId;
 
+    public ModeDamageCapPlan? AlliedDamageCap(int targetSeat)
+    {
+        var target = host.Player(targetSeat);
+        var owner = host.Players.FirstOrDefault(player => SameTeam(player, target) &&
+            host.HasEffectiveSkill(player.Seat, "jiange:chiying"));
+        return owner is null ? null : new(owner.Seat, "jiange:chiying", "allied-damage-cap", 1);
+    }
+
     public IEnumerable<RuleQueryContribution> NumericContributions(int seat, SkillRuleQuery query)
     {
         var activity = mode.TeamActivity!;

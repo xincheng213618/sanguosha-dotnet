@@ -22,5 +22,7 @@ public interface IHellEncounterHost
 
 public interface IHellEncounterFeature : IGameModeFeature
 {
+    bool IsNpcTeam(string? teamId);
+    bool AllowsTierTrigger(string skillId, string bindingId, string? teamId);
     bool IsPendingAppearance(long appearanceId, IReadOnlyList<int> candidateOwnerSeats);
 }

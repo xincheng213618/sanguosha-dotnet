@@ -92,8 +92,7 @@ public sealed partial class GameEngine
     private bool AllowsShenwuExpandedTrigger(ProgramTriggerLegalityContext gate)
     {
         if (gate.SkillId is "shenwu:enemy-tier" or "shenwu:player-tier-2020")
-            return _modeDefinition.ShenwuActivity is { Edition: > 0 } activity &&
-                (gate.SkillId == "shenwu:enemy-tier" ? !IsShenwuPlayerSlot(gate.OwnerSeat) && activity.EnemyTier >= 2 : IsShenwuPlayerSlot(gate.OwnerSeat) && activity.PlayerTier >= 2);
+            return ShenwuBattleRules?.AllowsTierTrigger(gate.OwnerSeat, gate.SkillId) ?? false;
         if (gate.SkillId is "shenwu:xunyou" or "shenwu:yanyu")
             return gate.WindowContext is null || gate.Context.TargetSeat is { } other && other != gate.OwnerSeat && _players[other].IsAlive;
         if (gate.SkillId == "shenwu:poison") return gate.Owner.Markers.GetValueOrDefault(PlayerMarkerKind.ShenwuPoison) > 0;

@@ -52,7 +52,7 @@ internal static class ModeEntryAssemblyChecks
         var setup = runtime.Find<IMatchModeSetupFeature>();
         var profile = runtime.Find<IMatchModeRuleProvider>();
         Require(setup is not null && profile is not null && setup is not IMatchModeRuleProvider &&
-            profile is not IMatchModeSetupFeature && profile.Rules is not null,
+            profile is not IMatchModeSetupFeature && profile is IMatchModeAllegiancePolicy && profile.Rules is not null,
             $"Mode '{mode.Id}' must compose independent setup and immutable rule-profile slots without reading a running host.");
         foreach (var contract in profile!.Rules.RequiredFeatureContracts)
             Require(features.Count(contract.IsInstanceOfType) == 1,

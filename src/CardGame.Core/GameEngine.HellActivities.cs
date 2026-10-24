@@ -2,8 +2,7 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
-    private bool IsHellNpc(CharacterState player) => _modeDefinition.HellActivity is not null &&
-        player.TeamId == _modeDefinition.BossActivity!.EnemyTeamId;
+    private bool IsHellNpc(CharacterState player) => HellFeature?.IsNpcTeam(player.TeamId) ?? false;
     private bool HasHellRemenImmunity(CharacterState player, CardKind kind) => player.IsAlive && !HasArmor(player) &&
         HasCardPolicy(player, SkillProgramCardPolicyKind.HellUnarmoredRemen, kind);
     private bool CanPlanHellDiscard(CardLocation destination) => destination == CardLocation.DiscardPile &&

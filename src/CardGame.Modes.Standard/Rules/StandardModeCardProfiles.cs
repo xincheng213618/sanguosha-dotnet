@@ -14,7 +14,16 @@ internal static class StandardModeCardProfiles
                 mode.WenheActivity is not null || mode.DragonBoatActivity is not null || mode.GuanduActivity is not null,
             SelectOrdinaryTricks(mode), SelectBasicConversions(mode),
             mode.Id == WushuangMode.ModeId ? new WushuangCardNameRule() : new UnrestrictedCardNameRule(), additions, ["ol:mo-guifu"],
-            DisabledOrdinaryTricks(mode));
+            DisabledOrdinaryTricks(mode),
+            new SelectedModeCardRecastRule(mode.HulaoActivity is not null ? [EquipmentSlot.Weapon] : [],
+                mode.GuanduActivity is not null ? [CardKind.UnitedEffort] : []), BasicPlayConversionKinds(mode));
+    }
+
+    private static IEnumerable<CardKind> BasicPlayConversionKinds(ContentModeDefinition mode)
+    {
+        // Play-action families are independent; source-program replacement keeps its separate Guandu-first precedence.
+        if (mode.DragonBoatActivity is not null) { yield return CardKind.Zong; yield return CardKind.RealgarWine; }
+        if (mode.GuanduActivity is not null) yield return CardKind.Intoxication;
     }
 
     private static IEnumerable<CardKind> DisabledOrdinaryTricks(ContentModeDefinition mode)
@@ -48,6 +57,16 @@ internal static class StandardModeCardProfiles
         if (mode.GuanduActivity is not null) return new GuanduBasicConversionRule();
         return mode.DragonBoatActivity is not null ? new DragonBoatBasicConversionRule() : null;
     }
+}
+
+internal sealed class SelectedModeCardRecastRule(IEnumerable<EquipmentSlot> handEquipmentSlots,
+    IEnumerable<CardKind> nativePhysicalKinds) : IModeCardRecastRule
+{
+    private readonly HashSet<EquipmentSlot> _handEquipmentSlots = new(handEquipmentSlots);
+    private readonly HashSet<CardKind> _nativePhysicalKinds = new(nativePhysicalKinds);
+    public bool AllowsHandEquipment(EquipmentSlot slot) => _handEquipmentSlots.Contains(slot);
+    public bool AllowsNativePhysicalCard(CardKind physicalKind, CardKind effectiveKind) =>
+        physicalKind == effectiveKind && _nativePhysicalKinds.Contains(physicalKind);
 }
 
 internal sealed class OriginalOrdinaryTrickRule : IModeOrdinaryTrickRule

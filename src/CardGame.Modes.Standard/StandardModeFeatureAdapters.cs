@@ -18,7 +18,7 @@ internal sealed class StandardModeSetupAdapter(StandardModeSetupFeature inner) :
 
 internal sealed class StandardModeProfileAdapter(StandardModeSetupFeature inner) : IMatchModeRuleProvider,
     IMatchModeConfigurationValidator, IMatchModeEquipmentProfile, IMatchModePresentation,
-    IMatchModeSetupPresentation, IMatchModeFactionPolicy, IMatchModeCommandHandler
+    IMatchModeSetupPresentation, IMatchModeFactionPolicy, IMatchModeAllegiancePolicy, IMatchModeCommandHandler
 {
     public ModeRuleSet Rules => inner.Rules;
     public void ValidateOptions() => inner.ValidateOptions();
@@ -32,6 +32,15 @@ internal sealed class StandardModeProfileAdapter(StandardModeSetupFeature inner)
     public string SetupCompletedText(ModeSetupCompletionFacts facts) => inner.SetupCompletedText(facts);
     public string? EffectiveFaction(ModeFactionFacts facts) => inner.EffectiveFaction(facts);
     public string? ScenarioGodFaction(string? printedFaction) => inner.ScenarioGodFaction(printedFaction);
+    public IReadOnlyList<string> NativeFactionChoices => inner.NativeFactionChoices;
+    public bool AllowsAvatarFactionChanges => inner.AllowsAvatarFactionChanges;
+    public bool AllowsLordSkillProjection => inner.AllowsLordSkillProjection;
+    public bool AllowsIdentityConcealment => inner.AllowsIdentityConcealment;
+    public bool AllowsPublicTeamSkillSynergy => inner.AllowsPublicTeamSkillSynergy;
+    public bool IsPublicFactionVisible(ModeFactionVisibilityFacts facts) => inner.IsPublicFactionVisible(facts);
+    public Role? PublicIdentityDeathRole(ModeIdentityDeathFacts facts) => inner.PublicIdentityDeathRole(facts);
+    public bool SamePublicTeam(ModeAllegianceSeatFacts first, ModeAllegianceSeatFacts second) => inner.SamePublicTeam(first, second);
+    public bool PublicTeamEnemy(ModeAllegianceSeatFacts owner, ModeAllegianceSeatFacts target) => inner.PublicTeamEnemy(owner, target);
     public IReadOnlyList<Type> CommandTypes => inner.CommandTypes;
     public CommandResult Submit(GameCommand command) => inner.Submit(command);
 }

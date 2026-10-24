@@ -10,11 +10,14 @@ public sealed class ModeCardRules
     private readonly IModeCardNameRule _cardNames;
     private readonly HashSet<string> _unprojectedProgramIds;
     private readonly HashSet<CardKind> _disabledOrdinaryTrickKinds;
+    private readonly IModeCardRecastRule? _recasts;
+    private readonly HashSet<CardKind> _basicPlayConversionKinds;
 
     public ModeCardRules(bool projectsSkillPrograms, IModeOrdinaryTrickRule ordinaryTricks,
         IModeBasicConversionRule? basicConversions, IModeCardNameRule cardNames,
         IReadOnlyList<ModeAdditionalOrdinaryTrick> additionalOrdinaryTricks,
-        IEnumerable<string>? unprojectedProgramIds = null, IEnumerable<CardKind>? disabledOrdinaryTrickKinds = null)
+        IEnumerable<string>? unprojectedProgramIds = null, IEnumerable<CardKind>? disabledOrdinaryTrickKinds = null,
+        IModeCardRecastRule? recasts = null, IEnumerable<CardKind>? basicPlayConversionKinds = null)
     {
         ProjectsSkillPrograms = projectsSkillPrograms;
         _ordinaryTricks = ordinaryTricks ?? throw new ArgumentNullException(nameof(ordinaryTricks));
@@ -22,12 +25,22 @@ public sealed class ModeCardRules
         _cardNames = cardNames ?? throw new ArgumentNullException(nameof(cardNames));
         _unprojectedProgramIds = new(unprojectedProgramIds ?? [], StringComparer.Ordinal);
         _disabledOrdinaryTrickKinds = new(disabledOrdinaryTrickKinds ?? []);
+        _recasts = recasts;
+        HasHandEquipmentRecast = recasts is not null && Enum.GetValues<EquipmentSlot>().Any(recasts.AllowsHandEquipment);
+        BasicPlayConversionKinds = Array.AsReadOnly((basicPlayConversionKinds ?? []).Distinct().ToArray());
+        _basicPlayConversionKinds = new(BasicPlayConversionKinds);
         AdditionalOrdinaryTricks = Array.AsReadOnly(additionalOrdinaryTricks.ToArray());
     }
 
     public bool ProjectsSkillPrograms { get; }
     public bool ProjectsBasicConversionFamilies => _basicConversions is not null;
     public IReadOnlyList<ModeAdditionalOrdinaryTrick> AdditionalOrdinaryTricks { get; }
+    public IReadOnlyList<CardKind> BasicPlayConversionKinds { get; }
+    public bool HasHandEquipmentRecast { get; }
+    public bool AllowsBasicPlayConversion(CardKind outputKind) => _basicPlayConversionKinds.Contains(outputKind);
+    public bool AllowsHandEquipmentRecast(EquipmentSlot slot) => _recasts?.AllowsHandEquipment(slot) == true;
+    public bool AllowsNativePhysicalRecast(CardKind physicalKind, CardKind effectiveKind) =>
+        _recasts?.AllowsNativePhysicalCard(physicalKind, effectiveKind) == true;
     public CardKind? ReplaceOrdinaryTrick(CardKind kind) => _ordinaryTricks.Replace(kind);
     public bool IsCardAllowed(CardKind kind) => _cardNames.IsAllowed(kind);
     public bool IsDeclaredCardNameAllowed(CardKind kind) => IsCardAllowed(kind) &&
@@ -52,3 +65,8 @@ public sealed class ModeCardRules
 public interface IModeOrdinaryTrickRule { CardKind? Replace(CardKind kind); }
 public interface IModeBasicConversionRule { bool TryReplace(CardKind kind, out CardKind output); }
 public interface IModeCardNameRule { bool IsAllowed(CardKind kind); }
+public interface IModeCardRecastRule
+{
+    bool AllowsHandEquipment(EquipmentSlot slot);
+    bool AllowsNativePhysicalCard(CardKind physicalKind, CardKind effectiveKind);
+}
