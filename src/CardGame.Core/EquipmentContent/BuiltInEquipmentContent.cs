@@ -27,8 +27,18 @@ public static partial class BuiltInEquipmentContent
         ArgumentNullException.ThrowIfNull(mode);
         ArgumentNullException.ThrowIfNull(registry);
         var extras = (additionalPackages ?? []).ToArray();
-        var packages = All.Concat(extras).ToArray();
-        var available = EquipmentContentRegistry.Create(packages);
+        // Explicit packages are the match's definitions. Legacy packages only
+        // fill absent keys; merging them first would reject intentional local
+        // rules for an existing card kind before a match could even start.
+        // Validate all explicit registrations together, including unused ones,
+        // so two explicit packages still cannot silently replace one another.
+        var installed = EquipmentContentRegistry.Create(extras);
+        var fallback = All.Select(package => new EquipmentContentPackage(package.Id,
+            package.Definitions.Where(definition => !installed.Definitions.ContainsKey(definition.Kind)),
+            package.SkillBindings.Where(binding => !installed.SkillBindings.ContainsKey(binding.Kind)),
+            package.DestinationPolicies.Where(policy => !installed.DestinationPolicies.ContainsKey(policy.SourceId)),
+            package.OperationDependencies));
+        var packages = fallback.Concat(extras).ToArray();
         var required = Standard.Definitions.Select(definition => definition.Kind).ToHashSet();
         required.UnionWith(registry.Cards.Values.Where(card => card.LegacyKind is not null)
             .Select(card => card.LegacyKind!.Value));
@@ -64,7 +74,7 @@ public static partial class BuiltInEquipmentContent
                 registry.Skills.ContainsKey(binding.SkillId)).ToArray();
             var policies = package.DestinationPolicies.Where(policy =>
                 (policy.RequiredEquipmentKind is not { } kind || required.Contains(kind)) &&
-                (package != WushuangPurchases || mode.Id == WushuangMode.ModeId)).ToArray();
+                (package.Id != WushuangPurchases.Id || mode.Id == WushuangMode.ModeId)).ToArray();
             if (definitions.Length == 0 && policies.Length == 0) continue;
             builder.Add(new EquipmentContentPackage(package.Id, definitions, bindings, policies));
         }

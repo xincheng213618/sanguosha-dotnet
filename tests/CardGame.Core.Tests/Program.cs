@@ -1014,6 +1014,7 @@ var tests = new (string Name, Action Body)[]
     ("Mode rules: card projection keeps source identity and mode-local names", ModeRuleSetChecks.CardProjectionKeepsSourceIdentityAndModeLocalNames),
     ("Mode equipment: optional packages and generated dependencies", EquipmentContentChecks.OptionalPackagesAndGeneratedDependencies),
     ("Mode equipment: exact entity source lifetime", EquipmentContentChecks.PurchasedEquipmentLifetimeUsesExactEntitySource),
+    ("Mode equipment: explicit match definitions and cold replay", EquipmentContentChecks.ExplicitMatchDefinitionsOverrideOnlyLegacyFallback),
     ("Equipment registration: frozen composition and fingerprint", EquipmentRegistrationChecks.FrozenCompositionAndCompleteFingerprint),
     ("Equipment registration: package dependencies and invalid references", EquipmentRegistrationChecks.PackageDependenciesAndInvalidReferences),
     ("Mode runtime: optional observers are not bound in other matches", MatchModeRuntimeChecks.ScopedObserversAreNotBoundInOtherMatches),
