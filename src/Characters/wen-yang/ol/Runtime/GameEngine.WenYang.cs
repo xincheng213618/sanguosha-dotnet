@@ -89,7 +89,7 @@ public sealed partial class GameEngine
     private IReadOnlyList<WenYangEntity> WenYangRandomInventory()
     {
         var pool=_cardZones.CardsAt(CardLocation.DrawPile).Concat(_cardZones.CardsAt(CardLocation.DiscardPile)).ToList();var selected=new List<WenYangEntity>();var names=new HashSet<CardKind>();var slots=new HashSet<EquipmentSlot>();
-        while(selected.Count<8){var eligible=pool.Where(c=>!names.Contains(c.Kind)&&(!EquipmentCatalog.IsEquipment(c.Kind)||!slots.Contains(EquipmentCatalog.Get(c.Kind).Slot))).ToArray();if(eligible.Length==0)break;var card=eligible[_random.Next(eligible.Length)];selected.Add(new(card.Id,card.Kind,_cardZones.GetLocation(card.Id)));names.Add(card.Kind);if(EquipmentCatalog.IsEquipment(card.Kind))slots.Add(EquipmentCatalog.Get(card.Kind).Slot);pool.Remove(card);}
+        while(selected.Count<8){var eligible=pool.Where(c=>!names.Contains(c.Kind)&&(!EquipmentRules.IsEquipment(c.Kind)||!slots.Contains(EquipmentRules.Get(c.Kind).Slot))).ToArray();if(eligible.Length==0)break;var card=eligible[_random.Next(eligible.Length)];selected.Add(new(card.Id,card.Kind,_cardZones.GetLocation(card.Id)));names.Add(card.Kind);if(EquipmentRules.IsEquipment(card.Kind))slots.Add(EquipmentRules.Get(card.Kind).Slot);pool.Remove(card);}
         return Array.AsReadOnly(selected.ToArray());
     }
     private bool DrainWenYang(long id)=>TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.Program)||TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(id,PostEventContinuation.Program)||TryBeginCardsMovedProgramWindow(id)||TryBeginAdvancedSkillsChanged(id);

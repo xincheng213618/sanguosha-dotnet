@@ -3,15 +3,6 @@ namespace CardGame.Core;
 public sealed partial class GameEngine
 {
     private const string ShanheXingtianSkill = "shanhe:xingtian-axe-20766-effect";
-    private bool ResolveShanheXingtianEquipmentSkillGrant(Card card, CardLocation from, CardLocation to)
-    {
-        if (card.Kind != CardKind.ShanheXingtianAxe) return false;
-        var grant = EquipmentSkillGrantId(card)!;
-        if (from is { Zone: CardZoneKind.Equipment, OwnerSeat: { } old }) _players[old].SkillGrants.RemoveGrant(grant);
-        if (to is { Zone: CardZoneKind.Equipment, OwnerSeat: { } next } && _contentRegistry.Skills.ContainsKey(ShanheXingtianSkill))
-            _players[next].SkillGrants.Grant(new SkillGrant(grant, ShanheXingtianSkill, grant, grant));
-        return true;
-    }
 
     private bool HasShanheXingtianSeal(int seat) => _turnCardUseEffects.TargetRestrictions.Any(r =>
         r.TurnNumber == _turnNumber && r.TurnSeat == _currentSeat && r.TargetSeat == seat &&

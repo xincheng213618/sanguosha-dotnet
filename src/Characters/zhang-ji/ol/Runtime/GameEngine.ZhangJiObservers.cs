@@ -14,7 +14,7 @@ public sealed partial class GameEngine
   {
    if(r.ChosenRank!=0 || r.JudgmentId is not null || r.JudgmentReturned || r.FinalRank is not null || r.GainCard is not null)return false;
    var uses=events.OfType<ZhangJiNativeUseIssuedEvent>().Where(e=>e.Origin.ProgramFrameId==f.Id).Select(e=>e.Origin).ToArray();
-   if(uses.Any(o=>o.Source!=r.Source || o.GameplayHash!=r.GameplayHash || o.Turn!=r.Turn || o.PhaseInstance!=r.PhaseInstance || o.InstructionIndex!=f.InstructionIndex || o.Actor!=target || !EquipmentCatalog.IsEquipment(o.Kind) || EquipmentCatalog.Get(o.Kind).Slot!=o.Slot) || !uses.Select(o=>o.Slot).SequenceEqual(r.Slots.Take(uses.Length)))return false;
+   if(uses.Any(o=>o.Source!=r.Source || o.GameplayHash!=r.GameplayHash || o.Turn!=r.Turn || o.PhaseInstance!=r.PhaseInstance || o.InstructionIndex!=f.InstructionIndex || o.Actor!=target || !EquipmentRules.IsEquipment(o.Kind) || EquipmentRules.Get(o.Kind).Slot!=o.Slot) || !uses.Select(o=>o.Slot).SequenceEqual(r.Slots.Take(uses.Length)))return false;
    var returned=events.OfType<ZhangJiNativeUseReturnedEvent>().Where(e=>e.Origin.ProgramFrameId==f.Id).ToArray();
    if(returned.Any(e=>uses.Count(o=>o==e.Origin)!=1 || _cardMovements.Count(m=>m.Sequence>e.Origin.Before && m.Sequence<=e.After && m.CardId==e.Origin.CardId && m.From==CardLocation.DrawPile && m.To==CardLocation.Processing)!=1) || returned.Select(e=>e.Origin.UseId).Distinct().Count()!=returned.Length)return false;
    if(r.NativeUse is{}currentOrigin)return uses.LastOrDefault()==currentOrigin && returned.Count(e=>e.Origin==currentOrigin)==(r.NativeReturned?1:0) && uses.Length==r.Slots.Count;

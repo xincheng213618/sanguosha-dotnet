@@ -5,16 +5,9 @@ public sealed record GuanduChariotDestroyedEvent(int CardId, int MovementSequenc
 
 public sealed partial class GameEngine
 {
-    private static string? GuanduEquipmentSkillGrantId(Card card) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GuanduEquipment.GuanduEquipmentSkillGrantId(card);
-    private bool ResolveGuanduEquipmentSkillGrant(Card card, CardLocation from, CardLocation to)
-    {
-        if (GuanduEquipmentSkillGrantId(card) is not { } grant) return false;
-        if (from is { Zone: CardZoneKind.Equipment, OwnerSeat: { } old }) _players[old].SkillGrants.RemoveGrant(grant);
-        if (to is { Zone: CardZoneKind.Equipment, OwnerSeat: { } target } && _contentRegistry.Skills.ContainsKey("guandu:thunder-chariot"))
-            _players[target].SkillGrants.Grant(new(grant, "guandu:thunder-chariot", grant, grant));
-        return true;
-    }
+    private string? GuanduEquipmentSkillGrantId(Card card) =>
+        EquipmentRules.GetSkillBinding(card.Kind) is { } binding && binding.SkillId.StartsWith("guandu:", StringComparison.Ordinal)
+            ? binding.CreateGrantId(card.Id) : null;
     private static bool IsGuanduThunderChariotDeparture(Card card, CardLocation from, CardLocation to) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GuanduEquipment.IsGuanduThunderChariotDeparture(card,from,to);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 44002)]

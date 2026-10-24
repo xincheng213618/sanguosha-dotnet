@@ -4,23 +4,12 @@ public sealed record HulaoInitialEquipmentPlacedEvent(int BossSeat) : IGameEvent
 
 public sealed partial class GameEngine
 {
-    private static string? HulaoEquipmentSkillId(CardKind kind) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_HulaoEquipment.HulaoEquipmentSkillId(kind);
+    private string? HulaoEquipmentSkillId(CardKind kind) =>
+        EquipmentRules.GetSkillBinding(kind) is { } binding && binding.SkillId.StartsWith("hulao:", StringComparison.Ordinal)
+            ? binding.SkillId : null;
 
-    private static string? HulaoEquipmentSkillGrantId(Card card) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_HulaoEquipment.HulaoEquipmentSkillGrantId(card);
-
-    private bool ResolveHulaoEquipmentSkillGrant(Card card, CardLocation from, CardLocation to)
-    {
-        if (HulaoEquipmentSkillId(card.Kind) is not { } skillId) return false;
-        var grantId = HulaoEquipmentSkillGrantId(card)!;
-        if (from is { Zone: CardZoneKind.Equipment, OwnerSeat: { } oldSeat })
-            _players[oldSeat].SkillGrants.RemoveGrant(grantId);
-        if (to is { Zone: CardZoneKind.Equipment, OwnerSeat: { } newSeat } &&
-            _contentRegistry.Skills.ContainsKey(skillId))
-            _players[newSeat].SkillGrants.Grant(new SkillGrant(grantId, skillId, grantId, grantId));
-        return true;
-    }
+    private string? HulaoEquipmentSkillGrantId(Card card) =>
+        HulaoEquipmentSkillId(card.Kind) is null ? null : EquipmentSkillGrantId(card);
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27500)]
     private bool AllowsHulaoEquipmentTrigger(ProgramTriggerLegalityContext gate)
@@ -98,7 +87,7 @@ public sealed partial class GameEngine
             // The source does not define how two selected armors share one slot.
             // This local choice equips one uniformly; every other entity remains
             // in the draw pile, rather than creating or destroying any equipment.
-            var slotCards = selected.Where(card => EquipmentCatalog.Get(card.Kind).Slot == slot).ToArray();
+            var slotCards = selected.Where(card => EquipmentRules.Get(card.Kind).Slot == slot).ToArray();
             var kinds = slotCards.Select(card => card.Kind).Distinct().ToArray();
             if (kinds.Length == 0) continue;
             var kind = kinds[_random.Next(kinds.Length)];

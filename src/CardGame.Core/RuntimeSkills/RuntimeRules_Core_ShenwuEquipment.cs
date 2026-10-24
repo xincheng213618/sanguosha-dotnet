@@ -3,15 +3,12 @@ namespace CardGame.Core.RuntimeSkills;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_ShenwuEquipment
 {
-    internal static string? ShenwuEquipmentSkillId(CardKind kind) => kind switch
-    {
-        CardKind.ShuraInfernoHalberd => "shenwu:shura-inferno-halberd",
-        CardKind.DelusionCrown => "shenwu:delusion-crown",
-        _ => null
-    };
+    internal static string? ShenwuEquipmentSkillId(CardKind kind) =>
+        EquipmentCatalog.GetSkillBinding(kind) is { } binding && binding.SkillId.StartsWith("shenwu:", StringComparison.Ordinal)
+            ? binding.SkillId : null;
 
     internal static string? ShenwuEquipmentSkillGrantId(Card card) =>
-        CardGame.Core.RuntimeSkills.RuntimeRules_Core_ShenwuEquipment.ShenwuEquipmentSkillId(card.Kind) is null ? null : $"equipment:shenwu:{card.Id}";
+        ShenwuEquipmentSkillId(card.Kind) is null ? null : EquipmentCatalog.GetSkillBinding(card.Kind)?.CreateGrantId(card.Id);
 
     internal static (CardKind Kind, CardKind? Replaces)? ShenwuGodEquipment(string? family) => family switch
     {

@@ -9,17 +9,6 @@ public sealed partial class GameEngine
         public SkillProgramStepOutcome ResolveShanheZhanhunDao(ProgramSkillFrame frame) => engine.ResolveShanheZhanhunDao(frame);
     }
 
-    private bool ResolveShanheZhanhunDaoEquipmentSkillGrant(Card card, CardLocation from, CardLocation to)
-    {
-        if (card.Kind != CardKind.ZhanhunDao) return false;
-        var grantId = EquipmentSkillGrantId(card)!;
-        if (from is { Zone: CardZoneKind.Equipment, OwnerSeat: { } oldSeat })
-            _players[oldSeat].SkillGrants.RemoveGrant(grantId);
-        if (to is { Zone: CardZoneKind.Equipment, OwnerSeat: { } newSeat } && _contentRegistry.Skills.ContainsKey(ShanheZhanhunDaoSkill))
-            _players[newSeat].SkillGrants.Grant(new SkillGrant(grantId, ShanheZhanhunDaoSkill, grantId, grantId));
-        return true;
-    }
-
     private bool HasActiveShanheZhanhunDao(int ownerSeat, string skillId, string skillInstanceId) =>
         skillId == ShanheZhanhunDaoSkill && GetEquipment(_players[ownerSeat]).Any(card => card.Kind == CardKind.ZhanhunDao &&
             IsActiveProgramSourceEquipmentCard(ownerSeat, skillId, skillInstanceId, card));

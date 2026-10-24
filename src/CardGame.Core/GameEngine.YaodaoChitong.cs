@@ -11,17 +11,6 @@ public sealed partial class GameEngine
         public SkillProgramStepOutcome ResolveYaodaoChitong(ProgramSkillFrame f, SkillProgramEffect e) => engine.ResolveYaodaoChitong(f, e);
     }
 
-    private bool ResolveYaodaoChitongEquipmentSkillGrant(Card card, CardLocation from, CardLocation to)
-    {
-        if (card.Kind != CardKind.YaodaoChitong) return false;
-        var grantId = EquipmentSkillGrantId(card)!;
-        if (from is { Zone: CardZoneKind.Equipment, OwnerSeat: { } oldSeat })
-            _players[oldSeat].SkillGrants.RemoveGrant(grantId);
-        if (to is { Zone: CardZoneKind.Equipment, OwnerSeat: { } newSeat } && _contentRegistry.Skills.ContainsKey(YaodaoChitongSkill))
-            _players[newSeat].SkillGrants.Grant(new SkillGrant(grantId, YaodaoChitongSkill, grantId, grantId));
-        return true;
-    }
-
     private Card? ActiveYaodaoChitong(int seat, string skillId, string instance) =>
         skillId == YaodaoChitongSkill && _players[seat].IsAlive && HasWeaponAbility(_players[seat], CardKind.YaodaoChitong)
             ? GetEquipment(_players[seat]).SingleOrDefault(c => c.Kind == CardKind.YaodaoChitong &&

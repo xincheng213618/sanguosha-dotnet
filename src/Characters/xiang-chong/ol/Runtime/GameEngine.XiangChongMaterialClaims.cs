@@ -57,7 +57,7 @@ public sealed partial class GameEngine
         if(first.From!=CardLocation.Processing)return false;
         if(first.To==CardLocation.Equipment(inner.SourceSeat)&&first.Reason==CardMoveReasons.EquipmentEnter)
             return ProgramEventHistory<EquipmentChangedEvent>().Any(e=>e.ResolutionId==inner.Id&&e.PlayerSeat==inner.SourceSeat&&e.CardId==o.CardId&&e.CardKind==o.CardKind);
-        return first.To==CardLocation.DiscardPile&&(first.Reason.Value=="area.abolished.equipment"&&_players[inner.SourceSeat].EquipmentSlotCapacity(EquipmentCatalog.Get(o.CardKind).Slot)==0||first.Reason==CardMoveReasons.UseFinished&&!_players[inner.SourceSeat].IsAlive);
+        return first.To==CardLocation.DiscardPile&&(first.Reason.Value=="area.abolished.equipment"&&_players[inner.SourceSeat].EquipmentSlotCapacity(EquipmentRules.Get(o.CardKind).Slot)==0||first.Reason==CardMoveReasons.UseFinished&&!_players[inner.SourceSeat].IsAlive);
     }
     private void CaptureXiangChongEquipmentMaterialEntry(ProgramSkillFrame f)
     {

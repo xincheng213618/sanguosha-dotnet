@@ -45,7 +45,7 @@ public sealed partial class GameEngine
             var from=Location(id);var card=e.GetAdvancedCard(id);
             return from.OwnerSeat is{}source&&source!=target&&e._players[source].IsAlive&&from.Zone is CardZoneKind.Equipment or CardZoneKind.Judgment&&
                 e.CanMoveProgramCardToCorrespondingZone(card,from.Zone,target)&&
-                (from.Zone!=CardZoneKind.Equipment||e._players[target].EquipmentSlotCapacity(EquipmentCatalog.Get(card.Kind).Slot)>0)&&
+                (from.Zone!=CardZoneKind.Equipment||e._players[target].EquipmentSlotCapacity(e.EquipmentRules.Get(card.Kind).Slot)>0)&&
                 !e.IsForeignEquipmentDiscardPrevented(e._currentSeat,card,from,OwnedCardMoveIntent.Transfer);
         }
         public IReadOnlyList<PromptChoice> HandChoices(ProgramSkillFrame f,int target)=>e.BuildOwnedCardPaymentChoices(f.Id,f.OwnerSeat,target,[CardZoneKind.Hand],OwnedCardMoveIntent.Obtain,
@@ -96,8 +96,8 @@ public sealed partial class GameEngine
             var destination=e.ProgramCorrespondingZoneLocation(card,from.Zone,target);
             if(destination.Zone==CardZoneKind.Equipment)
             {
-                var slot=EquipmentCatalog.Get(card.Kind).Slot;
-                var occupants=e.GetEquipment(e._players[target]).Where(c=>EquipmentCatalog.Get(c.Kind).Slot==slot).ToArray();
+                var slot=e.EquipmentRules.Get(card.Kind).Slot;
+                var occupants=e.GetEquipment(e._players[target]).Where(c=>e.EquipmentRules.Get(c.Kind).Slot==slot).ToArray();
                 if(occupants.Length>=e._players[target].EquipmentSlotCapacity(slot))
                     e.MoveCard(occupants[0],CardLocation.Equipment(target),CardLocation.DiscardPile,CardMoveReasons.EquipmentReplace,m=>Seal(f,m),disclosure:CardMovementDisclosure.FaceUp);
             }

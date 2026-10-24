@@ -10,13 +10,13 @@ public sealed partial class GameEngine
     [ProgramPipelineHook(ProgramPipelinePhase.VirtualEquipment, 45000)]
     private CardKind? XiahouEnVirtualQinggang(int seat, EquipmentSlot slot) => slot == EquipmentSlot.Weapon && IsValidPlayerSeat(seat) &&
         HasRuntimeSkill(_players[seat], AnniversaryXiahouEnComposition.Chijian) &&
-        !GetEquipment(_players[seat]).Any(c => EquipmentCatalog.IsEquipment(c.Kind) && EquipmentCatalog.Get(c.Kind).Slot == EquipmentSlot.Weapon)
+        !GetEquipment(_players[seat]).Any(c => EquipmentRules.IsEquipment(c.Kind) && EquipmentRules.Get(c.Kind).Slot == EquipmentSlot.Weapon)
             ? CardKind.QinggangSword : null;
     [ProgramDistanceRule(ProgramDistanceStage.AttackRangeBaseTerms, 45000)]
     private void XiahouEnVirtualSwordRange(ProgramAttackRangeQuery query, List<RuleQueryBaseTerm> terms)
     {
         if (query.ExcludedEquipmentSlot != EquipmentSlot.Weapon && XiahouEnVirtualQinggang(query.Player.Seat, EquipmentSlot.Weapon) is { } kind &&
-            EquipmentCatalog.Get(kind).WeaponAttackRange is { } range && terms[0].Value < range)
+            EquipmentRules.Get(kind).WeaponAttackRange is { } range && terms[0].Value < range)
             terms[0] = new RuleQueryBaseTerm($"skill:{query.Player.Seat}:anniversary-chijian:attack-range", range);
     }
 

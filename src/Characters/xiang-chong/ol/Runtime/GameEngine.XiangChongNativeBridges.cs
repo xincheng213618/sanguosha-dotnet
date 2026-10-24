@@ -16,9 +16,9 @@ public sealed partial class GameEngine
             lost.CardId != cardId || destination != from || !ValidXiang(frame) || !XiangLostStillAvailable(frame) ||
             !_players[frame.OwnerSeat].IsAlive || _winner != Winner.None ||
             from == CardLocation.OutsideGame || _cardZones.GetLocation(cardId) != from ||
-            !EquipmentCatalog.IsEquipment(lost.Kind)) return false;
+            !EquipmentRules.IsEquipment(lost.Kind)) return false;
         var owner = _players[frame.OwnerSeat];
-        return owner.EquipmentSlotCapacity(EquipmentCatalog.Get(lost.Kind).Slot) > 0 &&
+        return owner.EquipmentSlotCapacity(EquipmentRules.Get(lost.Kind).Slot) > 0 &&
             !IsCardUseForbidden(owner.Seat, lost.Kind, CardActionType.Use) &&
             !IsTurnPhysicalUseForbidden(owner.Seat, [cardId]);
     }

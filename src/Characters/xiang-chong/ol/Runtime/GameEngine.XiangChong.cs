@@ -69,7 +69,7 @@ public sealed partial class GameEngine
         if(r.Stage==XiangChongStage.Choice)
         {
             if(_players[r.TurnOwner].IsAlive&&XiangOwned(r.TurnOwner).Count>0)Add("give","随机交给向宠一张牌");
-            if(XiangLostStillAvailable(f)&&(!EquipmentCatalog.IsEquipment(r.Lost!.Kind)||CanIssueXiangChongGuyingEquipment(f,r.Lost.CardId,r.LossDestination!.Value)))Add("return",EquipmentCatalog.IsEquipment(r.Lost!.Kind)?"令向宠使用原装备牌":"令向宠获得原失去的牌");
+            if(XiangLostStillAvailable(f)&&(!EquipmentRules.IsEquipment(r.Lost!.Kind)||CanIssueXiangChongGuyingEquipment(f,r.Lost.CardId,r.LossDestination!.Value)))Add("return",EquipmentRules.IsEquipment(r.Lost!.Kind)?"令向宠使用原装备牌":"令向宠获得原失去的牌");
         }
         else if(r.Stage==XiangChongStage.Targets)
         {foreach(var t in _players.Where(t=>MuzhenTarget(f,f.OwnerSeat,t.Seat,r.Branch)))Add("target","选择 "+t.Name,targets:[t.Seat]);}
@@ -100,7 +100,7 @@ public sealed partial class GameEngine
         AssertXiang(f);ClearPendingDecision();ReplaceRuntimeTop(f=f with{Step=ResolutionFrameStep.ResolvingEffect});var branch=choice.Parameters["branch"];
         if(branch=="target")
         {
-            var target=choice.Targets.Single();var cards=XiangOwned(f.OwnerSeat,f).Where(c=>r.Branch=="gift"||EquipmentCatalog.IsEquipment(c.Kind)&&CanPlaceOwnedEquipment(f.OwnerSeat,target,GetAdvancedCard(c.CardId),c.From)).ToArray();
+            var target=choice.Targets.Single();var cards=XiangOwned(f.OwnerSeat,f).Where(c=>r.Branch=="gift"||EquipmentRules.IsEquipment(c.Kind)&&CanPlaceOwnedEquipment(f.OwnerSeat,target,GetAdvancedCard(c.CardId),c.From)).ToArray();
             ReplaceRuntimeTop(f=f with{XiangChong=r with{Recipient=target,Cards=cards,Stage=XiangChongStage.Cards}});PublishXiang(f);return;
         }
         if(branch=="card")
@@ -109,7 +109,7 @@ public sealed partial class GameEngine
         {var cards=XiangOwned(r.TurnOwner);var c=cards[_random.Next(cards.Count)];PayXiang(f,[c],CardLocation.Hand(f.OwnerSeat),XiangGift,"compensation");ContinueXiang(f.Id);return;}
         if(branch=="return")
         {
-            if(EquipmentCatalog.IsEquipment(r.Lost!.Kind))
+            if(EquipmentRules.IsEquipment(r.Lost!.Kind))
             {ReplaceRuntimeTop(f=f with{XiangChong=r with{Stage=XiangChongStage.EquipmentReady}});ContinueXiang(f.Id);return;}
             PayXiang(f,[r.Lost with{From=r.LossDestination!.Value}],CardLocation.Hand(f.OwnerSeat),XiangReturn,"return");ContinueXiang(f.Id);return;
         }
@@ -156,7 +156,7 @@ public sealed partial class GameEngine
         {
             if(!XiangLostStillAvailable(f)||!CanIssueXiangChongGuyingEquipment(f,r.Lost!.CardId,r.LossDestination!.Value)){FinishXiang(f,"original-equipment-no-longer-executable");return;}
             var origin=new XiangChongEquipmentOrigin(f.Id,_resolutionSequence+1,r.Lost!.CardId,r.Lost.Kind,f.OwnerSeat,r.LossDestination!.Value);
-            var slot=EquipmentCatalog.Get(origin.CardKind).Slot;var eq=GetEquipment(f.OwnerSeat).Where(c=>EquipmentCatalog.Get(c.Kind).Slot==slot).ToArray();var old=eq.Length>=_players[f.OwnerSeat].EquipmentSlotCapacity(slot)?eq[0]:null;
+            var slot=EquipmentRules.Get(origin.CardKind).Slot;var eq=GetEquipment(f.OwnerSeat).Where(c=>EquipmentRules.Get(c.Kind).Slot==slot).ToArray();var old=eq.Length>=_players[f.OwnerSeat].EquipmentSlotCapacity(slot)?eq[0]:null;
             var grain=old?.Kind==CardKind.WoodenOx?GetWoodenOxGrain(_players[f.OwnerSeat]).Select(c=>new XiangChongCard(c.Id,c.Kind,CardLocation.WoodenOxGrain(f.OwnerSeat))).ToArray():Array.Empty<XiangChongCard>();
             ReplaceRuntimeTop(f=f with{XiangChong=r with{Stage=XiangChongStage.EquipmentUse,Equipment=origin,Before=_movementSequence,After=_movementSequence,Replaced=old is null?null:new(old.Id,old.Kind,CardLocation.Equipment(f.OwnerSeat)),Auxiliaries=grain}});AdvanceEventRulesAndQueueFact(new XiangChongEquipmentIssuedEvent(origin));BeginXiangChongGuyingEquipment(f,origin);return;
         }

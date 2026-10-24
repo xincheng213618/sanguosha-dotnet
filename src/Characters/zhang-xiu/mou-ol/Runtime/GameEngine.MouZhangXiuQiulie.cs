@@ -18,7 +18,7 @@ public sealed partial class GameEngine
         !IsDirectedCardTargetProhibited(owner, target, CardKind.Slash) && !IsCardTargetProhibited(_players[target], CardKind.Slash, Suit.None, null);
     private Card[] MouZhangXiuOlDiscardable(int owner, bool defense = false) => GetHand(_players[owner]).Concat(GetEquipment(owner)).Where(c =>
         !IsForeignEquipmentDiscardPrevented(owner, c, _cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && !IsSelfHandCategoryDiscardForbidden(owner, c, _cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) &&
-        (!defense || GetProgramCardCategory(AdvancedEffectiveHandKind(_players[owner], c)) == SkillProgramCardCategory.Basic || EquipmentCatalog.IsEquipment(c.Kind) && EquipmentCatalog.Get(c.Kind).Slot == EquipmentSlot.Weapon)).ToArray();
+        (!defense || GetProgramCardCategory(AdvancedEffectiveHandKind(_players[owner], c)) == SkillProgramCardCategory.Basic || EquipmentRules.IsEquipment(c.Kind) && EquipmentRules.Get(c.Kind).Slot == EquipmentSlot.Weapon)).ToArray();
     [ProgramCapability] private sealed class MouZhangXiuOlCapability(GameEngine engine) : IMouZhangXiuOlHost
     {
         public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch

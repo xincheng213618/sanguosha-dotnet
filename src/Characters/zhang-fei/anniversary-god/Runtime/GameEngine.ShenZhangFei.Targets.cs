@@ -31,7 +31,7 @@ public sealed partial class GameEngine
         foreach(var action in actions.ToArray().Where(a=>a.CardId is not null&&a.ProgramActivationId is null&&a.Kind!=LegalActionKind.Recast))
         {
             var(kind,suit)=TargetAdjustmentAppearance(actor,action);
-            if(IsSlashCard(kind)||suit!=Suit.None||EquipmentCatalog.IsEquipment(kind)||IsDelayedCard(kind))continue;
+            if(IsSlashCard(kind)||suit!=Suit.None||EquipmentRules.IsEquipment(kind)||IsDelayedCard(kind))continue;
             var normal=action.Kind is LegalActionKind.DrawTwo or LegalActionKind.Peach or LegalActionKind.Alcohol ? new[] { actor.Seat } : GetDeclaredCardTargets(actor,action.Kind,action.TargetSeats).ToArray();
             if(normal.Length==0)continue;
             IEnumerable<IReadOnlyList<int>> targets;

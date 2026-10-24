@@ -4324,7 +4324,7 @@ public sealed partial class GameEngine
             BeginSimpleCardUse(resolutionId, new(equipment.Id, SimpleCardUseEffect.Equipment));
             return;
         }
-        var definition = EquipmentCatalog.Get(equipment.Kind);
+        var definition = EquipmentRules.Get(equipment.Kind);
         var sameSlot = GetEquipment(source).Where(card => FieldEquipmentSlot(card) == definition.Slot).ToArray();
         var replaced = sameSlot.Length >= source.EquipmentSlotCapacity(definition.Slot) ? sameSlot.FirstOrDefault() : null;
         if (replaced is not null)
@@ -15356,9 +15356,9 @@ public sealed partial class GameEngine
         }
 
         foreach (var equipment in playableCards.Where(card =>
-                     EquipmentCatalog.IsEquipment(card.Kind) && actor.EquipmentSlotCapacity(FieldEquipmentSlot(card)) > 0))
+                     EquipmentRules.IsEquipment(card.Kind) && actor.EquipmentSlotCapacity(FieldEquipmentSlot(card)) > 0))
         {
-            var definition = EquipmentCatalog.Get(equipment.Kind);
+            var definition = EquipmentRules.Get(equipment.Kind);
             actions.Add(new LegalAction(
                 LegalActionKind.Equip,
                 equipment.Id,
@@ -17353,7 +17353,7 @@ public sealed partial class GameEngine
             .ToArray();
 
     private bool HasBlackSlashBarrier(CharacterState player) =>
-        KongwuEffectiveEquipment(player).Any(card => EquipmentCatalog.Get(card.Kind).BlocksBlackSlash) ||
+        KongwuEffectiveEquipment(player).Any(card => EquipmentRules.Get(card.Kind).BlocksBlackSlash) ||
         !IsArmorIneffectiveForTurn(player) && ProgramVirtualEquipment(player.Seat, EquipmentSlot.Armor) == CardKind.RenwangShield ||
         !HasArmor(player) && !IsArmorIneffectiveForTurn(player) && HasCardPolicy(player, SkillProgramCardPolicyKind.VirtualEquipment, CardKind.RenwangShield);
 
@@ -17415,7 +17415,7 @@ public sealed partial class GameEngine
     }
 
     private bool HasArmorBypass(CharacterState player) =>
-        GetEquipmentRuleCards(player).Any(card => EquipmentCatalog.Get(card.Kind).IgnoresArmor);
+        GetEquipmentRuleCards(player).Any(card => EquipmentRules.Get(card.Kind).IgnoresArmor);
 
     private bool HasProgramSkill(CharacterState player, string skillId) =>
         GetSkillBindingShard(player).ProgramInstances.Any(instance =>
@@ -17985,7 +17985,7 @@ public sealed partial class GameEngine
         foreach (var player in _players)
         {
             var equipment = GetEquipment(player);
-            if (equipment.Any(card => !EquipmentCatalog.IsEquipment(card.Kind) && !HasExactHappyBonePlacement(card, player.Seat)))
+            if (equipment.Any(card => !EquipmentRules.IsEquipment(card.Kind) && !HasExactHappyBonePlacement(card, player.Seat)))
             {
                 throw new InvalidOperationException(
                     $"Player {player.Seat} equipment zone contains a non-equipment card.");

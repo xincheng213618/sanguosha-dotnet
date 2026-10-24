@@ -114,5 +114,5 @@ public sealed partial class GameEngine
     [ProgramAiChoice(SkillProgramEffectOp.PlaceXingGuMountAndObtainDiamond)]
     private PromptChoice AiXingGu(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderByDescending(c =>
         (AreProgramDistributionAllies(_players[f.OwnerSeat], _players[c.Targets.Single()]) ? 10 : 0) +
-        (GetEquipment(_players[c.Targets.Single()]).Any(e => EquipmentCatalog.Get(e.Kind).Slot == EquipmentCatalog.Get(GetAdvancedCard(c.Cards.Single()).Kind).Slot) ? 0 : 2)).First();
+        (GetEquipment(_players[c.Targets.Single()]).Any(e => EquipmentRules.Get(e.Kind).Slot == EquipmentRules.Get(GetAdvancedCard(c.Cards.Single()).Kind).Slot) ? 0 : 2)).First();
 }

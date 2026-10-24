@@ -6,7 +6,7 @@ public sealed partial class GameEngine
     {
         if(!_hasIssuedZhugeGuoState&&!_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ObtainDeckTrickForActualEquipmentUse))return;
         if(payload is not CardUseDeclaredEvent declared || LifecycleCardUse(declared.ResolutionId)is not{Action:{Type:CardActionType.Use}a}use)return;
-        if(EquipmentCatalog.IsEquipment(a.EffectiveKind) && a.PhysicalCards is[var material] && _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ObtainDeckTrickForActualEquipmentUse) && CollectProgramTriggerCandidates(_players[a.ActorSeat],SkillProgramTriggerWindow.CardUseTargetsFinalized).Any(c=>ProgramInstructionResolver.Default.Features(GetProgramTrigger(c)).HasOperation(SkillProgramEffectOp.ObtainDeckTrickForActualEquipmentUse)))
+        if(EquipmentRules.IsEquipment(a.EffectiveKind) && a.PhysicalCards is[var material] && _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ObtainDeckTrickForActualEquipmentUse) && CollectProgramTriggerCandidates(_players[a.ActorSeat],SkillProgramTriggerWindow.CardUseTargetsFinalized).Any(c=>ProgramInstructionResolver.Default.Features(GetProgramTrigger(c)).HasOperation(SkillProgramEffectOp.ObtainDeckTrickForActualEquipmentUse)))
         {
             var origin=new QirangEquipmentOrigin(use.Id,a,_movementSequence);ReplaceRuntimeFrame(use.Id,use=use with{QirangEquipmentOrigin=origin});AdvanceEventRulesAndQueueFact(new QirangEquipmentOriginCapturedEvent(use.Id,a.ActionId,a.ActorSeat,material.CardId,origin.MovementBefore));
         }

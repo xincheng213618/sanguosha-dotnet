@@ -6,7 +6,7 @@ public sealed partial class GameEngine
         var at = _resolutionStack.FindIndex(frame => frame.Id == use.Id);
         if (at < 1 || _resolutionStack[at - 1] is not ProgramSkillFrame { YangFu: { Op: SkillProgramEffectOp.ResolveSuyiEquipmentThenSlash, Stage: YangFuStage.EquipmentUse } r } f) return;
         if (r.NativeOrigin is not null || use.Action is not { Type: CardActionType.Use } action || use.SourceSeat != r.TargetSeat || action.ActorSeat != r.TargetSeat || action.ProviderSeat != r.TargetSeat ||
-            !EquipmentCatalog.IsEquipment(use.CardKind) || use.PhysicalCardIds is not [var id] || id != use.CardId || action.PhysicalCards is not [var cost] || cost.CardId != id || cost.From != CardLocation.DrawPile ||
+            !EquipmentRules.IsEquipment(use.CardKind) || use.PhysicalCardIds is not [var id] || id != use.CardId || action.PhysicalCards is not [var cost] || cost.CardId != id || cost.From != CardLocation.DrawPile ||
             f.CardSetBindings.SingleOrDefault(b => b.Name == SuyiEquipmentBind) is not { CardIds: [var bound] } || bound != id ||
             !action.ConversionChain.SequenceEqual([r.Source]) || f.PendingMovementContinuation?.SubjectSeat != r.TargetSeat)
             throw new InvalidOperationException("Suyi must issue the exact real stock equipment for its selected foreign actor.");
@@ -51,7 +51,7 @@ public sealed partial class GameEngine
         if (at < 1 || _resolutionStack[at - 1] is not ProgramSkillFrame { YangFu: { Op: SkillProgramEffectOp.ResolveSuyiEquipmentThenSlash, NativeCompleted: false } r } f ||
             f.Id != o.ProgramFrameId || r.NativeOrigin != o || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.ActualTurn != o.ActualTurn ||
             !issued.ConversionChain.SequenceEqual([r.Source])) return false;
-        return r.Stage == YangFuStage.EquipmentUse ? o.ActorSeat == r.TargetSeat && EquipmentCatalog.IsEquipment(o.Kind) && use.PhysicalCardIds is [var id] && id == o.CardId &&
+        return r.Stage == YangFuStage.EquipmentUse ? o.ActorSeat == r.TargetSeat && EquipmentRules.IsEquipment(o.Kind) && use.PhysicalCardIds is [var id] && id == o.CardId &&
             issued.PhysicalCards is [var cost] && cost.CardId == id && cost.From == CardLocation.DrawPile :
             r.Stage == YangFuStage.SlashUse && o.ActorSeat == f.OwnerSeat && o.CardId == 0 && o.Kind == CardKind.Slash && use.PhysicalCardIds is { Count: 0 } && issued.PhysicalCards.Count == 0;
     }
@@ -70,7 +70,7 @@ public sealed partial class GameEngine
         targets = Array.AsReadOnly(new[] { use.TargetSeats[0] }); return true;
     }
     private bool IsSuyiEquipmentRide(ResolutionFrame ride, ResolutionFrame beneath) => ride is CardUseFrame { SuyiOrigin: { } o } use &&
-        beneath is ProgramSkillFrame { YangFu.Stage: YangFuStage.EquipmentUse } f && o.ProgramFrameId == f.Id && EquipmentCatalog.IsEquipment(o.Kind) && IsIssuedSuyiUse(use);
+        beneath is ProgramSkillFrame { YangFu.Stage: YangFuStage.EquipmentUse } f && o.ProgramFrameId == f.Id && EquipmentRules.IsEquipment(o.Kind) && IsIssuedSuyiUse(use);
     [NativeUseValidation(27310)] private void ValidateSuyiNative(CardUseFrame use)
     { if (use.SuyiOrigin is not null && !IsIssuedSuyiUse(use)) throw new InvalidOperationException("Suyi lost its exact issued native use and original provider."); }
     [NativeUseReturn(27310)] private void ReturnSuyiNative(CardUseFrame use)

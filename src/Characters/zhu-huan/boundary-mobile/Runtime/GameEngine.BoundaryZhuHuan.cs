@@ -125,7 +125,7 @@ public sealed partial class GameEngine
         var receipt=frame.BoundaryZhuHuan!;
         ReplaceRuntimeTop(frame=frame with{BoundaryZhuHuan=receipt with{Stage=BoundaryZhuHuanStage.Equipment}});
         if(!_players[frame.OwnerSeat].IsAlive||!EnsureDrawPile()){CompleteBoundaryPingkou(frame);return;}
-        var candidates=_cardZones.CardsAt(CardLocation.DrawPile).Where(c=>EquipmentCatalog.IsEquipment(c.Kind)).OrderBy(c=>c.Id).ToArray();
+        var candidates=_cardZones.CardsAt(CardLocation.DrawPile).Where(c=>EquipmentRules.IsEquipment(c.Kind)).OrderBy(c=>c.Id).ToArray();
         if(candidates.Length==0){CompleteBoundaryPingkou(frame);return;}
         var card=candidates[_random.Next(candidates.Length)];var before=_movementSequence;
         ReplaceRuntimeTop(frame=frame with{BoundaryZhuHuan=frame.BoundaryZhuHuan! with{Stage=BoundaryZhuHuanStage.Movement,EquipmentCard=card.Id,Before=before,After=before},
@@ -183,7 +183,7 @@ public sealed partial class GameEngine
         ValidBoundaryPingkou(frame)&&frame.BoundaryZhuHuan is{Sealed:true,Stage:BoundaryZhuHuanStage.Movement}r&&r.Batch>0&&
         ProgramEventHistory<BoundaryZhuHuanEquipmentObtainedEvent>().Count(e=>e.FrameId==frame.Id&&e.OwnerSeat==frame.OwnerSeat&&e.CardId==r.EquipmentCard&&e.Before==r.Before&&e.After==r.After&&e.BatchId==r.Batch)==1&&
         _cardMovements.Where(m=>m.Sequence>r.Before&&m.Sequence<=r.After).ToArray() is[var move]&&move.CardId==r.EquipmentCard&&move.From==CardLocation.DrawPile&&move.To==CardLocation.Hand(frame.OwnerSeat)&&
-        move.Reason.Value==BoundaryPingkouGain&&EquipmentCatalog.IsEquipment(move.CardKind);
+        move.Reason.Value==BoundaryPingkouGain&&EquipmentRules.IsEquipment(move.CardKind);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,53800)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,53800)]
     private bool KeepIssuedBoundaryPingkou(ProgramSkillFrame frame)=>frame.BoundaryZhuHuan is{Sealed:true}&&ValidBoundaryPingkou(frame);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryZhuHuanPingkou)]

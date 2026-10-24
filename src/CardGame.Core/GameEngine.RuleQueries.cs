@@ -27,12 +27,12 @@ public sealed partial class GameEngine
         {
             new($"mode:{_modeDefinition.Id}:alive-seat-distance", GetAliveSeatDistance(source.Seat, target.Seat))
         };
-        baseTerms.AddRange(KongwuEffectiveEquipment(source).Where(card => card.Id != excludedEquipmentId && (excludedEquipmentSlot is null || EquipmentCatalog.Get(card.Kind).Slot != excludedEquipmentSlot)).Select(card => new RuleQueryBaseTerm(
+        baseTerms.AddRange(KongwuEffectiveEquipment(source).Where(card => card.Id != excludedEquipmentId && (excludedEquipmentSlot is null || EquipmentRules.Get(card.Kind).Slot != excludedEquipmentSlot)).Select(card => new RuleQueryBaseTerm(
             $"equipment:{card.Id}:outgoing-distance",
-            EquipmentCatalog.Get(card.Kind).OutgoingDistanceModifier)));
+            EquipmentRules.Get(card.Kind).OutgoingDistanceModifier)));
         baseTerms.AddRange(KongwuEffectiveEquipment(target).Where(card => card.Id != excludedEquipmentId).Select(card => new RuleQueryBaseTerm(
             $"equipment:{card.Id}:incoming-distance",
-            EquipmentCatalog.Get(card.Kind).IncomingDistanceModifier)));
+            EquipmentRules.Get(card.Kind).IncomingDistanceModifier)));
 
         DistanceRules.AddDistanceBaseTerms(new(source, target), baseTerms);
         var outgoing = CollectNumericRuleContributions(source, SkillRuleQuery.OutgoingDistance).ToList();
@@ -51,8 +51,8 @@ public sealed partial class GameEngine
         var baseTerms = new List<RuleQueryBaseTerm>();
         var minimumRange = 1;
         {
-            var weapon = KongwuEffectiveEquipment(player).Where(card => card.Id != excludedEquipmentId && (excludedEquipmentSlot is null || EquipmentCatalog.Get(card.Kind).Slot != excludedEquipmentSlot))
-                .Where(card => EquipmentCatalog.Get(card.Kind).Slot == EquipmentSlot.Weapon)
+            var weapon = KongwuEffectiveEquipment(player).Where(card => card.Id != excludedEquipmentId && (excludedEquipmentSlot is null || EquipmentRules.Get(card.Kind).Slot != excludedEquipmentSlot))
+                .Where(card => EquipmentRules.Get(card.Kind).Slot == EquipmentSlot.Weapon)
                 .MaxBy(card => GetWeaponAttackRange(player, card));
             if (weapon is { Kind: CardKind.RedBloodBlade } && GetWeaponAttackRange(player, weapon) == 0)
                 minimumRange = 0;
@@ -99,10 +99,10 @@ public sealed partial class GameEngine
                 GetCurrentTurnDefaultStat(player.Seat, SkillRuleQuery.DrawCount) ?? _drawPerTurn)
         };
         baseTerms.AddRange(KongwuEffectiveEquipment(player)
-            .Where(card => EquipmentCatalog.Get(card.Kind).DrawCountBonus != 0)
+            .Where(card => EquipmentRules.Get(card.Kind).DrawCountBonus != 0)
             .Select(card => new RuleQueryBaseTerm(
                 $"equipment:{card.Id}:draw-count",
-                EquipmentCatalog.Get(card.Kind).DrawCountBonus)));
+                EquipmentRules.Get(card.Kind).DrawCountBonus)));
         var contributions = CollectNumericRuleContributions(player, SkillRuleQuery.DrawCount).ToList();
         AddFiniteContribution(contributions, $"state:{player.Seat}:cao-xi:gangshu:draw", CaoXiGangshuBonus(player, SkillRuleQuery.DrawCount));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:shunshi:draw", DuFuRenPhaseBonus(player.Seat, SkillRuleQuery.DrawCount));
@@ -150,7 +150,7 @@ public sealed partial class GameEngine
         if (HasFriendYangmingQuota(player)) contributions.Add(new UnlimitedRuleQueryContribution($"skill:{player.Seat}:friend-yangming"));
         foreach (var card in GetEquipmentRuleCards(player, excludedEquipmentSlot).Where(card => card.Id != excludedEquipmentId))
         {
-            var bonus = IsDragonBoatActivity && card.Kind == CardKind.Crossbow ? 3 : EquipmentCatalog.Get(card.Kind).SlashLimitBonus;
+            var bonus = IsDragonBoatActivity && card.Kind == CardKind.Crossbow ? 3 : EquipmentRules.Get(card.Kind).SlashLimitBonus;
             if (bonus == int.MaxValue)
                 contributions.Add(new UnlimitedRuleQueryContribution($"equipment:{card.Id}:slash-use-limit"));
             else

@@ -8,7 +8,7 @@ public sealed partial class GameEngine
         IsValidPlayerSeat(owner) && IsValidPlayerSeat(target) && owner != target && _players[owner].IsAlive && _players[target].IsAlive &&
         from.Zone == CardZoneKind.PublicPersistentPile && from.OwnerSeat == owner && _cardZones.GetLocation(card.Id) == from &&
         PublicPileSources(owner).Any(source => source.SkillId == "ol:xinggu" && source.Location == from) && IsXingGuMount(card) &&
-        !_players[target].EquipmentAreaAbolished && _players[target].EquipmentSlotCapacity(EquipmentCatalog.Get(card.Kind).Slot) > 0;
+        !_players[target].EquipmentAreaAbolished && _players[target].EquipmentSlotCapacity(EquipmentRules.Get(card.Kind).Slot) > 0;
 
     private void PlaceZhangShiPingMount(ProgramSkillFrame frame, int target, Card card, CardLocation from)
     {
@@ -16,8 +16,8 @@ public sealed partial class GameEngine
             receipt.CardId != card.Id || receipt.RecipientSeat != target || receipt.PileLocation != from ||
             !CanPlaceZhangShiPingMount(frame.OwnerSeat, target, card, from))
             throw new InvalidOperationException("Xinggu lost its exact public mount, native equipment slot or accepted placement.");
-        var slot = EquipmentCatalog.Get(card.Kind).Slot;
-        var equipped = GetEquipment(_players[target]).Where(item => EquipmentCatalog.Get(item.Kind).Slot == slot).ToArray();
+        var slot = EquipmentRules.Get(card.Kind).Slot;
+        var equipped = GetEquipment(_players[target]).Where(item => EquipmentRules.Get(item.Kind).Slot == slot).ToArray();
         var replaced = equipped.Length >= _players[target].EquipmentSlotCapacity(slot) ? equipped[0] : null;
         if (replaced is not null)
         {

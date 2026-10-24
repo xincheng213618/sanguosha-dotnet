@@ -6,16 +6,6 @@ public sealed partial class GameEngine
     private bool HasShanheLeizhenCapability => _contentRegistry?.ProgramDependencies
         .HasTriggerOperation(SkillProgramEffectOp.ResolveShanheLeizhenUse) == true;
 
-    private bool ResolveShanheLeizhenEquipmentSkillGrant(Card card, CardLocation from, CardLocation to)
-    {
-        if (card.Kind != CardKind.Leizhen) return false;
-        var id = EquipmentSkillGrantId(card)!;
-        if (from is { Zone: CardZoneKind.Equipment, OwnerSeat: { } old }) _players[old].SkillGrants.RemoveGrant(id);
-        if (to is { Zone: CardZoneKind.Equipment, OwnerSeat: { } next } && _contentRegistry.Skills.ContainsKey(ShanheLeizhenSkill))
-            _players[next].SkillGrants.Grant(new SkillGrant(id, ShanheLeizhenSkill, id, id));
-        return true;
-    }
-
     private ShanheLeizhenChargeEarnedEvent? PendingShanheLeizhenCharge(int owner)
     {
         var spent = ProgramEventHistory<ShanheLeizhenChargeSpentEvent>().Where(e => e.OwnerSeat == owner)

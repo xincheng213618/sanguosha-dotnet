@@ -5,17 +5,6 @@ public sealed partial class GameEngine
     private const string AnqiFeirenSkill = "shanhe:anqi-feiren";
     private bool HasAnqiFeirenCapability => _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnqiFeiren);
 
-    private bool ResolveAnqiFeirenEquipmentSkillGrant(Card card, CardLocation from, CardLocation to)
-    {
-        if (card.Kind != CardKind.AnqiFeiren) return false;
-        var grantId = EquipmentSkillGrantId(card)!;
-        if (from is { Zone: CardZoneKind.Equipment, OwnerSeat: { } previous })
-            _players[previous].SkillGrants.RemoveGrant(grantId);
-        if (to is { Zone: CardZoneKind.Equipment, OwnerSeat: { } next } && _contentRegistry.Skills.ContainsKey(AnqiFeirenSkill))
-            _players[next].SkillGrants.Grant(new SkillGrant(grantId, AnqiFeirenSkill, grantId, grantId));
-        return true;
-    }
-
     private Card? ActiveAnqiFeiren(int owner, string skillId, string instanceId) => skillId != AnqiFeirenSkill ? null :
         GetEquipment(_players[owner]).SingleOrDefault(card => card.Kind == CardKind.AnqiFeiren &&
             IsActiveProgramSourceEquipmentCard(owner, skillId, instanceId, card));

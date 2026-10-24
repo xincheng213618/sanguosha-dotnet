@@ -9,19 +9,11 @@ public sealed partial class GameEngine
     private bool ShenwuRobeDirectedTargetProhibited(ProgramDirectedTargetQuery query) =>
         IsShenwuRobeTargetProhibited(query.ActorSeat, query.TargetSeat, query.Kind);
 
-    private static string? ShenwuEquipmentSkillId(CardKind kind) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ShenwuEquipment.ShenwuEquipmentSkillId(kind);
-    private static string? ShenwuEquipmentSkillGrantId(Card card) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ShenwuEquipment.ShenwuEquipmentSkillGrantId(card);
-    private bool ResolveShenwuEquipmentSkillGrant(Card card, CardLocation from, CardLocation to)
-    {
-        if (ShenwuEquipmentSkillId(card.Kind) is not { } skill) return false;
-        var grant = ShenwuEquipmentSkillGrantId(card)!;
-        if (from is { Zone: CardZoneKind.Equipment, OwnerSeat: { } old }) _players[old].SkillGrants.RemoveGrant(grant);
-        if (to is { Zone: CardZoneKind.Equipment, OwnerSeat: { } target } && _contentRegistry.Skills.ContainsKey(skill))
-            _players[target].SkillGrants.Grant(new(grant, skill, grant, grant));
-        return true;
-    }
+    private string? ShenwuEquipmentSkillId(CardKind kind) =>
+        EquipmentRules.GetSkillBinding(kind) is { } binding && binding.SkillId.StartsWith("shenwu:", StringComparison.Ordinal)
+            ? binding.SkillId : null;
+    private string? ShenwuEquipmentSkillGrantId(Card card) =>
+        ShenwuEquipmentSkillId(card.Kind) is null ? null : EquipmentSkillGrantId(card);
     private bool HasShenwuArmor(CharacterState player, CardKind kind) =>
         player.IsAlive && !IsArmorIneffectiveForTurn(player) && KongwuEffectiveEquipment(player).Any(card => card.Kind == kind);
     private bool IsShenwuRobeTargetProhibited(int actorSeat, int targetSeat, CardKind kind) =>

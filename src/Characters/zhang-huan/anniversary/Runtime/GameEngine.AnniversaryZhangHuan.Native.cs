@@ -59,7 +59,7 @@ public sealed partial class GameEngine
         if (!IsZhangHuanNative(use) || r.Returned || r.Used.Contains(n.Discard.CardId) || LifecycleCardUse(use.Id) is not null ||
             ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == n.Discard.CardId) != 1 ||
             _cardMovements.Count(m => m.CardId == n.Discard.CardId && m.Sequence > r.Before && m.From == CardLocation.DiscardPile && m.To == CardLocation.Processing &&
-                m.Reason == (EquipmentCatalog.IsEquipment(n.Discard.Kind) ? CardMoveReasons.EquipmentUse : CardMoveReasons.Use)) != 1)
+                m.Reason == (EquipmentRules.IsEquipment(n.Discard.Kind) ? CardMoveReasons.EquipmentUse : CardMoveReasons.Use)) != 1)
             throw new InvalidOperationException("Shuguo must pay and complete this exact original native entity once.");
         ReplaceRuntimeFrame(f.Id, f with { AnniversaryZhangHuan = r with { Returned = true, Used = r.Used.Append(n.Discard.CardId).ToArray(), Stop = n.Discard.ExecutorSeat != f.OwnerSeat } });
         AdvanceEventRulesAndQueueFact(new AnniversaryZhangHuanUseReturnedEvent(f.Id, use.Id, n.ActionId, n.Discard.CardId));

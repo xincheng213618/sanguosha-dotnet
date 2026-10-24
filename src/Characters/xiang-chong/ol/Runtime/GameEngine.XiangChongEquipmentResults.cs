@@ -49,7 +49,7 @@ public sealed partial class GameEngine
         {
             var first=_cardMovements.FirstOrDefault(m=>m.Sequence>r.Before&&m.CardId==o.CardId&&m.From==CardLocation.Processing);
             if(first is not{To:var terminalTo}||terminalTo!=CardLocation.DiscardPile||
-               !(first.Reason.Value=="area.abolished.equipment"&&_players[use.SourceSeat].EquipmentSlotCapacity(EquipmentCatalog.Get(o.CardKind).Slot)==0||first.Reason==CardMoveReasons.UseFinished&&!_players[use.SourceSeat].IsAlive))
+               !(first.Reason.Value=="area.abolished.equipment"&&_players[use.SourceSeat].EquipmentSlotCapacity(EquipmentRules.Get(o.CardKind).Slot)==0||first.Reason==CardMoveReasons.UseFinished&&!_players[use.SourceSeat].IsAlive))
                 throw new InvalidOperationException("Guying's equipment without entry requires its exact first native abolished-slot or dead-user terminal discard.");
             termination=new(first.Sequence,first.Reason.Value,first.Reason==CardMoveReasons.UseFinished);
         }

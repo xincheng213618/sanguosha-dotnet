@@ -7,28 +7,18 @@ public sealed partial class GameEngine
         if (to.Zone == CardZoneKind.Equipment && IsHappyWeiYanBone(card.Id))
             to = CardLocation.Processing;
         ResolveDynamicEquipmentSkillGrants(card, from, to);
-        if (ResolveHulaoEquipmentSkillGrant(card, from, to)) return;
-        if (ResolveShenwuEquipmentSkillGrant(card, from, to)) return;
-        if (ResolveGuanduEquipmentSkillGrant(card, from, to)) return;
-        if (ResolveShanheZhanhunDaoEquipmentSkillGrant(card, from, to)) return;
-        if (ResolveAnqiFeirenEquipmentSkillGrant(card, from, to)) return;
-        if (ResolveYaodaoChitongEquipmentSkillGrant(card, from, to)) return;
-        if (ResolveShanheXingtianEquipmentSkillGrant(card, from, to)) return;
-        if (ResolveShanheLeizhenEquipmentSkillGrant(card, from, to)) return;
-        if (card.Kind != CardKind.XingtianAxe ||
-            !_contentRegistry!.Skills.ContainsKey("special:xingtian-axe-effect"))
-            return;
-
-        var grantId = EquipmentSkillGrantId(card)!;
+        if (EquipmentRules.GetSkillBinding(card.Kind) is not { } binding) return;
+        var grantId = binding.CreateGrantId(card.Id);
         if (from is { Zone: CardZoneKind.Equipment, OwnerSeat: { } formerSeat })
             _players[formerSeat].SkillGrants.RemoveGrant(grantId);
-        if (to is { Zone: CardZoneKind.Equipment, OwnerSeat: { } newSeat })
+        if (to is { Zone: CardZoneKind.Equipment, OwnerSeat: { } newSeat } &&
+            _contentRegistry.Skills.ContainsKey(binding.SkillId))
             _players[newSeat].SkillGrants.Grant(new SkillGrant(
-                grantId, "special:xingtian-axe-effect", grantId, grantId));
+                grantId, binding.SkillId, grantId, grantId));
     }
 
-    private static string? EquipmentSkillGrantId(Card card) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_EquipmentSkills.EquipmentSkillGrantId(card);
+    private string? EquipmentSkillGrantId(Card card) =>
+        EquipmentRules.GetSkillBinding(card.Kind)?.CreateGrantId(card.Id);
 
     private bool IsActiveProgramSourceEquipmentCard(
         int ownerSeat, string skillId, string skillInstanceId, Card card)

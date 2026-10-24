@@ -43,7 +43,7 @@ public sealed partial class GameEngine
  private void BindZhangJiNativeUse(long useId)
  {
   if(LifecycleCardUse(useId) is not{Action:{}a}use || _resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f=>f.ZhangJi is{Stage:"issuing-equipment"}) is not{}f)return;
-  var r=f.ZhangJi!;if(a.ActorSeat!=r.Target || a.ProviderSeat!=r.Target || a.RequesterSeat is not null || a.PhysicalCards is not[var cost] || cost.From!=CardLocation.DrawPile || !EquipmentCatalog.IsEquipment(a.EffectiveKind) || r.Slots[^1]!=EquipmentCatalog.Get(a.EffectiveKind).Slot || a.ConversionChain is not[var source] || source!=r.Source)throw new InvalidOperationException("Tunjun native use lost its exact deck entity or actual beneficiary.");
+  var r=f.ZhangJi!;if(a.ActorSeat!=r.Target || a.ProviderSeat!=r.Target || a.RequesterSeat is not null || a.PhysicalCards is not[var cost] || cost.From!=CardLocation.DrawPile || !EquipmentRules.IsEquipment(a.EffectiveKind) || r.Slots[^1]!=EquipmentRules.Get(a.EffectiveKind).Slot || a.ConversionChain is not[var source] || source!=r.Source)throw new InvalidOperationException("Tunjun native use lost its exact deck entity or actual beneficiary.");
   var origin=new ZhangJiNativeUseOrigin(f.Id,r.Source,r.GameplayHash,r.Turn,r.PhaseInstance,f.InstructionIndex,use.Id,a.ActionId,r.Target,cost.CardId,a.EffectiveKind,r.Slots[^1],_movementSequence);
   ReplaceRuntimeFrame(f.Id,f with{ZhangJi=r with{NativeUse=origin,Stage="equipment-issued"}});UpdateLifecycleCardUse(use.Id,u=>u with{ZhangJiNativeOrigin=origin});AdvanceEventRulesAndQueueFact(new ZhangJiNativeUseIssuedEvent(origin));
  }
