@@ -28,11 +28,10 @@ public sealed partial class GameEngine
     private CardLocation NormalizeWushuangShopEquipmentDestination(Card card, CardLocation from, CardLocation to)
     {
         if (!IsWushuangShopEquipment(card.Id) || from == to) return to;
-        if (from.Zone == CardZoneKind.Equipment) return CardLocation.OutsideGame;
-        if (from != CardLocation.OutsideGame) return to;
         var created = ProgramEventHistory<WushuangShopEquipmentCreatedEvent>().Single(e => e.CardId == card.Id);
-        return to == CardLocation.Equipment(created.Seat) && !_cardMovements.Any(m => m.CardId == card.Id)
-            ? to : CardLocation.OutsideGame;
+        return EquipmentRules.NormalizeDestination(new(card, from, to,
+            new(card.Id, BuiltInEquipmentContent.WushuangShopSource, created.Seat),
+            HasPriorMovement: _cardMovements.Any(m => m.CardId == card.Id)));
     }
 
     private void RecordWushuangShopEquipmentDestruction(CardMovementRecord movement)

@@ -182,7 +182,7 @@ public sealed partial class GameEngine
     private void RunOneEngineStep()
     {
         if (GetRuntimeModule<NativeFrameAutomaticRuntime>().TryAdvance(NativeFrameAutomaticPhase.BeforeOpening)) return;
-        if (_pendingDecision is null && _resolutionStack.Count == 0 && TryBeginWushuangOpening())
+        if (_pendingDecision is null && _resolutionStack.Count == 0 && _modeRuntime.TryBeginOpening())
         { AdvanceRulesAndPublishState(); return; }
         if (GetRuntimeModule<NativeFrameAutomaticRuntime>().TryAdvance(NativeFrameAutomaticPhase.AfterOpening)) return;
         if (_resolutionStack.LastOrDefault() is RecoveryReplacementFrame recoveryReplacement)

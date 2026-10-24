@@ -325,7 +325,7 @@ public sealed partial class GameEngine
         _contentRegistry = contentRegistry;
         _modeDefinition = ResolveModeDefinition(contentRegistry, options);
         _modeRules = ModeRuleSet.Create(_modeDefinition, options);
-        _modeRuntime = MatchModeRuntime.Empty;
+        _modeRuntime = CreateMatchModeRuntime();
         _programCapabilities = new(this, ProgramCapabilityMetadata.Value);
         _programRuleObservers = new ProgramRuleObservers(ProgramRuleObserverRegistrations.Value,
             BindRuntimeHandler, _modeDefinition.Id);
@@ -689,18 +689,12 @@ public sealed partial class GameEngine
         _commandAwaitingCommit = CloneCommand(command);
         try
         {
+            if (_modeRuntime.TrySubmit(command, out var modeResult)) return modeResult!;
             return command switch
             {
                 StartGameCommand start => SubmitStart(start),
                 AdvanceCommand advance => SubmitAdvance(advance, singleStep: false),
                 AdvanceOneStepCommand step => SubmitAdvance(step, singleStep: true),
-                TickNianClockCommand clock => SubmitNianClock(clock),
-                TickWushuangClockCommand clock => SubmitWushuangClock(clock),
-                BuyWushuangOfferCommand purchase => SubmitBuyWushuangOffer(purchase),
-                RerollWushuangShopCommand refresh => SubmitRerollWushuangShop(refresh),
-                UpgradeWushuangShopCommand upgrade => SubmitUpgradeWushuangShop(upgrade),
-                FinishWushuangShopCommand finishShop => SubmitFinishWushuangShop(finishShop),
-                ToggleWushuangShopLockCommand lockShop => SubmitToggleWushuangShopLock(lockShop),
                 SelectGeneralCommand selectGeneral => SubmitSelectGeneral(selectGeneral),
                 RequestGeneralRosterCommand roster => SubmitGeneralRoster(roster),
                 RevealGeneralCommand revealGeneral => SubmitRevealGeneral(revealGeneral),
@@ -3274,6 +3268,12 @@ public sealed partial class GameEngine
 
         if (_turnNumber >= _options.MaxTurns)
         {
+            if (IsWushuangMode)
+            {
+                CompleteWushuangAtSurvivalLimit($"达到最大回合数 {_options.MaxTurns}");
+                AdvanceRulesAndPublishState();
+                return;
+            }
             EndAsDraw($"达到最大回合数 {_options.MaxTurns}");
             return;
         }
@@ -16813,7 +16813,7 @@ public sealed partial class GameEngine
 
     private void AdvanceAfterDeferredTurnEnd(CharacterState previous, bool skipped)
     {
-        if (TryBeginWushuangShopping(previous, skipped)) return;
+        if (_modeRuntime.TryBeginIntermission(previous.Seat, skipped)) return;
         ContinueAfterWushuangShopping(previous, skipped);
     }
 

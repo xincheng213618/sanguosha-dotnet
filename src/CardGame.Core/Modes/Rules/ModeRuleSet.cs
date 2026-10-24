@@ -23,6 +23,8 @@ internal sealed class ModeRuleSet
     internal bool UsesClassicBattleRules { get; }
     internal bool SupportsGodFactionSelection { get; }
     internal bool ReducesFirstActorInitialHand { get; }
+    internal int? FixedDistance { get; private init; }
+    internal int? InitialHandSizeOverride { get; private init; }
 
     internal static ModeRuleSet Create(ContentModeDefinition mode, GameOptions options)
     {
@@ -34,14 +36,18 @@ internal sealed class ModeRuleSet
         var survival = mode.ModeKind == ContentModeKind.Survival;
         var dragonBoat = mode.DragonBoatActivity is not null;
         var guandu = mode.GuanduActivity is not null;
-        return new(SelectOpening(mode, options, teamIds), SelectDeath(mode, options, teamIds), ModeCardRules.Create(mode),
+        return new ModeRuleSet(SelectOpening(mode, options, teamIds), SelectDeath(mode, options, teamIds), ModeCardRules.Create(mode),
             usesGeneralBaseHp: classicIdentity || wushuang || survival || dragonBoat || guandu,
             usesClassicBattleRules: classicIdentity || wushuang || options.ShanheBattle is not null ||
                 mode.TeamActivity is not null || mode.BossActivity is not null || mode.ShenwuActivity is not null ||
                 mode.WenheActivity is not null || dragonBoat || guandu,
             supportsGodFactionSelection: mode.ModeKind == ContentModeKind.Identity,
             reducesFirstActorInitialHand: mode.ModeKind == ContentModeKind.Team && options.ShanheBattle is null &&
-                !dragonBoat && !guandu && mode.TeamActivity is null && mode.BossActivity is null && mode.ShenwuActivity is null);
+                !dragonBoat && !guandu && mode.TeamActivity is null && mode.BossActivity is null && mode.ShenwuActivity is null)
+        {
+            FixedDistance = wushuang ? 1 : null,
+            InitialHandSizeOverride = wushuang ? 5 : null
+        };
     }
 
     private static IModeOpeningRule SelectOpening(ContentModeDefinition mode, GameOptions options,

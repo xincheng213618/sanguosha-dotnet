@@ -90,8 +90,7 @@ public sealed partial class GameEngine
                 ViewerCanUseHand = sharedHandAccess,
                 IdentityConcealed = player.IdentityConcealed,
                 HappyQiaoHealth = player.HasHpValue ? player.HappyQiaoHealth : null,
-                WushuangTacticIds = IsWushuangMode
-                    ? Array.AsReadOnly(_wushuangPlayers.GetValueOrDefault(player.Seat)?.Tactics.ToArray() ?? []) : null,
+                WushuangTacticIds = _modeRuntime.Wushuang?.TacticIds(player.Seat),
                 Armor = player.Armor,
                 IncomingDamageCap = GetIncomingFixedDamageCap(player,
                     (primarySkills ?? []).Concat(secondarySkills ?? []).Select(skill => skill.ContentId)

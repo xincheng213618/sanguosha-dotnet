@@ -1017,6 +1017,7 @@ var tests = new (string Name, Action Body)[]
     ("Equipment registration: frozen composition and fingerprint", EquipmentRegistrationChecks.FrozenCompositionAndCompleteFingerprint),
     ("Equipment registration: package dependencies and invalid references", EquipmentRegistrationChecks.PackageDependenciesAndInvalidReferences),
     ("Mode runtime: optional observers are not bound in other matches", MatchModeRuntimeChecks.ScopedObserversAreNotBoundInOtherMatches),
+    ("Mode runtime: Wushuang owns optional progress isolation and cold recovery", WushuangModeChecks.OptionalFeatureOwnsMatchProgressAndRecovery),
     ("program rule observer registration preserves ordered recursive boundaries", ProgramRuleObserverChecks.RegistrationPreservesOrderReentrancyAndIsolation),
     ("program rule observer registration rejects invalid metadata", ProgramRuleObserverChecks.InvalidRegistrationsFailBeforeDispatch),
     ("program legality registration preserves ordered capability gates", ProgramLegalityChecks.RegistrationAndDispatchPreserveBoundaries),

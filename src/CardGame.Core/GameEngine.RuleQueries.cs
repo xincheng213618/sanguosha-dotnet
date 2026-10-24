@@ -20,9 +20,9 @@ public sealed partial class GameEngine
     private RuleQueryEvaluation CalculateDistance(CharacterState source, CharacterState target,
         int? excludedEquipmentId = null, EquipmentSlot? excludedEquipmentSlot = null)
     {
-        if (IsWushuangMode)
+        if (_modeRules.FixedDistance is { } fixedDistance)
             return RuleQueryService.EvaluateDirectionalDistance(
-                [new($"mode:{WushuangMode.ModeId}:no-distance", 1)], [], []);
+                [new($"mode:{_modeDefinition.Id}:no-distance", fixedDistance)], [], []);
         var baseTerms = new List<RuleQueryBaseTerm>
         {
             new($"mode:{_modeDefinition.Id}:alive-seat-distance", GetAliveSeatDistance(source.Seat, target.Seat))
