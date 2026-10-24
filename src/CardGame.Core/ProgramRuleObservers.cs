@@ -13,14 +13,15 @@ internal enum ProgramRulePhase
 // Register next to the rule implementation. Orders are explicit because a rule
 // can recursively raise another fact before the remaining observers run.
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-internal sealed class ProgramRuleObserverAttribute(ProgramRulePhase phase, int order) : Attribute
+internal sealed class ProgramRuleObserverAttribute(ProgramRulePhase phase, int order, string? modeId = null) : Attribute
 {
     internal ProgramRulePhase Phase { get; } = phase;
     internal int Order { get; } = order;
+    internal string? ModeId { get; } = modeId;
 }
 
 internal sealed record ProgramRuleObserverRegistration(
-    MethodInfo Method, Type DelegateType, Func<Delegate, Action<IGameEvent?>> Adapt);
+    MethodInfo Method, Type DelegateType, Func<Delegate, Action<IGameEvent?>> Adapt, string? ModeId = null);
 
 // Static metadata never retains a match or a callback bound to a match.
 internal sealed class ProgramRuleObserverCatalog
@@ -59,11 +60,12 @@ internal sealed class ProgramRuleObserverCatalog
                         .CreateDelegate<Func<Delegate, Action<IGameEvent?>>>());
             foreach (var attribute in attributes)
             {
-                if (!Enum.IsDefined(attribute.Phase) || attribute.Order <= 0)
+                if (!Enum.IsDefined(attribute.Phase) || attribute.Order <= 0 ||
+                    attribute.ModeId is not null && string.IsNullOrWhiteSpace(attribute.ModeId))
                     throw new InvalidOperationException($"Rule observer '{method.Name}' requires a valid phase and positive explicit order.");
                 if (attribute.Phase == ProgramRulePhase.BeforeStatePublish && parameters.Length != 0)
                     throw InvalidSignature(method);
-                if (!phases[attribute.Phase].TryAdd(attribute.Order, registration))
+                if (!phases[attribute.Phase].TryAdd(attribute.Order, registration with { ModeId = attribute.ModeId }))
                     throw new InvalidOperationException($"Duplicate rule observer order '{attribute.Phase}:{attribute.Order}'.");
             }
         }
@@ -97,9 +99,11 @@ internal sealed class ProgramRuleObservers
     private readonly Action<IGameEvent?>[] _afterEvent;
     private readonly Action<IGameEvent?>[] _beforeStatePublish;
 
-    internal ProgramRuleObservers(ProgramRuleObserverCatalog catalog, Func<MethodInfo, Type, Delegate> bind)
+    internal ProgramRuleObservers(ProgramRuleObserverCatalog catalog, Func<MethodInfo, Type, Delegate> bind,
+        string? modeId = null)
     {
         Action<IGameEvent?>[] BindPhase(ProgramRulePhase phase) => catalog.Phases[phase]
+            .Where(registration => modeId is null || registration.ModeId is null || registration.ModeId == modeId)
             .Select(registration => registration.Adapt(bind(registration.Method, registration.DelegateType))).ToArray();
         _beforeEvent = BindPhase(ProgramRulePhase.BeforeEvent);
         _afterEvent = BindPhase(ProgramRulePhase.AfterEvent);
