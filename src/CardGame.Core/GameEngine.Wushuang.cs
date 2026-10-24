@@ -2,21 +2,15 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
-    private const string WushuangGrantSource = WushuangModeFeature.GrantSource;
-    private const string WushuangOriginalReplacementSource = WushuangModeFeature.OriginalReplacementSource;
-    private WushuangModeFeature? WushuangFeature => _modeRuntime.Wushuang;
-    private WushuangModeFeature RequireWushuangFeature => WushuangFeature ??
+    private const string WushuangGrantSource = WushuangSkillSources.Shop;
+    private IWushuangModeFeature? WushuangFeature => _modeRuntime.Wushuang;
+    private IWushuangModeFeature RequireWushuangFeature => WushuangFeature ??
         throw new InvalidOperationException("The current match has no Wushuang feature.");
-    // Compatibility bridges share the optional feature's sole progress store.
-    // Native skill/acquisition/AI adapters do not retain a second copy.
-    private IReadOnlyDictionary<int, WushuangPlayerProgress> _wushuangPlayers => RequireWushuangFeature.Players;
     private int _wushuangElapsedMilliseconds
     {
         get => WushuangFeature?.ElapsedMilliseconds ?? 0;
         set => RequireWushuangFeature.ElapsedMilliseconds = value;
     }
-    private WushuangModeFeature CreateWushuangModeFeature() =>
-        new(_options.Seed, _contentRegistry, new WushuangModeHost(this));
     public bool IsWushuangMode => _modeDefinition.Id == WushuangMode.ModeId;
     private bool IsWushuangSkillGrantQualified(SkillGrant grant) => !IsWushuangMode ||
         _contentRegistry.Skills.TryGetValue(grant.SkillId, out var skill) && WushuangCatalogue.IsSkillAllowed(skill);
@@ -29,7 +23,8 @@ public sealed partial class GameEngine
     }
     private WushuangIntermissionFrame? ActiveWushuangWindow(int seat) => WushuangFeature?.ActiveWushuangWindow(seat);
     private bool HasWushuangIntermissionBoundary() => WushuangFeature?.HasWushuangIntermissionBoundary() ?? false;
-    public WushuangSnapshot? CreateWushuangSnapshot(int viewerSeat) => WushuangFeature?.CreateWushuangSnapshot(viewerSeat);
+    public WushuangSnapshot? CreateWushuangSnapshot(int viewerSeat) => WushuangFeature?.CreateWushuangSnapshot(viewerSeat) is { } shop
+        ? shop with { RemainingTurns = Math.Max(0, _options.MaxTurns - _turnNumber) } : null;
     private bool CanUseWushuangShop(int seat) => WushuangFeature?.CanUseWushuangShop(seat) ?? false;
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 61001, WushuangMode.ModeId)]
     private void InitializeWushuangShops(GameStartedEvent started) => WushuangFeature?.InitializeWushuangShops(started);
@@ -88,6 +83,7 @@ public sealed partial class GameEngine
         public int EquipmentSlotCapacity(int seat, EquipmentSlot slot) => engine._players[seat].EquipmentSlotCapacity(slot);
         public EquipmentSlot GetEquipmentSlot(CardKind kind) => engine.EquipmentRules.Get(kind).Slot;
         public bool IsEquipment(CardKind kind) => engine.EquipmentRules.IsEquipment(kind);
+        public IWushuangShopRandom CreateShopRandom(int seed) => new WushuangShopRandom(seed);
         public bool IsSlash(CardKind kind) => IsSlashCard(kind);
         public bool HasReachedFiveTokens(int seat) => engine.ProgramEventHistory<WushuangTokensChangedEvent>().Any(fact => fact.Seat == seat && fact.Tokens >= 5);
         public IReadOnlyList<ResolutionFrame> Frames => Array.AsReadOnly(engine._resolutionStack.ToArray());
@@ -120,5 +116,11 @@ public sealed partial class GameEngine
         public bool TryBeginAcquisition(long frameId, WushuangShopOffer offer) => engine.TryBeginWushuangAcquisition(frameId, offer);
         public bool TryContinueAiShopping(int seat, WushuangIntermissionFrame frame) => false;
         public void ContinueAfterShopping(int endedSeat, bool skipped) => engine.ContinueAfterWushuangShopping(engine._players[endedSeat], skipped);
+    }
+
+    private sealed class WushuangShopRandom(int seed) : IWushuangShopRandom
+    {
+        private readonly DeterministicRandom _random = new(seed);
+        public void Shuffle<T>(IList<T> values) => _random.Shuffle(values);
     }
 }

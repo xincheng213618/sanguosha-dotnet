@@ -188,6 +188,7 @@ internal static class WushuangCombatChecks
         public PackageManifest Manifest { get; } = new("fixture:wushuang-combat", new Version(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
+            foreach (var factory in source.ModeFeatureFactories) b.AddModeFeatureFactory(factory);
             foreach (var x in source.Cards.Values) b.AddCard(x);
             foreach (var x in source.Skills.Values) b.AddSkill(x);
             foreach (var x in source.Generals.Values) b.AddGeneral(x);

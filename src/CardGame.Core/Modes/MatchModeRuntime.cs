@@ -54,7 +54,8 @@ internal sealed partial class MatchModeRuntime
     }
 
     internal T? Find<T>() where T : class =>
-        _features.TryGetValue(typeof(T), out var feature) ? (T)feature : null;
+        _features.TryGetValue(typeof(T), out var feature) ? (T)feature :
+            _features.Values.OfType<T>().SingleOrDefault();
 
     internal bool TrySubmit(GameCommand command, out CommandResult? result)
     {

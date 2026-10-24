@@ -108,14 +108,6 @@ public sealed partial class GameEngine
         return (new CardUseEffectSource(grant.SkillId, "allied-damage-cap", owner.Seat, grant.SkillInstanceId), 1);
     }
 
-    private string? EvaluateActivityWinner()
-    {
-        if (_modeDefinition.TeamActivity is null) return null;
-        if (!_players.Any(p => IsActivitySpiritSlot(p.Seat) && p.IsAlive)) return ActivityPlayerTeam;
-        return !_players.Any(p => p.TeamId == ActivityPlayerTeam && p.IsAlive)
-            ? GetModeTeamIds().Single(t => t != ActivityPlayerTeam) : null;
-    }
-
     [ProgramDistanceRule(ProgramDistanceStage.DistanceBaseTerms, 10)]
     private void AddJiangeDistanceBaseTerms(ProgramDistanceQuery query, List<RuleQueryBaseTerm> terms)
     {

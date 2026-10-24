@@ -18,6 +18,22 @@
 
 ## 内容装载
 
+### 场次规则与可选功能
+
+创建对局时，`ModeRuleSet` 固定选择开局、死亡胜负、卡牌转换、距离和初始牌数策略。身份、公开队伍、国战、Boss、神武、剑阁及延后计分使用各自策略；通用命令和死亡流程只应用规则结果。Boss 与神武的首领死亡仍须等待原生子结算和空栈边界，再决定胜利或切换关卡。
+
+`MatchModeRuntime` 只装配所选场次的命令处理及开局、回合间隙功能。单骑的 `WushuangModeFeature` 拥有虎符、商品、刷新、战法进度和时钟；身份及国战不创建该对象，也不绑定其模式观察器。原生适配器提供只读事实和受控操作，购买、取得战法后的等待状态继续保存在原结算帧，使用同一个命令会话和结算栈。山河征程继续由自己的 campaign session 管理跨关经济与奖励。
+
+单骑商店运行实现位于独立项目 `CardGame.Modes.Wushuang`，通过 Core 的 `IWushuangModeFeature` 和 `IWushuangModeHost` 交互。依赖方向为 `Content.Standard → Modes.Wushuang → Core`，Core 不引用模式实现程序集。内容包显式注册 `IGameModeFeatureFactory`，注册表按稳定顺序冻结执行绑定；宿主仅创建当前模式的功能。复制定义重建测试注册表时，应同时复制 `ModeFeatureFactories`。工厂属于执行绑定，沿用原先不对可执行实现计算内容 hash 的边界；命令、帧及 JSON 类型身份继续保留在 Core。
+
+### 装备内容
+
+`EquipmentContentRegistry` 按局组合普通、活动、武将生成和征程装备。实际查询和装备授技读取本局目录；`EquipmentCatalog` 保留完整内置目录供静态内容校验和旧调用使用。装配同时检查已注册卡牌、技能转换及生成依赖、活动替换和初始构筑，不能只按开始牌堆判断装备是否需要。
+
+新内容包可通过 `IContentRegistryBuilder.AddEquipmentContent` 注册定义、授技绑定、来源寿命和生成操作依赖。注册器校验引用与内容包依赖并冻结结果；显式装备内容进入指纹，没有显式扩展的旧注册表保持原指纹。
+
+装备种类与实体寿命分别描述。购买生成的普通武器可以在离开装备区时销毁，牌堆中的同种武器仍按正常移动规则处理。来源策略读取已有创建与移动凭据，不增加旁路 pending 状态，也不替代原来的精确付款和销毁证明。
+
 `CharacterContentCatalog` 发现人物资料并校验身份、顺序、规则资源和选将池声明。`EmbeddedSkillProgramCatalog` 按 bundle 加载规则和展示。最终 `ContentRegistry` 校验技能依赖、武将绑定、模式约束和相关能力引用，并冻结注册结果。
 
 规则 JSON 以 `SkillProgram` 表达。`ProgramOperationCatalog` 解析操作，`ProgramCompositionValidator` 验证绑定资源和组合约束，`ProgramEntryCapabilities` 验证当前入口提供的上下文。可执行计划由 `ProgramInstructionResolver` 缓存，`SkillProgramExecutor` 推进主动与触发程序。

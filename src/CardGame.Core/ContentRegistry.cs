@@ -63,6 +63,9 @@ public interface IContentRegistryBuilder
 
     void AddEquipmentContent(EquipmentContentPackage package) =>
         throw new NotSupportedException("This content builder does not support equipment content packages.");
+
+    void AddModeFeatureFactory(IGameModeFeatureFactory factory) =>
+        throw new NotSupportedException("This content builder does not support mode feature factories.");
 }
 
 public sealed record ContentCardDefinition(
@@ -200,7 +203,8 @@ public sealed partial class ContentRegistry
         IReadOnlyDictionary<string, ContentGeneralDefinition> generals,
         IReadOnlyDictionary<string, ContentDeckRecipe> decks,
         IReadOnlyDictionary<string, ContentModeDefinition> modes,
-        IReadOnlyList<RegisteredEquipmentContent> equipmentPackages)
+        IReadOnlyList<RegisteredEquipmentContent> equipmentPackages,
+        IReadOnlyList<IGameModeFeatureFactory> modeFeatureFactories)
     {
         Packages = packages;
         _cards = cards;
@@ -209,6 +213,7 @@ public sealed partial class ContentRegistry
         _decks = decks;
         _modes = modes;
         EquipmentPackages = Array.AsReadOnly(equipmentPackages.Select(registration => registration.Package).ToArray());
+        ModeFeatureFactories = modeFeatureFactories;
         ProgramDependencies = new SkillProgramDependencies(_skills.Values);
         var legacyContentHash = ComputeContentHash(
             Packages,
@@ -611,6 +616,7 @@ public sealed partial class ContentRegistry
         public void ValidateReferences(IReadOnlyList<PackageManifest> packages)
         {
             ValidateEquipmentReferences(packages);
+            ValidateModeFeatureReferences();
             CampaignTacticAcquisitionRules.Validate(_skills);
             RicePileContract.ValidatePrograms(_skills.Values.Where(s => s.Program is not null).ToDictionary(s => s.Id, s => s.Program!, StringComparer.Ordinal));
             foreach (var skill in _skills.Values.Where(item => item.Program is not null))
@@ -1079,7 +1085,8 @@ public sealed partial class ContentRegistry
             FreezeMutableDictionary(_generals),
             FreezeMutableDictionary(_decks),
             FreezeMutableDictionary(_modes),
-            Array.AsReadOnly(EquipmentRegistrations.OrderBy(registration => registration.Package.Id, StringComparer.Ordinal).ToArray()));
+            Array.AsReadOnly(EquipmentRegistrations.OrderBy(registration => registration.Package.Id, StringComparer.Ordinal).ToArray()),
+            Array.AsReadOnly(_modeFeatureFactories.Values.OrderBy(factory => factory.Id, StringComparer.Ordinal).ToArray()));
 
         private void Add<T>(
             IDictionary<string, T> target,
@@ -1462,6 +1469,8 @@ public sealed partial class ContentRegistry
                 owner.AddEquipmentContent(package);
                 owner._equipmentPackageOwners.Add(package.Id, packageId);
             }
+
+            public void AddModeFeatureFactory(IGameModeFeatureFactory factory) => owner.AddModeFeatureFactory(factory);
         }
     }
     private static bool HasRequiredPositiveCondition(SkillProgramTriggerCondition c, SkillProgramTriggerConditionKind kind) => c.Kind == kind || c.Kind == SkillProgramTriggerConditionKind.All && c.Children.Any(child => HasRequiredPositiveCondition(child, kind));

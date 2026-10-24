@@ -1,17 +1,19 @@
-namespace CardGame.Core;
+using CardGame.Core;
+
+namespace CardGame.Modes.Wushuang;
 
 internal sealed partial class WushuangModeFeature
 {
-    internal int WushuangExtraSkillCapacity(int seat) => 2 + (HasWushuangTactic(seat, 2293) ? 1 : 0);
+    public int WushuangExtraSkillCapacity(int seat) => 2 + (HasWushuangTactic(seat, 2293) ? 1 : 0);
 
     internal static bool IsWushuangOriginalGrant(SkillGrant grant) => grant.SourceId is
         CharacterState.PrimarySkillSource or CharacterState.SecondarySkillSource or WushuangOriginalReplacementSource;
 
-    internal IEnumerable<string> WushuangReplaceableOriginalSkills(int seat) => HasWushuangTactic(seat, 2221)
+    public IEnumerable<string> WushuangReplaceableOriginalSkills(int seat) => HasWushuangTactic(seat, 2221)
         ? _host.Player(seat).SkillGrants.Where(g => g.IsEnabled && IsWushuangOriginalGrant(g)).Select(g => g.SkillId).Distinct(StringComparer.Ordinal)
         : [];
 
-    internal void ChangeWushuangFreeRerolls(int seat, int delta, string reason)
+    public void ChangeWushuangFreeRerolls(int seat, int delta, string reason)
     {
         var progress = _players[seat];
         var count = checked(progress.FreeRerolls + delta);
@@ -20,14 +22,14 @@ internal sealed partial class WushuangModeFeature
         _host.PublishFact(new WushuangFreeRerollsChangedEvent(seat, count, reason));
     }
 
-    internal bool HasWushuangTactic(int seat, int id) =>
+    public bool HasWushuangTactic(int seat, int id) =>
         _players.TryGetValue(seat, out var progress) && progress.Tactics.Contains(id);
 
-    internal bool IsWushuangHandLimitExempt(int seat, CardKind kind) =>
+    public bool IsWushuangHandLimitExempt(int seat, CardKind kind) =>
         kind == CardKind.Dodge && HasWushuangTactic(seat, 2002) ||
         kind == CardKind.Peach && HasWushuangTactic(seat, 2003);
 
-    internal IEnumerable<RuleQueryContribution> WushuangNumericRuleContributions(int seat, SkillRuleQuery query)
+    public IEnumerable<RuleQueryContribution> WushuangNumericRuleContributions(int seat, SkillRuleQuery query)
     {
         if (!_players.TryGetValue(seat, out var progress)) yield break;
         var owner = _host.Player(seat);
@@ -54,19 +56,17 @@ internal sealed partial class WushuangModeFeature
         }
     }
 
-    internal RuleQueryEvaluation ApplyWushuangEnemyQuota(int seat, RuleQueryEvaluation ordinary, SkillRuleQuery query)
+    public RuleQueryEvaluation ApplyWushuangEnemyQuota(int seat, RuleQueryEvaluation ordinary, SkillRuleQuery query)
     {
         var tactic = query == SkillRuleQuery.DrawCount ? 2298 : 2299;
         if (!_host.Players.Any(p => p.IsAlive && p.Seat != seat && HasWushuangTactic(p.Seat, tactic)) ||
             ordinary.Value is not FiniteRuleQueryValue finite) return ordinary;
         var value = Math.Min(finite.Value, Math.Max(query == SkillRuleQuery.DrawCount ? 2 : 1, finite.Value - 1));
         var contribution = new FiniteRuleQueryContribution($"wushuang:{seat}:enemy:{tactic}", SkillRuleOperation.Add, value - finite.Value);
-        return new(new FiniteRuleQueryValue(value, Array.AsReadOnly(ordinary.Value.Contributions.Append(contribution).ToArray())),
-            ordinary.BaseTerms, Array.AsReadOnly(ordinary.Stages.Append(new RuleQueryStageSnapshot("wushuang-enemy-quota",
-                finite.Value, false, value, Array.AsReadOnly<RuleQueryContribution>([contribution]))).ToArray()));
+        return RuleQueryService.ApplyFiniteAdjustment(ordinary, "wushuang-enemy-quota", contribution);
     }
 
-    internal int WushuangSourceDamageBonus(WushuangDamageFacts attack)
+    public int WushuangSourceDamageBonus(WushuangDamageFacts attack)
     {
         if (attack.IsSourceLess || attack.IsChainPropagation ||
             !_players.TryGetValue(attack.SourceSeat, out var source)) return 0;

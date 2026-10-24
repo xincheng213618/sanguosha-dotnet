@@ -1,4 +1,5 @@
 using CardGame.Core;
+using CardGame.Modes.Wushuang;
 
 namespace CardGame.Content.Standard;
 
@@ -23,6 +24,7 @@ public sealed class StandardWushuangContentPackage : IGameContentPackage
 
     public void Register(IContentRegistryBuilder builder)
     {
+        builder.AddModeFeatureFactory(new WushuangModeFeatureFactory());
         builder.AddSkill(new("wushuang:catalogue", "单骑无双商品配置", WushuangCatalogue.Fingerprint));
         EmbeddedSkillProgramCatalog.RegisterBundle(builder, "wushuang-tactics", skill => skill with { Tags = SkillTag.Locked });
         EmbeddedSkillProgramCatalog.RegisterBundle(builder, "wushuang-skills", skill => skill with

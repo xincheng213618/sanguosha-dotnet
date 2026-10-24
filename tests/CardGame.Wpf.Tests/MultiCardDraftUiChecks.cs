@@ -230,10 +230,14 @@ internal static class MultiCardDraftUiChecks
         public void Register(IContentRegistryBuilder builder)
         {
             if (timed)
-                foreach (var skill in StandardWushuangContentRegistry.Create().Skills.Values.Where(skill =>
+            {
+                var source = StandardWushuangContentRegistry.Create();
+                foreach (var factory in source.ModeFeatureFactories) builder.AddModeFeatureFactory(factory);
+                foreach (var skill in source.Skills.Values.Where(skill =>
                     skill.Id.StartsWith("wushuang:", StringComparison.Ordinal) || skill.Id.StartsWith("shanhe:", StringComparison.Ordinal) ||
                     skill.Id.StartsWith("hulao:", StringComparison.Ordinal) || skill.Id.StartsWith("shenwu:", StringComparison.Ordinal) ||
                     skill.Id.StartsWith("ghost:", StringComparison.Ordinal))) builder.AddSkill(skill);
+            }
             else CharacterFixtureContent.Register(builder, "classic:sun-quan");
             var catalog = SkillProgramCatalog.Load($$$$"""
                 {"schemaVersion":{{{{SkillProgramCatalog.RulesSchemaVersion}}}},"skills":[{"id":"{{{{OwnedSkill}}}}","revision":1,

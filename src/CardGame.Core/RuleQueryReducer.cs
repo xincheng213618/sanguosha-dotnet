@@ -207,6 +207,25 @@ public static class RuleQueryReducer
 /// </summary>
 public static class RuleQueryService
 {
+    /// <summary>Appends a mode-owned final adjustment while preserving the original query's provenance.</summary>
+    public static RuleQueryEvaluation ApplyFiniteAdjustment(RuleQueryEvaluation original, string stageName,
+        FiniteRuleQueryContribution adjustment)
+    {
+        ArgumentNullException.ThrowIfNull(original);
+        ArgumentException.ThrowIfNullOrWhiteSpace(stageName);
+        ArgumentNullException.ThrowIfNull(adjustment);
+        if (original.Value is not FiniteRuleQueryValue finite || adjustment.Operation != SkillRuleOperation.Add)
+            throw new ArgumentException("A final finite adjustment requires a finite query and an additive contribution.");
+        if (original.Value.Contributions.Any(item => item.SourceId == adjustment.SourceId) ||
+            original.BaseTerms.Any(item => item.SourceId == adjustment.SourceId))
+            throw new ArgumentException("A final adjustment requires its own contribution source.", nameof(adjustment));
+        var value = RuleQueryReducer.Reduce(finite.Value, new(int.MinValue, int.MaxValue), [adjustment]);
+        var contributions = Array.AsReadOnly(original.Value.Contributions.Append(adjustment).ToArray());
+        return new(new FiniteRuleQueryValue(((FiniteRuleQueryValue)value).Value, contributions), original.BaseTerms,
+            Array.AsReadOnly(original.Stages.Append(new RuleQueryStageSnapshot(stageName, finite.Value, false,
+                ((FiniteRuleQueryValue)value).Value, Array.AsReadOnly<RuleQueryContribution>([adjustment]))).ToArray()));
+    }
+
     public static RuleQueryEvaluation Evaluate(
         SkillRuleQuery query,
         RuleQueryBounds bounds,

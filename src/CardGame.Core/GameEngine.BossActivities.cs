@@ -74,15 +74,6 @@ public sealed partial class GameEngine
         if (amount != 0) yield return new FiniteRuleQueryContribution($"activity:{_modeDefinition.Id}:tier-{query}", SkillRuleOperation.Add, amount);
     }
 
-    private string? EvaluateBossActivityWinner()
-    {
-        var activity = _modeDefinition.BossActivity!;
-        if (!_players.Any(p => p.TeamId == activity.PlayerTeamId && p.IsAlive)) return activity.EnemyTeamId;
-        // The final boss's death skills may still defeat the allied team.
-        // Allied victory is decided at the same empty-stack boundary as a new stage.
-        return null;
-    }
-
     // Change encounters only after the complete killing action, death skills,
     // and every child resolution return. A pending play prompt is refreshed.
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeDeclaration, 30)]

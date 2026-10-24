@@ -1,31 +1,38 @@
-namespace CardGame.Core;
+using CardGame.Core;
+
+namespace CardGame.Modes.Wushuang;
 
 /// <summary>
 /// Optional match-local shop, economy and tactic progression. The feature never
 /// receives the engine or owns a second command session or resolution stack.
 /// </summary>
-internal sealed partial class WushuangModeFeature(int seed, ContentRegistry definitions, IWushuangModeHost host)
+internal sealed partial class WushuangModeFeature(int seed, ContentRegistry definitions, IWushuangModeHost host) : IWushuangModeFeature
 {
-    internal const string GrantSource = "mode:wushuang-shop";
-    internal const string OriginalReplacementSource = "mode:wushuang-replaced-original";
-    private const string WushuangGrantSource = GrantSource;
-    private const string WushuangOriginalReplacementSource = OriginalReplacementSource;
+    private const string WushuangGrantSource = WushuangSkillSources.Shop;
+    private const string WushuangOriginalReplacementSource = WushuangSkillSources.OriginalReplacement;
     private readonly int _seed = seed;
     private readonly ContentRegistry _definitions = definitions;
     private readonly IWushuangModeHost _host = host;
     private readonly Dictionary<int, WushuangPlayerProgress> _players = [];
     private bool _wushuangOpeningCompleted;
-    internal int ElapsedMilliseconds { get; set; }
-    internal int RemainingMilliseconds => Math.Max(0, WushuangMode.TimeLimitMilliseconds - ElapsedMilliseconds);
+    public int ElapsedMilliseconds { get; set; }
+    public int RemainingMilliseconds => Math.Max(0, WushuangMode.TimeLimitMilliseconds - ElapsedMilliseconds);
     private int? WushuangRemainingMilliseconds => RemainingMilliseconds;
     private bool IsWushuangClockRunning => _host.ClockRunning;
-    // Temporary native bridges use this same state; no engine-side copy exists.
-    internal IReadOnlyDictionary<int, WushuangPlayerProgress> Players => _players;
-    internal IReadOnlyList<int> TacticIds(int seat) => Array.AsReadOnly(_players.GetValueOrDefault(seat)?.Tactics.ToArray() ?? []);
+    public IReadOnlyList<int> TacticIds(int seat) => Array.AsReadOnly(_players.GetValueOrDefault(seat)?.Tactics.ToArray() ?? []);
+    public bool HasPurchasedOffer(int seat, string offerId, int? tacticId = null) =>
+        _players.TryGetValue(seat, out var progress) && progress.Purchased.Any(offer => offer.Id == offerId &&
+            (tacticId is null || offer.TacticId == tacticId));
+    public void ToggleShopLock(int seat)
+    {
+        var progress = _players[seat];
+        progress.IsLocked = !progress.IsLocked;
+        _host.PublishFact(new WushuangShopLockChangedEvent(seat, progress.IsLocked));
+    }
     private bool IsValidSeat(int seat) => seat >= 0 && seat < _host.PlayerCount;
-    internal WushuangIntermissionFrame? ActiveWushuangWindow(int seat) =>
+    public WushuangIntermissionFrame? ActiveWushuangWindow(int seat) =>
         _host.Frames.LastOrDefault() is WushuangIntermissionFrame f && f.SeatCursor == seat ? f : null;
-    internal bool HasWushuangIntermissionBoundary() => _host.Frames.FirstOrDefault() is WushuangIntermissionFrame f &&
+    public bool HasWushuangIntermissionBoundary() => _host.Frames.FirstOrDefault() is WushuangIntermissionFrame f &&
         f.SeatCursor >= 0 && f.SeatCursor <= _host.PlayerCount && IsValidSeat(f.EndedSeat) &&
         _host.Frames.Count(frame => frame is WushuangIntermissionFrame) == 1;
     public WushuangSnapshot? CreateWushuangSnapshot(int viewerSeat)
@@ -46,15 +53,15 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
             TacticIds = Array.AsReadOnly(p?.Tactics.ToArray() ?? [])
         };
     }
-    internal bool CanUseWushuangShop(int seat) => IsWushuangClockRunning && IsValidSeat(seat) && _host.Player(seat).IsHuman &&
+    public bool CanUseWushuangShop(int seat) => IsWushuangClockRunning && IsValidSeat(seat) && _host.Player(seat).IsHuman &&
         _host.Player(seat).IsAlive && ActiveWushuangWindow(seat) is not null &&
         _host.PendingDecision is { Kind: DecisionKind.ProgramTrigger } p && p.PlayerSeat == seat && p.SkillPrompt?.SkillId == WushuangMode.ModeId;
-    internal void InitializeWushuangShops(GameStartedEvent started)
+    public void InitializeWushuangShops(GameStartedEvent started)
     {
         if (_players.Count != 0) return;
         foreach (var p in _host.Players) _players.Add(p.Seat, new());
     }
-    internal void ProgressWushuangEconomy(TurnStartedEvent started)
+    public void ProgressWushuangEconomy(TurnStartedEvent started)
     {
         if (_host.HasWinner || !_host.IsNormalTurn) return;
         foreach (var p in _host.Players.Where(p => p.IsAlive))
@@ -66,25 +73,25 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
             if (tactics.Contains(2290) && _players[p.Seat].FreeRerolls == 0) ChangeWushuangFreeRerolls(p.Seat, 1, "turn-start");
         }
     }
-    internal void ProgressWushuangRound(RoundStartedEvent started)
+    public void ProgressWushuangRound(RoundStartedEvent started)
     {
         if (!_host.HasWinner)
             foreach (var p in _host.Players.Where(p => p.IsAlive)) ChangeWushuangTokens(p.Seat, 1, "round-start");
     }
-    internal bool TryBeginWushuangOpening()
+    public bool TryBeginWushuangOpening()
     {
         if (!IsWushuangClockRunning || _wushuangOpeningCompleted || _players.Count != _host.PlayerCount) return false;
         foreach (var p in _host.Players) RefreshWushuangOffers(p.Seat, true);
         var f = new WushuangIntermissionFrame(_host.NextFrameId(), true, _host.CurrentSeat, false);
         _host.PushFrame(f); ContinueWushuangIntermission(f.Id); return true;
     }
-    internal bool TryBeginWushuangShopping(int endedSeat, bool skipped)
+    public bool TryBeginWushuangShopping(int endedSeat, bool skipped)
     {
         if (!IsWushuangClockRunning || !_host.IsNormalTurn) return false;
         var f = new WushuangIntermissionFrame(_host.NextFrameId(), false, endedSeat, skipped);
         _host.PushFrame(f); ContinueWushuangIntermission(f.Id); return true;
     }
-    internal void ContinueWushuangIntermission(long frameId)
+    public void ContinueWushuangIntermission(long frameId)
     {
         if (_host.PendingDecision is not null || _host.Frames.LastOrDefault() is not WushuangIntermissionFrame f || f.Id != frameId) return;
         if (f.SeatCursor >= _host.PlayerCount || _host.HasWinner)
@@ -121,7 +128,7 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
         { PromptId = _host.NextPromptId(), Choices = Array.AsReadOnly(choices), IsPrivate = true,
             SkillPrompt = new(WushuangMode.ModeId, f.Opening ? "初始奖励" : "虎符商店", "单骑无双", "战法不占额外技能槽。") });
     }
-    internal void AnswerWushuangChoice(PromptChoice choice)
+    public void AnswerWushuangChoice(PromptChoice choice)
     {
         if (_host.PendingDecision is not { } p || ActiveWushuangWindow(p.PlayerSeat) is not { } f)
             throw new InvalidOperationException("Wushuang choice lost its owning frame.");
@@ -131,7 +138,7 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
         if (offer is not null && _host.TryBeginAcquisition(f.Id, offer)) return;
         AdvanceWushuangShopSeat(f);
     }
-    internal void AdvanceWushuangShopSeat(WushuangIntermissionFrame f)
+    public void AdvanceWushuangShopSeat(WushuangIntermissionFrame f)
     {
         // Commit the next seat before any movement children run: replay or recovery
         // must never pay this purchase or repeat this AI action a second time.
@@ -139,16 +146,16 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
         _host.AdvanceState();
         if (_host.Frames.LastOrDefault()?.Id == f.Id) ContinueWushuangIntermission(f.Id);
     }
-    internal void ChangeWushuangTokens(int seat, int delta, string reason)
+    public void ChangeWushuangTokens(int seat, int delta, string reason)
     {
         var p = _players[seat]; p.Tokens = checked(p.Tokens + delta);
         if (p.Tokens < 0) throw new InvalidOperationException("Wushuang currency cannot be negative.");
         _host.PublishFact(new WushuangTokensChangedEvent(seat, delta, p.Tokens, reason));
     }
-    internal void RefreshWushuangOffers(int seat, bool opening = false)
+    public void RefreshWushuangOffers(int seat, bool opening = false)
     {
         var p = _players[seat]; p.RefreshNumber++;
-        var random = new DeterministicRandom(unchecked(_seed * 397 ^ seat * 7919 ^ p.RefreshNumber * 104729));
+        var random = _host.CreateShopRandom(unchecked(_seed * 397 ^ seat * 7919 ^ p.RefreshNumber * 104729));
         var tactics = WushuangTactics.All.Where(t => t.IsImplemented && (opening || !t.StartOnly) && !p.Tactics.Contains(t.Id) &&
             (t.SkillId is null || _definitions.Skills.TryGetValue(t.SkillId, out var definition) && definition.ImplementationStatus == SkillImplementationStatus.Complete)).ToList();
         random.Shuffle(tactics); var offers = new List<WushuangShopOffer>();
@@ -180,7 +187,7 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
         string Id(int slot) => $"wushuang:{seat}:{p.RefreshNumber}:{slot}:offer";
         WushuangShopOffer TacticOffer(WushuangTactic t, int slot, int cost) => new(Id(slot), t.Name, t.Description, cost, null, WushuangOfferKind.Tactic, 1) { TacticId = t.Id, Quality = t.Quality };
     }
-    internal CommandResult SubmitBuyWushuangOffer(BuyWushuangOfferCommand command)
+    public CommandResult SubmitBuyWushuangOffer(BuyWushuangOfferCommand command)
     {
         if (!CanUseWushuangShop(command.ActorSeat)) return _host.Reject(CommandErrorCode.IllegalAction, "当前不在虎符商店购买阶段。");
         var f = ActiveWushuangWindow(command.ActorSeat)!;
@@ -196,7 +203,7 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
             }
             else CompleteWushuangShopAction(f.Id); });
     }
-    internal string? ValidateWushuangPurchase(int seat, WushuangShopOffer? offer, string? replacement)
+    public string? ValidateWushuangPurchase(int seat, WushuangShopOffer? offer, string? replacement)
     {
         if (offer is null || offer.Cost > _players[seat].Tokens) return "商品已刷新或虎符不足。";
         if (offer.CardKind is { } unavailableCard && !WushuangCatalogue.IsCardAllowed(unavailableCard) ||
@@ -213,7 +220,7 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
             return "请选择可替换的额外技能；一忘皆空允许替换武将初始技能。";
         return extra.Length >= WushuangExtraSkillCapacity(seat) && replacement is null ? "额外技能槽已满，请选择要替换的技能。" : null;
     }
-    internal void BuyWushuangOffer(int seat, WushuangShopOffer offer, string? replacement, bool opening = false)
+    public void BuyWushuangOffer(int seat, WushuangShopOffer offer, string? replacement, bool opening = false)
     {
         var p = _players[seat]; var player = _host.Player(seat);
         if (offer.Cost != 0) ChangeWushuangTokens(seat, -offer.Cost, "purchase");
@@ -243,7 +250,7 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
         void Grant(string id, string source)
         { var g = $"{source}:{seat}:{offer.Id}"; _host.GrantSkill(seat, new(g, id, g, source)); }
     }
-    internal CommandResult SubmitRerollWushuangShop(RerollWushuangShopCommand c)
+    public CommandResult SubmitRerollWushuangShop(RerollWushuangShopCommand c)
     {
         if (!CanUseWushuangShop(c.ActorSeat) || ActiveWushuangWindow(c.ActorSeat) is not { Opening: false } f ||
             _players[c.ActorSeat] is { FreeRerolls: 0, Tokens: < 1 })
@@ -253,24 +260,24 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
             else ChangeWushuangTokens(c.ActorSeat, -1, "refresh");
             RefreshWushuangOffers(c.ActorSeat); CompleteWushuangShopAction(f.Id); });
     }
-    internal CommandResult SubmitUpgradeWushuangShop(UpgradeWushuangShopCommand c) => _host.Reject(CommandErrorCode.IllegalAction, "单骑无双没有经验或商店升级。");
-    internal CommandResult SubmitFinishWushuangShop(FinishWushuangShopCommand c)
+    public CommandResult SubmitUpgradeWushuangShop(UpgradeWushuangShopCommand c) => _host.Reject(CommandErrorCode.IllegalAction, "单骑无双没有经验或商店升级。");
+    public CommandResult SubmitFinishWushuangShop(FinishWushuangShopCommand c)
     {
         if (!CanUseWushuangShop(c.ActorSeat) || ActiveWushuangWindow(c.ActorSeat) is not { Opening: false } f)
             return _host.Reject(CommandErrorCode.IllegalAction, "请先选择初始战法，或等待商店开放。");
         return _host.Accept(() => { _host.ClearPrompt(); AdvanceWushuangShopSeat(f); if (_host.AdvanceAfterHumanCommands) _host.AdvanceToHumanBoundary(); });
     }
-    internal CommandResult SubmitToggleWushuangShopLock(ToggleWushuangShopLockCommand c)
+    public CommandResult SubmitToggleWushuangShopLock(ToggleWushuangShopLockCommand c)
     {
         if (!CanUseWushuangShop(c.ActorSeat) || ActiveWushuangWindow(c.ActorSeat) is not { Opening: false }) return _host.Reject(CommandErrorCode.IllegalAction, "只能在购买阶段锁定商品。");
-        return _host.Accept(() => { var p = _players[c.ActorSeat]; p.IsLocked = !p.IsLocked; _host.PublishFact(new WushuangShopLockChangedEvent(c.ActorSeat, p.IsLocked)); _host.AdvanceState(); });
+        return _host.Accept(() => { ToggleShopLock(c.ActorSeat); _host.AdvanceState(); });
     }
-    internal void CompleteWushuangShopAction(long frameId)
+    public void CompleteWushuangShopAction(long frameId)
     {
         _host.AdvanceState(); if (_host.Frames.LastOrDefault()?.Id == frameId) ContinueWushuangIntermission(frameId);
         if (_host.AdvanceAfterHumanCommands) _host.AdvanceToHumanBoundary();
     }
-    internal bool RunWushuangAiShop(WushuangPlayerFacts player, long windowId)
+    public bool RunWushuangAiShop(WushuangPlayerFacts player, long windowId)
     {
         var p = _players[player.Seat]; var extras = player.SkillGrants.Count(g => g.SourceId == WushuangGrantSource);
         var offer = p.Offers.OrderBy(o => o.Kind == WushuangOfferKind.Tactic ? 0 : o.Kind == WushuangOfferKind.Skill ? 1 : 2)

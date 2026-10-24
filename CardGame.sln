@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.11.12217.175 insiders
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardGame.Lan", "src\CardGame.Lan\CardGame.Lan.csproj", "{17F08FE4-5E0D-42FC-9A1C-73EDEB705CF5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardGame.Server", "src\CardGame.Server\CardGame.Server.csproj", "{8262E8C2-5B68-4434-95A2-82544C5325BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardGame.Modes.Wushuang", "src\CardGame.Modes.Wushuang\CardGame.Modes.Wushuang.csproj", "{7953FA76-7C61-4630-9A47-13550E060310}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +57,10 @@ Global
 		{8262E8C2-5B68-4434-95A2-82544C5325BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8262E8C2-5B68-4434-95A2-82544C5325BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8262E8C2-5B68-4434-95A2-82544C5325BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7953FA76-7C61-4630-9A47-13550E060310}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7953FA76-7C61-4630-9A47-13550E060310}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7953FA76-7C61-4630-9A47-13550E060310}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7953FA76-7C61-4630-9A47-13550E060310}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,6 +70,7 @@ Global
 		{54354F2F-92F6-41FA-8699-A7CB62E5CA7F} = {9D62AB7F-FC0B-4E84-8335-D527E418A344}
 		{17F08FE4-5E0D-42FC-9A1C-73EDEB705CF5} = {93B0EC94-1ABC-4A22-B3FE-10AC7A20B237}
 		{8262E8C2-5B68-4434-95A2-82544C5325BE} = {93B0EC94-1ABC-4A22-B3FE-10AC7A20B237}
+		{7953FA76-7C61-4630-9A47-13550E060310} = {93B0EC94-1ABC-4A22-B3FE-10AC7A20B237}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {59896EB3-6128-4887-AA3E-726D7A90486F}

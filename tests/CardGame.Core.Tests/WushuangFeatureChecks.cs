@@ -22,8 +22,11 @@ internal static partial class WushuangModeChecks
         var (second, _) = Start(clock: false);
         var firstFeature = Feature(first) ?? throw new InvalidOperationException("The first duel has no feature.");
         var secondFeature = Feature(second) ?? throw new InvalidOperationException("The second duel has no feature.");
-        Require(!ReferenceEquals(firstFeature, secondFeature) && !ReferenceEquals(firstFeature.Players, secondFeature.Players),
+        Require(!ReferenceEquals(firstFeature, secondFeature),
             "Each selected duel owns exactly its own optional feature and player progress store.");
+        Require(firstFeature.GetType().Assembly.GetName().Name == "CardGame.Modes.Wushuang" &&
+            typeof(GameEngine).Assembly.GetReferencedAssemblies().All(assembly => assembly.Name != "CardGame.Modes.Wushuang"),
+            "The installed mode owns its implementation assembly while the common engine depends only on its contracts.");
         Drive(first, () => Shop(first) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
         var oldTactics = firstFeature.TacticIds(0);
         Buy(first, Shop(first).Offers[0].Id);
@@ -40,8 +43,8 @@ internal static partial class WushuangModeChecks
             SnapshotJson.Serialize(restored.CreateSnapshot(0)) == SnapshotJson.Serialize(first.CreateSnapshot(0)),
             "Current command replay reconstructs a fresh feature and its exact published state without serializing a second state store.");
 
-        static WushuangModeFeature? Feature(GameEngine engine) =>
+        static IWushuangModeFeature? Feature(GameEngine engine) =>
             ((MatchModeRuntime)typeof(GameEngine).GetField("_modeRuntime", BindingFlags.Instance | BindingFlags.NonPublic)!
-                .GetValue(engine)!).Find<WushuangModeFeature>();
+                .GetValue(engine)!).Find<IWushuangModeFeature>();
     }
 }

@@ -2,6 +2,27 @@ using CardGame.Core;
 
 internal static class RuleQueryReducerChecks
 {
+    public static void FinalModeAdjustmentPreservesFrozenProvenance()
+    {
+        var original = RuleQueryService.Evaluate(SkillRuleQuery.DrawCount, new(0, int.MaxValue),
+            [new("fixture:base", 3)], [new FiniteRuleQueryContribution("fixture:bonus", SkillRuleOperation.Add, 2)]);
+        var adjustment = new FiniteRuleQueryContribution("fixture:mode", SkillRuleOperation.Add, -1);
+        var result = RuleQueryService.ApplyFiniteAdjustment(original, "fixture-final", adjustment);
+        Require(original.Value is FiniteRuleQueryValue { Value: 5 } && result.Value is FiniteRuleQueryValue { Value: 4 } &&
+            ReferenceEquals(original.BaseTerms, result.BaseTerms) && original.Stages.Count == 1 && result.Stages.Count == 2 &&
+            result.Stages[^1] is { Name: "fixture-final", InputValue: 5, OutputValue: 4 } &&
+            result.Value.Contributions.Select(item => item.SourceId).SequenceEqual(["fixture:bonus", "fixture:mode"]),
+            "A final mode adjustment must retain the original bases and stages without mutating its earlier result.");
+        Require(result.Value.Contributions is IList<RuleQueryContribution> { IsReadOnly: true } &&
+            result.Stages[^1].Contributions is IList<RuleQueryContribution> { IsReadOnly: true },
+            "Both the combined and stage-local contribution lists remain immutable across the module boundary.");
+        Throws<ArgumentException>(() => RuleQueryService.ApplyFiniteAdjustment(original, "fixture-final",
+            new("fixture:base", SkillRuleOperation.Add, -1)));
+        Throws<ArgumentException>(() => RuleQueryService.ApplyFiniteAdjustment(original, "fixture-final",
+            new("fixture:bonus", SkillRuleOperation.Add, -1)));
+        Throws<ArgumentException>(() => RuleQueryService.ApplyFiniteAdjustment(original, "fixture-final",
+            new("fixture:mode", SkillRuleOperation.Set, 1)));
+    }
 
     public static void ActualRoundUseDistanceRequiresCapturedCountAndOutgoingAddition()
     {

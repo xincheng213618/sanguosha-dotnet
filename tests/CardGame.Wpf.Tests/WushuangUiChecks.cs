@@ -1228,7 +1228,9 @@ internal static class WushuangUiChecks
         public PackageManifest Manifest { get; } = new("wushuang-ui-fixture", new Version(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
-            foreach (var skill in StandardWushuangContentRegistry.Create().Skills.Values.Where(s =>
+            var source = StandardWushuangContentRegistry.Create();
+            foreach (var factory in source.ModeFeatureFactories) builder.AddModeFeatureFactory(factory);
+            foreach (var skill in source.Skills.Values.Where(s =>
                 s.Id.StartsWith("wushuang:", StringComparison.Ordinal) || s.Id.StartsWith("shanhe:", StringComparison.Ordinal) ||
                 s.Id.StartsWith("hulao:", StringComparison.Ordinal) || s.Id.StartsWith("shenwu:", StringComparison.Ordinal) ||
                 s.Id.StartsWith("ghost:", StringComparison.Ordinal))) builder.AddSkill(skill);

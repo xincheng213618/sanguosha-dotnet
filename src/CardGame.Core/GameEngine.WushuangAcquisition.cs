@@ -9,7 +9,7 @@ public sealed partial class GameEngine
             program.Triggers.SingleOrDefault(t => t.Id == "acquired" && t.Window == SkillProgramTriggerWindow.SkillsChanged) is not { } trigger)
             return false;
         if (_resolutionStack.LastOrDefault() is not WushuangIntermissionFrame parent || parent.Id != windowId ||
-            parent.Acquisition is not null || !_wushuangPlayers[parent.SeatCursor].Purchased.Any(o => o.Id == offer.Id))
+            parent.Acquisition is not null || !RequireWushuangFeature.HasPurchasedOffer(parent.SeatCursor, offer.Id))
             throw new InvalidOperationException("A tactic acquisition lost its paid shop window.");
         var instance = GetRuntimeSkillInstanceId(_players[parent.SeatCursor], skillId);
         var receipt = new WushuangAcquisitionReceipt(parent.SeatCursor, id, offer.Id, skillId, instance,
@@ -30,8 +30,8 @@ public sealed partial class GameEngine
         if (!IsWushuangMode || context.ParentFrameId != parent.Id || frame.TriggerId != "acquired" ||
             frame.OwnerSeat != receipt.Seat || parent.SeatCursor != receipt.Seat || frame.SkillId != receipt.SkillId ||
             frame.SkillInstanceId != receipt.SkillInstanceId || frame.GameplayHash != receipt.GameplayHash ||
-            !_wushuangPlayers[receipt.Seat].Tactics.Contains(receipt.TacticId) ||
-            !_wushuangPlayers[receipt.Seat].Purchased.Any(o => o.Id == receipt.OfferId && o.TacticId == receipt.TacticId))
+            !RequireWushuangFeature.HasWushuangTactic(receipt.Seat, receipt.TacticId) ||
+            !RequireWushuangFeature.HasPurchasedOffer(receipt.Seat, receipt.OfferId, receipt.TacticId))
             throw new InvalidOperationException("A tactic acquisition lost its exact paid parent, source or offer.");
         ReplaceRuntimeTop(parent = parent with { Acquisition = null });
         if (receipt.AdvanceSeat) AdvanceWushuangShopSeat(parent);
@@ -57,8 +57,8 @@ public sealed partial class GameEngine
         var parent = _resolutionStack.OfType<WushuangIntermissionFrame>().SingleOrDefault(p => p.Id == frame.WindowContext?.ParentFrameId);
         if (!IsWushuangMode || parent?.Acquisition is not { } receipt || parent.SeatCursor != frame.OwnerSeat ||
             receipt.Seat != frame.OwnerSeat || receipt.SkillId != frame.SkillId || receipt.SkillInstanceId != frame.SkillInstanceId ||
-            receipt.GameplayHash != frame.GameplayHash || !_wushuangPlayers[frame.OwnerSeat].Tactics.Contains(receipt.TacticId) ||
-            !_wushuangPlayers[frame.OwnerSeat].Purchased.Any(o => o.Id == receipt.OfferId && o.TacticId == receipt.TacticId))
+            receipt.GameplayHash != frame.GameplayHash || !RequireWushuangFeature.HasWushuangTactic(frame.OwnerSeat, receipt.TacticId) ||
+            !RequireWushuangFeature.HasPurchasedOffer(frame.OwnerSeat, receipt.OfferId, receipt.TacticId))
             throw new InvalidOperationException("The acquired tactic requires its exact committed purchase and owning shop frame.");
     }
 }

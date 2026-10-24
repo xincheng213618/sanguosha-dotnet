@@ -160,9 +160,6 @@ public sealed partial class GameEngine
         AddLog("ShenwuEnraged", $"{leader.General.Name}首次降至半血，获得【{_contentRegistry.GetSkill(skill).Name}】。", leader.Seat);
     }
 
-    private string? EvaluateShenwuWinner() => _players.Any(player => IsShenwuPlayerSlot(player.Seat) && player.IsAlive)
-        ? null : _modeDefinition.ShenwuActivity!.EnemyTeamId;
-
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeDeclaration, 32)]
     private bool TryCompleteShenwuEncounter()
     {
