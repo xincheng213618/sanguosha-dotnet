@@ -119,6 +119,7 @@ internal sealed class SkillProgramDependencies
         UsesRoundTracking |= HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiLuSuHaoshi);
         UsesRoundTracking |= HasTriggerOperation(SkillProgramEffectOp.ResolveShiCaoShuangSheQuan);
         UsesRoundTracking |= HasActivationOperation(SkillProgramEffectOp.ResolveChenJiaoQingYan);
+        UsesRoundTracking |= HasTriggerOperation(SkillProgramEffectOp.ResolveShiZrFuan);
         UsesRoundTracking |= HasTriggerOperation(SkillProgramEffectOp.AwakenHappyTaishiCiPowei);
         UsesRoundTracking |= HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryCheZhouPigua);
         UsesRoundTracking |= HasActivationOperation(SkillProgramEffectOp.ResolveAnniversaryYanXiangYuzheng);

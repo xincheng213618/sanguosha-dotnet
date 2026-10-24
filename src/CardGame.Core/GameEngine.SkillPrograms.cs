@@ -1288,7 +1288,7 @@ public sealed partial class GameEngine
                     !HasExactHappyGongxinParticipantSelection(frame) && !HasExactHappyHuaTuoParticipantSelection(frame) &&
                     !HasExactHappyDianWeiElaiSelection(frame) && !HasExactAnniversaryYangBiaoParticipantSelection(frame) &&
                     !HasExactAnniversaryZhangXunFollowupSelection(frame) && !HasExactMobileShiTanfengParticipantSelection(frame) &&
-                    !HasExactBoundaryAnguoRescueTarget(frame))
+                    !HasExactBoundaryAnguoRescueTarget(frame) && !HasExactShiZrFuanStrikeTarget(frame))
                     throw new InvalidOperationException("An active trigger program has an invalid cursor or context.");
                 continue;
             }

@@ -71,6 +71,13 @@ public sealed partial class GameEngine
 
         var contributions = CollectNumericRuleContributions(player, SkillRuleQuery.AttackRange).ToList();
         AddFiniteContribution(contributions, $"issued:{player.Seat}:mobile:shi-libing:attack-range", ShiXbLibbingRangeBonus(player.Seat));
+        AddFiniteContribution(contributions, $"issued:{player.Seat}:mobile:shi-yinxian:range", ShiZrYinXianRangeBonus(player));
+        if (ShiZrFuanBaseZeroed(player))
+        {
+            // 伏暗 held the base attack range and the accrued YinXian bonus at zero.
+            minimumRange = 0;
+            baseTerms[0] = baseTerms[0] with { Value = 0 };
+        }
         DistanceRules.AddAttackRangeContributions(player, contributions);
         contributions.AddRange(_turnCardUseEffects
             .GetRuleModifiers(_turnNumber, _currentSeat, player.Seat, SkillRuleQuery.AttackRange)

@@ -1,0 +1,59 @@
+{
+ "schemaVersion": 62,
+ "skills": [
+  {
+   "id": "mobile:shi-fuan",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "fuan-turn-ending",
+     "window": "turnEnding",
+     "subject": "owner",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiZrFuan",
+       "target": "owner"
+      }
+     ]
+    },
+    {
+     "id": "fuan-strike",
+     "window": "turnEnding",
+     "subject": "owner",
+     "turnOwnerScope": "anyLiving",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiZrFuanStrike",
+       "target": "owner"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mobile:shi-yinxian",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "yinxian-use",
+     "window": "cardUseCompleted",
+     "ownerRelation": "actor",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiZrYinXian",
+       "target": "owner"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
