@@ -525,10 +525,10 @@ internal sealed class GrantTurnRuleModifierProgramOperationDescriptor : TurnEffe
                 amountFromMarker: r.Has("amountFromMarker") ? r.RequiredEnum<PlayerMarkerKind>("amountFromMarker") : null);
         }
         r.AllowOnly("op", "target", "ruleQuery", "ruleOperation", "condition", "cardKinds");
-        if (query is not (SkillRuleQuery.CardUseDistanceLimit or SkillRuleQuery.SlashDistanceLimit or SkillRuleQuery.AttackRange) ||
+        if (query is not (SkillRuleQuery.SlashLimit or SkillRuleQuery.CardUseDistanceLimit or SkillRuleQuery.SlashDistanceLimit or SkillRuleQuery.AttackRange) ||
             operation != SkillRuleOperation.Unlimited)
             throw new InvalidOperationException(
-                $"Invalid skill program at {r.Path}: supports slashLimit/handLimit add, slashDistanceLimit unlimited or attackRange unlimited.");
+                $"Invalid skill program at {r.Path}: supports slashLimit/handLimit add, or slashLimit/cardUseDistanceLimit/slashDistanceLimit/attackRange unlimited.");
         var unlimitedKinds = r.Has("cardKinds")
             ? r.RequiredEnumArray<CardKind>("cardKinds")
             : (IReadOnlyList<CardKind>)Array.Empty<CardKind>();

@@ -159,6 +159,8 @@ public sealed partial class GameEngine
         AddFiniteContribution(contributions, $"state:{player.Seat}:hengye:growth", GetHengyeGrowth(player));
         AddFiniteContribution(contributions, $"turn:{player.Seat}:slash-limit",
             GetAdditiveTurnRuleModifier(player.Seat, SkillRuleQuery.SlashLimit));
+        if (HasUnlimitedTurnRuleModifier(player.Seat, SkillRuleQuery.SlashLimit))
+            contributions.Add(new UnlimitedRuleQueryContribution($"turn:{player.Seat}:slash-limit:unlimited"));
         if (TracksFengjiRoundLedger)
             AddFiniteContribution(contributions, $"state:{player.Seat}:olfengji:round-slash",
                 GetFengjiRoundAdjustment(player.Seat, SkillRuleQuery.SlashLimit));

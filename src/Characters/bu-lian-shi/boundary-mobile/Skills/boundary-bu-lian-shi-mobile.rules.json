@@ -1,0 +1,11 @@
+{"schemaVersion":62,"skills":[
+ {"id":"boundary:anxu-mobile","revision":1,"activations":[{"id":"recipient-obtains-donor","minCards":0,"maxCards":0,"minTargets":2,"maxTargets":2,"targetKind":"livingPairDistinct","usesPerTurn":null,"usesPerPhase":1,"effects":[
+  {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"selectedFirst"},"cardOwnerRef":{"kind":"selectedSecond"},"zones":["hand","equipment"],"count":1,"destination":"selectedTargetHand","targetRef":{"kind":"selectedFirst"},"resultBind":"anxu-obtained","awaitMovementTriggers":true},
+  {"op":"prepareBoundaryBuLianShiAnxu","target":"owner"},
+  {"op":"draw","target":"owner","numberExpression":"boundCardCount","sourceBind":"anxu-hand-reward"},
+  {"op":"selectBoundaryBuLianShiAnxuLeast","target":"owner"},
+  {"op":"chooseOption","target":"owner","resultBind":"anxu-benefit","options":[{"id":"draw","requiredTargetKind":"boundaryBuLianShiAnxuLeast"},{"id":"skip"}]},
+  {"op":"draw","target":"selectedTarget","amount":1,"condition":{"kind":"choiceIs","sourceBind":"anxu-benefit","optionId":"draw"}}
+ ]}]},
+ {"id":"boundary:zhuiyi-mobile","revision":1,"triggers":[{"id":"owner-death-benefit","window":"ownerDied","subject":"owner","optional":true,"effects":[{"op":"selectTarget","target":"owner","targetKind":"otherLivingExceptSource"},{"op":"draw","target":"selectedTarget","amount":3},{"op":"recover","target":"selectedTarget","amount":1}]}]}
+]}

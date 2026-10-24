@@ -84,6 +84,9 @@ public static class GeneralGalleryCatalog
         groups.Add("boundary:yu-ji-mobile", "boundary");
         groups.Add("boundary:yuan-shu-mobile", "boundary");
         groups.Add("boundary:cao-zhang-mobile", "boundary-fame");
+        groups.Add("boundary:guan-xing-zhang-bao-mobile", "boundary-fame");
+        groups.Add("boundary:bu-lian-shi-mobile", "boundary-fame");
+        groups.Add("boundary:liu-biao-mobile", "boundary-fame");
         groups.Add("boundary:liao-hua-mobile", "boundary-fame");
         groups.Add("boundary:li-ru-mobile", "boundary-fame");
         groups.Add("boundary:yu-fan-mobile", "boundary-fame");

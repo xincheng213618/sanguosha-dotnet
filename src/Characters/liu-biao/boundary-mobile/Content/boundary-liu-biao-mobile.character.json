@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:liu-biao",
+  "skills": [
+    { "registrationOrder": 56000, "programBundle": "boundary-liu-biao-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:zishou-mobile", "name": "自守", "description": "摸牌阶段，你可以多摸X张牌（X为全场势力数）。若如此做，本回合你使用牌不能选择其他角色为目标。", "executionForms": "Trigger" } },
+    { "registrationOrder": 56001, "programBundle": "boundary-liu-biao-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:zongshi-mobile", "name": "宗室", "description": "锁定技，你的手牌上限+X（X为全场势力数）。准备阶段，若你的手牌数大于你的体力值，则你本回合使用杀无次数限制。", "tags": "Locked", "executionForms": "State, Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 56002, "pools": { "current": 56002 }, "definition": {
+    "id": "boundary:liu-biao-mobile", "name": "界刘表·移动版", "portraitKey": "boundary-liu-biao-mobile", "skillId": "boundary:zishou-mobile", "additionalSkillIds": ["boundary:zongshi-mobile"],
+    "factionId": "qun", "baseHp": 3, "gender": "Male", "characterId": "character:liu-biao", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

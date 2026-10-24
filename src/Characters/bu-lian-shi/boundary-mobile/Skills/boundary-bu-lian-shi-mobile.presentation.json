@@ -1,0 +1,4 @@
+{"schemaVersion":3,"skills":{
+ "boundary:anxu-mobile":{"name":"安恤","description":"出牌阶段限一次，指定获得者和另一名牌的原持有者，令获得者取得其一张手牌或装备牌。若来源不是装备区，你摸一张牌；之后可令二者中手牌严格较少者摸一张牌。","activationLabels":{"recipient-obtains-donor":"指定获得者，再指定牌的原持有者"},"optionLabels":{"draw":"令二者中手牌较少者摸一张牌","skip":"不追加摸牌"}},
+ "boundary:zhuiyi-mobile":{"name":"追忆","description":"死亡时，可令除杀死你的角色以外的一名其他角色摸三张牌并回复1点体力。","triggerChoices":{"owner-death-benefit":"令一名其他角色摸三张牌并回复1点体力（排除杀死你的角色）。"}}
+}}

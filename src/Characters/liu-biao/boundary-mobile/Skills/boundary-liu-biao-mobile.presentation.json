@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3, "skills": {
+    "boundary:zishou-mobile": { "name": "自守", "description": "摸牌阶段可额外摸全场现存势力数张牌；若如此做，本回合用牌不能选择其他角色为目标，仍可对自己或无目标使用。", "triggerChoices": { "extra-draw-self-only": "自守：多摸势力数张牌，本回合仅可选择自己为目标" } },
+    "boundary:zongshi-mobile": { "name": "宗室", "description": "锁定技，手牌上限增加现存势力数。准备阶段若手牌数大于当前体力，本回合使用杀无次数限制；效果发行后不随手牌减少撤销。", "triggerChoices": { "preparation-unlimited-slash": "宗室：本回合使用杀无次数限制" } }
+  }
+}

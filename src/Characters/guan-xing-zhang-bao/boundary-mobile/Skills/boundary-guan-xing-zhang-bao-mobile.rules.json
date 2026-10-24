@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "boundary:fuhun-mobile", "revision": 1,
+    "viewAs": [{ "id": "two-hand-cards-as-slash", "inputKinds": [], "inputSuits": [], "inputCount": 2, "outputKind": "slash", "forPlay": true, "forResponse": true, "condition": { "kind": "always" } }],
+    "activations": [{ "id": "two-hand-cards-as-slash", "minCards": 2, "maxCards": 2, "sourceZones": ["hand"], "minTargets": 1, "maxTargets": 1, "targetKind": "otherLiving", "usesPerTurn": null, "condition": { "kind": "always" },
+      "effects": [{ "op": "useSelectedCardsAs", "target": "selectedTarget", "sourceBind": "two-hand-cards-as-slash", "outputKind": "slash" }] }],
+    "triggers": [{ "id": "parent-skills-after-converted-slash-damage", "isSkillInvocation": false, "window": "afterDamageApplied", "subject": "source", "sourceSkillId": "boundary:fuhun-mobile", "sourceViewAsId": "two-hand-cards-as-slash", "damageOccurrence": "perDamage", "optional": false,
+      "condition": { "kind": "all", "children": [{ "kind": "cardActionActorIsCurrentTurn" }, { "kind": "cardActionPhaseIsPlay" }] },
+      "effects": [{ "op": "grantTurnSkills", "target": "owner", "skillIds": ["classic:wusheng", "classic:paoxiao"], "expiry": "actualTurnEnd" }] }]
+  }]
+}

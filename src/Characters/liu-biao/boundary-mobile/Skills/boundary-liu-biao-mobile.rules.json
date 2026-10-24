@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 62, "skills": [
+    { "id": "boundary:zishou-mobile", "revision": 1, "triggers": [
+      { "id": "extra-draw-self-only", "window": "drawPhaseStarting", "subject": "owner", "optional": true, "priority": 120, "drawPhaseMode": "additive",
+        "effects": [
+          { "op": "draw", "target": "owner", "numberExpression": "livingFactionCount" },
+          { "op": "grantTurnCardTargetRestriction", "target": "owner", "targetRestriction": "selfOnly" }
+        ] }
+    ] },
+    { "id": "boundary:zongshi-mobile", "revision": 1,
+      "modifiers": [{ "id": "living-faction-hand-limit", "query": "handLimit", "operation": "add", "valueExpression": "livingFactionCount", "priority": 0 }],
+      "triggers": [
+        { "id": "preparation-unlimited-slash", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false,
+          "condition": { "kind": "compare", "left": { "kind": "currentHandCount" }, "operator": "greaterThan", "right": { "kind": "currentHp" } },
+          "effects": [{ "op": "grantTurnRuleModifier", "target": "owner", "ruleQuery": "slashLimit", "ruleOperation": "unlimited" }] }
+      ]
+    }
+  ]
+}

@@ -319,8 +319,8 @@ internal sealed class ProgramOperationNodeReader
             var requiredTargetKind = reader.Has("requiredTargetKind")
                 ? reader.RequiredEnum<SkillProgramTargetKind>("requiredTargetKind") : (SkillProgramTargetKind?)null;
             if (requiredTargetKind is not null and not
-                (SkillProgramTargetKind.OtherLivingInAttackRange or SkillProgramTargetKind.OtherLivingWithDiscardableHandOrEquipment or SkillProgramTargetKind.OtherLivingVirtualDuelTarget))
-                Fail(reader.Path + ".requiredTargetKind", "requires an attack-range, discardable-card or virtual-Duel target set");
+                (SkillProgramTargetKind.OtherLivingInAttackRange or SkillProgramTargetKind.OtherLivingWithDiscardableHandOrEquipment or SkillProgramTargetKind.OtherLivingVirtualDuelTarget or SkillProgramTargetKind.BoundaryBuLianShiAnxuLeast))
+                Fail(reader.Path + ".requiredTargetKind", "requires an attack-range, discardable-card, virtual-Duel or original Anxu pair target set");
             return new SkillProgramChoiceOption(reader.RequiredIdentifier("id"), reader.Condition())
             {
                 RequiredTargetKind = requiredTargetKind

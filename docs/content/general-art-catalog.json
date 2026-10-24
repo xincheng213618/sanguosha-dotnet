@@ -2,6 +2,57 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "key": "boundary-guan-xing-zhang-bao-mobile",
+      "characterName": "界关兴张苞",
+      "defaultSkinId": "18800",
+      "skins": [
+        {
+          "id": "18800",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-137.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/18800.jpg",
+          "sha256": "47bd19d33575b0fccb83595b1a036bb997651b76d65886fb51a951784fdcd357",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-guan-xing-zhang-bao-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-bu-lian-shi-mobile",
+      "characterName": "界步练师",
+      "defaultSkinId": "51500",
+      "skins": [
+        {
+          "id": "51500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-371.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/51500.jpg",
+          "sha256": "b930017bf147c64faff5d5a1d46e15a6fd266aae8557f62dde96a6774fc4a568",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-bu-lian-shi-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-liu-biao-mobile",
+      "characterName": "界刘表",
+      "defaultSkinId": "51600",
+      "skins": [
+        {
+          "id": "51600",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-372.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/51600.jpg",
+          "sha256": "0e2bee83a1fb98ece105786787985d35c27f2bfa182fd052a5ccacb5481cfeaa",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-liu-biao-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
       "key": "boundary-cao-zhang-mobile",
       "characterName": "界曹彰",
       "defaultSkinId": "51300",

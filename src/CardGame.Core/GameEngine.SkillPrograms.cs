@@ -1077,7 +1077,7 @@ public sealed partial class GameEngine
                     SkillProgramEffectOp.SelectChainedByMarker or SkillProgramEffectOp.SelectOneSelectedTarget or
                     SkillProgramEffectOp.DamageFarthestCharacter or SkillProgramEffectOp.OfferCompletedCardGift or
                     SkillProgramEffectOp.RequestLegalSlashByNearest or SkillProgramEffectOp.OfferUnlimitedVirtualSlash or
-                    SkillProgramEffectOp.SelectIssuedFixedRecipientWithDeathReturn or SkillProgramEffectOp.SelectEquipmentPairAndPayment or
+                    SkillProgramEffectOp.SelectIssuedFixedRecipientWithDeathReturn or SkillProgramEffectOp.SelectEquipmentPairAndPayment or SkillProgramEffectOp.SelectBoundaryBuLianShiAnxuLeast or
                     SkillProgramEffectOp.SelectDyingOwnedCard or SkillProgramEffectOp.RequestFulueZeroDamageCounterSlash));
             var awaitingCurrentSelection = executedSelection is not null &&
                 ReferenceEquals(executedSelection, plan.Instructions[frame.InstructionIndex - 1]) &&
@@ -1097,6 +1097,7 @@ public sealed partial class GameEngine
             var dynamicTargetsValid = executedSelection is null || executedSelection.Op switch
             {
                 SkillProgramEffectOp.BindOwnTurnEnemyHandGain => HasExactOwnTurnEnemyHandGainSelection(frame),
+                SkillProgramEffectOp.SelectBoundaryBuLianShiAnxuLeast => ValidBoundaryBuLianShiAnxuLeastSelection(frame),
                 SkillProgramEffectOp.SelectAllPublicTeamTargets or SkillProgramEffectOp.SelectRandomPublicTeamTarget => IsExactPublicTeamTargetSelection(frame, executedSelection, plan),
                 SkillProgramEffectOp.RequestFulueZeroDamageCounterSlash => HasIssuedFulueRequest(frame),
                 SkillProgramEffectOp.RequestLegalSlashByNearest or SkillProgramEffectOp.OfferUnlimitedVirtualSlash =>
