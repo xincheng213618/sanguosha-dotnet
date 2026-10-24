@@ -43,11 +43,11 @@ public sealed partial class GameEngine
     {
         public bool HasPendingDecision => engine._pendingDecision is not null;
         public int StepCount(NativeFrameAutomaticPhase phase) =>
-            NativeFrameAutomaticStepCatalog.Default.Registrations[phase].Count;
+            engine.ModeNativeFrames.Automatic[phase].Count;
         public NativeFrameAutomaticStepMetadata StepAt(NativeFrameAutomaticPhase phase, int index) =>
-            NativeFrameAutomaticStepCatalog.Default.Registrations[phase][index].Step;
+            engine.ModeNativeFrames.Automatic[phase][index].Step;
         public bool Matches(NativeFrameAutomaticPhase phase, int index, ResolutionFrame frame) =>
-            NativeFrameAutomaticStepCatalog.Default.Registrations[phase][index].Matches(engine, frame);
+            engine.ModeNativeFrames.Automatic[phase][index].Matches(engine, frame);
     }
 
     [ProgramCapability]

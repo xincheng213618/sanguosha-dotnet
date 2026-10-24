@@ -3,16 +3,12 @@ namespace CardGame.Core;
 /// <summary>Generic lifecycle-program host. It contains no character or skill ids.</summary>
 public sealed partial class GameEngine
 {
-    private static readonly Lazy<ProgramInteractionCatalog> ProgramInteractionMetadata = new(() =>
-        ProgramInteractionCatalog.Discover(
-            RuntimeModuleMethods
-                .Concat(typeof(ProgramAiChoiceSelector).GetMethods(
-                    System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic))), true);
     private ProgramInteractionRouter? _programInteractions;
     private ProgramInteractionRouter ProgramInteractions => _programInteractions ??= new(
-        ProgramInteractionMetadata.Value,
+        ProgramInteractionCatalog.Default,
         BindRuntimeHandler,
-        ResolveProgramActivationChoice);
+        ResolveProgramActivationChoice,
+        _modeRuntime.PromptAnswers);
 
     [ProgramAnswerBefore(1)]
     private bool TryResolveRoundOnceProgramAnswer(PromptChoice selected) =>

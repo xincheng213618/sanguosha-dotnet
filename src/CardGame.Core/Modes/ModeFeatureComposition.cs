@@ -27,8 +27,16 @@ internal static class ModeFeatureComposition
             var feature = factory.Create(context);
             if (factory is IGameModeSetupFeatureFactory && feature is not IMatchModeSetupFeature)
                 throw new InvalidOperationException($"Setup feature factory '{factory.Id}' did not create an IMatchModeSetupFeature.");
-            features.Add(feature);
+            AddFeature(feature, features);
         }
         return features;
     }
+
+    private static void AddFeature(IGameModeFeature feature, List<object> features)
+    {
+        if (feature is ModeFeatureBundle bundle)
+            foreach (var child in bundle.Features) AddFeature(child, features);
+        else features.Add(feature);
+    }
+
 }

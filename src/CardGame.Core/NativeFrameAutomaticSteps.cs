@@ -5,7 +5,7 @@ namespace CardGame.Core;
 
 // Positions in the existing scheduler. A route opts in locally; explicit child
 // returns do not acquire an automatic step just because they have a route.
-internal enum NativeFrameAutomaticPhase
+public enum NativeFrameAutomaticPhase
 {
     BeforeOpening,
     AfterOpening,
@@ -13,14 +13,14 @@ internal enum NativeFrameAutomaticPhase
     BeforeJudgmentDecision
 }
 
-internal enum NativeFrameAutomaticPending
+public enum NativeFrameAutomaticPending
 {
     RequireNoneBeforeFrame,
     RequireNoneAfterFrame,
     Ignore
 }
 
-internal enum NativeFrameAutomaticPublish { AfterAdvance, None }
+public enum NativeFrameAutomaticPublish { AfterAdvance, None }
 
 [AttributeUsage(AttributeTargets.Method)]
 internal sealed class NativeFrameAutomaticStepAttribute(NativeFrameAutomaticPhase phase, int order,

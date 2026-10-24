@@ -62,7 +62,7 @@ public sealed partial class GameEngine
     [ProgramCapability]
     private sealed class NativeFrameRoutes(GameEngine engine) : INativeFrameRoutes
     {
-        public bool TryAdvance(ResolutionFrame frame) => NativeFrameRouteCatalog.Default.TryAdvance(engine, frame);
+        public bool TryAdvance(ResolutionFrame frame) => engine.ModeNativeFrames.TryAdvance(engine, frame);
     }
 
     [ProgramCapability]

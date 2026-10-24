@@ -31,10 +31,27 @@ internal sealed class ProgramAiChoiceAttribute(params SkillProgramEffectOp[] ope
 // capability implementation, so adding an interaction does not edit a dispatcher.
 internal sealed class ProgramInteractionCatalog
 {
+    private static readonly Lazy<ProgramInteractionCatalog> BuiltIn = new(() => Discover(
+        ProgramRuntimeModuleCatalog.Default.Methods.Concat(typeof(ProgramAiChoiceSelector)
+            .GetMethods(BindingFlags.Static | BindingFlags.NonPublic))), true);
+    internal static ProgramInteractionCatalog Default => BuiltIn.Value;
     internal IReadOnlyDictionary<string, MethodInfo> Answers { get; }
     internal IReadOnlyDictionary<string, MethodInfo> Prefixes { get; }
     internal IReadOnlyDictionary<SkillProgramEffectOp, MethodInfo> AiChoices { get; }
     internal IReadOnlyList<MethodInfo> BeforeAnswers { get; }
+
+    internal IReadOnlyList<ModePromptAnswerRegistration> FreezeModeAnswers(IEnumerable<ModePromptAnswerRegistration> registrations)
+    {
+        ArgumentNullException.ThrowIfNull(registrations);
+        var frozen = registrations.ToArray();
+        var names = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var registration in frozen)
+            if (registration is null || !names.Add(registration.Action) || Answers.ContainsKey(registration.Action) ||
+                registration.Action is "activate" or "skip" ||
+                Prefixes.Keys.Any(prefix => registration.Action.StartsWith(prefix, StringComparison.Ordinal)))
+                throw new InvalidOperationException("Mode prompt answers cannot duplicate or overlap native program actions.");
+        return Array.AsReadOnly(frozen);
+    }
 
     private ProgramInteractionCatalog(Dictionary<string, MethodInfo> answers,
         Dictionary<string, MethodInfo> prefixes, Dictionary<SkillProgramEffectOp, MethodInfo> ai,
@@ -120,17 +137,21 @@ internal sealed class ProgramInteractionRouter
     private readonly ProgramInteractionCatalog _catalog;
     private readonly Func<MethodInfo, Type, Delegate> _bind;
     private readonly Action<PromptChoice> _activation;
+    private readonly IReadOnlyDictionary<string, Action<PromptChoice>> _modeAnswers;
     private readonly Dictionary<MethodInfo, Delegate> _answers = new();
     private readonly Dictionary<MethodInfo, Func<PromptChoice, bool>> _before = new();
     private readonly Dictionary<MethodInfo, Func<PendingDecision, ProgramSkillFrame, SkillProgramEffect, PromptChoice>> _ai = new();
     private readonly ProgramAiChoiceSelector _selector;
 
     internal ProgramInteractionRouter(ProgramInteractionCatalog catalog,
-        Func<MethodInfo, Type, Delegate> bind, Action<PromptChoice> activation)
+        Func<MethodInfo, Type, Delegate> bind, Action<PromptChoice> activation,
+        IReadOnlyList<ModePromptAnswerRegistration>? modeAnswers = null)
     {
         _catalog = catalog;
         _bind = bind;
         _activation = activation;
+        _modeAnswers = new ReadOnlyDictionary<string, Action<PromptChoice>>(catalog.FreezeModeAnswers(modeAnswers ?? [])
+            .ToDictionary(registration => registration.Action, registration => registration.Handler, StringComparer.Ordinal));
         _selector = new(ResolveAi);
     }
 
@@ -156,6 +177,11 @@ internal sealed class ProgramInteractionRouter
                     InvokeAnswer(handler, selected, action);
                     return;
                 }
+            if (_modeAnswers.TryGetValue(action, out var modeAnswer))
+            {
+                modeAnswer(selected);
+                return;
+            }
         }
         // This is the existing trigger activation protocol, not an old dispatcher.
         // It validates candidate/group identity and rejects unknown actions.

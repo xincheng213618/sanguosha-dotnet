@@ -1013,6 +1013,7 @@ var tests = new (string Name, Action Body)[]
     ("character manifests preserve ordered registration and package isolation", CharacterContentCatalogChecks.OrderedRegistrationAndPackageIsolation),
     ("program capability registration isolates adapters and preserves typed host compatibility", ProgramCapabilityChecks.RegistrationAndIsolationPreserveBoundaries),
     ("program runtime modules share match instances and reject engine dependencies", ProgramRuntimeModuleChecks.IndependentFactoriesShareMatchInstancesAndRejectEngineDependencies),
+    ("Mode native pipeline: optional registrations preserve native ordering and per-match ownership", ModeNativePipelineChecks.OptionalRegistrationsShareNativeOrderingAndFreezePerMatch),
     ("Mode setup composition: exact override preserves independent features and rejects conflicts", ModeSetupCompositionChecks.ExactSetupReplacesOnlyDefaultAndConflictsStayExplicit),
     ("Mode setup: frozen private drafts use shared deterministic random", ModeSetupPlanChecks.FrozenPrivateDraftsUseSharedDeterministicRandom),
     ("Mode setup: pure names selected equipment and primary dual health", ModeSetupPlanChecks.PureCardNamesSelectedEquipmentAndPrimaryDualHealth),

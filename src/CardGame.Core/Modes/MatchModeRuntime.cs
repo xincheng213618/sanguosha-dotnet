@@ -70,6 +70,7 @@ internal sealed partial class MatchModeRuntime
             throw new InvalidOperationException("Mode runtime hooks require unique phase/order registrations.");
         RuleObservers = Array.AsReadOnly(observers.OrderBy(item => item.Phase).ThenBy(item => item.Order).ToArray());
         RuntimeHooks = Array.AsReadOnly(hooks.OrderBy(item => item.Phase).ThenBy(item => item.Order).ToArray());
+        _ports = new(features);
     }
 
     internal T? Find<T>() where T : class
