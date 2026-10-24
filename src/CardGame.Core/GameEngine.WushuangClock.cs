@@ -20,18 +20,21 @@ public sealed partial class GameEngine
         });
     }
 
-    private void ExpireWushuangMatch()
+    private void ExpireWushuangMatch() => CompleteWushuangAtSurvivalLimit("15分钟时限已到", clockExpired: true);
+
+    private void CompleteWushuangAtSurvivalLimit(string reason, bool clockExpired = false)
     {
-        var left = _players[0];
-        var right = _players[1];
-        // Local deterministic scoring, deliberately different from OL's opaque
-        // MVP formula. Ratios use cross multiplication, without rounding.
-        var comparison = (left.Hp * right.MaxHp).CompareTo(right.Hp * left.MaxHp);
-        if (comparison == 0) comparison = left.Hp.CompareTo(right.Hp);
-        if (comparison == 0) comparison = GetHand(left).Count.CompareTo(GetHand(right).Count);
-        _winnerSeat = comparison == 0 ? null : comparison > 0 ? 0 : 1;
-        _winnerTeamId = _winnerSeat is { } winner ? _players[winner].TeamId : null;
-        _winner = _winnerTeamId is null ? Winner.Draw : GetWinnerForTeam(_winnerTeamId);
+        // Compare current HP only. Equal HP remains a low-value draw, regardless
+        // of maximum HP, hand size or shop resources.
+        _winnerSeat = null;
+        _winnerTeamId = null;
+        _winner = Winner.Draw;
+        var survivors = _players.Where(player => player.IsAlive).OrderByDescending(player => player.Hp).ToArray();
+        if (survivors.Length > 0 && (survivors.Length == 1 || survivors[0].Hp > survivors[1].Hp))
+        {
+            _winnerTeamId = survivors[0].TeamId!;
+            _winner = GetWinnerForTeam(_winnerTeamId);
+        }
 
         var revealedJudgments = _resolutionStack.OfType<JudgmentFrame>().Where(f => f.CardId is not null)
             .Select(f => (CardId: f.CardId!.Value, f.TargetSeat)).Distinct().ToArray();
@@ -52,8 +55,11 @@ public sealed partial class GameEngine
                 MoveCard(GetAttackCard(judgment.CardId), CardLocation.Judgment(judgment.TargetSeat),
                     CardLocation.DiscardPile, new("mode.wushuang.timeout-judgment"));
         _pendingCardsMovedBatches.Clear();
-        AdvanceEventRulesAndQueueFact(new WushuangClockExpiredEvent(_wushuangElapsedMilliseconds, _winnerSeat,
-            "本地计分：体力比例、体力值、手牌数依次比较，全部相同则平局。"));
+        var outcome = _winner == Winner.Draw ? "双方当前体力相同，和局。" : "当前体力较高的一方获胜。";
+        AddLog("WushuangSurvivalLimit", reason + "，" + outcome);
+        if (clockExpired)
+            AdvanceEventRulesAndQueueFact(new WushuangClockExpiredEvent(_wushuangElapsedMilliseconds, _winnerSeat,
+                reason + "，" + outcome));
         AdvanceEventRulesAndQueueFact(new WinnerDeterminedEvent(_winner, _winnerTeamId, null) { WinnerSeat = _winnerSeat });
         CompleteGame();
     }

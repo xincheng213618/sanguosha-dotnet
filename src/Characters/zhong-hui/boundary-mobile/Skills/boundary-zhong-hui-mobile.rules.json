@@ -1,0 +1,29 @@
+{"schemaVersion":62,"skills":[
+ {"id":"boundary:quanji-mobile","revision":1,"modifiers":[{"id":"authority-hand-limit","query":"handLimit","operation":"add","valueExpression":"ownedZoneCount","valueZone":"authority","priority":0}],"triggers":[
+  {"id":"damage-point-authority","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamagePoint","optional":true,"effects":[
+   {"op":"draw","target":"owner","amount":1},
+   {"op":"selectOwnedCards","target":"owner","amount":1,"zones":["hand"],"resultBind":"authority-card"},
+   {"op":"moveBoundCards","target":"owner","sourceBind":"authority-card","destination":"ownerPersistentZone","destinationZone":"authority","awaitMovementTriggers":true}
+  ]},
+  {"id":"own-play-ending-authority","window":"playEnding","subject":"owner","turnOwnerScope":"own","optional":true,"usageScope":"phase","usageLimit":1,
+   "condition":{"kind":"compare","left":{"kind":"currentHandCount"},"operator":"greaterThan","right":{"kind":"currentHp"}},"effects":[
+   {"op":"draw","target":"owner","amount":1},
+   {"op":"selectOwnedCards","target":"owner","amount":1,"zones":["hand"],"resultBind":"authority-card"},
+   {"op":"moveBoundCards","target":"owner","sourceBind":"authority-card","destination":"ownerPersistentZone","destinationZone":"authority","awaitMovementTriggers":true}
+  ]}
+ ]},
+ {"id":"boundary:zili-mobile","revision":1,"triggers":[
+  {"id":"recover","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"choiceGroup":"awakening-benefit",
+   "condition":{"kind":"all","children":[{"kind":"compare","left":{"kind":"currentOwnedZoneCount","zone":"authority"},"operator":"greaterThanOrEqual","right":{"kind":"integerConstant","value":3}},{"kind":"compare","left":{"kind":"currentHp"},"operator":"lessThan","right":{"kind":"currentMaxHp"}}]},"effects":[
+   {"op":"recover","target":"owner","amount":1},{"op":"changeMaximumHp","target":"owner","amount":-1},{"op":"grantSkills","target":"owner","skillIds":["boundary:paiyi-mobile"]}
+  ]},
+  {"id":"draw","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"choiceGroup":"awakening-benefit",
+   "condition":{"kind":"compare","left":{"kind":"currentOwnedZoneCount","zone":"authority"},"operator":"greaterThanOrEqual","right":{"kind":"integerConstant","value":3}},"effects":[
+   {"op":"draw","target":"owner","amount":2},{"op":"changeMaximumHp","target":"owner","amount":-1},{"op":"grantSkills","target":"owner","skillIds":["boundary:paiyi-mobile"]}
+  ]}
+ ]},
+ {"id":"boundary:paiyi-mobile","revision":1,"activations":[{"id":"remove-authority","minCards":1,"maxCards":1,"sourceZones":["authority"],"minTargets":1,"maxTargets":1,"targetKind":"anyLiving","usesPerTurn":null,"usesPerPhase":1,"effects":[
+  {"op":"discardSelected","target":"owner","amount":1},{"op":"draw","target":"selectedTarget","amount":2},
+  {"op":"damage","target":"selectedTarget","amount":1,"condition":{"kind":"all","children":[{"kind":"selectedTargetIsOther"},{"kind":"selectedTargetHandGreaterThanOwner"}]}}
+ ]}]}
+]}

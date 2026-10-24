@@ -1,0 +1,5 @@
+{"schemaVersion":3,"skills":{
+ "boundary:quanji-mobile":{"name":"权计","description":"出牌阶段结束时，若手牌数大于体力值，或每受到1点伤害后，你可以摸一张牌，将一张手牌置为“权”；手牌上限增加权数。","authorityName":"权","triggerChoices":{"damage-point-authority":"摸一张牌，然后将一张手牌置为权。","own-play-ending-authority":"出牌阶段结束：摸一张牌，将一张手牌置为权。"}},
+ "boundary:zili-mobile":{"name":"自立","description":"觉醒技，准备阶段，权不少于3时，选择回复1点体力或摸两张牌，然后减1点体力上限，获得排异。","triggerChoices":{"recover":"回复1点体力。","draw":"摸两张牌。"}},
+ "boundary:paiyi-mobile":{"name":"排异","description":"出牌阶段限一次，移去一张权，令一名角色摸两张牌，然后若其手牌数大于你，你对其造成1点伤害。"}
+}}

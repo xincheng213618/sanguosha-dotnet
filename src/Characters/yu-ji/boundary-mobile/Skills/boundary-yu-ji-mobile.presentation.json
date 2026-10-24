@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:guhuo-mobile": { "name": "蛊惑", "description": "每名角色的回合限一次，你可以扣置一张手牌当任意一张基本牌或普通锦囊牌使用或打出。一旦有其他角色质疑，翻开此牌：若为假则此牌作废；若为真则质疑者获得“缠怨”。" },
+    "boundary:chanyuan-mobile": { "name": "缠怨", "description": "锁定技，你不能质疑蛊惑；若你的体力值为1，则你的其他技能失效。" }
+  }
+}

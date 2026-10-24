@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:zuo-ci",
+  "skills": [
+    { "registrationOrder": 55100, "programBundle": "boundary-zuo-ci-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:huashen-mobile", "name": "化身", "description": "游戏开始时，你随机获得三张未加入游戏的武将牌作为化身，亮出其中一张并选择其一个技能（限定技、觉醒技、主公技除外），你视为拥有此技能，且性别和势力与此化身相同。回合开始时或回合结束后，你可以重新亮出化身并选择技能，或移去至多两张未亮出的化身并获得等量新的化身。", "executionForms": "Trigger" } },
+    { "registrationOrder": 55101, "programBundle": "boundary-zuo-ci-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:xinsheng-mobile", "name": "新生", "description": "当你受到1点伤害后，若你有技能“化身”，你可以随机获得一张新的化身牌。", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 55102, "pools": { "current": 55102 }, "definition": {
+    "id": "boundary:zuo-ci-mobile", "name": "界左慈·移动版", "portraitKey": "boundary-zuo-ci-mobile", "skillId": "boundary:huashen-mobile", "additionalSkillIds": ["boundary:xinsheng-mobile"],
+    "factionId": "qun", "baseHp": 3, "gender": "Male", "characterId": "character:zuo-ci", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

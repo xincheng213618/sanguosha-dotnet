@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3, "skills": {
+    "boundary:huashen-mobile": { "name": "化身", "description": "开局随机获得三张私密化身，选一张亮出并借用非限定、觉醒、主公技能，性别势力随之改变。回合开始或结束后，可重新选择亮出化身与技能，或实际移去至多两张未亮化身后等量重抽。", "triggerChoices": { "initial": "化身：从三张化身中亮出并选择技能", "start": "化身：改选或交换未亮化身", "ended": "化身：回合结束后改选或交换" } },
+    "boundary:xinsheng-mobile": { "name": "新生", "description": "每受到1点伤害后，若有化身，可随机获得一张新的化身；每点分别选择。", "triggerChoices": { "damage": "新生：为此点伤害获得一张新化身" } }
+  }
+}
