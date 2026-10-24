@@ -66,6 +66,8 @@ public interface IContentRegistryBuilder
 
     void AddModeFeatureFactory(IGameModeFeatureFactory factory) =>
         throw new NotSupportedException("This content builder does not support mode feature factories.");
+
+    bool HasModeFeatureFactory(string id) => false;
 }
 
 public sealed record ContentCardDefinition(
@@ -1471,6 +1473,8 @@ public sealed partial class ContentRegistry
             }
 
             public void AddModeFeatureFactory(IGameModeFeatureFactory factory) => owner.AddModeFeatureFactory(factory);
+
+            public bool HasModeFeatureFactory(string id) => owner.HasModeFeatureFactory(id);
         }
     }
     private static bool HasRequiredPositiveCondition(SkillProgramTriggerCondition c, SkillProgramTriggerConditionKind kind) => c.Kind == kind || c.Kind == SkillProgramTriggerConditionKind.All && c.Children.Any(child => HasRequiredPositiveCondition(child, kind));

@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace CardGame.Core;
 
-internal enum ProgramRulePhase
+public enum ProgramRulePhase
 {
     BeforeEvent,
     AfterEvent,
@@ -21,7 +21,7 @@ internal sealed class ProgramRuleObserverAttribute(ProgramRulePhase phase, int o
 }
 
 internal sealed record ProgramRuleObserverRegistration(
-    MethodInfo Method, Type DelegateType, Func<Delegate, Action<IGameEvent?>> Adapt, string? ModeId = null);
+    MethodInfo Method, Type DelegateType, Func<Delegate, Action<IGameEvent?>> Adapt, string? ModeId = null, int Order = 0);
 
 // Static metadata never retains a match or a callback bound to a match.
 internal sealed class ProgramRuleObserverCatalog
@@ -65,7 +65,7 @@ internal sealed class ProgramRuleObserverCatalog
                     throw new InvalidOperationException($"Rule observer '{method.Name}' requires a valid phase and positive explicit order.");
                 if (attribute.Phase == ProgramRulePhase.BeforeStatePublish && parameters.Length != 0)
                     throw InvalidSignature(method);
-                if (!phases[attribute.Phase].TryAdd(attribute.Order, registration with { ModeId = attribute.ModeId }))
+                if (!phases[attribute.Phase].TryAdd(attribute.Order, registration with { ModeId = attribute.ModeId, Order = attribute.Order }))
                     throw new InvalidOperationException($"Duplicate rule observer order '{attribute.Phase}:{attribute.Order}'.");
             }
         }
@@ -100,11 +100,20 @@ internal sealed class ProgramRuleObservers
     private readonly Action<IGameEvent?>[] _beforeStatePublish;
 
     internal ProgramRuleObservers(ProgramRuleObserverCatalog catalog, Func<MethodInfo, Type, Delegate> bind,
-        string? modeId = null)
+        string? modeId = null, IReadOnlyList<ModeRuleObserverRegistration>? additionalObservers = null)
     {
-        Action<IGameEvent?>[] BindPhase(ProgramRulePhase phase) => catalog.Phases[phase]
-            .Where(registration => modeId is null || registration.ModeId is null || registration.ModeId == modeId)
-            .Select(registration => registration.Adapt(bind(registration.Method, registration.DelegateType))).ToArray();
+        var additional = (additionalObservers ?? []).ToArray();
+        if (additional.Any(item => item is null)) throw new ArgumentException("A mode observer registration cannot be null.", nameof(additionalObservers));
+        Action<IGameEvent?>[] BindPhase(ProgramRulePhase phase)
+        {
+            var core = catalog.Phases[phase].Where(registration => modeId is null || registration.ModeId is null || registration.ModeId == modeId).ToArray();
+            var external = additional.Where(registration => registration.Phase == phase).ToArray();
+            if (core.Select(item => item.Order).Concat(external.Select(item => item.Order)).GroupBy(order => order).Any(group => group.Count() > 1))
+                throw new InvalidOperationException($"Duplicate rule observer order in the composed '{phase}' pipeline.");
+            return core.Select(registration => (registration.Order, Callback: registration.Adapt(bind(registration.Method, registration.DelegateType))))
+                .Concat(external.Select(registration => (registration.Order, registration.Callback)))
+                .OrderBy(item => item.Order).Select(item => item.Callback).ToArray();
+        }
         _beforeEvent = BindPhase(ProgramRulePhase.BeforeEvent);
         _afterEvent = BindPhase(ProgramRulePhase.AfterEvent);
         _beforeStatePublish = BindPhase(ProgramRulePhase.BeforeStatePublish);

@@ -6,7 +6,7 @@ namespace CardGame.Core;
 // These phases are positions in the existing scheduler, not interchangeable
 // priorities. In particular, paid response-health cursors stay between the two
 // subtree phases, and selection validation stays between the invariant phases.
-internal enum ProgramRuntimePhase
+public enum ProgramRuntimePhase
 {
     BeforeDeclaration,
     BeforeResponseHealth,
@@ -45,7 +45,7 @@ internal sealed class ProgramRecoveryParentAttribute(ProgramRecoveryParentPhase 
     internal int Order { get; } = order;
 }
 
-internal sealed record ProgramRuntimeRegistration(MethodInfo Method, Type DelegateType);
+internal sealed record ProgramRuntimeRegistration(MethodInfo Method, Type DelegateType, int Order = 0);
 
 // Static discovery retains immutable metadata only. All match-bound delegates
 // are created below, once per engine, and never enter a frame or a checkpoint.
@@ -89,7 +89,7 @@ internal sealed class ProgramRuntimeHookCatalog
                 if (method.IsStatic && !ProgramRuntimeModuleCatalog.IsDeclaredStaticHandler(method) ||
                     !ValidSignature(method, typeof(bool), parameterTypes)) throw Invalid(method);
                 var registration = new ProgramRuntimeRegistration(method,
-                    permission ? typeof(Func<ProgramSkillFrame, bool>) : typeof(Func<bool>));
+                    permission ? typeof(Func<ProgramSkillFrame, bool>) : typeof(Func<bool>), attribute.Order);
                 if (!hooks[attribute.Phase].TryAdd(attribute.Order, registration))
                     throw new InvalidOperationException($"Duplicate runtime hook order '{attribute.Phase}:{attribute.Order}'.");
             }
@@ -103,7 +103,7 @@ internal sealed class ProgramRuntimeHookCatalog
                     : new[] { typeof(ProgramSkillFrame) };
                 if (!ValidSignature(method, typeof(void), parameterTypes)) throw Invalid(method);
                 var registration = new ProgramRuntimeRegistration(method, withPlan
-                    ? typeof(Action<ProgramSkillFrame, ProgramExecutionPlan>) : typeof(Action<ProgramSkillFrame>));
+                    ? typeof(Action<ProgramSkillFrame, ProgramExecutionPlan>) : typeof(Action<ProgramSkillFrame>), attribute.Order);
                 if (!invariants[attribute.Phase].TryAdd(attribute.Order, registration))
                     throw new InvalidOperationException($"Duplicate frame invariant order '{attribute.Phase}:{attribute.Order}'.");
             }
@@ -114,7 +114,7 @@ internal sealed class ProgramRuntimeHookCatalog
                 if (!ValidSignature(method, typeof(bool), [typeof(ProgramSkillFrame), typeof(RecoveryReplacementFrame)]))
                     throw Invalid(method);
                 var registration = new ProgramRuntimeRegistration(method,
-                    typeof(Func<ProgramSkillFrame, RecoveryReplacementFrame, bool>));
+                    typeof(Func<ProgramSkillFrame, RecoveryReplacementFrame, bool>), attribute.Order);
                 if (!recoveryParents[attribute.Phase].TryAdd(attribute.Order, registration))
                     throw new InvalidOperationException($"Duplicate recovery parent order '{attribute.Phase}:{attribute.Order}'.");
             }
@@ -128,6 +128,16 @@ internal sealed class ProgramRuntimeHookCatalog
 
     internal static bool IsPermission(ProgramRuntimePhase phase) =>
         phase is ProgramRuntimePhase.AfterOwnerDeath or ProgramRuntimePhase.AfterSkillLoss;
+
+    internal void ValidateAdditional(IReadOnlyList<ModeRuntimeHookRegistration> additional)
+    {
+        ArgumentNullException.ThrowIfNull(additional);
+        if (additional.Any(item => item is null)) throw new ArgumentException("A mode hook registration cannot be null.", nameof(additional));
+        foreach (var phase in Hooks)
+            if (phase.Value.Select(item => item.Order).Concat(additional.Where(item => item.Phase == phase.Key).Select(item => item.Order))
+                .GroupBy(order => order).Any(group => group.Count() > 1))
+                throw new InvalidOperationException($"Duplicate runtime hook order in the composed '{phase.Key}' scheduler phase.");
+    }
 
     private static bool ValidSignature(MethodInfo method, Type result, Type[] parameterTypes) =>
         !method.IsGenericMethod && !method.ContainsGenericParameters && method.ReturnType == result &&
@@ -149,8 +159,11 @@ internal sealed partial class ProgramRuntimeHooks
     private readonly Dictionary<ProgramFrameInvariantPhase, Action<ProgramSkillFrame, ProgramExecutionPlan>[]> _invariants;
     private readonly Dictionary<ProgramRecoveryParentPhase, Func<ProgramSkillFrame, RecoveryReplacementFrame, bool>[]> _recoveryParents;
 
-    internal ProgramRuntimeHooks(ProgramRuntimeHookCatalog catalog, Func<MethodInfo, Type, Delegate> bind)
+    internal ProgramRuntimeHooks(ProgramRuntimeHookCatalog catalog, Func<MethodInfo, Type, Delegate> bind,
+        IReadOnlyList<ModeRuntimeHookRegistration>? additionalHooks = null)
     {
+        var additional = (additionalHooks ?? []).ToArray();
+        catalog.ValidateAdditional(additional);
         var bound = new Dictionary<MethodInfo, Delegate>();
         Delegate Bind(ProgramRuntimeRegistration registration)
         {
@@ -158,7 +171,13 @@ internal sealed partial class ProgramRuntimeHooks
                 bound.Add(registration.Method, callback = bind(registration.Method, registration.DelegateType));
             return callback;
         }
-        _hooks = catalog.Hooks.ToDictionary(p => p.Key, p => p.Value.Select(Bind).ToArray());
+        _hooks = catalog.Hooks.ToDictionary(pair => pair.Key, pair =>
+        {
+            var external = additional.Where(item => item.Phase == pair.Key).ToArray();
+            return pair.Value.Select(registration => (registration.Order, Callback: Bind(registration)))
+                .Concat(external.Select(registration => (registration.Order, registration.Callback)))
+                .OrderBy(item => item.Order).Select(item => item.Callback).ToArray();
+        });
         _invariants = catalog.Invariants.ToDictionary(p => p.Key, p => p.Value.Select(registration =>
         {
             var callback = Bind(registration);
@@ -206,5 +225,6 @@ public sealed partial class GameEngine
         ProgramRuntimeHookCatalog.Discover(RuntimeModuleMethods), true);
     private ProgramRuntimeHooks? _runtimeHooks;
     private ProgramRuntimeHooks RuntimeHooks => _runtimeHooks ??= new(RuntimeHookMetadata.Value,
-        BindRuntimeHandler);
+        BindRuntimeHandler, _modeRuntime.RuntimeHooks);
+    private void ValidateModeRuntimeHookPriorities() => RuntimeHookMetadata.Value.ValidateAdditional(_modeRuntime.RuntimeHooks);
 }

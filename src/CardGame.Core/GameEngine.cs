@@ -326,9 +326,10 @@ public sealed partial class GameEngine
         _modeDefinition = ResolveModeDefinition(contentRegistry, options);
         _modeRules = ModeRuleSet.Create(_modeDefinition, options);
         _modeRuntime = CreateMatchModeRuntime();
+        ValidateModeRuntimeHookPriorities();
         _programCapabilities = new(this, ProgramCapabilityMetadata.Value);
         _programRuleObservers = new ProgramRuleObservers(ProgramRuleObserverRegistrations.Value,
-            BindRuntimeHandler, _modeDefinition.Id);
+            BindRuntimeHandler, _modeDefinition.Id, _modeRuntime.RuleObservers);
         _programPipelineHooks = new ProgramPipelineHooks(ProgramPipelineHookRegistrations.Value, this);
         _programLegality = new(ProgramLegalityMetadata.Value, this, ResolveRuntimeHandlerTarget);
         _programSelections = new(ProgramSelectionMetadata.Value, ProgramSelectionQueries);

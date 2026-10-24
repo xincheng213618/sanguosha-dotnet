@@ -16,7 +16,7 @@ public sealed partial class ContentRegistry
         internal FrozenModeFeatureFactory(IGameModeFeatureFactory source)
         {
             Id = new ContentId(source.Id).Value;
-            ModeId = new ContentId(source.ModeId).Value;
+            ModeId = source.ModeId == ModeFeatureTargets.AllModes ? ModeFeatureTargets.AllModes : new ContentId(source.ModeId).Value;
             _create = source.Create;
         }
         public string Id { get; }
@@ -32,6 +32,8 @@ public sealed partial class ContentRegistry
     {
         private readonly Dictionary<string, IGameModeFeatureFactory> _modeFeatureFactories = new(StringComparer.Ordinal);
 
+        public bool HasModeFeatureFactory(string id) => _modeFeatureFactories.ContainsKey(id);
+
         public void AddModeFeatureFactory(IGameModeFeatureFactory factory)
         {
             ArgumentNullException.ThrowIfNull(factory);
@@ -42,7 +44,7 @@ public sealed partial class ContentRegistry
         private void ValidateModeFeatureReferences()
         {
             foreach (var factory in _modeFeatureFactories.Values)
-                if (!_modes.ContainsKey(factory.ModeId))
+                if (factory.ModeId != ModeFeatureTargets.AllModes && !_modes.ContainsKey(factory.ModeId))
                     throw new InvalidOperationException($"Mode feature factory '{factory.Id}' references unknown mode '{factory.ModeId}'.");
         }
     }
