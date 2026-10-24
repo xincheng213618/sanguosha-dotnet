@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:shi-qingyan",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "qingyan-show",
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 0,
+          "maxTargets": 0,
+          "targetKind": "anyLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": null,
+          "condition": {
+            "kind": "always"
+          },
+          "effects": [
+            {
+              "op": "resolveChenJiaoQingYan",
+              "target": "owner"
+            }
+          ]
+        }
+      ],
+      "triggers": []
+    },
+    {
+      "id": "mobile:shi-ceduan",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "ceduan-use",
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherLivingWhoseAttackRangeIncludesOwner",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "condition": {
+            "kind": "always"
+          },
+          "effects": [
+            {
+              "op": "resolveChenJiaoCeDuan",
+              "target": "owner"
+            },
+            {
+              "op": "resolveChenJiaoCeDuanSettle",
+              "target": "owner"
+            }
+          ]
+        }
+      ],
+      "triggers": []
+    }
+  ]
+}
