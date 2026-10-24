@@ -1,0 +1,51 @@
+{
+ "schemaVersion": 62,
+ "skills": [
+  {
+   "id": "mobile:shi-ganjue",
+   "revision": 1,
+   "activations": [
+    {
+     "id": "ganjue-use",
+     "minCards": 0,
+     "maxCards": 0,
+     "minTargets": 1,
+     "maxTargets": 1,
+     "targetKind": "otherLiving",
+     "usesPerTurn": null,
+     "usesPerPhase": 1,
+     "condition": {
+      "kind": "always"
+     },
+     "effects": [
+      {
+       "op": "resolveShiSsGanjue",
+       "target": "owner"
+      }
+     ]
+    }
+   ],
+   "triggers": []
+  },
+  {
+   "id": "mobile:shi-zhuji",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "zhuji-play-ending",
+     "window": "playEnding",
+     "subject": "owner",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiSsZhuji",
+       "target": "owner"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
