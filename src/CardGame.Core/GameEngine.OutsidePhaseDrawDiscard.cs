@@ -19,7 +19,7 @@ public sealed partial class GameEngine
     }
     private bool TracksNativeDrawInvocations =>
         _contentRegistry.ProgramDependencies.RequiresFact(ProgramTrackedFact.NativeDrawInvocation) ||
-        IsWushuangMode ||
+        _modeRules.RuntimeRequirements.TracksNativeDrawInvocations ||
         TracksNativeDrawOrdinals ||
         _contentRegistry.ProgramDependencies.UsesDrawPhaseDrawCountHandLimit ||
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouHuangYueyingLixian) ||

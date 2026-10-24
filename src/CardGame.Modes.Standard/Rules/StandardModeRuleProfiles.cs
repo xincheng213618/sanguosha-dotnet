@@ -40,7 +40,14 @@ public static class StandardModeRuleProfiles
             requiredFeatureContracts: RequiredFeatures(mode, options),
             isClassicIdentityContext: classicIdentity,
             requiresRoundTracking: wushuang || mode.NianActivity is not null || dragonBoat || guandu,
-            requiresRecipientDamageReevaluation: wushuang || guandu)
+            requiresRecipientDamageReevaluation: wushuang || guandu,
+            runtimeRequirements: new(
+                TracksActualDiscardRecoveryPhases: guandu,
+                TracksActualPhaseEnds: guandu,
+                TracksNativeDrawInvocations: wushuang,
+                TracksRoundEnding: dragonBoat,
+                CapturesRecipientDamageBase: guandu,
+                TracksFinalizedCardTargets: guandu))
         {
             FixedDistance = wushuang ? 1 : null,
             InitialHandSizeOverride = wushuang ? 5 : null

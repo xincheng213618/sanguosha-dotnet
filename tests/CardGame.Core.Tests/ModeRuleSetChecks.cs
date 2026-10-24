@@ -68,6 +68,15 @@ internal static class ModeRuleSetChecks
         Require(!hell.RequiresRecipientDamageReevaluation && !wenhe.RequiresRecipientDamageReevaluation &&
             nian.RequiresRoundTracking && !nian.RequiresRecipientDamageReevaluation,
             "Installing a damage provider does not itself opt Hell or Wenhe into Guandu and duel recipient resets; Nian independently requires rounds.");
+        var dragon = StandardModeRuleProfiles.Create(Mode("activity:dragon", ContentModeKind.Team) with
+            { DragonBoatActivity = new(new Dictionary<string, IReadOnlyList<string>>()) }, options);
+        Require(identity.RuntimeRequirements == new ModeRuntimeRequirements() &&
+            guandu.RuntimeRequirements == new ModeRuntimeRequirements(TracksActualDiscardRecoveryPhases: true,
+                TracksActualPhaseEnds: true, CapturesRecipientDamageBase: true, TracksFinalizedCardTargets: true) &&
+            duel.RuntimeRequirements == new ModeRuntimeRequirements(TracksNativeDrawInvocations: true) &&
+            dragon.RuntimeRequirements == new ModeRuntimeRequirements(TracksRoundEnding: true) &&
+            hell.RuntimeRequirements == new ModeRuntimeRequirements() && wenhe.RuntimeRequirements == new ModeRuntimeRequirements(),
+            "Each profile opts into only its original tracking mechanisms; duel recipient reevaluation does not imply a Guandu recipient base.");
     }
 
     internal static void DeathObjectivesPreserveEncounterAndRankingBoundaries()

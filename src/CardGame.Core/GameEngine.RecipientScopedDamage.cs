@@ -5,7 +5,7 @@ public sealed partial class GameEngine
     private bool HasShenwuRecipientDamageModifiers =>
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.PreventShenwuNitaiOwnTurnDamage) ||
         _contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.ShenwuArmedSourceDamageBonus);
-    private bool NeedsRecipientScopedDamageBase => HasSignedDamagePayments || HasShenwuRecipientDamageModifiers || IsGuanduActivity || HasAnniversaryCheZhouRules ||
+    private bool NeedsRecipientScopedDamageBase => HasSignedDamagePayments || HasShenwuRecipientDamageModifiers || _modeRules.RuntimeRequirements.CapturesRecipientDamageBase || HasAnniversaryCheZhouRules ||
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShanheS5Yimie);
     private bool SupportsIssuedRecipientDamageScope(RecipientScopedDamageState scope) =>
         NeedsRecipientScopedDamageBase || scope.PublicEnemyObserver && HasPublicEnemyParticipantDamageModifiers ||

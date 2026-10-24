@@ -7,7 +7,7 @@ public sealed partial class GameEngine
     private bool TracksActualDiscardRecoveryPhases =>
         _contentRegistry.ProgramDependencies.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase) ||
         _contentRegistry.ProgramDependencies.UsesDrawPhaseDrawCountHandLimit ||
-        IsGuanduActivity || HasLishiCapability ||
+        _modeRules.RuntimeRequirements.TracksActualDiscardRecoveryPhases || HasLishiCapability ||
         _contentRegistry.ProgramDependencies.UsesEqualNameLengthUse ||
         _contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.HellShiyouIntercept) ||
         _contentRegistry.ProgramDependencies.HasTriggerWindow(SkillProgramTriggerWindow.NativeDrawStarting) ||

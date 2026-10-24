@@ -14,7 +14,7 @@ public sealed class ModeRuleSet
         bool publishesCardMovementDisclosure = false, bool revealsTeamsOnStart = false,
         ModeVisibilityRules? visibility = null, IEnumerable<Type>? requiredFeatureContracts = null,
         bool isClassicIdentityContext = false, bool requiresRoundTracking = false,
-        bool requiresRecipientDamageReevaluation = false)
+        bool requiresRecipientDamageReevaluation = false, ModeRuntimeRequirements? runtimeRequirements = null)
     {
         Opening = opening ?? throw new ArgumentNullException(nameof(opening));
         Death = death ?? throw new ArgumentNullException(nameof(death));
@@ -24,6 +24,7 @@ public sealed class ModeRuleSet
         IsClassicIdentityContext = isClassicIdentityContext;
         RequiresRoundTracking = requiresRoundTracking;
         RequiresRecipientDamageReevaluation = requiresRecipientDamageReevaluation;
+        RuntimeRequirements = runtimeRequirements ?? new ModeRuntimeRequirements();
         SupportsGodFactionSelection = supportsGodFactionSelection;
         ReducesFirstActorInitialHand = reducesFirstActorInitialHand;
         AllowsDiscardRecycling = allowsDiscardRecycling;
@@ -46,6 +47,7 @@ public sealed class ModeRuleSet
     public bool IsClassicIdentityContext { get; }
     public bool RequiresRoundTracking { get; }
     public bool RequiresRecipientDamageReevaluation { get; }
+    public ModeRuntimeRequirements RuntimeRequirements { get; }
     public bool SupportsGodFactionSelection { get; }
     public bool ReducesFirstActorInitialHand { get; }
     public bool AllowsDiscardRecycling { get; }
