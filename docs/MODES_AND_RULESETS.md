@@ -2,6 +2,26 @@
 
 模式由 `ContentModeDefinition` 注册，使用 `ModeKind`、身份／队伍／势力人数、武将池、候选配置和牌堆 ID 描述。Core 复用同一命令、结算与牌区移动系统；WPF 的默认大厅入口由 `MainViewModel.TableModes` 提供。
 
+## 运行时模块边界
+
+场次模块使用同一个 `GameEngine` 命令事务、确定性随机源和结算栈，不创建独立牌局或第二套事件总线。当前依赖关系为：
+
+- `CardGame.Core` 定义场次接口、受控宿主、不可变计划，以及应用计划和推进原生结算的操作。
+- `CardGame.Modes.Standard` 仅依赖 Core，负责现有场次的座次、身份／队伍／势力分配、候选与人物版本抽取、选将初始技能和体力、牌堆替换，以及神武选将后的专属装备计划。
+- `CardGame.Modes.Activities` 仅依赖 Core，负责虎牢变身、中断回合、洗牌期限和驱鬼式连续关卡流程。
+- `CardGame.Modes.Wushuang` 仅依赖 Core，负责无双的商店经济、战法和局内成长。
+- `CardGame.Content.Standard` 显式注册这些工厂；Core 不扫描或加载具体模块程序集。
+
+`IMatchModeSetupFeature` 返回冻结的开局、候选、选将和装备计划。Core 将它们应用到原有角色、私有候选字段、牌区和技能授予中；候选不会另存一份挂起状态。模块通过 `IModeSetupRandom` 使用本局随机源，保留原调用顺序；`ProjectDeckCardNames` 只投影牌名，不抽取虎牢装备或消耗随机数。
+
+默认开局由通配 `StandardModeSetupFactory` 提供。独立场次可以注册针对该 `ModeId` 的 `IGameModeSetupFeatureFactory`，覆盖默认开局实现；同目标的两个开局工厂会报冲突，其他观察器和流程工厂继续加载。复制注册表时使用 `CopyModeFeatureFactoriesFrom` 保留显式绑定；包装 `IContentRegistryBuilder` 的适配器须透传模块、装备注册及工厂存在查询。
+
+外部规则通过 `IMatchModeRuleObserverProvider` 和 `IMatchModeRuntimeHookProvider` 插入现有阶段及优先级，重复优先级直接拒绝。命令、开局边界、回合间歇分别通过公开接口进入同一命令会话。宿主只能按接口白名单取得，不能获得可变角色列表或结算栈。
+
+虎牢的同步 `ModeFlowInterruption` 只在当前命令内交还流程控制：已支付牌保持支付，原生栈和处理区由 Core 清理，仍记录原有取消、回合结束和关卡事件。血线变身后先锋先手，首次洗牌变身后 Boss 先手。连续关卡等待击杀动作和死亡子结算全部结束，再替换 Boss 并保留联军及当前回合。十殿阎罗的专用换关、其他活动的战斗技能和胜负策略仍沿用现有实现，不因本次拆分改写。
+
+上述绑定属于运行实现，不新增存档字段或规则版本。玩家快照、事件冻结、牌区移动、命令校验与存档重放继续由 Core 统一处理。
+
 ## 默认大厅模式
 
 | 入口 | ModeId | 人数与阵营 | 胜利目标 |

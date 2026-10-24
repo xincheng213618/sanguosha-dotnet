@@ -1757,9 +1757,9 @@ public sealed partial class GameEngine
         var result = ExecuteExclusive(() =>
         {
             try { operation(); }
-            catch (HulaoTurnInterruption interruption)
+            catch (ModeFlowInterruption interruption)
             {
-                CompleteHulaoTurnInterruption(interruption);
+                _modeRuntime.CompleteFlowInterruption(interruption);
                 if (_commandAwaitingCommit is AdvanceCommand || _options.AdvanceAfterHumanCommands)
                     AdvanceToHumanBoundary();
             }
@@ -16781,7 +16781,7 @@ public sealed partial class GameEngine
             CardMoveReasons.Reshuffle);
         _cardZones.Shuffle(CardLocation.DrawPile, _random);
         AddLog("DeckReshuffled", "摸牌堆耗尽，洗混弃牌堆形成新的摸牌堆。");
-        RecordHulaoDeckShuffle();
+        _modeRuntime.NotifyDeckRecycled();
         return true;
     }
 

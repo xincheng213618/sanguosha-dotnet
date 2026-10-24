@@ -11,6 +11,7 @@
     <ProjectReference Include="..\CardGame.Core\CardGame.Core.csproj" />
     <ProjectReference Include="..\CardGame.Modes.Wushuang\CardGame.Modes.Wushuang.csproj" />
     <ProjectReference Include="..\CardGame.Modes.Standard\CardGame.Modes.Standard.csproj" />
+    <ProjectReference Include="..\CardGame.Modes.Activities\CardGame.Modes.Activities.csproj" />
     <EmbeddedResource Include="..\Characters\**\Content\*.character.json"
                       LogicalName="CardGame.Content.Standard.Characters.%(Filename)%(Extension)"
                       WithCulture="false" />

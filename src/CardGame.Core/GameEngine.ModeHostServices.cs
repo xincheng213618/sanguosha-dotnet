@@ -4,7 +4,8 @@ public sealed partial class GameEngine
 {
     private ModeHostRegistry CreateModeHostServices() => new ModeHostRegistry()
         .Register<IWushuangModeHost>(() => new WushuangModeHost(this))
-        .Register<IModeSetupRandom>(() => new ModeSetupRandom(this));
+        .Register<IModeSetupRandom>(() => new ModeSetupRandom(this))
+        .Register<IModeEncounterHost>(CreateModeEncounterHost);
 
     private sealed class ModeSetupRandom(GameEngine engine) : IModeSetupRandom
     {
