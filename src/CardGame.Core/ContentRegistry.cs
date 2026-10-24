@@ -60,6 +60,9 @@ public interface IContentRegistryBuilder
     void AddDeck(ContentDeckRecipe definition);
 
     void AddMode(ContentModeDefinition definition);
+
+    void AddEquipmentContent(EquipmentContentPackage package) =>
+        throw new NotSupportedException("This content builder does not support equipment content packages.");
 }
 
 public sealed record ContentCardDefinition(
@@ -178,7 +181,7 @@ public sealed record ContentModeDefinition(
 /// Immutable, per-engine content catalogue. No static registration state is
 /// shared between registries, so test packages and future modes remain isolated.
 /// </summary>
-public sealed class ContentRegistry
+public sealed partial class ContentRegistry
 {
     // Only the fixed expanded-domain proof is shared. Programs are immutable;
     // weak keys let a custom catalogue be collected without retaining its rules.
@@ -196,7 +199,8 @@ public sealed class ContentRegistry
         IReadOnlyDictionary<string, ContentSkillDefinition> skills,
         IReadOnlyDictionary<string, ContentGeneralDefinition> generals,
         IReadOnlyDictionary<string, ContentDeckRecipe> decks,
-        IReadOnlyDictionary<string, ContentModeDefinition> modes)
+        IReadOnlyDictionary<string, ContentModeDefinition> modes,
+        IReadOnlyList<RegisteredEquipmentContent> equipmentPackages)
     {
         Packages = packages;
         _cards = cards;
@@ -204,14 +208,16 @@ public sealed class ContentRegistry
         _generals = generals;
         _decks = decks;
         _modes = modes;
+        EquipmentPackages = Array.AsReadOnly(equipmentPackages.Select(registration => registration.Package).ToArray());
         ProgramDependencies = new SkillProgramDependencies(_skills.Values);
-        ContentHash = ComputeContentHash(
+        var legacyContentHash = ComputeContentHash(
             Packages,
             _cards,
             _skills,
             _generals,
             _decks,
             _modes);
+        ContentHash = ExtendEquipmentContentHash(legacyContentHash, equipmentPackages);
     }
 
     public IReadOnlyList<PackageManifest> Packages { get; }
@@ -280,7 +286,7 @@ public sealed class ContentRegistry
             package.Register(builder.ForPackage(manifest.Id));
         }
 
-        builder.ValidateReferences();
+        builder.ValidateReferences(ordered);
         var registry = builder.Freeze(ordered);
         var programs = registry.Skills.Values
             .Select(skill => skill.Program)
@@ -558,7 +564,7 @@ public sealed class ContentRegistry
         return manifest;
     }
 
-    private sealed class RegistryBuilder : IContentRegistryBuilder
+    private sealed partial class RegistryBuilder : IContentRegistryBuilder
     {
         private readonly Dictionary<string, ContentCardDefinition> _cards = new(StringComparer.Ordinal);
         private readonly Dictionary<string, ContentSkillDefinition> _skills = new(StringComparer.Ordinal);
@@ -569,8 +575,7 @@ public sealed class ContentRegistry
 
         public IContentRegistryBuilder ForPackage(string packageId)
         {
-            _ = packageId;
-            return new PackageBuilder(this);
+            return new PackageBuilder(this, packageId);
         }
 
         public void AddCard(ContentCardDefinition definition) => Add(
@@ -603,8 +608,9 @@ public sealed class ContentRegistry
             definition.Id,
             "mode");
 
-        public void ValidateReferences()
+        public void ValidateReferences(IReadOnlyList<PackageManifest> packages)
         {
+            ValidateEquipmentReferences(packages);
             CampaignTacticAcquisitionRules.Validate(_skills);
             RicePileContract.ValidatePrograms(_skills.Values.Where(s => s.Program is not null).ToDictionary(s => s.Id, s => s.Program!, StringComparer.Ordinal));
             foreach (var skill in _skills.Values.Where(item => item.Program is not null))
@@ -1072,7 +1078,8 @@ public sealed class ContentRegistry
             FreezeMutableDictionary(_skills),
             FreezeMutableDictionary(_generals),
             FreezeMutableDictionary(_decks),
-            FreezeMutableDictionary(_modes));
+            FreezeMutableDictionary(_modes),
+            Array.AsReadOnly(EquipmentRegistrations.OrderBy(registration => registration.Package.Id, StringComparer.Ordinal).ToArray()));
 
         private void Add<T>(
             IDictionary<string, T> target,
@@ -1434,17 +1441,27 @@ public sealed class ContentRegistry
             new ReadOnlyDictionary<string, T>(
                 new Dictionary<string, T>(source, StringComparer.Ordinal));
 
-        private sealed class PackageBuilder(RegistryBuilder owner) : IContentRegistryBuilder
+        private sealed class PackageBuilder(RegistryBuilder owner, string packageId) : IContentRegistryBuilder
         {
             public void AddCard(ContentCardDefinition definition) => owner.AddCard(definition);
 
-            public void AddSkill(ContentSkillDefinition definition) => owner.AddSkill(definition);
+            public void AddSkill(ContentSkillDefinition definition)
+            {
+                owner.AddSkill(definition);
+                owner._skillPackageOwners.Add(definition.Id, packageId);
+            }
 
             public void AddGeneral(ContentGeneralDefinition definition) => owner.AddGeneral(definition);
 
             public void AddDeck(ContentDeckRecipe definition) => owner.AddDeck(definition);
 
             public void AddMode(ContentModeDefinition definition) => owner.AddMode(definition);
+
+            public void AddEquipmentContent(EquipmentContentPackage package)
+            {
+                owner.AddEquipmentContent(package);
+                owner._equipmentPackageOwners.Add(package.Id, packageId);
+            }
         }
     }
     private static bool HasRequiredPositiveCondition(SkillProgramTriggerCondition c, SkillProgramTriggerConditionKind kind) => c.Kind == kind || c.Kind == SkillProgramTriggerConditionKind.All && c.Children.Any(child => HasRequiredPositiveCondition(child, kind));
