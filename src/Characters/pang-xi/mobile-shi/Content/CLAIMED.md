@@ -1,0 +1,1 @@
+{"claimed":"mobile-shi batch (pang-xi)","note":"implementation in agent worktree .artifacts/agent-pang-xi"}

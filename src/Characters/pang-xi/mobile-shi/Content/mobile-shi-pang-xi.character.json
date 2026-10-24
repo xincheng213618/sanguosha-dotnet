@@ -1,0 +1,54 @@
+{
+ "formatVersion": 1,
+ "packageId": "standard-classic-generals",
+ "characterId": "character:pang-xi",
+ "skills": [
+  {
+   "registrationOrder": 51800,
+   "programBundle": "mobile-shi-pang-xi",
+   "includeProgramPresentation": true,
+   "definition": {
+    "id": "mobile:shi-xuye",
+    "name": "蓄业",
+    "description": "每回合限一次，当手牌数为全场最少的角色受到伤害后，你可以令其摸两张牌，然后若其手牌数为全场最多，你将其区域内的一张牌置于牌堆顶。",
+    "actionForms": "Active",
+    "executionForms": "Trigger"
+   }
+  },
+  {
+   "registrationOrder": 51801,
+   "programBundle": "mobile-shi-pang-xi",
+   "includeProgramPresentation": true,
+   "definition": {
+    "id": "mobile:shi-kuangxiang",
+    "name": "匡襄",
+    "description": "出牌阶段限一次，你可以与一名手牌数小于等于你的其他角色交换手牌，且直到你的下个出牌阶段开始前，你或其失去所有因此获得的手牌后，你可以对自己发动“蓄业”（不受发动次数影响）。",
+    "actionForms": "Active",
+    "executionForms": "Trigger"
+   }
+  }
+ ],
+ "generals": [
+  {
+   "registrationOrder": 51804,
+   "pools": {
+    "current": 51804
+   },
+   "definition": {
+    "id": "mobile:shi-pang-xi",
+    "name": "势庞羲",
+    "portraitKey": "mobile-shi-pang-xi",
+    "skillId": "mobile:shi-xuye",
+    "additionalSkillIds": [
+     "mobile:shi-kuangxiang"
+    ],
+    "factionId": "shu",
+    "baseHp": 3,
+    "gender": "Male",
+    "characterId": "character:pang-xi",
+    "variantId": "mobile-shi",
+    "rulesetId": "sanguosha-mobile"
+   }
+  }
+ ]
+}
