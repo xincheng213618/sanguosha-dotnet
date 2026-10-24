@@ -1,0 +1,6 @@
+{
+  "schemaVersion":3,"skills":{
+    "boundary:duodao-mobile":{"name":"夺刀","description":"当你受到伤害后，你可获得伤害来源装备区里的武器牌。"},
+    "boundary:anjian-mobile":{"name":"暗箭","description":"锁定技，当你使用【杀】指定目标后，若你不在目标角色攻击范围内，你选择一项：令其无法响应此【杀】；此【杀】对其伤害+1。","optionLabels":{"no-response":"令当前目标无法响应此杀","damage":"此杀对当前目标伤害+1"}}
+  }
+}

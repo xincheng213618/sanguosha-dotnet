@@ -4,7 +4,7 @@ namespace CardGame.Core.RuntimeSkills;
 internal static class RuntimeRules_Core_FinalTargetSlash
 {
     internal static bool HasFinalTargetSlashEffects(IEnumerable<SkillProgramEffect> effects) =>
-        effects.Any(effect => effect.Op is SkillProgramEffectOp.PreventCurrentTargetSlashCancellation or SkillProgramEffectOp.AddCurrentTargetSlashDamage or
+        effects.Any(effect => effect.Op is SkillProgramEffectOp.IssueBoundaryAnjianChoice or SkillProgramEffectOp.PreventCurrentTargetSlashCancellation or SkillProgramEffectOp.AddCurrentTargetSlashDamage or
             SkillProgramEffectOp.ZhuiLieEscalateTargetDamage or SkillProgramEffectOp.RevealRecordedSuitSlash or
             SkillProgramEffectOp.ClaimCurrentUsePhysicalCards or SkillProgramEffectOp.PreventCurrentTargetSlashCancellationByRule or
             SkillProgramEffectOp.ResolveMouTianYuZhenxi or SkillProgramEffectOp.DiscardAttackRangeCardsFromSlashTarget);

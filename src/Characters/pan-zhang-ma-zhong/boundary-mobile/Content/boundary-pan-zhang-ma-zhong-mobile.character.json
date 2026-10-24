@@ -1,0 +1,8 @@
+{
+  "formatVersion":1,"packageId":"standard-classic-generals","characterId":"character:pan-zhang-ma-zhong",
+  "skills":[
+    {"registrationOrder":54000,"programBundle":"boundary-pan-zhang-ma-zhong-mobile","includeProgramPresentation":true,"definition":{"id":"boundary:duodao-mobile","name":"夺刀","description":"当你受到伤害后，你可获得伤害来源装备区里的武器牌。","executionForms":"Trigger"}},
+    {"registrationOrder":54001,"programBundle":"boundary-pan-zhang-ma-zhong-mobile","includeProgramPresentation":true,"definition":{"id":"boundary:anjian-mobile","name":"暗箭","description":"锁定技，当你使用【杀】指定目标后，若你不在目标角色攻击范围内，你选择一项：令其无法响应此【杀】；此【杀】对其伤害+1。","tags":"Locked","executionForms":"Trigger"}}
+  ],
+  "generals":[{"registrationOrder":54002,"pools":{"current":54002},"definition":{"id":"boundary:pan-zhang-ma-zhong-mobile","name":"界潘璋马忠·移动版","portraitKey":"boundary-pan-zhang-ma-zhong-mobile","skillId":"boundary:duodao-mobile","additionalSkillIds":["boundary:anjian-mobile"],"factionId":"wu","baseHp":4,"gender":"Male","characterId":"character:pan-zhang-ma-zhong","variantId":"boundary-mobile","rulesetId":"sanguosha-mobile"}}]
+}

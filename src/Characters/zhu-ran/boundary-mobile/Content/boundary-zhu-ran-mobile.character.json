@@ -1,0 +1,9 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhu-ran",
+  "skills": [{ "registrationOrder": 53900, "programBundle": "boundary-zhu-ran-mobile", "includeProgramPresentation": true,
+    "definition": { "id": "boundary:danshou-mobile", "name": "胆守", "description": "其他角色的结束阶段，若你本回合未成为过其使用牌的目标，你摸一张牌；否则你可以弃置X张牌，对其造成1点伤害（X为你本回合成为其使用牌的目标次数）。", "executionForms": "Trigger" } }],
+  "generals": [{ "registrationOrder": 53901, "pools": { "current": 53901 },
+    "definition": { "id": "boundary:zhu-ran-mobile", "name": "界朱然·移动版", "portraitKey": "boundary-zhu-ran-mobile", "skillId": "boundary:danshou-mobile", "factionId": "wu", "baseHp": 4, "gender": "Male", "characterId": "character:zhu-ran", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile" } }]
+}

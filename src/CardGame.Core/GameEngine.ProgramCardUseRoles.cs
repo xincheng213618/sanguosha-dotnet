@@ -62,6 +62,7 @@ public sealed partial class GameEngine
                 HasCardPolicy(actor, SkillProgramCardPolicyKind.IgnoreUseDistance, kind) || GetCombatDistance(actor.Seat, target.Seat) == 1),
             CardKind.Dismantlement => HasTargetCard(target),
             CardKind.FireAttack or CardKind.UnexpectedAssault => GetHand(target).Count > 0,
+            CardKind.DrawTwo => AllowsBoundarySunLuBanDrawTwoRoleTarget(use),
             CardKind.IronChain => true,
             CardKind.BorrowedSword => GetWeapon(target) is not null && _players.Any(victim => IsLegalBorrowedSwordSlashTarget(target, victim)),
             _ => false

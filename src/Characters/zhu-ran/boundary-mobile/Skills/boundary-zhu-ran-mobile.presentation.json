@@ -1,0 +1,4 @@
+{
+  "schemaVersion": 3,
+  "skills": { "boundary:danshou-mobile": { "name": "胆守", "description": "其他角色的结束阶段，若你本回合未成为过其使用牌的目标，你摸一张牌；否则你可以弃置X张牌，对其造成1点伤害（X为你本回合成为其使用牌的目标次数）。" } }
+}

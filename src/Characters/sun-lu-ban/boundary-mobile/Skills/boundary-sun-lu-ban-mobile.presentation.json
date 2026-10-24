@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:zenhui-mobile": {
+      "name": "谮毁", "description": "每个出牌阶段一次，使用杀或黑色普通锦囊指定唯一目标时，可选择另一合法目标，由你选择获得其一张牌并改为其使用，或追加其为目标。",
+      "triggerChoices": { "own-choice-role": "谮毁：选择另一合法目标" }
+    },
+    "boundary:jiaojin-mobile": {
+      "name": "骄矜", "description": "受到男性角色造成的伤害时，可弃置一张手牌或装备区的装备牌，防止整次伤害。",
+      "triggerChoices": { "equipment-prevent-male-damage": "骄矜：弃置装备牌，防止此伤害" }
+    }
+  }
+}

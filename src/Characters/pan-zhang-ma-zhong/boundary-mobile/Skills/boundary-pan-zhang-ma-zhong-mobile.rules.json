@@ -1,0 +1,12 @@
+{
+  "schemaVersion":62,"skills":[
+    {"id":"boundary:duodao-mobile","revision":1,"triggers":[{"id":"take-source-weapon","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamage","optional":true,"effects":[
+      {"op":"selectSourceCard","target":"owner","cardSource":"damageSource","zones":["equipment"],"equipmentSlots":["weapon"],"resultBind":"weapon","skipIfNoCards":true,"allowSameSource":true},
+      {"op":"moveBoundCards","target":"owner","sourceBind":"weapon","destination":"ownerHand","awaitMovementTriggers":true}
+    ]}]},
+    {"id":"boundary:anjian-mobile","revision":1,"triggers":[{"id":"outside-target-range-choice","window":"cardUseTargetsFinalized","ownerRelation":"actor","cardKinds":["slash","fireSlash","thunderSlash"],"optional":false,"effects":[
+      {"op":"chooseOption","target":"owner","resultBind":"anjian-choice","options":[{"id":"no-response"},{"id":"damage"}]},
+      {"op":"issueBoundaryAnjianChoice","target":"owner"}
+    ]}]}
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:zenhui-mobile", "revision": 1, "triggers": [
+      { "id": "own-choice-role", "window": "cardUseTargetsFinalized", "ownerRelation": "actor", "optional": true,
+        "cardCategories": ["basic", "instantTrick"], "usageScope": "phase", "usageLimit": 1,
+        "condition": { "kind": "all", "children": [
+          { "kind": "cardActionPhaseIsPlay" }, { "kind": "cardActionActorIsCurrentTurn" },
+          { "kind": "compare", "left": { "kind": "cardUseDesignatedTargetCount" }, "operator": "equal", "right": { "kind": "integerConstant", "value": 1 } },
+          { "kind": "any", "children": [{ "kind": "cardActionCategoryIs", "categories": ["basic"] }, { "kind": "cardActionCardIsBlack" }] }
+        ] },
+        "effects": [
+          { "op": "selectTarget", "target": "owner", "targetKind": "otherLegalCurrentCardTarget" },
+          { "op": "chooseBoundarySunLuBanZenhui", "target": "owner", "resultBind": "own-role-choice" },
+          { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "selectedTarget" },
+            "zones": ["hand", "equipment"], "count": 1, "destination": "ownerHand", "awaitMovementTriggers": true,
+            "condition": { "kind": "choiceIs", "sourceBind": "own-role-choice", "optionId": "become-user" } },
+          { "op": "replaceCurrentCardUseActor", "target": "selectedTarget", "condition": { "kind": "choiceIs", "sourceBind": "own-role-choice", "optionId": "become-user" } },
+          { "op": "addCurrentCardUseTarget", "target": "selectedTarget", "condition": { "kind": "choiceIs", "sourceBind": "own-role-choice", "optionId": "extra-target" } }
+        ] }
+    ] },
+    { "id": "boundary:jiaojin-mobile", "revision": 1, "triggers": [
+      { "id": "equipment-prevent-male-damage", "window": "beforeDamageApplied", "subject": "damageTarget", "optional": true,
+        "condition": { "kind": "damageSourceGenderIs", "gender": "male" }, "effects": [
+          { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "owner" },
+            "zones": ["hand", "equipment"], "cardCategories": ["equipment"], "count": 1, "destination": "discardPile", "resultBind": "jiaojin-cost", "awaitMovementTriggers": true },
+          { "op": "preventCurrentDamage", "target": "owner" }
+        ] }
+    ] }
+  ]
+}
