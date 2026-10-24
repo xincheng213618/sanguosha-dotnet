@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3, "skills": {
+    "boundary:qizhi-mobile": { "name": "奇制", "description": "蓄力1/2。出牌阶段每角色一次，耗1点令其摸2；本阶段用基本/普通锦囊指定目标后，依次私看这些角色全部手牌并各弃1。", "activationLabels": { "charge-draw": "奇制：耗1蓄力，令一名角色摸两张" }, "triggerChoices": { "initial-charge": "奇制：初始蓄力", "inspect-recipients": "奇制：依次私看并弃置手牌" } },
+    "boundary:jinqu-mobile": { "name": "进趋", "description": "回合内每使用两张基本/普通锦囊，令一名有蓄力技的角色获得1点蓄力；结束阶段摸本回合自己蓄力最高值张牌。", "triggerChoices": { "paired-use-charge": "进趋：选择蓄力角色", "ending-peak": "进趋：摸本回合蓄力最高值张牌" } }
+  }
+}

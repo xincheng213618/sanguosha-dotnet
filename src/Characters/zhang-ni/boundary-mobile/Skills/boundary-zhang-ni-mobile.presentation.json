@@ -1,0 +1,4 @@
+{"schemaVersion":3,"skills":{
+ "boundary:wurong-mobile":{"name":"怃戎","description":"出牌阶段限一次，与其他角色秘密谋弈。镇压/反抗：伤害对方1并摸1；镇压/归顺：获得其1张牌后交给其2张牌；安抚/反抗：受到1点无来源伤害后摸1；安抚/归顺：其交给你2张牌，不足则改为跳过其下个摸牌阶段。"},
+ "boundary:shizhi-mobile":{"name":"矢志","description":"锁定技，体力值为1时，你的〖闪〗只能当做普通〖杀〗使用或打出。"}
+}}

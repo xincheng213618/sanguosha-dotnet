@@ -1133,6 +1133,7 @@ public sealed partial class GameEngine
                 if (IsBoundarySidiChoiceResult(frame, binding)) continue;
                 if (IsBoundaryGuYongChoiceResult(frame, binding)) continue;
                 if (IsBoundarySunLuBanChoiceResult(frame, binding)) continue;
+                if (IsBoundaryWurongChoiceResult(frame, binding)) continue;
                 if (IsBoundaryManChongChoiceResult(frame, binding)) continue;
                 if (IsNearestFactionChoiceResult(frame, binding)) continue;
                 if (IsShenwuChoiceResult(frame, binding)) continue;

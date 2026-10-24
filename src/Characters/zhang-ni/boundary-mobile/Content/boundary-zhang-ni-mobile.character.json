@@ -1,0 +1,12 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:zhang-ni",
+  "skills": [
+    { "registrationOrder": 54200, "programBundle": "boundary-zhang-ni-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:wurong-mobile", "name": "怃戎", "description": "出牌阶段限一次，你可以与一名其他角色谋弈：镇压与反抗，你对其造成1点伤害，然后摸一张牌；镇压与归顺，你获得其一张牌，然后交给其两张牌；安抚与反抗，你受到1点无来源伤害，然后摸一张牌；安抚与归顺，其交给你两张牌，若其牌数不足两张，则改为跳过其下一个摸牌阶段。", "actionForms": "Active" } },
+    { "registrationOrder": 54201, "programBundle": "boundary-zhang-ni-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:shizhi-mobile", "name": "矢志", "description": "锁定技，当你体力值为1时，你的〖闪〗只能当做普通〖杀〗使用或打出。", "tags": "Locked", "executionForms": "State" } }
+  ],
+  "generals": [{ "registrationOrder": 54202, "pools": { "current": 54202 }, "definition": {
+    "id": "boundary:zhang-ni-mobile", "name": "界张嶷·移动版", "portraitKey": "boundary-zhang-ni-mobile", "skillId": "boundary:wurong-mobile", "additionalSkillIds": ["boundary:shizhi-mobile"],
+    "factionId": "shu", "baseHp": 4, "gender": "Male", "characterId": "character:zhang-ni", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile" } }]
+}

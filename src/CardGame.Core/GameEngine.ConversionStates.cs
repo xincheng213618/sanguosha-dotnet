@@ -16,6 +16,6 @@ public sealed partial class GameEngine
         var optIn = program is not null && (program.Activations.Any(binding => ProgramInstructionResolver.Default.Features(binding).UsesConversionPolarity) ||
             program.Triggers.Any(binding => ProgramInstructionResolver.Default.Features(binding).UsesConversionPolarity));
         if (optIn || program is null && (definition.Tags & SkillTag.Conversion) != 0)
-            _skillRuntimeState.RegisterConversionSkill(player.Seat, skillId, SkillPolarity.Yang);
+            _skillRuntimeState.RegisterConversionSkill(player.Seat, skillId, InitialBoundaryYanYanPolarity(player, skillId));
     }
 }

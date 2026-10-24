@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:qizhi-mobile", "revision": 1,
+      "activations": [{ "id": "charge-draw", "minCards": 0, "maxCards": 0, "minTargets": 1, "maxTargets": 1, "targetKind": "anyLiving", "usesPerTurn": null,
+        "effects": [{ "op": "spendBoundaryWangJiQizhi", "target": "owner" }] }],
+      "triggers": [
+        { "id": "initial-charge", "window": "gameStarting", "subject": "owner", "optional": false, "effects": [{ "op": "initializeBoundaryWangJi", "target": "owner" }] },
+        { "id": "inspect-recipients", "window": "cardUseTargetsFinalized", "ownerRelation": "actor", "cardCategories": ["basic", "instantTrick"], "optional": false,
+          "effects": [{ "op": "resolveBoundaryWangJiQizhi", "target": "owner" }] }
+      ] },
+    { "id": "boundary:jinqu-mobile", "revision": 1, "triggers": [
+      { "id": "paired-use-charge", "window": "cardUseCompleted", "ownerRelation": "observer", "includeResponseUses": true, "singleActionInstance": true, "optional": false,
+        "effects": [{ "op": "resolveBoundaryWangJiJinqu", "target": "owner" }] },
+      { "id": "ending-peak", "window": "turnEnding", "subject": "owner", "optional": false,
+        "effects": [{ "op": "resolveBoundaryWangJiJinqu", "target": "owner" }] }
+    ] }
+  ]
+}

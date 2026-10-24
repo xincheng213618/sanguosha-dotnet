@@ -1,0 +1,18 @@
+{
+ "schemaVersion":62,"skills":[
+  {"id":"boundary:wurong-mobile","revision":1,"activations":[{
+   "id":"private-mouyi","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"usesPerPhase":1,
+   "effects":[
+    {"op":"resolveBoundaryZhangNiWurong","target":"owner","stateId":"strategies","resultBind":"wurong-result"},
+    {"op":"damage","target":"selectedTarget","amount":1,"condition":{"kind":"choiceIs","sourceBind":"wurong-result","optionId":"suppress-resist"}},
+    {"op":"draw","target":"owner","amount":1,"condition":{"kind":"choiceIs","sourceBind":"wurong-result","optionId":"suppress-resist"}},
+    {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"selectedTarget"},"zones":["hand","equipment"],"count":1,"destination":"ownerHand","skipIfNoCards":true,"awaitMovementTriggers":true,"condition":{"kind":"choiceIs","sourceBind":"wurong-result","optionId":"suppress-submit"}},
+    {"op":"resolveBoundaryZhangNiWurong","target":"owner","stateId":"gifts"},
+    {"op":"receiveOwnerDamage","target":"owner","amount":1,"condition":{"kind":"choiceIs","sourceBind":"wurong-result","optionId":"appease-resist"}},
+    {"op":"draw","target":"owner","amount":1,"condition":{"kind":"choiceIs","sourceBind":"wurong-result","optionId":"appease-resist"}}
+   ]}],
+   "triggers":[{"id":"issued-next-draw-skip","window":"drawPhaseStarting","subject":"owner","optional":false,"isSkillInvocation":false,"priority":1000,
+     "effects":[{"op":"consumeBoundaryZhangNiDrawSkip","target":"owner"}]}]},
+  {"id":"boundary:shizhi-mobile","revision":1,"cardIdentities":[{"id":"one-hp-dodge-as-slash","zones":["hand"],"inputKinds":["dodge"],"inputSuits":[],"outputKind":"slash","condition":{"kind":"all","children":[{"kind":"hpAtLeast","value":1},{"kind":"not","children":[{"kind":"hpAtLeast","value":2}]}]}}]}
+ ]
+}

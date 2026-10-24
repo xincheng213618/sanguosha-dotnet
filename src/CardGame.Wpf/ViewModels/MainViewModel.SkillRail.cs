@@ -11,6 +11,7 @@ public sealed partial class MainViewModel
             .Select(ApplyBoundaryZhuZhiProgress)
             .Select(ApplyBoundaryCaoZhenSidiProgress)
             .Select(ApplyBoundarySunXiuProgress)
+            .Select(ApplyBoundaryYanYanProgress)
             .Select(ApplyMobileShiZhaoYunProgress)
             .Select(ApplyMobileShiWeiYanProgress)
             .Select(ApplyMobileShiChenQunProgress)

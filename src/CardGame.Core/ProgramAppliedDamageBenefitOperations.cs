@@ -26,7 +26,9 @@ internal sealed class ReceiveOwnerDamageDescriptor : ProgramOperationDescriptorB
         r.AllowOnly("op", "target", "amount", "condition");
         var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r),
             DrawProgramOperationDescriptor.Amount(r, 20), r.Condition());
-        RequireAlways(effect, r.Path); return effect;
+        if (effect.Condition.Kind is not (SkillProgramConditionKind.Always or SkillProgramConditionKind.ChoiceIs))
+            throw new InvalidOperationException(r.Path + ": received owner damage requires an unconditional instruction or a declared choice result.");
+        return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [];
 }

@@ -126,6 +126,10 @@ internal static class Program
             Check("Mobile boundary batch 46 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
                 new HashSet<string>(StringComparer.Ordinal) { "boundary:chen-qun-mobile", "boundary:gu-yong-mobile", "boundary:zhu-huan-mobile" }));
             Check("Mobile boundary Gu Yong UI: mixed-color reveal and native self recipient draft", () => BoundaryGuYongUiChecks.MixedColorSameTypeRevealAndNativeSelfRecipientDraft(output));
+            Check("Mobile boundary batch 48 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
+                new HashSet<string>(StringComparer.Ordinal) { "boundary:zhang-ni-mobile", "boundary:yan-yan-mobile", "boundary:wang-ji-mobile" }));
+            Check("Mobile boundary Yan Yan UI: structured state counter and persistent quota cold", () => BoundaryYanYanUiChecks.StructuredPolarityOccurrenceAndPersistentQuotaRailCold(output));
+            Check("Mobile boundary Wang Ji UI: actual inspected foreign hand and card button cold", () => BoundaryWangJiUiChecks.ActualInspectedForeignHandAndPaidCardButtonCold(output));
             Check("Mobile boundary batch 47 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
                 new HashSet<string>(StringComparer.Ordinal) { "boundary:zhu-ran-mobile", "boundary:pan-zhang-ma-zhong-mobile", "boundary:sun-lu-ban-mobile" }));
             Check("Mobile boundary Sun Lu Ban UI: owner branch and actual foreign hidden hand", () => BoundarySunLuBanUiChecks.OwnerBranchAndActualForeignHiddenHandPicker(output));

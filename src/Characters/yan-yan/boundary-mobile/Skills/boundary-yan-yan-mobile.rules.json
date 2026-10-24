@@ -1,0 +1,12 @@
+{"schemaVersion":62,"skills":[{"id":"boundary:juzhan-mobile","revision":1,"triggers":[
+ {"id":"yin-designated-use","window":"cardUseTargetsFinalized","ownerRelation":"observer","cardKinds":["slash","fireSlash","thunderSlash"],"requiredPolarity":"yin","optional":true,"effects":[
+  {"op":"prepareBoundaryYanYanJuzhan","target":"owner"},{"op":"commitConversionPolarity","target":"owner"},
+  {"op":"selectTarget","target":"owner","targetKind":"currentCardUseTargets","zones":["hand","equipment"]},
+  {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"selectedTarget"},"zones":["hand","equipment"],"count":1,"destination":"ownerHand","skipIfNoCards":true,"awaitMovementTriggers":true},
+  {"op":"finishBoundaryYanYanJuzhan","target":"owner"}]},
+ {"id":"yang-became-target","window":"cardUseBeforeTargetEffects","ownerRelation":"observer","cardKinds":["slash","fireSlash","thunderSlash"],"requiredPolarity":"yang","optional":true,"effects":[
+  {"op":"prepareBoundaryYanYanJuzhan","target":"owner"},{"op":"commitConversionPolarity","target":"owner"},
+  {"op":"draw","target":"owner","amount":1},{"op":"draw","target":"actor","amount":1},
+  {"op":"finishBoundaryYanYanJuzhan","target":"owner"}]},
+ {"id":"chengshi-completed-use","window":"cardUseCompleted","ownerRelation":"observer","cardKinds":["slash","fireSlash","thunderSlash"],"optional":false,"isSkillInvocation":false,"effects":[{"op":"claimBoundaryYanYanChengshi","target":"owner"}]}
+]}]}

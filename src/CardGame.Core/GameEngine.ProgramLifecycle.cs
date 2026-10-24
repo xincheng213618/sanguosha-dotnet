@@ -3219,7 +3219,7 @@ public sealed partial class GameEngine
         if (!owner.IsAlive || owner.Seat != _currentSeat || _phase != TurnPhase.Draw ||
             _pendingDecision is not null || _resolutionStack.Count != 0)
             return false;
-        if (!HasLivingProgramTriggerBindings(SkillProgramTriggerWindow.DrawPhaseStarting)) return false;
+        if (!HasLivingProgramTriggerBindings(SkillProgramTriggerWindow.DrawPhaseStarting) && !HasPendingBoundaryWurongDrawSkip(owner.Seat)) return false;
         var facts = CaptureProgramTriggerFacts(owner);
         if(HasAttributedEventOperations())facts=facts with {EventTargetMarkerCounts=new Dictionary<PlayerMarkerKind,int>(owner.Markers)};
         var candidates = CollectEligibleProgramTriggerCandidates(
