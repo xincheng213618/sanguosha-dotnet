@@ -20,14 +20,15 @@ public sealed partial class GameEngine
     private void CaptureProgramAlcoholConsumption(long cardUseFrameId, CharacterState actor)
     {
         var permanent = _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ReplaceOwnSkillsAfterAlcoholSlashDamage);
+        var captureAmount = permanent || _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ReduceBoundaryGaoShunAlcoholSlash);
         if (!actor.HasAlcoholEffect ||
-            !permanent && !_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.SuppressOwnSkillAfterAlcoholSlashDamage)) return;
+            !captureAmount && !_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.SuppressOwnSkillAfterAlcoholSlashDamage)) return;
         var use = LifecycleCardUse(cardUseFrameId);
         if (use?.Action is not { Type: CardActionType.Use } action || action.ActorSeat != actor.Seat ||
             use.SourceSeat != actor.Seat || !IsSlashCard(action.EffectiveKind) || use.CardKind != action.EffectiveKind)
             throw new InvalidOperationException("Alcohol consumption requires its original real Slash use and actor.");
         if (use.ConsumedAlcoholBoost) throw new InvalidOperationException("A Slash cannot consume its Alcohol effect twice.");
-        int? bonus = permanent ? actor.AlcoholDamageBonus : null;
+        int? bonus = captureAmount ? actor.AlcoholDamageBonus : null;
         ReplaceRuntimeFrame(use.Id, use with { ConsumedAlcoholBoost = true, ConsumedAlcoholBonus = bonus });
         AdvanceEventRulesAndQueueFact(new CardUseAlcoholConsumptionCapturedEvent(use.Id, action.ActionId, actor.Seat) { AlcoholBonus = bonus });
     }

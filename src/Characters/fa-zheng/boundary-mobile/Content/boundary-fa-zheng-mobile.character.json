@@ -1,0 +1,52 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:fa-zheng",
+  "skills": [
+    {
+      "registrationOrder": 57500,
+      "programBundle": "boundary-fa-zheng-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:enyuan-mobile",
+        "name": "恩怨",
+        "description": "当你获得一名其他角色两张或更多的牌后，你可以令其摸一张牌；当你受到1点伤害后，你可以令伤害来源选择一项：1.将一张手牌交给你；2.失去1点体力。",
+        "executionForms": "Trigger"
+      }
+    },
+    {
+      "registrationOrder": 57501,
+      "programBundle": "boundary-fa-zheng-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:xuanhuo-mobile",
+        "name": "眩惑",
+        "description": "摸牌阶段，你可以改为令一名其他角色摸两张牌，然后除非该角色对其攻击范围内你选择的另一名角色使用一张杀，否则你获得其两张牌。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 57502,
+      "pools": {
+        "current": 57502
+      },
+      "definition": {
+        "id": "boundary:fa-zheng-mobile",
+        "name": "界法正·移动版",
+        "portraitKey": "boundary-fa-zheng-mobile",
+        "skillId": "boundary:enyuan-mobile",
+        "additionalSkillIds": [
+          "boundary:xuanhuo-mobile"
+        ],
+        "factionId": "shu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:fa-zheng",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

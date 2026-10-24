@@ -11,7 +11,7 @@ public sealed partial class GameEngine
         if (frame.AssistedSlashRequest is { } request)
         {
             if (paused.Op != SkillProgramEffectOp.RequestSlashAgainstChosenTarget || frame.SelectedTargetSeats is not [var actor] || actor != request.ActorSeat || actor == frame.OwnerSeat ||
-                request.TargetSeat is { } target && !AssistedPhysicalSlashTargets(actor).Contains(target) || frame.ChoiceBindings.Any(binding => binding.Name == paused.ResultBind) || request.ActorChoosesTarget != (paused.ChooserRef?.Kind == ProgramParticipantRef.SelectedTarget))
+                request.TargetSeat is { } target && !FaZhengMobileAssistedTargets(frame, actor).Contains(target) || frame.ChoiceBindings.Any(binding => binding.Name == paused.ResultBind) || request.ActorChoosesTarget != (paused.ChooserRef?.Kind == ProgramParticipantRef.SelectedTarget))
                 throw new InvalidOperationException("An assisted physical Slash draft lost its frozen instruction or participants.");
             if (ReferenceEquals(frame, _resolutionStack.LastOrDefault()) && (_pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt ||
                 prompt.PlayerSeat != (request.TargetSeat is null && !request.ActorChoosesTarget ? frame.OwnerSeat : actor) || !AssistedChoicesEqual(RoundOnceCardlessProgramNativeDecision(TousuiProgramNativeDecision(KenshangProgramNativeDecision(ChainedStateBasicNativeDecision(DrawFundedDistinctBasicNativeDecision(RequestedDeckBasicNativeDecision(WeijieNativeDecision(prompt))))))).Choices, AssistedPhysicalSlashWithKenshangChoices(frame))))
@@ -41,7 +41,7 @@ public sealed partial class GameEngine
         var active = GetActiveProgramFrame(frame.Id);
         if (active.AssistedSlashRequest is not null || active.SelectedTargetSeats.Count != 1 || active.SelectedTargetSeats[0] != actorSeat || actorSeat == active.OwnerSeat)
             throw new InvalidOperationException("An assisted Slash requires one distinct selected actor.");
-        if (!_players[actorSeat].IsAlive || AssistedPhysicalSlashTargets(actorSeat).Length == 0)
+        if (!_players[actorSeat].IsAlive || FaZhengMobileAssistedTargets(active, actorSeat).Length == 0)
         {
             CommitProgramChoiceResult(active.Id, bind, "declined", actorSeat, "没有合法目标。");
             return SkillProgramStepOutcome.Continue;
@@ -61,7 +61,7 @@ public sealed partial class GameEngine
             ["program-action"] = "assisted-physical-slash", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["request-option"] = option
         };
         if (draft.TargetSeat is null)
-            return AssistedPhysicalSlashTargets(actor.Seat).Select(seat => new PromptChoice(new ChoiceId($"assisted-slash.{frame.Id}.target-{seat}"), $"指定 {_players[seat].Name} 为【杀】的目标", [], [seat], Parameters("target"))).ToArray();
+            return FaZhengMobileAssistedTargets(frame, actor.Seat).Select(seat => new PromptChoice(new ChoiceId($"assisted-slash.{frame.Id}.target-{seat}"), $"指定 {_players[seat].Name} 为【杀】的目标", [], [seat], Parameters("target"))).ToArray();
         var targetSeat = draft.TargetSeat.Value;
         var choices = new List<PromptChoice>();
         foreach (var card in GetSlashUseCards(actor))
@@ -148,7 +148,7 @@ public sealed partial class GameEngine
                 .Concat(nativeChoices.Where(choice => choice.Parameters.GetValueOrDefault("request-option") == "decline")).ToArray())
             : nativeChoices;
         var skill = _contentRegistry.GetSkill(frame.SkillId);
-        _pendingDecision = new PendingDecision(DecisionKind.ProgramTrigger, chooserSeat, draft.TargetSeat is null ? "请选择受令角色攻击范围内的目标。" : "使用一张【杀】，或允许技能拥有者获得你的牌。", choices.SelectMany(c => c.Cards).Distinct().ToArray(), draft.TargetSeat is null ? AssistedPhysicalSlashTargets(draft.ActorSeat) : [draft.TargetSeat.Value], frame.OwnerSeat)
+        _pendingDecision = new PendingDecision(DecisionKind.ProgramTrigger, chooserSeat, draft.TargetSeat is null ? "请选择受令角色攻击范围内的目标。" : "使用一张【杀】，或允许技能拥有者获得你的牌。", choices.SelectMany(c => c.Cards).Distinct().ToArray(), draft.TargetSeat is null ? FaZhengMobileAssistedTargets(frame, draft.ActorSeat) : [draft.TargetSeat.Value], frame.OwnerSeat)
         { PromptId = CreatePromptId(), IsPrivate = true, TargetSeat = chooserSeat, Choices = Array.AsReadOnly(choices.ToArray()), SkillPrompt = new(frame.SkillId, skill.Name, skill.Name, skill.Description) };
         _status = _players[chooserSeat].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }
@@ -186,7 +186,7 @@ public sealed partial class GameEngine
         }
         var actor = _players[draft.ActorSeat];
         var (cards, kind, conversion) = ReadAssistedSlashPayment(actor, selected);
-        if (!AssistedPhysicalSlashTargets(actor.Seat).Contains(draft.TargetSeat.Value) || !AssistedSlashPaymentHasRange(actor, draft.TargetSeat.Value, cards, conversion) || !CanUseSlashTarget(actor, _players[draft.TargetSeat.Value], cards[0], conversion, kind, noEffectiveRank:cards.Count > 1, specificEffectiveRank:selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString() ? ZhangbaSpecificSlashRank(actor,cards) : null, physicalCardIds:cards.Select(c=>c.Id).ToArray()))
+        if (!FaZhengMobileAssistedTargets(frame, actor.Seat).Contains(draft.TargetSeat.Value) || !AssistedSlashPaymentHasRange(actor, draft.TargetSeat.Value, cards, conversion) || !CanUseSlashTarget(actor, _players[draft.TargetSeat.Value], cards[0], conversion, kind, noEffectiveRank:cards.Count > 1, specificEffectiveRank:selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString() ? ZhangbaSpecificSlashRank(actor,cards) : null, physicalCardIds:cards.Select(c=>c.Id).ToArray()))
             throw new InvalidOperationException("The assisted Slash target became illegal.");
         CommitProgramChoiceResult(frame.Id, effect.ResultBind!, "used-slash", actor.Seat, "使用【杀】。");
         ResolveSlashCore(actor, _players[draft.TargetSeat.Value], cards[0], kind, actor.Seat, physicalCards: cards, countsTowardSlashLimit: false,

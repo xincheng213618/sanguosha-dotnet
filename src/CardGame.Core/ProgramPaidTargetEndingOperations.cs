@@ -119,18 +119,26 @@ internal static class PaidTargetEndingComposition
     {
         if (effects.Any(e => e.Op is SkillProgramEffectOp.PayHpThenNullifyOwnActualUseTarget or SkillProgramEffectOp.ScheduleEarnedActualEndingBenefit))
         {
+            var mobileDiscard = effects is [
+                { Op: SkillProgramEffectOp.PayHpThenNullifyOwnActualUseTarget },
+                { Op: SkillProgramEffectOp.SelectAndMoveOwnedCard, Target: SkillProgramEffectTarget.Owner,
+                    ChooserRef.Kind: ProgramParticipantRef.Owner, CardOwnerRef.Kind: ProgramParticipantRef.EventSource,
+                    Destination: SkillProgramCardDestination.DiscardPile, SkipIfNoCards: true, AwaitMovementTriggers: true,
+                    AllowDecline: false, Condition.Kind: SkillProgramConditionKind.Always }] &&
+                effects[1].Zones.SequenceEqual([CardZoneKind.Hand, CardZoneKind.Equipment]) &&
+                effects[1].CardKinds.Count == 0 && effects[1].CardCategories.Count == 0 && effects[1].Suits.Count == 0;
             bool Choice(SkillProgramEffect e, string option) => e.Condition.Kind == SkillProgramConditionKind.ChoiceIs &&
                 e.Condition.SourceBind == "benefit" && e.Condition.OptionId == option;
             if (window != SkillProgramTriggerWindow.OtherActualUseTargeted || subject != SkillProgramTriggerSubject.Owner ||
-                !optional || effects.Count != 4 || effects[0].Op != SkillProgramEffectOp.PayHpThenNullifyOwnActualUseTarget ||
+                !optional || !mobileDiscard && (effects.Count != 4 || effects[0].Op != SkillProgramEffectOp.PayHpThenNullifyOwnActualUseTarget ||
                 effects[1] is not { Op: SkillProgramEffectOp.ChooseOption, Target: SkillProgramEffectTarget.Owner, ResultBind: "benefit" } ||
                 !effects[1].Options.Select(o => o.Id).SequenceEqual(["obtain", "ending", "skip"]) ||
                 effects[2] is not { Op: SkillProgramEffectOp.SelectAndMoveOwnedCard, Target: SkillProgramEffectTarget.Owner,
                     ChooserRef.Kind: ProgramParticipantRef.Owner, CardOwnerRef.Kind: ProgramParticipantRef.EventSource,
                     Destination: SkillProgramCardDestination.OwnerHand, SkipIfNoCards: true, AwaitMovementTriggers: true } ||
                 !effects[2].Zones.SequenceEqual([CardZoneKind.Hand, CardZoneKind.Equipment]) || !Choice(effects[2], "obtain") ||
-                effects[3].Op != SkillProgramEffectOp.ScheduleEarnedActualEndingBenefit || !Choice(effects[3], "ending"))
-                throw new InvalidOperationException($"Invalid skill program at {path}: a paid target requires one exact cost/nullification and mutually exclusive obtain/actual-ending/skip choices.");
+                effects[3].Op != SkillProgramEffectOp.ScheduleEarnedActualEndingBenefit || !Choice(effects[3], "ending")))
+                throw new InvalidOperationException($"Invalid skill program at {path}: a paid target requires the exact cost/nullification followed by either the mobile discard or mutually exclusive obtain/actual-ending/skip choices.");
         }
         if (scope == SkillProgramTurnOwnerScope.EarnedActualEnding || effects.Any(e => e.Op == SkillProgramEffectOp.DrawLostHpThenOfferOwnedCardsUpTo))
             if (window != SkillProgramTriggerWindow.TurnEnding || subject != SkillProgramTriggerSubject.Owner || effects.Count != 1 ||

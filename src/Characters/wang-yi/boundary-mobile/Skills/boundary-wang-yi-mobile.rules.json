@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:zhenlie-mobile", "revision": 1, "triggers": [
+      { "id": "paid-own-target", "window": "otherActualUseTargeted", "subject": "owner", "optional": true, "effects": [
+        { "op": "payHpThenNullifyOwnActualUseTarget", "target": "owner" },
+        { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "eventSource" }, "zones": ["hand", "equipment"], "count": 1,
+          "destination": "discardPile", "skipIfNoCards": true, "awaitMovementTriggers": true }
+      ] }
+    ] },
+    { "id": "boundary:miji-mobile", "revision": 1, "triggers": [
+      { "id": "natural-ending", "window": "turnEnding", "subject": "owner", "optional": true, "priority": 180,
+        "condition": { "kind": "compare", "left": { "kind": "currentHp" }, "operator": "lessThan", "right": { "kind": "currentMaxHp" } },
+        "effects": [
+          { "op": "chooseBoundaryWangYiMijiCount", "target": "owner" },
+          { "op": "draw", "target": "owner", "numberExpression": "boundaryWangYiMijiCount", "resultBind": "drawn" },
+          { "op": "distributeOwnedCards", "target": "owner", "zones": ["hand"], "numberExpression": "boundCardCount", "sourceBind": "drawn", "targetKind": "otherLiving", "allowDeclineBeforeFirst": true }
+        ] }
+    ] }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:xianzhen-mobile", "revision": 1,
+      "activations": [{ "id": "contest", "minCards": 1, "maxCards": 1, "sourceZones": ["hand"], "minTargets": 1, "maxTargets": 1, "targetKind": "otherLivingWithHand", "usesPerTurn": null, "usesPerPhase": 1,
+        "effects": [{ "op": "pindian", "target": "selectedTarget", "amount": 1 }, { "op": "issueBoundaryGaoShunXianzhen", "target": "owner" }] }] },
+    { "id": "boundary:jinjiu-mobile", "revision": 1,
+      "cardIdentities": [{ "id": "alcohol-as-ordinary-slash", "zones": ["hand"], "inputKinds": ["alcohol"], "inputSuits": [], "outputKind": "slash" }],
+      "cardPolicies": [{ "id": "own-turn-foreign-alcohol-ban", "kind": "foreignTurnAlcoholUseProhibition", "cardKinds": ["alcohol"] }],
+      "triggers": [{ "id": "remove-real-alcohol-boost", "window": "beforeDamageApplied", "subject": "damageTarget", "optional": false,
+        "effects": [{ "op": "reduceBoundaryGaoShunAlcoholSlash", "target": "owner" }] }] }
+  ]
+}

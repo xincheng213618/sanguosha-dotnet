@@ -786,7 +786,7 @@ public sealed partial class GameEngine
     {
         var target = _players[targetSeat];
         if ((numberExpression is SkillProgramNumberExpression.OwnerLostHp or SkillProgramNumberExpression.OwnerMaxHp or
-                SkillProgramNumberExpression.CurrentHp or SkillProgramNumberExpression.LiveOwnerLostHp) && !_players[frame.OwnerSeat].HasHpValue ||
+                SkillProgramNumberExpression.CurrentHp or SkillProgramNumberExpression.LiveOwnerLostHp or SkillProgramNumberExpression.BoundaryWangYiMijiCount) && !_players[frame.OwnerSeat].HasHpValue ||
             (numberExpression is SkillProgramNumberExpression.LostHpMinusHandCount or SkillProgramNumberExpression.TargetMaxHpMinusHandCount) && !target.HasHpValue ||
             numberExpression == SkillProgramNumberExpression.LivingPlayersMinHp && _players.Any(p => p.IsAlive && !p.HasHpValue) && !_players.Any(p => p.IsAlive && p.HasHpValue))
         { CancelProgramBindingAndCleanup(frame, "体力值未定义，无法计算此效果。"); return null; }
@@ -804,6 +804,7 @@ public sealed partial class GameEngine
             SkillProgramNumberExpression.CategoryTargetTurnUsage => GetProgramCategoryTargetTurnUsage(frame),
             SkillProgramNumberExpression.SelectedTargetsHandGreaterThanLord => CountSelectedTargetsHandGreaterThanLord(frame),
             SkillProgramNumberExpression.OwnerLostHp => GetProgramOwnerLostHp(frame),
+            SkillProgramNumberExpression.BoundaryWangYiMijiCount => BoundaryWangYiMijiDrawCount(frame),
             SkillProgramNumberExpression.LostHpMinusHandCount => Math.Max(0, target.MaxHp - target.Hp - GetHand(target).Count),
             SkillProgramNumberExpression.LivingFactionCount => GetLivingFactionCount(),
             SkillProgramNumberExpression.LivingPlayersMinHp => GetLivingPlayersMinHp(),

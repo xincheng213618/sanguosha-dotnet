@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:zhenlie-mobile": { "name": "贞烈", "description": "成为其他角色的杀或普通锦囊目标后，可失去1点体力令此牌对你无效，然后弃置使用者一张牌。" },
+    "boundary:miji-mobile": { "name": "秘计", "description": "结束阶段可摸至多已损失体力数的牌，然后可将等量手牌分给其他角色。" }
+  }
+}

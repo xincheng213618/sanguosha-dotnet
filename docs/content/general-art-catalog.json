@@ -2,6 +2,57 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "key": "boundary-gao-shun-mobile",
+      "characterName": "界高顺",
+      "defaultSkinId": "49300",
+      "skins": [
+        {
+          "id": "49300",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-358.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/49300.jpg",
+          "sha256": "138bea2f48922b56082b5522d556fddffcceb7258761aa9eb338ae276d03da0c",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-gao-shun-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-wang-yi-mobile",
+      "characterName": "界王异",
+      "defaultSkinId": "18700",
+      "skins": [
+        {
+          "id": "18700",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-136.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/18700.jpg",
+          "sha256": "005430112d558f81a368128b842742fcde923620472c5742f31a3d73d8a4593d",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-wang-yi-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-fa-zheng-mobile",
+      "characterName": "界法正",
+      "defaultSkinId": "18500",
+      "skins": [
+        {
+          "id": "18500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-134.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/18500.jpg",
+          "sha256": "21dc1ed55438f038b6643cc3b8f1e69d9cd827a6ec99e78cb8bc7c10ab616ee7",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-fa-zheng-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
       "key": "boundary-xu-sheng-mobile",
       "characterName": "界徐盛",
       "defaultSkinId": "49100",

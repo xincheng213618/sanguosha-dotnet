@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:enyuan-mobile": {
+      "name": "恩怨",
+      "description": "当你获得一名其他角色两张或更多的牌后，你可以令其摸一张牌；当你受到1点伤害后，你可以令伤害来源选择一项：1.将一张手牌交给你；2.失去1点体力。",
+      "optionLabels": {
+        "gift": "交给法正一张手牌",
+        "lose-hp": "失去1点体力"
+      }
+    },
+    "boundary:xuanhuo-mobile": {
+      "name": "眩惑",
+      "description": "摸牌阶段，你可以改为令一名其他角色摸两张牌，然后除非该角色对其攻击范围内你选择的另一名角色使用一张杀，否则你获得其两张牌。"
+    }
+  }
+}

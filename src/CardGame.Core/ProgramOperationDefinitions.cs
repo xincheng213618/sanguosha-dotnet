@@ -480,7 +480,7 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
                  SkillProgramNumberExpression.PhaseSkillUsage or SkillProgramNumberExpression.CurrentTurnUsedCardCategoryCount or SkillProgramNumberExpression.ActualTurnDeathBenefits or
                  SkillProgramNumberExpression.TurnOwnerDiscardPhaseHandDiscardCount or SkillProgramNumberExpression.CurrentHandEmptyTwoOtherwiseOne or
                  SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne or SkillProgramNumberExpression.OwnerMaxHp or
-                 SkillProgramNumberExpression.CurrentHp or SkillProgramNumberExpression.LiveOwnerLostHp)))
+                 SkillProgramNumberExpression.CurrentHp or SkillProgramNumberExpression.LiveOwnerLostHp or SkillProgramNumberExpression.BoundaryWangYiMijiCount)))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: draw accepts a constant or a supported public-state expression.");
         var source = r.OptionalIdentifier("sourceBind");
         if ((expression is SkillProgramNumberExpression.BoundCardCount or SkillProgramNumberExpression.PhaseSkillUsage) != (source is not null))
@@ -504,6 +504,9 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
             sourceBind: source, resultBind: bind, targetReference: targetRef,
             replacementSuits: replacementSuits, minimumReplacementRank: minimumReplacementRank,
             maximumReplacementRank: maximumReplacementRank);
+        if (expression == SkillProgramNumberExpression.BoundaryWangYiMijiCount &&
+            (target != SkillProgramEffectTarget.Owner || targetRef is not null || bind != "drawn" || replacementSuits.Count != 0))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: mobile Miji requires the owner's chosen draw count and the drawn binding.");
         if (expression == SkillProgramNumberExpression.CurrentHandEmptyTwoOtherwiseOne &&
             (target != SkillProgramEffectTarget.Owner || bind is not null || targetRef is not null || replacementSuits.Count != 0))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: empty-hand draw requires the owner and no binding or replacement filter.");

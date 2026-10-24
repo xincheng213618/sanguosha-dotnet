@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:wang-yi",
+  "skills": [
+    { "registrationOrder": 57400, "programBundle": "boundary-wang-yi-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:zhenlie-mobile", "name": "贞烈", "description": "当你成为其他角色使用杀或普通锦囊牌的目标后，你可以失去1点体力。若如此做，此牌对你无效，然后你弃置其一张牌。", "executionForms": "Trigger" } },
+    { "registrationOrder": 57401, "programBundle": "boundary-wang-yi-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:miji-mobile", "name": "秘计", "description": "结束阶段，你可以摸至多X张牌（X为你已损失的体力值），然后可以将等量的手牌交给其他角色。", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 57402, "pools": { "current": 57402 }, "definition": {
+    "id": "boundary:wang-yi-mobile", "name": "界王异·移动版", "portraitKey": "boundary-wang-yi-mobile", "skillId": "boundary:zhenlie-mobile", "additionalSkillIds": ["boundary:miji-mobile"],
+    "factionId": "wei", "baseHp": 3, "gender": "Female", "characterId": "character:wang-yi", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

@@ -311,6 +311,9 @@ public enum SkillProgramEffectOp
     SelectBoundaryCaoZhiTrick = 56700,
     UpgradeBoundaryCaoZhiJiushi = 56701,
     SelectBoundaryLingTongEquipmentPair = 56800,
+    IssueBoundaryGaoShunXianzhen = 57300,
+    ReduceBoundaryGaoShunAlcoholSlash = 57301,
+    ChooseBoundaryWangYiMijiCount = 57400,
     ResolveBoundaryCaoXiuQingxi = 51100,
     ResolveBoundaryQuanCongYaoming = 51200,
     SelectMobileShiKaijiTargets = 47400,
@@ -1861,7 +1864,8 @@ public enum SkillProgramNumberExpression
     OwnerMaxHp = 43000,
     FourMinusHandCount = 47000,
     HandCountMinusFour = 47001,
-    AfterDamageAmount = 56100
+    AfterDamageAmount = 56100,
+    BoundaryWangYiMijiCount = 57400
 }
 public enum SkillProgramCardSetVisibility { Private, Public }
 public enum SkillProgramCardDestination

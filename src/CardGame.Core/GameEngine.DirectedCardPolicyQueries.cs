@@ -13,7 +13,8 @@ public sealed partial class GameEngine
         IsSlashCard(kind) && HasCardPolicy(actor, SkillProgramCardPolicyKind.HellSlashIgnoreArmor, kind) ||
         HasArmorBypass(actor) ||
         IsArmorIneffectiveForTurn(target) ||
-        HasDirectedTurnCardPolicy(actor.Seat, target.Seat, kind, DirectedTurnCardPolicyEffect.IgnoreArmor);
+        HasDirectedTurnCardPolicy(actor.Seat, target.Seat, kind, DirectedTurnCardPolicyEffect.IgnoreArmor) ||
+        HasBoundaryGaoShunArmorBypass(actor.Seat, target.Seat, kind);
 
     private bool HasYuanchouCardPolicy => _contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.BlackSlashIgnoresArmorBothDirections);
 
