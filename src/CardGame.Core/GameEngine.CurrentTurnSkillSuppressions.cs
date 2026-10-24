@@ -51,7 +51,7 @@ public sealed partial class GameEngine
         IsDyingWindowGrantQualified(owner, grant) && IsMiuyanGrantQualified(owner, grant) && YunzhengNonLockedGrantQualified(owner, grant) &&
         IsMobileDuoruiGrantQualified(owner, grant) && IsMobileMaChaoTingweiGrantQualified(owner, grant) &&
         IsAnniversaryXiahouJieGrantQualified(owner, grant) && IsAnniversaryCuiLieGrantQualified(owner, grant) &&
-        IsAnqiFeirenGrantQualified(owner, grant);
+        IsAnqiFeirenGrantQualified(owner, grant) && ShiZrFuanGrantQualified(owner, grant);
 
     private long CaptureCurrentTurnQualificationStamp()
     {
