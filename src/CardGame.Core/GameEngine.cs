@@ -323,9 +323,12 @@ public sealed partial class GameEngine
         ArgumentNullException.ThrowIfNull(contentRegistry);
         _options = options;
         _contentRegistry = contentRegistry;
+        _modeDefinition = ResolveModeDefinition(contentRegistry, options);
+        _modeRules = ModeRuleSet.Create(_modeDefinition, options);
+        _modeRuntime = MatchModeRuntime.Empty;
         _programCapabilities = new(this, ProgramCapabilityMetadata.Value);
         _programRuleObservers = new ProgramRuleObservers(ProgramRuleObserverRegistrations.Value,
-            BindRuntimeHandler);
+            BindRuntimeHandler, _modeDefinition.Id);
         _programPipelineHooks = new ProgramPipelineHooks(ProgramPipelineHookRegistrations.Value, this);
         _programLegality = new(ProgramLegalityMetadata.Value, this, ResolveRuntimeHandlerTarget);
         _programSelections = new(ProgramSelectionMetadata.Value, ProgramSelectionQueries);
@@ -333,7 +336,6 @@ public sealed partial class GameEngine
         _programTargetResolvers = new(ProgramTargetResolverMetadata.Value, ProgramSelectionQueries);
         _programActions = new(ProgramActionMetadata.Value, BindRuntimeHandler);
         _nativeReturns = new(NativeReturnMetadata.Value, BindRuntimeHandler);
-        _modeDefinition = ResolveModeDefinition(contentRegistry, options);
         ValidateModeOptions(options, _modeDefinition);
         ValidateShanheBattleOptions(options, contentRegistry, _modeDefinition);
         _generalPool = CreateRuntimeGeneralPool(contentRegistry, _modeDefinition);
@@ -384,17 +386,16 @@ public sealed partial class GameEngine
         new(options ?? new GameOptions(), contentRegistry);
 
     private bool SupportsGodFactionSelection =>
-        _modeDefinition.ModeKind == ContentModeKind.Identity;
+        _modeRules.SupportsGodFactionSelection;
 
     private bool IsClassicIdentityMode =>
         _modeDefinition.Id.StartsWith("identity:classic-", StringComparison.Ordinal);
 
     private bool UsesClassicBattleRules =>
-        IsClassicIdentityMode || IsWushuangMode || _options.ShanheBattle is not null || _modeDefinition.TeamActivity is not null || _modeDefinition.BossActivity is not null ||
-        _modeDefinition.ShenwuActivity is not null || _modeDefinition.WenheActivity is not null || IsDragonBoatActivity || IsGuanduActivity;
+        _modeRules.UsesClassicBattleRules;
 
     private bool UsesGeneralBaseHp =>
-        IsClassicIdentityMode || IsWushuangMode || IsSurvivalMode || IsDragonBoatActivity || IsGuanduActivity;
+        _modeRules.UsesGeneralBaseHp;
 
     private bool UsesFormalKongchengTargeting =>
         UsesClassicBattleRules;
@@ -2827,35 +2828,8 @@ public sealed partial class GameEngine
         };
     }
 
-    private int GetStartingSeat()
-    {
-        if (_options.ShanheBattle is not null) return 0;
-        if (IsWushuangMode) return _random.Next(_playerCount);
-        if (IsGuanduActivity) return GuanduConfiguration!.CaoCommanderSeat;
-        if (IsSurvivalMode || IsDragonBoatActivity) return _random.Next(_playerCount);
-        if (_modeDefinition.BossActivity is not null || _modeDefinition.ShenwuActivity is not null) return Math.Max(0, _options.HumanSeat);
-        if (IsNationalWarMode)
-        {
-            return 0;
-        }
-
-        if (!IsTeamMode)
-        {
-            return _players.Single(player => player.Role == Role.Lord).Seat;
-        }
-
-        var firstTeam = GetModeTeamIds().FirstOrDefault()
-            ?? throw new InvalidOperationException($"Mode '{_modeDefinition.Id}' has no teams.");
-        var seat = _players
-            .Where(player => player.TeamId == firstTeam)
-            .OrderBy(player => player.Seat)
-            .Select(player => player.Seat)
-            .FirstOrDefault(-1);
-        return seat >= 0
-            ? seat
-            : throw new InvalidOperationException(
-                $"Mode '{_modeDefinition.Id}' has no seat assigned to team '{firstTeam}'.");
-    }
+    private int GetStartingSeat() => _modeRules.Opening.GetStartingSeat(
+        CaptureModeLife(), _random.Next, GuanduConfiguration?.CaoCommanderSeat);
 
     private static IReadOnlyList<GeneralDefinition> CreateRuntimeGeneralPool(
         ContentRegistry contentRegistry,
@@ -3274,7 +3248,7 @@ public sealed partial class GameEngine
                 if (cardIndex >= counts[player.Seat]) continue;
                 // The first seat of the first public team starts with one
                 // fewer card in the 2v2 adapter, compensating for initiative.
-                if (IsTeamMode && _options.ShanheBattle is null && !IsDragonBoatActivity && !IsGuanduActivity && _modeDefinition.TeamActivity is null && _modeDefinition.BossActivity is null && _modeDefinition.ShenwuActivity is null && cardIndex == 0 && player.Seat == _currentSeat)
+                if (_modeRules.ReducesFirstActorInitialHand && cardIndex == 0 && player.Seat == _currentSeat)
                 {
                     continue;
                 }

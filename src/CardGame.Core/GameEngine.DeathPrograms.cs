@@ -439,12 +439,12 @@ public sealed partial class GameEngine
         if (killer is { } killerState && killerState.Seat == _currentSeat && _phase == TurnPhase.Play)
             _playPhaseKillCountByCurrentPlayer++;
         ResetHengyeAfterKill(killer);
-        if (!IsNationalWarMode)
+        if (_modeRules.Death.NotifyAiOnDeath)
         {
             NotifyAiOfDeath(killer, victim);
         }
 
-        if (!IsTeamMode && !IsSurvivalMode && killer is { IsAlive: true })
+        if (_modeRules.Death.UsesIdentityRewards && killer is { IsAlive: true })
         {
             if (victim.Role == Role.Rebel)
             {
@@ -464,40 +464,7 @@ public sealed partial class GameEngine
         }
 
         var previousWinner = _winner;
-        if (IsSurvivalMode)
-        {
-            RecordWenheDeathRank(deathFrameId, victim.Seat);
-        }
-        else if (IsDragonBoatActivity || IsGuanduActivity)
-        {
-            // The treasure race ranks four teams at its actual round end.
-        }
-        else if (IsTeamMode)
-        {
-            _winnerTeamId = _modeDefinition.ShenwuActivity is not null ? EvaluateShenwuWinner() :
-                _modeDefinition.BossActivity is not null ? EvaluateBossActivityWinner() :
-                EvaluateActivityWinner() ?? GameRules.EvaluateWinningTeam(_players.Select(player =>
-                    new TeamLifeState(player.TeamId!, player.IsAlive)));
-            _winner = _winnerTeamId is null
-                ? Winner.None
-                : GetWinnerForTeam(_winnerTeamId);
-        }
-        else if (IsNationalWarMode)
-        {
-            _winnerFactionId = GameRules.EvaluateWinningFaction(_players.Select(player =>
-                new FactionLifeState(player.NationalFactionId!, player.IsAlive)));
-            _winner = _winnerFactionId is null
-                ? Winner.None
-                : GetWinnerForFaction(_winnerFactionId);
-        }
-        else
-        {
-            _winnerTeamId = null;
-            _winnerFactionId = null;
-            _winner = GameRules.EvaluateWinner(_players.Select(player =>
-                new PlayerLifeState(player.Role, player.IsAlive)));
-            if (ZaowangRebelDeathWins(victim, killer)) _winner = Winner.LordAndLoyalists;
-        }
+        ApplyModeDeathOutcome(deathFrameId, victim, killer);
 
         if (_winner != previousWinner && _winner != Winner.None)
         {

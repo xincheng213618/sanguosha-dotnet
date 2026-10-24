@@ -2,11 +2,6 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
-    private static readonly IReadOnlySet<CardKind> DragonBoatTraditionalBasicKinds = new HashSet<CardKind>
-        { CardKind.Slash, CardKind.Dodge, CardKind.Peach, CardKind.Alcohol };
-    private static string DragonBoatBasicViewAsFamily(SkillProgramViewAs rule) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DragonBoatBasicConversions.DragonBoatBasicViewAsFamily(rule);
-
     [ProgramCardAction(ProgramCardActionPhase.BeforeProgram, 43000)]
     private void AddDragonBoatBasicConversionActions(List<LegalAction> actions, CharacterState actor,
         IReadOnlyList<Card> playable, int? selectedPhysicalCardId = null)

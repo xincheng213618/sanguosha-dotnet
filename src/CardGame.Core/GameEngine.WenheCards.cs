@@ -41,8 +41,7 @@ public sealed record WenheCardChaosReturnedEvent(long CardUseFrameId, long Actio
 
 public sealed partial class GameEngine
 {
-    private static readonly IReadOnlyList<CardKind> WenheOrdinaryTrickKinds = Array.AsReadOnly(new[]
-        { CardKind.StarShift, CardKind.BeamSwap, CardKind.HandRedistribution, CardKind.WenheChaos });
+    private static IReadOnlyList<CardKind> WenheOrdinaryTrickKinds => ModeCardRules.WenheOrdinaryTrickKinds;
     private static bool IsWenheCard(CardKind kind) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_WenheCards.IsWenheCard(kind);
     private static LegalActionKind WenheCardAction(CardKind kind) =>
