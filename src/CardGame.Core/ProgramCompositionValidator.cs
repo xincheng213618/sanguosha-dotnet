@@ -222,6 +222,8 @@ internal static class ProgramCompositionValidator
                         roots.Add(root);
                         Add(sourceCard.Name, new(root, root.Atoms.Keys.ToHashSet(), sourceCard.MaximumCount,
                             sourceCard.CardOwner));
+                        if (effect.Condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits)
+                            choiceGuardedBindings.Add(sourceCard.Name, effect.Condition);
                         break;
                     }
                     case CaptureActivationCards activationCards:
@@ -724,13 +726,19 @@ internal static class ProgramCompositionValidator
             }
 
             static bool ImpliesChoiceBranch(SkillProgramCondition condition, SkillProgramCondition guard) =>
+                guard.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits &&
+                    condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits &&
+                    condition.SourceBind == guard.SourceBind && condition.Suits.Count > 0 &&
+                    condition.Suits.All(guard.Suits.Contains) ||
                 condition.Kind == SkillProgramConditionKind.ChoiceIs && condition.SourceBind == guard.SourceBind && condition.OptionId == guard.OptionId ||
                 condition.Kind == SkillProgramConditionKind.All && condition.Children.FirstOrDefault() is { } first && ImpliesChoiceBranch(first, guard);
 
             Binding Get(string name)
             {
                 if (choiceGuardedBindings.TryGetValue(name, out var guard) && !ImpliesChoiceBranch(effect.Condition, guard))
-                    throw Error(nodePath, $"conditional card binding '{name}' requires its matching choice branch");
+                    throw Error(nodePath, guard.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits
+                        ? $"conditional card binding '{name}' requires its matching judgment outcome branch"
+                        : $"conditional card binding '{name}' requires its matching choice branch");
                 return bindings.TryGetValue(name, out var value) ? value : throw Error(nodePath, $"unknown card binding '{name}'");
             }
             void Add(string name, Binding value)

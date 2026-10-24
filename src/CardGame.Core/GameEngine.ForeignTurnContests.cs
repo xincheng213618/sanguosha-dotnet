@@ -91,7 +91,10 @@ public sealed partial class GameEngine
     {
         var owner = _players[candidate.OwnerSeat];
         return context.Window == SkillProgramTriggerWindow.OtherActualTurnStarted &&
-            owner.IsAlive && (candidate.SkillId is "mobile-god:powei" or "happy:chongwei" or "anniversary:cuixi" or "anniversary:shiwu" || owner.Hp > 0 && IsRuleWounded(owner)) &&
+            owner.IsAlive && (candidate.SkillId is "mobile-god:powei" or "happy:chongwei" or "anniversary:cuixi" or "anniversary:shiwu" ||
+                (candidate.SkillId == "boundary:zhuikong-mobile"
+                    ? owner.HasHpValue && _players[_currentSeat].HasHpValue && _players[_currentSeat].Hp >= owner.Hp
+                    : owner.Hp > 0 && IsRuleWounded(owner))) &&
             context.SourceSeat == _currentSeat && context.TargetSeat == _currentSeat && owner.Seat != _currentSeat &&
             _players[_currentSeat].IsAlive && (candidate.SkillId is "mobile-god:powei" or "happy:chongwei" or "anniversary:cuixi" or "anniversary:shiwu" ||
                 HasWuLuKangPindianInput(owner) && HasWuLuKangPindianInput(_players[_currentSeat]) && CanBePindianTarget(owner.Seat, _currentSeat)) &&

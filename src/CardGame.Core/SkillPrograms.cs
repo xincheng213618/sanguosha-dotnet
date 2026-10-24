@@ -302,6 +302,7 @@ public enum SkillProgramEffectOp
     ResolveBoundaryLiRuMieji = 55700,
     PrepareBoundaryBuLianShiAnxu = 55900,
     SelectBoundaryBuLianShiAnxuLeast = 55901,
+    ResolveBoundaryChengPuLihuo = 56200,
     ResolveBoundaryCaoXiuQingxi = 51100,
     ResolveBoundaryQuanCongYaoming = 51200,
     SelectMobileShiKaijiTargets = 47400,
@@ -1847,7 +1848,8 @@ public enum SkillProgramNumberExpression
     LiveOwnerLostHp = 40800,
     OwnerMaxHp = 43000,
     FourMinusHandCount = 47000,
-    HandCountMinusFour = 47001
+    HandCountMinusFour = 47001,
+    AfterDamageAmount = 56100
 }
 public enum SkillProgramCardSetVisibility { Private, Public }
 public enum SkillProgramCardDestination
@@ -5374,7 +5376,7 @@ public sealed class SkillProgramCatalog
                     : window is SkillProgramTriggerWindow.CardUseCompleted or SkillProgramTriggerWindow.CardUseCommitted
                     ? cardKinds.All(kind => kind is not (CardKind.Dodge or CardKind.Nullification))
                     : window is SkillProgramTriggerWindow.CardEffectBeforeApply or SkillProgramTriggerWindow.CardUseBeforeTargetEffects or SkillProgramTriggerWindow.CardUseTargetsFinalized
-                    ? cardKinds.All(kind => kind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash ||
+                    ? cardKinds.All(kind => kind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash ||
                         CardCatalog.Get(kind).CategoryName == "锦囊牌")
                     : window is SkillProgramTriggerWindow.CardUseCommitted or SkillProgramTriggerWindow.CardEffectBeforeApply or SkillProgramTriggerWindow.CardUseBeforeTargetEffects or SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.SlashTargetRedirecting or SkillProgramTriggerWindow.SlashBeforeResponse or SkillProgramTriggerWindow.SlashFullyDodged
                     ? cardKinds.All(kind => kind is CardKind.Slash or CardKind.FireSlash or

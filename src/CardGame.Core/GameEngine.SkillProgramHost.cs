@@ -138,6 +138,10 @@ public sealed partial class GameEngine
                 null => amount,
                 SkillProgramNumberExpression.BoundCardCount when sourceBind is not null =>
                     engine.GetProgramCardSet(engine.GetActiveProgramFrame(frameId), sourceBind).CardIds.Count,
+                SkillProgramNumberExpression.AfterDamageAmount when sourceBind is null &&
+                    engine.GetActiveProgramFrame(frameId).WindowContext is
+                        { Window: SkillProgramTriggerWindow.AfterDamageApplied, DamageFrameId: not null, Amount: > 0 } damage &&
+                    damage.TargetSeat == targetSeat => damage.Amount,
                 _ => throw new InvalidOperationException(
                     $"Unsupported recovery number expression '{numberExpression}'.")
             };

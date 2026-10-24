@@ -319,8 +319,8 @@ public sealed partial class GameEngine
         options = FreezeShanheBattleOptions(options);
         if (options.HumanSeats is { } humans)
             options = options with { HumanSeats = Array.AsReadOnly(humans.ToArray()) };
-        ValidateOptions(options, contentRegistry);
         ArgumentNullException.ThrowIfNull(contentRegistry);
+        ValidateOptions(options, contentRegistry);
         _options = options;
         _contentRegistry = contentRegistry;
         _modeDefinition = ResolveModeDefinition(contentRegistry, options);
@@ -2667,8 +2667,8 @@ public sealed partial class GameEngine
     public string SerializeState(bool revealAll = false) =>
         SnapshotJson.Serialize(CreateSnapshot(_options.HumanSeat, revealAll));
 
-    private static void ValidateOptions(GameOptions options, ContentRegistry? registry = null) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.ValidateOptions(options, registry is null ? null :
+    private static void ValidateOptions(GameOptions options, ContentRegistry registry) =>
+        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.ValidateOptions(options,
             () => ModeFeatureComposition.ValidateInitialOptions(options, registry, ModeConfigurationValidationPhase.Adapter));
 
     private static ContentModeDefinition ResolveModeDefinition(

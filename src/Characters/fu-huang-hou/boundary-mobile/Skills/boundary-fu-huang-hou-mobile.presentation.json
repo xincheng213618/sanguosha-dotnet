@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3, "skills": {
+    "boundary:zhuikong-mobile": { "name": "惴恐", "description": "每轮一次，其他实际回合开始、其体力不小于你时可拼点。赢则其本回合用牌仅可选择自己；没赢（含平局）先获得其原拼点牌，再由其原生视为对你使用一张普通杀。", "triggerChoices": { "foreign-actual-turn-contest": "惴恐：与本回合角色拼点（每轮一次）" } },
+    "boundary:qiuyuan-mobile": { "name": "求援", "description": "成为杀的目标时，可选除你与使用者外的其他角色，其交给你非杀基本牌，否则加入原杀目标；不对伤害锦囊发动。", "triggerChoices": { "finalized-slash-aid": "求援：请另一角色交非杀基本牌或加入原杀目标", "legacy-virtual-slash-aid": "求援：为原生虚拟杀选择援助角色" } }
+  }
+}

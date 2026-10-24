@@ -1,0 +1,15 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cai-wen-ji",
+  "skills": [
+    { "registrationOrder": 56100, "programBundle": "boundary-cai-wen-ji-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:beige-mobile", "name": "悲歌", "description": "当一名角色受到【杀】造成的伤害后，你可以弃置一张牌，然后令其进行判定，若结果为：红桃，其回复X点体力（X为其本次受到的伤害值）；方块，其摸三张牌；梅花，伤害来源弃置两张牌；黑桃，伤害来源翻面。", "executionForms": "Trigger" } },
+    { "registrationOrder": 56101, "programBundle": "boundary-cai-wen-ji-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:duanchang-mobile", "name": "断肠", "description": "锁定技，当你死亡时，杀死你的角色失去所有武将技能。", "tags": "Locked", "executionForms": "Trigger" } }
+  ],
+  "generals": [
+    { "registrationOrder": 56102, "pools": { "current": 56102 },
+      "definition": { "id": "boundary:cai-wen-ji-mobile", "name": "界蔡文姬·移动版", "portraitKey": "boundary-cai-wen-ji-mobile", "skillId": "boundary:beige-mobile", "additionalSkillIds": ["boundary:duanchang-mobile"], "factionId": "qun", "baseHp": 3, "gender": "Female", "characterId": "character:cai-wen-ji", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile" } }
+  ]
+}

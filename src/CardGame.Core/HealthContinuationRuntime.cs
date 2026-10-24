@@ -261,6 +261,9 @@ internal sealed partial class HealthContinuationRuntime
         {
             FixedProgramAmount fixedAmount => fixedAmount.Value,
             BoundCardCountProgramAmount bound => producer.CardSetBindings.SingleOrDefault(b => b.Name == bound.SourceBind)?.CardIds.Count ?? -1,
+            ExpressionProgramAmount { Expression: SkillProgramNumberExpression.AfterDamageAmount } when
+                producer.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied, DamageFrameId: not null, Amount: > 0 } damage &&
+                damage.TargetSeat == change.TargetSeat => damage.Amount,
             _ => -1
         };
         if (change.Amount > requested) return false;
@@ -439,6 +442,9 @@ internal sealed partial class HealthContinuationRuntime
         {
             FixedProgramAmount fixedAmount => fixedAmount.Value,
             BoundCardCountProgramAmount bound => producer.CardSetBindings.SingleOrDefault(b => b.Name == bound.SourceBind)?.CardIds.Count ?? -1,
+            ExpressionProgramAmount { Expression: SkillProgramNumberExpression.AfterDamageAmount } when
+                producer.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied, DamageFrameId: not null, Amount: > 0 } damage &&
+                damage.TargetSeat == attempt.TargetSeat => damage.Amount,
             _ => -1
         };
         if (attempt.Amount > requested) return false;

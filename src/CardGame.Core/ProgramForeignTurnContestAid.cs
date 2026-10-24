@@ -122,8 +122,9 @@ internal static class ForeignTurnContestAidComposition
              window is not (SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.OtherActualUseTargeted) ||
              window == SkillProgramTriggerWindow.OtherActualUseTargeted && subject != SkillProgramTriggerSubject.Owner ||
              window == SkillProgramTriggerWindow.CardUseTargetsFinalized && (relation != SkillProgramCardActionOwnerRelation.Target ||
-                 kinds.Count != 7 || !kinds.ToHashSet().SetEquals(new[] { CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash,
-                     CardKind.Duel, CardKind.FireAttack, CardKind.BarbarianAssault, CardKind.ArrowBarrage }))))
+                 !(kinds.Count == 7 && kinds.ToHashSet().SetEquals(new[] { CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash,
+                     CardKind.Duel, CardKind.FireAttack, CardKind.BarbarianAssault, CardKind.ArrowBarrage }) ||
+                   kinds.Count == 4 && kinds.ToHashSet().SetEquals(new[] { CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.ColdSlash })))))
             throw new InvalidOperationException($"Invalid skill program at {path}: actual-use aid requires one optional target instruction.");
     }
 }

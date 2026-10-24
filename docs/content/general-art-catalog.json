@@ -2,6 +2,57 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "key": "boundary-cai-wen-ji-mobile",
+      "characterName": "界蔡文姬",
+      "defaultSkinId": "47400",
+      "skins": [
+        {
+          "id": "47400",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-292.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/47400.jpg",
+          "sha256": "7b1914ec658046e247accb13f7833e48a82b2a9618737fc8ce1441dfceed3557",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-cai-wen-ji-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-cheng-pu-mobile",
+      "characterName": "界程普",
+      "defaultSkinId": "51100",
+      "skins": [
+        {
+          "id": "51100",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-367.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/51100.jpg",
+          "sha256": "e503d9199164e0700340fba4604bb0d4b788238864fa47d1876e9d5a6b99a1af",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-cheng-pu-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-fu-huang-hou-mobile",
+      "characterName": "界伏皇后",
+      "defaultSkinId": "54300",
+      "skins": [
+        {
+          "id": "54300",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-394.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/54300.jpg",
+          "sha256": "8befa67e117488d8456e46c025ddaa3e949ee4df284f2adf0e13ee7475c4bf29",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-fu-huang-hou-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
       "key": "boundary-guan-xing-zhang-bao-mobile",
       "characterName": "界关兴张苞",
       "defaultSkinId": "18800",

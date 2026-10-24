@@ -4597,6 +4597,18 @@ public sealed partial class GameEngine
             return CreateAttributedPaymentAiContext(owner, trigger) with { HpDamageShieldTargetValue = GetHpDamageShieldAiTargetValue(owner) };
         if (trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.PeekTurnQuotaTop))
             return CreateAttributedPaymentAiContext(owner,trigger) with { TurnCriterionQuota = ComputeTurnCriterionQuota(owner.Seat) };
+        if (trigger.Window == SkillProgramTriggerWindow.AfterDamageApplied &&
+            trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.Recover &&
+                effect.NumberExpression == SkillProgramNumberExpression.AfterDamageAmount) &&
+            ActiveDamageTrigger is { } afterDamage)
+        {
+            var attack = GetDamageTriggerAttack(afterDamage);
+            return CreateAttributedPaymentAiContext(owner, trigger) with
+            {
+                AfterDamageAmount = attack.DamageAmount,
+                SelectedTarget = CreateAiSkillContext(_players[attack.TargetSeat], ownerSeat)
+            };
+        }
         if (trigger.Window is SkillProgramTriggerWindow.CardUseCommitted or
             SkillProgramTriggerWindow.CardUseBeforeTargetEffects or
             SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.CardResponseAccepted or SkillProgramTriggerWindow.CardResponseCompleted or SkillProgramTriggerWindow.CardSupplyCompleted or

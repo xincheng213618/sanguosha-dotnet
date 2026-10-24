@@ -1,0 +1,4 @@
+{"schemaVersion":3,"skills":{
+ "boundary:lihuo-mobile":{"name":"疠火","description":"普通杀可改为火杀，若该转换杀的目标处于连环状态则伤害+1。你使用的任意火杀结算结束后，每实际造成2点伤害失去1点体力。"},
+ "boundary:chunlao-mobile":{"name":"醇醪","description":"结束阶段没有醇时，可将任意张手牌杀存为醇；一名角色濒死时可移去一醇，视为其对自己使用酒。","triggerChoices":{"store-chun-at-turn-end":"将任意张手牌杀存为醇。","spend-chun-for-dying-alcohol":"移去一张醇，令濒死角色视为使用酒。"}}
+}}

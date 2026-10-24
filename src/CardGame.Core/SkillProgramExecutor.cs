@@ -605,6 +605,10 @@ public sealed class RecoverSkillProgramEffectHandler : ISkillProgramEffectHandle
                     host.Recover(frame.Id, frame.OwnerSeat, targetSeat, 0,
                         SkillProgramNumberExpression.BoundCardCount, bound.SourceBind);
                     break;
+                case ExpressionProgramAmount { Expression: SkillProgramNumberExpression.AfterDamageAmount }:
+                    host.Recover(frame.Id, frame.OwnerSeat, targetSeat, 0,
+                        SkillProgramNumberExpression.AfterDamageAmount, null);
+                    break;
                 default:
                     throw new InvalidOperationException("Recover has an unsupported amount instruction.");
             }

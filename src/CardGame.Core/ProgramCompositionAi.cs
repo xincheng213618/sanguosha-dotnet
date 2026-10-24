@@ -43,7 +43,8 @@ internal sealed record ProgramAiPublicContext(
     int LivingPlayerCount = 0,
     double? WholeCardUseNullificationScore = null,
     Func<int, int, int>? SourceOccurrenceDamageBonus = null,
-    Func<int, PublicDamagePrediction>? VirtualSlashDamagePrediction = null);
+    Func<int, PublicDamagePrediction>? VirtualSlashDamagePrediction = null,
+    int? AfterDamageAmount = null);
 
 /// <summary>
 /// Pure, public-state estimate for schema-23 program compositions. Unknown cards use a
@@ -391,9 +392,12 @@ internal sealed partial class ProgramAiEstimateContext
         if (effect.Target is SkillProgramEffectTarget.HpPairHigher or SkillProgramEffectTarget.HpPairLower &&
             (_publicContext.SelectedTarget is null || _publicContext.SelectedTarget.Hp == _player.Hp ||
              _publicContext.SelectedTarget.Seat == _player.Seat)) return;
-        var amount = effect.NumberExpression == SkillProgramNumberExpression.BoundCardCount
-            ? Binding(effect.SourceBind).Count
-            : effect.Amount;
+        var amount = effect.NumberExpression switch
+        {
+            SkillProgramNumberExpression.BoundCardCount => Binding(effect.SourceBind).Count,
+            SkillProgramNumberExpression.AfterDamageAmount => Math.Max(0, _publicContext.AfterDamageAmount ?? 1),
+            _ => effect.Amount
+        };
         if (TargetsOwner(effect))
         {
             var actual = Math.Min(amount, Math.Max(0, _estimatedMaxHp - _estimatedHp));

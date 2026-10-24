@@ -565,6 +565,8 @@ internal sealed class RecoverProgramOperationDescriptor : ProgramOperationDescri
         {
             SkillProgramNumberExpression.BoundCardCount =>
                 new BoundCardCountProgramAmount(effect.SourceBind!),
+            SkillProgramNumberExpression.AfterDamageAmount =>
+                new ExpressionProgramAmount(SkillProgramNumberExpression.AfterDamageAmount),
             null => new FixedProgramAmount(effect.Amount),
             { } expression => throw new InvalidOperationException(
                 $"Recovery cannot execute unsupported amount expression '{expression}'.")
@@ -598,8 +600,15 @@ internal sealed class RecoverProgramOperationDescriptor : ProgramOperationDescri
         }
         if (r.Has("amount")) throw new InvalidOperationException($"Invalid skill program at {r.Path}: recover accepts amount or numberExpression.");
         var expression = r.RequiredEnum<SkillProgramNumberExpression>("numberExpression");
+        if (expression == SkillProgramNumberExpression.AfterDamageAmount)
+        {
+            if (r.Has("sourceBind") || replacementSuits.Count != 0 ||
+                target != SkillProgramEffectTarget.Owner || targetRef?.Kind != ProgramParticipantRef.EventTarget)
+                throw new InvalidOperationException($"Invalid skill program at {r.Path}: after-damage recovery requires its event target and no card binding or replacement filter.");
+            return new(Op, target, 0, r.Condition(), numberExpression: expression, targetReference: targetRef);
+        }
         if (expression != SkillProgramNumberExpression.BoundCardCount)
-            throw new InvalidOperationException($"Invalid skill program at {r.Path}.numberExpression: only boundCardCount is supported.");
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}.numberExpression: only boundCardCount or afterDamageAmount is supported.");
         var effect = new SkillProgramEffect(Op, target, 0, r.Condition(), numberExpression: expression,
             sourceBind: r.RequiredIdentifier("sourceBind"), replacementSuits: replacementSuits,
             minimumReplacementRank: minimumReplacementRank, maximumReplacementRank: maximumReplacementRank);
@@ -613,7 +622,10 @@ internal sealed class RecoverProgramOperationDescriptor : ProgramOperationDescri
             : WithSelectedTarget(effect, effect.NumberExpression == SkillProgramNumberExpression.BoundCardCount
             ? new ProgramResourceOperation[] { new ReadCardSet(effect.SourceBind!) }
             : Array.Empty<ProgramResourceOperation>()))
-            .Concat(ParticipantResources(effect.TargetReference)).ToArray();
+            .Concat(ParticipantResources(effect.TargetReference))
+            .Concat(effect.NumberExpression == SkillProgramNumberExpression.AfterDamageAmount
+                ? [new RequireTriggerWindow(SkillProgramTriggerWindow.AfterDamageApplied)]
+                : Array.Empty<ProgramResourceOperation>()).ToArray();
 }
 
 internal sealed class LoseHpProgramOperationDescriptor : ProgramOperationDescriptorBase
@@ -778,6 +790,7 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
         // cards), or a placement onto the draw pile top (Gongxin).
         if (effect.Condition.Kind != SkillProgramConditionKind.Always &&
             !(effect.Condition.Kind == SkillProgramConditionKind.BoundCardsMatchSuits && destination == SkillProgramCardDestination.OwnerHand) &&
+            !(effect.Condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits && destination == SkillProgramCardDestination.DiscardPile) &&
             !(effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs &&
               destination is SkillProgramCardDestination.DiscardPile or SkillProgramCardDestination.OwnerHand or
                 SkillProgramCardDestination.DrawPileTop) &&

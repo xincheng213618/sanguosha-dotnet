@@ -71,6 +71,7 @@ public sealed partial class GameEngine
         amount = checked(amount + ShanheLeizhenPublicActionBonus(viewerSeat, kind));
         if (damageKind == CardKind.Duel && TryGetShanheS5ShuangxiongPublicDuelBaseDamage(viewerSeat, action, out var scaled))
             amount = scaled;
+        amount = checked(amount + BoundaryChengPuPublicActionBonus(viewerSeat, action, targetSeat));
         return PredictVisibleDamage(view, viewerSeat, targetSeat, kind is null ? 0 : amount,
             kind, kind is not null, false, false, false, paidHand, HasArmorBypass(_players[viewerSeat]));
     }
@@ -143,7 +144,7 @@ public sealed partial class GameEngine
             }
         }
         if (!finalized && issuedAttack is { } originalAttack)
-            cardLayer = checked(cardLayer + BoundaryAnjianDamage(originalAttack));
+            cardLayer = checked(cardLayer + BoundaryAnjianDamage(originalAttack) + BoundaryChengPuLihuoDamage(originalAttack));
         if (!finalized)
             additional = checked(additional + ShanheS5JiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards) +
                 ClassicJiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards));

@@ -60,7 +60,10 @@ public sealed partial class GameEngine
         return instructions.Any(e => e.Op == SkillProgramEffectOp.DiscardEquipmentAndResolveJiqiao && e.SourceBind == bind) || instructions.Any(e => e.Op == SkillProgramEffectOp.MoveBoundCards && e.SourceBind == bind &&
             e.Destination == SkillProgramCardDestination.DiscardPile && (e.Condition.Kind == SkillProgramConditionKind.Always ||
             e.Condition.Kind == SkillProgramConditionKind.ChoiceIs && f.ChoiceBindings.Any(c =>
-                c.Name == e.Condition.SourceBind && c.OptionId == e.Condition.OptionId)));
+                c.Name == e.Condition.SourceBind && c.OptionId == e.Condition.OptionId) ||
+            e.Condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits &&
+                f.JudgmentOutcomeBindings?.Any(outcome => outcome.Name == e.Condition.SourceBind &&
+                    outcome.Suit is { } suit && e.Condition.Suits.Contains(suit)) == true));
     }
     private bool CanSelectSelfDiscardBinding(ProgramSkillFrame f, string bind, int selectionActorSeat, Card card, CardLocation location) =>
         !ProgramSelectionWillSelfDiscard(f, bind) || !IsSelfHandCategoryDiscardForbidden(selectionActorSeat,
