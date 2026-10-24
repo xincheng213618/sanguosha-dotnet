@@ -9,7 +9,4 @@ public sealed partial class GameEngine
         WushuangFeature?.WushuangNumericRuleContributions(owner.Seat, query) ?? [];
     private RuleQueryEvaluation ApplyWushuangEnemyQuota(CharacterState player, RuleQueryEvaluation ordinary, SkillRuleQuery query) =>
         WushuangFeature?.ApplyWushuangEnemyQuota(player.Seat, ordinary, query) ?? ordinary;
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 61001)]
-    private int WushuangSourceDamageBonus(IDamageAttempt attack) => WushuangFeature?.WushuangSourceDamageBonus(
-        new(attack.SourceSeat, attack.CardUserSeat, attack.IsSourceLess, attack.IsChainPropagation, attack.EffectiveCardKind)) ?? 0;
 }

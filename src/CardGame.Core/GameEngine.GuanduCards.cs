@@ -11,9 +11,7 @@ public sealed partial class GameEngine
     private bool GuanduIntoxicationTargetSpent(int target) => ProgramEventHistory<GuanduIntoxicationCommittedEvent>()
         .Any(e => e.ActualTurnNumber == _turnNumber && e.TargetSeat == target);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 220)]
-    private int GuanduIntoxicationDamageBonus(IDamageAttempt attack) => !IsGuanduActivity ||
-        _phase is TurnPhase.NotStarted or TurnPhase.Finished ? 0 : ProgramEventHistory<GuanduIntoxicationAppliedEvent>()
-            .Count(e => e.ActualTurnNumber == _turnNumber && e.TargetSeat == attack.TargetSeat);
+    private int GuanduIntoxicationDamageBonus(IDamageAttempt attack) => GuanduRules?.IntoxicationDamageBonus(attack.TargetSeat) ?? 0;
     private bool CanBeGuanduAdditionalTarget(CardUseFrame use, CharacterState target) => target.IsAlive && (use.CardKind switch
     {
         CardKind.StoreGrain => true,

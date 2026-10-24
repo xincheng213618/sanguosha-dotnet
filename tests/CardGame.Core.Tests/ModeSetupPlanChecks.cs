@@ -12,7 +12,7 @@ internal static class ModeSetupPlanChecks
         var random = new TrackedRandom(19);
         var feature = Feature(registry, mode, random);
         var plan = feature.BuildPlayers();
-        Require(plan.Seats.Count == 4 && plan.Seats.Single(p => p.Seat == 0) is
+        Require(plan.InitialActorSeat is null && plan.Seats.Count == 4 && plan.Seats.Single(p => p.Seat == 0) is
             { IsHuman: true, Role: Role.Lord, GeneralSelected: false } && random.Shuffles == 2,
             "Identity setup uses the shared host for role and available-roster shuffles, retaining a private human Lord.");
         Require(plan.Seats is IList<ModeSeatSetup> { IsReadOnly: true } &&

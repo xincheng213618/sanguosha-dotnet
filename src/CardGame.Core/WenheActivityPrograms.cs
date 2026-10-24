@@ -55,120 +55,38 @@ public sealed partial class GameEngine
 {
     [ProgramCapability]
     private sealed class WenheActivityProgramHost(GameEngine engine) : IWenheActivityProgramHost
-    { public SkillProgramStepOutcome ExecuteWenheActivity(ProgramSkillFrame f, SkillProgramEffectOp op) => engine.ExecuteWenheActivity(f, op); }
+    { public SkillProgramStepOutcome ExecuteWenheActivity(ProgramSkillFrame frame, SkillProgramEffectOp op) => engine.ExecuteWenheActivity(frame, op); }
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 41000)]
-    private bool AllowsWenheActivation(ProgramActivationLegalityContext gate) => gate.SkillId switch
-    {
-        "wenhe:chaos-resolution" => false,
-        "wenhe:champion-mark" => _modeDefinition.WenheActivity is { EnableAspirations: true } &&
-            WenheGoalRank(gate.OwnerSeat) == 1 && !WenheChampionMarkUsed(gate.OwnerSeat),
-        _ => true
-    };
+    private bool AllowsWenheActivation(ProgramActivationLegalityContext gate) =>
+        WenheRules?.AllowsActivation(gate.SkillId, gate.OwnerSeat) ??
+            gate.SkillId is not ("wenhe:chaos-resolution" or "wenhe:champion-mark");
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 41000)]
-    private bool AllowsWenheRuleTrigger(ProgramTriggerLegalityContext gate)
-    {
-        if (gate.SkillId != "wenhe:rules") return true;
-        if (_modeDefinition.WenheActivity is null) return false;
-        if (gate.WindowContext is not { } c) return true;
-        return c.Window switch
-        {
-            SkillProgramTriggerWindow.RoundStarting => gate.OwnerSeat == _currentSeat && CurrentWenheRule == WenheRuleKind.Chaos &&
-                !ProgramEventHistory<WenheRuleFlowIssuedEvent>().Any(e => e.RoundNumber == _roundNumber && e.Operation == SkillProgramEffectOp.ResolveWenheRoundStart),
-            SkillProgramTriggerWindow.TurnStartBeforeNormalFlow => gate.OwnerSeat == _currentSeat && CurrentWenheRule == WenheRuleKind.LastStand,
-            SkillProgramTriggerWindow.TurnEnding => (gate.OwnerSeat == _currentSeat || IsWenheDeadOwnerEndingCandidate(gate.Candidate, _currentSeat)) && CurrentWenheRule == WenheRuleKind.Equipment &&
-                !ProgramEventHistory<WenheRuleFlowIssuedEvent>().Any(e => e.TurnNumber == _turnNumber && e.Operation == SkillProgramEffectOp.ResolveWenheTurnEnd),
-            SkillProgramTriggerWindow.RoundEnding => gate.OwnerSeat == _players.Where(p => p.IsAlive).Select(p => p.Seat).DefaultIfEmpty(-1).Min() && CurrentWenheRule == WenheRuleKind.Famine &&
-                !ProgramEventHistory<WenheRuleFlowIssuedEvent>().Any(e => e.RoundNumber == _roundNumber && e.Operation == SkillProgramEffectOp.ResolveWenheRoundEnd),
-            SkillProgramTriggerWindow.CharacterDied => c.SourceSeat == gate.OwnerSeat && c.TargetSeat != gate.OwnerSeat,
-            _ => false
-        };
-    }
-    private bool HasWenheDeadOwnerEnding(int actualOwner) => _modeDefinition.WenheActivity is not null &&
-        CurrentWenheRule == WenheRuleKind.Equipment && !_players[actualOwner].IsAlive && _players.Any(p => p.IsAlive);
-    private bool IsWenheDeadOwnerEndingCandidate(ProgramTriggerCandidate c, int actualOwner) =>
-        HasWenheDeadOwnerEnding(actualOwner) && c.SkillId == "wenhe:rules" && c.BindingId == "turn-end-rule" &&
-        c.OwnerSeat == _players.Where(p => p.IsAlive).Min(p => p.Seat);
+    private bool AllowsWenheRuleTrigger(ProgramTriggerLegalityContext gate) =>
+        WenheRules?.AllowsTrigger(new(gate.SkillId, gate.Candidate.BindingId, gate.OwnerSeat,
+            gate.WindowContext?.Window, gate.WindowContext?.SourceSeat, gate.WindowContext?.TargetSeat)) ?? gate.SkillId != "wenhe:rules";
+    private bool HasWenheDeadOwnerEnding(int actualOwner) => WenheRules?.HasDeadOwnerEnding(actualOwner) ?? false;
+    private bool IsWenheDeadOwnerEndingCandidate(ProgramTriggerCandidate candidate, int actualOwner) =>
+        WenheRules?.IsDeadOwnerEndingCandidate(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, actualOwner) ?? false;
     private SkillProgramStepOutcome ExecuteWenheActivity(ProgramSkillFrame frame, SkillProgramEffectOp op)
     {
-        if (_modeDefinition.WenheActivity is null || frame.WenheRuleFlow is not null ||
-            ProgramEventHistory<WenheRuleFlowIssuedEvent>().Any(e => e.ProgramFrameId == frame.Id))
+        if (frame.WenheRuleFlow is not null || ProgramEventHistory<WenheRuleFlowIssuedEvent>().Any(fact => fact.ProgramFrameId == frame.Id))
             throw new InvalidOperationException("Wenhe requires its exact once-issued activity operation.");
-        var living = _players.Where(p => p.IsAlive).ToArray();
-        var amount = op == SkillProgramEffectOp.ResolveWenheRoundEnd ? _roundNumber :
-            op == SkillProgramEffectOp.RewardWenheKiller ? CurrentWenheRule == WenheRuleKind.Bounty ? 2 : 1 : 1;
-        var seats = op switch
-        {
-            SkillProgramEffectOp.ResolveWenheTurnEnd => living.Where(p => GetEquipment(p).Count == living.Min(q => GetEquipment(q).Count)).Select(p => p.Seat).ToArray(),
-            SkillProgramEffectOp.ResolveWenheRoundEnd => living.Where(p => GetHand(p).Count == living.Min(q => GetHand(q).Count)).Select(p => p.Seat).ToArray(),
-            _ => new[] { frame.OwnerSeat }
-        };
-        if (op == SkillProgramEffectOp.UseWenheChampionMark)
-        {
-            if (WenheGoalRank(frame.OwnerSeat) != 1 || WenheChampionMarkUsed(frame.OwnerSeat))
-                throw new InvalidOperationException("The private champion mark is unavailable.");
-            AdvanceEventRulesAndQueueFact(new WenheChampionMarkUsedEvent(frame.Id, frame.OwnerSeat));
-        }
-        ReplaceRuntimeTop(frame = frame with { WenheRuleFlow = new(op, _roundNumber, _turnNumber, amount, 0, 0) { Seats = seats } });
-        AdvanceEventRulesAndQueueFact(new WenheRuleFlowIssuedEvent(frame.Id, op, _roundNumber, _turnNumber, frame.OwnerSeat, seats.Length, amount));
-        for (var index = 0; index < seats.Length; index++) AdvanceEventRulesAndQueueFact(new WenheRuleParticipantEvent(frame.Id, index, seats[index]));
-        if (op == SkillProgramEffectOp.ResolveWenheRoundStart)
+        var plan = (WenheRules ?? throw new InvalidOperationException("The activity rule feature is not installed."))
+            .IssueFlow(frame.Id, op, frame.OwnerSeat);
+        ReplaceRuntimeTop(frame = frame with { WenheRuleFlow = new(op, _roundNumber, _turnNumber, plan.Amount, 0, 0) { Seats = plan.Seats } });
+        AdvanceEventRulesAndQueueFact(new WenheRuleFlowIssuedEvent(frame.Id, op, _roundNumber, _turnNumber, frame.OwnerSeat, plan.Seats.Count, plan.Amount));
+        for (var index = 0; index < plan.Seats.Count; index++) AdvanceEventRulesAndQueueFact(new WenheRuleParticipantEvent(frame.Id, index, plan.Seats[index]));
+        if (plan.BeginsChaos)
         {
             ReplaceRuntimeTop(frame = frame with { WenheRuleFlow = frame.WenheRuleFlow! with { Stage = 3 } });
-            BeginWenheChaos(frame, null); return SkillProgramStepOutcome.AwaitChild;
+            BeginWenheChaos(frame, null);
+            return SkillProgramStepOutcome.AwaitChild;
         }
         return ResumeWenheRuleFlow(frame.Id) ? SkillProgramStepOutcome.AwaitChild : SkillProgramStepOutcome.Continue;
     }
     [ProgramContinuation(ProgramContinuationKind.Resume, 41000)]
-    private bool ResumeWenheRuleFlow(long id)
-    {
-        if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { WenheRuleFlow: { } r } frame || frame.Id != id) return false;
-        AssertWenheRuleFlow(frame);
-        if (r.Stage == 3) throw new InvalidOperationException("Round chaos cannot resume before its issued child returns.");
-        if (TryBeginWenheRuleChildren(id)) return true;
-        frame = GetActiveProgramFrame(id); r = frame.WenheRuleFlow!;
-        while (r.Index < r.Seats.Count)
-        {
-            var seat = r.Seats[r.Index];
-            if (r.Stage == 0)
-            {
-                r = r with { Stage = 1 }; ReplaceRuntimeTop(frame = frame with { WenheRuleFlow = r });
-                if (_players[seat].IsAlive)
-                {
-                    if (r.Operation == SkillProgramEffectOp.RewardWenheKiller) ChangeProgramMaximumHp(frame, r.Amount);
-                    else if (r.Operation != SkillProgramEffectOp.UseWenheChampionMark)
-                    {
-                        if (new ProgramSkillHost(this).LoseHp(id, frame.SkillId, seat, r.Amount) == SkillProgramStepOutcome.AwaitChild) return true;
-                    }
-                    if (TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program)) return true;
-                }
-                frame = GetActiveProgramFrame(id); r = frame.WenheRuleFlow!;
-            }
-            if (r.Stage == 1)
-            {
-                r = r with { Stage = 2 }; ReplaceRuntimeTop(frame = frame with { WenheRuleFlow = r });
-                if (_players[seat].IsAlive)
-                {
-                    var draw = r.Operation switch { SkillProgramEffectOp.RewardWenheKiller => r.Amount * 3,
-                        SkillProgramEffectOp.ResolveWenheTurnStart => 3, SkillProgramEffectOp.UseWenheChampionMark => 2, _ => 0 };
-                    if (draw > 0) { BeginOperationProgramDraw(frame, seat, draw, new("wenhe.rule.draw")); return true; }
-                    if (r.Operation == SkillProgramEffectOp.ResolveWenheTurnEnd)
-                    {
-                        var equipment = _cardZones.CardsAt(CardLocation.DrawPile).Where(c => EquipmentCatalog.IsEquipment(c.Kind) &&
-                            _players[seat].EquipmentSlotCapacity(EquipmentCatalog.Get(c.Kind).Slot) > 0).ToArray();
-                        if (equipment.Length > 0) PlaceAdvancedEquipment(equipment[_random.Next(equipment.Length)], seat);
-                    }
-                }
-            }
-            // Equipment replacement can attach a native recovery receipt to this
-            // same frame. Drain it before the next tied participant and never
-            // overwrite a producer update with the pre-effect local record.
-            if (TryBeginWenheRuleChildren(id)) return true;
-            frame = GetActiveProgramFrame(id); r = frame.WenheRuleFlow!;
-            r = r with { Stage = 0, Index = r.Index + 1 }; ReplaceRuntimeTop(frame = frame with { WenheRuleFlow = r });
-        }
-        ReplaceRuntimeTop(frame with { WenheRuleFlow = null }); return false;
-    }
+    private bool ResumeWenheRuleFlow(long id) => WenheRules?.ResumeFlow(id) ?? false;
     private bool TryBeginWenheRuleChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
         TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
         TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
@@ -177,7 +95,7 @@ public sealed partial class GameEngine
     {
         AssertWenheRuleFlow(f);
         var r = f.WenheRuleFlow!;
-        var count = r.Operation == SkillProgramEffectOp.RewardWenheKiller ? r.Amount * 3 : r.Operation == SkillProgramEffectOp.ResolveWenheTurnStart ? 3 : 2;
+        var count = (WenheRules ?? throw new InvalidOperationException("The activity rule feature is not installed.")).DrawCount(r.Operation, r.Amount);
         if (r.Stage != 2 || outcome.RecipientSeat != r.Seats[r.Index] || outcome.RequestedCount != count)
             throw new InvalidOperationException("Wenhe draw lost its already paid participant.");
         CompleteProgramDrawCards(f.Id, outcome.RecipientSeat, null, SkillProgramCardSetVisibility.Private, new("wenhe.rule.draw"), 0, outcome.ActualDrawIds);

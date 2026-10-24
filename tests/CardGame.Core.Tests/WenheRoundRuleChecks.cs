@@ -67,7 +67,7 @@ internal static class WenheRoundRuleChecks
         var turn = g.CreateSnapshot(0).TurnNumber;
         var before = g.Events.Count;
         var aliveHp = g.CreateSnapshot(0).Players.Skip(1).ToDictionary(p => p.Seat, p => p.Hp);
-        Use(g, "self-twenty");
+        Use(g, "self-lethal");
         Drive(g, () => E<TurnEndedEvent>(g).Any(e => e.TurnNumber == turn && e.ActorSeat == 0));
         var issued = E<WenheRuleFlowIssuedEvent>(g).Where(e => e.Operation == SkillProgramEffectOp.ResolveWenheTurnEnd && e.TurnNumber == turn).ToArray();
         Need(!V(g, 0).IsAlive && issued is [{ OwnerSeat: 1, Count: 7 }] &&
@@ -214,11 +214,21 @@ internal static class WenheRoundRuleChecks
     }
     private static void Play(GameEngine g) => Drive(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
     private static void End(GameEngine g) => Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
-    private static void Use(GameEngine g, string id, int? target = null) => Accept(g,
-        new UseProgramSkillCommand(0, Driver, id, [], target is { } seat ? [seat] : [], g.Revision, P(g)!.PromptId));
+    private static void Use(GameEngine g, string id, int? target = null)
+    {
+        if (id is "self-lethal" or "defeat")
+        {
+            // Wenhe's rescue recovers three, rather than recovering to three.
+            // Freeze the public current HP in the selected constant-cost binding.
+            var hp = V(g, target ?? 0).Hp;
+            Need(hp is > 0 and <= 22, "The bounded native lethal fixture requires a living participant with at most 22 HP.");
+            id += $"-{hp}";
+        }
+        Accept(g, new UseProgramSkillCommand(0, Driver, id, [], target is { } seat ? [seat] : [], g.Revision, P(g)!.PromptId));
+    }
     private static void SpendHumanNirvana(GameEngine g)
     {
-        for (var hit = 0; hit < 2 && Nirvanas(g, 0) == 0; hit++) { Use(g, "self-twenty"); Play(g); }
+        Use(g, "self-lethal"); Play(g);
         Need(Nirvanas(g, 0) == 1 && V(g, 0) is { IsAlive: true, Hp: 3 },
             "Single real losses must stop immediately after the first successful native Nirvana, whatever earlier activity losses changed the human's health.");
     }
@@ -272,11 +282,24 @@ internal static class WenheRoundRuleChecks
             var activity = SkillProgramCatalog.Load(rules.ReadToEnd(), presentation.ReadToEnd());
             foreach (var (id, program) in activity.Programs) b.AddSkill(new(id, activity.Presentations[id].Name, activity.Presentations[id].Description)
             { Program = program, ProgramPresentation = activity.Presentations[id], Tags = id == "wenhe:niepan" ? SkillTag.Limited : id == "wenhe:rules" ? SkillTag.Locked : SkillTag.None });
+            var lethalActivations = string.Join(",", new[] { "self-lethal", "defeat" }.SelectMany(id =>
+                Enumerable.Range(1, 22).Select(hp => JsonSerializer.Serialize(new
+                {
+                    id = $"{id}-{hp}", minCards = 0, maxCards = 0,
+                    minTargets = id == "defeat" ? 1 : 0, maxTargets = id == "defeat" ? 1 : 0,
+                    targetKind = id == "defeat" ? "otherLiving" : "anyLiving", usesPerTurn = (int?)null,
+                    // Each native constant is bounded at 20; for 21/22 HP only
+                    // the final instruction reaches dying, exactly at zero.
+                    effects = Enumerable.Range(0, (hp + 19) / 20).Select(index => new
+                    {
+                        op = id == "defeat" ? "damage" : "loseHp",
+                        target = id == "defeat" ? "selectedTarget" : "owner", amount = Math.Min(20, hp - index * 20)
+                    }).ToArray()
+                }))));
             var fixtureRules = $$$"""
             {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[
              {"id":"{{{Driver}}}","revision":1,"activations":[
-              {"id":"self-twenty","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
-               "effects":[{"op":"loseHp","target":"owner","amount":20}]},
+              {{{lethalActivations}}},
               {"id":"leave-one","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
                "effects":[{"op":"loseHp","target":"owner","amount":20}]},
               {"id":"self-two","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
@@ -285,8 +308,6 @@ internal static class WenheRoundRuleChecks
                "effects":[{"op":"loseHp","target":"selectedTarget","amount":2}]},
               {"id":"lose-one-other","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,
                "effects":[{"op":"loseHp","target":"selectedTarget","amount":1}]},
-              {"id":"defeat","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,
-               "effects":[{"op":"damage","target":"selectedTarget","amount":20}]},
               {"id":"extra","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
                "effects":[{"op":"pendExtraTurn","target":"owner"}]},
               {"id":"chain","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,

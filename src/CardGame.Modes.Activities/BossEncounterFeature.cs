@@ -3,7 +3,7 @@ using CardGame.Core;
 namespace CardGame.Modes.Activities;
 
 /// <summary>Owns successive-encounter decisions; every mutation uses the native command and frame owners.</summary>
-internal class BossEncounterFeature : IGameModeFeature, IMatchModeRuntimeHookProvider
+internal class BossEncounterFeature : IBossEncounterFlowFeature, IMatchModeRuntimeHookProvider
 {
     protected readonly ContentModeDefinition Mode;
     protected readonly IModeEncounterHost Host;

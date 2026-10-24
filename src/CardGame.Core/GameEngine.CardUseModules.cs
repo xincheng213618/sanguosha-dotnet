@@ -21,7 +21,7 @@ public sealed partial class GameEngine
     }
 
     private bool IsCardUseForbidden(int actorSeat, CardKind effectiveKind, CardActionType actionType, bool ignoreIssuedPlayBan=false, long? existingUseFrameId = null) =>
-        IsWushuangMode && !WushuangCatalogue.IsCardAllowed(effectiveKind) ||
+        !_modeRules.Cards.IsCardAllowed(effectiveKind) ||
         CardLegality.IsUseForbidden(ProgramCardLegalityStage.BeforeIntrinsicUseBan,
             new(actorSeat, effectiveKind, actionType, existingUseFrameId)) ||
         effectiveKind == CardKind.Poison ||

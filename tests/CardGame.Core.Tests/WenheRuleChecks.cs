@@ -95,7 +95,7 @@ internal static class WenheRuleChecks
         for (var victim = 1; victim < 8; victim++)
         {
             var beforeRescue = V(game, 0);
-            Accept(game, new UseProgramSkillCommand(0, Driver, "defeat", [], [victim], game.Revision, game.PendingDecision!.PromptId));
+            Defeat(game, victim);
             Until(game, () => game.PendingDecision is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
             Need(V(game, victim) is { IsAlive: true, Hp: 3, SurvivalRank: null } &&
                 E<ProgramBindingResolvedEvent>(game).Count(e => e.OwnerSeat == victim && e.SkillId == "wenhe:niepan" && e.Activated && e.Completed) == 1 &&
@@ -104,7 +104,7 @@ internal static class WenheRuleChecks
                 "The first genuine lethal hit must resolve that five-tier opponent's one real Nirvana recovery and draw, with no rank or false kill reward.");
             var before = V(game, 0); var rewardCount = E<WenheRuleFlowIssuedEvent>(game).Count(e => e.Operation == SkillProgramEffectOp.RewardWenheKiller);
             var start = game.Events.Count;
-            Accept(game, new UseProgramSkillCommand(0, Driver, "defeat", [], [victim], game.Revision, game.PendingDecision!.PromptId));
+            Defeat(game, victim);
             Until(game, () => game.PendingDecision is { PlayerSeat: 0, SkillPrompt.SkillId: Driver });
             Need(!V(game, victim).IsAlive && V(game, victim).SurvivalRank == 9 - victim &&
                 game.CreateSnapshot(0).Winner == Winner.None && V(game, 0).Hp == before.Hp &&
@@ -151,6 +151,14 @@ internal static class WenheRuleChecks
         Accept(game, new SelectGeneralCommand(0, Owner, game.Revision, game.PendingDecision!.PromptId));
     }
     private static PlayerSnapshot V(GameEngine game, int seat) => game.CreateSnapshot(0).Players[seat];
+    private static void Defeat(GameEngine game, int victim)
+    {
+        // The mode rescue recovers three HP; it does not recover to three.
+        // Select a real constant-damage activation that lands exactly at zero.
+        var hp = V(game, victim).Hp;
+        Need(hp is > 0 and <= 6, "The native death fixture requires a living six-HP-or-lower opponent.");
+        Accept(game, new UseProgramSkillCommand(0, Driver, $"defeat-{hp}", [], [victim], game.Revision, game.PendingDecision!.PromptId));
+    }
     private static T[] E<T>(GameEngine game) => game.Events.Select(e => e.Payload).OfType<T>().ToArray();
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
     private static void Accept(GameEngine game, GameCommand command)
@@ -202,10 +210,15 @@ internal static class WenheRuleChecks
             foreach (var (id, program) in activity.Programs)
                 builder.AddSkill(new(id, activity.Presentations[id].Name, activity.Presentations[id].Description)
                 { Program = program, ProgramPresentation = activity.Presentations[id], Tags = id == "wenhe:niepan" ? SkillTag.Limited : id == "wenhe:rules" ? SkillTag.Locked : SkillTag.None });
+            var defeatActivations = JsonSerializer.Serialize(Enumerable.Range(1, 6).Select(amount => new
+            {
+                id = $"defeat-{amount}", minCards = 0, maxCards = 0, minTargets = 1, maxTargets = 1,
+                targetKind = "otherLiving", usesPerTurn = (int?)null,
+                effects = new[] { new { op = "damage", target = "selectedTarget", amount } }
+            }));
             var driver = SkillProgramCatalog.Load($$$"""
               {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[{"id":"{{{Driver}}}","revision":1,
-              "activations":[{"id":"defeat","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,
-                "effects":[{"op":"damage","target":"selectedTarget","amount":20}]}],
+              "activations":{{{defeatActivations}}},
               "triggers":{{{(slash ? "[]" : """
               [{"id":"pause-real-death","window":"characterDied","subject":"owner","priority":100,"optional":false,
                 "effects":[{"op":"chooseOption","target":"owner","resultBind":"death-watch","options":[{"id":"continue"}]}]}]

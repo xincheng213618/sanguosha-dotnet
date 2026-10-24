@@ -3,79 +3,19 @@ namespace CardGame.Core;
 public sealed partial class GameEngine
 {
     private int? _winnerSeat;
-    private WenheRuleKind? CurrentWenheRule => _modeDefinition.WenheActivity is null ? null :
-        ProgramEventHistory<WenheRoundRuleChangedEvent>().LastOrDefault()?.Rule;
-    private WenheRoundRuleSnapshot? GetWenheRuleSnapshot() => _modeDefinition.WenheActivity is null ? null :
-        ProgramEventHistory<WenheRoundRuleChangedEvent>().LastOrDefault() is { } fact ? new(fact.RoundNumber, fact.Rule) : null;
-    private int? WenheSurvivalRank(int seat) => !IsSurvivalMode ? null :
-        ProgramEventHistory<WenhePlayerRankedEvent>().LastOrDefault(e => e.Seat == seat)?.Rank;
-    private bool WenheChampionMarkUsed(int seat) => ProgramEventHistory<WenheChampionMarkUsedEvent>().Any(e => e.Seat == seat);
-    private int WenheGoalRank(int seat) => seat == _options.HumanSeat ? _options.WenheAspirationRank ?? 1 : 1;
-    private WenheAspirationSnapshot? GetWenheAspirationSnapshot(int viewer) =>
-        _modeDefinition.WenheActivity is { EnableAspirations: true } && IsValidPlayerSeat(viewer)
-            ? new(WenheGoalRank(viewer), _players[viewer].IsAlive && WenheGoalRank(viewer) == 1 && !WenheChampionMarkUsed(viewer), WenheChampionMarkUsed(viewer)) : null;
+    private WenheRuleKind? CurrentWenheRule => WenheRules?.CurrentRule;
+    private WenheRoundRuleSnapshot? GetWenheRuleSnapshot() => WenheRules?.RoundRuleSnapshot;
+    private int? WenheSurvivalRank(int seat) => WenheRules?.SurvivalRank(seat);
+    private bool WenheChampionMarkUsed(int seat) => WenheRules?.ChampionMarkUsed(seat) ?? false;
+    private int WenheGoalRank(int seat) => WenheRules?.GoalRank(seat) ?? 1;
+    private WenheAspirationSnapshot? GetWenheAspirationSnapshot(int viewer) => WenheRules?.Aspiration(viewer);
+    private bool IsWenhePlayerSkillVisible(CharacterState player, GeneralSkillDefinition skill, int viewer, bool revealAll) =>
+        WenheRules is not IMatchModeSkillVisibility visibility || visibility.IsSkillVisible(player.Seat, skill.ContentId, viewer, revealAll);
+    private IEnumerable<RuleQueryContribution> WenheActivityRuleContributions(CharacterState player, SkillRuleQuery query) =>
+        WenheRules is IMatchModeNumericRules numeric ? numeric.NumericContributions(player.Seat, query) : [];
+    private void RecordWenheDeathRank(long deathId, int seat) =>
+        (WenheRules as IMatchModeDeathRanking)?.RecordDeathRank(deathId, seat);
+    private bool TryCompleteWenheSurvival() => WenheRules is IMatchModeLifecycle lifecycle &&
+        lifecycle.TryCompleteMatch(ModeCompletionBoundary.AfterCommand);
 
-    private bool IsWenhePlayerSkillVisible(CharacterState player, GeneralSkillDefinition skill, int viewer, bool revealAll)
-    {
-        if (_modeDefinition.WenheActivity is null || skill.ContentId != "wenhe:champion-mark" || revealAll ||
-            WenheChampionMarkUsed(player.Seat) || viewer == player.Seat && WenheGoalRank(player.Seat) == 1) return true;
-        // A separately acquired/printed same-name skill remains public. Only
-        // the unused mode mark is private; its grant is not a public marker.
-        return EnabledRuntimeSkillGrants(player).Any(grant => grant.SkillId == skill.ContentId && !grant.IsModeRule);
-    }
-
-    private IEnumerable<RuleQueryContribution> WenheActivityRuleContributions(CharacterState p, SkillRuleQuery query)
-    {
-        if (_modeDefinition.WenheActivity is not { } a) yield break;
-        var amount = query switch { SkillRuleQuery.InitialHandSize => a.PlayerTier >= 3 ? 1 : 0,
-            SkillRuleQuery.DrawCount => a.PlayerTier >= 4 ? 1 : 0,
-            SkillRuleQuery.SlashLimit => a.PlayerTier >= 3 ? 1 : 0, _ => 0 };
-        if (amount != 0) yield return new FiniteRuleQueryContribution($"wenhe:tier:{query}", SkillRuleOperation.Add, amount);
-    }
-    private void RecordWenheDeathRank(long deathId, int seat)
-    {
-        if (WenheSurvivalRank(seat) is not null) throw new InvalidOperationException("A Wenhe death cannot award its rank twice.");
-        AdvanceEventRulesAndQueueFact(new WenhePlayerRankedEvent(deathId, seat, _players.Count(p => p.IsAlive) + 1));
-    }
-    [ProgramRuntimeHook(ProgramRuntimePhase.BeforeDeclaration, 41000)]
-    private bool TryCompleteWenheSurvival()
-    {
-        if (!IsSurvivalMode || !_setupComplete || !_gameStartingProgramsResolved || _winner != Winner.None ||
-            _resolutionStack.Count != 0 ||
-            _pendingDecision is { Kind: not DecisionKind.PlayCard }) return false;
-        var living = _players.Where(p => p.IsAlive).ToArray();
-        if (living.Length > 1) return false;
-        // A paid departure may still own a native health/movement boundary even
-        // after its last card frame retired. Settle that work before selecting
-        // the survivor; in particular a public Poison can kill the last actor.
-        if (_pendingCardsMovedBatches.Count != 0 || _pendingHpChanges.Count != 0)
-        {
-            ClearPendingDecision();
-            AdvanceRulesAndPublishState();
-            if (_resolutionStack.Count != 0 || _pendingCardsMovedBatches.Count != 0 || _pendingHpChanges.Count != 0) return true;
-            living = _players.Where(p => p.IsAlive).ToArray();
-            if (living.Length > 1) return true;
-        }
-        _winnerSeat = living.SingleOrDefault()?.Seat;
-        _winner = _winnerSeat is null ? Winner.Draw : Winner.SoleSurvivor;
-        if (_winnerSeat is { } winner && WenheSurvivalRank(winner) is null)
-            AdvanceEventRulesAndQueueFact(new WenhePlayerRankedEvent(0, winner, 1));
-        AdvanceEventRulesAndQueueFact(new WinnerDeterminedEvent(_winner) { WinnerSeat = _winnerSeat });
-        CompleteGame();
-        return true;
-    }
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 41000)]
-    private void ObserveWenheRound(IGameEvent payload)
-    {
-        if (_modeDefinition.WenheActivity is null || payload is not RoundStartedEvent round) return;
-        var rule = round.RoundNumber == 1 ? WenheRuleKind.Chaos : (WenheRuleKind)_random.Next(7);
-        AdvanceEventRulesAndQueueFact(new WenheRoundRuleChangedEvent(round.RoundNumber, rule));
-        AddLog("WenheRule", $"第{round.RoundNumber}轮规则：{WenheRuleName(rule)}。", round.ActorSeat);
-    }
-    private static string WenheRuleName(WenheRuleKind rule) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_WenheActivities.WenheRuleName(rule);
-
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 270)]
-    private int WenheSweepActualDamageBonus(IDamageAttempt attack) =>
-        CurrentWenheRule == WenheRuleKind.Sweep && !attack.IsChainPropagation ? 1 : 0;
 }

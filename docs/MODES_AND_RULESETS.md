@@ -7,18 +7,20 @@
 场次模块使用同一个 `GameEngine` 命令事务、确定性随机源和结算栈，不创建独立牌局或第二套事件总线。当前依赖关系为：
 
 - `CardGame.Core` 定义场次接口、受控宿主、不可变计划，以及应用计划和推进原生结算的操作。
-- `CardGame.Modes.Standard` 仅依赖 Core，负责现有场次的座次、身份／队伍／势力分配、候选与人物版本抽取、选将初始技能和体力、牌堆替换，以及神武选将后的专属装备计划。
-- `CardGame.Modes.Activities` 仅依赖 Core，负责虎牢变身、中断回合、洗牌期限和驱鬼式连续关卡流程。
-- `CardGame.Modes.Wushuang` 仅依赖 Core，负责无双的商店经济、战法和局内成长。
+- `CardGame.Modes.Standard` 仅依赖 Core，负责现有场次的配置校验、默认场次、规则配置、装备配方、展示与势力策略，以及座次、选将、牌堆和初始装备计划。
+- `CardGame.Modes.Activities` 仅依赖 Core，负责虎牢、驱鬼、十殿、年兽的流程，以及山河、剑阁、神武、文和、官渡、龙舟的场次规则、轮次推进、奖励与胜负边界。
+- `CardGame.Modes.Wushuang` 仅依赖 Core，负责无双的命令、商店经济、战法、计时、回合间歇和局内成长。
 - `CardGame.Content.Standard` 显式注册这些工厂；Core 不扫描或加载具体模块程序集。
 
 `IMatchModeSetupFeature` 返回冻结的开局、候选、选将和装备计划。Core 将它们应用到原有角色、私有候选字段、牌区和技能授予中；候选不会另存一份挂起状态。模块通过 `IModeSetupRandom` 使用本局随机源，保留原调用顺序；`ProjectDeckCardNames` 只投影牌名，不抽取虎牢装备或消耗随机数。
 
-默认开局由通配 `StandardModeSetupFactory` 提供。独立场次可以注册针对该 `ModeId` 的 `IGameModeSetupFeatureFactory`，覆盖默认开局实现；同目标的两个开局工厂会报冲突，其他观察器和流程工厂继续加载。复制注册表时使用 `CopyModeFeatureFactoriesFrom` 保留显式绑定；包装 `IContentRegistryBuilder` 的适配器须透传模块、装备注册及工厂存在查询。
+默认开局和规则配置分别由通配 `StandardModeSetupFactory`、`StandardModeProfileFactory` 提供。独立场次可以按 `ModeId` 注册 `IGameModeSetupFeatureFactory` 或 `IGameModeProfileFeatureFactory`，分别覆盖这两个入口；只替换选将不会丢失原有规则、展示和装备配方。相同入口的同目标工厂会报冲突，其他观察器和流程工厂继续加载。复制注册表时使用 `CopyModeFeatureFactoriesFrom` 保留显式绑定；包装 `IContentRegistryBuilder` 的适配器须透传模块、装备注册及工厂存在查询。
 
-外部规则通过 `IMatchModeRuleObserverProvider` 和 `IMatchModeRuntimeHookProvider` 插入现有阶段及优先级，重复优先级直接拒绝。命令、开局边界、回合间歇分别通过公开接口进入同一命令会话。宿主只能按接口白名单取得，不能获得可变角色列表或结算栈。
+外部规则通过 `IMatchModeRuleObserverProvider` 和 `IMatchModeRuntimeHookProvider` 插入现有阶段及优先级。命令、开局、结束边界、数值与距离查询、初始发牌、快照投影、原生结算帧和询问答案均使用公开接口进入同一命令会话。伤害规则按原有优先级与原生规则合并；重复优先级和重复入口在建局时拒绝。模块只取得白名单内的受控宿主和冻结事实，按需调用原生操作；构造模块无需读取已开局状态。
 
-虎牢的同步 `ModeFlowInterruption` 只在当前命令内交还流程控制：已支付牌保持支付，原生栈和处理区由 Core 清理，仍记录原有取消、回合结束和关卡事件。血线变身后先锋先手，首次洗牌变身后 Boss 先手。连续关卡等待击杀动作和死亡子结算全部结束，再替换 Boss 并保留联军及当前回合。十殿阎罗的专用换关、其他活动的战斗技能和胜负策略仍沿用现有实现，不因本次拆分改写。
+规则配置声明本场必须安装的功能接口，缺失或重复会在建局阶段报错。装备由本局配方创建，无双商店、战法和活动装备只随对应模块及配方启用。共享执行链只执行已安装的接口，不按活动 ID 选择实现。
+
+虎牢的同步 `ModeFlowInterruption` 只在当前命令内交还流程控制：已支付牌保持支付，原生栈和处理区由 Core 清理，仍记录原有取消、回合结束和关卡事件。血线变身后先锋先手，首次洗牌变身后 Boss 先手。驱鬼和十殿的连续关卡等待击杀动作和死亡子结算全部结束，再替换 Boss 并保留联军及当前回合。文和和官渡的全局阶段推进由模块决定；原生帧仍验证付款、来源、父子返回和所有者。活动牌及武将技能的实体移动、濒死、响应、合法目标和恢复证明继续复用 Core 的原生机制。
 
 上述绑定属于运行实现，不新增存档字段或规则版本。玩家快照、事件冻结、牌区移动、命令校验与存档重放继续由 Core 统一处理。
 

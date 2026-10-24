@@ -18,13 +18,13 @@ public static partial class BuiltInEquipmentContent
     /// <summary>
     /// Builds the equipment catalogue for one match. Registered cards, conversion outputs and
     /// native generation dependencies all participate; a deck-only filter would deny generated weapons.
-    /// Extra kinds cover trusted encounter opening recipes, and extra packages allow new registrations.
+    /// A mode supplies its frozen recipe; extra packages allow explicit content registrations.
     /// This catalogue describes content; it does not decide which acquisition routes a mode allows.
     /// </summary>
-    public static EquipmentContentRegistry CreateForMatch(ContentModeDefinition mode, ContentRegistry registry,
-        IEnumerable<CardKind>? additionalKinds = null, IEnumerable<EquipmentContentPackage>? additionalPackages = null)
+    public static EquipmentContentRegistry CreateForMatch(ModeEquipmentRecipe recipe, ContentRegistry registry,
+        IEnumerable<EquipmentContentPackage>? additionalPackages = null)
     {
-        ArgumentNullException.ThrowIfNull(mode);
+        ArgumentNullException.ThrowIfNull(recipe);
         ArgumentNullException.ThrowIfNull(registry);
         var extras = (additionalPackages ?? []).ToArray();
         // Explicit packages are the match's definitions. Legacy packages only
@@ -42,13 +42,10 @@ public static partial class BuiltInEquipmentContent
         var required = Standard.Definitions.Select(definition => definition.Kind).ToHashSet();
         required.UnionWith(registry.Cards.Values.Where(card => card.LegacyKind is not null)
             .Select(card => card.LegacyKind!.Value));
-        required.UnionWith(additionalKinds ?? []);
+        required.UnionWith(recipe.RequiredKinds);
         // Explicitly supplied content is an intentional installation, even if
         // its future generated entities are absent from this opening deck.
         required.UnionWith(extras.SelectMany(package => package.Definitions).Select(definition => definition.Kind));
-        if (mode.HulaoActivity is not null) required.UnionWith(Hulao.Definitions.Select(definition => definition.Kind));
-        if (mode.ShenwuActivity is not null) required.UnionWith(Shenwu.Definitions.Select(definition => definition.Kind));
-        if (mode.GuanduActivity is not null) required.UnionWith(Guandu.Definitions.Select(definition => definition.Kind));
 
         var operations = new HashSet<SkillProgramEffectOp>();
         foreach (var skill in registry.Skills.Values)
@@ -74,7 +71,7 @@ public static partial class BuiltInEquipmentContent
                 registry.Skills.ContainsKey(binding.SkillId)).ToArray();
             var policies = package.DestinationPolicies.Where(policy =>
                 (policy.RequiredEquipmentKind is not { } kind || required.Contains(kind)) &&
-                (package.Id != WushuangPurchases.Id || mode.Id == WushuangMode.ModeId)).ToArray();
+                !recipe.DisabledDestinationPolicyPackageIds.Contains(package.Id, StringComparer.Ordinal)).ToArray();
             if (definitions.Length == 0 && policies.Length == 0) continue;
             builder.Add(new EquipmentContentPackage(package.Id, definitions, bindings, policies));
         }

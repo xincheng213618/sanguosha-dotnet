@@ -24,7 +24,11 @@ public sealed class StandardContentPackage : IGameContentPackage
     {
         ArgumentNullException.ThrowIfNull(builder);
         builder.AddModeFeatureFactory(new CardGame.Modes.Standard.StandardModeSetupFactory());
+        builder.AddModeFeatureFactory(new CardGame.Modes.Standard.StandardModeProfileFactory());
         builder.AddModeFeatureFactory(new CardGame.Modes.Activities.ActivityEncounterFeatureFactory());
+        builder.AddModeFeatureFactory(new CardGame.Modes.Activities.HellNianFeatureFactory());
+        builder.AddModeFeatureFactory(new CardGame.Modes.Activities.StandardBattleFeatureFactory());
+        builder.AddModeFeatureFactory(new CardGame.Modes.Activities.ActivityBattleRulesFeatureFactory());
         EmbeddedSkillProgramCatalog.RegisterBundle(builder, "mobile-mantian-guohai");
         builder.AddCard(new ContentCardDefinition("mobile:mantian-guohai", "瞒天过海", "锦囊牌",
             CardCatalog.Get(CardKind.MantianGuohai).Description, CardKind.MantianGuohai,

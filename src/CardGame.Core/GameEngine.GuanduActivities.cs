@@ -25,73 +25,19 @@ public sealed partial class GameEngine
     private bool IsGuanduActivity => _modeDefinition.GuanduActivity is not null;
     private GuanduBattleConfiguredEvent? GuanduConfiguration => IsGuanduActivity
         ? ProgramEventHistory<GuanduBattleConfiguredEvent>().SingleOrDefault() ?? _guanduInitialConfiguration : null;
-    private void RecordGuanduSetupFact()
-    {
-        if (_guanduInitialConfiguration is { } configuration)
-            AdvanceEventRulesAndQueueFact(configuration);
-    }
-    private bool IsGuanduCommander(int seat) => GuanduConfiguration is { } c &&
-        (c.CaoCommanderSeat == seat || c.YuanCommanderSeat == seat);
-    private bool GuanduAllies(int first, int second) => IsValidPlayerSeat(first) && IsValidPlayerSeat(second) &&
-        _players[first].TeamId is { } team && team == _players[second].TeamId;
-    private bool IsGuanduCommanderPrintedLordGrant(CharacterState p, SkillGrant g) => IsGuanduCommander(p.Seat) &&
-        g.SourceId == CharacterState.PrimarySkillSource && g.LordProjection is null && g.GeneralLibraryProjection is null &&
-        p.General.Skills.Any(s => s.ContentId == g.SkillId && s.Tags.HasFlag(SkillTag.Lord));
-    private GuanduActivitySnapshot? GetGuanduSnapshot()
-    {
-        if (GuanduConfiguration is not { } c) return null;
-        var cao = c.PlayerTeamId == "team:cao";
-        return new(c.Event, _roundNumber, cao ? c.CaoCommanderSeat : c.YuanCommanderSeat,
-            cao ? c.YuanCommanderSeat : c.CaoCommanderSeat, ProgramEventHistory<GuanduDeckExhaustedEvent>().Any(),
-            c.PlayerTeamId, c.HumanRole, c.LayoutIndex);
-    }
-    private IEnumerable<RuleQueryContribution> GuanduActivityRuleContributions(CharacterState p, SkillRuleQuery query)
-    {
-        if (_modeDefinition.GuanduActivity is not { } a) yield break;
-        var amount = query switch { SkillRuleQuery.InitialHandSize => a.PlayerTier >= 3 ? 1 : 0,
-            SkillRuleQuery.DrawCount => a.PlayerTier >= 4 ? 1 : 0, SkillRuleQuery.SlashLimit => a.PlayerTier >= 3 ? 1 : 0, _ => 0 };
-        if (amount != 0) yield return new FiniteRuleQueryContribution($"guandu:tier:{query}", SkillRuleOperation.Add, amount);
-        foreach (var contribution in GuanduEventRuleContributions(p, query)) yield return contribution;
-        foreach (var contribution in GuanduGeneralRuleContributions(p, query)) yield return contribution;
-    }
-    private void RecordGuanduDeckExhaustion()
-    {
-        if (!IsGuanduActivity || ProgramEventHistory<GuanduDeckExhaustedEvent>().Any()) return;
-        AdvanceEventRulesAndQueueFact(new GuanduDeckExhaustedEvent(_turnNumber));
-    }
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 46000)]
-    private void ObserveGuanduDeckExhaustion(IGameEvent e)
-    {
-        if (IsGuanduActivity && _setupComplete && e is CardMovedEvent && _cardZones.Count(CardLocation.DrawPile) == 0)
-            RecordGuanduDeckExhaustion();
-    }
-    private void ApplyGuanduDeathReward(CharacterState victim, CharacterState? killer)
-    {
-        if (!IsGuanduActivity || killer is not { IsAlive: true } || killer.Seat == victim.Seat) return;
-        if (!GuanduAllies(victim.Seat, killer.Seat))
-            MoveCards(GetHand(victim).ToArray(), CardLocation.Hand(victim.Seat), CardLocation.Hand(killer.Seat), new("guandu.enemy-kill-hand"));
-        else
-        {
-            MoveLogicalDiscardCards(killer.Seat, killer.Seat, GetHand(killer).ToArray(), CardLocation.Hand(killer.Seat), new("guandu.friendly-kill"));
-            MoveLogicalDiscardCards(killer.Seat, killer.Seat, GetEquipment(killer).ToArray(), CardLocation.Equipment(killer.Seat), new("guandu.friendly-kill"));
-        }
-    }
-    [ProgramRuntimeHook(ProgramRuntimePhase.BeforeDeclaration, 46000)]
-    private bool TryCompleteGuanduBattle()
-    {
-        if (GuanduConfiguration is not { } c || !_setupComplete || !_gameStartingProgramsResolved ||
-            _winner != Winner.None || _resolutionStack.Count != 0 || _pendingDecision is { Kind: not DecisionKind.PlayCard }) return false;
-        var exhausted = ProgramEventHistory<GuanduDeckExhaustedEvent>().Any();
-        if (_players[c.CaoCommanderSeat].IsAlive && _players[c.YuanCommanderSeat].IsAlive && !exhausted) return false;
-        if (_pendingCardsMovedBatches.Count != 0 || _pendingHpChanges.Count != 0)
-        {
-            ClearPendingDecision(); AdvanceRulesAndPublishState(); return true;
-        }
-        _winnerTeamId = exhausted ? c.PlayerTeamId == "team:cao" ? "team:yuan" : "team:cao" :
-            !_players[c.CaoCommanderSeat].IsAlive && !_players[c.YuanCommanderSeat].IsAlive ? null :
-            _players[c.CaoCommanderSeat].IsAlive ? "team:cao" : "team:yuan";
-        _winner = _winnerTeamId is null ? Winner.Draw : GetWinnerForTeam(_winnerTeamId);
-        AdvanceEventRulesAndQueueFact(new WinnerDeterminedEvent(_winner, _winnerTeamId));
-        CompleteGame(); return true;
-    }
+    private void RecordGuanduSetupFact() => (GuanduRules as IMatchModeLifecycle)?.OnMatchStart(ModeMatchStartPhase.AfterRunning);
+    private bool IsGuanduCommander(int seat) => GuanduRules?.IsCommander(seat) ?? false;
+    private bool GuanduAllies(int first, int second) => GuanduRules?.Allies(first, second) ??
+        (IsValidPlayerSeat(first) && IsValidPlayerSeat(second) && _players[first].TeamId is { } team && team == _players[second].TeamId);
+    private bool IsGuanduCommanderPrintedLordGrant(CharacterState player, SkillGrant grant) => IsGuanduCommander(player.Seat) &&
+        grant.SourceId == CharacterState.PrimarySkillSource && grant.LordProjection is null && grant.GeneralLibraryProjection is null &&
+        player.General.Skills.Any(skill => skill.ContentId == grant.SkillId && skill.Tags.HasFlag(SkillTag.Lord));
+    private GuanduActivitySnapshot? GetGuanduSnapshot() => GuanduRules?.Snapshot;
+    private IEnumerable<RuleQueryContribution> GuanduActivityRuleContributions(CharacterState player, SkillRuleQuery query) =>
+        GuanduRules is IMatchModeNumericRules numeric ? numeric.NumericContributions(player.Seat, query) : [];
+    private void RecordGuanduDeckExhaustion() => GuanduRules?.RecordDeckExhaustion();
+    private void ApplyGuanduDeathReward(CharacterState victim, CharacterState? killer) =>
+        (GuanduRules as IMatchModeLifecycle)?.ApplyDeathReward(victim.Seat, killer?.Seat);
+    private bool TryCompleteGuanduBattle() => GuanduRules is IMatchModeLifecycle lifecycle &&
+        lifecycle.TryCompleteMatch(ModeCompletionBoundary.AfterTurnEnded);
 }

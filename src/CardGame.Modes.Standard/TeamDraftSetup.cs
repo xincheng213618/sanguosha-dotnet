@@ -95,7 +95,8 @@ internal sealed partial class StandardModeSetupFeature
             };
         }
         if (Interactive) return new(players, GeneralPool.Select(g => g.Id),
-            players.OrderByDescending(p => p.IsHuman).ThenBy(p => p.Seat).Select(p => p.Seat), guanduConfiguration: configured);
+            players.OrderByDescending(p => p.IsHuman).ThenBy(p => p.Seat).Select(p => p.Seat),
+            guanduConfiguration: configured, initialActorSeat: configured.CaoCommanderSeat);
         foreach (var seat in players.OrderByDescending(p => Commander(p.Seat)).ThenBy(p => p.Seat).Select(p => p.Seat).ToArray())
         {
             var player = players[seat];
@@ -109,7 +110,7 @@ internal sealed partial class StandardModeSetupFeature
             players[seat] = selected with { GeneralDraftCandidateIds = null,
                 MaxHp = general.BaseHp + bonus, Hp = (general.InitialHp ?? general.BaseHp) + bonus };
         }
-        return new(players, [], [], guanduConfiguration: configured);
+        return new(players, [], [], guanduConfiguration: configured, initialActorSeat: configured.CaoCommanderSeat);
     }
 
     private ModeGeneralOfferPlan GuanduOffers(ModeGeneralOfferRequest request)

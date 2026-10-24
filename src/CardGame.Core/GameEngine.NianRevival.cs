@@ -100,20 +100,9 @@ public sealed partial class GameEngine
         public IReadOnlyList<int> DeadAllies(int ownerSeat) => engine.NianDeadAllies(ownerSeat);
     }
 
-    private int NianUsedRevives => CompleteProgramEventHistory().OfType<NianRevivalPaidEvent>().Count();
-    private bool IsNianAlliedSeat(int seat) => _modeDefinition.NianActivity is not null &&
-        _modeDefinition.BossActivity is { } activity && IsValidPlayerSeat(seat) &&
-        seat != BossActivitySeat && _players[seat].TeamId == activity.PlayerTeamId;
-
-    private IReadOnlyList<int> NianDeadAllies(int ownerSeat)
-    {
-        if (!IsNianAlliedSeat(ownerSeat) || !_players[ownerSeat].IsAlive ||
-            NianUsedRevives >= _modeDefinition.NianActivity!.SharedRevives) return [];
-        var died = CompleteProgramEventHistory().OfType<PlayerDiedEvent>().Select(e => e.VictimSeat).ToHashSet();
-        return Array.AsReadOnly(_players.Where(p => p.Seat != ownerSeat && IsNianAlliedSeat(p.Seat) &&
-                !p.IsAlive && p.GeneralSelected && p.MaxHp > 0 && p.HasHpValue && died.Contains(p.Seat))
-            .Select(p => p.Seat).Order().ToArray());
-    }
+    private int NianUsedRevives => NianFeature?.UsedRevives ?? 0;
+    private bool IsNianAlliedSeat(int seat) => NianFeature?.IsAlliedSeat(seat) == true;
+    private IReadOnlyList<int> NianDeadAllies(int ownerSeat) => NianFeature?.DeadAllies(ownerSeat) ?? [];
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 27930, SkillProgramEffectOp.ReviveNianAlly)]
     private bool AllowsNianRevival(ProgramActivationLegalityContext gate) => gate.SkillId == NianReviveSkill &&
@@ -274,7 +263,7 @@ public sealed partial class GameEngine
             f.SelectedCardIds.Count != 0 || !f.SelectedTargetSeats.SequenceEqual([r.TargetSeat]) ||
             !IsNianAlliedSeat(r.TargetSeat) || r.MaximumHp <= 0 || r.Before > r.After || r.After > _movementSequence ||
             r.Count < 0 || !Enum.IsDefined(r.Stage) || r.UsedRevives <= 0 ||
-            r.UsedRevives > _modeDefinition.NianActivity!.SharedRevives)
+            r.UsedRevives > (NianFeature?.SharedRevives ?? 0))
             throw new InvalidOperationException("Nian revival lost its exact owning instruction and original participant.");
         var paid = CompleteProgramEventHistory().OfType<NianRevivalPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (paid is not [var payment] || payment.ActorSeat != f.OwnerSeat || payment.TargetSeat != r.TargetSeat ||
@@ -303,18 +292,4 @@ public sealed partial class GameEngine
         if (f.NianRevival is not null) RequireNianRevival(f);
     }
 
-    [ProgramRuntimeHook(ProgramRuntimePhase.BeforeDeclaration, 27930)]
-    private bool TryAdvanceNianRevivalAi()
-    {
-        if (_modeDefinition.NianActivity is null || !_setupComplete || _winner != Winner.None ||
-            _pendingDecision is not null || _resolutionStack.Count != 0 || _phase != TurnPhase.Play ||
-            !IsNianAlliedSeat(_currentSeat) || _players[_currentSeat].IsHuman || !_players[_currentSeat].IsAlive) return false;
-        var action = BuildLegalActions(_players[_currentSeat]).SingleOrDefault(a =>
-            a.Kind == LegalActionKind.UseProgramSkill && a.ProgramSkillId == NianReviveSkill && a.ProgramActivationId == "revive");
-        if (action is null) return false;
-        var target = NianDeadAllies(_currentSeat).OrderByDescending(s => _players[s].IsHuman).ThenBy(s => s).First();
-        ExecuteProgramSkill(_players[_currentSeat], action, [], [target]);
-        AdvanceRulesAndPublishState();
-        return true;
-    }
 }

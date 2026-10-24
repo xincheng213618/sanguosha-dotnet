@@ -3,7 +3,7 @@ namespace CardGame.Core.RuntimeSkills;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_CommonRules
 {
-    internal static void ValidateOptions(GameOptions options)
+    internal static void ValidateOptions(GameOptions options, Action? validateAdapterOptions = null)
     {
         if (!AiDecisionPolicy.IsSupported(options.AiPolicyVersion))
         {
@@ -11,9 +11,8 @@ internal static class RuntimeRules_Core_CommonRules
                 $"Supported AI policy versions are 1 through {AiDecisionPolicy.CurrentVersion}.");
         }
 
-        if (options.PlayerCount is not (4 or 5 or 6 or 8) &&
-            !(options.ModeId == WushuangMode.ModeId && options.PlayerCount == 2) &&
-            !(options.ShanheBattle is not null && options.PlayerCount is >= 2 and <= 8))
+        validateAdapterOptions?.Invoke();
+        if (options.PlayerCount is < 2 or > 8)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(options.PlayerCount),
@@ -44,89 +43,6 @@ internal static class RuntimeRules_Core_CommonRules
             throw new ArgumentException("Multiplayer opening-hand rerolls are not supported.", nameof(options));
     }
 
-    internal static void ValidateModeOptions(
-        GameOptions options,
-        ContentModeDefinition mode)
-    {
-        if (options.HumanSeats is not null && (mode.ModeKind != ContentModeKind.Identity || options.ShanheBattle is not null))
-            throw new ArgumentException("Multiplayer currently supports identity tables only.", nameof(options));
-        if (options.HumanGuanduRole is not null && mode.GuanduActivity is null)
-            throw new ArgumentException("Guandu role is only valid in Guandu.", nameof(options.HumanGuanduRole));
-        if (options.WenheAspirationRank is { } goal &&
-            (mode.WenheActivity is null || options.HumanSeat < 0 || goal is not (1 or 2 or 4 or 6)))
-            throw new ArgumentException("Wenhe aspiration requires a human seat in Wenhe and a rank of 1, 2, 4 or 6.", nameof(options));
-        if (mode.ModeKind == ContentModeKind.Survival)
-        {
-            if (options.HumanRole is not null || options.HumanTeamId is not null)
-                throw new ArgumentException("Independent survival contestants have neither identity choices nor teams.", nameof(options));
-            return;
-        }
-        if (mode.ModeKind == ContentModeKind.Team)
-        {
-            if (options.HumanRole is not null)
-            {
-                throw new ArgumentException(
-                    "HumanRole must be null in a public-team mode.",
-                    nameof(options.HumanRole));
-            }
-
-            if (mode.TeamCounts is null || mode.TeamCounts.Count != (mode.DragonBoatActivity is null ? 2 : 4) ||
-                mode.TeamCounts.Values.Sum() != options.PlayerCount)
-            {
-                throw new InvalidOperationException(
-                    $"Mode '{mode.Id}' is not supported by the two-team adapter for {options.PlayerCount} players.");
-            }
-
-            if (options.HumanSeat < 0 && options.HumanTeamId is not null)
-            {
-                throw new ArgumentException(
-                    "HumanTeamId requires a human seat.",
-                    nameof(options.HumanTeamId));
-            }
-
-            if (options.HumanTeamId is not null &&
-                !mode.TeamCounts.ContainsKey(options.HumanTeamId))
-            {
-                throw new ArgumentException(
-                    $"Team '{options.HumanTeamId}' is not defined by mode '{mode.Id}'.",
-                    nameof(options.HumanTeamId));
-            }
-            if (mode.BossActivity is { } boss && options.HumanTeamId is { } selectedTeam && selectedTeam != boss.PlayerTeamId)
-                throw new ArgumentException("The local player must join the allied team in a boss activity.", nameof(options.HumanTeamId));
-            if (mode.ShenwuActivity is { } shenwu && options.HumanTeamId is { } selectedShenwuTeam && selectedShenwuTeam != shenwu.PlayerTeamId)
-                throw new ArgumentException("The local player must join the allied team in Shenwu.", nameof(options.HumanTeamId));
-        }
-        else if (mode.ModeKind == ContentModeKind.NationalWarLite)
-        {
-            if (options.HumanRole is not null)
-            {
-                throw new ArgumentException(
-                    "HumanRole must be null in a national-war mode.",
-                    nameof(options.HumanRole));
-            }
-
-            if (options.HumanTeamId is not null)
-            {
-                throw new ArgumentException(
-                    "HumanTeamId is not valid in a national-war mode.",
-                    nameof(options.HumanTeamId));
-            }
-
-            if (mode.FactionCounts is null ||
-                mode.FactionCounts.Count < 2 ||
-                mode.FactionCounts.Values.Sum() != options.PlayerCount)
-            {
-                throw new InvalidOperationException(
-                    $"Mode '{mode.Id}' must define at least two factions totaling {options.PlayerCount} players.");
-            }
-        }
-        else if (options.HumanTeamId is not null)
-        {
-            throw new ArgumentException(
-                "HumanTeamId is only valid in a public-team mode.",
-                nameof(options.HumanTeamId));
-        }
-    }
 
     internal static string FormatRoleSummary(ContentModeDefinition mode)
     {

@@ -74,9 +74,11 @@ internal sealed class ProgramDamageHookCatalog
 
 // Shared metadata is immutable and contains no engine. Delegates are bound once
 // per reached phase per engine; handlers run synchronously, once, in source order.
-internal sealed class ProgramDamageHooks(ProgramDamageHookCatalog catalog, Func<ProgramDamageRegistration, Delegate> bind)
+internal sealed class ProgramDamageHooks(ProgramDamageHookCatalog catalog, Func<ProgramDamageRegistration, Delegate> bind,
+    IReadOnlyList<ModeDamageRuleRegistration>? modeRules = null, Func<object, ModeDamageFacts>? captureModeFacts = null)
 {
     private readonly Dictionary<ProgramDamagePhase, Array> _handlers = new();
+    private readonly IReadOnlyList<ModeDamageRuleRegistration> _modeRules = ModeDamageRuleComposition.Freeze(catalog, modeRules ?? []);
 
     private T[] Handlers<T>(ProgramDamagePhase phase) where T : Delegate
     {
@@ -99,9 +101,25 @@ internal sealed class ProgramDamageHooks(ProgramDamageHookCatalog catalog, Func<
     {
         // Enumerable.Sum remains at the caller and retains its checked sum.
         // The old subsequent + expression was left-associative and unchecked.
-        foreach (var provider in Handlers<Func<TAttack, int>>(ProgramDamagePhase.AdditiveAmount))
+        foreach (var provider in AdditiveHandlers<TAttack>())
             initial = unchecked(initial + provider(attack));
         return initial;
+    }
+
+    private Func<TAttack, int>[] AdditiveHandlers<TAttack>()
+    {
+        var phase = ProgramDamagePhase.AdditiveAmount;
+        if (catalog.DelegateType(phase) != typeof(Func<TAttack, int>)) throw new ArgumentOutOfRangeException(nameof(phase));
+        if (!_handlers.TryGetValue(phase, out var handlers))
+        {
+            if (_modeRules.Count != 0 && captureModeFacts is null)
+                throw new InvalidOperationException("Mode damage hooks require their native immutable-facts projection.");
+            var native = catalog.Phases[phase].Select(row => (row.Order, Handler: (Func<TAttack, int>)bind(row)));
+            var mode = _modeRules.Select(rule => (rule.Order,
+                Handler: (Func<TAttack, int>)(attack => rule.Amount(captureModeFacts!(attack!)))));
+            _handlers.Add(phase, handlers = native.Concat(mode).OrderBy(row => row.Order).Select(row => row.Handler).ToArray());
+        }
+        return (Func<TAttack, int>[])handlers;
     }
 
     internal ProgramDamageInterception Intercept<TAttack>(ProgramDamagePhase phase, TAttack attack, int amount, DamageNature nature)
@@ -151,7 +169,13 @@ public sealed partial class GameEngine
 
     private static readonly Lazy<ProgramDamageHookCatalog> DamageHookMetadata = new(() =>
         ProgramDamageHookCatalog.Discover(RuntimeModuleMethods, DamageHookDelegateType), true);
+    internal static ProgramDamageHookCatalog NativeDamageHookCatalog => DamageHookMetadata.Value;
     private ProgramDamageHooks? _damageHooks;
     private ProgramDamageHooks DamageHooks => _damageHooks ??= new(DamageHookMetadata.Value,
-        row => BindRuntimeHandler(row.Method, row.DelegateType));
+        row => BindRuntimeHandler(row.Method, row.DelegateType), _modeRuntime.DamageRules,
+        attack => CaptureModeDamageFacts((IDamageAttempt)attack));
+
+    private ModeDamageFacts CaptureModeDamageFacts(IDamageAttempt attack) => new(attack.ResolutionId,
+        attack.SourceSeat, attack.TargetSeat, attack.CardUserSeat, attack.EffectiveCardKind, GetDamageNature(attack),
+        attack.IsChainPropagation, attack.IsSourceLess);
 }

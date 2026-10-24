@@ -161,13 +161,11 @@ public sealed partial class GameEngine
                 p.CostCardId, p.TargetSeat, p.RevealedCardId, p.RevealedSuit, p.SequenceBefore, p.SequenceAfter)) != 1)
             throw new InvalidOperationException("Poison Fire Attack changed its exact paid discard or native effect continuation.");
     }
-    private int? CaptureWenhePoisonRound() => _modeDefinition.WenheActivity is not null &&
-        _setupComplete && _winner == Winner.None && CurrentWenheRule == WenheRuleKind.Poison ? _roundNumber : null;
+    private int? CaptureWenhePoisonRound() => WenheRules?.PoisonRound;
 
     private bool IsWenhePhysicalPoison(CharacterState owner, Card card) =>
-        _modeDefinition.WenheActivity is not null && CurrentWenheRule == WenheRuleKind.Poison &&
-        card.Kind == CardKind.Peach && card.Id > 0 && owner.IsAlive &&
-        _cardZones.GetLocation(card.Id) == CardLocation.Hand(owner.Seat);
+        WenheRules?.IsPhysicalPoison(card.Kind, card.Id, owner.IsAlive,
+            card.Id > 0 && _cardZones.GetLocation(card.Id) == CardLocation.Hand(owner.Seat)) ?? false;
 
     // Match conversion input names against the current held identity without
     // rewriting the physical entity recorded by native material payments.

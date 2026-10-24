@@ -11,7 +11,7 @@ public sealed partial class GameEngine
         var nature = GetDamageNature(kind);
         if (ShenwuEnabled(actor, "shenwu:zhaohuo") || HasWeaponAbility(actor, CardKind.CrimsonSoulZither))
             nature = DamageNature.Fire;
-        nature = GuanduDamageNature(nature);
+        nature = _modeRuntime.TransformDamageNature(nature);
         if (action.TargetSeat is { } target && HasShouliDamageDebt(target))
             nature = DamageNature.Thunder;
         if (HasRuntimeSkill(actor, MobileMaChaoYuli))

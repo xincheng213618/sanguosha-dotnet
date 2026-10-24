@@ -3,23 +3,34 @@ using CardGame.Core;
 namespace CardGame.Modes.Standard;
 
 /// <summary>Installed by the standard content package, including its custom-mode fixtures.</summary>
-public sealed class StandardModeSetupFactory : IGameModeSetupFeatureFactory
+public sealed partial class StandardModeSetupFactory : IGameModeSetupFeatureFactory
 {
     public string Id => "mode:standard-setup";
     public string ModeId => ModeFeatureTargets.AllModes;
-    public IGameModeFeature Create(ModeFeatureCreationContext context) => new StandardModeSetupFeature(
+    public IGameModeFeature Create(ModeFeatureCreationContext context) => new StandardModeSetupAdapter(CreateImplementation(context));
+
+    internal static StandardModeSetupFeature CreateImplementation(ModeFeatureCreationContext context) => new(
         context.Options ?? throw new InvalidOperationException("Standard setup requires real match options."),
         context.ModeDefinition ?? throw new InvalidOperationException("Standard setup requires the selected mode."),
-        context.ContentRegistry, context.GetHost<IModeSetupRandom>());
+        context.ContentRegistry, context.GetHost<IModeSetupRandom>(), () => context.GetHost<IModeNationalRevealHost>(),
+        () => context.GetHost<IModeSetupEquipmentHost>());
 }
 
 internal sealed partial class StandardModeSetupFeature(
-    GameOptions options, ContentModeDefinition mode, ContentRegistry registry, IModeSetupRandom random) : IMatchModeSetupFeature
+    GameOptions options, ContentModeDefinition mode, ContentRegistry registry, IModeSetupRandom random,
+    Func<IModeNationalRevealHost> revealHostFactory, Func<IModeSetupEquipmentHost> equipmentHostFactory) :
+    IMatchModeSetupFeature, IMatchModeRuleProvider, IMatchModePresentation, IMatchModeCommandHandler
 {
+    public ModeRuleSet Rules { get; } = StandardModeRuleProfiles.Create(mode, options);
     private readonly GameOptions _options = options;
     private readonly ContentModeDefinition _mode = mode;
     private readonly ContentRegistry _registry = registry;
     private readonly IModeSetupRandom _random = random;
+    private readonly Func<IModeNationalRevealHost> _revealHostFactory = revealHostFactory;
+    private readonly Func<IModeSetupEquipmentHost> _equipmentHostFactory = equipmentHostFactory;
+    public IReadOnlyList<Type> InitialEquipmentCompletionFacts { get; } = Array.AsReadOnly(
+        (mode.ShenwuActivity is null ? Array.Empty<Type>() : [typeof(ShenwuEquipmentInitializedEvent)])
+            .Concat(mode.HulaoActivity is null ? Array.Empty<Type>() : [typeof(HulaoInitialEquipmentPlacedEvent)]).ToArray());
     private readonly IReadOnlyList<ContentGeneralDefinition> _generalPool = Array.AsReadOnly(
         (mode.GeneralPoolIds ?? registry.Generals.Keys.Where(registry.IsGeneralPlayable)
             .OrderBy(id => id, StringComparer.Ordinal).ToArray()).Select(id => registry.Generals[id]).ToArray());
@@ -49,7 +60,8 @@ internal sealed partial class StandardModeSetupFeature(
         _mode.DragonBoatActivity is not null || _mode.GuanduActivity is not null;
     private string CharacterFamily(ContentGeneralDefinition general) => general.CharacterId ?? general.Id;
     private static ModeSeatSetupFacts Facts(ModeSeatSetup seat) => new(seat.Seat, seat.IsHuman, seat.Role,
-        seat.TeamId, seat.NationalFactionId, seat.GeneralId, seat.GeneralSelected, seat.SecondaryGeneralId, seat.SecondaryGeneralSelected);
+        seat.TeamId, seat.NationalFactionId, seat.GeneralId, seat.GeneralSelected, seat.SecondaryGeneralId, seat.SecondaryGeneralSelected)
+        { IsAlive = seat.IsAlive };
 
     public ModeSetupPlan BuildPlayers()
     {

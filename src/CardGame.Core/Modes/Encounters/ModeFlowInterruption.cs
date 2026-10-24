@@ -20,7 +20,7 @@ public sealed class ModeFlowInterruption : Exception
     public ModeFlowTransitionRequest Request { get; }
 }
 
-public interface IModeFlowInterruptionHandler
+public interface IModeFlowInterruptionHandler : IGameModeFeature
 {
     string InterruptionHandlerId { get; }
     void CompleteInterruption(ModeFlowTransitionRequest request);

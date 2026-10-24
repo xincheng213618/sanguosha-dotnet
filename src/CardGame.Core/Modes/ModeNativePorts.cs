@@ -8,7 +8,7 @@ internal sealed partial class MatchModeRuntime
     internal IReadOnlyList<ModePromptAnswerRegistration> PromptAnswers => NativePipeline.Answers;
 
     // Called at composition, before any handler can observe or modify a match.
-    internal void ValidateNativePorts() => _ = NativePipeline;
+    internal void ValidateNativePorts() { _ = NativePipeline; ValidateDamagePorts(); }
 
     private sealed class NativePipelinePorts
     {

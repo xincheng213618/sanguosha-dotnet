@@ -116,7 +116,7 @@ public sealed partial class GameEngine
         if (TracksFengjiRoundLedger)
             AddFiniteContribution(contributions, $"state:{player.Seat}:olfengji:round-draw",
                 GetFengjiRoundAdjustment(player.Seat, SkillRuleQuery.DrawCount));
-        return ApplyWushuangEnemyQuota(player, RuleQueryService.Evaluate(
+        return ApplyModeNumericRules(player, RuleQueryService.Evaluate(
             SkillRuleQuery.DrawCount,
             new RuleQueryBounds(0, int.MaxValue),
             baseTerms,
@@ -150,7 +150,7 @@ public sealed partial class GameEngine
         if (HasFriendYangmingQuota(player)) contributions.Add(new UnlimitedRuleQueryContribution($"skill:{player.Seat}:friend-yangming"));
         foreach (var card in GetEquipmentRuleCards(player, excludedEquipmentSlot).Where(card => card.Id != excludedEquipmentId))
         {
-            var bonus = IsDragonBoatActivity && card.Kind == CardKind.Crossbow ? 3 : EquipmentRules.Get(card.Kind).SlashLimitBonus;
+            var bonus = _modeRuntime.EquipmentSlashLimitBonus(card.Kind, EquipmentRules.Get(card.Kind).SlashLimitBonus);
             if (bonus == int.MaxValue)
                 contributions.Add(new UnlimitedRuleQueryContribution($"equipment:{card.Id}:slash-use-limit"));
             else
@@ -164,7 +164,7 @@ public sealed partial class GameEngine
         if (TracksFengjiRoundLedger)
             AddFiniteContribution(contributions, $"state:{player.Seat}:olfengji:round-slash",
                 GetFengjiRoundAdjustment(player.Seat, SkillRuleQuery.SlashLimit));
-        return ApplyWushuangEnemyQuota(player, RuleQueryService.Evaluate(
+        return ApplyModeNumericRules(player, RuleQueryService.Evaluate(
             SkillRuleQuery.SlashLimit,
             new RuleQueryBounds(0, int.MaxValue),
             baseTerms,
@@ -260,8 +260,7 @@ public sealed partial class GameEngine
         if (bindings.Length == 0) return CollectStrategicRuleContributions(player, query)
             .Concat(MobileWuqianRuleContributions(player, query))
             .Concat(WushuangSkillsBNumericContributions(player, query))
-            .Concat(WushuangNumericRuleContributions(player, query))
-            .Concat(ActivityRuleContributions(player, query))
+            .Concat(_modeRuntime.NumericContributions(player.Seat, query))
             .Concat(CollectOtherPublicTeamNumericRuleContributions(player, query)).Concat(MouSmSlashContributions(player, query))
             .Concat(HappyZlNumericContributions(player, query))
             .Concat(AnniversaryZhangXunSlashContributions(player, query))
@@ -302,8 +301,7 @@ public sealed partial class GameEngine
         return programContributions.Concat(CollectStrategicRuleContributions(player, query))
             .Concat(MobileWuqianRuleContributions(player, query))
             .Concat(WushuangSkillsBNumericContributions(player, query))
-            .Concat(WushuangNumericRuleContributions(player, query))
-            .Concat(ActivityRuleContributions(player, query))
+            .Concat(_modeRuntime.NumericContributions(player.Seat, query))
             .Concat(CollectOtherPublicTeamNumericRuleContributions(player, query)).Concat(MouSmSlashContributions(player, query))
             .Concat(HappyZlNumericContributions(player, query))
             .Concat(AnniversaryZhangXunSlashContributions(player, query))

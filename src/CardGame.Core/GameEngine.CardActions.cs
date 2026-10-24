@@ -237,7 +237,7 @@ public sealed partial class GameEngine
             TryBeginMouSmPrivateWindow(attack, MouSmPrivateCall.CommittedSlash)) return true;
         if ((continuation is null) != (completedResponseReturn is not null) && !IsMouSmPlayedWindow(action, window) && !IsMouLuSuPlayedWindow(action, window))
             throw new InvalidOperationException("A card trigger window needs exactly one return continuation.");
-        RecordGuanduCardAction(action, window);
+        _modeRuntime.OnCardAction(action, window);
         if (window == SkillProgramTriggerWindow.CardUseCommitted && TracksAlternateActualUseColor)
             RecordAlternateActualUseColor(action);
         if (window is SkillProgramTriggerWindow.CardUseCommitted or SkillProgramTriggerWindow.CardResponseAccepted &&

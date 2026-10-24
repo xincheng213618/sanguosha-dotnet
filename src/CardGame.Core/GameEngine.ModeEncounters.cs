@@ -36,8 +36,8 @@ public sealed partial class GameEngine
             {
                 replacement = previous;
                 replacement.General = general;
-                replacement.MaxHp = general.BaseHp;
-                replacement.Hp = general.InitialHp ?? general.BaseHp;
+                replacement.MaxHp = request.MaximumHpOverride ?? general.BaseHp;
+                replacement.Hp = request.HpOverride ?? general.InitialHp ?? general.BaseHp;
             }
             else
             {
@@ -46,7 +46,7 @@ public sealed partial class GameEngine
                     Seat = previous.Seat, Name = previous.Name, IsHuman = false, Role = previous.Role,
                     TeamId = previous.TeamId, TeamRevealed = true, RoleRevealed = true,
                     General = general, GeneralSelected = true, GeneralRevealed = true,
-                    Hp = general.InitialHp ?? general.BaseHp, MaxHp = general.BaseHp
+                    Hp = request.HpOverride ?? general.InitialHp ?? general.BaseHp, MaxHp = request.MaximumHpOverride ?? general.BaseHp
                 };
                 if (engine.HasPrivateGeneralLibraryCapability) replacement.GeneralLibraryGenderQuery = engine.GetPrivateGeneralLibraryGender;
                 engine._players[replacement.Seat] = replacement;

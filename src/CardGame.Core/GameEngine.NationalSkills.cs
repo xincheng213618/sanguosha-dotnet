@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace CardGame.Core;
 
 public sealed partial class GameEngine
@@ -18,25 +16,6 @@ public sealed partial class GameEngine
                 (_modeDefinition.DualGenerals && player.Role == Role.Lord ? 1 : 0);
             player.Hp = player.MaxHp;
         }
-    }
-
-    private PromptChoice WithDualGeneralHealthPreview(PromptChoice choice, CharacterState player, GeneralDefinition candidate)
-    {
-        if (!IsDualGeneralMode) return choice;
-        var parameters = new Dictionary<string, string>(choice.Parameters);
-        parameters["base-hp"] = candidate.BaseHp.ToString(CultureInfo.InvariantCulture);
-        var health = $"基础体力 {candidate.BaseHp}";
-        if (player.GeneralSelected)
-        {
-            var lordBonus = _modeDefinition.DualGenerals && player.Role == Role.Lord ? 1 : 0;
-            var maxHp = DualGeneralMaxHp(player.General, candidate) + lordBonus;
-            parameters["primary-base-hp"] = player.General.BaseHp.ToString(CultureInfo.InvariantCulture);
-            parameters["combined-max-hp"] = maxHp.ToString(CultureInfo.InvariantCulture);
-            health += $" · 组合上限 {maxHp}（{player.General.BaseHp}+{candidate.BaseHp} 平均向下取整）";
-            if (lordBonus > 0) health += " · 含主公 +1";
-        }
-        parameters["health-preview"] = health;
-        return choice with { Description = choice.Description + " · " + health, Parameters = parameters };
     }
 
     /// <summary>

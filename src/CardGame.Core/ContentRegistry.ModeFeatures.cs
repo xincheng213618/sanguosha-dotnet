@@ -28,8 +28,17 @@ public sealed partial class ContentRegistry
         }
     }
 
-    private sealed class FrozenModeSetupFeatureFactory(IGameModeFeatureFactory source)
-        : FrozenModeFeatureFactory(source), IGameModeSetupFeatureFactory { }
+    private sealed class FrozenModeSetupFeatureFactory(IGameModeSetupFeatureFactory source)
+        : FrozenModeFeatureFactory(source), IGameModeSetupFeatureFactory
+    {
+        private readonly Action<GameOptions, ModeConfigurationValidationPhase> _validateInitial = source.ValidateInitialOptions;
+        private readonly Func<GameOptions, ContentRegistry, string?> _resolveDefault = source.ResolveDefaultModeId;
+        public void ValidateInitialOptions(GameOptions options, ModeConfigurationValidationPhase phase) => _validateInitial(options, phase);
+        public string? ResolveDefaultModeId(GameOptions options, ContentRegistry registry) => _resolveDefault(options, registry);
+    }
+
+    private sealed class FrozenModeProfileFeatureFactory(IGameModeProfileFeatureFactory source)
+        : FrozenModeFeatureFactory(source), IGameModeProfileFeatureFactory { }
 
     private sealed partial class RegistryBuilder
     {
@@ -40,8 +49,14 @@ public sealed partial class ContentRegistry
         public void AddModeFeatureFactory(IGameModeFeatureFactory factory)
         {
             ArgumentNullException.ThrowIfNull(factory);
-            FrozenModeFeatureFactory frozen = factory is IGameModeSetupFeatureFactory
-                ? new FrozenModeSetupFeatureFactory(factory) : new FrozenModeFeatureFactory(factory);
+            if (factory is IGameModeSetupFeatureFactory && factory is IGameModeProfileFeatureFactory)
+                throw new InvalidOperationException("A mode factory cannot target both the setup and profile slots.");
+            FrozenModeFeatureFactory frozen = factory switch
+            {
+                IGameModeSetupFeatureFactory setup => new FrozenModeSetupFeatureFactory(setup),
+                IGameModeProfileFeatureFactory profile => new FrozenModeProfileFeatureFactory(profile),
+                _ => new FrozenModeFeatureFactory(factory)
+            };
             Add(_modeFeatureFactories, frozen, frozen.Id, "mode feature factory");
         }
 

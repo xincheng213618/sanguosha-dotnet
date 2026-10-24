@@ -7,16 +7,6 @@ public sealed partial class GameEngine
     private bool HasShanhePrintedLordQualifications => _options.ShanheBattle is { } setup &&
         setup.AllyRoster.Concat(setup.EnemyRoster).Any(member => member.QualifiedPrintedLordSkillIds is { Count: > 0 });
 
-    private static void ValidateShanhePrintedLordQualifications(ShanheCombatantDefinition member,
-        ContentGeneralDefinition general, ContentRegistry registry)
-    {
-        if (member.QualifiedPrintedLordSkillIds is not { } requested) return;
-        if (requested.Distinct(StringComparer.Ordinal).Count() != requested.Count || requested.Any(id =>
-                string.IsNullOrWhiteSpace(id) || !general.SkillIds.Contains(id, StringComparer.Ordinal) ||
-                !registry.Skills.TryGetValue(id, out var skill) || !skill.Tags.HasFlag(SkillTag.Lord) ||
-                skill.ImplementationStatus != SkillImplementationStatus.Complete || skill.Program is null))
-            throw new ArgumentException("Scenario Lord qualification requires distinct complete Lord skills printed on the original primary general.");
-    }
 
     // Qualification is a property of this immutable encounter recipe and its
     // exact original printed instance. It never changes a role, creates a grant,

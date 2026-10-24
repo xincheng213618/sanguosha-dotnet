@@ -69,159 +69,50 @@ public sealed partial class GameEngine
     [ProgramCapability]
     private sealed class GuanduEventCapability(GameEngine engine) : IGuanduEventHost
     { public SkillProgramStepOutcome Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => engine.ExecuteGuanduEvent(f, op); }
-    private GuanduBattleEvent? CurrentGuanduEvent => GuanduConfiguration?.Event;
-    private void RecordGuanduCardAction(CardActionContext a, SkillProgramTriggerWindow window)
-    {
-        if (!IsGuanduActivity || window is not (SkillProgramTriggerWindow.CardUseCommitted or SkillProgramTriggerWindow.CardResponseAccepted) ||
-            ProgramEventHistory<GuanduActualCardActionEvent>().Any(e => e.ActionId == a.ActionId)) return;
-        var use = _resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Action?.ActionId == a.ActionId);
-        var logicalUse = window == SkillProgramTriggerWindow.CardUseCommitted || a.Type == CardActionType.Use;
-        var ordinal = ProgramEventHistory<GuanduActualCardActionEvent>().Count(e => e.CountsAsUse) + (logicalUse ? 1 : 0);
-        AdvanceEventRulesAndQueueFact(new GuanduActualCardActionEvent(a.ActionId, use?.Id ?? 0, a.Type,
-            a.ActorSeat, a.EffectiveKind, _turnNumber, CurrentActualDiscardRecoveryPhase(), ordinal) { CountsAsUse = logicalUse });
-    }
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 46002)]
-    private void ObserveGuanduDeclaredUse(IGameEvent payload)
-    {
-        if (!IsGuanduActivity || payload is not CardUseDeclaredEvent declared ||
-            LifecycleCardUse(declared.ResolutionId)?.Action is not { Type: CardActionType.Use } action) return;
-        RecordGuanduCardAction(action, SkillProgramTriggerWindow.CardUseCommitted);
-    }
-    private DamageNature GuanduDamageNature(DamageNature nature) => CurrentGuanduEvent == GuanduBattleEvent.WuchaoFire &&
-        nature == DamageNature.Normal ? DamageNature.Fire : nature;
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 210)]
-    private int GuanduEventDamageBonus(IDamageAttempt damage)
-    {
-        if (damage.IsSourceLess || !IsGuanduActivity) return 0;
-        if (CurrentGuanduEvent == GuanduBattleEvent.Underdog)
-            return _players[damage.TargetSeat].Hp > _players[damage.SourceSeat].Hp ? 1 : 0;
-        if (CurrentGuanduEvent != GuanduBattleEvent.Standoff || _roundNumber <= 4 || damage.IsChainPropagation ||
-            damage.SourceSeat != _currentSeat || damage.CardUserSeat != damage.SourceSeat ||
-            damage.EffectiveCardKind is not { } kind || !IsSlashCard(kind)) return 0;
-        return ProgramEventHistory<GuanduActualCardActionEvent>().FirstOrDefault(e =>
-            e.ActualTurnNumber == _turnNumber && e.ActorSeat == damage.SourceSeat && e.Type == CardActionType.Use && IsSlashCard(e.Kind))?.UseFrameId == damage.ResolutionId ? 1 : 0;
-    }
-    private int GuanduSlowEligibleCredits(int seat) => ProgramEventHistory<GuanduSlowAdvanceEarnedEvent>()
-        .Where(e => e.Phase.ActualTurnOwnerSeat == seat)
-        .Skip(ProgramEventHistory<GuanduSlowAdvanceConsumedEvent>().Where(e => e.OwnerSeat == seat).Sum(e => e.Credits))
-        .Count(e => e.Phase.TurnNumber < _turnNumber);
-    private bool GuanduSlowBonusAvailable(int seat) => GuanduSlowEligibleCredits(seat) > 0 &&
-        _resolutionStack.OfType<DrawPhaseObligationFrame>().LastOrDefault()?.IsExtra != true;
-    private int GuanduHoldCredits(int seat, long? excludedToken = null) => ProgramEventHistory<GuanduHoldLineUsedEvent>()
-        .Where(e => e.OwnerSeat == seat)
-        .Skip(ProgramEventHistory<GuanduHoldLineConsumedEvent>().Where(e => e.Phase.ActualTurnOwnerSeat == seat).Sum(e => e.Credits))
-        .Count(e => excludedToken is null || e.ExcludedDiscardPhaseToken != excludedToken);
-    private long? GuanduCurrentDiscardToken => CurrentActualDiscardRecoveryPhase() is { Kind: ActualDiscardRecoveryPhaseKind.Discard } phase &&
-        !ProgramEventHistory<ActualPhaseEndedEvent>().Any(e => e.Phase == phase) ? phase.Token : null;
-    private IEnumerable<RuleQueryContribution> GuanduEventRuleContributions(CharacterState p, SkillRuleQuery query)
-    {
-        var amount = query switch
-        {
-            SkillRuleQuery.DrawCount when CurrentGuanduEvent == GuanduBattleEvent.GrainShortage => -1,
-            SkillRuleQuery.DrawCount when CurrentGuanduEvent == GuanduBattleEvent.SlowAdvance => GuanduSlowBonusAvailable(p.Seat) ? 1 : 0,
-            SkillRuleQuery.HandLimit when CurrentGuanduEvent == GuanduBattleEvent.Standoff && _roundNumber <= 4 => _roundNumber,
-            SkillRuleQuery.HandLimit when CurrentGuanduEvent == GuanduBattleEvent.HoldTheLine => -GuanduHoldCredits(p.Seat, GuanduCurrentDiscardToken),
-            _ => 0
-        };
-        if (amount != 0) yield return new FiniteRuleQueryContribution($"guandu:event:{query}", SkillRuleOperation.Add, amount);
-    }
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 46001)]
-    private void ObserveGuanduEventPhases(IGameEvent e)
-    {
-        if (!IsGuanduActivity) return;
-        if (e is ActualPhaseEndedEvent { Phase.Kind: ActualDiscardRecoveryPhaseKind.Play } ended &&
-            CurrentGuanduEvent == GuanduBattleEvent.SlowAdvance && !ProgramEventHistory<GuanduActualCardActionEvent>().Any(a =>
-                a.Phase == ended.Phase && a.ActorSeat == ended.Phase.ActualTurnOwnerSeat && IsSlashCard(a.Kind)))
-            AdvanceEventRulesAndQueueFact(new GuanduSlowAdvanceEarnedEvent(ended.Phase));
-        if (e is ActualDrawPhaseCompletedEvent { IsExtra: false, Skipped: false } draw && GuanduSlowEligibleCredits(draw.OwnerSeat) > 0)
-            AdvanceEventRulesAndQueueFact(new GuanduSlowAdvanceConsumedEvent(draw.FrameId, draw.OwnerSeat, GuanduSlowEligibleCredits(draw.OwnerSeat)));
-        if (e is ActualPhaseEndedEvent { Phase.Kind: ActualDiscardRecoveryPhaseKind.Discard } discarded && GuanduHoldCredits(discarded.Phase.ActualTurnOwnerSeat, discarded.Phase.Token) > 0)
-            AdvanceEventRulesAndQueueFact(new GuanduHoldLineConsumedEvent(discarded.Phase, GuanduHoldCredits(discarded.Phase.ActualTurnOwnerSeat, discarded.Phase.Token)));
-    }
+    private GuanduBattleEvent? CurrentGuanduEvent => GuanduRules?.CurrentEvent;
+    private void RecordGuanduCardAction(CardActionContext action, SkillProgramTriggerWindow window) =>
+        GuanduRules?.RecordCardAction(new(action.ActionId, action.Type, action.ActorSeat, action.EffectiveKind), window);
     private bool CanUseGuanduRoundConversion(IndexedSkillProgramInstance instance, SkillProgramViewAs rule, CharacterState owner) =>
-        instance.SkillId != "guandu:battle-event" || rule.Id != "hold-line" ||
-        CurrentGuanduEvent == GuanduBattleEvent.HoldTheLine && !ProgramEventHistory<GuanduHoldLineUsedEvent>().Any(e =>
-            e.OwnerSeat == owner.Seat && e.RoundNumber == _roundNumber);
+        GuanduRules?.CanUseRoundConversion(instance.SkillId, rule.Id, owner.Seat) ??
+            (instance.SkillId != "guandu:battle-event" || rule.Id != "hold-line");
     private void ConsumeGuanduRoundConversion(CardConversionSource source)
     {
-        if (source.SkillId != "guandu:battle-event" || source.BindingId != "hold-line") return;
-        if (CurrentGuanduEvent != GuanduBattleEvent.HoldTheLine || ProgramEventHistory<GuanduHoldLineUsedEvent>().Any(e =>
-            e.OwnerSeat == source.OwnerSeat && e.RoundNumber == _roundNumber))
-            throw new InvalidOperationException("The actual round's Slash-as-Dodge allowance was already paid.");
-        AdvanceEventRulesAndQueueFact(new GuanduHoldLineUsedEvent(_roundNumber, source.OwnerSeat, _turnNumber)
-        { ExcludedDiscardPhaseToken = GuanduCurrentDiscardToken });
+        if (GuanduRules is { } rules) rules.ConsumeRoundConversion(source);
+        else if (source.SkillId == "guandu:battle-event" && source.BindingId == "hold-line")
+            throw new InvalidOperationException("The activity conversion feature is not installed.");
     }
     private CardUseFrame? GuanduDamageRewardUse(int owner, ProgramSkillWindowContext context) =>
         context.SourceSeat == owner && CurrentDamageAttempt is { IsSourceLess: false } damage && damage.SourceSeat == owner &&
         LifecycleCardUse(damage.ResolutionId) is { Action.Type: CardActionType.Use } use &&
-        !ProgramEventHistory<GuanduDamageRewardedEvent>().Any(e => e.UseFrameId == use.Id) ? use : null;
+        GuanduRules?.DamageRewardAvailable(use.Id) == true ? use : null;
     private CardUseFrame? GuanduTenthUse(int owner, ProgramSkillWindowContext context)
     {
         if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.CardUse is not { } c ||
             LifecycleCardUse(c.ParentCardUseFrameId) is not { Action: { } action, ExtraCardEffect: null } use ||
             action.ActionId != c.CardActionId || action.ActorSeat != owner || action.Type != CardActionType.Use || !ExtraEffectCardKind(use.CardKind) ||
             use.CardKind is CardKind.Dodge or CardKind.Nullification) return null;
-        return ProgramEventHistory<GuanduActualCardActionEvent>().Any(e => e.ActionId == action.ActionId && e.UseOrdinal % 10 == 0) ? use : null;
+        return GuanduRules?.IsTenthAction(action.ActionId) == true ? use : null;
     }
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 46000)]
     private bool AllowsGuanduEvent(ProgramTriggerLegalityContext gate)
     {
         if (gate.SkillId != "guandu:battle-event") return true;
-        if (!IsGuanduActivity || gate.WindowContext is not { } c) return false;
-        return gate.Candidate.BindingId switch
-        {
-            "tenth-use" => CurrentGuanduEvent == GuanduBattleEvent.TenWinsTenLosses && GuanduTenthUse(gate.OwnerSeat, c) is not null,
-            "damage-draw" => CurrentGuanduEvent == GuanduBattleEvent.GrainShortage && c.Amount > 0 && GuanduDamageRewardUse(gate.OwnerSeat, c) is not null,
-            "turn-duel" => CurrentGuanduEvent == GuanduBattleEvent.SlayTheGenerals && gate.OwnerSeat == _currentSeat,
-            "arrogance" => CurrentGuanduEvent == GuanduBattleEvent.Arrogance && gate.OwnerSeat == _currentSeat,
-            "arrogance-discard" => CurrentGuanduEvent == GuanduBattleEvent.Arrogance && gate.OwnerSeat == _currentSeat &&
-                GetHand(gate.Owner).Count + GetEquipment(gate.Owner).Count > 0 &&
-                _players.Where(p => p.IsAlive && p.Seat != gate.OwnerSeat).All(p => p.Hp < gate.Owner.Hp),
-            _ => false
-        };
+        var context = gate.WindowContext;
+        return GuanduRules?.AllowsEvent(new(gate.SkillId, gate.Candidate.BindingId, gate.OwnerSeat,
+            context is not null, context?.Amount ?? 0,
+            context is not null && GuanduTenthUse(gate.OwnerSeat, context) is not null,
+            context is not null && GuanduDamageRewardUse(gate.OwnerSeat, context) is not null)) ?? false;
     }
     private SkillProgramStepOutcome ExecuteGuanduEvent(ProgramSkillFrame input, SkillProgramEffectOp op)
     {
-        var f = GetActiveProgramFrame(input.Id);
-        if (!IsGuanduActivity || f.WindowContext is not { } c || f.GuanduEventFlow is not null)
+        var frame = GetActiveProgramFrame(input.Id);
+        if (frame.WindowContext is null || frame.GuanduEventFlow is not null)
             throw new InvalidOperationException("A Guandu event lost its exact once-issued program.");
-        if (op == SkillProgramEffectOp.ResolveGuanduRepeat)
-        {
-            var use = GuanduTenthUse(f.OwnerSeat, c) ?? throw new InvalidOperationException("The tenth-card event lost its actual use.");
-            var window = _resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(w => w.Id == c.ParentFrameId);
-            var source = new CardConversionSource(f.SkillId, GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-            ReplaceRuntimeFrame(use.Id, use with { ExtraCardEffect = new() { Source = source, ProgramFrameId = f.Id,
-                ActionId = use.Action!.ActionId, AutomaticGameplayHash = f.GameplayHash, Simple = window.SimpleContinuation, Trick = window.TrickContinuation } });
-            AdvanceEventRulesAndQueueFact(new AutomaticExtraCardEffectIssuedEvent(f.Id, source, use.Id, use.Action!.ActionId, f.GameplayHash));
-            return SkillProgramStepOutcome.Continue;
-        }
-        var rewarding = op == SkillProgramEffectOp.RewardGuanduDamage;
-        var useId = rewarding ? GuanduDamageRewardUse(f.OwnerSeat, c)?.Id : null;
-        if (rewarding && useId is null) throw new InvalidOperationException("Grain shortage cannot reward a card twice.");
-        if (!rewarding && op != SkillProgramEffectOp.ResolveGuanduArrogance) throw new InvalidOperationException("Unknown Guandu event operation.");
-        if (!rewarding && _players.Any(p => p.IsAlive && GetHand(p).Count > GetHand(_players[f.OwnerSeat]).Count)) return SkillProgramStepOutcome.Continue;
-        ReplaceRuntimeTop(f = f with { GuanduEventFlow = new(op, _turnNumber, useId) });
-        AdvanceEventRulesAndQueueFact(new GuanduEventFlowIssuedEvent(f.Id, op, f.OwnerSeat, _turnNumber, useId));
-        if (rewarding)
-        {
-            AdvanceEventRulesAndQueueFact(new GuanduDamageRewardedEvent(useId!.Value, f.OwnerSeat));
-            BeginOperationProgramDraw(f, f.OwnerSeat, 1, new("guandu.grain-shortage.draw"));
-            return SkillProgramStepOutcome.AwaitChild;
-        }
-        var result = new ProgramSkillHost(this).LoseHp(f.Id, f.SkillId, f.OwnerSeat, 1);
-        if (result == SkillProgramStepOutcome.AwaitChild || ResumeGuanduEventFlow(f.Id)) return SkillProgramStepOutcome.AwaitChild;
-        return SkillProgramStepOutcome.Continue;
+        return (GuanduRules ?? throw new InvalidOperationException("The activity event feature is not installed."))
+            .ExecuteEvent(frame.Id, frame.OwnerSeat, op);
     }
     [ProgramContinuation(ProgramContinuationKind.Resume, 46000)]
-    private bool ResumeGuanduEventFlow(long id)
-    {
-        if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { GuanduEventFlow: { } r } f || f.Id != id) return false;
-        if (r.Operation == SkillProgramEffectOp.RewardGuanduDamage && f.NativeDraw is not null)
-            throw new InvalidOperationException("Guandu draw cannot pass an unreturned draw request.");
-        if (TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-            TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id)) return true;
-        ReplaceRuntimeTop(GetActiveProgramFrame(id) with { GuanduEventFlow = null }); return false;
-    }
+    private bool ResumeGuanduEventFlow(long id) => GuanduRules?.ResumeEvent(id) ?? false;
     [ProgramNativeDrawReturn(SkillProgramEffectOp.RewardGuanduDamage)]
     private void ReturnGuanduEventDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {

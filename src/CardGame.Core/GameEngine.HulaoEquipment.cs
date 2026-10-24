@@ -49,28 +49,4 @@ public sealed partial class GameEngine
             !HasCardArmorBypass(_players[useAction.ActorSeat], gate.Owner, useAction.EffectiveKind);
     }
 
-    private void EquipHulaoBossInitialEquipment()
-    {
-        if (_modeDefinition.HulaoActivity is null || CompleteProgramEventHistory()
-            .OfType<HulaoInitialEquipmentPlacedEvent>().Any()) return;
-        var boss = _players[BossActivitySeat];
-        if (!boss.GeneralSelected || !boss.IsAlive)
-            throw new InvalidOperationException("Hulao initial equipment requires the selected living Boss.");
-        var selected = _cardZones.CardsAt(CardLocation.DrawPile)
-            .Where(card => HulaoEquipmentSkillId(card.Kind) is not null).ToList();
-        foreach (var slot in Enum.GetValues<EquipmentSlot>())
-        {
-            // The source does not define how two selected armors share one slot.
-            // This local choice equips one uniformly; every other entity remains
-            // in the draw pile, rather than creating or destroying any equipment.
-            var slotCards = selected.Where(card => EquipmentRules.Get(card.Kind).Slot == slot).ToArray();
-            var kinds = slotCards.Select(card => card.Kind).Distinct().ToArray();
-            if (kinds.Length == 0) continue;
-            var kind = kinds[_random.Next(kinds.Length)];
-            var entities = slotCards.Where(card => card.Kind == kind).ToArray();
-            var card = entities[_random.Next(entities.Length)];
-            if (card is not null) PlaceAdvancedEquipment(card, boss.Seat);
-        }
-        AdvanceEventRulesAndQueueFact(new HulaoInitialEquipmentPlacedEvent(boss.Seat));
-    }
 }

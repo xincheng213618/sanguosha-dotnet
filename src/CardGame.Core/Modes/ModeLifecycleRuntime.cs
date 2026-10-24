@@ -65,7 +65,14 @@ internal sealed partial class MatchModeRuntime
     { foreach (var feature in _ports.Projection) game = feature.ProjectGame(game, viewerSeat, revealAll); return game; }
 
     internal void OnCardAction(CardActionContext action, SkillProgramTriggerWindow window)
-    { foreach (var feature in _ports.CardActions) feature.OnCardAction(action, window); }
+    {
+        if (_ports.CardActions.Length == 0) return;
+        var facts = new ModeCardActionFacts(action.ActionId, action.Type, action.ActorSeat, action.EffectiveKind);
+        foreach (var feature in _ports.CardActions) feature.OnCardAction(facts, window);
+    }
+
+    internal int? InitialHandSizeOverride(int seat)
+    { foreach (var feature in _ports.InitialDeal) if (feature.InitialHandSizeOverride(seat) is { } value) return value; return null; }
 
     internal void BeforeInitialDeal()
     { foreach (var feature in _ports.InitialDeal) feature.BeforeInitialDeal(); }

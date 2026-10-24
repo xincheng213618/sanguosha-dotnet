@@ -2,6 +2,8 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
+    private int? _modeInitialActorSeat;
+
     private IMatchModeSetupFeature ModeSetup => _modeRuntime.Find<IMatchModeSetupFeature>() ??
         throw new InvalidOperationException("The selected mode requires an explicitly installed setup feature.");
 
@@ -21,7 +23,8 @@ public sealed partial class GameEngine
         ArgumentNullException.ThrowIfNull(plan);
         if (_players.Count != 0 || plan.Seats.Count != _playerCount ||
             !plan.Seats.Select(seat => seat.Seat).Order().SequenceEqual(Enumerable.Range(0, _playerCount)) ||
-            plan.SelectionOrder.Any(seat => !IsValidPlayerSeat(seat)))
+            plan.SelectionOrder.Any(seat => !IsValidPlayerSeat(seat)) ||
+            plan.InitialActorSeat is { } initialActor && !IsValidPlayerSeat(initialActor))
             throw new InvalidOperationException("The mode setup must describe exactly the current match's seats.");
         foreach (var seat in plan.Seats.OrderBy(seat => seat.Seat))
         {
@@ -51,6 +54,7 @@ public sealed partial class GameEngine
         }
         _availableGenerals.AddRange(plan.AvailableGeneralIds.Select(ResolveSetupGeneral));
         _selectionOrder.AddRange(plan.SelectionOrder);
+        _modeInitialActorSeat = plan.InitialActorSeat;
         if (plan.ShenwuSharedGodIds is { } shared)
             _shenwuDraft = new(Array.AsReadOnly(shared.ToArray()), plan.ShenwuLeaderGeneralId ??
                 throw new InvalidOperationException("A shared god draft requires its configured encounter leader."));
@@ -61,7 +65,7 @@ public sealed partial class GameEngine
         player.IsHuman, player.Role, player.TeamId, player.NationalFactionId,
         player.GeneralSelected ? player.General.Id : null, player.GeneralSelected,
         player.SecondaryGeneralSelected ? player.SecondaryGeneral?.Id : null, player.SecondaryGeneralSelected)
-        { IsGuanduCommander = IsGuanduCommander(player.Seat) };
+        { IsGuanduCommander = IsGuanduCommander(player.Seat), IsAlive = player.IsAlive };
 
     private IReadOnlyList<ModeSeatSetupFacts> CaptureModeSetupSeats() =>
         Array.AsReadOnly(_players.Select(CaptureModeSetupSeat).ToArray());

@@ -1,3 +1,4 @@
+using CardGame.Modes.Standard;
 using CardGame.Core;
 
 internal static class ModeRuleSetChecks
@@ -12,46 +13,61 @@ internal static class ModeRuleSetChecks
             new(0, Role.Rebel, true, "team:red", "faction:shu")
         ];
         var options = new GameOptions { PlayerCount = 4, HumanSeat = 3 };
-        var identity = ModeRuleSet.Create(Mode("identity:classic-4", ContentModeKind.Identity), options);
+        var identity = StandardModeRuleProfiles.Create(Mode("identity:classic-4", ContentModeKind.Identity), options);
         Require(identity.Opening.GetStartingSeat(players, NoRandom) == 2 && identity.UsesGeneralBaseHp &&
-            identity.SupportsGodFactionSelection && !identity.ReducesFirstActorInitialHand,
+            identity.SupportsGodFactionSelection && !identity.ReducesFirstActorInitialHand && identity.IsClassicIdentityContext &&
+            identity.Visibility.PublishesIdentityComposition,
             "Identity initiative belongs to its Lord, without consuming the deterministic random sequence.");
 
         var teams = new Dictionary<string, int> { ["team:red"] = 2, ["team:blue"] = 2 };
-        var team = ModeRuleSet.Create(Mode("team:test", ContentModeKind.Team) with { TeamCounts = teams }, options);
+        var team = StandardModeRuleProfiles.Create(Mode("team:test", ContentModeKind.Team) with { TeamCounts = teams }, options);
         teams.Clear();
         Require(team.Opening.GetStartingSeat(players, NoRandom) == 1 && team.ReducesFirstActorInitialHand &&
-            !team.SupportsGodFactionSelection && !team.UsesGeneralBaseHp,
+            !team.SupportsGodFactionSelection && !team.UsesGeneralBaseHp && !team.IsClassicIdentityContext &&
+            !team.Visibility.PublishesIdentityComposition,
             "The public-team rule freezes ordinal team order, then selects its lowest seat and initiative compensation.");
 
-        var national = ModeRuleSet.Create(Mode("national:test", ContentModeKind.NationalWarLite), options);
+        var national = StandardModeRuleProfiles.Create(Mode("national:test", ContentModeKind.NationalWarLite), options);
         Require(national.Opening.GetStartingSeat(players, NoRandom) == 0 && !national.ReducesFirstActorInitialHand,
             "National War starts at zero independently of identity or team compatibility fields.");
 
         var calls = 0;
-        var duel = ModeRuleSet.Create(Mode(WushuangMode.ModeId, ContentModeKind.Team),
+        var duel = StandardModeRuleProfiles.Create(Mode(WushuangMode.ModeId, ContentModeKind.Team),
             options with { PlayerCount = 2 });
         Require(duel.Opening.GetStartingSeat(players, count =>
-            { calls++; Require(count == 2, "Duel initiative requests its actual player count."); return 1; }) == 1 && calls == 1,
+            { calls++; Require(count == 2, "Duel initiative requests its actual player count."); return 1; }) == 1 && calls == 1 &&
+            duel.UsesClassicBattleRules && !duel.IsClassicIdentityContext && !duel.Visibility.PublishesIdentityComposition &&
+            duel.RequiresRoundTracking && duel.RequiresRecipientDamageReevaluation,
             "Random initiative consumes exactly one bounded draw instead of evaluating every installed mode.");
 
         var bossMode = Mode("activity:boss", ContentModeKind.Team) with
         {
             BossActivity = new([], [], 5, [])
         };
-        var boss = ModeRuleSet.Create(bossMode, options);
+        var boss = StandardModeRuleProfiles.Create(bossMode, options);
         Require(boss.Opening.GetStartingSeat(players, NoRandom) == 3 && !boss.ReducesFirstActorInitialHand,
             "A cooperative encounter uses its first allied seat and does not inherit 2v2 initiative compensation.");
-        Require(ModeRuleSet.Create(bossMode, options with { HumanSeat = -1 }).Opening.GetStartingSeat(players, NoRandom) == 0,
+        Require(StandardModeRuleProfiles.Create(bossMode, options with { HumanSeat = -1 }).Opening.GetStartingSeat(players, NoRandom) == 0,
             "An all-AI cooperative encounter retains the existing zero-seat fallback.");
 
-        var guandu = ModeRuleSet.Create(Mode("activity:guandu", ContentModeKind.Team) with
+        var guandu = StandardModeRuleProfiles.Create(Mode("activity:guandu", ContentModeKind.Team) with
         {
             GuanduActivity = new(new Dictionary<string, IReadOnlyList<string>>(),
                 new Dictionary<string, string>(), [], [])
         }, options);
-        Require(guandu.Opening.GetStartingSeat(players, NoRandom, guanduCommanderSeat: 3) == 3,
-            "Guandu takes its already-configured Cao commander and does not consume another random draw.");
+        var configured = new ModeSetupPlan([], [], [], initialActorSeat: 3);
+        Require(guandu.Opening.GetStartingSeat(players, NoRandom, initialActorSeat: configured.InitialActorSeat) == 3 &&
+            guandu.RequiresRoundTracking && guandu.RequiresRecipientDamageReevaluation,
+            "Guandu takes the setup plan's generic initial actor and does not consume another random draw.");
+        var hell = StandardModeRuleProfiles.Create(Mode("activity:hell", ContentModeKind.Team) with
+            { HellActivity = new(5, "fixture:auxiliary", "fixture:hidden") }, options);
+        var wenhe = StandardModeRuleProfiles.Create(Mode("activity:wenhe", ContentModeKind.Survival) with
+            { WenheActivity = new() }, options);
+        var nian = StandardModeRuleProfiles.Create(Mode("activity:nian", ContentModeKind.Team) with
+            { NianActivity = new([]) }, options);
+        Require(!hell.RequiresRecipientDamageReevaluation && !wenhe.RequiresRecipientDamageReevaluation &&
+            nian.RequiresRoundTracking && !nian.RequiresRecipientDamageReevaluation,
+            "Installing a damage provider does not itself opt Hell or Wenhe into Guandu and duel recipient resets; Nian independently requires rounds.");
     }
 
     internal static void DeathObjectivesPreserveEncounterAndRankingBoundaries()
@@ -67,7 +83,7 @@ internal static class ModeRuleSetChecks
             new(5, Role.TeamB, false, "team:beasts", null)
         ];
         int[] participantOffsets = [0, 1, 2];
-        var shenwu = ModeRuleSet.Create(Mode("activity:shenwu", ContentModeKind.Team) with
+        var shenwu = StandardModeRuleProfiles.Create(Mode("activity:shenwu", ContentModeKind.Team) with
         {
             ShenwuActivity = new([], [], [], [], participantOffsets, 4, [3, 5], 5, [],
                 new Dictionary<string, string>())
@@ -79,7 +95,7 @@ internal static class ModeRuleSetChecks
         Require(shenwu.Death.Evaluate(encounter).WinningGroupId is null,
             "A dead Shenwu leader does not grant victory before its killing action and death children finish.");
 
-        var boss = ModeRuleSet.Create(Mode("activity:boss", ContentModeKind.Team) with { BossActivity = new([], [], 5, []) }, options);
+        var boss = StandardModeRuleProfiles.Create(Mode("activity:boss", ContentModeKind.Team) with { BossActivity = new([], [], 5, []) }, options);
         Require(boss.Death.Evaluate(encounter).WinningGroupId is null,
             "Successive bosses leave progression to the stable encounter boundary rather than declaring victory on death.");
         var wiped = encounter.Select(player => player with { IsAlive = false }).ToArray();
@@ -87,7 +103,7 @@ internal static class ModeRuleSetChecks
             "Allied defeat remains immediate even when the killing sequence also killed the last enemy.");
 
         var teams = new Dictionary<string, int> { ["team:blue"] = 4, ["team:red"] = 4 };
-        var jiange = ModeRuleSet.Create(Mode("activity:jiange", ContentModeKind.Team) with
+        var jiange = StandardModeRuleProfiles.Create(Mode("activity:jiange", ContentModeKind.Team) with
         {
             TeamCounts = teams,
             TeamActivity = new(new Dictionary<string, IReadOnlyList<string>>(), new Dictionary<string, IReadOnlyList<string>>(),
@@ -105,25 +121,25 @@ internal static class ModeRuleSetChecks
         Require(jiange.Death.Evaluate(objective.Select(player => player with { IsAlive = false }).ToArray()).WinningGroupId == "team:blue",
             "The existing spirit-objective-before-allied-elimination precedence is preserved.");
 
-        var national = ModeRuleSet.Create(Mode("national:test", ContentModeKind.NationalWarLite), options);
+        var national = StandardModeRuleProfiles.Create(Mode("national:test", ContentModeKind.NationalWarLite), options);
         ModePlayerLife[] nationalLives =
         [new(0, Role.TeamA, true, "team:blue", "wei"), new(1, Role.TeamB, true, "team:red", "wei")];
         Require(national.Death.Evaluate(nationalLives) is { Kind: ModeDeathOutcomeKind.Faction, WinningGroupId: "wei" } &&
             !national.Death.NotifyAiOnDeath,
             "National victory uses the true faction without mistaking compatibility teams for player-visible relations.");
 
-        var identity = ModeRuleSet.Create(Mode("identity:test", ContentModeKind.Identity), options);
+        var identity = StandardModeRuleProfiles.Create(Mode("identity:test", ContentModeKind.Identity), options);
         ModePlayerLife[] identityLives = [new(0, Role.Lord, false, null, null), new(1, Role.Renegade, true, null, null)];
         Require(identity.Death.Evaluate(identityLives).Winner == Winner.Renegade &&
             identity.Death.Evaluate(identityLives, zaowangRebelDeathWins: true).Winner == Winner.LordAndLoyalists &&
             identity.Death.EvaluatesIdentityVictory,
             "Identity preserves the lone Renegade result and its qualified Zaowang override.");
-        var race = ModeRuleSet.Create(Mode("activity:dragon", ContentModeKind.Team) with
+        var race = StandardModeRuleProfiles.Create(Mode("activity:dragon", ContentModeKind.Team) with
         { DragonBoatActivity = new(new Dictionary<string, IReadOnlyList<string>>()) }, options);
         Require(race.Death.Evaluate(identityLives).Kind == ModeDeathOutcomeKind.Preserve &&
             !race.Death.UsesIdentityRewards && !race.Death.EvaluatesIdentityVictory,
             "A score race does not replace the winner or run identity rewards on a participant death.");
-        Require(ModeRuleSet.Create(Mode("survival:test", ContentModeKind.Survival), options)
+        Require(StandardModeRuleProfiles.Create(Mode("survival:test", ContentModeKind.Survival), options)
             .Death.Evaluate(identityLives).Kind == ModeDeathOutcomeKind.SurvivalRank,
             "Survival records death rank and leaves final victory to its existing stable boundary.");
     }
@@ -147,11 +163,11 @@ internal static class ModeRuleSetChecks
         var original = new SkillProgram("fixture:mode-card-projection", 1, "fixture-source-hash", "fixture-runtime", 0,
             [], Array.AsReadOnly(views.ToArray()), [], [allTricks], [], []);
         var options = new GameOptions { PlayerCount = 8, HumanSeat = 0 };
-        var plain = ModeRuleSet.Create(Mode("identity:classic-8", ContentModeKind.Identity), options).Cards;
+        var plain = StandardModeRuleProfiles.Create(Mode("identity:classic-8", ContentModeKind.Identity), options).Cards;
         Require(ReferenceEquals(plain.ProjectProgram(original), original) && !plain.ProjectsSkillPrograms,
             "Ordinary identity does not derive a skill view or install activity-card rules.");
 
-        var dragon = ModeRuleSet.Create(Mode("activity:dragon", ContentModeKind.Team) with
+        var dragon = StandardModeRuleProfiles.Create(Mode("activity:dragon", ContentModeKind.Team) with
         { DragonBoatActivity = new(new Dictionary<string, IReadOnlyList<string>>()) }, options).Cards;
         var projected = dragon.ProjectProgram(original);
         Require(projected.Id == original.Id && projected.Revision == original.Revision &&
@@ -171,18 +187,28 @@ internal static class ModeRuleSetChecks
         Require(!dragon.IsDeclaredCardNameAllowed(CardKind.DrawTwo) && !dragon.IsDeclaredCardNameAllowed(CardKind.PeachGarden) &&
             dragon.IsDeclaredCardNameAllowed(CardKind.SameBoat) && plain.IsDeclaredCardNameAllowed(CardKind.DrawTwo),
             "Removed and replaced declaration names are excluded only by the selected match's card rules.");
+        Require(dragon.IsCardAllowed(CardKind.DrawTwo) && !dragon.AllowsOrdinaryTrickOption(CardKind.DrawTwo) &&
+            dragon.AllowsOrdinaryTrickOption(CardKind.DrawTwo, CardKind.DrawTwo) &&
+            dragon.AllowsOrdinaryTrickOption(CardKind.SameBoat) && !plain.AllowsOrdinaryTrickOption(CardKind.SameBoat) &&
+            plain.AllowsOrdinaryTrickOption(CardKind.SameBoat, CardKind.SameBoat) &&
+            !plain.AllowsOrdinaryTrickOption(CardKind.SameBoat, CardKind.Duel),
+            "A named conversion retains its explicit card while only the selected activity adds that card to ordinary name choices.");
+        var duelCards = StandardModeRuleProfiles.Create(Mode(WushuangMode.ModeId, ContentModeKind.Team), options).Cards;
+        var excluded = Enum.GetValues<CardKind>().First(kind => !WushuangCatalogue.IsCardAllowed(kind));
+        Require(!duelCards.IsCardAllowed(excluded) && !duelCards.AllowsOrdinaryTrickOption(excluded, excluded),
+            "The profile's card-use whitelist remains authoritative even for a specifically named conversion.");
 
-        var guandu = ModeRuleSet.Create(Mode("activity:guandu", ContentModeKind.Team) with
+        var guandu = StandardModeRuleProfiles.Create(Mode("activity:guandu", ContentModeKind.Team) with
         { GuanduActivity = new(new Dictionary<string, IReadOnlyList<string>>(), new Dictionary<string, string>(), [], []) }, options).Cards;
         var guanduProgram = guandu.ProjectProgram(original);
         Require(guanduProgram.ViewAs.Single(view => view.Id == "basic-Peach") is { OutputKind: CardKind.Peach, ForResponse: true } &&
             guanduProgram.ViewAs.Single(view => view.Id == "basic-Alcohol") is { OutputKind: CardKind.Intoxication, ForResponse: false },
             "Guandu replaces Alcohol alone and does not inherit Dragon Boat's Peach-to-Zong rule.");
 
-        var wenhe = ModeRuleSet.Create(Mode("activity:wenhe", ContentModeKind.Survival) with
+        var wenhe = StandardModeRuleProfiles.Create(Mode("activity:wenhe", ContentModeKind.Survival) with
         { WenheActivity = new() }, options).Cards.ProjectProgram(original);
         var additions = wenhe.ViewAs.Where(view => view.Id.Contains(".activity-", StringComparison.Ordinal)).ToArray();
-        Require(additions.Select(view => view.OutputKind).SequenceEqual(ModeCardRules.WenheOrdinaryTrickKinds.Concat(ModeCardRules.WenheOrdinaryTrickKinds)) &&
+        Require(additions.Select(view => view.OutputKind).SequenceEqual(StandardModeRuleProfiles.WenheOrdinaryTrickKinds.Concat(StandardModeRuleProfiles.WenheOrdinaryTrickKinds)) &&
             additions.Take(4).All(view => view.Id.StartsWith("family-1-Duel.activity-", StringComparison.Ordinal)) &&
             additions.Skip(4).All(view => view.Id.StartsWith("family-2-Duel.activity-", StringComparison.Ordinal)),
             "Added ordinary names retain the published family-first order and original binding-derived suffixes.");

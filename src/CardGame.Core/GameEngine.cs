@@ -319,13 +319,15 @@ public sealed partial class GameEngine
         options = FreezeShanheBattleOptions(options);
         if (options.HumanSeats is { } humans)
             options = options with { HumanSeats = Array.AsReadOnly(humans.ToArray()) };
-        ValidateOptions(options);
+        ValidateOptions(options, contentRegistry);
         ArgumentNullException.ThrowIfNull(contentRegistry);
         _options = options;
         _contentRegistry = contentRegistry;
         _modeDefinition = ResolveModeDefinition(contentRegistry, options);
-        _modeRules = ModeRuleSet.Create(_modeDefinition, options);
         _modeRuntime = CreateMatchModeRuntime();
+        _modeRules = (_modeRuntime.Find<IMatchModeRuleProvider>() ??
+            throw new InvalidOperationException("The mode requires its installed rule profile.")).Rules;
+        _modeRuntime.EnsureRequiredFeatures(_modeRules.RequiredFeatureContracts);
         ValidateModeRuntimeHookPriorities();
         _programCapabilities = new(this, ProgramCapabilityMetadata.Value);
         _programRuleObservers = new ProgramRuleObservers(ProgramRuleObserverRegistrations.Value,
@@ -337,8 +339,8 @@ public sealed partial class GameEngine
         _programTargetResolvers = new(ProgramTargetResolverMetadata.Value, ProgramSelectionQueries);
         _programActions = new(ProgramActionMetadata.Value, BindRuntimeHandler);
         _nativeReturns = new(NativeReturnMetadata.Value, BindRuntimeHandler);
-        ValidateModeOptions(options, _modeDefinition);
-        ValidateShanheBattleOptions(options, contentRegistry, _modeDefinition);
+        (_modeRuntime.Find<IMatchModeConfigurationValidator>() ??
+            throw new InvalidOperationException("The mode requires its installed configuration validator.")).ValidateOptions();
         _generalPool = CreateRuntimeGeneralPool(contentRegistry, _modeDefinition);
         _playerCount = options.PlayerCount;
         _cardZones = new CardZoneStore(_playerCount);
@@ -389,7 +391,7 @@ public sealed partial class GameEngine
         _modeRules.SupportsGodFactionSelection;
 
     private bool IsClassicIdentityMode =>
-        _modeDefinition.Id.StartsWith("identity:classic-", StringComparison.Ordinal);
+        _modeRules.IsClassicIdentityContext;
 
     private bool UsesClassicBattleRules =>
         _modeRules.UsesClassicBattleRules;
@@ -489,11 +491,11 @@ public sealed partial class GameEngine
     private bool UsesFormalWoodenOx =>
         UsesClassicBattleRules;
 
-    private bool IsTeamMode => _modeDefinition.ModeKind == ContentModeKind.Team;
-    private bool IsSurvivalMode => _modeDefinition.ModeKind == ContentModeKind.Survival;
+    private bool IsTeamMode => _modeRules.Visibility.ShowsPublicTeams;
+    private bool IsSurvivalMode => _modeRules.Visibility.UsesSurvivalRanking;
 
-    private bool IsNationalWarMode => _modeDefinition.ModeKind == ContentModeKind.NationalWarLite;
-    private bool IsDualGeneralMode => IsNationalWarMode || _modeDefinition.DualGenerals;
+    private bool IsNationalWarMode => _modeRules.Visibility.UsesHiddenFaction;
+    private bool IsDualGeneralMode => _modeRules.Visibility.UsesSecondaryGeneral;
 
     /// <summary>The deterministic match seed for local diagnostics and replay labels.</summary>
     public int Seed => _options.Seed;
@@ -697,7 +699,6 @@ public sealed partial class GameEngine
                 AdvanceOneStepCommand step => SubmitAdvance(step, singleStep: true),
                 SelectGeneralCommand selectGeneral => SubmitSelectGeneral(selectGeneral),
                 RequestGeneralRosterCommand roster => SubmitGeneralRoster(roster),
-                RevealGeneralCommand revealGeneral => SubmitRevealGeneral(revealGeneral),
                 PlayCardCommand play => SubmitPlayCard(play),
                 RecastCardCommand recast => SubmitRecast(recast),
                 UseProgramSkillCommand program => SubmitUseProgramSkill(program),
@@ -771,52 +772,6 @@ public sealed partial class GameEngine
         }
 
         return Accept(() => HumanSelectGeneralCore(command.GeneralId, advanceToHumanBoundary: _options.AdvanceAfterHumanCommands));
-    }
-
-    private CommandResult SubmitRevealGeneral(RevealGeneralCommand command)
-    {
-        var pendingKind = _pendingDecision?.Kind ?? DecisionKind.PlayCard;
-        var validation = ValidateHumanPrompt(
-            command.ActorSeat,
-            pendingKind,
-            command.PromptId,
-            CommandErrorCode.IllegalAction);
-        if (validation is not null)
-        {
-            return Reject(validation.Code, validation.Message);
-        }
-
-        if (pendingKind is not (DecisionKind.PlayCard or DecisionKind.RespondDodge or DecisionKind.RespondSlash))
-        {
-            return Reject(CommandErrorCode.IllegalAction, "The engine is not waiting for a revealable national-war action.");
-        }
-
-        if (!IsNationalWarMode)
-        {
-            return Reject(
-                CommandErrorCode.IllegalAction,
-                "General reveal is only available in the national-war lite mode.");
-        }
-
-        if (!Enum.IsDefined(command.Slot))
-        {
-            return Reject(CommandErrorCode.IllegalAction, "The general reveal slot is invalid.");
-        }
-
-        var actor = _players[command.ActorSeat];
-        var action = BuildNationalRevealActions(actor).SingleOrDefault(candidate =>
-            candidate.Kind == LegalActionKind.RevealGeneral &&
-            candidate.GeneralSlot == command.Slot);
-        if (action is null)
-        {
-            return Reject(
-                CommandErrorCode.IllegalAction,
-                "The selected general is already public or cannot be revealed now.");
-        }
-
-        return Accept(() => HumanRevealGeneralCore(
-            command.Slot,
-            advanceToHumanBoundary: _options.AdvanceAfterHumanCommands));
     }
 
     private CommandResult SubmitPlayCard(PlayCardCommand command)
@@ -1763,7 +1718,7 @@ public sealed partial class GameEngine
                 if (_commandAwaitingCommit is AdvanceCommand || _options.AdvanceAfterHumanCommands)
                     AdvanceToHumanBoundary();
             }
-            TryCompleteWenheSurvival();
+            _modeRuntime.TryCompleteMatch(ModeCompletionBoundary.AfterCommand);
             if (_winner != Winner.None &&
                 _status != EngineStatus.Completed &&
                 _pendingDecision is null &&
@@ -1789,18 +1744,12 @@ public sealed partial class GameEngine
         }
 
         _started = true;
-        PublishShanheStartingResourceOrigins();
+        _modeRuntime.OnMatchStart(ModeMatchStartPhase.BeforeRunning);
         _status = EngineStatus.Running;
-        RecordGuanduSetupFact();
-        RecordShenwuDraftFacts();
-        AddLog(
-            "GameStarted",
-            IsWushuangMode ? $"单骑无双开始，本局随机先手为 {_players[_currentSeat].Name}（{_currentSeat + 1:00} 号位）。" :
-            IsSurvivalMode ? $"{_playerCount}人文和乱武开始，随机{_currentSeat + 1}号位先行动，独自存活者获胜。" : IsNationalWarMode
-                ? $"{_playerCount}人国战简化局开始，1号位先行动。"
-                : IsTeamMode
-                    ? $"{_playerCount}人公开阵营局开始，{GetRoleName(GetTeamRole(GetModeTeamIds()[0]))}先行动。"
-                    : $"{_playerCount}人身份局开始，主公先行动。");
+        _modeRuntime.OnMatchStart(ModeMatchStartPhase.AfterRunning);
+        var presentation = _modeRuntime.Find<IMatchModePresentation>() ??
+            throw new InvalidOperationException("The mode requires its installed presentation feature.");
+        AddLog("GameStarted", presentation.StartLog(CaptureModePresentationContext()));
         if (_setupComplete)
         {
             AdvanceEventRulesAndQueueFact(new GameStartedEvent(_playerCount, _modeDefinition.Id));
@@ -1818,13 +1767,14 @@ public sealed partial class GameEngine
         {
             AdvanceEventRulesAndQueueFact(new SetupStartedEvent(_playerCount, _modeDefinition.Id));
         }
-        if (IsTeamMode)
+        if (_modeRules.RevealsTeamsOnStart)
         {
             foreach (var player in _players.OrderBy(player => player.Seat))
             {
                 AdvanceEventRulesAndQueueFact(new TeamAssignedEvent(player.Seat, player.TeamId!));
             }
         }
+        _modeRuntime.OnMatchStart(ModeMatchStartPhase.AfterOpeningFacts);
         var dyingAlcoholRules = ("酒可使本回合下一张直接杀伤害 +1，也可在濒死时仅自救 1 点体力");
         var targetCardRules = ("过河拆桥和顺手牵羊的手牌效果由使用者选择不透明牌位，目标牌面不公开"
 );
@@ -1832,13 +1782,7 @@ public sealed partial class GameEngine
 );
         var delayedCardRules = ($"乐不思蜀置入目标判定区并在其下回合摸牌前判定，结果不为红桃时跳过出牌阶段；兵粮寸断{supplyShortageTargetRules}，置入目标判定区并在其下回合摸牌前判定，结果不为梅花时跳过摸牌阶段；闪电置于自己的判定区，判定为黑桃 2 至 9 时受到 3 点雷电伤害，否则移至下一名存活角色。"
 );
-        var modeRules = IsWushuangMode
-            ? "单骑无双本地版：单机1v1对战AI，先手4张后手5张初牌；开局战法三选一，每个自然回合开始双方各得1虎符，新一轮另得1虎符；回合结束进入虎符商店，刷新花1虎符，支持锁定；额外武将技能最多两个，战法不占技能槽；15分钟到时按本地计分结算"
-            : IsSurvivalMode ? "八名角色独立求生；按死亡顺序排名，最后存活者获胜，击杀获得体力上限与摸牌奖励" : IsNationalWarMode
-            ? $"{FormatFactionSummary(_modeDefinition)}；每名角色选择两名同势力武将，势力和武将默认暗置，明置后公开；消灭其他势力获胜"
-            : IsTeamMode
-                ? $"{FormatTeamSummary(_modeDefinition)}；阵营身份和队友关系公开，击败另一阵营即获胜，{GetRoleName(GetTeamRole(GetModeTeamIds()[0]))}的首位座位先行动"
-                : FormatRoleSummary(_modeDefinition);
+        var modeRules = presentation.RulesText(CaptureModePresentationContext());
         var weaponRules = ("诸葛连弩攻击范围为 1 且杀不受次数限制，青釭剑攻击范围为 2 且使直接杀无视目标防具"
 );
         var armorRules = ("八卦阵在需要使用或打出闪时可选择发动判定，红色判定牌视为闪，仁王盾使黑色杀在指定目标后无效"
@@ -2723,19 +2667,16 @@ public sealed partial class GameEngine
     public string SerializeState(bool revealAll = false) =>
         SnapshotJson.Serialize(CreateSnapshot(_options.HumanSeat, revealAll));
 
-    private static void ValidateOptions(GameOptions options) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.ValidateOptions(options);
+    private static void ValidateOptions(GameOptions options, ContentRegistry? registry = null) =>
+        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.ValidateOptions(options, registry is null ? null :
+            () => ModeFeatureComposition.ValidateInitialOptions(options, registry, ModeConfigurationValidationPhase.Adapter));
 
     private static ContentModeDefinition ResolveModeDefinition(
         ContentRegistry contentRegistry,
         GameOptions options)
     {
-        if (options.HumanGuanduRole is { } guanduRole && (!Enum.IsDefined(guanduRole) || options.HumanSeat < 0))
-            throw new ArgumentException("A Guandu role requires a valid human seat and role.", nameof(options.HumanGuanduRole));
-        var modeId = options.ModeId ??
-            (options.PlayerCount == 4
-                ? "team:standard-2v2"
-                : $"identity:standard-{options.PlayerCount}");
+        ModeFeatureComposition.ValidateInitialOptions(options, contentRegistry, ModeConfigurationValidationPhase.BeforeModeResolution);
+        var modeId = options.ModeId ?? ModeFeatureComposition.ResolveDefaultMode(options, contentRegistry);
         if (!contentRegistry.Modes.TryGetValue(modeId, out var registeredMode))
         {
             throw new InvalidOperationException(
@@ -2749,11 +2690,6 @@ public sealed partial class GameEngine
         }
         return registeredMode;
     }
-
-    private static void ValidateModeOptions(
-        GameOptions options,
-        ContentModeDefinition mode) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.ValidateModeOptions(options,mode);
 
     private static string FormatRoleSummary(ContentModeDefinition mode) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.FormatRoleSummary(mode);
@@ -2780,11 +2716,9 @@ public sealed partial class GameEngine
     private static string GetFactionName(string factionId) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.GetFactionName(factionId);
 
-    private string? GetEffectiveFactionId(CharacterState player) =>
-        IsDragonBoatActivity ? player.TeamId?[5..] : IsNationalWarMode
-            ? player.NationalFactionId
-            : player.NativeEffectiveFactionOverrideId ?? GetPrivateGeneralLibraryFaction(player) ?? player.ChosenFactionId ??
-              GetScenarioGodFaction(player) ?? player.General.FactionId;
+    private string? GetEffectiveFactionId(CharacterState player) => ModeFactionPolicy.EffectiveFaction(new(
+        player.TeamId, player.NationalFactionId, player.NativeEffectiveFactionOverrideId,
+        GetPrivateGeneralLibraryFaction(player), player.ChosenFactionId, player.General.FactionId));
 
     private bool RequiresGodFactionSelection(CharacterState player) =>
         SupportsGodFactionSelection &&
@@ -2820,7 +2754,7 @@ public sealed partial class GameEngine
     }
 
     private int GetStartingSeat() => _modeRules.Opening.GetStartingSeat(
-        CaptureModeLife(), _random.Next, GuanduConfiguration?.CaoCommanderSeat);
+        CaptureModeLife(), _random.Next, _modeInitialActorSeat);
 
     private static IReadOnlyList<GeneralDefinition> CreateRuntimeGeneralPool(
         ContentRegistry contentRegistry,
@@ -2946,8 +2880,8 @@ public sealed partial class GameEngine
 
     private void DealInitialHands()
     {
-        PrepareShenwuSelectedEquipmentAndDeck();
-        EquipHulaoBossInitialEquipment();
+        PrepareModeSelectedEquipmentAndDeck();
+        _modeRuntime.BeforeInitialDeal();
         var counts = _players.ToDictionary(player => player.Seat, GetInitialHandSize);
         var rounds = counts.Values.DefaultIfEmpty(0).Max();
         for (var cardIndex = 0; cardIndex < rounds; cardIndex++)
@@ -2962,12 +2896,12 @@ public sealed partial class GameEngine
                     continue;
                 }
 
-                if (!TryDealShanheStartingHandCard(player.Seat, cardIndex))
+                if (!_modeRuntime.TryDealInitialCard(player.Seat, cardIndex))
                     DrawCards(player, 1, log: false, CardMoveReasons.InitialDeal);
             }
         }
 
-        PlaceShanheStartingCards();
+        _modeRuntime.AfterInitialDeal();
 
         AssertCoreInvariants();
     }
@@ -2983,9 +2917,8 @@ public sealed partial class GameEngine
 
         if (_turnNumber >= _options.MaxTurns)
         {
-            if (IsWushuangMode)
+            if (_modeRuntime.TryFinishAtTurnLimit(_options.MaxTurns))
             {
-                CompleteWushuangAtSurvivalLimit($"达到最大回合数 {_options.MaxTurns}");
                 AdvanceRulesAndPublishState();
                 return;
             }
@@ -3422,65 +3355,15 @@ public sealed partial class GameEngine
         IReadOnlyDictionary<string, string> candidateIds,
         bool fullRoster = false)
     {
-        var choices = candidates.Select(general =>
-        {
-            var factionSuffix = IsNationalWarMode
-                ? $" · {GetFactionName(general.FactionId ?? string.Empty)}"
-                : string.Empty;
-            var choice = new PromptChoice(
-                new ChoiceId($"setup.general.{general.Id}"),
-                $"选择 {general.Name}（{general.SkillSummary}{factionSuffix}）",
-                [],
-                [],
-                new Dictionary<string, string>
-                {
-                    ["action"] = "select-general",
-                    ["general-id"] = general.Id,
-                    ["faction-id"] = general.FactionId ?? string.Empty
-                });
-            if (fullRoster)
-                choice = choice with { Parameters = new Dictionary<string, string>(choice.Parameters, StringComparer.Ordinal)
-                    { ["full-roster"] = "true" } };
-            choice = choice with { ContentIds = [general.Id] };
-            if (_modeDefinition.GeneralVariantGroups is not null)
-                choice = choice with { Parameters = new Dictionary<string, string>(choice.Parameters, StringComparer.Ordinal)
-                    { ["candidate-general-id"] = candidateIds[general.Id] } };
-            if (!IsDualGeneralMode && UsesGeneralBaseHp)
-            {
-                var identityMaxHp = general.BaseHp + (player.Role == Role.Lord ? 1 : 0);
-                choice = choice with
-                {
-                    Parameters = new Dictionary<string, string>(choice.Parameters, StringComparer.Ordinal)
-                    {
-                        ["base-hp"] = general.BaseHp.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                        ["identity-max-hp"] = identityMaxHp.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                        ["health-preview"] = (player.Role == Role.Lord
-                            ? $"主公体力上限为基础 {general.BaseHp} + 1 = {identityMaxHp}。"
-                            : $"身份模式体力上限为 {identityMaxHp}。") +
-                            (general.InitialHp is { } initialHp
-                                ? $"初始体力为 {initialHp + (player.Role == Role.Lord ? 1 : 0)}/{identityMaxHp}。" : string.Empty)
-                    }
-                };
-            }
-            choice = WithDualGeneralHealthPreview(choice, player, general);
-            choice = WithShenwuGeneralChoice(choice, general, candidateIds[general.Id]);
-            return choice;
-        }).ToArray();
+        var facts = new ModeGeneralSelectionFacts(player.Role, player.GeneralSelected, player.General.Name, player.General.BaseHp);
+        var choices = candidates.Select(general => ModeSetupPresentation.GeneralChoice(facts,
+            new(general.Id, general.Name, general.SkillSummary, general.FactionId, GetFactionName(general.FactionId ?? string.Empty),
+                general.BaseHp, general.InitialHp, candidateIds[general.Id]), fullRoster)).ToArray();
 
         _pendingDecision = new PendingDecision(
             DecisionKind.SelectGeneral,
             player.Seat,
-            IsNationalWarMode
-                ? player.GeneralSelected
-                    ? $"主将 {player.General.Name}（基础体力 {player.General.BaseHp}）· 请选择副将，卡片显示组合后的体力上限。"
-                    : $"请选择你的第 {(player.GeneralSelected ? "二" : "一")} 名同势力武将。候选仅对你可见，明置前势力不会公开。"
-                : _modeDefinition.DualGenerals
-                    ? player.GeneralSelected
-                        ? $"主将 {player.General.Name} · 请选择副将。体力为两将基础体力平均向下取整，主公额外 +1；势力与性别沿用主将。"
-                        : "请选择主将，再选择副将。两将技能同时生效，势力与性别沿用主将。"
-                : IsTeamMode
-                    ? IsDragonBoatActivity ? "请选择本势力六名候选中的武将。你与同船队友互见候选，其他队伍不可见。" : "请选择你的武将。候选仅对你可见，所有人完成后才会公开结果。"
-                    : "主公先选并公开，本地玩家接着选，其余玩家随后暗选。候选仅对你可见，其余武将在开局确认后公开。",
+            ModeSetupPresentation.SelectionPrompt(facts),
             [],
             [])
         {
@@ -3501,13 +3384,9 @@ public sealed partial class GameEngine
         }
 
         player.GeneralDraftCandidates = null;
-        if (UsesFamilyGeneralDraft)
-        {
-            var family = _modeDefinition.GeneralVariantGroups?.Values
-                .FirstOrDefault(ids => ids.Contains(general.Id, StringComparer.Ordinal));
-            if (family is not null)
-                _availableGenerals.RemoveAll(candidate => family.Contains(candidate.Id, StringComparer.Ordinal));
-        }
+        var retiredCandidates = ModeSetup.RemoveGeneralIdsAfterSelection(general.Id);
+        if (retiredCandidates.Count != 0)
+            _availableGenerals.RemoveAll(candidate => retiredCandidates.Contains(candidate.Id, StringComparer.Ordinal));
 
         if (IsNationalWarMode)
         {
@@ -3601,9 +3480,7 @@ public sealed partial class GameEngine
         _status = EngineStatus.Running;
         AddLog(
             "SetupCompleted",
-            IsNationalWarMode
-                ? "国战选将完成，双将与势力保持暗置；出牌阶段或杀响应时可按需明置一名武将。"
-                : $"选将完成并公开：{string.Join("、", _players.OrderBy(player => player.Seat).Select(GetPublicGeneralName))}。",
+            ModeSetupPresentation.SetupCompletedText(new(_players.OrderBy(player => player.Seat).Select(GetPublicGeneralName))),
             _currentSeat);
         AdvanceEventRulesAndQueueFact(new GameStartedEvent(_playerCount, _modeDefinition.Id));
         AdvanceEventRulesAndQueueFact(new SetupCompletedEvent(_players.Count, _modeDefinition.Id));
@@ -15723,7 +15600,7 @@ public sealed partial class GameEngine
         MobileMaChaoYuliNature(attack, GetDamageNatureBeforeMobileMaChao(attack));
 
     private DamageNature GetDamageNatureBeforeMobileMaChao(IDamageAttempt attack) =>
-        ShouliThunderNature(attack) ?? GuanduDamageNature(ShenwuDamageNature(attack, IsYingboRepeated(attack.ResolutionId)
+        ShouliThunderNature(attack) ?? _modeRuntime.TransformDamageNature(ShenwuDamageNature(attack, IsYingboRepeated(attack.ResolutionId)
             ? DamageNature.Fire
             : attack.DamageNatureOverride ?? GetDamageNature(RequireAttackCardKind(attack))));
 
@@ -16503,9 +16380,7 @@ public sealed partial class GameEngine
 
     private void CompleteActualTurnCursorAfterRoundEnding(CharacterState previous, bool skipped)
     {
-        if (TryCompleteWenheSurvival()) return;
-        if (TryCompleteGuanduBattle()) return;
-        if (TryCompleteDragonBoatRace()) return;
+        if (_modeRuntime.TryCompleteMatch(ModeCompletionBoundary.AfterTurnEnded)) return;
         // Per-general tracking opts in declaratively through descriptor TracksActualTurnCursorReturn
         // markers; only engine-level aggregates and non-op dependencies stay listed here.
         if (TracksRoundEnding || TracksActualPhaseEnds || TracksWholeActualTurnUseOrdinal || UsesTreatedWounded ||
@@ -16608,7 +16483,7 @@ public sealed partial class GameEngine
             {
                 AdvanceEventRulesAndQueueFact(new RoleRevealedEvent(victim.Seat, victim.Role));
             }
-            ApplyGuanduDeathReward(victim, killer);
+            _modeRuntime.ApplyDeathReward(victim.Seat, killer?.Seat);
             if (TryBeginAnniversaryYuanYinDeathBeforeCleanup(deathFrameId)) return;
             ContinuePlayerDeathCleanup(deathFrameId);
         }
@@ -16639,12 +16514,9 @@ public sealed partial class GameEngine
         _pendingDecision = null;
         _pendingCardsMovedBatches.Clear();
         _pendingHpChanges.Clear();
-        var winnerName = IsGuanduActivity && _winnerTeamId is { } army ? GetTeamName(army) : IsDragonBoatActivity && _winnerTeamId is { } boat ? $"{GetFactionName(boat[5..])}队" : IsSurvivalMode && _winnerSeat is { } champion ? _players[champion].Name : IsNationalWarMode
-            ? _winnerFactionId is { } winnerFactionId
-                ? $"{GetFactionName(winnerFactionId)}势力"
-                : "未知势力"
-            : GetWinnerName(_winner);
-        AddLog("GameEnded", _winner == Winner.Draw ? "游戏结束：本局平局。" : $"游戏结束：{winnerName}获胜。 ");
+        AddLog("GameEnded", (_modeRuntime.Find<IMatchModePresentation>() ??
+            throw new InvalidOperationException("The mode requires its installed presentation feature."))
+            .WinnerLog(CaptureModeWinnerPresentationContext()));
         AdvanceEventRulesAndQueueFact(new GameEndedEvent(
             _winner,
             IsTeamMode ? _winnerTeamId : null,
@@ -16764,9 +16636,9 @@ public sealed partial class GameEngine
             return true;
         }
 
-        if (IsGuanduActivity)
+        if (!_modeRules.AllowsDiscardRecycling)
         {
-            RecordGuanduDeckExhaustion();
+            _modeRuntime.TryHandleEmptyDrawPile();
             return false;
         }
 
@@ -17467,7 +17339,7 @@ public sealed partial class GameEngine
             card.Kind,
             from,
             to,
-            reason) { Disclosure = _modeDefinition.WenheActivity is null ? CardMovementDisclosure.Unspecified : disclosure,
+            reason) { Disclosure = _modeRules.PublishesCardMovementDisclosure ? disclosure : CardMovementDisclosure.Unspecified,
                 ActualPlaySlashLoss = CaptureActualPlaySlashLoss(card, from, to),
                 RedOwnedLoss = CaptureRedOwnedLoss(card, from, to, _movementSequence),
                 HappyMedicineHandLoss = CaptureHappyHuaTuoHandLoss(card, from, to, _movementSequence),

@@ -11,15 +11,21 @@ public interface IModeSetupRandom
 /// Installs the setup service as its principal feature. An exact-mode setup replaces the all-modes default;
 /// independent command, observer and encounter factories keep their ordinary composition.
 /// </summary>
-public interface IGameModeSetupFeatureFactory : IGameModeFeatureFactory { }
+public interface IGameModeSetupFeatureFactory : IGameModeFeatureFactory
+{
+    void ValidateInitialOptions(GameOptions options, ModeConfigurationValidationPhase phase) { }
+    string? ResolveDefaultModeId(GameOptions options, ContentRegistry registry) => null;
+}
 
 /// <summary>Pure setup algorithms. The engine alone applies plans to players, cards and private draft state.</summary>
 public interface IMatchModeSetupFeature : IGameModeFeature
 {
     ModeSetupPlan BuildPlayers();
     ModeGeneralOfferPlan GetGeneralOffers(ModeGeneralOfferRequest request);
+    IReadOnlyList<string> RemoveGeneralIdsAfterSelection(string generalId) => [];
     IReadOnlyList<Card> PrepareDeck(IReadOnlyList<Card> original);
     IReadOnlyList<Card> ProjectDeckCardNames(IReadOnlyList<Card> original);
+    IReadOnlyList<Type> InitialEquipmentCompletionFacts => [];
     ModeSelectedEquipmentPlan? PrepareSelectedEquipment(IReadOnlyList<Card> drawPile, IReadOnlyList<ModeSeatSetupFacts> seats);
     ModeSelectedGeneralPlan PrepareSelectedGeneral(ModeSeatSetupFacts seat, string generalId);
 }
@@ -57,7 +63,8 @@ public sealed class ModeSetupPlan
 {
     public ModeSetupPlan(IEnumerable<ModeSeatSetup> seats, IEnumerable<string> availableGeneralIds,
         IEnumerable<int> selectionOrder, IEnumerable<string>? shenwuSharedGodIds = null,
-        string? shenwuLeaderGeneralId = null, GuanduBattleConfiguredEvent? guanduConfiguration = null)
+        string? shenwuLeaderGeneralId = null, GuanduBattleConfiguredEvent? guanduConfiguration = null,
+        int? initialActorSeat = null)
     {
         Seats = Array.AsReadOnly(seats.ToArray());
         AvailableGeneralIds = Array.AsReadOnly(availableGeneralIds.ToArray());
@@ -65,6 +72,7 @@ public sealed class ModeSetupPlan
         ShenwuSharedGodIds = shenwuSharedGodIds is null ? null : Array.AsReadOnly(shenwuSharedGodIds.ToArray());
         ShenwuLeaderGeneralId = shenwuLeaderGeneralId;
         GuanduConfiguration = guanduConfiguration;
+        InitialActorSeat = initialActorSeat;
     }
     public IReadOnlyList<ModeSeatSetup> Seats { get; }
     public IReadOnlyList<string> AvailableGeneralIds { get; }
@@ -72,6 +80,7 @@ public sealed class ModeSetupPlan
     public IReadOnlyList<string>? ShenwuSharedGodIds { get; }
     public string? ShenwuLeaderGeneralId { get; }
     public GuanduBattleConfiguredEvent? GuanduConfiguration { get; }
+    public int? InitialActorSeat { get; }
 }
 
 /// <summary>Trusted scalar draft facts, kept separate from player-facing projections.</summary>
@@ -80,6 +89,7 @@ public sealed record ModeSeatSetupFacts(int Seat, bool IsHuman, Role Role, strin
     string? SecondaryGeneralId = null, bool SecondaryGeneralSelected = false)
 {
     public bool IsGuanduCommander { get; init; }
+    public bool IsAlive { get; init; } = true;
 }
 
 public sealed class ModeGeneralOfferRequest

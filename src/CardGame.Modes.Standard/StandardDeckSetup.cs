@@ -65,6 +65,38 @@ internal sealed partial class StandardModeSetupFeature
 
     public ModeSelectedEquipmentPlan? PrepareSelectedEquipment(IReadOnlyList<Card> drawPile, IReadOnlyList<ModeSeatSetupFacts> seats)
     {
+        if (InitialEquipmentCompletionFacts.Count == 0) return null;
+        var shenwu = PrepareShenwuSelectedEquipment(drawPile, seats);
+        IReadOnlyList<Card> cards = shenwu?.Cards ?? drawPile;
+        var placements = shenwu?.Placements.ToList() ?? [];
+        var facts = shenwu?.CompletionFacts.ToList() ?? [];
+        if (_mode.HulaoActivity is not null)
+        {
+            var bossSeat = RelativeSeat(3);
+            var boss = seats.Single(player => player.Seat == bossSeat);
+            if (!boss.GeneralSelected || !boss.IsAlive)
+                throw new InvalidOperationException("Hulao initial equipment requires the selected living Boss.");
+            var equipment = _equipmentHostFactory();
+            var placedIds = placements.Select(placement => placement.CardId).ToHashSet();
+            var selected = cards.Where(card => !placedIds.Contains(card.Id) && equipment.SkillBinding(card.Kind) is { } binding &&
+                binding.SkillId.StartsWith("hulao:", StringComparison.Ordinal)).ToArray();
+            foreach (var slot in Enum.GetValues<EquipmentSlot>())
+            {
+                var slotCards = selected.Where(card => equipment.Definition(card.Kind).Slot == slot).ToArray();
+                var kinds = slotCards.Select(card => card.Kind).Distinct().ToArray();
+                if (kinds.Length == 0) continue;
+                var kind = kinds[_random.Next(kinds.Length)];
+                var entities = slotCards.Where(card => card.Kind == kind).ToArray();
+                var card = entities[_random.Next(entities.Length)];
+                placements.Add(new(bossSeat, card.Id));
+            }
+            facts.Add(new HulaoInitialEquipmentPlacedEvent(bossSeat));
+        }
+        return new(cards, placements, facts);
+    }
+
+    private ModeSelectedEquipmentPlan? PrepareShenwuSelectedEquipment(IReadOnlyList<Card> drawPile, IReadOnlyList<ModeSeatSetupFacts> seats)
+    {
         if (_mode.ShenwuActivity is not { } activity) return null;
         var selected = activity.PlayerSeatOffsets.Select(RelativeSeat).Select(seat => seats.Single(p => p.Seat == seat))
             .Where(player => activity.GodPoolIds.Contains(player.GeneralId!, StringComparer.Ordinal))

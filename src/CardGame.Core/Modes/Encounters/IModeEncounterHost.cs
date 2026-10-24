@@ -16,7 +16,7 @@ public sealed record ModeEncounterGeneralFacts(string Id, string Name, int BaseH
 
 /// <summary>Replace a seat's general, either preserving its current state or starting a fresh combatant.</summary>
 public sealed record ModeCombatantReplacement(int Seat, string ExpectedGeneralId, string GeneralId,
-    bool PreserveCurrentState);
+    bool PreserveCurrentState, int? MaximumHpOverride = null, int? HpOverride = null);
 
 public sealed record ModeCancelledResolution(long FrameId, ResolutionFrameKind Kind, int TurnNumber);
 

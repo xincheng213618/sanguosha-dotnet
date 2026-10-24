@@ -2,7 +2,10 @@ namespace CardGame.Core;
 
 /// <summary>Immutable native facts consumed by the optional single-match feature.</summary>
 public sealed record WushuangPlayerFacts(int Seat, string Name, bool IsHuman, bool IsAlive,
-    int Hp, int MaxHp, IReadOnlyList<SkillGrant> SkillGrants);
+    int Hp, int MaxHp, IReadOnlyList<SkillGrant> SkillGrants)
+{
+    public string? TeamId { get; init; }
+}
 
 public sealed record WushuangDamageFacts(int SourceSeat, int CardUserSeat,
     bool IsSourceLess, bool IsChainPropagation, CardKind? EffectiveCardKind);
@@ -16,6 +19,7 @@ public interface IWushuangModeHost
     int PlayerCount { get; }
     int CurrentSeat { get; }
     int RoundNumber { get; }
+    int MaximumTurns { get; }
     int FirstNormalSeat { get; }
     long Revision { get; }
     bool ClockRunning { get; }
@@ -53,6 +57,11 @@ public interface IWushuangModeHost
     bool TryBeginAcquisition(long frameId, WushuangShopOffer offer);
     bool TryContinueAiShopping(int seat, WushuangIntermissionFrame frame);
     void ContinueAfterShopping(int endedSeat, bool skipped);
+    void RetirePendingMatch(string? winningTeamId, Func<long, ResolutionFrameKind, IGameEvent> cancellationFact,
+        string processingReason, string judgmentReason);
+    void Log(string kind, string message);
+    void PublishCurrentWinner();
+    void CompleteGame();
 }
 
 /// <summary>Shop-local deterministic shuffle; one instance serves the complete page refresh.</summary>

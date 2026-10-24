@@ -52,15 +52,18 @@ public interface IMatchModeSkillVisibility : IGameModeFeature
     bool IsSkillVisible(int seat, string? skillId, int viewerSeat, bool revealAll);
 }
 
+public sealed record ModeCardActionFacts(long ActionId, CardActionType Type, int ActorSeat, CardKind EffectiveKind);
+
 public interface IMatchModeCardActionObserver : IGameModeFeature
 {
     int Order { get; }
-    void OnCardAction(CardActionContext action, SkillProgramTriggerWindow window);
+    void OnCardAction(ModeCardActionFacts action, SkillProgramTriggerWindow window);
 }
 
 public interface IMatchModeInitialDeal : IGameModeFeature
 {
     int Order { get; }
+    int? InitialHandSizeOverride(int seat) => null;
     void BeforeInitialDeal() { }
     bool TryDealInitialCard(int seat, int cardIndex) => false;
     void AfterInitialDeal() { }

@@ -15,9 +15,9 @@ public sealed partial class GameEngine
         {
             var player = _players[playerIndex];
             var playerHand = GetHand(player);
-            var canSeeRole = !IsNationalWarMode &&
+            var canSeeRole = !_modeRules.Visibility.ConcealsRoleCompletely &&
                              (revealAll ||
-                              IsTeamMode ||
+                              _modeRules.Visibility.ShowsPublicTeams ||
                               player.Role == Role.Lord ||
                               player.RoleRevealed ||
                               player.Seat == viewerSeat);
@@ -53,19 +53,20 @@ public sealed partial class GameEngine
                                         string.Equals(player.General.FactionId, "god", StringComparison.Ordinal) &&
                                         player.ChosenFactionId is not null;
             var hasScenarioGodFaction = GetScenarioGodFaction(player) is not null;
-            var hasActivityFaction = _modeDefinition.ShenwuActivity is not null || _modeDefinition.NianActivity is not null || IsDragonBoatActivity || IsGuanduActivity;
+            var hasActivityFaction = _modeRules.Visibility.PublishesActivityFaction;
             var canSeeFaction = effectiveFactionId is not null &&
-                                (IsNationalWarMode
+                                (_modeRules.Visibility.UsesHiddenFaction
                                     ? revealAll || player.FactionRevealed || player.Seat == viewerSeat
                                     : (hasIdentityGodFaction || hasScenarioGodFaction || hasActivityFaction || HasNativeEffectiveFactionDeclaration(player) || GetPrivateGeneralLibraryFaction(player) is not null) &&
                                       (revealAll || player.GeneralRevealed || player.Seat == viewerSeat));
             var primarySkills = canSeeGeneral
                 ? player.IdentityConcealed ? general.Skills.ToArray()
                     : OwnedRuntimeSkills(player, general, includeAcquired: true).ToArray() : null;
-            if (_modeDefinition.WenheActivity is not null)
-                primarySkills = primarySkills?.Where(skill => IsWenhePlayerSkillVisible(player, skill, viewerSeat, revealAll)).ToArray();
+            primarySkills = primarySkills?.Where(skill => _modeRuntime.IsSkillVisible(player.Seat, skill.ContentId, viewerSeat, revealAll)).ToArray();
             var secondarySkills = secondaryGeneral is not null
                 ? OwnedRuntimeSkills(player, secondaryGeneral, includeAcquired: false).ToArray() : null;
+            var activeWushuangSkillIds = IsWushuangMode ? GetSkillBindingShard(player).ProgramInstances
+                .Select(instance => instance.SkillId).ToHashSet(StringComparer.Ordinal) : null;
             var publicPile = SinglePublicPileSource(player.Seat);
             var publicPileCards = publicPile is not null ? PublicPileCards(publicPile) : Array.Empty<Card>();
             var deferredPileCards = _cardZones.CardsAt(new CardLocation(CardZoneKind.PublicDeferredPile, player.Seat));
@@ -75,7 +76,7 @@ public sealed partial class GameEngine
                 player.Name,
                 player.IsHuman,
                 canSeeRole ? player.Role : null,
-                !IsNationalWarMode && (player.RoleRevealed || player.Role == Role.Lord),
+                !_modeRules.Visibility.ConcealsRoleCompletely && (player.RoleRevealed || player.Role == Role.Lord),
                 general.Id,
                 general.Name,
                 general.PortraitKey,
@@ -90,13 +91,16 @@ public sealed partial class GameEngine
                 ViewerCanUseHand = sharedHandAccess,
                 IdentityConcealed = player.IdentityConcealed,
                 HappyQiaoHealth = player.HasHpValue ? player.HappyQiaoHealth : null,
-                WushuangTacticIds = _modeRuntime.Wushuang?.TacticIds(player.Seat),
+                WushuangBuild = IsWushuangMode && (primarySkills is not null || secondarySkills is not null)
+                    ? WushuangBuildProfile.Read((primarySkills ?? []).Concat(secondarySkills ?? [])
+                        .Select(skill => skill.ContentId).OfType<string>().Distinct(StringComparer.Ordinal)
+                        .Where(id => activeWushuangSkillIds!.Contains(id))
+                        .Select(id => _contentRegistry.Skills.GetValueOrDefault(id)?.Program).OfType<SkillProgram>())
+                    : null,
                 Armor = player.Armor,
                 IncomingDamageCap = GetIncomingFixedDamageCap(player,
                     (primarySkills ?? []).Concat(secondarySkills ?? []).Select(skill => skill.ContentId)
                         .OfType<string>().ToHashSet(StringComparer.Ordinal)),
-                SurvivalRank = WenheSurvivalRank(player.Seat),
-                WenheChampionMarkUsed = IsSurvivalMode && WenheChampionMarkUsed(player.Seat) ? true : null,
                 HpUndefined = !player.HasHpValue || player.HappyQiaoHealth is not null,
                 HandLimit = _setupComplete && player.Seat == _currentSeat && player.HasHpValue
                     ? GetHandLimit(player) : null,
@@ -104,8 +108,8 @@ public sealed partial class GameEngine
                 IsFaceDown = player.IsFaceDown,
                 ActiveEffects = ProjectActivePlayerEffects(player, primarySkills, secondarySkills),
                 OriginalHandEntities = ProjectOriginalHandEntities(player.Seat, viewerSeat, revealAll),
-                TeamId = IsTeamMode && player.TeamRevealed ? player.TeamId : null,
-                IsTeamRevealed = IsTeamMode && player.TeamRevealed,
+                TeamId = _modeRules.Visibility.ShowsPublicTeams && player.TeamRevealed ? player.TeamId : null,
+                IsTeamRevealed = _modeRules.Visibility.ShowsPublicTeams && player.TeamRevealed,
                 Equipment = equipment,
                 IsEquipmentAreaAbolished = player.EquipmentAreaAbolished,
                 EquipmentSlotCapacities = player.EquipmentSlotCapacities.Count > 0
@@ -181,13 +185,13 @@ public sealed partial class GameEngine
                         .ToArray()
                     : null))))))),
                 FactionId = canSeeFaction ? effectiveFactionId : null,
-                IsFactionRevealed = IsNationalWarMode
+                IsFactionRevealed = _modeRules.Visibility.UsesHiddenFaction
                     ? player.FactionRevealed
                     : (hasIdentityGodFaction || hasScenarioGodFaction || hasActivityFaction || HasNativeEffectiveFactionDeclaration(player) || GetPrivateGeneralLibraryFaction(player) is not null) && player.GeneralRevealed,
                 SecondaryGeneralId = secondaryGeneral?.Id,
                 SecondaryGeneralName = secondaryGeneral?.Name,
                 SecondaryPortraitKey = secondaryGeneral?.PortraitKey,
-                IsSecondaryGeneralPublic = IsDualGeneralMode && player.SecondaryGeneralRevealed,
+                IsSecondaryGeneralPublic = _modeRules.Visibility.UsesSecondaryGeneral && player.SecondaryGeneralRevealed,
                 Skills = primarySkills,
                 SecondarySkills = secondarySkills,
                 SkillRuntimeStates = primarySkills is not null
@@ -199,6 +203,7 @@ public sealed partial class GameEngine
                         .ToArray()
                     : null
             };
+            snapshots[playerIndex] = _modeRuntime.ProjectPlayer(snapshots[playerIndex], viewerSeat, revealAll);
         }
 
         var visibleDecision = GetPendingDecisionForActor(viewerSeat);
@@ -255,7 +260,7 @@ public sealed partial class GameEngine
         if (lastProgram?.AlternatingSuitTop is { Mode: "completed", Stage: "order" } orderedCosts)
             publicRevealedCards = publicRevealedCards.Concat(orderedCosts.CardIds.Except(orderedCosts.SelectedIds).Select(id => ToSnapshot(_cardZones.CardsAt(_cardZones.GetLocation(id)).Single(c=>c.Id==id)))).DistinctBy(c=>c.Id).ToArray();
 
-        return FreezePlayerView(new GameSnapshot(
+        return FreezePlayerView(_modeRuntime.ProjectGame(new GameSnapshot(
             revealAll ? _options.Seed : null,
             _options.HumanSeats is null ? _options.HumanSeat : viewerSeat,
             _status,
@@ -278,16 +283,10 @@ public sealed partial class GameEngine
             BenevolenceCards = _cardZones.CardsAt(CardLocation.Benevolence) is { Count: > 0 } benevolence
                 ? benevolence.Select(ToSnapshot).ToArray() : null,
             WinnerSeat = _winnerSeat,
-            WenheRule = GetWenheRuleSnapshot(),
-            WenheAspiration = GetWenheAspirationSnapshot(viewerSeat),
-            GuanduActivity = GetGuanduSnapshot(),
-            Wushuang = CreateWushuangSnapshot(viewerSeat),
-            DragonBoatStandings = GetDragonBoatStandings(),
-            DragonBoatDraft = GetDragonBoatDraft(viewerSeat),
-            WinnerTeamId = IsTeamMode ? _winnerTeamId : null,
-            WinnerFactionId = IsNationalWarMode ? _winnerFactionId : null,
+            WinnerTeamId = _modeRules.Visibility.ShowsPublicTeams ? _winnerTeamId : null,
+            WinnerFactionId = _modeRules.Visibility.UsesHiddenFaction ? _winnerFactionId : null,
             ModeKind = _modeDefinition.ModeKind,
-            IdentityComposition = _modeDefinition.ModeKind == ContentModeKind.Identity
+            IdentityComposition = _modeRules.Visibility.PublishesIdentityComposition
                 ? new PublicIdentityComposition(
                     _modeDefinition.RoleCounts.GetValueOrDefault(nameof(Role.Lord)),
                     _modeDefinition.RoleCounts.GetValueOrDefault(nameof(Role.Loyalist)),
@@ -303,7 +302,7 @@ public sealed partial class GameEngine
             BoundarySidiPredictions = GetBoundarySidiPredictionViews(viewerSeat),
             ProgramResponseExchangeStates = GetResponseExchangeStateSnapshots(),
             TurnProhibitedPhysicalCards = GetResponseEntityRestrictionSnapshots()
-        });
+        }, viewerSeat, revealAll));
     }
 
     private CardSnapshot ProjectHandCard(CharacterState owner, Card card)

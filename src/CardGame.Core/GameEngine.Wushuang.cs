@@ -6,12 +6,7 @@ public sealed partial class GameEngine
     private IWushuangModeFeature? WushuangFeature => _modeRuntime.Wushuang;
     private IWushuangModeFeature RequireWushuangFeature => WushuangFeature ??
         throw new InvalidOperationException("The current match has no Wushuang feature.");
-    private int _wushuangElapsedMilliseconds
-    {
-        get => WushuangFeature?.ElapsedMilliseconds ?? 0;
-        set => RequireWushuangFeature.ElapsedMilliseconds = value;
-    }
-    public bool IsWushuangMode => _modeDefinition.Id == WushuangMode.ModeId;
+    public bool IsWushuangMode => WushuangFeature is not null;
     private bool IsWushuangSkillGrantQualified(SkillGrant grant) => !IsWushuangMode ||
         _contentRegistry.Skills.TryGetValue(grant.SkillId, out var skill) && WushuangCatalogue.IsSkillAllowed(skill);
     public bool IsWushuangClockRunning => WushuangFeature is not null && _started && _setupComplete && _winner == Winner.None;
@@ -21,20 +16,6 @@ public sealed partial class GameEngine
     public WushuangSnapshot? CreateWushuangSnapshot(int viewerSeat) => WushuangFeature?.CreateWushuangSnapshot(viewerSeat) is { } shop
         ? shop with { RemainingTurns = Math.Max(0, _options.MaxTurns - _turnNumber) } : null;
     private bool CanUseWushuangShop(int seat) => WushuangFeature?.CanUseWushuangShop(seat) ?? false;
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 61001, WushuangMode.ModeId)]
-    private void InitializeWushuangShops(GameStartedEvent started) => WushuangFeature?.InitializeWushuangShops(started);
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 61002, WushuangMode.ModeId)]
-    private void ProgressWushuangEconomy(TurnStartedEvent started) => WushuangFeature?.ProgressWushuangEconomy(started);
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 61003, WushuangMode.ModeId)]
-    private void ProgressWushuangRound(RoundStartedEvent started) => WushuangFeature?.ProgressWushuangRound(started);
-    private bool TryBeginWushuangOpening() => WushuangFeature?.TryBeginWushuangOpening() ?? false;
-    private bool TryBeginWushuangShopping(CharacterState previous, bool skipped) =>
-        WushuangFeature?.TryBeginWushuangShopping(previous.Seat, skipped) ?? false;
-    [NativeFrameAutomaticStep(NativeFrameAutomaticPhase.BeforeOpening, 0, NativeFrameAutomaticPending.RequireNoneBeforeFrame, NativeFrameAutomaticPublish.AfterAdvance)]
-    [NativeFrameRoute(typeof(WushuangIntermissionFrame), 0)]
-    private void ContinueWushuangIntermission(long frameId) => RequireWushuangFeature.ContinueWushuangIntermission(frameId);
-    [ProgramAnswer("wushuang-choice")]
-    private void AnswerWushuangChoice(PromptChoice choice) => RequireWushuangFeature.AnswerWushuangChoice(choice);
     private void AdvanceWushuangShopSeat(WushuangIntermissionFrame frame) => RequireWushuangFeature.AdvanceWushuangShopSeat(frame);
     private void ChangeWushuangTokens(int seat, int delta, string reason) => RequireWushuangFeature.ChangeWushuangTokens(seat, delta, reason);
     private void RefreshWushuangOffers(int seat, bool opening = false) => RequireWushuangFeature.RefreshWushuangOffers(seat, opening);
@@ -60,6 +41,7 @@ public sealed partial class GameEngine
         public int PlayerCount => engine._playerCount;
         public int CurrentSeat => engine._currentSeat;
         public int RoundNumber => engine._roundNumber;
+        public int MaximumTurns => engine._options.MaxTurns;
         public int FirstNormalSeat => engine.ProgramEventHistory<MoLuBuOpeningStartedEvent>().FirstOrDefault()?.NormalSeat ??
             engine.ProgramEventHistory<RoundStartedEvent>().FirstOrDefault()?.ActorSeat ?? engine._currentSeat;
         public long Revision => engine._revision;
@@ -72,7 +54,7 @@ public sealed partial class GameEngine
         {
             var player = engine._players[seat];
             return new(player.Seat, player.Name, player.IsHuman, player.IsAlive, player.Hp, player.MaxHp,
-                Array.AsReadOnly(player.SkillGrants.Grants.ToArray()));
+                Array.AsReadOnly(player.SkillGrants.Grants.ToArray())) { TeamId = player.TeamId };
         }
         public IReadOnlyList<string> EnabledSkillIds(int seat) => Array.AsReadOnly(engine.EnabledContentSkillIds(engine._players[seat]).ToArray());
         public int EquipmentSlotCapacity(int seat, EquipmentSlot slot) => engine._players[seat].EquipmentSlotCapacity(slot);
@@ -111,6 +93,12 @@ public sealed partial class GameEngine
         public bool TryBeginAcquisition(long frameId, WushuangShopOffer offer) => engine.TryBeginWushuangAcquisition(frameId, offer);
         public bool TryContinueAiShopping(int seat, WushuangIntermissionFrame frame) => false;
         public void ContinueAfterShopping(int endedSeat, bool skipped) => engine.ContinueAfterWushuangShopping(engine._players[endedSeat], skipped);
+        public void RetirePendingMatch(string? winningTeamId, Func<long, ResolutionFrameKind, IGameEvent> cancellationFact,
+            string processingReason, string judgmentReason) => engine.RetirePendingMatchAtModeLimit(winningTeamId, cancellationFact, processingReason, judgmentReason);
+        public void Log(string kind, string message) => engine.AddLog(kind, message);
+        public void PublishCurrentWinner() => engine.AdvanceEventRulesAndQueueFact(
+            new WinnerDeterminedEvent(engine._winner, engine._winnerTeamId, null) { WinnerSeat = engine._winnerSeat });
+        public void CompleteGame() => engine.CompleteGame();
     }
 
     private sealed class WushuangShopRandom(int seed) : IWushuangShopRandom

@@ -56,25 +56,6 @@ public sealed partial class GameEngine
             LifecycleCardUse(attack.ResolutionId)?.Action?.EffectiveDesignatedTargetSeats.Contains(attack.TargetSeat) == true;
     }
 
-    private void PrepareShenwuSelectedEquipmentAndDeck()
-    {
-        if (_modeDefinition.ShenwuActivity is not { } activity || CompleteProgramEventHistory()
-            .OfType<ShenwuEquipmentInitializedEvent>().Any()) return;
-        if (_setupComplete || _turnNumber != 0 || _players.Any(player => !player.GeneralSelected) || _cardMovements.Count != 0 ||
-            _cardZones.Count(CardLocation.DrawPile) != _cardZones.TotalCards)
-            throw new InvalidOperationException("Shenwu god equipment must be prepared after all drafts and before the first physical movement.");
-        var plan = ModeSetup.PrepareSelectedEquipment(Array.AsReadOnly(_cardZones.CardsAt(CardLocation.DrawPile).ToArray()), CaptureModeSetupSeats()) ??
-            throw new InvalidOperationException("Shenwu setup did not produce its selected-equipment plan.");
-        _cardZones.RebuildPristineDrawPile(plan.Cards);
-        _initialCardCount = _cardZones.TotalCards;
-        foreach (var placement in plan.Placements)
-        {
-            var card = _cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(card => card.Id == placement.CardId) ??
-                throw new InvalidOperationException("A chosen god's original dedicated equipment entity is missing from the military deck.");
-            PlaceAdvancedEquipment(card, placement.Seat);
-        }
-        foreach (var fact in plan.CompletionFacts) AdvanceEventRulesAndQueueFact(fact);
-    }
     [ProgramDistanceRule(ProgramDistanceStage.DistanceBaseTerms, 20)]
     private void AddShenwuDistanceBaseTerms(ProgramDistanceQuery query, List<RuleQueryBaseTerm> terms)
     {
