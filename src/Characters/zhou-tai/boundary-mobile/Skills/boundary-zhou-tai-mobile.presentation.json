@@ -1,0 +1,4 @@
+{
+  "schemaVersion": 3,
+  "skills": { "boundary:fenji-mobile": { "name": "奋激", "description": "一名角色的回合结束时，若其没有手牌，你可以令其摸两张牌，然后你失去1点体力。" } }
+}

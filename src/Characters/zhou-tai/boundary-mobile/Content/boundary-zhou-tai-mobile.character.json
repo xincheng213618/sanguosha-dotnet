@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhou-tai",
+  "skills": [
+    { "registrationOrder": 58000, "programBundle": "boundary-zhou-tai-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:fenji-mobile", "name": "奋激", "description": "一名角色的回合结束时，若其没有手牌，你可以令其摸两张牌，然后你失去1点体力。", "executionForms": "Trigger" } }
+  ],
+  "generals": [
+    { "registrationOrder": 58001, "pools": { "current": 58001 },
+      "definition": { "id": "boundary:zhou-tai-mobile", "name": "界周泰·移动版", "portraitKey": "boundary-zhou-tai-mobile", "skillId": "boundary:buqu-current", "additionalSkillIds": ["boundary:fenji-mobile"], "factionId": "wu", "baseHp": 4, "gender": "Male", "characterId": "character:zhou-tai", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile" } }
+  ]
+}

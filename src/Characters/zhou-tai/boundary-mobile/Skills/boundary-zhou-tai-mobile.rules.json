@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "boundary:fenji-mobile", "revision": 1,
+    "triggers": [
+      { "id": "own-empty-hand-turn-ended", "window": "afterTurnEnded", "subject": "owner", "turnOwnerScope": "own", "optional": true,
+        "effects": [{ "op": "draw", "target": "owner", "amount": 2 }, { "op": "loseHp", "target": "owner", "amount": 1 }] },
+      { "id": "foreign-empty-hand-turn-ended", "window": "afterTurnEnded", "subject": "owner", "turnOwnerScope": "otherLiving", "optional": true,
+        "effects": [{ "op": "selectTarget", "target": "owner", "targetKind": "eventSource" }, { "op": "draw", "target": "selectedTarget", "amount": 2 }, { "op": "loseHp", "target": "owner", "amount": 1 }] }
+    ]
+  }]
+}

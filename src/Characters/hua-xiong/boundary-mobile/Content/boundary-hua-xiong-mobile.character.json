@@ -1,0 +1,26 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:hua-xiong",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 57900,
+      "pools": {
+        "current": 57900
+      },
+      "definition": {
+        "id": "boundary:hua-xiong-mobile",
+        "name": "界华雄·移动版",
+        "portraitKey": "boundary-hua-xiong-mobile",
+        "skillId": "mou-mobile:yaowu",
+        "factionId": "qun",
+        "baseHp": 6,
+        "gender": "Male",
+        "characterId": "character:hua-xiong",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

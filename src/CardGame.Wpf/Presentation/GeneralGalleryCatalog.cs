@@ -103,6 +103,10 @@ public static class GeneralGalleryCatalog
         groups.Add("boundary:yu-jin-mobile", "boundary-fame");
         groups.Add("boundary:gongsun-zan-mobile", "boundary");
         groups.Add("boundary:ju-shou-mobile", "boundary-fame");
+        groups.Add("boundary:hua-xiong-mobile", "boundary");
+        groups.Add("boundary:zhou-tai-mobile", "boundary");
+        groups.Add("boundary:huang-zhong-mobile", "boundary");
+        groups.Add("boundary:wei-yan-mobile", "boundary");
         groups.Add("boundary:bu-lian-shi-mobile", "boundary-fame");
         groups.Add("boundary:liu-biao-mobile", "boundary-fame");
         groups.Add("boundary:liao-hua-mobile", "boundary-fame");

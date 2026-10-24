@@ -25,7 +25,7 @@ public sealed partial class GameEngine
         var turn = _turnCardUseEffects.GetDamageModifiers(_turnNumber, _currentSeat,
             attack.SourceSeat, attack.CardUserSeat, kind, false).Sum(m => m.Amount);
         var passive = GetPassiveProgramDamageModifiers(attack, cardDamageOnly: true).Sum(m => m.Amount);
-        var amount = checked(attack.DamageAmount + ProgramConversionDamageBonus(card) + turn + passive + BoundaryAnjianDamage(attack) + BoundaryChengPuLihuoDamage(attack));
+        var amount = checked(attack.DamageAmount + ProgramConversionDamageBonus(card) + turn + passive + BoundaryAnjianDamage(attack) + BoundaryChengPuLihuoDamage(attack) + BoundaryHuangZhongCardDamage(attack));
         UpdateCardAttackState(attack.ResolutionId, state => state! with { CardDamageLayerAmount = amount });
         return amount;
     }

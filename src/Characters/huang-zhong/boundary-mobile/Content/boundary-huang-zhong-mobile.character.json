@@ -1,0 +1,9 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:huang-zhong",
+  "skills": [{ "registrationOrder": 58100, "programBundle": "boundary-huang-zhong-mobile", "includeProgramPresentation": true,
+    "definition": { "id": "boundary:liegong-mobile", "name": "烈弓", "description": "你使用杀可选择在此杀点数距离内的角色为目标。当你使用杀指定目标后，你可以根据下列条件执行相应的效果：1.若你的手牌数大于等于其手牌数，该角色不能使用闪；2.若你的体力值小于等于其体力值，此杀伤害+1。", "executionForms": "Trigger" } }],
+  "generals": [{ "registrationOrder": 58101, "pools": { "current": 58101 }, "definition": {
+    "id": "boundary:huang-zhong-mobile", "name": "界黄忠·移动版", "portraitKey": "boundary-huang-zhong-mobile", "skillId": "boundary:liegong-mobile",
+    "factionId": "shu", "baseHp": 4, "gender": "Male", "characterId": "character:huang-zhong", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

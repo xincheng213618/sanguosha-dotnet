@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3,
+  "skills": { "boundary:liegong-mobile": {
+    "name": "烈弓", "description": "杀可额外选择点数距离内的角色；指定目标后可按手牌与体力比较，分别令其不能使用闪、此杀对其伤害+1，两项可同时生效。"
+  } }
+}

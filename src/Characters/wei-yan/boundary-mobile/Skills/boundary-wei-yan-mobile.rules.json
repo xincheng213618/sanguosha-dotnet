@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:kuanggu-mobile", "revision": 1,
+      "triggers": [{ "id": "nearby-damage-choice", "window": "afterDamageApplied", "subject": "damageSource", "damageOccurrence": "perDamagePoint", "optional": true, "priority": 100,
+        "condition": { "kind": "compare", "left": { "kind": "sourceToTargetDistanceAtDamage" }, "operator": "lessThanOrEqual", "right": { "kind": "integerConstant", "value": 1 } },
+        "effects": [
+          { "op": "chooseOption", "target": "owner", "resultBind": "benefit", "options": [{ "id": "recover", "condition": { "kind": "wounded" } }, { "id": "draw", "condition": { "kind": "always" } }] },
+          { "op": "recover", "target": "owner", "amount": 1, "condition": { "kind": "choiceIs", "sourceBind": "benefit", "optionId": "recover" } },
+          { "op": "draw", "target": "owner", "amount": 1, "condition": { "kind": "choiceIs", "sourceBind": "benefit", "optionId": "draw" } }
+        ]
+      }] },
+    { "id": "boundary:qimou-mobile", "revision": 1,
+      "activations": [{ "id": "lose-hp-for-turn-benefits", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving", "usesPerTurn": null, "usesPerGame": 1,
+        "effects": [
+          { "op": "chooseOwnerHpLoss", "target": "owner", "resultBind": "loss" },
+          { "op": "drawPaidHpLoss", "target": "owner", "sourceBind": "loss", "drawCards": false },
+          { "op": "grantPaidHpLossDistance", "target": "owner", "sourceBind": "loss" },
+          { "op": "grantPaidHpLossSlashLimit", "target": "owner", "sourceBind": "loss" }
+        ]
+      }] }
+  ]
+}

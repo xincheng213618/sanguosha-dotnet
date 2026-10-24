@@ -10,6 +10,7 @@
       "definition": {
         "id": "boundary:buqu-current",
         "name": "不屈",
+        "tags": "Locked",
         "description": "锁定技。当你处于濒死状态时，你将牌堆顶的一张牌置于你的武将牌上，称为“创”，若此牌点数与其他“创”均不同，你回复至1点体力，否则将此牌置入弃牌堆。若你的武将牌上有“创”，你的手牌上限为“创”的数量。",
         "executionForms": "State, Trigger"
       }

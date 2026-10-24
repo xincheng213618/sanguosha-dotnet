@@ -96,6 +96,7 @@ public sealed partial class GameEngine
     private bool HasRankSlashRange(CharacterState actor, CardKind kind) =>
         IsSlashCard(kind) && (HasCardPolicy(actor, SkillProgramCardPolicyKind.SlashRangeFromEffectiveRank, kind) || CurrentJudgedRankSlashPolicy(actor.Seat) is not null || HasWuLuKangDixianGrant(actor.Seat));
     private bool IsWithinSpecificSlashRange(CharacterState actor, CharacterState target, CardKind kind, int? rank, long? existingUseFrameId = null, int? excludedEquipmentId = null, EquipmentSlot? excludedEquipmentSlot = null) =>
+        IsBoundaryHuangZhongOrdinaryRange(actor, target, kind, excludedEquipmentId, excludedEquipmentSlot) ||
         DistanceRules.AllowsSlashDistance(ProgramDistanceStage.SpecificSlashExemption,
             new(actor, target, kind, ExistingUseFrameId: existingUseFrameId, EffectiveRank: rank)) ||
         (HasCardPolicy(actor, SkillProgramCardPolicyKind.SlashRangeFromEffectiveRank, kind) && rank is > 0
