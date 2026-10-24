@@ -351,7 +351,7 @@ internal static class WushuangUiChecks
     public static void MixedShopEquipmentShowsItsNativePurchase(string output)
     {
         var registry = ComposedSkillContentRegistry.CreateShowcase(additionalPackages: [new QuietFixture()]);
-        var game = GameEngine.CreateStandard(StandardWushuangContentRegistry.CreateOptions(17) with
+        var game = GameEngine.CreateStandard(StandardWushuangContentRegistry.CreateOptions(80) with
             { UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false }, registry);
         Accept(game, new StartGameCommand());
         for (var step = 0; game.PendingDecision?.Kind != DecisionKind.SelectGeneral && step < 40; step++)

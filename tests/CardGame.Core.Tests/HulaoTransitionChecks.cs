@@ -50,11 +50,12 @@ internal static class HulaoTransitionChecks
             var after = View(game);
             var recent = game.Events.Skip(firstEvent).Select(e => e.Payload).ToArray();
             var damage = recent.OfType<DamageAppliedEvent>().Single();
-            Require(damage.TargetSeat == BossSeat && damage.RemainingHp == (activation == "threshold" ? 4 : 0) &&
+            Require(damage.TargetSeat == BossSeat && damage.Amount == (activation == "threshold" ? 4 : 20) &&
+                damage.RemainingHp == before.Players[BossSeat].Hp - damage.Amount &&
                 after.Players[BossSeat] is { Hp: 6, MaxHp: 6, IsAlive: true } &&
                 after.Players[BossSeat].GeneralId == "fixture:hulao-second" &&
                 after.CurrentSeat == 0 && after.Phase == TurnPhase.NotStarted && after.Winner == Winner.None,
-                "Four HP and overkill to zero must both immediately replace the living first form with the six-HP second form and restart at the vanguard.");
+                "Four HP and overkill with its exact negative-HP fact must both immediately replace the living first form with the six-HP second form and restart at the vanguard.");
             Require(recent.OfType<HulaoTurnInterruptedEvent>().Single().Cause == HulaoTransformationCause.HealthThreshold &&
                 recent.OfType<BossActivityStageStartedEvent>().Single().StageIndex == 1 &&
                 !recent.OfType<PlayerDyingEvent>().Any(e => e.VictimSeat == BossSeat) &&
