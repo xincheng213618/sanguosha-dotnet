@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:gongsun-zan",
+  "skills": [
+    { "registrationOrder": 57700, "programBundle": null, "includeProgramPresentation": false,
+      "definition": { "id": "boundary:yicong-mobile", "name": "义从", "description": "锁定技，你计算与其他角色的距离-X（X为你的体力值-1）；其他角色计算与你的距离+Y（Y为你损失的体力值-1）。", "tags": "Locked", "executionForms": "State" } },
+    { "registrationOrder": 57701, "programBundle": "boundary-gongsun-zan-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:qiaomeng-mobile", "name": "趫猛", "description": "当你使用的黑色杀对一名角色造成伤害后，你可弃置其装备区里的一张牌。然后当此牌置入弃牌堆后，若此牌为坐骑牌，你获得之。", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 57702, "pools": { "current": 57702 }, "definition": {
+    "id": "boundary:gongsun-zan-mobile", "name": "界公孙瓒·移动版", "portraitKey": "boundary-gongsun-zan-mobile", "skillId": "boundary:yicong-mobile", "additionalSkillIds": ["boundary:qiaomeng-mobile"],
+    "factionId": "qun", "baseHp": 4, "gender": "Male", "characterId": "character:gongsun-zan", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

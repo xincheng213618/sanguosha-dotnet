@@ -39,9 +39,11 @@ public sealed partial class GameEngine
     {
         var previous = PreviousPlayCard(action.ActorSeat, action.ActionId);
         return previous is not null &&
-            (action.EffectiveSuit is { } suit && previous.EffectiveSuit == suit ||
+            (action.EffectiveSuit is { } suit && suit != Suit.None && previous.EffectiveSuit == suit ||
              action.EffectiveRank is > 0 && previous.EffectiveRank == action.EffectiveRank);
     }
+    private Suit? PreviousPlaySuitForInheritance(int actorSeat) =>
+        PreviousPlayCard(actorSeat)?.EffectiveSuit is { } suit && suit != Suit.None ? suit : null;
     private bool PreviousPlayCardIsBasic(CardActionContext action)
     {
         var previous = PreviousPlayCard(action.ActorSeat, action.ActionId);
@@ -101,7 +103,7 @@ public sealed partial class GameEngine
         ApplyJuewuOwnedAppearance(owner,
         source is not null && (IsXieweiSource(source) || IsWushuangJinzhiSource(source)) ? card with { Suit = Suit.None, Rank = 0 } :
         source is not null && ViewAsRule(source)?.InheritPreviousPlaySuit == true &&
-        PreviousPlayCard(owner.Seat)?.EffectiveSuit is { } suit
+        PreviousPlaySuitForInheritance(owner.Seat) is { } suit
             ? card with { Suit = suit }
             : card);
 

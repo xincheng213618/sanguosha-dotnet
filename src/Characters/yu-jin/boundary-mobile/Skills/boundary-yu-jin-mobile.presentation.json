@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:jieyue-mobile": { "name": "节钺", "description": "结束阶段，你可以交给一名其他角色一张牌，令其选择一项：1.保留一张手牌和一张装备区里的牌，然后弃置其余的牌；2.令你摸三张牌。", "optionLabels": { "retain": "各保留一张手牌与装备，弃置其余", "draw": "令于禁摸三张牌" } }
+  }
+}

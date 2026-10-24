@@ -314,6 +314,7 @@ public enum SkillProgramEffectOp
     IssueBoundaryGaoShunXianzhen = 57300,
     ReduceBoundaryGaoShunAlcoholSlash = 57301,
     ChooseBoundaryWangYiMijiCount = 57400,
+    BindBoundaryYuJinRemainder = 57600,
     ResolveBoundaryCaoXiuQingxi = 51100,
     ResolveBoundaryQuanCongYaoming = 51200,
     SelectMobileShiKaijiTargets = 47400,
@@ -4324,7 +4325,7 @@ public sealed class SkillProgramCatalog
             chainedStateCost.HasValue || tieredRound is not null || roundOnceCardless is not null || drawFunded is not null))
             Fail(path + ".sourcePileSkillId", "requires a single physical public-pile Slash or Dodge conversion");
         var fuleAlias = id.StartsWith("fu-alias-", StringComparison.Ordinal);
-        if (!(extended && inputCount == 1 && CardUseCategoryCatalog.Get(output) is CardUseCategories.Basic or CardUseCategories.DelayedTrick) && !fuleAlias && !AnniversaryXunXuComposition.IsBoqiaRuleId(id) && tieredRound is null && !singleTrick && output is not (CardKind.Slash or CardKind.Dodge or CardKind.FireSlash or CardKind.ThunderSlash or
+        if (!(extended && inputCount == 1 && CardUseCategoryCatalog.Get(output) is CardUseCategories.Basic or CardUseCategories.DelayedTrick) && !fuleAlias && !AnniversaryXunXuComposition.IsBoqiaRuleId(id) && tieredRound is null && !singleTrick && output is not (CardKind.Slash or CardKind.Dodge or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash or
                 CardKind.Dismantlement or CardKind.SupplyShortage or CardKind.Indulgence or
                 CardKind.IronChain or CardKind.FireAttack or CardKind.UnexpectedAssault or CardKind.QizhengXiangsheng or CardKind.Nullification or CardKind.Peach or
                 CardKind.ArrowBarrage or CardKind.Alcohol or CardKind.Snatch))
@@ -4336,7 +4337,7 @@ public sealed class SkillProgramCatalog
         if (!rankTwoDamageUse && !equalNameLengthUse && xieweiBaitBasicUse is null && leiluanBasicUse is null && tieredRound is null && drawFunded is null && roundDistinct is null && !chainedStateCost.HasValue && useOnly && !singleTrick && !((conversionState is not null || unusedName || lastInSourceZone == true) && output == CardKind.Nullification && !forPlay && forResponse && inputCount == 1) && (inputCount != 1 ||
             (output == CardKind.Dodge ? forPlay || !forResponse :
              !forPlay || forResponse || output is not
-                (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.Peach or CardKind.Alcohol))))
+                (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash or CardKind.Peach or CardKind.Alcohol))))
             Fail(path + ".useOnly", "requires one physical cost and a legal basic-card use direction");
         if (unusedName && (!useOnly || inputCount != 1 ||
             CardUseCategoryCatalog.Get(output) is not (CardUseCategories.Basic or CardUseCategories.InstantTrick)))
@@ -4367,7 +4368,7 @@ public sealed class SkillProgramCatalog
             Fail(path + ".usageGroup", "requires usesPerPhase or usesPerActualTurn");
         if (!equalNameLengthUse && !singleTrick && !(conversionState is not null && useOnly && !forPlay && forResponse && output is CardKind.Dodge or CardKind.Nullification) && (usesPerPhase is not null || inheritPreviousPlaySuit) &&
             (!forPlay || forResponse || inputCount != 1 || output is not
-                (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.Peach or CardKind.Alcohol)))
+                (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash or CardKind.Peach or CardKind.Alcohol)))
             Fail(path, "phase-limited viewAs requires one basic-card input for play only");
         if (activationGroup is not null && (usesPerPhase is null || declaredEntity)) Fail(path, "activationUsageGroup requires a phase-limited direct conversion");
         if (!forPlay && !forResponse) Fail(path, "at least one of forPlay or forResponse must be true");

@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3,
+  "skills": { "boundary:qiaomeng-mobile": { "name": "趫猛", "description": "当你使用的黑色杀对一名角色造成伤害后，你可弃置其装备区里的一张牌。然后当此牌置入弃牌堆后，若此牌为坐骑牌，你获得之。",
+    "triggerChoices": { "black-slash-equipment-discard-and-mount": "弃置其一张装备；若为坐骑，入弃牌堆后获得" }
+  } }
+}

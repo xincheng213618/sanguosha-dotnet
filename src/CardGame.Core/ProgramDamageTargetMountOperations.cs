@@ -14,6 +14,7 @@ internal interface IDamageTargetMountProgramHost
 }
 internal sealed class DiscardDamageTargetAndClaimMountDescriptor : ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.DiscardDamageTargetAndClaimMount;
     public override ISkillProgramEffectHandler Handler { get; } = new DiscardDamageTargetAndClaimMountHandler();
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;

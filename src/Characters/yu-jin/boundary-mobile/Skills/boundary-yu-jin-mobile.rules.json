@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "boundary:jieyue-mobile", "revision": 1,
+    "triggers": [{ "id": "ending-gift-and-recipient-choice", "window": "turnEnding", "subject": "owner", "turnOwnerScope": "own", "optional": true,
+      "effects": [
+        { "op": "selectTarget", "target": "owner", "targetKind": "otherLiving" },
+        { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "owner" }, "zones": ["hand", "equipment"], "count": 1, "destination": "selectedTargetHand", "targetRef": { "kind": "selectedTarget" }, "resultBind": "jieyue-gift", "awaitMovementTriggers": true },
+        { "op": "chooseOption", "target": "owner", "chooserRef": { "kind": "selectedTarget" }, "resultBind": "jieyue-answer", "options": [{ "id": "retain" }, { "id": "draw" }] },
+        { "op": "draw", "target": "owner", "amount": 3, "condition": { "kind": "choiceIs", "sourceBind": "jieyue-answer", "optionId": "draw" } },
+        { "op": "selectOwnedCards", "target": "selectedTarget", "amount": 1, "zones": ["hand"], "resultBind": "jieyue-kept-hand", "condition": { "kind": "choiceIs", "sourceBind": "jieyue-answer", "optionId": "retain" } },
+        { "op": "selectOwnedCards", "target": "selectedTarget", "amount": 1, "zones": ["equipment"], "resultBind": "jieyue-kept-equipment", "condition": { "kind": "choiceIs", "sourceBind": "jieyue-answer", "optionId": "retain" } },
+        { "op": "bindBoundaryYuJinRemainder", "target": "owner", "resultBind": "jieyue-remainder", "condition": { "kind": "choiceIs", "sourceBind": "jieyue-answer", "optionId": "retain" } },
+        { "op": "moveBoundCards", "target": "owner", "sourceBind": "jieyue-remainder", "destination": "discardPile", "awaitMovementTriggers": true, "condition": { "kind": "choiceIs", "sourceBind": "jieyue-answer", "optionId": "retain" } }
+      ]
+    }]
+  }]
+}

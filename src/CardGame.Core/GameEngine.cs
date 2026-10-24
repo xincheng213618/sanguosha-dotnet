@@ -15171,7 +15171,7 @@ public sealed partial class GameEngine
                 slashTraits[action] = CreatePublicSlashTraits(actor, action, effectiveKind.Value, declaredColor, slashTraitsView);
             }
             if (action.Kind != LegalActionKind.Recast && action.MaxCardCount <= 1 && declaredSuit is { } useSuit && IsTurnSuitUseForbidden(actor.Seat, useSuit)) return false;
-            if (action.Kind != LegalActionKind.Recast && action.MaxCardCount <= 1 && IsCuiYanNextUseForbidden(actor.Seat, action.CardId is { } cuiCardId ? [cuiCardId] : [], action.ConversionSource is { } cuiConversion && ViewAsRule(cuiConversion)?.InheritPreviousPlaySuit == true ? PreviousPlayCard(actor.Seat)?.EffectiveSuit ?? declaredSuit : declaredSuit)) return false;
+            if (action.Kind != LegalActionKind.Recast && action.MaxCardCount <= 1 && IsCuiYanNextUseForbidden(actor.Seat, action.CardId is { } cuiCardId ? [cuiCardId] : [], action.ConversionSource is { } cuiConversion && ViewAsRule(cuiConversion)?.InheritPreviousPlaySuit == true ? PreviousPlaySuitForInheritance(actor.Seat) ?? declaredSuit : declaredSuit)) return false;
             // Global tricks drop individually shielded targets instead of the whole
             // use: a black Nanman still resolves against everyone a Curtain bearer
             // does not protect, and only loses its action when no target remains.

@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:jianying-mobile": { "name": "渐营", "description": "本出牌阶段使用相邻同花色或同点数牌可摸1；每出牌阶段一次，可将一张牌当基本牌使用，并继承上一张牌的有效花色。初始2/3体力，3护甲。" },
+    "boundary:shibei-mobile": { "name": "矢北", "description": "锁定技，每回合第一次受到伤害后回复1点体力，后续每次受到伤害后失去1点体力。" }
+  }
+}

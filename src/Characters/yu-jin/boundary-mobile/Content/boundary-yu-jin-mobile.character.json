@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:yu-jin",
+  "skills": [
+    { "registrationOrder": 57600, "programBundle": "boundary-yu-jin-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:jieyue-mobile", "name": "节钺", "description": "结束阶段，你可以交给一名其他角色一张牌，令其选择一项：1.保留一张手牌和一张装备区里的牌，然后弃置其余的牌；2.令你摸三张牌。", "executionForms": "Trigger" } }
+  ],
+  "generals": [
+    { "registrationOrder": 57601, "pools": { "current": 57601 },
+      "definition": { "id": "boundary:yu-jin-mobile", "name": "界于禁·移动版", "portraitKey": "boundary-yu-jin-mobile", "skillId": "boundary:jieyue-mobile", "factionId": "wei", "baseHp": 4, "gender": "Male", "characterId": "character:yu-jin", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile" } }
+  ]
+}

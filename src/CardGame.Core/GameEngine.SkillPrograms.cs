@@ -890,7 +890,7 @@ public sealed partial class GameEngine
                     binding.SelectionActorSeat is { } selectionActor &&
                     (!HasForeignDiscardCapability && !TracksNativeLogicalDiscards || !IsValidPlayerSeat(selectionActor) ||
                      !plan.Instructions.Take(frame.InstructionIndex).Any(e => e.ResultBind == binding.Name &&
-                        (e.Op is SkillProgramEffectOp.SelectOwnedCards or SkillProgramEffectOp.SelectOwnedHandRankSum or SkillProgramEffectOp.SelectSourceCard or SkillProgramEffectOp.SelectCardSubset or SkillProgramEffectOp.FilterBoundCards or SkillProgramEffectOp.SelectTurnDamageUseDebtPayment or SkillProgramEffectOp.SelectEquipmentPairAndPayment or SkillProgramEffectOp.SelectDyingOwnedCard ||
+                        (e.Op is SkillProgramEffectOp.SelectOwnedCards or SkillProgramEffectOp.SelectOwnedHandRankSum or SkillProgramEffectOp.SelectSourceCard or SkillProgramEffectOp.SelectCardSubset or SkillProgramEffectOp.FilterBoundCards or SkillProgramEffectOp.SelectTurnDamageUseDebtPayment or SkillProgramEffectOp.SelectEquipmentPairAndPayment or SkillProgramEffectOp.SelectDyingOwnedCard or SkillProgramEffectOp.BindBoundaryYuJinRemainder ||
                          e.Op == SkillProgramEffectOp.SelectFrozenHandExchangeDebtPayment &&
                          selectionActor == frame.OwnerSeat && frame.PhaseHandDebtPayment is { } debt &&
                          debt.ResultBind == binding.Name && binding.CardIds.Count == debt.RequiredPaymentCount &&

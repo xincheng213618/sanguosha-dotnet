@@ -18,10 +18,10 @@ public sealed partial class GameEngine
             u.Action is { Type: CardActionType.Use } a && a.ActorSeat == ownerSeat &&
             a.EffectiveKind == attack.EffectiveCardKind);
     }
-    private IReadOnlyList<PromptChoice> DamageTargetMountChoices(long frameId, int ownerSeat, int targetSeat)
+    private IReadOnlyList<PromptChoice> DamageTargetMountChoices(long frameId, int ownerSeat, int targetSeat, string? skillId = null)
     {
         if (ownerSeat != targetSeat)
-            return BuildOtherOwnedCardDiscardChoices(frameId, ownerSeat, DamageTargetMountZones,
+            return BuildOtherOwnedCardDiscardChoices(frameId, ownerSeat, DamageTargetMountZonesFor(skillId),
                 new CardMoveReason("skill-program.damage-target-mount.discard"))
                 .Where(c => c.Targets.SequenceEqual([targetSeat]))
                 .Select(c => c with { Parameters = new Dictionary<string,string>(c.Parameters) { ["program-action"] = "damage-target-mount" } }).ToArray();
@@ -29,7 +29,7 @@ public sealed partial class GameEngine
         // Keep the mature only-other helper unchanged; this opt-in alone adds self-owned slots.
         var result = new List<PromptChoice>();
         if (!_players[targetSeat].IsAlive) return result;
-        foreach (var zone in DamageTargetMountZones)
+        foreach (var zone in DamageTargetMountZonesFor(skillId))
         {
             var cards = _cardZones.CardsAt(new(zone,targetSeat));
             for (var slot=0;slot<cards.Count;slot++)
@@ -46,24 +46,27 @@ public sealed partial class GameEngine
         return result;
     }
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 1130, SkillProgramEffectOp.DiscardDamageTargetAndClaimMount)]
-    private bool CanOfferDamageTargetMount(int ownerSeat, ProgramSkillWindowContext context) =>
-        ActualDamageTargetMountUse(ownerSeat, context) is not null && context.TargetSeat is { } seat &&
-        IsValidPlayerSeat(seat) && _players[seat].IsAlive && DamageTargetMountChoices(1, ownerSeat, seat).Count > 0;
+    private bool CanOfferDamageTargetMountEdition(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) =>
+        CanOfferDamageTargetMount(candidate.OwnerSeat, context, candidate.SkillId);
+    private bool CanOfferDamageTargetMount(int ownerSeat, ProgramSkillWindowContext context, string? skillId = null) =>
+        ActualDamageTargetMountUse(ownerSeat, context) is { } use && DamageTargetMountUseMatchesEdition(skillId, use) && context.TargetSeat is { } seat &&
+        IsValidPlayerSeat(seat) && _players[seat].IsAlive && DamageTargetMountChoices(1, ownerSeat, seat, skillId).Count > 0;
     private SkillProgramStepOutcome BeginDamageTargetMount(ProgramSkillFrame f)
     {
         var active = GetActiveProgramFrame(f.Id);
         var context = active.WindowContext ?? throw new InvalidOperationException("Mount discard lost its damage window.");
         var use = ActualDamageTargetMountUse(f.OwnerSeat, context);
-        if (use?.Action is not { } action || !CanOfferDamageTargetMount(f.OwnerSeat, context)) return SkillProgramStepOutcome.Continue;
+        if (use?.Action is not { } action || !CanOfferDamageTargetMount(f.OwnerSeat, context, f.SkillId)) return SkillProgramStepOutcome.Continue;
         if (active.DamageTargetMount is not null) throw new InvalidOperationException("Mount discard cannot pay twice.");
         var target = context.TargetSeat!.Value;
         ReplaceRuntimeTop(active with { DamageTargetMount = new(active.InstructionIndex, active.OwnerSeat, target,
             context.ParentFrameId, context.DamageFrameId!.Value, use.Id, action.ActionId,
             active.SkillId, GetProgramBindingId(active), active.SkillInstanceId, active.GameplayHash) });
-        var choices = DamageTargetMountChoices(f.Id, f.OwnerSeat, target);
+        var choices = DamageTargetMountChoices(f.Id, f.OwnerSeat, target, f.SkillId);
         var skill = _contentRegistry.GetSkill(f.SkillId);
+        var region = f.SkillId == BoundaryMobileGszQiaomeng ? "装备区" : "区域";
         _pendingDecision = new PendingDecision(DecisionKind.ProgramTrigger, f.OwnerSeat,
-            $"【{skill.Name}】弃置 {_players[target].Name} 区域里的一张牌；若为坐骑牌，你获得之。",
+            $"【{skill.Name}】弃置 {_players[target].Name} {region}里的一张牌；若为坐骑牌，你获得之。",
             choices.SelectMany(c => c.Cards).Distinct().ToArray(), [target], f.OwnerSeat)
         { PromptId = CreatePromptId(), IsPrivate = true, TargetSeat = target,
           SkillPrompt = new(f.SkillId, skill.Name, skill.Name + " · 弃置牌", skill.Description),
@@ -78,12 +81,12 @@ public sealed partial class GameEngine
         var draft = f.DamageTargetMount ?? throw new InvalidOperationException("Mount discard lost its payment draft.");
         if (draft.Receipt is not null || _pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat ||
             choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) ||
-            !DamageTargetMountChoices(f.Id,f.OwnerSeat,draft.TargetSeat).Any(c => c.Id == choice.Id &&
+            !DamageTargetMountChoices(f.Id,f.OwnerSeat,draft.TargetSeat,f.SkillId).Any(c => c.Id == choice.Id &&
                 c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets) && c.Parameters.OrderBy(x=>x.Key).SequenceEqual(choice.Parameters.OrderBy(x=>x.Key))))
             throw new InvalidOperationException("Mount discard must name its exact published opaque slot.");
         ClearPendingDecision();
         if (!_players[f.OwnerSeat].IsAlive || !HasRuntimeSkillInstance(_players[f.OwnerSeat],f.SkillId,f.SkillInstanceId) ||
-            !CanOfferDamageTargetMount(f.OwnerSeat,f.WindowContext!))
+            !CanOfferDamageTargetMount(f.OwnerSeat,f.WindowContext!,f.SkillId))
         { CancelProgramBindingAndCleanup(f,"付款前技能来源或伤害目标已失效。"); return; }
         var source = new CardLocation(Enum.Parse<CardZoneKind>(choice.Parameters["source-zone"]), draft.TargetSeat);
         var card = _cardZones.CardsAt(source)[int.Parse(choice.Parameters["slot-index"],CultureInfo.InvariantCulture)];
@@ -127,12 +130,12 @@ public sealed partial class GameEngine
             plan.Trigger?.Subject != SkillProgramTriggerSubject.DamageSource || plan.Trigger.Optional != true) return false;
         var use=_resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u=>u.Id==d.CardUseFrameId);
         if (use?.Action is not {Type:CardActionType.Use} action || action.ActionId!=d.CardActionId || action.ActorSeat!=d.OwnerSeat ||
-            !IsSlashCard(action.EffectiveKind)) return false;
+            !IsSlashCard(action.EffectiveKind) || !DamageTargetMountUseMatchesEdition(f.SkillId, use)) return false;
         if(d.Receipt is not { } r) return !d.ClaimIssued && d.ClaimMovementSequence is null;
         var actual=_cardMovements.SingleOrDefault(m=>m.Sequence==r.MovementSequence);
         return actual is not null && actual.CardId==r.CardId && actual.CardKind==r.PrintedKind && actual.From==r.From && actual.To==r.To &&
             actual.Reason.Value==r.Reason && r.Reason=="skill-program.damage-target-mount.discard" &&
-            r.From.OwnerSeat==d.TargetSeat && DamageTargetMountZones.Contains(r.From.Zone) &&
+            r.From.OwnerSeat==d.TargetSeat && DamageTargetMountZonesFor(f.SkillId).Contains(r.From.Zone) &&
             r.To==NormalizeEphemeralCardDestination(GetAdvancedCard(r.CardId), r.From, r.PrintedKind==CardKind.GeneralWeapon && r.From.Zone==CardZoneKind.Equipment?CardLocation.OutsideGame:CardLocation.DiscardPile) &&
             r.IsMount==IsPrintedMount(r.PrintedKind) &&
             (d.ClaimMovementSequence is null ? !d.ClaimIssued : d.ClaimIssued && _cardMovements.Any(m=>
