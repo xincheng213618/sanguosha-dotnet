@@ -135,7 +135,12 @@ public sealed partial class GameEngine
                 !card.PhysicalCards.Select(c => c.Id).SequenceEqual(use.PhysicalCardIds!) &&
                     !HasExactCompletedUndamagedTunanVirtualAttack(use, action, card) ||
                 card.PhysicalCards.Any(c => !action.PhysicalCards.Any(cost => cost.CardId == c.Id && cost.CardKind == c.Kind)))
-                throw new InvalidOperationException("Whole-use damage cannot borrow an unaccepted action identity.");
+                throw new InvalidOperationException($"Whole-use damage cannot borrow an unaccepted action identity. " +
+                    $"Use={use.Id}; actor={action.ActorSeat}/{use.SourceSeat}; kind={action.EffectiveKind}/{use.CardKind}; " +
+                    $"accepted={HasExactAcceptedCompletedUndamagedUse(use, action)}; " +
+                    $"nativeMaterials={card.PhysicalCards.Select(c => c.Id).SequenceEqual(use.PhysicalCardIds!)}; " +
+                    $"tunan={HasExactCompletedUndamagedTunanVirtualAttack(use, action, card)}; " +
+                    $"declaredMaterials={card.PhysicalCards.All(c => action.PhysicalCards.Any(cost => cost.CardId == c.Id && cost.CardKind == c.Kind))}.");
         }
         else if (use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !IsActualTurnLegacyVirtualUse(use) ||
             !MatchesDeclaredActualDamageUse(use, use.SourceSeat, use.SourceSeat)) return;

@@ -58,6 +58,30 @@ public sealed partial class GameEngine
     private bool IsHappyZuoCiDestroyedMaterial(CardMovementRecord m)=>m.To==CardLocation.OutsideGame&&m.HappyZuoCiPhantomDestination is{}plan&&
         HappyZcPlanProof(plan)&&m.From==plan.From&&m.CardId==plan.CardId&&m.CardKind==plan.Face.Kind&&m.Reason==plan.Reason&&m.Sequence>plan.SequenceBefore&&
         _cardMovements.Count(actual=>actual.Sequence==m.Sequence&&actual==m)==1;
+    private bool IsHappyZuoCiDestroyedResponseFinish(CardActionContext action,CardActionCost cost,CardMovementRecord finish)=>
+        action.Type==CardActionType.Response&&action.PhysicalCards.Contains(cost)&&cost.From.OwnerSeat==action.ProviderSeat&&
+        finish.CardId==cost.CardId&&finish.CardKind==cost.CardKind&&finish.From==CardLocation.Processing&&
+        finish.HappyZuoCiPhantomDestination is{RequestedTo:var requested,OriginalForeignGainSequence:null}plan&&requested==CardLocation.DiscardPile&&
+        plan.Issuer==action.ProviderSeat&&
+        IsHappyZuoCiDestroyedMaterial(finish)&&
+        _cardMovements.LastOrDefault(m=>m.CardId==cost.CardId&&m.Sequence<=plan.SequenceBefore) is{}entry&&
+        entry.CardKind==cost.CardKind&&entry.From==cost.From&&entry.To==CardLocation.Processing&&entry.Sequence<finish.Sequence&&
+        (entry.Reason==CardMoveReasons.Respond&&finish.Reason==CardMoveReasons.ResponseFinished||
+         entry.Reason==CardMoveReasons.Nullification&&finish.Reason==CardMoveReasons.NullificationFinished||
+         entry.Reason.Value=="conversion.declaration.pay"&&_resolutionStack.Any(owner=>owner.AcceptedDeclarationPayment is{Claimed:true}paid&&
+             paid.ProviderSeat==action.ProviderSeat&&paid.ActorSeat==action.ActorSeat&&paid.Cost==cost&&action.ConversionChain.Contains(paid.Source)&&
+             finish.Reason==(paid.ReturnPurpose==CardDeclarationPurpose.Counterspell?CardMoveReasons.NullificationFinished:CardMoveReasons.ResponseFinished)&&
+             IsResponseCompletionEntry(action,paid.ReturnPurpose switch
+             {
+                 CardDeclarationPurpose.Counterspell=>ProgramCardContinuation.NullificationResponse,
+                 CardDeclarationPurpose.Dodge=>ProgramCardContinuation.Dodge,
+                 CardDeclarationPurpose.Duel=>ProgramCardContinuation.DuelSlash,
+                 CardDeclarationPurpose.Group=>ProgramCardContinuation.GroupResponse,
+                 CardDeclarationPurpose.FactionDefense=>ProgramCardContinuation.FactionDefenseDodge,
+                 CardDeclarationPurpose.FactionSlash=>ProgramCardContinuation.FactionSlashDuelSlash,
+                 CardDeclarationPurpose.QizhengResponse=>ProgramCardContinuation.QizhengResponse,
+                 _=>ProgramCardContinuation.CompletedCard
+             },owner.Id,cost,entry)));
     private bool IsHappyZuoCiDestroyedMaterial(int cardId,CardLocation from,CardLocation to)=>to==CardLocation.OutsideGame&&
         _cardMovements.Any(m=>m.CardId==cardId&&m.To==to&&IsHappyZuoCiDestroyedMaterial(m)&&(m.From==from||m.HappyZuoCiPhantomDestination?.OriginalForeignGainSequence is{}sequence&&
             _cardMovements.Any(g=>g.Sequence==sequence&&g.CardId==cardId&&g.From==from)));

@@ -9,6 +9,8 @@ public sealed partial class SimpleAiBrain
         var copy = new SimpleAiBrain(Seat, 1, _policyVersion, _includeJudgmentMaterials);
         foreach (var item in _rebelSuspicion) copy._rebelSuspicion.Add(item.Key, item.Value);
         foreach (var item in _nationalEnemySuspicion) copy._nationalEnemySuspicion.Add(item.Key, item.Value);
+        if (_policyVersion >= AiDecisionPolicy.IdentityStrategyVersion)
+            CopyIdentityEvidenceTo(copy);
         return copy;
     }
 

@@ -95,6 +95,10 @@ public sealed partial class GameEngine
         }
         PublishRecipientCategoryMarkChoice(f); return SkillProgramStepOutcome.AwaitChoice;
     }
+    private int IndependentRecipientCategoryMarkerCount(CharacterState holder, PlayerMarkerKind marker, int source) =>
+        source == holder.Seat ? _recipientCategoryMarks.Values.Count(token =>
+            token.HolderSeat == holder.Seat && RecipientPublicMarker(token.Kind) == marker) : 0;
+
     private void ChangeRecipientCategoryMarker(ProgramSkillFrame f, int holder, RecipientCategoryMarkKind kind, int delta)
     {
         var p = _players[holder]; var marker = RecipientPublicMarker(kind); var key = (marker, holder);

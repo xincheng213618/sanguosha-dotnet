@@ -75,6 +75,7 @@ public sealed partial class MainViewModel
     {
         get
         {
+            if (IsRevealedSubsetSelectionPending || IsDeckReorderPending) return [];
             if (IsOwnedCardSelectionPending && HasProjectedOwnedSelection(_snapshot.PendingDecision!))
                 return OwnedSelectionExtraChoices;
             if (IsMobileShiZhuangshiSelectionPending)

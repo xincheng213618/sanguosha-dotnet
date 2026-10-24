@@ -23,8 +23,14 @@ public sealed partial class GameEngine
         var action = DuKuiUseActions(f).Single(a => a.Kind == selected.Kind && a.CardId == selected.CardId && a.PlayedCardKind == selected.PlayedCardKind &&
             a.TargetCardId == selected.TargetCardId && a.TargetSeats.SequenceEqual(selected.TargetSeats) && a.ProgramActivationId == selected.ProgramActivationId);
         var kind = action.PlayedCardKind ?? card.Kind;
+        var implicitGlobal = action.TargetSeats.Count == 0 && kind is CardKind.BarbarianAssault or CardKind.ArrowBarrage or CardKind.PeachGarden or CardKind.FiveGrains or CardKind.AllianceFeast or CardKind.ReturnSoul or CardKind.StriveUpstream;
+        var trick = IsOrdinaryTrick(card.Kind) ? BuildProgramOrdinaryTrickUseOptions(actor, card.Kind, EffectiveSuit(actor, card),
+            enforceUsePermission: true, actualEffectiveColor: CapturePhysicalCardColor(actor.Seat, card), hasActualColor: true, physicalCardIds: [card.Id])
+            .FirstOrDefault(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && (implicitGlobal || o.TargetSeats.SequenceEqual(action.TargetSeats))) : null;
+        var targets = GetImplicitSelfCardUseTargets(kind, actor.Seat, implicitGlobal
+            ? trick?.TargetSeats ?? throw new InvalidOperationException("Fanyin lost its accepted native global target scope.") : action.TargetSeats);
         ReplaceRuntimeTop(f = f with { DuKui = r with { Stage = DuKuiStage.NativeIssuing, UseAction = action.Kind, UseKind = kind, TargetCardId = action.TargetCardId,
-            UseTargets = GetImplicitSelfCardUseTargets(kind, actor.Seat, action.TargetSeats), Before = _movementSequence, After = _movementSequence, NativeBatches = [] } });
+            UseTargets = targets, Before = _movementSequence, After = _movementSequence, NativeBatches = [] } });
         if (action.ProgramActivationId is "next-card-target-adjustment" or "next-actual-use-target-adjustment") _selectedNextCardTargetSeats = action.TargetSeats;
         if (IsSlashCard(card.Kind))
         {
@@ -32,7 +38,7 @@ public sealed partial class GameEngine
                 usesZhuqueFan: kind == CardKind.FireSlash && card.Kind == CardKind.Slash && HasZhuqueFan(actor),
                 programSkillCardUseFrameId: f.Id, physicalSourceLocation: CardLocation.Processing); return;
         }
-        var useId = BeginCardUse(card, actor.Seat, action.TargetSeats, card.Kind, physicalCardIds: [card.Id],
+        var useId = BeginCardUse(card, actor.Seat, targets, card.Kind, physicalCardIds: [card.Id],
             designatedTargetSeats: card.Kind == CardKind.BorrowedSword ? action.TargetSeats.Where((_, i) => i % 2 == 0).ToArray() : null);
         if (LifecycleCardUse(useId)?.DuKuiOrigin is null) throw new InvalidOperationException("Fanyin must freeze the true native use before resolving any effect.");
         if (EquipmentCatalog.IsEquipment(card.Kind))
@@ -42,10 +48,7 @@ public sealed partial class GameEngine
         if (card.Kind == CardKind.Peach) { BeginSimpleCardUse(useId, new(card.Id, SimpleCardUseEffect.Recovery)); return; }
         if (card.Kind == CardKind.Alcohol) { BeginSimpleCardUse(useId, new(card.Id, SimpleCardUseEffect.Alcohol)); return; }
         if (card.Kind == CardKind.Lightning && !HasSoleTargetProtectionCapability && TryBeginDelayedCardUsePrograms(useId)) return;
-        var required = IsOrdinaryTrick(card.Kind) ? BuildProgramOrdinaryTrickUseOptions(actor, card.Kind, EffectiveSuit(actor, card),
-            enforceUsePermission: true, actualEffectiveColor: CapturePhysicalCardColor(actor.Seat, card), hasActualColor: true, physicalCardIds: [card.Id])
-            .FirstOrDefault(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && o.TargetSeats.SequenceEqual(action.TargetSeats))?.RequiredCardKind : null;
-        BeginJizhiOrNullificationWindow(useId, card, actor.Seat, LifecycleCardUse(useId)!.TargetSeats, action.Kind, action.TargetCardId, required, card.Kind);
+        BeginJizhiOrNullificationWindow(useId, card, actor.Seat, LifecycleCardUse(useId)!.TargetSeats, action.Kind, action.TargetCardId, trick?.RequiredCardKind, card.Kind);
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 43200)]

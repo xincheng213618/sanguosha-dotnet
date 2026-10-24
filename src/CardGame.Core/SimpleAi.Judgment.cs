@@ -25,7 +25,8 @@ public sealed partial class SimpleAiBrain
         var currentDesired = Succeeds(currentSuit, currentRank) == wantsSuccess;
         var candidates = validCardIds.Select(id =>
         {
-            var card = self.Hand.Concat(self.Equipment).Single(item => item.Id == id);
+            var card = self.Hand.Concat(self.Equipment).Concat(VisibleOriginalPublicPileCards(self))
+                .DistinctBy(item => item.Id).Single(item => item.Id == id);
             var desired = Succeeds(card.Suit, card.Rank) == wantsSuccess;
             var score = currentDesired ? -CardCatalog.Get(card.Kind).HandKeepValue :
                 desired ? 42d - CardCatalog.Get(card.Kind).HandKeepValue :

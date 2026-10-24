@@ -103,8 +103,8 @@ public sealed partial class MainViewModel
         }
     }
 
-    public bool CanCancelAction => HasSelection || OwnedCardDeclineChoice is not null || HandResponseDeclineChoice is not null || SkillTargetDeclineChoice is not null;
-    public string CancelActionHint => OwnedCardDeclineChoice is not null ? "放弃本次选牌；Esc 仅取消当前选牌。" : HandResponseDeclineChoice is { } choice
+    public bool CanCancelAction => IsDeckReorderPending ? false : IsRevealedSubsetSelectionPending ? EmptyRevealedSubsetChoice is not null : HasSelection || OwnedCardDeclineChoice is not null || HandResponseDeclineChoice is not null || SkillTargetDeclineChoice is not null;
+    public string CancelActionHint => EmptyRevealedSubsetChoice is not null ? "不选择任何展示牌；Esc 仅清空当前选择。" : OwnedCardDeclineChoice is not null ? "放弃本次选牌；Esc 仅取消当前选牌。" : HandResponseDeclineChoice is { } choice
         ? $"{choice.Description} · Esc 仅取消选牌。"
         : SkillTargetDeclineChoice is { } decline ? $"{decline.Description} · Esc 仅取消选择。"
         : "取消当前选牌和目标 · Esc";
@@ -184,6 +184,13 @@ public sealed partial class MainViewModel
 
     private void CancelAction()
     {
+        if (IsDeckReorderPending) return;
+        if (EmptyRevealedSubsetChoice is { } empty)
+        {
+            SubmitPublishedPromptChoice(empty, IsRevealedSubsetSelectionPending, "展示牌选择未执行");
+            return;
+        }
+        if (IsRevealedSubsetSelectionPending) return;
         if (IsMobileShiZhuangshiSelectionPending) { ClearMobileShiZhuangshiSelection(); return; }
         if (IsOwnedCardSelectionPending && HasOwnedCardDraftSelection) { ClearSelection(); return; }
         if (OwnedCardDeclineChoice is { } finish) SubmitPublishedPromptChoice(finish, IsOwnedCardSelectionPending, "选牌未执行");

@@ -626,7 +626,8 @@ public sealed partial class GameEngine
             foreach (var item in attributed)
             {
                 var independent = IndependentMarkerCount(player, item.Key.Marker, owner.Seat) +
-                    IndependentIssuedDrawMarkerCount(player, item.Key.Marker, owner.Seat);
+                    IndependentIssuedDrawMarkerCount(player, item.Key.Marker, owner.Seat) +
+                    IndependentRecipientCategoryMarkerCount(player, item.Key.Marker, owner.Seat);
                 var removed = item.Value - independent;
                 if (removed < 0) throw new InvalidOperationException("Independent shields exceed their public attributed markers.");
                 if (removed == 0) continue;

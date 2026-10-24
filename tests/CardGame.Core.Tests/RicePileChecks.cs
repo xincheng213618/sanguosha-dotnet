@@ -7,6 +7,37 @@ internal static class RicePileChecks
 {
     private const string Yi = "ol:yishe", Bu = "ol:bushi", Mi = "ol:midao", Second = "fixture:rice-second";
     private const string Driver = "fixture:rice-driver", Owner = "fixture:rice-owner", Watch = "fixture:rice-watch", Mode = "identity:classic-rice";
+    public static void PublishedRiceJudgmentAiResolvesRealPublicMaterials()
+    {
+        var (g, _) = Start(ownerBushi: false);
+        End(g); Reach(g, () => Optional(P(g), Yi)); Activate(g); Reach(g, () => RicePrompt(P(g)));
+        Answer(g, choice => choice.Cards.Count == 1);
+        Answer(g, choice => choice.Cards.Count == 1);
+        Answer(g, choice => choice.Parameters.GetValueOrDefault("rice-action") == "pay");
+        Play(g);
+        Use(g, "judge", targets: [0]);
+        Reach(g, () => P(g) is { Kind: DecisionKind.ProgramJudgmentReplacement, PlayerSeat: 0 });
+        var view = g.CreateSnapshot(0);
+        var prompt = P(g)!;
+        var frame = g.ResolutionStack.OfType<JudgmentFrame>().Single();
+        var rice = view.Players[0].PublicPersistentPileCards!;
+        Need(prompt.ValidCardIds.Count > 0 && prompt.ValidCardIds.All(id => rice.Any(card => card.Id == id)) &&
+             prompt.ValidCardIds.All(id => view.Players[0].Hand.Concat(view.Players[0].Equipment).All(card => card.Id != id)) &&
+             view.Players.Skip(1).All(player => player.Hand.Count == 0),
+            "The real Midao prompt supplies exact public rice IDs outside HE without exposing other players' hands.");
+        var before = SnapshotJson.Serialize(view);
+        foreach (var policy in new[] { AiDecisionPolicy.TacticalPlanningVersion, AiDecisionPolicy.IdentityStrategyVersion })
+        {
+            var (card, thought) = new SimpleAiBrain(0, 83, policy).ChooseJudgmentReplacement(view, 0, frame.Reason,
+                prompt.ValidCardIds, frame.CardKind!.Value, frame.Suit!.Value, 7, null, 1);
+            Need((card is null || prompt.ValidCardIds.Contains(card.Value)) &&
+                 thought.Candidates.Count == prompt.ValidCardIds.Count + 1 &&
+                 thought.Candidates.All(candidate => double.IsFinite(candidate.Score)),
+                "Both recorded policies must evaluate every published rice replacement and the native decline without inventing a hand card or dropping a valid choice.");
+        }
+        Need(SnapshotJson.Serialize(view) == before,
+            "Evaluating the actual rice judgment prompt must leave its player view unchanged.");
+    }
     public static void ActualEndingDrawHEStoreAndColdMovementChildren()
     {
         var (g, registry) = Start(child: "pause", mixed: true);

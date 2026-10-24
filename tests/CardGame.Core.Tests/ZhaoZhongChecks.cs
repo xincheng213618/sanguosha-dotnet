@@ -178,6 +178,41 @@ internal static class ZhaoZhongChecks
         late.NextOwnPlay(); late.RecoverPeer(1); late.Need(late.E<YintianChargeIssuedEvent>().Length == 1, "The next actual turn has its own genuine first-recovery opportunity."); late.Cold();
     }
 
+    public static void BiriNativeDrawInvoiceIndexKeepsExactProofAcrossColdAndPendingChanges()
+    {
+        var s = Scenario.Start("biri-gift"); s.Use("draw"); s.Play();
+        var invoice = s.E<NativeDrawInvocationRecordedEvent>().Last(e => e.OwnerSeat == 0 && e.ActualCount > 0);
+        var draw = s.G.CardMovements.First(m => m.Sequence > invoice.SequenceBefore && m.Sequence <= invoice.SequenceAfter &&
+            m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(0) && m.Reason == invoice.Reason);
+        bool Native(CardMovementRecord movement) => (bool)typeof(GameEngine).GetMethod("IsNativeDrawGainMovement",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.Invoke(s.G, [movement])!;
+        s.Need(Native(draw) && Native(draw), "Warm native-draw lookup must retain the exact real invocation and all of its materials.");
+        var pending = (List<IGameEvent>)typeof(GameEngine).GetField("_pendingEvents",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(s.G)!;
+        var index = pending.Count;
+        try
+        {
+            // A duplicate ID in another recipient's bucket is still globally
+            // invalid; partitioning cannot weaken invocation uniqueness.
+            pending.Add(invoice with { OwnerSeat = 1 });
+            s.Need(!Native(draw), "A duplicate native invocation ID must invalidate the proof even outside the indexed recipient bucket.");
+            pending[index] = invoice with { InvocationId = invoice.InvocationId + 1_000_000, OwnerSeat = 1 };
+            s.Need(Native(draw), "A same-count pending replacement must refresh the fact index and retain the unchanged genuine material proof.");
+        }
+        finally { pending.RemoveAt(index); }
+        s.Need(Native(draw), "Removing the test-only conflicting pending invoice must restore the original complete proof.");
+        s.Cold();
+        s.Need(Native(s.G.CardMovements.Single(m => m.Sequence == draw.Sequence)),
+            "Cold reconstruction must rebuild the index from the same journal facts rather than require saved cache state.");
+        s.Use("give", cards: [s.V().Hand[0].Id], targets: [1]); s.Reach(() => s.Hold("biri"));
+        var issued = s.E<BiriDrawIssuedEvent>().Single();
+        var gift = s.G.CardMovements.Single(m => m.Sequence == issued.GainSequence);
+        s.Need(!Native(gift), "The actual first non-draw Hand gift must not be reclassified by an unrelated native draw invoice.");
+        s.Cold(); s.Play(); s.Use("draw"); s.Play();
+        s.Need(s.E<BiriDrawIssuedEvent>().Length == 1,
+            "Further actual draws after the holder's issued benefit must not revisit or duplicate the same turn's Biri entitlement.");
+    }
+
     public static void BiriActualNonDrawGainsAndNativeDrawChildrenCold()
     {
         foreach (var scene in new[] { "biri-gift", "biri-loss" })

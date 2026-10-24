@@ -1061,6 +1061,9 @@ public sealed record LegalAction
     public int? TargetSeat { get; init; }
     public string Description { get; init; }
     public CardKind? PlayedCardKind { get; init; }
+    /// <summary>Owner-visible prospective Slash appearance; never authoritative command input.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public PublicSlashTraits? SlashTraits { get; init; }
     public int? TargetCardId { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -1225,6 +1228,10 @@ public sealed partial record GameSnapshot(
     /// <summary>Mode metadata used by view-scoped AI and presentation adapters.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public ContentModeKind ModeKind { get; init; }
+
+    /// <summary>The identity counts published by the mode, including eliminated seats.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public PublicIdentityComposition? IdentityComposition { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? WinnerFactionId { get; init; }

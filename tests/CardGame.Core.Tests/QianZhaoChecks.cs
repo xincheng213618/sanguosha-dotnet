@@ -26,11 +26,13 @@ internal static class QianZhaoChecks
         Need(E<WeifuTargetAddedEvent>(g).Where(e => e.UseId == use.Id).Select(e => e.TargetSeat).SequenceEqual([1, 3]) &&
             Enumerable.Range(1, 3).All(s => E<DamageAppliedEvent>(g).Count(e => e.SourceSeat == 0 && e.TargetSeat == s && e.Amount == 1) == 1) &&
             E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == use.Id) == 1, "The actual physical Slash resolves every original and appended native response cursor once.");
+        AssertWholeUseTargets(g, use.Id, use.Action!.ActionId, 0, [2], [2, 1, 3]);
         Begin(g); Play(g); Use(g, "virtual", [1]); Reach(g, () => Branch(g, "weifu-target"));
         g = Cold(g, registry); Answer(g, c => c.Targets.SequenceEqual([2])); Reach(g, () => P(g)?.SkillPrompt?.SkillId == Driver && Option(g, "continue"));
         var virtualUse = E<WeifuUseIssuedEvent>(g).Last();
         Need(E<CardActionAcceptedEvent>(g).Any(e => e.Action.ActionId == virtualUse.ActionId && e.Action.PhysicalCards.Count == 0 && e.Action.ActorSeat == 0) &&
             E<DamageAppliedEvent>(g).Count(e => e.TargetSeat == 2) == 2, "A genuine zero-entity native Slash owns the added target and returns to the paused original producer.");
+        AssertWholeUseTargets(g, virtualUse.UseId, virtualUse.ActionId, 0, [1], [1, 2]);
         g = Cold(g, registry); Continue(g); Play(g); Begin(g); Play(g);
         var unspent = E<WeifuGrantedEvent>(g).Last(); var turn = g.State.TurnNumber; End(g); Reach(g, () => g.State.TurnNumber > turn && P(g) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
         Need(E<WeifuGrantExpiredEvent>(g).Count(e => e.GrantFrameId == unspent.FrameId) == 1 &&
@@ -49,6 +51,7 @@ internal static class QianZhaoChecks
                 E<WeifuUseIssuedEvent>(changed).Length == 1 && E<WeifuGrantConsumedEvent>(changed).Length == 1 &&
                 E<CardUseFinishedEvent>(changed).Count(e => e.ResolutionId == actual.Id) == 1,
                 "The same changed-source native Slash resolves both actual targets cold without creating a second actor entitlement or repeating the original grant payment.");
+            AssertWholeUseTargets(changed, actual.Id, actual.Action!.ActionId, 3, [1], [1, 2]);
             _ = Cold(changed, cr);
         }
         {
@@ -66,6 +69,7 @@ internal static class QianZhaoChecks
                 (redirect.TargetSeat == primary || V(redirected, redirect.TargetSeat).Hp == hpBefore[redirect.TargetSeat] - 1) && V(redirected, redirector).Hp == hpBefore[redirector] &&
                 E<CardUseFinishedEvent>(redirected).Count(e => e.ResolutionId == redirectedUse.Id) == 1,
                 "The exact redirected target receives the actual native response and damage once after cold resume."); _ = Cold(redirected, rr);
+            AssertWholeUseTargets(redirected, redirectedUse.Id, redirectedUse.Action!.ActionId, 0, [primary], [primary, redirect.TargetSeat]);
         }
         {
             var (ai, ar) = Start("ai"); var seat = Enumerable.Range(0, 4).Single(s => V(ai, s).GeneralId == Owner);
@@ -84,6 +88,14 @@ internal static class QianZhaoChecks
     private static T[] E<T>(GameEngine g) where T : IGameEvent => g.Events.Select(e => e.Payload).OfType<T>().ToArray();
     private static bool Branch(GameEngine g, string branch) => P(g)?.Choices.Any(c => c.Parameters.GetValueOrDefault("branch") == branch) == true;
     private static bool Option(GameEngine g, string option) => P(g)?.Choices.Any(c => c.Parameters.GetValueOrDefault("option-id") == option) == true;
+    private static void AssertWholeUseTargets(GameEngine g, long useId, long actionId, int actor, int[] original, int[] actual)
+    {
+        var ledger = E<CompletedUndamagedUseDamageRecordedEvent>(g).Where(e => e.CardUseFrameId == useId).ToArray();
+        var accepted = E<CardActionAcceptedEvent>(g).Where(e => e.Action.ActionId == actionId).ToArray();
+        Need(ledger.Length == actual.Length && ledger.All(e => e.CardActionId == actionId && e.ActorSeat == actor && e.Amount == 1) &&
+            ledger.Select(e => e.TargetSeat).SequenceEqual(actual) && accepted.Length > 0 && accepted.All(e => e.Action.TargetSeats.SequenceEqual(original)),
+            "The real classic whole-Use ledger reconstructs each Weifu-added or redirected damage target from the original accepted native action, without publishing a replacement acceptance.");
+    }
     private static void Need(bool yes, string message) { if (!yes) throw new InvalidOperationException(message); }
     private static void Accept(GameEngine g, GameCommand c) { var result = g.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single()); Need(result.Accepted, (result.Error?.Message ?? "Rejected Qian Zhao command.") + " " + JsonSerializer.Serialize(P(g))); }
     private static void Answer(GameEngine g, Func<PromptChoice, bool> predicate) { var p = P(g)!; Need(V(g, p.PlayerSeat).IsHuman, "Only the actual human may send an answer."); Accept(g, new AnswerPromptCommand(p.PlayerSeat, p.PromptId, p.Choices.First(predicate).Id, g.Revision)); }
@@ -134,6 +146,9 @@ internal static class QianZhaoChecks
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b, "ol:qian-zhao");
+            // The normal classic catalog enables this whole-Use observer even
+            // when Wang Guan himself is not seated at this table.
+            CharacterFixtureContent.Register(b, "ol:wang-guan");
             b.AddCard(new("fixture:qz-lion", "实际白银狮子", "装备牌", "真实装备失去回复", CardKind.SilverLion));
             if (scenario == "ai") b.AddCard(new("fixture:qz-alcohol", "真实酒", "基本牌", "固定AI牌堆", CardKind.Alcohol));
             var defs = new List<string>

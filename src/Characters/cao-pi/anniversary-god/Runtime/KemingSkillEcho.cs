@@ -135,6 +135,21 @@ public sealed partial class GameEngine
         { PromptId = CreatePromptId(), IsPrivate = true, Choices = KemingEchoChoices(f), SkillPrompt = new(skill.Id, skill.Name, skill.Name, skill.Description) };
         _status = _players[owner].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }
+    private bool TryChooseKemingEchoAi(PendingDecision decision, out PromptChoice selected)
+    {
+        selected = null!;
+        if (!ReferenceEquals(decision, _pendingDecision) || !HasKemingEchoPrompt() ||
+            _resolutionStack.LastOrDefault() is not KemingSkillEchoFrame { Stage: KemingSkillEchoStage.Choosing } frame)
+            return false;
+        AssertKemingEcho(frame);
+        // This is an already-issued native effect return, not a new trigger
+        // activation. Select its published benefit and retain AnswerKemingEcho's
+        // exact source, owner, parent and once-only native-draw validation.
+        selected = decision.Choices.Single(choice =>
+            choice.Parameters.GetValueOrDefault("program-action") == "keming-echo" &&
+            choice.Parameters.GetValueOrDefault("accept") == "yes");
+        return true;
+    }
     [ProgramAnswer("keming-echo")] private void AnswerKemingEcho(PromptChoice choice)
     {
         if (_resolutionStack.LastOrDefault() is not KemingSkillEchoFrame { Stage: KemingSkillEchoStage.Choosing } f ||

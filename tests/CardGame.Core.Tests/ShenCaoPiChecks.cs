@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
@@ -80,7 +81,41 @@ internal static class ShenCaoPiChecks
         s.Replay();
         CheckNativeCixiongCompletion();
     }
-    private sealed class Fixture(bool nativeEquipment = false) : IGameContentPackage
+    public static void AiKemingEchoKeepsIssuedNativeParentAndColdReturn()
+    {
+        var s = Scene.Start(aiEcho: true); s.Play();
+        s.Use(Driver, "opponent-duel", [1]);
+        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondSlash });
+        s.Answer(choice => choice.Parameters.GetValueOrDefault("response") is "pass" or "take-damage");
+        s.Play();
+        s.Need(s.E<KemingEchoArmedEvent>() is [{ TargetSeat: 0 }] &&
+            s.E<DamageAppliedEvent>().Any(damage => damage.SourceSeat == 1 && damage.TargetSeat == 0),
+            "The AI Cao Pi must really damage the human source through the selected actor's native Duel before an echo is armed.");
+        s.Use(Driver, "draw", []);
+        s.Reach(() => s.P?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "keming-echo") == true);
+        var echo = s.G.ResolutionStack.OfType<KemingSkillEchoFrame>().Single();
+        var hand = s.V(1).HandCount;
+        s.Need(s.P is { PlayerSeat: 1, Kind: DecisionKind.ProgramTrigger } && !s.V(1).IsHuman &&
+            echo is { Stage: KemingSkillEchoStage.Choosing, Return.Kind: KemingEchoReturnKind.ProgramCompletion } &&
+            echo.Capture is { ActorSeat: 0, SkillKey: Driver, Names.Count: 2 } &&
+            echo.Capture.Entitlements.Single().Source.OwnerSeat == 1 &&
+            s.G.ResolutionStack.Last().Id == echo.Id &&
+            s.G.ResolutionStack.OfType<ProgramSkillFrame>().Any(parent => parent.Id == echo.ParentFrameId && parent.SkillId == Driver),
+            "An actual AI-owned echo prompt belongs to its distinct typed frame over the completed original draw skill, without a generic trigger candidate at the top.");
+        s.Cold();
+        s.Accept(new AdvanceOneStepCommand(s.G.Revision));
+        s.Reach(() => s.E<KemingEchoFinishedEvent>().Any(finished => finished.FrameId == echo.Id));
+        s.Need(s.E<KemingEchoChoiceEvent>().Count(choice => choice.FrameId == echo.Id && choice.OwnerSeat == 1 && choice.Accepted) == 1 &&
+            s.E<KemingEchoDrawPaidEvent>().Single(paid => paid.FrameId == echo.Id) is { Requested: 2, Actual: 2 } &&
+            s.E<KemingEchoFinishedEvent>().Count(finished => finished.FrameId == echo.Id && finished.ParentFrameId == echo.ParentFrameId) == 1 &&
+            s.V(1).HandCount == hand + 2 &&
+            s.G.CardMovements.Count(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(1) &&
+                move.Reason.Value == "skill-program.anniversary:keming.same-name-draw") == 2 &&
+            !s.G.ResolutionStack.Any(frame => frame.Id == echo.Id || frame.Id == echo.ParentFrameId),
+            "The real AI response uses the published native choice, pays two matching entities once and returns the exact original completed skill once after cold restore.");
+        s.Play(); s.Cold(); s.Replay();
+    }
+    private sealed class Fixture(bool nativeEquipment = false, bool aiEcho = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-shen-cp", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
@@ -100,6 +135,14 @@ internal static class ShenCaoPiChecks
               {"id":"{{Watch}}","revision":1,"triggers":[{"id":"watch","isSkillInvocation":false,"window":"nativeDrawStarting","subject":"owner","optional":true,"effects":[{"op":"setChainedState","target":"owner","chained":true}]}]}]}
             """;
             var labels = new[] { Driver, Pulse, Probe, Quiet, NoDraw, Watch, PlayHold }.ToDictionary(id => id, id => new { name = id, description = "神曹丕真实原生小局", optionLabels = id == PlayHold ? new Dictionary<string, string> { ["continue"] = "继续原生出牌阶段" } : new Dictionary<string, string>() });
+            if (aiEcho)
+            {
+                var definition = JsonNode.Parse(rules)!;
+                var actions = definition["skills"]![0]!["activations"]!.AsArray();
+                actions.Add(JsonNode.Parse("""{"id":"opponent-duel","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"usesPerPhase":2,"effects":[{"op":"useSelectedActorDuel","target":"owner"}]}"""));
+                actions.Add(JsonNode.Parse("""{"id":"draw","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"draw","target":"owner","amount":2}]}"""));
+                rules = definition.ToJsonString();
+            }
             var catalog = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, p) in catalog.Programs) b.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description) { Program = p, ProgramPresentation = catalog.Presentations[id], Tags = id is NoDraw or Quiet or PlayHold ? SkillTag.Locked : SkillTag.None });
             b.AddGeneral(new(Ally, "实际技能来源", "", nativeEquipment ? Probe : Pulse, "wei", 12, Gender: GeneralGender.Male));
@@ -142,13 +185,13 @@ internal static class ShenCaoPiChecks
         public void Replay() { var before = State(); G = GameReplay.Replay(G.CreateCheckpoint().Options, G.AcceptedCommands, registry); Need(before == State(), "Accepted-command replay preserves original damage, reserved invocation and matching entity payments."); }
         public void Accept(GameCommand c) { var r = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single()); Need(r.Accepted, r.Error?.Message ?? "Rejected command."); }
         public void Need(bool ok, string reason) { if (!ok) throw new InvalidOperationException(reason + JsonSerializer.Serialize(new { G.State.CurrentSeat, G.State.TurnNumber, P, Facts = G.Events.TakeLast(8).Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())) })); }
-        public static Scene Start(bool nativeEquipment = false, bool borrowScenario = false)
+        public static Scene Start(bool nativeEquipment = false, bool borrowScenario = false, bool aiEcho = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(nativeEquipment));
-            var setup = new ShanheBattleSetup(37, 1, "anniversary-cp", Hero, 4, 0, 0, 0, 0, [Driver, NoDraw, Watch],
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(nativeEquipment, aiEcho));
+            var setup = new ShanheBattleSetup(37, 1, "anniversary-cp", aiEcho ? Ally : Hero, 4, 0, 0, 0, 0, [Driver, NoDraw, Watch],
                 nativeEquipment ? [new(CardKind.CixiongDoubleSwords, Suit.Spade, 2)] : [new(CardKind.Slash, Suit.Heart, 8), new(CardKind.Duel, Suit.Spade, 1)], [],
                 [new(Cao, Hp: borrowScenario ? 1 : null) { StartingHand = nativeEquipment ? [] : [new(CardKind.Dodge, Suit.Heart, 2), new(CardKind.Slash, Suit.Spade, 3)] }, new(Enemy) { StartingHand = [] }],
-                [new(Ally, ExtraSkillIds: [NoDraw]) { StartingHand = nativeEquipment ? [new(CardKind.Slash, Suit.Spade, 7)] : [] }], new string('e', 64)) { DefaultGodFactionId = "wei" };
+                [new(aiEcho ? Hero : Ally, ExtraSkillIds: [NoDraw]) { StartingHand = nativeEquipment ? [new(CardKind.Slash, Suit.Spade, 7)] : [] }], new string('e', 64)) { DefaultGodFactionId = "wei" };
             var g = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,
                 ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup, UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 16 }, registry);
             var s = new Scene(g, registry); s.Accept(new StartGameCommand()); return s;

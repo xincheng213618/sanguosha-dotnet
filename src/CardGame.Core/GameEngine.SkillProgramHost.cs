@@ -78,7 +78,9 @@ public sealed partial class GameEngine
                 (cardBind, choiceBind) => engine.DoesProgramFrozenSuitMatchChoice(frame, cardBind, choiceBind),
                 (bind, suits) => engine.DoProgramBoundCardsMatchSuits(frame, bind, suits),
                 (bind, _) => engine.DoProgramBoundCardCategoryMatchAction(frame, bind),
-                requestedSlashDamagedOwner: frame.RequestedSlashDamagedOwner == true);
+                requestedSlashDamagedOwner: frame.RequestedSlashDamagedOwner == true,
+                eventSourceExists: frame.WindowContext?.SourceSeat is { } sourceSeat &&
+                    engine.IsValidPlayerSeat(sourceSeat));
         }
 
         public bool TryStartPostInstructionWindow(long frameId) =>

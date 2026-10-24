@@ -921,7 +921,7 @@
                                 <TextBlock Text="{Binding OriginalHandTag}" Foreground="#F9EAC5" Background="#D074562A" FontSize="10" Padding="3,1" MaxWidth="64" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="3" Visibility="{Binding HasOriginalHandTag, Converter={StaticResource BoolToVisibility}}" />
                             </controls:PublicRevealSurface>
                             <Border x:Name="ChoiceCaption" Background="#314D43" CornerRadius="2" Margin="0,4,0,0" Padding="0,4">
-                                <TextBlock Text="{Binding PublicCardLabel}" Foreground="#FFF1CB" FontSize="12" TextAlignment="Center" />
+                                <TextBlock x:Name="ChoiceLabel" Text="{Binding PublicCardLabel}" Foreground="#FFF1CB" FontSize="12" TextAlignment="Center" />
                             </Border>
                         </StackPanel>
                     </Border>
@@ -930,6 +930,15 @@
                         <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="ChoiceFrame" Property="BorderBrush" Value="#FFF0BA" /><Setter TargetName="ChoiceCaption" Property="Background" Value="#527663" /></Trigger>
                         <Trigger Property="IsPressed" Value="True"><Setter TargetName="ChoiceFrame" Property="Background" Value="#61775D" /><Setter TargetName="ChoiceCaption" Property="Background" Value="#284337" /></Trigger>
                         <Trigger Property="IsEnabled" Value="False"><Setter Property="Cursor" Value="Arrow" /></Trigger>
+                        <DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter TargetName="ChoiceFrame" Property="BorderBrush" Value="#FFE291" /><Setter TargetName="ChoiceFrame" Property="Background" Value="#806335" /><Setter TargetName="ChoiceCaption" Property="Background" Value="#806335" /></DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsSubsetChoice}" Value="True" />
+                                <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource TemplatedParent}}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ChoiceFrame" Property="Opacity" Value="0.45" />
+                            <Setter TargetName="ChoiceLabel" Property="Text" Value="不符合约束" />
+                        </MultiDataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Button.Template>

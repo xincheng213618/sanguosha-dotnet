@@ -5,7 +5,54 @@ using CardGame.Core.Campaigns;
 
 internal static class AnniversaryWangChangChecks
 {
-    private const string Hero = "anniversary:wang-chang", Kaiji = "anniversary:kaiji", Pingxi = "anniversary:pingxi", Peer = "fixture:wang-chang-peer", Driver = "fixture:wang-chang-driver", Watch = "fixture:wang-chang-watch", Quiet = "fixture:wang-chang-quiet", Deck = "fixture:wang-chang-deck";
+    private const string Hero = "anniversary:wang-chang", Kaiji = "anniversary:kaiji", Pingxi = "anniversary:pingxi", Peer = "fixture:wang-chang-peer", Driver = "fixture:wang-chang-driver", Watch = "fixture:wang-chang-watch", Quiet = "fixture:wang-chang-quiet", Deck = "fixture:wang-chang-deck", PhantomHero = "happy:shen-zuo-ci";
+    public static void ForeignPhantomDiscardPaysOnceAndReturnsNativeSlashCold()
+    {
+        var s = Scene.Start(phantomPeer: true); s.Play();
+        s.Need(s.E<HappyZuoCiPoolInitializedEvent>().Single().Source.OwnerSeat == 1 &&
+            s.V(1).HandCount > 0 && s.V(1).Hand.All(card => card.SkillMarkLabel == "幻术"),
+            "The real foreign Happy Shen Zuo Ci starts empty and receives genuine phantom entities through GameStart and round rules.");
+        s.UseKaiji(); s.Play(); s.End(); s.Play();
+        s.UseKaiji(); s.Menu(AnniversaryWangChangStage.OwnCards);
+        var ownCost = s.P!.Choices.First(choice => choice.Cards.Count == 1).Cards.Single();
+        s.Answer(choice => choice.Cards.SequenceEqual([ownCost])); s.Menu(AnniversaryWangChangStage.OwnCards);
+        s.Answer(choice => Verb(choice) == "pay"); s.Play(); s.End(); s.Offer(); s.Activate();
+        s.Menu(AnniversaryWangChangStage.Targets);
+        var pingxi = s.Root!.Id;
+        s.Answer(choice => choice.Targets.SequenceEqual([1])); s.Menu(AnniversaryWangChangStage.Targets);
+        s.Answer(choice => Verb(choice) == "seal"); s.Menu(AnniversaryWangChangStage.ForeignCard);
+        var phantom = s.V(1).Hand[0];
+        s.Need(phantom.SkillMarkLabel == "幻术" && s.V(0).Hand.All(card => card.Id != phantom.Id) &&
+            s.G.CreateSnapshot(0).Players.Single(player => player.Seat == 1).Hand.Count == 0 &&
+            s.P!.Choices.All(choice => choice.Cards.Count == 0 && choice.Parameters.GetValueOrDefault("card-owner-seat") == "1"),
+            "Pingxi selects an actual hidden phantom by the original opaque foreign hand slot, never by exposing or forging its physical ID.");
+        s.Cold();
+        s.Answer(choice => choice.Parameters.GetValueOrDefault("source-zone") == "Hand" &&
+            choice.Parameters.GetValueOrDefault("slot-index") == "0");
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == Watch);
+        var paid = s.E<AnniversaryWangChangDiscardPaidEvent>().Single(e => e.FrameId == pingxi);
+        var movement = s.G.CardMovements.Single(move => move.CardId == phantom.Id && move.From == CardLocation.Hand(1) &&
+            move.Reason.Value == "skill-program.anniversary:wang-chang.discard");
+        var slash = s.E<AnniversaryWangChangSlashIssuedEvent>().Single(e => e.FrameId == pingxi);
+        s.Need(paid is { Cursor: 0, SubjectSeat: 1, Count: 1 } && movement.To == CardLocation.OutsideGame &&
+            movement.HappyZuoCiPhantomDestination is { Issuer: 1, OriginalForeignGainSequence: null } plan &&
+            plan.RequestedTo == CardLocation.DiscardPile && plan.ActualTo == CardLocation.OutsideGame &&
+            plan.From == CardLocation.Hand(1) && plan.Reason == movement.Reason &&
+            movement.Sequence > paid.Before && movement.Sequence <= paid.After &&
+            s.Root!.AnniversaryWangChang is { Stage: AnniversaryWangChangStage.NativeSlash, Cursor: 1, SlashCursor: 0 } receipt &&
+            receipt.Moves.SequenceEqual([movement]) && slash.TargetSeat == 1,
+            "The original paid Pingxi receipt must accept the exact Hand-to-Outside phantom destruction as its requested discard before issuing one native Slash.");
+        s.Cold(); s.Continue(); s.Reach(() => s.G.ResolutionStack.All(frame => frame.Id != pingxi));
+        s.Need(s.E<AnniversaryWangChangDiscardPaidEvent>().Count(e => e.FrameId == pingxi) == 1 &&
+            s.E<AnniversaryWangChangSlashIssuedEvent>().Count(e => e.FrameId == pingxi) == 1 &&
+            s.E<AnniversaryWangChangSlashReturnedEvent>().Count(e => e.FrameId == pingxi && e.UseId == slash.UseId && e.ActionId == slash.ActionId) == 1 &&
+            s.E<CardUseDeclaredEvent>().Count(e => e.ResolutionId == slash.UseId && e.CardKind == CardKind.Slash && e.CardId == 0) == 1 &&
+            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == slash.UseId && e.CardId == 0) == 1 &&
+            s.E<AnniversaryWangChangCompletedEvent>().Count(e => e.FrameId == pingxi) == 1 &&
+            s.G.CardMovements.Count(move => move.CardId == phantom.Id && move.To == CardLocation.OutsideGame) == 1,
+            "Cold recovery must not repay or destroy the discarded phantom again, and the following genuine Slash must finish and return once to the same Pingxi parent.");
+        s.Replay();
+    }
     public static void ActualPhaseConversionHePaymentAndWholeGroupSlashesCold()
     {
         var s = Scene.Start(); s.Play(); var turn = s.G.State.TurnNumber;
@@ -109,23 +156,26 @@ internal static class AnniversaryWangChangChecks
         private string Dump() => JsonSerializer.Serialize(new { G.State.TurnNumber, G.State.CurrentSeat, P, Receipt = Root?.AnniversaryWangChang, Started = E<AnniversaryWangChangStartedEvent>(), Last = G.Events.TakeLast(8).Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray() });
         public void Need(bool ok, string message) { if (!ok) throw new InvalidOperationException(message + " " + Dump()); }
         private void Accept(GameCommand command) { var result = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([command])).Single()); Need(result.Accepted, result.Error?.Message ?? "Rejected exact original Wang Chang command."); }
-        public static Scene Start()
+        public static Scene Start(bool phantomPeer = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(phantomPeer));
             var peerHand = new[] { new ShanheStartingCard(CardKind.Dodge, Suit.Heart, 2), new ShanheStartingCard(CardKind.Dodge, Suit.Club, 3) };
             var setup = new ShanheBattleSetup(47, 1, "anniversary-wang-chang", Hero, 3, 0, 0, 0, 0, [Driver, Watch], [new(CardKind.Crossbow, Suit.Spade, 1)], [],
-                [new(Peer) { StartingHand = peerHand }, new(Peer) { StartingHand = peerHand }], [new(Peer) { StartingHand = peerHand }], new string('c', 64));
+                [new(Peer) { StartingHand = peerHand }, new(Peer) { StartingHand = peerHand }],
+                [new(phantomPeer ? PhantomHero : Peer) { StartingHand = phantomPeer ? [] : peerHand }], new string('c', 64))
+                { DefaultGodFactionId = phantomPeer ? "qun" : null };
             var g = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,
                 AiPolicyVersion = AiDecisionPolicy.CurrentVersion, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup, UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 6 }, registry);
             var scene = new Scene(g, registry); scene.Accept(new StartGameCommand()); return scene;
         }
     }
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool phantomPeer = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-anniversary-wang-chang", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b, Hero);
+            if (phantomPeer) CharacterFixtureContent.Register(b, PhantomHero);
             var c = SkillProgramCatalog.Load(Rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = new Dictionary<string, object>
             {
                 [Driver] = new { name = "真实额外出牌", description = "同一回合的两个实际出牌阶段。" }, [Quiet] = new { name = "安静同桌", description = "保留原生摸牌和弃牌。" },
@@ -134,7 +184,7 @@ internal static class AnniversaryWangChangChecks
             foreach (var (id, p) in c.Programs) b.AddSkill(new(id, c.Presentations[id].Name, c.Presentations[id].Description) { Program = p, ProgramPresentation = c.Presentations[id] });
             b.AddGeneral(new(Peer, "固定同桌", "", Quiet, "wei", 12));
             b.AddDeck(new(Deck, "固定小闪牌堆", 0, 2, []) { PhysicalCards = Enumerable.Range(0, 48).Select(_ => new ContentDeckPhysicalCard("standard:dodge", Suit.Heart, 2)).ToArray() });
-            b.AddMode(new(ShanheBattleSetup.BattleModeId, "王昶原生小局", 4, 4, new Dictionary<string, int>(), Deck, GeneralPoolIds: [Hero, Peer], ModeKind: ContentModeKind.Team,
+            b.AddMode(new(ShanheBattleSetup.BattleModeId, "王昶原生小局", 4, 4, new Dictionary<string, int>(), Deck, GeneralPoolIds: phantomPeer ? [Hero, Peer, PhantomHero] : [Hero, Peer], ModeKind: ContentModeKind.Team,
                 TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 2, [ShanheBattleSetup.EnemyTeamId] = 2 }));
         }
         private static string Rules => $$"""

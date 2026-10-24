@@ -16,8 +16,19 @@ public sealed partial class GameEngine
     private ActualDiscardRecoveryPhaseKey? CurrentActualDiscardRecoveryPhase()
     {
         if (!TracksActualDiscardRecoveryPhases || _turnNumber < 1 || _phase is TurnPhase.NotStarted or TurnPhase.Finished) return null;
-        var last = CompleteProgramEventHistory().LastOrDefault(e => e is ActualDiscardRecoveryPhaseStartedEvent or
-            ActualDiscardRecoveryPhaseRestoredEvent or ActualDiscardRecoveryPhaseClearedEvent);
+        // Pending facts follow committed facts. Search that exact order in
+        // reverse: material queries need the latest phase, not a full replay of
+        // every older card movement for every candidate in a long AI match.
+        IGameEvent? last = null;
+        for (var index = _pendingEvents.Count - 1; index >= 0; index--)
+            if (_pendingEvents[index] is ActualDiscardRecoveryPhaseStartedEvent or
+                ActualDiscardRecoveryPhaseRestoredEvent or ActualDiscardRecoveryPhaseClearedEvent)
+            { last = _pendingEvents[index]; break; }
+        if (last is null)
+            for (var index = _events.Count - 1; index >= 0; index--)
+                if (_events[index].Payload is ActualDiscardRecoveryPhaseStartedEvent or
+                    ActualDiscardRecoveryPhaseRestoredEvent or ActualDiscardRecoveryPhaseClearedEvent)
+                { last = _events[index].Payload; break; }
         var phase = last switch
         {
             ActualDiscardRecoveryPhaseStartedEvent e => e.Phase,
@@ -30,7 +41,7 @@ public sealed partial class GameEngine
     private void StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind kind, int actor)
     {
         if (!TracksActualDiscardRecoveryPhases || _turnNumber < 1 || _winner != Winner.None || !_players[actor].IsAlive) return;
-        var token = CompleteProgramEventHistory().OfType<ActualDiscardRecoveryPhaseStartedEvent>()
+        var token = ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>()
             .Select(e => e.Phase.Token).DefaultIfEmpty().Max() + 1;
         AdvanceEventRulesAndQueueFact(new ActualDiscardRecoveryPhaseStartedEvent(new(token, _turnNumber,
             _turnProgression.OwnerSeat, actor, kind)));
@@ -38,7 +49,7 @@ public sealed partial class GameEngine
 
     private bool IsRecordedActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKey phase) =>
         phase.Token>0 &&phase.TurnNumber>0 &&IsValidPlayerSeat(phase.ActualTurnOwnerSeat) &&IsValidPlayerSeat(phase.ActorSeat) &&
-        Enum.IsDefined(phase.Kind) &&CompleteProgramEventHistory().OfType<ActualDiscardRecoveryPhaseStartedEvent>().Count(e=>e.Phase==phase)==1;
+        Enum.IsDefined(phase.Kind) &&ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Count(e=>e.Phase==phase)==1;
 
     private void ClearActualDiscardRecoveryPhase()
     {

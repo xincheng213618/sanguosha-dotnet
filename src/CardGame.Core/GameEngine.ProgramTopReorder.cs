@@ -55,7 +55,13 @@ public sealed partial class GameEngine
                 new Dictionary<string, string> { ["action"] = "finish-top" }));
         _pendingDecision = new PendingDecision(DecisionKind.ProgramTopReorder, frame.OwnerSeat,
             "依次排列牌堆顶和牌堆底。", choices.SelectMany(choice => choice.Cards).ToArray(), [])
-        { PromptId = CreatePromptId(), IsPrivate = true, Choices = choices.AsReadOnly(), TargetSeat = frame.OwnerSeat };
+        {
+            PromptId = CreatePromptId(), IsPrivate = true, Choices = choices.AsReadOnly(), TargetSeat = frame.OwnerSeat,
+            DeckReorder = new(frame.Id,
+                Array.AsReadOnly(order.ViewedCardIds.Select(id => ToSnapshot(_cardZones.CardsAt(CardLocation.DrawPile).Single(card => card.Id == id))).ToArray()),
+                Array.AsReadOnly(order.TopCardIds.ToArray()), Array.AsReadOnly(order.BottomCardIds.ToArray()),
+                order.ChoosingBottom, order.RequiredTopCount)
+        };
         if (order.RequiredTopCount is { } required)
         {
             var skill = _contentRegistry.GetSkill(frame.SkillId);

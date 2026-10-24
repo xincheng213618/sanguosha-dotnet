@@ -98,5 +98,8 @@ public sealed partial class GameEngine
 
     private bool IsRedirectedPaidDiscardMovement(CardMovementRecord move, CardLocation expectedSource, CardMoveReason expectedReason) =>
         IsHellShiyouPaidDiscardMovement(move, expectedSource, expectedReason) ||
-        IsLishiPaidDiscardMovement(move, expectedSource, expectedReason);
+        IsLishiPaidDiscardMovement(move, expectedSource, expectedReason) ||
+        move.From == expectedSource && move.Reason == expectedReason &&
+        move.HappyZuoCiPhantomDestination is { RequestedTo: var requested } &&
+        requested == CardLocation.DiscardPile && IsHappyZuoCiDestroyedMaterial(move);
 }

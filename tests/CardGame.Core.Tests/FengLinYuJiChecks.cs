@@ -15,6 +15,8 @@ internal static partial class FengLinYuJiChecks
             else if(purpose=="duel")Driver(g,"duel",[1,0]);
             else Driver(g,"dying");
             Reach(g,p=>p.PlayerSeat==0&&(p.Kind==DecisionKind.RespondDodge||p.Kind==DecisionKind.RespondSlash||p.Kind==DecisionKind.RescueDying));
+            if(purpose is "peach" or "alcohol")Require(g.State.Players[0].Hp==0,
+                "The real rescue fixture must enter Dying at exactly zero HP: "+RecoveryDiagnostic(g,purpose));
             var prompt=P(g)!;var choice=prompt.Choices.First(c=>c.Parameters.GetValueOrDefault("conversion-skill-id")=="classic:guhuo");
             Accept(g,new AnswerPromptCommand(0,prompt.PromptId,choice.Id,g.Revision));
             Require(g.ResolutionStack.OfType<CardDeclarationFrame>().Any(),"Actual response/rescue suspends before successful action.");Replay(g,r);
@@ -25,10 +27,26 @@ internal static partial class FengLinYuJiChecks
                 "An unchallenged hidden Dodge, Duel or rescue declaration exposed printed metadata after payment.");
             if(purpose=="dodge")Require(g.State.Players[0].Hp==hp,"Declared Dodge resumes the real incoming Slash without damage.");
             else if(purpose=="duel")Require(g.Events.Select(e=>e.Payload).OfType<DuelResponseEvent>().Any(e=>e.ResponderSeat==0&&e.UsedSlash),"Played Slash returns to real virtual Duel, not Use.");
-            else Require(g.State.Players[0].Hp==1&&g.Events.Select(e=>e.Payload).OfType<DyingResponseEvent>().Any(e=>e.ResponderSeat==0&&(e.UsedPeach||e.UsedAlcohol)),"Dying-use returns after real recovery.");
+            else
+            {
+                for(var step=0;step<100&&!g.Events.Select(e=>e.Payload).OfType<DyingResponseEvent>()
+                    .Any(e=>e.ResponderSeat==0&&(e.UsedPeach||e.UsedAlcohol));step++)
+                    Accept(g,new AdvanceOneStepCommand(g.Revision));
+                Require(g.State.Players[0].Hp==1&&g.Events.Select(e=>e.Payload).OfType<DyingResponseEvent>()
+                    .Any(e=>e.ResponderSeat==0&&(e.UsedPeach||e.UsedAlcohol))&&
+                    g.CardMovements.Count(m=>m.CardId==hiddenCost&&m.From==CardLocation.Hand(0)&&m.To==CardLocation.Processing)==1,
+                    "Dying-use returns after real recovery and one physical declaration payment: "+RecoveryDiagnostic(g,purpose));
+            }
             Replay(g,r);Conserve(g);
         }
     }
+    private static string RecoveryDiagnostic(GameEngine g,string purpose)=>JsonSerializer.Serialize(new
+    {
+        purpose,g.State.Status,Hp=g.State.Players[0].Hp,Prompt=P(g)?.Kind,
+        Frames=g.ResolutionStack.Select(f=>new{f.Id,f.Kind,f.Step,f.AcceptedDeclarationPayment}),
+        Payments=g.CardMovements.Where(m=>m.From==CardLocation.Hand(0)&&m.To==CardLocation.Processing).TakeLast(3),
+        LastFacts=g.Events.TakeLast(6).Select(e=>e.Payload.GetType().Name)
+    });
     private static void Driver(GameEngine g,string id,IReadOnlyList<int>? targets=null)=>Accept(g,new UseProgramSkillCommand(0,"fixture:yu-driver",id,[],targets??[],g.Revision,P(g)!.PromptId));
     private static (GameEngine,ContentRegistry) Start(string card,bool providers=false,bool declarations=true,bool costChild=false,ContentRegistry? registry=null)
     {
@@ -48,7 +66,7 @@ internal static partial class FengLinYuJiChecks
         public PackageManifest Manifest{get;}=new("fixture-yuji",new(1,0,0),[]);
         public void Register(IContentRegistryBuilder b)
         {
-            var catalog=SkillProgramCatalog.Load($$"""{"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"fixture:yu-driver","revision":1,"cardPolicies":[{"id":"fixture-providers","kind":"factionResponseRequest","requiredCardKinds":["slash"],"factionId":"qun","ownerRole":"lord"}],"activations":[{"id":"strip-slash","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"selectedTarget"},"zones":["hand"],"cardKinds":["slash"],"count":1,"destination":"discardPile"}]},{"id":"equip-target","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"targetRef":{"kind":"selectedTarget"},"zones":["hand"],"cardCategories":["equipment"],"count":1,"destination":"selectedTargetEquipment"}]},{"id":"poke","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"selectedTarget","amount":1}]},{"id":"duel","minCards":0,"maxCards":0,"minTargets":2,"maxTargets":2,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"startVirtualDuel","target":"owner"}]},{"id":"dying","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"loseHp","target":"owner","amount":20}]},{"id":"request","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"requestFactionCard","target":"selectedTarget","providerFactionId":"qun","requiredKind":"slash"}]}]},{"id":"fixture:yu-retaliate","revision":1,"triggers":[{"id":"retaliate","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamage","optional":false,"effects":[{"op":"selectTarget","target":"owner","targetKind":"eventSource"},{"op":"useVirtualSlash","target":"selectedTarget"}]}]}]}""", """{"schemaVersion":3,"skills":{"fixture:yu-driver":{"name":"真实子链","description":"真实子链"},"fixture:yu-retaliate":{"name":"反击","description":"反击"}}}""");
+            var catalog=SkillProgramCatalog.Load($$"""{"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"fixture:yu-driver","revision":1,"cardPolicies":[{"id":"fixture-providers","kind":"factionResponseRequest","requiredCardKinds":["slash"],"factionId":"qun","ownerRole":"lord"}],"activations":[{"id":"strip-slash","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"selectedTarget"},"zones":["hand"],"cardKinds":["slash"],"count":1,"destination":"discardPile"}]},{"id":"equip-target","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"targetRef":{"kind":"selectedTarget"},"zones":["hand"],"cardCategories":["equipment"],"count":1,"destination":"selectedTargetEquipment"}]},{"id":"poke","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"selectedTarget","amount":1}]},{"id":"duel","minCards":0,"maxCards":0,"minTargets":2,"maxTargets":2,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"startVirtualDuel","target":"owner"}]},{"id":"dying","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"loseHp","target":"owner","amount":5}]},{"id":"request","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"requestFactionCard","target":"selectedTarget","providerFactionId":"qun","requiredKind":"slash"}]}]},{"id":"fixture:yu-retaliate","revision":1,"triggers":[{"id":"retaliate","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamage","optional":false,"effects":[{"op":"selectTarget","target":"owner","targetKind":"eventSource"},{"op":"useVirtualSlash","target":"selectedTarget"}]}]}]}""", """{"schemaVersion":3,"skills":{"fixture:yu-driver":{"name":"真实子链","description":"真实子链"},"fixture:yu-retaliate":{"name":"反击","description":"反击"}}}""");
             foreach(var pair in catalog.Programs)b.AddSkill(new(pair.Key,pair.Key,pair.Key){Program=pair.Value});
             if(card=="mixed-borrowed")
             {

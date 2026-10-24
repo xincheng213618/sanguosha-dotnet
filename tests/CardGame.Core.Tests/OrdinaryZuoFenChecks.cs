@@ -59,6 +59,30 @@ internal static class OrdinaryZuoFenChecks
         }
     }
 
+    public static void HolderDeathRetainsTheExactIndependentCategoryBadgeCold()
+    {
+        foreach (var kind in new[] { CardKind.Nullification, CardKind.Crossbow, CardKind.Slash })
+        {
+            var (g, registry) = Create(Scenario.Gift, kind);
+            Answer(g, Activate); Reach(g, p => MarkChoice(p, "gift"));
+            Answer(g, c => c.Parameters.GetValueOrDefault("mark-action") == "gift");
+            Reach(g, p => p.PlayerSeat == 1 && p.SkillPrompt?.SkillId == Gain && IsContinue(p));
+            g = Cold(g, registry); Continue(g); Play(g);
+            var token = E<RecipientCategoryMarkGrantedEvent>(g).Single().Token;
+            var marker = token.Kind switch { RecipientCategoryMarkKind.Rescue => PlayerMarkerKind.CategoryLei,
+                RecipientCategoryMarkKind.Discard => PlayerMarkerKind.CategoryFu, _ => PlayerMarkerKind.CategorySong };
+            Use(g, "die");
+            for (var step = 0; step < 120 && (V(g, 0).IsAlive ||
+                g.State.Status != EngineStatus.Completed && g.ResolutionStack.Count != 0); step++) Step(g);
+            Require(!V(g, 0).IsAlive && E<PlayerDiedEvent>(g).Any(e => e.VictimSeat == 0) &&
+                Marker(g, 0, marker) == 1 && E<RecipientCategoryMarkGrantedEvent>(g).Length == 1 &&
+                E<RecipientCategoryMarkConsumedEvent>(g).Length == 0 &&
+                !E<PlayerMarkerChangedEvent>(g).Any(e => e.PlayerSeat == 0 && e.Marker == marker && e.Delta < 0),
+                "Death of the recipient cannot clear a badge while its independent issued token remains unconsumed.");
+            _ = Cold(g, registry);
+        }
+    }
+
     private static PlayerSnapshot V(GameEngine g, int seat) => g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 4).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static T[] E<T>(GameEngine g) where T : IGameEvent => g.Events.Select(e => e.Payload).OfType<T>().ToArray();

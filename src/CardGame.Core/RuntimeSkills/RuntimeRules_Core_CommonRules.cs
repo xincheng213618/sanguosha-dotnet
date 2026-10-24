@@ -634,6 +634,12 @@ internal static class RuntimeRules_Core_CommonRules
             ValidTargetSeats = Array.AsReadOnly(decision.ValidTargetSeats.ToArray()),
             Choices = Array.AsReadOnly(decision.Choices.Select(PromptChoiceProjection.Freeze).ToArray()),
             ValidContentIds = Array.AsReadOnly(decision.ValidContentIds.ToArray()),
+            DeckReorder = decision.DeckReorder is { } order ? order with
+            {
+                Cards = Array.AsReadOnly(order.Cards.ToArray()),
+                TopCardIds = Array.AsReadOnly(order.TopCardIds.ToArray()),
+                BottomCardIds = Array.AsReadOnly(order.BottomCardIds.ToArray())
+            } : null,
         };
 
     internal static GameCommand CloneCommand(GameCommand command) =>

@@ -121,13 +121,22 @@ internal static class LiFengChecks
 
     public static void ShuliangOriginalPlayKindsAndWholeUseCollectionCold()
     {
-        foreach (var scene in new[] { "play-slash", "play-trick", "play-chain", "play-equipment", "play-delayed", "converted-lease" })
+        foreach (var scene in new[] { "play-slash", "play-trick", "play-chain", "play-equipment", "play-delayed", "play-snatch", "play-dismantlement", "converted-lease" })
         {
             var (g, r) = Start(scene, beforePrep: true);
             Prepare(g, [0]); Play(g);
             var marked = V(g).Hand.Single();
             var original = Pile(g).Single(c => c.Kind == (scene == "converted-lease" ? CardKind.DrawTwo : PrimaryKind(scene)));
             Need(Marked(marked) && marked.Kind == PrimaryKind(scene), "The real one-card Prep lease has this scene's exact printed primary kind.");
+            if (scene is "play-snatch" or "play-dismantlement")
+            {
+                Use(g, "stock-two"); Play(g);
+                var targets = V(g).Hand.Where(card => card.Id != marked.Id).ToArray();
+                Need(targets.Length == 2, "The targeted native trick receives two genuine extra Hand entities, separately from its original marked lease.");
+                foreach (var targetCard in targets) { Use(g, "give", [targetCard.Id], [1]); Play(g); }
+                Need(V(g, 1).HandCount == 2 && V(g).Hand.Any(card => card.Id == marked.Id),
+                    "Two real gifts give the target one entity for each complete original-grain and marked-Hand trick use.");
+            }
             var raw = g.GetHumanLegalActions().First(a => a.CardId == original.Id && a.NativePublicPileSource is not null);
             Need(raw.ConversionSource is null && (raw.AdditionalConversionSources?.Count ?? 0) == 0,
                 "Direct grain authorization remains separate from optional ViewAs conversion sources.");
@@ -646,7 +655,7 @@ internal static class LiFengChecks
     }
     private static int[] NativeTargets(CardKind kind, int target) => kind switch
     {
-        CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.Indulgence or CardKind.IronChain => [target],
+        CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.Indulgence or CardKind.IronChain or CardKind.Snatch or CardKind.Dismantlement => [target],
         _ => []
     };
     private static void AssertOriginalUse(GameEngine g, CardSnapshot original, int provider, CardActionContext? captured = null)
@@ -718,6 +727,10 @@ internal static class LiFengChecks
             var p = P(g);
             if (p is null || p.PlayerSeat != 0) Accept(g, new AdvanceOneStepCommand(g.Revision));
             else if (p.Kind == DecisionKind.PlayCard) End(g);
+            else if (p.Kind == DecisionKind.SelectTargetCard)
+                Answer(g, choice => choice.Cards.Count == 0 &&
+                    choice.Parameters.GetValueOrDefault("action") == "target-card-slot" &&
+                    choice.Parameters.GetValueOrDefault("slot-index") == "0");
             else if (p.SkillPrompt?.SkillId == Watch) Continue(g);
             else if (p.Kind is DecisionKind.RespondDodge or DecisionKind.RespondSlash or DecisionKind.Nullification)
                 Answer(g, c => c.Cards.Count == 0 && c.Parameters.GetValueOrDefault("response") is not ("faction-slash-request" or "faction-defense-request"));
@@ -787,6 +800,7 @@ internal static class LiFengChecks
     {
         "play-slash" => CardKind.FireSlash, "play-trick" or "paid-loss" or "paid-death" => CardKind.DrawTwo,
         "play-chain" => CardKind.IronChain, "play-equipment" => CardKind.Crossbow, "play-delayed" => CardKind.Indulgence,
+        "play-snatch" => CardKind.Snatch, "play-dismantlement" => CardKind.Dismantlement,
         "dodge-quota" or "arrows" or "converted-lease" or "lease-dodge" => CardKind.Dodge,
         "null" or "lease-null" or "ai-null" => CardKind.Nullification, "rescue" => CardKind.Peach,
         "forced" => CardKind.FireSlash,
@@ -838,7 +852,7 @@ internal static class LiFengChecks
             var watches = new JsonArray();
             if (scene.StartsWith("play-", StringComparison.Ordinal) || scene == "converted-lease")
             {
-                var kind = scene switch { "play-slash" => "fireSlash", "play-chain" => "ironChain", "play-equipment" => "crossbow", "play-delayed" => "indulgence", _ => "drawTwo" };
+                var kind = scene switch { "play-slash" => "fireSlash", "play-chain" => "ironChain", "play-equipment" => "crossbow", "play-delayed" => "indulgence", "play-snatch" => "snatch", "play-dismantlement" => "dismantlement", _ => "drawTwo" };
                 watches.Add(N($$"""{"id":"original-live-action","window":"cardUseCommitted","ownerRelation":"actor","cardKinds":["{{kind}}"],"usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"original-live","options":[{"id":"original-live"}]}]}"""));
             }
             if (scene == "converted-lease") watches.Add(N("""{"id":"converted-live-action","window":"cardUseCommitted","ownerRelation":"actor","cardKinds":["ironChain"],"usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"converted-live","options":[{"id":"converted-live"}]}]}"""));

@@ -66,8 +66,10 @@
           { "op": "startJudgment", "target": "owner", "judgmentReason": "skill.ganglie",
             "resultBind": "judgment", "visibility": "public" },
           { "op": "chooseOption", "target": "owner", "chooserRef": { "kind": "eventSource" },
-            "resultBind": "punishment", "condition": { "kind": "boundCardsMatchSuits",
-              "sourceBind": "judgment", "suits": ["heart", "diamond"] },
+            "resultBind": "punishment", "condition": { "kind": "all", "children": [
+              { "kind": "eventSourceExists" },
+              { "kind": "boundCardsMatchSuits", "sourceBind": "judgment", "suits": ["heart", "diamond"] }
+            ] },
             "options": [
               { "id": "discard", "condition": { "kind": "handCountAtLeast", "value": 2 } },
               { "id": "damage", "condition": { "kind": "always" } }
@@ -96,8 +98,10 @@
           { "op": "startJudgment", "target": "owner", "judgmentReason": "skill.ganglie",
             "resultBind": "judgment", "visibility": "public" },
           { "op": "chooseOption", "target": "owner", "chooserRef": { "kind": "eventSource" },
-            "resultBind": "punishment", "condition": { "kind": "boundCardsMatchSuits",
-              "sourceBind": "judgment", "suits": ["spade", "club", "diamond"] },
+            "resultBind": "punishment", "condition": { "kind": "all", "children": [
+              { "kind": "eventSourceExists" },
+              { "kind": "boundCardsMatchSuits", "sourceBind": "judgment", "suits": ["spade", "club", "diamond"] }
+            ] },
             "options": [
               { "id": "discard", "condition": { "kind": "handCountAtLeast", "value": 2 } },
               { "id": "damage", "condition": { "kind": "always" } }

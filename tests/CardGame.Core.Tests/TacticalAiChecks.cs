@@ -43,7 +43,10 @@ internal static class TacticalAiChecks
 
     public static void PolicyReplay()
     {
-        foreach (var version in new[] { 1, 2, 3 })
+        foreach (var version in new[] { 1, 2, 3, AiDecisionPolicy.CooperativeCategoryGiftVersion,
+                     AiDecisionPolicy.TacticalPlanningVersion, AiDecisionPolicy.IdentityStrategyVersion,
+                     AiDecisionPolicy.RebelStrategyVersion, AiDecisionPolicy.RebelPressureVersion,
+                     AiDecisionPolicy.RebelCoordinationVersion })
         {
             var game = GameEngine.CreateStandard(new GameOptions { Seed = 561923, HumanSeat = -1, HumanRole = null, AiPolicyVersion = version, UseInteractiveSetup = true }, StandardContentRegistry.Create());
             Require(game.Submit(new StartGameCommand()).Accepted, "Full AI match failed.");

@@ -116,6 +116,8 @@ internal static class ProgramCompositionValidator
             foreach (var condition in Conditions(effect.Condition)
                          .Concat(effect.Options.SelectMany(option => Conditions(option.Condition))))
             {
+                if (condition.Kind == SkillProgramConditionKind.EventSourceExists && window is null)
+                    Fail("eventSourceExists requires a trigger event context");
                 if (condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits &&
                     !judgmentOutcomes.Contains(condition.SourceBind!))
                     Fail($"unknown judgment outcome binding '{condition.SourceBind}'");

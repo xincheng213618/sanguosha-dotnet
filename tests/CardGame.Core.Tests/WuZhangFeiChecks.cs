@@ -21,6 +21,9 @@ internal static class WuZhangFeiChecks
     public static void TrueUseMaterialRanksPrivateSamplingAndCold()
     {
         ReservedLoaderRejectsTransplants();
+        DeclaredResponsesKeepOriginalRanksAndOnePaymentCold();
+        DeclaredCounterspellGroupAndProactiveRecoveryCold();
+        ActualAiGroupMultiDodgeUsesItsCompletePublishedSelectionCold();
         foreach (var (left, right, eligible) in new[] { (1, 5, true), (9, 9, true), (1, 2, false), (1, 3, false) })
         {
             var s = Scene.Start(new("spear-" + left + "-" + right)
@@ -112,12 +115,173 @@ internal static class WuZhangFeiChecks
                 neutral.E<XieweiBaitStoredEvent>().All(e => originals.Contains(e.CardId) && e.From == CardLocation.Hand(0) &&
                     neutral.G.CardMovements.Count(m => m.Sequence == e.Sequence && m.CardId == e.CardId && m.From == e.From && m.To == e.Pile && m.Reason.Value == "skill-program.guan-hai.xiewei.store") == 1),
                 "Actual Xiewei deposits both original nines once while its genuine immutable action receipt keeps the native Slash or true Dodge output colorless and rank zero; bait storage is not a second response payment."); neutral.Immutable(native!.PhysicalCards); neutral.Cold();
+            if (response)
+            {
+                var admitted = neutral.E<MouZhaJiangResponseAdmittedEvent>().Single(e => e.ActionId == output.ActionId);
+                var materials = neutral.E<MouZhaJiangResponseMaterialEvent>().Where(e => e.OwnerFrameId == admitted.OwnerFrameId && e.Index == admitted.Index).OrderBy(e => e.MaterialIndex).ToArray();
+                neutral.Need(materials.Select(e => e.CardId).SequenceEqual(native.PhysicalCards.Select(c => c.CardId)) &&
+                    materials.All(e => e.From == CardLocation.Hand(0)) && native.PhysicalCards.All(c => c.From == CardLocation.Hand(0)) &&
+                    neutral.E<MouZhaJiangResponsePreparedEvent>().Single(e => e.OwnerFrameId == admitted.OwnerFrameId && e.Index == admitted.Index) is { ActorSeat: 0, Kind: CardKind.Dodge, MaterialCount: 2 },
+                    "With the real ZhaJiang capability loaded, Xiewei freezes both original Hand materials before depositing its bait; its accepted Response adopts the same exact actor and materials without weakening admission validation.");
+            }
             neutral.Need(neutral.SampleObtains().Length == 0 && neutral.E<WuZhangFeiUseQualifiedEvent>().Length == 0 && neutral.E<WuZhangFeiUseStartedEvent>().Length == 0 &&
                 neutral.E<WuZhangFeiUseRankCapturedEvent>().Any(e => e.ActionId == output.ActionId && e.MaterialCount == 2 && e.RankSum == 0) &&
                 (response ? neutral.E<CardResponseCompletedEvent>().Count(e => e.ActionId == output.ActionId && e.OriginalContinuation == ProgramCardContinuation.Dodge) == 1 :
                     neutral.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == output.UseId) == 1),
                 "The source-specific neutral rank dominates its 9+9 provenance: neither active nor response Xiewei can qualify for a sample, and the real native continuation returns once without an invoice exception."); neutral.Cold();
         }
+    }
+
+    private static void DeclaredResponsesKeepOriginalRanksAndOnePaymentCold()
+    {
+        foreach (var kind in new[] { CardKind.Dodge, CardKind.Nullification })
+        foreach (var alcoholIdentity in new[] { false, true })
+        {
+            var isCounter = kind == CardKind.Nullification;
+            var s = Scene.Start(new("declared-" + kind + "-" + alcoholIdentity)
+            {
+                Declarations = true, DeclarationCostChild = !isCounter && !alcoholIdentity,
+                AlcoholIdentity = alcoholIdentity,
+                Hand = isCounter ? [C(CardKind.Dismantlement, 1), C(alcoholIdentity ? CardKind.Alcohol : CardKind.Slash, 6), C(CardKind.Duel, 1)]
+                    : [C(alcoholIdentity ? CardKind.Alcohol : CardKind.Slash, 6)],
+                PeerHands = [[], [C(CardKind.Slash, 2)], []]
+            });
+            var material = s.V().Hand.Single(card => card.Kind == (alcoholIdentity ? CardKind.Alcohol : CardKind.Slash)).Id;
+            if (isCounter) { s.Native(CardKind.Dismantlement, [2]); s.Reach(() => s.P is { Kind: DecisionKind.Nullification }); }
+            else s.IncomingSlash();
+            s.Answer(choice => choice.Cards.SequenceEqual([material]) && choice.Parameters.GetValueOrDefault("conversion-skill-id") == "classic:guhuo");
+            var declared = s.G.ResolutionStack.OfType<CardDeclarationFrame>().Single();
+            var originalRank = alcoholIdentity ? 13 : 6;
+            s.Need(declared.Payment is { OriginalRank: var rank, BianFuRenPaymentSequence: not null } && rank == originalRank &&
+                declared.Payment.ReturnPurpose == (isCounter ? CardDeclarationPurpose.Counterspell : CardDeclarationPurpose.Dodge) &&
+                declared.Payment.Cost.From == CardLocation.Hand(0) && declared.Payment.Cost.CardId == material,
+                "A real declaration freezes its original owned rank and exact physical entry before leaving Hand; a king-identity Alcohol is thirteen, not its printed six.");
+            if (!isCounter && !alcoholIdentity)
+            {
+                s.Reach(() => s.Hold("declaration-child")); s.Cold(); s.Continue();
+            }
+            s.Reach(() => s.G.ResolutionStack.LastOrDefault() is CardDeclarationChallengeFrame);
+            while (s.G.ResolutionStack.LastOrDefault() is CardDeclarationChallengeFrame) s.AnswerDeclaration("pass");
+            if (!alcoholIdentity) { s.ReachSample(); s.SelectSample(); }
+            else s.Play();
+            var action = s.E<CardActionAcceptedEvent>().Select(e => e.Action).Single(a => a.Type == CardActionType.Response &&
+                a.ActorSeat == 0 && a.EffectiveKind == kind && a.PhysicalCards.Any(cost => cost.CardId == material));
+            s.Need(action.ProviderSeat == 0 && action.ConversionChain.Contains(declared.Payment.Source) &&
+                action.PhysicalCards.Single() == declared.Payment.Cost && action.EffectiveRank == originalRank &&
+                s.E<WuZhangFeiUseRankCapturedEvent>().Single(e => e.ActionId == action.ActionId).RankSum == originalRank &&
+                s.E<WuZhangFeiResponseRankBoundEvent>().Count(e => e.ActionId == action.ActionId) == 1 &&
+                s.G.CardMovements.Count(m => m.CardId == material && m.From == CardLocation.Hand(0) &&
+                    m.To == CardLocation.Processing && m.Reason.Value == "conversion.declaration.pay") == 1 &&
+                !s.G.CardMovements.Any(m => m.CardId == material && (m.Reason == CardMoveReasons.Respond || m.Reason == CardMoveReasons.Nullification)) &&
+                s.PaidOnce(material) && s.SampleObtains().Length == (alcoholIdentity ? 0 : 1),
+                "Declared Dodge/Nullification adopts exactly one real prepaid entity and original rank, binds once, and never manufactures a second native response payment.");
+            s.Cold();
+            if (isCounter && !alcoholIdentity)
+            {
+                var duelId = s.V().Hand.Single(card => card.Kind == CardKind.Duel).Id;
+                s.Native(CardKind.Duel, [2]);
+                var native = s.G.ResolutionStack.OfType<CardUseFrame>().Single(frame => frame.CardId == duelId);
+                s.Need(native.Action is { Type: CardActionType.Use, ActorSeat: 0, ProviderSeat: 0 } used &&
+                    used.EffectiveKind == CardKind.Duel && used.ConversionChain.Count == 0 &&
+                    used.PhysicalCards is [var cost] && cost.CardId == duelId && cost.From == CardLocation.Hand(0),
+                    "An explicitly selected native Duel after a declared Nullification has an empty source chain; it must not inherit the earlier Guhuo response source.");
+                s.Play();
+                s.Need(s.PaidOnce(duelId) && s.G.CardMovements.Count(move => move.CardId == duelId &&
+                    move.From == CardLocation.Hand(0) && move.To == CardLocation.Processing && move.Reason == CardMoveReasons.Use) == 1 &&
+                    s.E<CardUseFinishedEvent>().Count(finish => finish.ResolutionId == native.Id &&
+                        finish.CardId == duelId && finish.CardKind == CardKind.Duel) == 1,
+                    "The genuine native follow-up Duel pays its own entity once and completes its existing native use once.");
+                s.Cold();
+            }
+        }
+
+        var failed = Scene.Start(new("declared-failed") { Declarations = true, Hand = [C(CardKind.Slash, 6)] });
+        var failedMaterial = failed.V().Hand.Single().Id;
+        failed.IncomingSlash();
+        failed.Answer(choice => choice.Cards.SequenceEqual([failedMaterial]) && choice.Parameters.GetValueOrDefault("conversion-skill-id") == "classic:guhuo");
+        failed.Reach(() => failed.G.ResolutionStack.LastOrDefault() is CardDeclarationChallengeFrame);
+        failed.Cold(); failed.AnswerDeclaration("challenge"); failed.Play();
+        failed.Need(failed.E<CardDeclarationRevealedEvent>() is [{ Succeeded: false }] &&
+            failed.E<WuZhangFeiResponseRankBoundEvent>().Length == 0 && failed.SampleObtains().Length == 0 &&
+            !failed.E<CardActionAcceptedEvent>().Any(e => e.Action.PhysicalCards.Any(cost => cost.CardId == failedMaterial)) &&
+            failed.G.CardMovements.Count(m => m.CardId == failedMaterial && m.Reason.Value == "conversion.declaration.failed") == 1 &&
+            failed.PaidOnce(failedMaterial),
+            "A genuinely challenged false declaration consumes its existing material once and never binds a response rank or obtains a Zisheng sample.");
+        failed.Cold();
+    }
+
+    private static void DeclaredCounterspellGroupAndProactiveRecoveryCold()
+    {
+        foreach(var trick in new[]{CardKind.DrawTwo,CardKind.ArrowBarrage})
+        {
+            var s=Scene.Start(new("declared-group-"+trick){Declarations=true,Hand=[C(trick,1),C(CardKind.Slash,6),C(CardKind.Peach,6)]});
+            var material=s.V().Hand.Single(c=>c.Kind==CardKind.Slash).Id;
+            s.Use("hp-loss",[0]);s.Play();var wounded=s.V().Hp;
+            var use=s.G.GetHumanLegalActions().First(a=>a.CardId is{}id&&s.V().Hand.Any(c=>c.Id==id&&c.Kind==trick)&&a.ConversionSource is null&&a.Kind!=LegalActionKind.Recast);
+            s.Accept(new PlayCardCommand(0,use.CardId!.Value,use.TargetSeats,s.G.Revision,s.P!.PromptId,use.PlayedCardKind));
+            s.Reach(()=>s.P is{Kind:DecisionKind.Nullification});
+            s.Answer(c=>c.Cards.SequenceEqual([material])&&c.Parameters.GetValueOrDefault("conversion-skill-id")=="classic:guhuo");
+            s.Reach(()=>s.G.ResolutionStack.LastOrDefault() is CardDeclarationChallengeFrame);s.Cold();
+            while(s.G.ResolutionStack.LastOrDefault() is CardDeclarationChallengeFrame)s.AnswerDeclaration("pass");
+            s.ReachSample();s.SelectSample();s.Play();
+            var response=s.E<CardActionAcceptedEvent>().Select(e=>e.Action).Single(a=>a.Type==CardActionType.Response&&a.PhysicalCards.Any(c=>c.CardId==material));
+            s.Need(response.EffectiveKind==CardKind.Nullification&&response.EffectiveRank==6&&s.PaidOnce(material)&&
+                s.E<WuZhangFeiResponseRankBoundEvent>().Count(e=>e.ActionId==response.ActionId)==1,
+                "A declared counterspell retains its exact original rank and prepaid receipt when answering an implicit-self or multi-target group trick.");s.Cold();
+            var nativePeach=s.G.GetHumanLegalActions().First(a=>a.Kind==LegalActionKind.Peach&&a.ConversionSource is null);var peachId=nativePeach.CardId!.Value;
+            s.Accept(new PlayCardCommand(0,peachId,nativePeach.TargetSeats,s.G.Revision,s.P!.PromptId,nativePeach.PlayedCardKind));s.ReachSample();
+            var usedPeach=s.G.ResolutionStack.OfType<CardUseFrame>().Single(f=>f.CardId==peachId).Action!;
+            s.Need(usedPeach.Type==CardActionType.Use&&usedPeach.ActorSeat==0&&usedPeach.ProviderSeat==0&&usedPeach.ConversionChain.Count==0&&
+                usedPeach.PhysicalCards is[{CardId:var paidPeach,From:var peachFrom}]&&paidPeach==peachId&&peachFrom==CardLocation.Hand(0),
+                "The explicitly ordinary rank-six Peach pauses at its actual Zisheng Use boundary with its own physical invoice and an empty conversion chain.");s.Cold();s.SelectSample();s.Play();
+            s.Need(s.V().Hp==wounded+1&&s.PaidOnce(peachId)&&s.E<CardDeclarationCommittedEvent>().Length==1,
+                "The next explicitly ordinary Peach overrides the old Guhuo response source before recovery declaration lookup and native Use capture; it never invents another declaration or foreign conversion.");s.Cold();
+        }
+        var recovery=Scene.Start(new("declared-proactive-recovery"){Declarations=true,Hand=[C(CardKind.Slash,6)]});
+        var cost=recovery.V().Hand.Single().Id;recovery.Use("hp-loss",[0]);recovery.Play();var before=recovery.V().Hp;
+        var peach=recovery.G.GetHumanLegalActions().First(a=>a.CardId==cost&&a.PlayedCardKind==CardKind.Peach&&a.ConversionSource?.SkillId=="classic:guhuo");
+        recovery.Accept(new PlayCardCommand(0,cost,peach.TargetSeats,recovery.G.Revision,recovery.P!.PromptId,peach.PlayedCardKind){ConversionSource=peach.ConversionSource});
+        recovery.Reach(()=>recovery.G.ResolutionStack.LastOrDefault() is CardDeclarationChallengeFrame);
+        recovery.Need(recovery.G.ResolutionStack.OfType<CardDeclarationFrame>().Single().Return is{Purpose:CardDeclarationPurpose.Use,ParentFrameId:0,DyingResponse:null,UseAction.PlayedCardKind:CardKind.Peach},
+            "The real proactive Peach declaration has no suspended response parent to borrow for its true Use.");recovery.Cold();
+        while(recovery.G.ResolutionStack.LastOrDefault() is CardDeclarationChallengeFrame)recovery.AnswerDeclaration("pass");
+        recovery.ReachSample();recovery.SelectSample();recovery.Play();
+        recovery.Need(recovery.V().Hp==before+1&&recovery.PaidOnce(cost)&&
+            recovery.E<CardUseFinishedEvent>().Count(e=>e.CardId==cost&&e.CardKind==CardKind.Peach)==1&&
+            !recovery.G.ResolutionStack.OfType<CardDeclarationFrame>().Any(),
+            "An accepted proactive recovery transfers its original declaration directly to the genuine native Peach Use, restores one HP and finishes with one physical payment.");recovery.Cold();
+
+        var foreign=Scene.Start(new("declared-foreign-native-counter"){Declarations=true,Hand=[C(CardKind.Dismantlement,1),C(CardKind.Slash,6)],
+            PeerHands=[[C(CardKind.Nullification,1)],[C(CardKind.Slash,2)],[]]});
+        var nullId=foreign.V(1).Hand.Single().Id;var ownMaterial=foreign.V().Hand.Single(c=>c.Kind==CardKind.Slash).Id;
+        foreign.Native(CardKind.Dismantlement,[2]);foreign.Reach(()=>foreign.P is{Kind:DecisionKind.Nullification});
+        foreign.Answer(c=>c.Cards.SequenceEqual([ownMaterial])&&c.Parameters.GetValueOrDefault("conversion-skill-id")=="classic:guhuo");
+        foreign.Reach(()=>foreign.G.ResolutionStack.LastOrDefault() is CardDeclarationChallengeFrame);
+        while(foreign.G.ResolutionStack.LastOrDefault() is CardDeclarationChallengeFrame)foreign.AnswerDeclaration("pass");
+        foreign.ReachSample();foreign.SelectSample();foreign.Play();
+        var ordinary=foreign.E<CardActionAcceptedEvent>().Select(e=>e.Action).Single(a=>a.Type==CardActionType.Response&&a.ActorSeat==1&&a.PhysicalCards.Any(c=>c.CardId==nullId));
+        foreign.Need(ordinary.ProviderSeat==1&&ordinary.EffectiveKind==CardKind.Nullification&&ordinary.ConversionChain.Count==0&&
+            foreign.E<CardDeclarationCommittedEvent>().All(e=>e.OwnerSeat==0)&&foreign.G.CardMovements.Count(m=>m.CardId==nullId&&m.From==CardLocation.Hand(1)&&m.To==CardLocation.Processing&&m.Reason==CardMoveReasons.Nullification)==1&&
+            foreign.G.CardMovements.Count(m=>m.CardId==nullId&&m.From==CardLocation.Processing&&m.To==CardLocation.DiscardPile&&m.Reason==CardMoveReasons.NullificationFinished)==1,
+            "The next real AI responder's ordinary counterspell owns its own paid material and empty source chain, rather than inheriting the prior declarer's Guhuo skill instance.");foreign.Cold();
+    }
+
+    private static void ActualAiGroupMultiDodgeUsesItsCompletePublishedSelectionCold()
+    {
+        var s=Scene.Start(new("multi-group-ai"){Hand=[C(CardKind.ArrowBarrage,1)],PeerHands=[[],[C(CardKind.Slash,9),C(CardKind.Slash,9)],[]],PeerHp=[12,1,12]});
+        var use=s.G.GetHumanLegalActions().First(a=>a.Kind==LegalActionKind.ArrowBarrage&&a.ConversionSource is null);
+        s.Accept(new PlayCardCommand(0,use.CardId!.Value,use.TargetSeats,s.G.Revision,s.P!.PromptId,use.PlayedCardKind));
+        s.Reach(()=>s.G.CreateSnapshot(2).PendingDecision is{Kind:DecisionKind.RespondDodge});
+        var prompt=s.G.CreateSnapshot(2).PendingDecision!;var materials=s.V(2).Hand.Select(c=>c.Id).ToArray();
+        s.Need(prompt.Choices.Any(c=>c.Parameters.GetValueOrDefault("response")=="extended-view-as"&&c.Cards.SequenceEqual(materials))&&
+            !prompt.Choices.Any(c=>c.Cards.Count==1),"The actual NPC group defender publishes only its complete two-card Dodge conversion and no standalone material choice.");s.Cold();
+        s.Accept(new AdvanceOneStepCommand(s.G.Revision));s.Play();
+        var action=s.E<CardActionAcceptedEvent>().Select(e=>e.Action).Single(a=>a.Type==CardActionType.Response&&a.ActorSeat==2);
+        s.Need(action.EffectiveKind==CardKind.Dodge&&action.PhysicalCards.Select(c=>c.CardId).SequenceEqual(materials)&&
+            materials.All(id=>s.G.CardMovements.Count(m=>m.CardId==id&&m.From==CardLocation.Hand(2)&&m.To==CardLocation.Processing)==1&&
+                s.G.CardMovements.Count(m=>m.CardId==id&&m.From==CardLocation.Processing&&m.To==CardLocation.DiscardPile)==1)&&s.V(2).Hp==1&&
+            !s.G.AcceptedCommands.OfType<AnswerPromptCommand>().Any(c=>c.PromptId==prompt.PromptId),
+            "One actual AI advance selects and pays the full published multi-Dodge against the group attack; it never parses its first material as an independent response or fabricates an NPC answer.");s.Cold();
     }
 
     public static void CausalDiscardObtainVictimDamageAndOxSpillCold()
@@ -336,6 +500,9 @@ internal static class WuZhangFeiChecks
         public bool DrawChildDamage { get; init; }
         public bool XieweiSource { get; init; }
         public bool AncestorGift { get; init; }
+        public bool Declarations { get; init; }
+        public bool DeclarationCostChild { get; init; }
+        public bool AlcoholIdentity { get; init; }
     }
 
     private sealed class Fixture(Spec spec) : IGameContentPackage
@@ -345,8 +512,10 @@ internal static class WuZhangFeiChecks
         {
             var production = SkillProgramCatalog.Load(ReadBundle("rules"), ReadBundle("presentation"));
             foreach (var (id, program) in production.Programs) b.AddSkill(new(id, production.Presentations[id].Name, production.Presentations[id].Description) { Program = program, ProgramPresentation = production.Presentations[id] });
+            if (spec.Declarations) CharacterFixtureContent.Register(b, "classic:yu-ji", "ol:bian-fu-ren");
             if (spec.XieweiSource)
             {
+                CharacterFixtureContent.Register(b, "mou:huang-gai-mobile");
                 string ReadXiewei(string suffix) { using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ol-guan-hai." + suffix + ".json") ?? throw new InvalidOperationException("Missing real Xiewei source bundle."); using var reader = new StreamReader(stream); return reader.ReadToEnd(); }
                 var xiewei = SkillProgramCatalog.Load(ReadXiewei("rules"), ReadXiewei("presentation"));
                 foreach (var (id, program) in xiewei.Programs) b.AddSkill(new(id, xiewei.Presentations[id].Name, xiewei.Presentations[id].Description) { Program = program, ProgramPresentation = xiewei.Presentations[id] });
@@ -369,7 +538,10 @@ internal static class WuZhangFeiChecks
             var defs = new JsonArray(new JsonObject { ["id"] = Driver, ["revision"] = 1, ["activations"] = acts,
                     ["modifiers"] = N("[{\"id\":\"hold-stock\",\"query\":\"handLimit\",\"operation\":\"add\",\"value\":40,\"priority\":0}]") },
                 N("{\"id\":\"" + Quiet + "\",\"revision\":1,\"triggers\":[{\"id\":\"quiet\",\"window\":\"afterNormalDraw\",\"subject\":\"owner\",\"optional\":false,\"effects\":[{\"op\":\"skipTurnPhases\",\"target\":\"owner\",\"phases\":[\"play\"]}]}]}"));
+            if (spec.AlcoholIdentity) defs[0]!["cardPolicies"] = N("[{\"id\":\"original-alcohol-rank\",\"kind\":\"alcoholKingIdentityRank\",\"cardKinds\":[\"alcohol\"]}]");
+            if (spec.DeclarationCostChild) defs.Add(N("{\"id\":\"" + Watch + "\",\"revision\":1,\"triggers\":[{\"id\":\"declaration-child\",\"window\":\"cardsMoved\",\"subject\":\"owner\",\"sourceZones\":[\"hand\"],\"movementReasons\":[\"conversion.declaration.pay\"],\"movementOccurrence\":\"perBatch\",\"optional\":false,\"effects\":[{\"op\":\"chooseOption\",\"target\":\"owner\",\"resultBind\":\"held\",\"options\":[{\"id\":\"declaration-child\"}]},{\"op\":\"draw\",\"target\":\"owner\",\"amount\":1}]}]}"));
             if (spec.Name == "multi-response") defs[0]!["viewAs"] = N("[{\"id\":\"two-material-dodge\",\"inputKinds\":[],\"inputSuits\":[],\"sourceZones\":[\"hand\"],\"inputCount\":2,\"extendedUse\":true,\"outputKind\":\"dodge\",\"forPlay\":false,\"forResponse\":true}]");
+            if (spec.Name == "multi-group-ai") defs.Add(N("{\"id\":\"fixture:wzf-peer-multi-dodge\",\"revision\":1,\"viewAs\":[{\"id\":\"actual-pair\",\"inputKinds\":[],\"inputSuits\":[],\"sourceZones\":[\"hand\"],\"inputCount\":2,\"extendedUse\":true,\"outputKind\":\"dodge\",\"forPlay\":false,\"forResponse\":true}]}"));
             if (spec.ConditionalSources) defs.Add(N("{\"id\":\"" + Conditional + "\",\"revision\":1,\"hpSkillGrants\":[" + string.Join(",", new[] { Zisheng, Xianlue, Haoxian }.Select((id, i) => "{\"id\":\"living-" + i + "\",\"skillId\":\"" + id + "\",\"minimumHp\":2}")) + "]}"));
             if (spec.GainChildLoss != 0) defs.Add(N("{\"id\":\"" + Watch + "\",\"revision\":1,\"triggers\":[{\"id\":\"paid-gain-child\",\"window\":\"cardsGained\",\"subject\":\"owner\",\"destinationZones\":[\"hand\"],\"movementReasons\":[\"skill-program.wumiao-zhang-fei.haoxian.obtain\"],\"movementOccurrence\":\"perBatch\",\"priority\":1000,\"usageScope\":\"game\",\"usageLimit\":1,\"optional\":false,\"effects\":[{\"op\":\"chooseOption\",\"target\":\"owner\",\"resultBind\":\"held\",\"options\":[{\"id\":\"gain-child\"}]},{\"op\":\"loseHp\",\"target\":\"owner\",\"amount\":" + spec.GainChildLoss + "}]}]}"));
             if (spec.DrawChildDamage) defs.Add(N("{\"id\":\"" + Watch + "\",\"revision\":1,\"triggers\":[{\"id\":\"first-rank-award-child\",\"window\":\"cardsGained\",\"subject\":\"owner\",\"destinationZones\":[\"hand\"],\"movementReasons\":[\"skill-program.wu-zhang-fei.xianlue.draw\"],\"movementOccurrence\":\"perBatch\",\"usageScope\":\"game\",\"usageLimit\":1,\"optional\":false,\"priority\":1000,\"effects\":[{\"op\":\"chooseOption\",\"target\":\"owner\",\"resultBind\":\"held\",\"options\":[{\"id\":\"draw-child\"}]},{\"op\":\"selectTarget\",\"target\":\"owner\",\"targetKind\":\"otherLiving\"},{\"op\":\"damage\",\"target\":\"selectedTarget\",\"amount\":1}]}]}"));
@@ -386,8 +558,10 @@ internal static class WuZhangFeiChecks
                 JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, labels[id].name, labels[id].description) { Program = program, ProgramPresentation = catalog.Presentations[id] });
             var own = new List<string> { Driver }; if (spec.ConditionalSources) own.Add(Conditional); else own.AddRange([Zisheng, Xianlue, Haoxian]); if (spec.XieweiSource) own.Add(Xiewei); if (spec.GainChildLoss != 0 || spec.DrawChildDamage || spec.AncestorGift) own.Add(Watch);
+            if (spec.Declarations) own.Add("classic:guhuo");
+            if (spec.DeclarationCostChild) own.Add(Watch);
             b.AddGeneral(new(Owner, "武张飞真实本人", "", "standard:none", "shu", 4, own));
-            foreach (var id in new[] { Ally, EnemyA, EnemyB }) b.AddGeneral(new(id, "实际其他角色", "", "standard:none", "qun", 12, spec.AncestorGift && id == Ally ? [Quiet, DyingGift] : [Quiet]));
+            foreach (var id in new[] { Ally, EnemyA, EnemyB }) b.AddGeneral(new(id, "实际其他角色", "", "standard:none", "qun", 12, spec.Name == "multi-group-ai" && id == EnemyA ? [Quiet, "fixture:wzf-peer-multi-dodge"] : spec.AncestorGift && id == Ally ? [Quiet, DyingGift] : [Quiet]));
             b.AddDeck(new(Deck, "四十八张固定实体", 0, 0, []) { PhysicalCards = Enumerable.Range(0, 48).Select(i => new ContentDeckPhysicalCard("standard:slash", Suit.Spade, i < spec.RankThreeStock ? 3 : 4)).ToArray() });
             b.AddMode(new(ShanheBattleSetup.BattleModeId, "武张飞真实小局", 4, 4, new Dictionary<string, int>(), Deck,
                 GeneralPoolIds: [Owner, Ally, EnemyA, EnemyB], ModeKind: ContentModeKind.Team,
@@ -437,6 +611,14 @@ internal static class WuZhangFeiChecks
         public void IncomingSlash() { Use("incoming", [1]); Reach(() => P?.Choices.Any(c => IsAction(c, "virtual-slash-offer") && c.Targets.SequenceEqual([0])) == true); Answer(c => IsAction(c, "virtual-slash-offer") && c.Targets.SequenceEqual([0])); Reach(() => P is { Kind: DecisionKind.RespondDodge }); }
         public void Respond(int id) { Private(); RejectPrompt(); Cold(); Answer(c => c.Cards.SequenceEqual([id]) && c.Parameters.GetValueOrDefault("response") is not ("pass" or "take-damage" or "let-die")); }
         public void Continue() => Answer(c => c.Parameters.ContainsKey("option-id"));
+        public void AnswerDeclaration(string answer)
+        {
+            for(var step=0;step<20&&G.PendingDecision is null&&!Enumerable.Range(0,4).Any(seat=>G.CreateSnapshot(seat).PendingDecision is not null);step++)
+                Accept(new AdvanceOneStepCommand(G.Revision));
+            var prompt = G.PendingDecision ?? Enumerable.Range(0, 4).Select(seat => G.CreateSnapshot(seat).PendingDecision).First(p => p is not null);
+            var choice = prompt!.Choices.Single(c => c.Parameters.GetValueOrDefault("declaration-answer") == answer);
+            Accept(new AnswerPromptCommand(prompt.PlayerSeat, prompt.PromptId, choice.Id, G.Revision));
+        }
         public void Play() => Reach(() => P is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
         public void End() => Accept(new EndPlayPhaseCommand(0, G.Revision, P!.PromptId));
         public void Answer(Func<PromptChoice, bool> match) { var p = P!; var c = p.Choices.FirstOrDefault(match); Need(p.PlayerSeat == 0 && c is not null, "The owner chooses an actually published canonical option."); Accept(new AnswerPromptCommand(0, p.PromptId, c!.Id, G.Revision)); }

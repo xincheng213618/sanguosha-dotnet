@@ -95,7 +95,8 @@ internal sealed class ProgramAiChoiceSelector
         SkillProgramEffectOp.ConfigureFriendDuelCategories,
         SkillProgramEffectOp.ConfigureFriendUseSuits,
         SkillProgramEffectOp.JuanxiaDeclareTricks,
-        SkillProgramEffectOp.JuanxiaRetaliation)]
+        SkillProgramEffectOp.JuanxiaRetaliation,
+        SkillProgramEffectOp.LoseSkillsAndObtainNamedCard)]
     private static PromptChoice SelectFirstChoice(
         PendingDecision decision, ProgramSkillFrame frame, SkillProgramEffect effect) =>
         decision.Choices[0];

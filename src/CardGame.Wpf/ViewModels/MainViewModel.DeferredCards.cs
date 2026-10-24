@@ -41,7 +41,9 @@ public sealed partial class MainViewModel
     {
         var game = _game;
         var revision = _snapshot.Revision;
-        var source = _snapshot.PublicRevealedCards.Select(card => (Card: card, IsChoice: RevealedCardChoice(card.Id) is not null)).ToArray();
+        var source = _snapshot.PublicRevealedCards.Select(card => (Card: card, IsChoice: IsRevealedSubsetSelectionPending
+            ? _snapshot.PendingDecision!.Choices.Any(choice => choice.Cards.Contains(card.Id))
+            : RevealedCardChoice(card.Id) is not null)).ToArray();
         if (ReferenceEquals(_publicCardViewGame, game) && _publicCardViewRevision == revision &&
             _publicCardViewSource.SequenceEqual(source)) return;
 
@@ -61,9 +63,10 @@ public sealed partial class MainViewModel
                 OriginalHandTag = card.SkillMarkLabel ?? string.Empty,
                 IsPlayable = false,
                 IsPublicChoice = isChoice,
+                IsSubsetChoice = IsRevealedSubsetSelectionPending && _snapshot.PendingDecision!.ValidCardIds.Contains(card.Id),
                 PublicHandOwnerLabel = card.PublicHandOwnerSeat is { } ownerSeat
                     ? _snapshot.Players.Single(player => player.Seat == ownerSeat).Name : string.Empty,
-                IsSelected = false
+                IsSelected = IsRevealedSubsetSelectionPending && _revealedSubsetCardIds.Contains(card.Id)
             });
         }
         HasPublicRevealedCards = PublicRevealedCards.Count > 0;
@@ -82,7 +85,7 @@ public sealed partial class MainViewModel
         var choosingHandIds = _snapshot.PendingDecision?.Choices
             .Where(choice => choice.Parameters.GetValueOrDefault("program-action") == "private-hand-take")
             .SelectMany(choice => choice.Cards).ToHashSet() ?? [];
-        foreach (var card in (_snapshot.PrivateRevealedCards ?? []).Where(card => !choosingHandIds.Contains(card.Id)))
+        foreach (var card in (_snapshot.PrivateRevealedCards ?? []).Where(card => !IsDeckReorderPending && !choosingHandIds.Contains(card.Id)))
             PrivatelyViewedCards.Add(CreateViewedCard(card, privateView: true));
         RaisePropertyChanged(nameof(HasPrivatelyViewedCards));
         RaisePropertyChanged(nameof(PrivateRevealTitle));
@@ -129,6 +132,7 @@ public sealed partial class MainViewModel
         OriginalHandTag = card.SkillMarkLabel ?? string.Empty,
         IsPrivateReveal = privateView,
         IsPublicChoice = false,
-        IsSelected = false
+        IsSubsetChoice = IsRevealedSubsetSelectionPending && _snapshot.PendingDecision!.ValidCardIds.Contains(card.Id),
+        IsSelected = IsRevealedSubsetSelectionPending && _revealedSubsetCardIds.Contains(card.Id)
     };
 }

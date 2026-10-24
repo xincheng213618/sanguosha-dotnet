@@ -21,10 +21,20 @@ public sealed partial class GameEngine
         _cardMovements.SingleOrDefault(m => m.Sequence == e.Sequence) is { } m && m.CardId == e.CardId && m.To == CardLocation.Hand(e.RecipientSeat) && !IsNativeDrawGainMovement(m));
     private IReadOnlyList<ProgramTriggerCandidate> CollectBiriMovementCandidates(CardMovementBatchContext batch)
     {
+        // Most classic tables have no current Biri holder, and an already paid
+        // holder has nothing to collect. Avoid rebuilding every earlier native
+        // draw's proof before discovering either case. Potential gain facts are
+        // still captured, so a later skill grant cannot retroclaim this turn.
+        var holders = ProgramEventHistory<BiriPotentialHolderEvent>()
+            .Where(e => e.BatchId == batch.Id && _players[e.Source.OwnerSeat].IsAlive).ToArray();
+        if (holders.Length == 0) return [];
         var potential = ProgramEventHistory<BiriPotentialGainEvent>().FirstOrDefault(e => e.BatchId == batch.Id);
-        if (potential is null || FirstBiriGain(potential.ActualTurn, potential.TurnOwner) is not { } first || first.BatchId != batch.Id) return [];
-        return Array.AsReadOnly(ProgramEventHistory<BiriPotentialHolderEvent>().Where(e => e.BatchId == batch.Id && _players[e.Source.OwnerSeat].IsAlive &&
-            !ProgramEventHistory<BiriDrawIssuedEvent>().Any(p => p.Source.OwnerSeat == e.Source.OwnerSeat && p.ActualTurn == first.ActualTurn && p.TurnOwner == first.TurnOwner))
+        if (potential is null) return [];
+        var issued = ProgramEventHistory<BiriDrawIssuedEvent>();
+        var eligible = holders.Where(e => !issued.Any(p => p.Source.OwnerSeat == e.Source.OwnerSeat &&
+            p.ActualTurn == potential.ActualTurn && p.TurnOwner == potential.TurnOwner)).ToArray();
+        if (eligible.Length == 0 || FirstBiriGain(potential.ActualTurn, potential.TurnOwner) is not { } first || first.BatchId != batch.Id) return [];
+        return Array.AsReadOnly(eligible
             .Select(e => new ProgramTriggerCandidate(e.Source.OwnerSeat, e.Source.SkillId, e.Source.BindingId, e.Source.SkillInstanceId, e.GameplayHash, GetProgramTrigger(new ProgramTriggerCandidate(e.Source.OwnerSeat, e.Source.SkillId, e.Source.BindingId, e.Source.SkillInstanceId, e.GameplayHash, 0)).Priority)).ToArray());
     }
     private ProgramSkillWindowContext CreateBiriMovementContext(CardsMovedTriggerWindowFrame w, ProgramTriggerCandidate c) => new(SkillProgramTriggerWindow.CardsGained, w.Id, c.OwnerSeat, SourceSeat: w.Batch.OriginOwnerSeat, TargetSeat: c.OwnerSeat, Facts: CaptureProgramTriggerFacts(_players[c.OwnerSeat]), MovementBatch: w.Batch, OccurrenceIndex: c.OccurrenceIndex);

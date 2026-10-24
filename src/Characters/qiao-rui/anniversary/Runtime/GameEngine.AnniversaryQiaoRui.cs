@@ -12,11 +12,28 @@ public sealed partial class GameEngine
  // An Ai is this particular acquisition's Hand residency, not a permanent tag
  // on every future holder of the physical entity. Movement cutoffs make a
  // suspended loss window independent of later nested moves or reacquisition.
- private int[] QiaoRuiMarkedHand(int owner, long cutoff) => !HasAnniversaryQiaoRuiCapability ? [] :
-  ProgramEventHistory<AnniversaryQiaoRuiMarkedEvent>().Where(mark => mark.Source.OwnerSeat == owner && mark.EntrySequence <= cutoff &&
-   _cardMovements.Any(m => m.Sequence == mark.EntrySequence && m.CardId == mark.CardId && m.CardKind == mark.PrintedKind && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(owner)) &&
-   !_cardMovements.Any(m => m.CardId == mark.CardId && m.Sequence > mark.EntrySequence && m.Sequence <= cutoff && m.From == CardLocation.Hand(owner) && m.To != m.From))
+ private int[] QiaoRuiMarkedHand(int owner, long cutoff)
+ {
+  if (!HasAnniversaryQiaoRuiCapability) return [];
+  var hand = CardLocation.Hand(owner);
+  var entries = new HashSet<(long Sequence, int CardId, CardKind Kind)>();
+  var lastExits = new Dictionary<int, long>();
+  // Share the same cutoff scan across all issued marks. Keeping the exact
+  // entry and latest departure preserves residency even after reacquisition.
+  foreach (var movement in _cardMovements)
+  {
+   if (movement.Sequence > cutoff) continue;
+   if (movement.From == CardLocation.DrawPile && movement.To == hand)
+    entries.Add((movement.Sequence, movement.CardId, movement.CardKind));
+   if (movement.From == hand && movement.To != movement.From &&
+    (!lastExits.TryGetValue(movement.CardId, out var last) || movement.Sequence > last))
+    lastExits[movement.CardId] = movement.Sequence;
+  }
+  return ProgramEventHistory<AnniversaryQiaoRuiMarkedEvent>().Where(mark => mark.Source.OwnerSeat == owner && mark.EntrySequence <= cutoff &&
+   entries.Contains((mark.EntrySequence, mark.CardId, mark.PrintedKind)) &&
+   (!lastExits.TryGetValue(mark.CardId, out var last) || last <= mark.EntrySequence))
    .Select(mark => mark.CardId).Distinct().Order().ToArray();
+ }
  private bool QiaoRuiLastLoss(int owner, CardMovementBatchContext b)
  {
   if (b.TurnNumber <= 0 || b.MovementTiming is not { } timing || timing.ActualTurnOwnerSeat == owner || b.Movements.Count == 0 || b.Movements.Any(m => !_cardMovements.Contains(m)) ||

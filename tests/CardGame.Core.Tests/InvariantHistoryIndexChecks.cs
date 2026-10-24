@@ -16,6 +16,8 @@ internal static class InvariantHistoryIndexChecks
         Assert(empty, "AssertJudgedRankSlashPolicies");
         Assert(empty, "AssertPhaseHandSeizurePrograms");
         TypedSnapshotsReuseOnlyUnchangedFacts(empty);
+        TypedProductionAppendsRetainIndependentCursorsAndFrozenCommitIdentity(Create());
+        ActualPhaseQueriesKeepCommittedPendingAndRestoredOrder(Create());
 
         // This is a narrow host-state audit, not command replay: the source is
         // absent while its historical facts and durable state remain present.
@@ -253,6 +255,86 @@ internal static class InvariantHistoryIndexChecks
         pending.Clear();
         Require(read().Count == 2 && ReferenceEquals(read()[0], frozenFirst) && committed.Count == 2,
             "Cancelling a later typed pending fact retains all committed historical facts and earlier snapshots.");
+    }
+
+    private static void TypedProductionAppendsRetainIndependentCursorsAndFrozenCommitIdentity(GameEngine game)
+    {
+        var history = typeof(GameEngine).GetMethod("ProgramEventHistory", Flags)!;
+        var targets = history.MakeGenericMethod(typeof(TargetsConfirmedEvent))
+            .CreateDelegate<Func<IReadOnlyList<TargetsConfirmedEvent>>>(game);
+        var turns = history.MakeGenericMethod(typeof(TurnStartedEvent))
+            .CreateDelegate<Func<IReadOnlyList<TurnStartedEvent>>>(game);
+        var append = typeof(GameEngine).GetMethod("AppendPendingProgramEvent", Flags)!
+            .CreateDelegate<Action<IGameEvent>>(game);
+        var clear = typeof(GameEngine).GetMethod("ClearPendingProgramEvents", Flags)!
+            .CreateDelegate<Action>(game);
+        var empty = targets();
+        for (var index = 0; index < 256; index++)
+        {
+            append(new TurnStartedEvent(index + 1, index % 5));
+            for (var repeat = 0; repeat < 8; repeat++)
+                Require(ReferenceEquals(empty, targets()), "Unrelated production appends preserve the target snapshot.");
+        }
+        Require(Inspections(typeof(TargetsConfirmedEvent)) == 256,
+            "Interleaved warm reads inspect each production pending fact once, rather than rescanning the growing whole-command history.");
+        Require(turns().Count == 256 && Inspections(typeof(TurnStartedEvent)) == 256,
+            "A type first queried after many appends has its own complete once-only pending cursor.");
+        var first = new TargetsConfirmedEvent(810, new List<int> { 1, 2 });
+        append(first);
+        var before = targets();
+        Require(before.Count == 1 && turns().Count == 256 &&
+            Inspections(typeof(TargetsConfirmedEvent)) == 257 && Inspections(typeof(TurnStartedEvent)) == 257,
+            "Two event types consume the same appended tail independently and retain unrelated typed facts.");
+        var replacement = first with { TargetSeats = new List<int> { 3 } };
+        Pending(game)[256] = replacement;
+        append(new TurnStartedEvent(257, 1));
+        Require(ReferenceEquals(targets().Single(), replacement) && ReferenceEquals(before.Single(), first),
+            "An untracked same-count replacement cannot hide behind the next tracked append or mutate an earlier snapshot.");
+        var frozen = (TargetsConfirmedEvent)CommittedEventProjection.Freeze(replacement);
+        var events = Field<List<EventEnvelope>>(game, "_events");
+        events.Add(new EventEnvelope(new EventId(1), null, 1, game.Revision, "incremental-history", frozen));
+        clear();
+        var committed = targets();
+        Require(committed.Count == 1 && ReferenceEquals(committed[0], frozen) && !ReferenceEquals(frozen, replacement) &&
+            turns().Count == 0 && before[0].TargetSeats.SequenceEqual([1, 2]),
+            "Tracked commit cleanup selects the frozen committed identity and retires every other pending typed tail.");
+        append(first); clear();
+        Require(ReferenceEquals(committed, targets()),
+            "Append then cancellation between reads cannot retain an uncommitted typed fact.");
+        var byteStart = GC.GetAllocatedBytesForCurrentThread();
+        for (var index = 0; index < 128; index++) { _ = targets(); _ = turns(); }
+        Require(GC.GetAllocatedBytesForCurrentThread() == byteStart,
+            "Independent generation and public List mutation witnesses keep warm typed reads allocation-free.");
+
+        long Inspections(Type type)
+        {
+            var cache = Field<IDictionary>(game, "_typedProgramEventHistory")[type]!;
+            return (long)cache.GetType().GetField("_pendingScanOperations", Flags)!.GetValue(cache)!;
+        }
+    }
+
+    private static void ActualPhaseQueriesKeepCommittedPendingAndRestoredOrder(GameEngine game)
+    {
+        typeof(GameEngine).GetField("_turnNumber", Flags)!.SetValue(game, 1);
+        typeof(GameEngine).GetField("_phase", Flags)!.SetValue(game, TurnPhase.Play);
+        var progression = typeof(GameEngine).GetField("_turnProgression", Flags)!.GetValue(game)!;
+        var owner = (int)progression.GetType().GetProperty("OwnerSeat")!.GetValue(progression)!;
+        var phase = new ActualDiscardRecoveryPhaseKey(1, 1, owner, owner, ActualDiscardRecoveryPhaseKind.Play);
+        var method = typeof(GameEngine).GetMethod("CurrentActualDiscardRecoveryPhase", Flags)!;
+        ActualDiscardRecoveryPhaseKey? Current() => (ActualDiscardRecoveryPhaseKey?)method.Invoke(game, []);
+        Pending(game).Add(new ActualDiscardRecoveryPhaseStartedEvent(phase));
+        Require(Current() == phase, "A pending real phase is visible before commit.");
+        CommitFacts(game);
+        Pending(game).Add(new TurnStartedEvent(1, owner));
+        Require(Current() == phase, "Unrelated pending facts cannot hide the latest committed phase.");
+        Pending(game).Add(new ActualDiscardRecoveryPhaseClearedEvent(1));
+        Require(Current() is null, "A pending clear supersedes the older committed phase.");
+        Pending(game).Add(new ActualDiscardRecoveryPhaseRestoredEvent(10, phase));
+        Require(Current() == phase, "A typed restoration supersedes the clear in actual history order.");
+        CommitFacts(game);
+        Require(Current() == phase, "Commit preserves the same restored actual phase.");
+        Pending(game).Add(new ActualDiscardRecoveryPhaseStartedEvent(phase with { Token = 2, TurnNumber = 2 }));
+        Require(Current() is null, "A latest fact from another turn cannot fall back to an older matching phase.");
     }
 
     private static T Field<T>(GameEngine game, string name) => (T)typeof(GameEngine).GetField(name, Flags)!.GetValue(game)!;

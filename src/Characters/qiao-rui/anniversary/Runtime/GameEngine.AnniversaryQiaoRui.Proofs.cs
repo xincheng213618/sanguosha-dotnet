@@ -27,7 +27,11 @@ public sealed partial class GameEngine
   {
    if (r.Draw is not null || r.Requested != 0 || r.Plan is not null || r.UseId != 0 || r.ActionId != 0 || r.Returned || r.Damaged || r.NativeBatches.Count != 0 || r.Stage is not (AnniversaryQiaoRuiStage.DiscardChildren or AnniversaryQiaoRuiStage.HealthChildren or AnniversaryQiaoRuiStage.Completed)) return false;
    if (r.Operation == SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouLastLoss && (r.Cards.Count != 0 || r.Stage == AnniversaryQiaoRuiStage.DiscardChildren)) return false;
-   if (r.Cards.Any(id => !QiaoRuiMarkedHand(f.OwnerSeat, r.Before).Contains(id))) return false;
+   if (r.Cards.Count > 0)
+   {
+    var originalMarks = QiaoRuiMarkedHand(f.OwnerSeat, r.Before).ToHashSet();
+    if (r.Cards.Any(id => !originalMarks.Contains(id))) return false;
+   }
   }
   else
   {

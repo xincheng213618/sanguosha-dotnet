@@ -40,6 +40,41 @@ internal static class OrdinaryChenLinChecks
             "The payment and reward children return to the original due binding once, without repaying the deposit or Hand exchange.");
         g = Cold(g, r);
     }
+    public static void DeferredOfferDeathReturnsBeforeInventingActualPhasesCold()
+    {
+        var (g, r) = Create(dyingTarget: true); Play(g);
+        var card = g.CreateSnapshot(0).Players[0].Hand[0].Id;
+        End(g); Reach(g, p => p.SkillPrompt?.SkillId == Bifa && Has(p, "activate"));
+        Answer(g, P(g)!.Choices.Single(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate"));
+        Reach(g, p => p.SkillPrompt?.SkillId == Bifa && Has(p, "select-owned-cards"));
+        Answer(g, P(g)!.Choices.Single(choice => choice.Cards.SequenceEqual([card])));
+        Reach(g, p => p.SkillPrompt?.SkillId == Bifa && Has(p, "select-target"));
+        Answer(g, P(g)!.Choices.Single(choice => choice.Targets.SequenceEqual([1])));
+        ReachFrame(g, frame => frame.PrivateOffer?.Stage == PrivateOfferStage.ChoosingExchange);
+        var original = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.PrivateOffer is { Stage: PrivateOfferStage.ChoosingExchange });
+        var held = original.PrivateOffer!;
+        var actualTurn = g.State.TurnNumber;
+        var victim = g.CreateSnapshot(1).Players[1];
+        Require(g.State.CurrentSeat == 1 && victim is { Hp: 1, IsAlive: true, HandCount: 0 } &&
+            original.WindowContext?.ParentFrameId == g.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>()
+                .Single(window => window.DeferredPrivateOffers is not null).Id &&
+            !E<ActualDiscardRecoveryPhaseStartedEvent>(g).Any(e => e.Phase.TurnNumber == actualTurn && e.Phase.ActorSeat == 1),
+            "The one-HP empty-hand target reaches its real private due offer before any actual Preparation phase, with the original paid deposit and lifecycle parent intact.");
+        g = Cold(g, r);
+        Accept(g, new AdvanceOneStepCommand(g.Revision));
+        ReachCondition(g, () => E<ActualTurnCursorReturnedEvent>(g).Any(e => e.ActualTurn == actualTurn && e.OwnerSeat == 1));
+        Require(!g.CreateSnapshot(1).Players[1].IsAlive && g.State.Winner == Winner.None && g.State.CurrentSeat != 1 &&
+            g.ResolutionStack.Count == 0 &&
+            E<PlayerDiedEvent>(g).Count(e => e.VictimSeat == 1) == 1 &&
+            E<PrivateCardOfferSegmentIssuedEvent>(g).Count(e => e.FrameId == original.Id && e.Stage == PrivateOfferStage.RemovalChildren) == 1 &&
+            g.CardMovements.Count(move => move.CardId == card && move.From == held.Location && move.To == CardLocation.DiscardPile) == 1 &&
+            E<ProgramBindingResolvedEvent>(g).Count(e => e.FrameId == original.Id && e.Completed) == 1 &&
+            !E<ActualDiscardRecoveryPhaseStartedEvent>(g).Any(e => e.Phase.TurnNumber == actualTurn && e.Phase.ActorSeat == 1) &&
+            E<TurnEndedEvent>(g).Count(e => e.TurnNumber == actualTurn && e.ActorSeat == 1) == 1 &&
+            E<ActualTurnCursorReturnedEvent>(g).Count(e => e.ActualTurn == actualTurn && e.OwnerSeat == 1) == 1,
+            "The original removal/HP-loss/death return finishes its due parent and actual turn once, advances to a living actor and never manufactures Preparation, Draw or later phases for the corpse.");
+        _ = Cold(g, r);
+    }
     private static void CheckPrivateHoldViews(GameEngine g, int target, int source, int id, bool due)
     {
         for (var viewer = 0; viewer < 4; viewer++)
@@ -90,19 +125,22 @@ internal static class OrdinaryChenLinChecks
     { var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(g.CreateCheckpoint())), r); Require(State(g) == State(restored), "Accepted-journal cold replay rebuilds all four views, exact parent frames, private choices, movements and facts."); return restored; }
     private static void Freeze<T>(IReadOnlyList<T> list) { if (list is IList<T> writable && list.Count > 0) { try { writable[0] = writable[0]; } catch (NotSupportedException) { return; } throw new InvalidOperationException("Exposed collection is mutable."); } }
     private static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
-    private static (GameEngine, ContentRegistry) Create(bool foreign = false, bool equipment = false, bool loseSource = false)
+    private static (GameEngine, ContentRegistry) Create(bool foreign = false, bool equipment = false, bool loseSource = false, bool dyingTarget = false)
     {
-        var r = ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(true), new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(), new Fixture(foreign, equipment, loseSource));
+        var r = dyingTarget
+            ? ContentRegistry.Build(new StandardContentPackage(), new Fixture(foreign, equipment, loseSource, true))
+            : ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(true), new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(), new Fixture(foreign, equipment, loseSource));
         var g = GameEngine.CreateStandard(new GameOptions { Seed = 31, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord, ModeId = Mode, UseInteractiveSetup = true,
             UseInteractiveDiscard = true, AdvanceAfterHumanCommands = false, MaxTurns = 12 }, r);
         Accept(g, new StartGameCommand()); Reach(g, p => p.Kind == DecisionKind.SelectGeneral && p.PlayerSeat == 0);
         Accept(g, new SelectGeneralCommand(0, "fixture:cl-owner", g.Revision, P(g)!.PromptId)); return (g, r);
     }
-    private sealed class Fixture(bool foreign, bool equipment, bool loseSource) : IGameContentPackage
+    private sealed class Fixture(bool foreign, bool equipment, bool loseSource, bool dyingTarget = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-chen-lin", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
+            if (dyingTarget) CharacterFixtureContent.Register(b, "ol:chen-lin", "ol:ya-dan", "ol:du-fu-ren");
             var rules = JsonNode.Parse(FixtureRules)!; rules["schemaVersion"] = SkillProgramCatalog.RulesSchemaVersion;
             if (loseSource) rules["skills"]![3]!["triggers"]![0]!["effects"]!.AsArray().Add(new JsonObject { ["op"] = "grantSkills", ["target"] = "owner", ["skillIds"] = new JsonArray(JsonValue.Create("fixture:cl-noop")) });
             var ids = rules["skills"]!.AsArray().Select(n => n!["id"]!.GetValue<string>()).ToArray();
@@ -116,9 +154,10 @@ internal static class OrdinaryChenLinChecks
             b.AddGeneral(new("fixture:cl-owner", "陈琳共享真实命令", "supporter", Driver, "wei", 6, skills.Where(s => s != Driver).ToArray(), GeneralGender.Male) { InitialHp = foreign || equipment ? 1 : null });
             for (var i = 1; i < 4; i++)
             { var peer = new List<string> { "fixture:cl-quiet", Gain }; if (foreign && i == 1) peer.Add(Foreign);
-              b.AddGeneral(new($"fixture:cl-peer-{i}", "原参与角色", "supporter", "fixture:cl-pick-peer", "wei", 8, peer, GeneralGender.Female)); }
+              b.AddGeneral(new($"fixture:cl-peer-{i}", "原参与角色", "supporter", "fixture:cl-pick-peer", "wei", 8, peer, GeneralGender.Female)
+                  { InitialHp = dyingTarget ? 1 : null }); }
             var kind = equipment ? "classic:silver-lion" : "standard:slash";
-            b.AddDeck(new("fixture:cl-deck", "固定实体", 4, 2, []) { PhysicalCards = Enumerable.Range(0, 72).Select(_ => new ContentDeckPhysicalCard(kind, Suit.Heart, 7)).ToArray() });
+            b.AddDeck(new("fixture:cl-deck", "固定实体", dyingTarget ? 0 : 4, 2, []) { PhysicalCards = Enumerable.Range(0, 72).Select(_ => new ContentDeckPhysicalCard(kind, Suit.Heart, 7)).ToArray() });
             b.AddMode(new(Mode, "陈琳完整私有延后/整局角色额度", 4, 4, new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 3 }, "fixture:cl-deck", GeneralCandidateCount: 4,
                 GeneralPoolIds: ["fixture:cl-owner", "fixture:cl-peer-1", "fixture:cl-peer-2", "fixture:cl-peer-3"]));
         }

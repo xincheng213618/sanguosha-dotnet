@@ -10,6 +10,7 @@ internal static class AnniversaryDuKuiChecks
 
     public static void RevealedRankLoopNativeUseAndMutualRangeMovesCold()
     {
+        RevealedGroupUseFreezesNativeResponseKindCold();
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
         var g = GameEngine.CreateStandard(Options(), registry); Accept(g, new StartGameCommand());
         Offer(g, Fanyin); Answer(g, c => Action(c) == "activate"); Menu(g, DuKuiStage.Choice);
@@ -87,6 +88,26 @@ internal static class AnniversaryDuKuiChecks
             "The rank RNG, published Processing entity, implicit-target native Use, cold return, real Slash quota, extra-target grant and range-dependent field moves replay from commands.");
     }
 
+    private static void RevealedGroupUseFreezesNativeResponseKindCold()
+    {
+        foreach(var kind in new[]{CardKind.BarbarianAssault,CardKind.ArrowBarrage})
+        {
+            var registry=ContentRegistry.Build(new StandardContentPackage(),new Fixture(kind));
+            var g=GameEngine.CreateStandard(Options(),registry);Accept(g,new StartGameCommand());Offer(g,Fanyin);Answer(g,c=>Action(c)=="activate");Menu(g,DuKuiStage.Choice);
+            var shown=Root(g)!.DuKui!.CardId;Need(Kind(g,shown)==kind,"The original rank-one public entity is the actual selected group trick.");
+            g=Cold(g,registry);Answer(g,c=>Verb(c)=="use");Reach(g,p=>p.SkillPrompt?.SkillId==Watch);
+            var use=g.ResolutionStack.OfType<CardUseFrame>().Single(f=>f.CardId==shown);
+            var required=kind==CardKind.BarbarianAssault?CardKind.Slash:CardKind.Dodge;
+            Need(use.Action is{Type:CardActionType.Use}a&&a.EffectiveKind==kind&&a.PhysicalCards is[{CardId:var id,From:var from}]&&id==shown&&from==CardLocation.Processing&&
+                g.ResolutionStack.OfType<ProgramCardTriggerWindowFrame>().Any(w=>w.ParentFrameId==use.Id&&w.TrickContinuation?.RequiredCardKind==required),
+                "Fanyin freezes the accepted public group's exact response kind while its original Choice is still legal, before entering the paid native use and its before-effects child. Actual="+JsonSerializer.Serialize(new{use.Action,Root=Root(g)?.DuKui,Windows=g.ResolutionStack.OfType<ProgramCardTriggerWindowFrame>().Select(w=>new{w.ParentFrameId,w.Continuation,w.TrickContinuation})}));
+            g=Cold(g,registry);Continue(g);Menu(g,DuKuiStage.Choice);
+            Need(E<CardUseFinishedEvent>(g).Count(e=>e.ResolutionId==use.Id)==1&&E<DuKuiNativeReturnedEvent>(g).Count(e=>e.UseId==use.Id)==1&&
+                g.CardMovements.Count(m=>m.CardId==shown&&m.From==CardLocation.DrawPile&&m.To==CardLocation.Processing)==1&&
+                g.CardMovements.Count(m=>m.CardId==shown&&m.From==CardLocation.Processing&&m.To==CardLocation.DiscardPile)==1,
+                "The original revealed group pays and returns once after its native Slash/Dodge response attack resolves, without querying a vanished Fanyin Choice to reconstruct its rule.");g=Cold(g,registry);
+        }
+    }
     private static GameOptions Options()
     {
         var setup = new ShanheBattleSetup(7, 1, "anniversary-du-kui", Hero, 3, 0, 0, 0, 0, [Driver, Watch],
@@ -136,7 +157,7 @@ internal static class AnniversaryDuKuiChecks
         Frames = g.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())).ToArray(), Facts = g.Events.Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray(),
         Zones = g.CreateCardZoneDiagnostics(), g.CardMovements, Commands = CommandJson.Serialize(g.AcceptedCommands) });
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(CardKind? firstGroup=null) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-anniversary-du-kui", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
@@ -147,7 +168,7 @@ internal static class AnniversaryDuKuiChecks
               {"id":"{{Driver}}","revision":1,"activations":[
                 {"id":"place","targetKind":"otherLiving","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"usesPerTurn":null,"effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"targetRef":{"kind":"selectedTarget"},"zones":["hand"],"cardCategories":["equipment"],"count":1,"destination":"selectedTargetEquipment","awaitMovementTriggers":true}]},
                 {"id":"damage","targetKind":"anyLiving","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"usesPerTurn":null,"effects":[{"op":"damage","target":"owner","amount":1}]}]},
-              {"id":"{{Watch}}","revision":1,"triggers":[{"id":"published-native-use","window":"cardUseBeforeTargetEffects","ownerRelation":"actor","cardKinds":["drawTwo"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"native-use","options":[{"id":"continue"}]}]}]},
+              {"id":"{{Watch}}","revision":1,"triggers":[{"id":"published-native-use","window":"cardUseBeforeTargetEffects","ownerRelation":"actor","cardKinds":["drawTwo","barbarianAssault","arrowBarrage"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"native-use","options":[{"id":"continue"}]}]}]},
               {"id":"{{Wide}}","revision":1,"modifiers":[{"id":"native-peer-range","query":"attackRange","operation":"set","value":4,"priority":0}]}]}
             """;
             var labels = new Dictionary<string, object> { [Driver] = new { name = "真实场上移动驱动", description = "原生装备转交与实际受伤。" },
@@ -156,7 +177,7 @@ internal static class AnniversaryDuKuiChecks
             var c = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, p) in c.Programs) b.AddSkill(new(id, c.Presentations[id].Name, c.Presentations[id].Description) { Program = p, ProgramPresentation = c.Presentations[id] });
             for (var seat = 1; seat < 4; seat++) b.AddGeneral(new(Peer(seat), "真实场上角色", "supporter", Wide, "wei", 8));
-            b.AddDeck(new(Deck, "固定点数倍增牌堆", 0, 0, []) { PhysicalCards = new[] { ("standard:draw_two", 1), ("standard:dodge", 2), ("standard:slash", 4), ("standard:slash", 8) }
+            b.AddDeck(new(Deck, "固定点数倍增牌堆", 0, 0, []) { PhysicalCards = new[] { (firstGroup==CardKind.BarbarianAssault?"standard:barbarian_assault":firstGroup==CardKind.ArrowBarrage?"standard:arrow_barrage":"standard:draw_two", 1), ("standard:dodge", 2), ("standard:slash", 4), ("standard:slash", 8) }
                 .SelectMany(x => Enumerable.Range(0, 8).Select(_ => new ContentDeckPhysicalCard(x.Item1, Suit.Spade, x.Item2))).ToArray() });
             b.AddMode(new(ShanheBattleSetup.BattleModeId, "周年杜夔真实亮牌与移牌", 4, 4, new Dictionary<string, int>(), Deck,
                 GeneralPoolIds: [Hero, Peer(1), Peer(2), Peer(3)], ModeKind: ContentModeKind.Team,

@@ -22,6 +22,15 @@ internal static class BoundaryLiDianChecks
         var (g,r) = Start(normalDraw:0); Skip(g); Settle(g); Driver(g,"legacy");
         Require(P(g)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("action")=="finish-top"), "Legacy null still allows an immediate finish-top.");
         var frame=Frame(g);
+        var orderView = g.CreateSnapshot(0).PendingDecision!.DeckReorder!;
+        Require(orderView is { RequiredTopCount: null, ChoosingBottom: false } && orderView.FrameId == frame.Id &&
+            orderView.Cards.Select(card => card.Id).SequenceEqual(frame.TopReorder!.ViewedCardIds) &&
+            Enumerable.Range(1, 3).All(seat => g.CreateSnapshot(seat).PendingDecision is null),
+            "Legacy ordering exposes exact detached private faces and accepted row prefixes only to its owner.");
+        Require(orderView.Cards is IList<CardSnapshot> { IsReadOnly: true } &&
+            orderView.TopCardIds is IList<int> { IsReadOnly: true } && orderView.BottomCardIds is IList<int> { IsReadOnly: true },
+            "The prepared ordering projection freezes every nested card and row collection.");
+        Replay(g,r);
         Require(!JsonSerializer.Serialize(frame.TopReorder).Contains("RequiredTopCount") &&
             !JsonSerializer.Serialize(Load("fixture:old", "\"activations\":[" + Activation("order", "[{\"op\":\"reorderTopCards\",\"target\":\"owner\",\"amount\":4}]") + "]").Activations.Single().Effects.Single()).Contains("ExactTopCount"), "Old null metadata stays absent.");
         var before=Pile(g); Answer(g,c=>c.Parameters.GetValueOrDefault("action")=="finish-top");

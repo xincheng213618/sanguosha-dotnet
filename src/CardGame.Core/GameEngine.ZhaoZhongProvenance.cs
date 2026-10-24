@@ -2,12 +2,30 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
+    private IReadOnlyList<NativeDrawInvocationRecordedEvent>? _zhaoZhongDrawInvoiceFacts;
+    private Dictionary<(int Turn, int Recipient), NativeDrawInvocationRecordedEvent[]> _zhaoZhongDrawInvoices = [];
+    private Dictionary<long, int> _zhaoZhongDrawInvocationCounts = [];
+
+    private void IndexZhaoZhongNativeDrawInvoices()
+    {
+        // Typed history snapshots are immutable and change identity whenever
+        // their committed/pending facts change. This index stores facts only;
+        // every query still verifies the actual materials and active proof.
+        var facts = ProgramEventHistory<NativeDrawInvocationRecordedEvent>();
+        if (ReferenceEquals(facts, _zhaoZhongDrawInvoiceFacts)) return;
+        _zhaoZhongDrawInvoices = facts.GroupBy(fact => (fact.TurnNumber, fact.OwnerSeat))
+            .ToDictionary(group => group.Key, group => group.ToArray());
+        _zhaoZhongDrawInvocationCounts = facts.GroupBy(fact => fact.InvocationId)
+            .ToDictionary(group => group.Key, group => group.Count());
+        _zhaoZhongDrawInvoiceFacts = facts;
+    }
+
     private bool IsNativeDrawGainMovement(CardMovementRecord movement)
     {
         if (movement.From != CardLocation.DrawPile || movement.To.Zone != CardZoneKind.Hand ||
             movement.To.OwnerSeat is not { } recipient || !_cardMovements.Contains(movement)) return false;
-        var invoices = ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(e =>
-            e.OwnerSeat == recipient && e.TurnNumber == movement.TurnNumber &&
+        IndexZhaoZhongNativeDrawInvoices();
+        var invoices = (_zhaoZhongDrawInvoices.GetValueOrDefault((movement.TurnNumber, recipient)) ?? []).Where(e =>
             movement.Sequence > e.SequenceBefore && movement.Sequence <= e.SequenceAfter).ToArray();
         if (invoices is not [var invoice] || invoice.InvocationId <= 0 || invoice.LastBatchId <= 0 ||
             invoice.ActualCount <= 0 || invoice.Requested < invoice.ActualCount ||
@@ -15,7 +33,7 @@ public sealed partial class GameEngine
             !IsValidPlayerSeat(invoice.PhaseActorSeat) || invoice.TurnNumber < 1 ||
             invoice.SequenceBefore < 0 || invoice.SequenceAfter <= invoice.SequenceBefore ||
             invoice.SequenceAfter > _movementSequence || invoice.Reason == CardMoveReasons.InitialDeal ||
-            ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Count(e => e.InvocationId == invoice.InvocationId) != 1)
+            _zhaoZhongDrawInvocationCounts.GetValueOrDefault(invoice.InvocationId) != 1)
             return false;
         // This native completion fact was issued only after DrawCards verified
         // every actual ID against its structured invocation. Rebuild that exact

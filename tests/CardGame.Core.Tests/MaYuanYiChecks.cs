@@ -8,6 +8,34 @@ internal static class MaYuanYiChecks
 {
     private static string ActiveScene="";
     private const string Owner="fixture:my-owner",Driver="fixture:my-driver",Quiet="fixture:my-quiet",Watch="fixture:my-watch",Health="fixture:my-health",Mode="identity:classic-ma-yuan-yi",Jibing="ol:jibing",Wangjing="ol:wangjing",Moucuan="ol:moucuan",Binghuo="ol:binghuo";
+    public static void PublishedBingAiMaterialUsesItsExactPublicPileCold()
+    {
+        var (g, r) = Start("slash"); Store(g);
+        foreach (var cold in new[] { false, true })
+        {
+            if (cold) g = Cold(g, r);
+            var view = g.CreateSnapshot(0);
+            var actions = g.GetHumanLegalActions();
+            var bing = actions.First(action => action.Kind == LegalActionKind.Slash && action.TargetSeats.SequenceEqual([1]) &&
+                action.ConversionSource is { SkillId: Jibing, BindingId: "bing-slash", OwnerSeat: 0 } source &&
+                (view.Players[0].PublicPersistentPiles?.Any(pile => pile.SourceSkillId == Jibing &&
+                    pile.SourceSkillInstanceId == source.SkillInstanceId && pile.Cards.Any(card => card.Id == action.CardId)) == true ||
+                    view.Players[0].PublicPersistentPiles is null && view.Players[0].PublicPersistentPileSkillId == Jibing &&
+                    view.Players[0].PublicPersistentPileCards?.Any(card => card.Id == action.CardId) == true));
+            var end = actions.Single(action => action.Kind == LegalActionKind.EndPlay);
+            var before = SnapshotJson.Serialize(view);
+            Need(bing.CardId is > 0 && view.Players[0].Hand.All(card => card.Id != bing.CardId),
+                "A real published Jibing Slash pays a true public pile entity that is absent from its owner's Hand.");
+            foreach (var policy in new[] { AiDecisionPolicy.IdentityStrategyVersion, AiDecisionPolicy.RebelStrategyVersion,
+                AiDecisionPolicy.CurrentVersion })
+            {
+                var choice = new SimpleAiBrain(0, 83, policy).ChoosePlay(view, [bing, end], 1);
+                Need(choice.Action == bing && choice.Thought.Candidates.All(candidate => double.IsFinite(candidate.Score)),
+                    "Both current identity policies must score and retain the exact published Bing conversion instead of looking for an invented Hand material.");
+            }
+            Need(SnapshotJson.Serialize(view) == before, "Bing material scoring must preserve the real supplied player view.");
+        }
+    }
     public static void JibingActualDrawThresholdNativePileAndPrivacyCold()
     {
         foreach(var scene in new[]{"slash","dodge","fire","decline","skip","reshuffle","shortage","empty"})

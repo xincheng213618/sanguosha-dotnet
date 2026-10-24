@@ -43,6 +43,13 @@ public sealed partial class GameEngine
         FinishWuAnGuoLiyong(frame, true); return true;
     }
 
+    private bool HasWuAnGuoLiyongCompletedUseParent(long useId) =>
+        _resolutionStack.LastOrDefault() is ProgramSkillFrame
+        { WuAnGuoLiyong: { Stage: WuAnGuoLiyongStage.DuelIssued, Duel: { } origin } } frame &&
+        origin.CardUseFrameId == useId && MatchesWuAnGuoLiyong(frame, origin) &&
+        ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == useId &&
+            e.CardId == 0 && e.CardKind == CardKind.Duel) == 1;
+
     [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 27010)]
     private void AssertWuAnGuoLiyongNativeUses(ProgramSkillFrame frame)
     {

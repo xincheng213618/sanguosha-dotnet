@@ -119,7 +119,13 @@ public sealed partial class SimpleAiBrain
             // A physical wine cannot both be drunk and converted by Wusheng.
             // Published legal Slash actions already include range and turn limits.
             var followUp = legalActions.Where(candidate => candidate.Kind == LegalActionKind.Slash && candidate.CardId != action.CardId)
-                .Select(candidate => (Action: candidate, Score: ScoreTacticalAction(view, self, role, candidate, legalActions, damagePrediction).Score))
+                .Select(candidate =>
+                {
+                    var attack = ScoreTacticalAction(view, self, role, candidate, legalActions, damagePrediction);
+                    if (_policyVersion >= AiDecisionPolicy.TacticalPlanningVersion)
+                        attack = ScorePlanningAction(view, self, role, candidate, legalActions, attack, damagePrediction);
+                    return (Action: candidate, Score: attack.Score);
+                })
                 .OrderByDescending(candidate => candidate.Score).FirstOrDefault();
             if (followUp.Action is null || followUp.Score <= 0)
                 return (-80, "没有另一张可合法打出且有正收益的杀；不消耗酒。");
@@ -160,7 +166,7 @@ public sealed partial class SimpleAiBrain
             // physical material can carry this additional hand reserve cost.
             if (action.CardId is > 0)
             {
-                var card = AiActionPhysicalCard(self, action);
+                var card = AiActionPhysicalCard(view, self, action);
                 if (!IsSlashCard(card.Kind))
                 {
                     var reserve = card.Kind switch
@@ -218,10 +224,13 @@ public sealed partial class SimpleAiBrain
                 : -80d;
         }
 
-        if (victim.Role == Role.Lord) return ProtectLord(view, role) ? 160 : -100;
-        if (role == Role.Renegade) return -20;
-        var hostility = GetHostility(view, role, victim);
-        return hostility < -15 ? 70 : -30;
+        var baseline = victim.Role == Role.Lord ? ProtectLord(view, role) ? 160d : -100d
+            : role == Role.Renegade ? -20d : GetHostility(view, role, victim) < -15 ? 70d : -30d;
+        if (_policyVersion >= AiDecisionPolicy.IdentityStrategyVersion)
+            baseline = ScoreIdentityDyingResponse(view, role, victim, baseline);
+        return _policyVersion >= AiDecisionPolicy.RebelStrategyVersion &&
+            _policyVersion < AiDecisionPolicy.RebelCoordinationVersion
+            ? ScoreRebelDyingResponse(view, role, victim, baseline) : baseline;
     }
 
     private double GetTacticalHostility(GameSnapshot view, Role role, PlayerSnapshot target)

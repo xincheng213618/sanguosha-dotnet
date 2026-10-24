@@ -14,7 +14,14 @@ public sealed record CardDeclarationParentReturn(CardDeclarationPurpose Purpose,
 
 /// <summary>Trusted paid-cost receipt owned by the actual continuation frame.</summary>
 public sealed partial record DeclaredCardPayment(long DeclarationId, long OwnerFrameId, int ProviderSeat,
-    CardActionCost Cost, CardConversionSource Source, CardKind DeclaredKind, bool Claimed = false, bool IsRevealed = false, int? ActorSeat = null, Suit? FrozenSuit = null);
+    CardActionCost Cost, CardConversionSource Source, CardKind DeclaredKind, bool Claimed = false, bool IsRevealed = false, int? ActorSeat = null, Suit? FrozenSuit = null)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public CardDeclarationPurpose? ReturnPurpose { get; init; }
+    /// <summary>Original owned-entity rank, frozen before the declaration leaves Hand.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? OriginalRank { get; init; }
+}
 
 public sealed record CardDeclarationFrame(long Id, int OwnerSeat, int TurnNumber,
     DeclaredCardPayment Payment, CardDeclarationParentReturn Return,

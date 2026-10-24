@@ -534,11 +534,11 @@ public sealed partial class GameEngine
         PrepareMouGszHuResponse(responder, current.Cards, selection.OutputKind, current.Source, actorSeat);
         PrepareLeiluanResponsePayment(responder, current, resolutionId);
         PrepareXieweiResponsePayment(responder, current, resolutionId, actorSeat);
+        var completedResponseUseSuit = HasHengwuCapability || actorSeat is null || actorSeat == responder.Seat
+            ? FreezeCompletedResponseUseSuit(responder, current.Cards, selection.OutputKind) : null;
         var xieweiPayment = IsXieweiSelection(current);
         if (xieweiPayment && !TryPayXieweiMaterials(current.Cards, responder.Seat, null, CardMoveReasons.Respond))
             throw new InvalidOperationException("The configured Xiewei response has no exact issued public-pile payment.");
-        var completedResponseUseSuit = HasHengwuCapability || actorSeat is null || actorSeat == responder.Seat
-            ? FreezeCompletedResponseUseSuit(responder, current.Cards, selection.OutputKind) : null;
         var leiluanAtomicPayment = ViewAsRule(current.Source)?.LeiluanBasicUse is not null ||
             IsAnniversaryXunXuBoqiaSource(current.Source);
         if (leiluanAtomicPayment && !xieweiPayment)
@@ -885,7 +885,7 @@ public sealed partial class GameEngine
                     : [])
                 .Distinct()
                 .ToArray();
-        var selected = _selectedUseConversion ?? _selectedResponseConversion;
+        var selected = _hasSelectedUseConversionChoice ? _selectedUseConversion : _selectedResponseConversion;
         var selectedChoice = _hasSelectedUseConversionChoice || _hasSelectedResponseConversionChoice;
         _selectedUseConversion = null;
         _selectedResponseConversion = null;

@@ -26,6 +26,54 @@ if (args.FirstOrDefault() == "--ai-batch")
     return 0;
 }
 
+if (args.FirstOrDefault() == "--ai-duel")
+{
+    if (args.Length is < 2 or > 6 || args.Skip(2).Any(value => !int.TryParse(value, out _)))
+    {
+        Console.Error.WriteLine("Usage: --ai-duel <output.json> [pairs] [baseline-policy] [candidate-policy] [first-pair]");
+        return 2;
+    }
+    try
+    {
+        return TacticalAiDuelEvaluation.Run(args[1],
+            args.Length > 2 ? int.Parse(args[2]) : 12,
+            args.Length > 3 ? int.Parse(args[3]) : AiDecisionPolicy.CooperativeCategoryGiftVersion,
+            args.Length > 4 ? int.Parse(args[4]) : null,
+            args.Length > 5 ? int.Parse(args[5]) : 0);
+    }
+    catch (ArgumentException exception)
+    {
+        Console.Error.WriteLine(exception.Message);
+        return 2;
+    }
+}
+
+if (args.FirstOrDefault() == "--ai-identity")
+{
+    if (args.Length is < 2 or > 9 || args.Skip(2).Take(4).Any(value => !int.TryParse(value, out _)) ||
+        args.Length > 7 && !args[7].Equals("all", StringComparison.OrdinalIgnoreCase) && !int.TryParse(args[7], out _))
+    {
+        Console.Error.WriteLine("Usage: --ai-identity <output.json> [seeds] [baseline-policy] [candidate-policy] [first-seed] [standard|active|classic] [5|8|all] [all|control|LordAndLoyalists|Rebels|Renegade]");
+        return 2;
+    }
+    try
+    {
+        return IdentityAiEvaluation.Run(args[1],
+            args.Length > 2 ? int.Parse(args[2]) : 12,
+            args.Length > 3 ? int.Parse(args[3]) : AiDecisionPolicy.TacticalPlanningVersion,
+            args.Length > 4 ? int.Parse(args[4]) : null,
+            args.Length > 5 ? int.Parse(args[5]) : 0,
+            args.Length > 6 ? args[6] : "standard",
+            args.Length > 7 && !args[7].Equals("all", StringComparison.OrdinalIgnoreCase) ? int.Parse(args[7]) : null,
+            args.Length > 8 ? args[8] : null);
+    }
+    catch (ArgumentException exception)
+    {
+        Console.Error.WriteLine(exception.Message);
+        return 2;
+    }
+}
+
 var unknownArguments = args.Where(argument =>
     !argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase) &&
     !argument.Equals("--verbose", StringComparison.OrdinalIgnoreCase)).ToArray();
@@ -512,6 +560,7 @@ var tests = new (string Name, Action Body)[]
     ("Yang Fu: damage draw and paid loss death replay", YangFuChecks.BingzhongDamageDrawAndSuyiPaidLossDeathCold),
     ("Da Qiao Xiao Qiao: public pile derived sources zero transitions and replay", DaQiaoXiaoQiaoChecks.PublicPileDerivedSourcesZeroTransitionsAndCold),
     ("Ma Yuan Yi: actual draw threshold native pile and privacy replay", MaYuanYiChecks.JibingActualDrawThresholdNativePileAndPrivacyCold),
+    ("Ma Yuan Yi: published Bing AI exact public pile material cold", MaYuanYiChecks.PublishedBingAiMaterialUsesItsExactPublicPileCold),
     ("Ma Yuan Yi: actual use played Dodge Duel and forced Slash replay", MaYuanYiChecks.WangjingActualUsePlayedDodgeDuelAndForcedSlashCold),
     ("Ma Yuan Yi: all factions awakening maximum loss grant and death replay", MaYuanYiChecks.MoucuanAllFactionsThresholdMaximumLossGrantAndDeathCold),
     ("Ma Yuan Yi: historical Bing judgment replacement thunder children replay", MaYuanYiChecks.BinghuoHistoricalBingJudgmentReplacementThunderChildrenCold),
@@ -595,6 +644,7 @@ var tests = new (string Name, Action Body)[]
     ("Zhao Zhong: original Hand gift independent next chain leases cold", CardGame.Core.Tests.ZhaoZhongChecks.DiciOriginalHandGiftIndependentNextChainLeasesCold),
     ("Zhao Zhong: first positive recovery nonstacking native damage cold", CardGame.Core.Tests.ZhaoZhongChecks.YintianFirstPositiveRecoveryNonstackingNativeDamageCold),
     ("Zhao Zhong: actual non-draw gains and native draw children cold", CardGame.Core.Tests.ZhaoZhongChecks.BiriActualNonDrawGainsAndNativeDrawChildrenCold),
+    ("Zhao Zhong: exact native draw invoice index pending changes and cold", CardGame.Core.Tests.ZhaoZhongChecks.BiriNativeDrawInvoiceIndexKeepsExactProofAcrossColdAndPendingChanges),
     ("Tao Qian: whole virtual Slash and unique damage payment cold", CardGame.Core.Tests.TaoQianChecks.ZongluanWholeVirtualSlashAndUniqueDamagePaymentCold),
     ("Tao Qian: first victim damage original Hand and turn timing cold", CardGame.Core.Tests.TaoQianChecks.ZhaohuoFirstVictimDamageOriginalHandAndTurnTimingCold),
     ("Tao Qian: marked Use Played and hand limit expiry cold", CardGame.Core.Tests.TaoQianChecks.ZhaohuoMarkedUsePlayedAndHandLimitExpiryCold),
@@ -888,6 +938,7 @@ var tests = new (string Name, Action Body)[]
     ("Zhang Yan: SujiAnyTargetOwnForeignNormalRangeAndDamageOwnerCold", ZhangYanChecks.SujiAnyTargetOwnForeignNormalRangeAndDamageOwnerCold),
     ("Han Fu: ShuziHandExchangePrivateChooserAndNamesCold", HanFuChecks.ShuziHandExchangePrivateChooserAndNamesCold),
     ("Wu An Guo: FourSuitsRealYangAndYinNativeResponsesCold", WuAnGuoChecks.FourSuitsRealYangAndYinNativeResponsesCold),
+    ("Wu An Guo: Liyong Lord death returns paid native Duel before game end cold", WuAnGuoChecks.LiyongLordDeathReturnsPaidNativeDuelBeforeGameEndCold),
     ("Yuan Huan: DeruPresenceSetsAllNoneAndOpaqueRandomPrivacyCold", YuanHuanChecks.DeruPresenceSetsAllNoneAndOpaqueRandomPrivacyCold),
     ("Lu Yu Sheng: BottomRevealNativeDrawAndZeroHeartsCold", LuYuShengChecks.BottomRevealNativeDrawAndZeroHeartsCold),
     ("Shi Tai Shi Ci: Hanzhan rallies both hands and duels", ShiTaiShiCiChecks.HanzhanRalliesBothHandsAndDuels),
@@ -973,6 +1024,7 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Shen Hua Tuo: Wuling ordered entries equipment and native draw cold", CardGame.Core.Tests.MobileShenHuaTuoChecks.WulingOrdersEntriesEquipmentAndNativeDrawCold),
     ("Mobile Shen Hua Tuo: Youyi shared Ren payment recovery cold", CardGame.Core.Tests.MobileShenHuaTuoChecks.YouyiSharedRenPaysWholeAreaBeforeRecoveryCold),
     ("Shen Ma Chao starting mounts foreign Slash debt and Hengwu cold", ShenMaChaoChecks.StartingMountsForeignSlashDebtAndHengwuCold),
+    ("Tactical planning AI: published foreign mount and wine followup", ShenMaChaoChecks.PublishedForeignMountAiMaterialAndWineFollowupStayPublic),
     ("Shen Ma Chao own mount Dodge true response and zero Hengwu cold", ShenMaChaoChecks.OwnMountDodgeTrueResponseAndZeroHengwuCold),
     ("Shen Pang Tong: native Luansuo and Fengliao", ShenPangTongChecks.NativeLuansuoAndFengliao),
     ("Shen Pang Tong: native Kunyu death payment cold", ShenPangTongChecks.NativeKunyuDeathPaymentCold),
@@ -987,6 +1039,7 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Shen Huang Zhong: Zhanjue native draw phase Slash recovery controls", CardGame.Core.Tests.AnniversaryShenHuangZhongChecks.ZhanjueNativeDrawPhaseSlashRecoveryAndWoundControls),
     ("Shen Cao Pi: Yinzhi native hand response and actual-turn restriction", CardGame.Core.Tests.ShenCaoPiChecks.YinzhiNativeHandResponseAndActualTurnRestriction),
     ("Shen Cao Pi: Keming native damage borrow and same-name echo cold", CardGame.Core.Tests.ShenCaoPiChecks.KemingBorrowsNativeDamageAndEchoesSameNamesCold),
+    ("Shen Cao Pi: AI Keming echo issued native parent and cold return", CardGame.Core.Tests.ShenCaoPiChecks.AiKemingEchoKeepsIssuedNativeParentAndColdReturn),
     ("Mobile Gan Ning: ended Camp removal precedes gain and resumes cold", CardGame.Core.Tests.MobileShenGanNingChecks.EndedCampRemovalPrecedesGainAndResumesCold),
     ("Mobile Shen Lu Xun: Cuike chains before discard and cold returns once", MobileShenLuXunChecks.CuikeChainsBeforeDiscardAndColdReturnsOnce),
     ("Anniversary Shen Guan Yu: respondable heart Slashes bidirectional Nightmare and native draw death cold", CardGame.Core.Tests.AnniversaryShenGuanYuChecks.RespondableHeartSlashesDrawOnceBidirectionalNightmareAndDeathCold),
@@ -1092,6 +1145,7 @@ var tests = new (string Name, Action Body)[]
     ("Extra card effect and rank guess: Peach and stacked Alcohol cold replay", ExtraEffectsAndRankGuessChecks.ActualPeachAndDoubleAlcoholBonusColdReplay),
     ("Extra card effect and rank guess: paid source loss death and original use once", ExtraCardEffectPaidSourceChecks.PaidHandCostSourceLossAndOwnerDeathKeepOriginalUseOnce),
     ("Rice pile: actual ending hand equipment storage and cold children", RicePileChecks.ActualEndingDrawHEStoreAndColdMovementChildren),
+    ("Rice pile AI: published rice judgment material remains public", RicePileChecks.PublishedRiceJudgmentAiResolvesRealPublicMaterials),
     ("Incoming distance courtesy: actual faction cost permanent direction and extra turns", IncomingDistanceCourtesyChecks.ActualFactionCostAndPermanentDirectionAcrossTurns),
     ("Sole target protection: actual Slash and black trick substitution", SoleTargetProtectionChecks.SubstitutionChangesActualSlashAndBlackTrickTarget),
     ("Targeted trick hand HP: actual ending adjustment reward gift and cold", TargetedTrickHandHpChecks.ActualEndingDrawDiscardSelfAndOptionalGiftColdReturn),
@@ -1126,6 +1180,7 @@ var tests = new (string Name, Action Body)[]
     ("Mou Zhuge Liang copied basic cards finish without physical cleanup", MouZhugeLiangChecks.CopiedBasicCardsFinishWithoutPhysicalCleanup),
     ("Friend Pang Tong manjuan ordered current gain cold replay", FriendPangTongChecks.ManjuanOrdersOnlyCurrentGainAndReplays),
     ("Recipient category mark: face-up gift issues one public token and survives source loss", OrdinaryZuoFenChecks.FaceUpGiftIssuesOnePublicTokenAndRetainsItAfterSourceLoss),
+    ("Recipient category mark: holder death retains independent badge cold", OrdinaryZuoFenChecks.HolderDeathRetainsTheExactIndependentCategoryBadgeCold),
     ("Chained state basic: own play pays state and returns once", ChainedStateBasicConversionChecks.OwnPlayStateCostUsesNativeQuotaAndReturnsOnce),
     ("Foreign selected card Slash: hand use and exact outcome", ForeignSelectedCardSlashChecks.HandSlotsFreezeNativeUseAndDamageOutcome),
     ("Actor hand limit penalty: real uses stack and change actual discard", ActorHandLimitPenaltyChecks.RealUsesStackAndChangeActualDiscard),
@@ -1142,6 +1197,7 @@ var tests = new (string Name, Action Body)[]
     ("Original hand entities: initial physical loss, returned card and real paired recast", OrdinaryYangHuChecks.OriginalInitialEntitiesDepartOnceAndChongxinReallyRecasts),
     ("Native discard classification: exact paid producers exclude adjacent gain and cleanup", NativeDiscardClassificationChecks.ExactPaidProducersExcludeNeighborReasons),
     ("Phase name prediction: secret actual phase, escalating round cost and native settlement", PhaseNamePredictionChecks.SecretExactPhaseAndSettlement),
+    ("Phase name prediction: lethal settlement cold return skips dead actor phases", PhaseNamePredictionChecks.LethalSettlementReturnsColdChildWithoutDeadActorPhases),
     ("Last damage source reciprocity: latest actual source, native HE payment and physical regrant memory", LastDamageSourceReciprocityChecks.LatestSourceAndPhysicalRegrantKeepExactNativeReciprocity),
     ("Unexpected Assault: opaque reveal native damage counterspell and conversion lifetime", UnexpectedAssaultChecks.OpaqueRevealDamageNullificationAndConversionLock),
     ("Activation-count awakening: actual refunded activations preparation quota and source loss", GameActivationAwakeningChecks.ActualRefundedActivationsQualifyPreparationOnceAndSurviveSourceLoss),
@@ -1224,9 +1280,11 @@ var tests = new (string Name, Action Body)[]
     ("Ol Yi Ji jijie hands deck bottom to selected participant", OrdinaryYiJiChecks.JijieHandsDeckBottomToSelectedParticipant),
     ("Ordinary Cao Hong real placement replacement and armor draw", OrdinaryCaoHongChecks.RealPlacementReplacementAndArmorDraw),
     ("Ordinary Guan Yin Ping red equipment cost before lost HP targets and real fire draw", OrdinaryGuanYinPingChecks.RedEquipmentCostFinishesBeforeLostHpTargetsAndRealFireDraw),
+    ("Ordinary Guan Yin Ping: Wuji named card registered AI choice and cold return", OrdinaryGuanYinPingChecks.ActualWujiNamedCardPromptUsesRegisteredAiChoiceAndColdReturn),
     ("ordinary OL Zhuge Ke empty-hand Dodge private top request and once payment", OrdinaryZhugeKeChecks.EmptyHandDodgeViewsFourPrivatelyAndPaysOriginalResponseOnce),
     ("Ordinary SP Cao Ren private whole hand after HP children and real discard", OrdinarySpCaoRenChecks.PrivateWholeHandAfterHpChildrenAndRealDiscard),
     ("Ordinary Chen Lin deferred private offer next actual start exchange", OrdinaryChenLinChecks.DeferredPrivateOfferTargetsNextActualStartAndExchangeReturnsOnce),
+    ("Ordinary Chen Lin: deferred offer death returns before actual phases cold", OrdinaryChenLinChecks.DeferredOfferDeathReturnsBeforeInventingActualPhasesCold),
     ("Ordinary SP Cai Wen Ji original Dying four suits private cost cold replay", DyingSuitsAndEndingHistoryChecks.ChenqingOriginalDyingFourSuitsPrivateCostAndColdReplay),
     ("Ordinary SP Pang De two real costs and issued Duel typed return", OrdinarySpPangDeChecks.TwoRealCostsAndIssuedDuelTypedReturn),
     ("Ordinary Fu Wan same-use benefit and real Dodge settlement", OrdinaryFuWanChecks.RealBenefitAndDodgeCancellationPayOriginalEntitiesOnce),
@@ -1366,6 +1424,7 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Du Kui: revealed ranks native uses mutual range field moves cold", AnniversaryDuKuiChecks.RevealedRankLoopNativeUseAndMutualRangeMovesCold),
     ("Anniversary Liu Yong: Xi leader native uses phase quota cold", CardGame.Core.Tests.AnniversaryLiuYongChecks.XiLeaderNativeUsesAndPhaseQuotaResumeCold),
     ("Anniversary Liu Li: category payment dynamic cap native round names cold", CardGame.Core.Tests.AnniversaryLiuLiChecks.CategoryDiscardDynamicDrawAndNativeRoundNamesCold),
+    ("Anniversary Liu Li: chosen Slash filters Zhangba Use but keeps pure Played cold", CardGame.Core.Tests.AnniversaryLiuLiChecks.ChosenSlashNameFiltersZhangbaUseButKeepsPlayedResponseCold),
     ("Anniversary Zhang Fen: real cart upgrades inserted Play destruction native returns cold", AnniversaryZhangFenChecks.RealCartUpgradesInsertedPlayDestructionAndNativeReturnsCold),
     ("Anniversary Bai Ling Yun: private top native use suppression limited recovery cold", CardGame.Core.Tests.AnniversaryBaiLingYunChecks.PrivateTopNativeUseSuppressionAndLimitedRecoveryResumeCold),
     ("Anniversary Yang Biao: normal draw obligation, dying HE payment and whole random Uses cold", CardGame.Core.Tests.AnniversaryYangBiaoChecks.NormalDrawObligationDyingHePaymentAndWholeRandomUsesCold),
@@ -1421,6 +1480,7 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Che Zhou: real hand age Wine and native Pigua obtain cold", AnniversaryCheZhouChecks.RealHandAgeWineAndPiguaNativeObtainCold),
     ("Anniversary Che Zhou: incoming later chain recipient uses original hand age", AnniversaryCheZhouChecks.IncomingLaterChainRecipientUsesOriginalHandAge),
     ("Anniversary Wang Chang: actual phase conversion HE payment and whole group Slashes cold", AnniversaryWangChangChecks.ActualPhaseConversionHePaymentAndWholeGroupSlashesCold),
+    ("Anniversary Wang Chang: exact foreign phantom discard and native Slash cold", AnniversaryWangChangChecks.ForeignPhantomDiscardPaysOnceAndReturnsNativeSlashCold),
     ("current classic catalogue modes and skill references", CurrentClassicContentChecks.CatalogueAndModes),
     ("Fame 2011 equipment atomic exchange and replay", Fame2011EquipmentChecks.GanluAtomicEquipmentAndReplay),
     ("Fame 2011 equipment dying reveal privacy and replay", Fame2011EquipmentChecks.BuyiSelfChoiceBlindOtherPrivacyAndReplay),
@@ -1621,6 +1681,37 @@ var tests = new (string Name, Action Body)[]
     ("Liu Yan: actual targets post-payment and effective hand replay", LiuYanChecks.ActualTargetsPostPaymentAndEffectiveHandCold),
     ("identity Rebel kill reward draws exactly three cards and replays once", IdentitySetupChecks.RebelKillDrawsThree),
     ("AI support draw accepts optional empty target sets", TacticalAiChecks.SupportDrawAllowsPublishedEmptyTargetSets),
+    ("Identity belief AI: public quotas and directed evidence", IdentityBeliefAiChecks.PublicCompositionAndDirectedEvidenceConditionJointBeliefs),
+    ("Identity belief AI: revealed roles and uncertain endgame", IdentityBeliefAiChecks.PublicRoleRevelationRevisesEvidenceWithoutInventingEndgameRoles),
+    ("Identity belief AI: reversible evidence and fallback", IdentityBeliefAiChecks.EvidenceCanReverseAndMissingCompositionRemainsUncertain),
+    ("Identity belief AI: real snapshots publish public composition", IdentityBeliefAiChecks.NativeSnapshotsPublishOnlyPublicCompositionAndViewerRoles),
+    ("Identity belief AI: participant fork preserves independent observations", IdentityBeliefAiChecks.DetachedParticipantBeliefsPreserveHistoryWithoutSharingObservations),
+    ("Identity belief AI: Rebels pressure uncertain targets and protect likely allies", IdentityBeliefAiChecks.RebelsPressureUnresolvedTargetsWithoutAttackingLikelyAllies),
+    ("Identity strategy AI: Rebels concentrate on Lord", IdentityStrategyAiChecks.RebelsConcentrateOnLordWithoutRevivingBlockedAttacks),
+    ("Identity strategy AI: Lord safety and Loyalist rescue reserve", IdentityStrategyAiChecks.LordSafetyAndLoyalistRescueReserve),
+    ("Identity strategy AI: Renegade balances camps and final duel", IdentityStrategyAiChecks.RenegadeBalancesPublicCampsAndTransitionsToFinalDuel),
+    ("Identity strategy AI: rescue beliefs and weaker camp", IdentityStrategyAiChecks.RescueBeliefsProtectLordAndPreserveWeakSide),
+    ("Identity strategy AI: public views and other modes", IdentityStrategyAiChecks.IdentityObjectivesKeepPublicInputsAndOtherModesStable),
+    ("Identity strategy AI: nullification and rescue share camp objectives", IdentityStrategyAiChecks.IdentityNullificationAndRescueMatchCampObjectives),
+    ("Rebel strategy AI: effective Lord damage and exposure", RebelStrategyAiChecks.LordPressurePricesEffectiveDamageAndExposure),
+    ("Rebel pressure AI: objective exposure preserves attack value and safety", RebelStrategyAiChecks.PressureDiscountsOnlyNewObjectiveAndKeepsRealDamageSafety),
+    ("Rebel coordination AI: uncertain neighbour evidence and Lord pressure", RebelStrategyAiChecks.CoordinationWaitsForEvidenceWithoutSuppressingLordOrKnownEnemies),
+    ("Rebel strategy AI: group pressure protects allies and winning attacks", RebelStrategyAiChecks.GroupPressureProtectsAlliesUnlessItCanFinishLord),
+    ("Rebel strategy AI: side focus and native preparation safety", RebelStrategyAiChecks.SideFocusAndPreparationKeepNativeSafetyRejections),
+    ("Rebel strategy AI: confident rescue and self reserve", RebelStrategyAiChecks.RescueReserveUsesConfidenceWithoutAbandoningKnownAllies),
+    ("Tactical planning AI: defense removal before a published Slash", ShortPlanningAiChecks.RemovesDefenseBeforeAvailableSlashAndKeepsLegacyPriority),
+    ("Tactical planning AI: preserve Vine fire and Silver Lion healing", ShortPlanningAiChecks.PreservesVineFireAndSilverLionHealing),
+    ("Tactical planning AI: select fire and red Slash against public armor", ShortPlanningAiChecks.SelectsFireAndRedSlashAgainstPublicArmor),
+    ("Tactical planning AI: independent legal materials and immutable views", ShortPlanningAiChecks.OnlyPlansIndependentPublishedAttacksAndNeverMutatesInput),
+    ("Tactical planning AI: reserve rescue and skill response materials", SkillAwareCardValueChecks.ReservesLastRescueAndSkillResponseMaterials),
+    ("Tactical planning AI: spare responses and constrained skill payments", SkillAwareCardValueChecks.PricesSpareResponsesAndKeepsSelectionConstraints),
+    ("Tactical planning AI: convertible defense and historical reserve", SkillAwareCardValueChecks.PreservesConvertibleDefenseWithoutRevivingRejectedActions),
+    ("Tactical planning AI: Duel readiness and public response risk", SkillAwareCardValueChecks.DuelReadinessUsesRemainingResponsesAndPublicRisk),
+    ("Tactical planning AI: wine uses final attack score", TacticalPlanningIntegrationChecks.WineUsesFinalAttackScoreAndKeepsHistoricalPolicy),
+    ("Tactical planning AI: native Liubing traits pure and cold", TacticalPlanningIntegrationChecks.NativeLiubingTraitsArePureAndOverridePrintedSlashColor),
+    ("Tactical planning AI: native Yuanchou traits preserve visibility", TacticalPlanningIntegrationChecks.NativeYuanchouTraitsRespectOwnerAndTargetVisibility),
+    ("Ganglie source guard: source-less Lightning keeps judgment and cold", SourceLessGanglieChecks.LightningKeepsJudgmentButSkipsMissingSourceAndColdRestores),
+    ("Ganglie source guard: sourced punishment and condition shape", SourceLessGanglieChecks.SourcedJudgmentStillPunishesOriginalParticipantAndConditionShapeIsValidated),
     ("AI policy versions validate and replay deterministically", TacticalAiChecks.PolicyReplay),
     ("targeted tricks finish when the target spends its last card on Nullification", TargetLossChecks.LastNullification),
     ("hand guidance is private, read-only and agrees with legal actions", HandGuidanceChecks.ReadOnlyAndPrivate),

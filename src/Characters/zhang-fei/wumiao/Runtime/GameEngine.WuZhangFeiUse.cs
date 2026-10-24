@@ -24,9 +24,16 @@ public sealed partial class GameEngine
         return action;
     }
     private int? CaptureWuZhangFeiResponseRank(CharacterState provider, CardKind kind,
-        IReadOnlyList<CardActionCost> costs, CardConversionSource? source) =>
-        HasWuZhangFeiUseCapability && costs is [var cost]
-            ? ApplyProgramUseAppearance(provider, GetAdvancedCard(cost.CardId), source).Rank : null;
+        IReadOnlyList<CardActionCost> costs, CardConversionSource? source)
+    {
+        if (!HasWuZhangFeiUseCapability || costs is not [var cost]) return null;
+        var declared = _resolutionStack.Select(frame => frame.AcceptedDeclarationPayment)
+            .SingleOrDefault(paid => paid is { Claimed: true } && paid.ProviderSeat == provider.Seat &&
+                paid.Cost == cost && paid.Source == source && paid.DeclaredKind == kind);
+        return declared is null ? ApplyProgramUseAppearance(provider, GetAdvancedCard(cost.CardId), source).Rank :
+            declared.OriginalRank is >= 0 and <= 13 ? declared.OriginalRank :
+            throw new InvalidOperationException("A declared response lost its original owned-entity rank.");
+    }
 
     private void PrepareWuZhangFeiResponseRanks(CharacterState provider, CardKind kind,
         IReadOnlyList<Card> cards, CardConversionSource? source, int? actorSeat = null)
@@ -36,8 +43,16 @@ public sealed partial class GameEngine
             kind != CardKind.Nullification && !IsProgramResponseCardUse(provider, kind)) return;
         var parent = _resolutionStack.LastOrDefault() ?? throw new InvalidOperationException("A response rank payment requires its native owning frame.");
         if (parent.WuZhangFeiResponseRanks is not null) throw new InvalidOperationException("A native response cannot pay another unbound rank invoice.");
-        var materials = cards.Select(card => new WuZhangFeiResponseMaterialRank(card.Id, card.Kind, FindOwnedCardLocation(provider, card),
-            source is not null && IsXieweiSource(source) ? 0 : EffectiveOwnedCardRank(provider, card))).ToArray();
+        var materials = cards.Select(card =>
+        {
+            var declared = UnclaimedDeclarationPayment(provider.Seat, card.Id);
+            if (declared is not null && (cards.Count != 1 || declared.Source != source || declared.DeclaredKind != kind ||
+                declared.Cost.CardKind != card.Kind || declared.OriginalRank is not (>= 0 and <= 13) ||
+                declared.ReturnPurpose != (kind == CardKind.Nullification ? CardDeclarationPurpose.Counterspell : CardDeclarationPurpose.Dodge)))
+                throw new InvalidOperationException("A declared response rank requires its exact original declaration receipt.");
+            return new WuZhangFeiResponseMaterialRank(card.Id, card.Kind, FindOwnedCardLocation(provider, card),
+                declared?.OriginalRank ?? EffectiveOwnedCardRank(provider, card));
+        }).ToArray();
         var payment = new WuZhangFeiResponseRankPayment(++_resolutionSequence, parent.Id, provider.Seat, kind,
             _movementSequence, materials.Sum(card => card.Rank)) { Materials = materials };
         ReplaceRuntimeFrame(parent.Id, parent with { WuZhangFeiResponseRanks = payment });
@@ -65,12 +80,43 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("Zisheng response ranks must bind once to their exact paid native materials and original owner.");
         if (payment.Materials.Any(card => !_cardMovements.Any(move => move.Sequence > payment.Before && move.CardId == card.CardId &&
             move.From == card.From && move.CardKind == card.PrintedKind &&
-            (move.Reason == CardMoveReasons.Respond || move.Reason == CardMoveReasons.Nullification))))
-            throw new InvalidOperationException("Zisheng cannot bind an unpaid original response rank.");
+            (move.Reason == CardMoveReasons.Respond || move.Reason == CardMoveReasons.Nullification)) &&
+            !IsWuZhangFeiDeclaredResponsePayment(parent, payment, action, card)))
+            throw new InvalidOperationException("Zisheng cannot bind an unpaid original response rank. " +
+                System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    InvoiceOwner = parent.Id, payment.Before, payment.Materials, Action = action,
+                    Declarations = _resolutionStack.Where(f => f.AcceptedDeclarationPayment is { } paid &&
+                        action.PhysicalCards.Any(c => c.CardId == paid.Cost.CardId)).Take(4).Select(f => new
+                    {
+                        Frame = f.Id, Payment = f.AcceptedDeclarationPayment,
+                        Targets = (f as NullificationWindowFrame)?.TargetSeats,
+                        Entry = _cardMovements.SingleOrDefault(m => m.Sequence == f.AcceptedDeclarationPayment!.BianFuRenPaymentSequence),
+                        Committed = ProgramEventHistory<CardDeclarationCommittedEvent>().Where(e => e.DeclarationId == f.AcceptedDeclarationPayment!.DeclarationId).ToArray()
+                    }).ToArray()
+                }));
         ReplaceRuntimeFrame(parent.Id, parent with { WuZhangFeiResponseRanks = null });
         AdvanceEventRulesAndQueueFact(new WuZhangFeiResponseRankBoundEvent(payment.CaptureId, parent.Id, action.ActionId));
         AdvanceEventRulesAndQueueFact(new WuZhangFeiUseRankCapturedEvent(action.ActionId, action.ActorSeat,
             action.ProviderSeat, action.PhysicalCards.Count, payment.RankSum));
+    }
+
+    private bool IsWuZhangFeiDeclaredResponsePayment(ResolutionFrame invoiceOwner,
+        WuZhangFeiResponseRankPayment invoice, CardActionContext action, WuZhangFeiResponseMaterialRank material)
+    {
+        if (action.PhysicalCards is not [var cost] || cost.CardId != material.CardId ||
+            cost.CardKind != material.PrintedKind || cost.From != material.From) return false;
+        var owners = _resolutionStack.Where(frame => frame.AcceptedDeclarationPayment is { Claimed: true } paid &&
+            paid.ProviderSeat == action.ProviderSeat && paid.Cost == cost && action.ConversionChain.Contains(paid.Source)).ToArray();
+        if (owners is not [var owner] || owner.AcceptedDeclarationPayment is not { } declaration ||
+            declaration.OwnerFrameId != owner.Id || declaration.OriginalRank != material.Rank ||
+            declaration.BianFuRenPaymentSequence is not { } sequence || sequence > invoice.Before ||
+            invoiceOwner.Id != owner.Id && !(invoiceOwner is ResponseWindowFrame response && response.ParentFrameId == owner.Id)) return false;
+        var continuation = action.EffectiveKind == CardKind.Nullification ? ProgramCardContinuation.NullificationResponse : ProgramCardContinuation.Dodge;
+        if (declaration.ReturnPurpose != (action.EffectiveKind == CardKind.Nullification
+                ? CardDeclarationPurpose.Counterspell : CardDeclarationPurpose.Dodge)) return false;
+        var original = _cardMovements.SingleOrDefault(move => move.Sequence == sequence);
+        return original is not null && IsResponseCompletionEntry(action, continuation, owner.Id, cost, original);
     }
 
     private bool IsWuZhangFeiTrueUse(CardActionContext action)

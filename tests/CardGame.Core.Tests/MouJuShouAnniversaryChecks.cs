@@ -5,9 +5,10 @@ using CardGame.Core.Campaigns;
 namespace CardGame.Core.Tests;
 internal static class MouJuShouAnniversaryChecks
 {
- private const string Hero="mou:ju-shou",Plain="fixture:mjs-anniv-plain",Quiet="fixture:mjs-anniv-quiet",Driver="fixture:mjs-anniv-driver",Deck="fixture:mjs-anniv-deck";
+ private const string Hero="mou:ju-shou",Plain="fixture:mjs-anniv-plain",Quiet="fixture:mjs-anniv-quiet",Driver="fixture:mjs-anniv-driver",Request="fixture:mjs-anniv-request",Deck="fixture:mjs-anniv-deck";
  public static void ActualDrawChoiceUseOnlyEntityExpiryAndPaidCold()
  {
+  HeldGrantsAreExcludedFromActualAssistedSlashCold();
   var registry=ContentRegistry.Build(new StandardContentPackage(),new Fixture());
   var setup=new ShanheBattleSetup(7,1,"mou-ju-shou-anniversary-native",Hero,Hp:3,MaxHpBonus:0,InitialHandBonus:0,DrawBonus:0,SlashBonus:0,ExtraSkillIds:[Driver],StartingCards:[new(CardKind.Dodge,Suit.Heart,2),new(CardKind.Dodge,Suit.Heart,3),new(CardKind.Dodge,Suit.Heart,4)],StartingEquipment:[],EnemyRoster:[new(Plain,Hp:12){StartingHand=[]},new(Plain,Hp:12){StartingHand=[]}],AllyRoster:[new(Plain,Hp:12){StartingHand=[]}],CampaignHash:new string('a',64));
   var game=GameEngine.CreateStandard(new(){Seed=setup.BattleSeed,PlayerCount=4,HumanSeat=0,HumanRole=null,HumanTeamId=ShanheBattleSetup.PlayerTeamId,ModeId=ShanheBattleSetup.BattleModeId,ShanheBattle=setup,UseInteractiveSetup=false,UseInteractiveDiscard=false,AdvanceAfterHumanCommands=false,MaxTurns=12},registry);
@@ -56,12 +57,46 @@ internal static class MouJuShouAnniversaryChecks
   Submit(new UseProgramSkillCommand(0,Driver,"foreign-discard",[],[1],game.Revision,P()!.PromptId));Reach(()=>P()?.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="select-and-move-owned-card")==true);Answer(c=>c.Parameters.GetValueOrDefault("slot-index")=="0");Play();
   Need(E<MouJsRecoveredEvent>().Single(e=>e.Turn==transferTurn).CardId==transferred&&game.CardMovements.Count(m=>m.CardId==transferred&&m.From==CardLocation.Hand(1)&&m.To==CardLocation.DiscardPile)==1&&game.CardMovements.Count(m=>m.CardId==transferred&&m.From==CardLocation.DiscardPile&&m.To==CardLocation.Hand(0))==1&&V().Hand.Any(c=>c.Id==transferred),"The user's selected entity-tracking rule follows the exact gifted entity into a later genuine foreign discard within this same actual turn and recovers that card once.");
  }
- private sealed class Fixture:IGameContentPackage
+ private static void HeldGrantsAreExcludedFromActualAssistedSlashCold()
+ {
+  var registry=ContentRegistry.Build(new StandardContentPackage(),new Fixture(assisted:true));
+  var setup=new ShanheBattleSetup(7,1,"mou-ju-shou-assisted-grant",Hero,3,0,0,0,0,[Driver],[new(CardKind.Dodge,Suit.Heart,2),new(CardKind.Slash,Suit.Club,7)],[],[new(Plain,Hp:12){StartingHand=[]},new(Plain,Hp:12){StartingHand=[]}],[new(Plain,Hp:12){StartingHand=[]}],new string('b',64));
+  var game=GameEngine.CreateStandard(new(){Seed=setup.BattleSeed,PlayerCount=4,HumanSeat=0,HumanRole=null,HumanTeamId=ShanheBattleSetup.PlayerTeamId,ModeId=ShanheBattleSetup.BattleModeId,ShanheBattle=setup,UseInteractiveSetup=false,UseInteractiveDiscard=false,AdvanceAfterHumanCommands=false,MaxTurns=4},registry);
+  PendingDecision? P()=>Enumerable.Range(0,4).Select(s=>game.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);
+  PlayerSnapshot V()=>game.CreateSnapshot(0).Players[0];
+  void Need(bool yes,string why){if(!yes)throw new InvalidOperationException(why+JsonSerializer.Serialize(new{Prompt=P(),Frames=game.ResolutionStack,Hand=V().Hand}));}
+  void Submit(GameCommand c){var r=game.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single());Need(r.Accepted,r.Error?.Message??"The actual assisted grant command was rejected.");}
+  void Reach(Func<bool> ready){for(var n=0;n<150;n++){if(ready())return;Need(P()?.PlayerSeat!=0,"An unexpected Human boundary precedes the actual assisted Slash offer.");Submit(new AdvanceOneStepCommand(game.Revision));}throw new InvalidOperationException("The bounded assisted grant boundary was not reached.");}
+  void Answer(Func<PromptChoice,bool> match){var p=P()!;var c=p.Choices.FirstOrDefault(match);Need(p.PlayerSeat==0&&c is not null,"The real recipient must see its required native choice.");Submit(new AnswerPromptCommand(0,p.PromptId,c!.Id,game.Revision));}
+  void Play()=>Reach(()=>P() is{PlayerSeat:0,Kind:DecisionKind.PlayCard});
+  void Cold(){var before=SnapshotJson.Serialize(game.CreateSnapshot(0));var moves=game.CardMovements.ToArray();game=GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())),registry);Need(before==SnapshotJson.Serialize(game.CreateSnapshot(0))&&moves.SequenceEqual(game.CardMovements),"Cold retains the same exact grant entities, native request and published legal cards without another movement.");}
+  Submit(new StartGameCommand());Play();
+  Submit(new UseProgramSkillCommand(0,"mou:zuojun","draw-and-choose",[],[0],game.Revision,P()!.PromptId));
+  Reach(()=>game.ResolutionStack.OfType<ProgramSkillFrame>().Any(f=>f.MouJuShou?.Stage==MouJuShouStage.Choice)&&P()?.PlayerSeat==0);
+  var granted=game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.MouJuShou?.Stage==MouJuShouStage.Choice).MouJuShou!.Bound.ToArray();
+  Answer(c=>c.Parameters.GetValueOrDefault("branch")=="keep");Play();
+  Need(granted.Length==3&&granted.All(id=>V().Hand.Single(c=>c.Id==id) is{Kind:CardKind.Slash}card&&card.SkillMarkLabel?.Contains("佐军")==true),"The actual keep branch grants three real physical Slash entities.");
+  var gift=V().Hand.Single(c=>c.Kind==CardKind.Dodge).Id;
+  Submit(new UseProgramSkillCommand(0,Driver,"give",[gift],[1],game.Revision,P()!.PromptId));
+  Reach(()=>P()?.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="assisted-physical-slash"&&c.Parameters.GetValueOrDefault("request-option")=="target")==true);
+  Cold();Answer(c=>c.Parameters.GetValueOrDefault("request-option")=="target"&&c.Targets.SequenceEqual([3]));
+  Reach(()=>P()?.Choices.Any(c=>c.Parameters.GetValueOrDefault("request-option")=="decline")==true);
+  var request=game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.AssistedSlashRequest is not null);
+  Need(request.OwnerSeat==1&&request.AssistedSlashRequest is{ActorSeat:0,TargetSeat:3}&&
+   P()!.Choices.Where(c=>c.Parameters.GetValueOrDefault("request-option")=="use").Any(c=>c.Cards.Count==1)&&
+   !P()!.Choices.Any(c=>c.Cards.Any(granted.Contains))&&granted.All(id=>V().Hand.Any(c=>c.Id==id)),
+   "A genuine foreign request publishes available ordinary Slash material while excluding every still-held ZuoJun entity before the choice can reach strict native Use submission.");
+  Cold();Answer(c=>c.Parameters.GetValueOrDefault("request-option")=="decline");Play();
+  Need(granted.All(id=>V().Hand.Any(c=>c.Id==id))&&!game.CardMovements.Any(m=>granted.Contains(m.CardId)&&m.From==CardLocation.Hand(0))&&
+   !game.ResolutionStack.OfType<ProgramSkillFrame>().Any(f=>f.AssistedSlashRequest is not null),
+   "Declining the real native request completes its owning frame without spending, clearing or fabricating any of the original held grants.");Cold();
+ }
+ private sealed class Fixture(bool assisted=false):IGameContentPackage
  {
   public PackageManifest Manifest {get;}=new("fixture-mou-ju-shou-anniversary",new(1,0,0));
   public void Register(IContentRegistryBuilder b)
   {
-   CharacterFixtureContent.Register(b,Hero);foreach(var kind in new[]{CardKind.DrawTwo,CardKind.Dodge}){var c=CardCatalog.Get(kind);b.AddCard(new("fixture:mjs-anniv-"+kind,c.DisplayName,c.CategoryName,c.Description,kind));}
+   CharacterFixtureContent.Register(b,Hero);foreach(var kind in new[]{CardKind.DrawTwo,CardKind.Dodge,CardKind.Slash}){var c=CardCatalog.Get(kind);b.AddCard(new("fixture:mjs-anniv-"+kind,c.DisplayName,c.CategoryName,c.Description,kind));}
    var rules=$$"""
     {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
      {"id":"{{Driver}}","revision":1,"activations":[
@@ -73,9 +108,17 @@ internal static class MouJuShouAnniversaryChecks
      {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"selectOwnedCards","target":"owner","numberExpression":"allOwnedZoneCards","zones":["hand"],"resultBind":"empty"},{"op":"moveBoundCards","target":"owner","sourceBind":"empty","destination":"discardPile","awaitMovementTriggers":true},{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}
     ]}
     """;
-   var catalog=SkillProgramCatalog.Load(rules,JsonSerializer.Serialize(new{schemaVersion=SkillProgramCatalog.PresentationSchemaVersion,skills=new Dictionary<string,object>{[Driver]=new{name="真实失牌输入",description="原生移动选定手牌到弃牌堆。"},[Quiet]=new{name="安静同行",description="正常摸牌后真实弃手并跳过出牌。"}}}));
-   foreach(var(id,p)in catalog.Programs)b.AddSkill(new(id,catalog.Presentations[id].Name,catalog.Presentations[id].Description){Program=p,ProgramPresentation=catalog.Presentations[id]});b.AddGeneral(new(Plain,"实际安静角色","",Quiet,"wei",12));
-   b.AddDeck(new(Deck,"固定真实无中牌堆",0,2,[]){PhysicalCards=Enumerable.Range(0,100).Select(_=>new ContentDeckPhysicalCard("fixture:mjs-anniv-"+CardKind.DrawTwo,Suit.Club,2)).ToArray()});b.AddMode(new(ShanheBattleSetup.BattleModeId,"谋沮授佐军真实主流程",4,4,new Dictionary<string,int>(),Deck,GeneralPoolIds:[Hero,Plain],ModeKind:ContentModeKind.Team,TeamCounts:new Dictionary<string,int>{[ShanheBattleSetup.PlayerTeamId]=2,[ShanheBattleSetup.EnemyTeamId]=2}));
+   var labels=new Dictionary<string,object>{[Driver]=new{name="真实失牌输入",description="原生移动选定手牌到弃牌堆。"},[Quiet]=new{name="安静同行",description="正常摸牌后真实弃手并跳过出牌。"}};
+   if(assisted)
+   {
+    var json=System.Text.Json.Nodes.JsonNode.Parse(rules)!;
+    json["skills"]![0]!["activations"]!.AsArray().Single(a=>a!["id"]!.GetValue<string>()=="give")!["effects"]=System.Text.Json.Nodes.JsonNode.Parse("""[{"op":"captureSelectedCards","target":"owner","resultBind":"gift"},{"op":"moveBoundCards","target":"owner","sourceBind":"gift","destination":"selectedTargetHand"}]""");
+    json["skills"]!.AsArray().Add(System.Text.Json.Nodes.JsonNode.Parse($$"""{"id":"{{Request}}","revision":1,"triggers":[{"id":"actual-foreign-request","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementReasons":["skill-program.{{Driver}}.MoveBoundCards"],"movementOccurrence":"perBatch","usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"selectTarget","target":"owner","targetKind":"currentTurnPlayer"},{"op":"requestSlashAgainstChosenTarget","target":"selectedTarget","chooserRef":{"kind":"selectedTarget"},"resultBind":"actual-use"}]}]}"""));rules=json.ToJsonString();
+    labels.Add(Request,new{name="实际受令出杀",description="在原生赠牌子链请求当前回合角色真正使用杀。"});
+   }
+   var catalog=SkillProgramCatalog.Load(rules,JsonSerializer.Serialize(new{schemaVersion=SkillProgramCatalog.PresentationSchemaVersion,skills=labels}));
+   foreach(var(id,p)in catalog.Programs)b.AddSkill(new(id,catalog.Presentations[id].Name,catalog.Presentations[id].Description){Program=p,ProgramPresentation=catalog.Presentations[id]});b.AddGeneral(new(Plain,"实际安静角色","",Quiet,"wei",12,assisted?[Request]:[]));
+   b.AddDeck(new(Deck,"固定真实无中牌堆",0,2,[]){PhysicalCards=Enumerable.Range(0,100).Select(_=>new ContentDeckPhysicalCard("fixture:mjs-anniv-"+(assisted?CardKind.Slash:CardKind.DrawTwo),Suit.Club,2)).ToArray()});b.AddMode(new(ShanheBattleSetup.BattleModeId,"谋沮授佐军真实主流程",4,4,new Dictionary<string,int>(),Deck,GeneralPoolIds:[Hero,Plain],ModeKind:ContentModeKind.Team,TeamCounts:new Dictionary<string,int>{[ShanheBattleSetup.PlayerTeamId]=2,[ShanheBattleSetup.EnemyTeamId]=2}));
   }
  }
 }

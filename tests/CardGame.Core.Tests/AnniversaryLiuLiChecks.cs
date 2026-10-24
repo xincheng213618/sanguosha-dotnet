@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
@@ -58,6 +59,44 @@ internal static class AnniversaryLiuLiChecks
             "The normal discard phase keeps all exempt cards, with exactly one native Dehua invocation in each of the five real rounds.");
         s.Replay();
     }
+    public static void ChosenSlashNameFiltersZhangbaUseButKeepsPlayedResponseCold()
+    {
+        var s = Scene.Start(spear: true); s.Menu(AnniversaryLiuLiStage.UseChoice);
+        s.Native(CardKind.Duel, 1); s.Play();
+        var firstPair = s.V(0).Hand.Where(card => card.Kind is CardKind.Dismantlement or CardKind.BorrowedSword).Select(card => card.Id).Order().ToArray();
+        s.Need(firstPair.Length == 2 && s.G.GetHumanLegalActions().Any(action => action.Kind == LegalActionKind.UseEquipmentEffect &&
+            action.EquipmentKind == CardKind.ZhangbaSerpentSpear && firstPair.All(action.SelectableCardIds.Contains) && action.SelectableTargetSeats.Contains(1)),
+            "Before Slash is chosen, the real equipped Spear publishes an ordinary two-Hand-material Slash Use.");
+        s.Cold(); s.Accept(new UseEquipmentEffectCommand(0, CardKind.ZhangbaSerpentSpear, firstPair, [1], s.G.Revision, s.P!.PromptId)); s.Play();
+        var firstUse = s.E<ZhangbaSerpentSpearConvertedEvent>().Single(converted => converted.IsUse);
+        s.Need(firstUse.PhysicalCardIds.Order().SequenceEqual(firstPair) && s.E<CardUseFinishedEvent>().Count(done => done.ResolutionId == firstUse.ResolutionId) == 1,
+            "The control really pays and finishes its published native Zhangba Use, rather than merely checking a menu.");
+
+        s.NextRound(CardKind.Slash); s.Play(); s.Cold();
+        var responsePair = s.V(0).Hand.Select(card => card.Id).Order().ToArray();
+        s.Need(responsePair.Length == 2 && s.E<AnniversaryLiuLiNameChosenEvent>().Select(chosen => chosen.Name).SequenceEqual([CardKind.Duel, CardKind.Slash]) &&
+            s.G.GetHumanLegalActions().All(action => action.Kind != LegalActionKind.Slash &&
+                !(action.Kind == LegalActionKind.UseEquipmentEffect && action.EquipmentKind == CardKind.ZhangbaSerpentSpear)),
+            "After the real Dehua Slash completes, both one-entity Slash uses and the two-Hand-material equipment Use must disappear from published play actions.");
+        s.Reject(new UseEquipmentEffectCommand(0, CardKind.ZhangbaSerpentSpear, responsePair, [1], s.G.Revision, s.P!.PromptId),
+            "A stale Zhangba Use cannot consume Hand entities, mutate the chosen-name proof or bypass the final Dehua restriction.");
+        s.IncomingDuel(); s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondSlash });
+        var use = s.G.ResolutionStack.OfType<CardUseFrame>().Single(frame => frame.SelectedActorDuelOrigin is not null);
+        var origin = use.SelectedActorDuelOrigin!;
+        s.Need(origin is { OwnerSeat: 0, InitialActorSeat: 1, SkillId: Driver, ActivationId: "incoming-duel", AttackStarted: true } &&
+            s.G.ResolutionStack.OfType<ProgramSkillFrame>().Any(parent => parent.Id == origin.ParentProgramFrameId && parent.GameplayHash == origin.GameplayHash) &&
+            s.P!.Choices.Any(choice => choice.Parameters.GetValueOrDefault("response") == "zhangba-slash" && choice.Cards.Order().SequenceEqual(responsePair)),
+            "The genuine incoming Duel retains its issued program source and native use while still publishing a pure Played Zhangba response from the same Hand materials.");
+        s.Cold(); s.Answer(choice => choice.Parameters.GetValueOrDefault("response") == "zhangba-slash" && choice.Cards.Order().SequenceEqual(responsePair)); s.Play();
+        s.Need(s.E<ZhangbaSerpentSpearConvertedEvent>().Count(converted => !converted.IsUse && converted.ResolutionId == use.Id && converted.PhysicalCardIds.Order().SequenceEqual(responsePair)) == 1 &&
+            responsePair.All(id => s.G.CardMovements.Count(move => move.CardId == id && move.From == CardLocation.Hand(0) && move.To == CardLocation.Processing && move.Reason == CardMoveReasons.Respond) == 1 &&
+                s.G.CardMovements.Count(move => move.CardId == id && move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.ResponseFinished) == 1) &&
+            s.E<CardUseDeclaredEvent>().All(declared => !responsePair.Contains(declared.CardId)) &&
+            s.E<CardUseFinishedEvent>().Count(done => done.ResolutionId == use.Id) == 1 &&
+            s.E<ProgramSkillResolvedEvent>().Count(done => done.FrameId == origin.ParentProgramFrameId && done.Completed) == 1 && s.G.ResolutionStack.Count == 0,
+            "Cold pure Played response pays each actual entity once and returns once to the issued native Duel and original program, without declaring a forbidden new Slash Use.");
+        s.Cold(); s.Replay();
+    }
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {
         public GameEngine G { get; private set; } = game;
@@ -74,6 +113,7 @@ internal static class AnniversaryLiuLiChecks
         public void End() => Accept(new EndPlayPhaseCommand(0, G.Revision, P!.PromptId));
         public void ActivateFuli() => Accept(new UseProgramSkillCommand(0, Fuli, "reveal-discard-draw", [], [], G.Revision, P!.PromptId));
         public void Stock() => Accept(new UseProgramSkillCommand(0, Driver, "stock", [], [], G.Revision, P!.PromptId));
+        public void IncomingDuel() => Accept(new UseProgramSkillCommand(0, Driver, "incoming-duel", [], [1], G.Revision, P!.PromptId));
         public void ContinueWatch() => Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue" || c.Parameters.GetValueOrDefault("program-option") == "continue" || c.Label == "继续");
         public void Native(CardKind kind, int target)
         {
@@ -108,21 +148,22 @@ internal static class AnniversaryLiuLiChecks
         public void Cold() { var state = State(); G = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), registry); Need(state == State(), "Cold preserves the original private category, once-paid real movement and full native child cursor."); }
         public void Replay() { var state = State(); G = GameReplay.Replay(G.CreateCheckpoint().Options, G.AcceptedCommands, registry); Need(state == State(), "The real whole damage Uses, payment children and persistent effects replay identically."); }
         public void Accept(GameCommand c) { var result = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single()); Need(result.Accepted, result.Error?.Message ?? "Rejected real Liu Li command."); }
+        public void Reject(GameCommand c, string message) { var state = State(); Need(!G.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single()).Accepted && state == State(), message); }
         public void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message + " " + Dump()); }
         private string Dump() => JsonSerializer.Serialize(new { G.State.TurnNumber, G.State.CurrentSeat, P, Receipt = Root?.AnniversaryLiuLi, Chosen = E<AnniversaryLiuLiNameChosenEvent>(), Draws = E<AnniversaryLiuLiDrawIssuedEvent>(), Last = G.Events.TakeLast(8).Select(e => e.Payload).ToArray() });
-        public static Scene Start()
+        public static Scene Start(bool spear = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(spear));
             var hand = new[] { new ShanheStartingCard(CardKind.Dismantlement, Suit.Spade, 3), new ShanheStartingCard(CardKind.BorrowedSword, Suit.Club, 4), new ShanheStartingCard(CardKind.Slash, Suit.Club, 7), new ShanheStartingCard(CardKind.FireSlash, Suit.Diamond, 8) };
             var peerHand = new[] { new ShanheStartingCard(CardKind.Peach, Suit.Heart, 1), new ShanheStartingCard(CardKind.Peach, Suit.Heart, 2), new ShanheStartingCard(CardKind.Peach, Suit.Heart, 3) };
-            var setup = new ShanheBattleSetup(43, 1, "anniversary-liuli", Hero, 3, 0, 0, 0, 0, [Driver, Watch], hand, [],
+            var setup = new ShanheBattleSetup(43, 1, "anniversary-liuli", Hero, 3, 0, 0, 0, 0, [Driver, Watch], hand, spear ? [new(CardKind.ZhangbaSerpentSpear, Suit.Spade, 12)] : [],
                 [new(Peer, Hp: 20) { StartingHand = peerHand }, new(Peer, Hp: 20) { StartingHand = peerHand }], [new(Peer, Hp: 20) { StartingHand = peerHand }], new string('b', 64));
             var game = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,
                 ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup, UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 24 }, registry);
             var scene = new Scene(game, registry); scene.Accept(new StartGameCommand()); return scene;
         }
     }
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool spear = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-anniversary-liuli", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
@@ -130,7 +171,10 @@ internal static class AnniversaryLiuLiChecks
             CharacterFixtureContent.Register(b, Hero);
             b.AddCard(new("classic:borrowed-sword", "借刀杀人", "锦囊牌", CardCatalog.Get(CardKind.BorrowedSword).Description, CardKind.BorrowedSword,
                 AiTags: new Dictionary<string, string> { ["action"] = "force-slash-or-take-weapon", ["targets"] = "ordered-two" }));
-            var catalog = SkillProgramCatalog.Load(Rules, Presentation);
+            if (spear) b.AddCard(new("classic:zhangba-serpent-spear", "丈八蛇矛", "装备牌", EquipmentCatalog.Get(CardKind.ZhangbaSerpentSpear).Description, CardKind.ZhangbaSerpentSpear));
+            var rules = JsonNode.Parse(Rules)!;
+            if (spear) rules["skills"]![2]!["activations"]!.AsArray().Add(JsonNode.Parse("""{"id":"incoming-duel","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"usesPerPhase":2,"effects":[{"op":"useSelectedActorDuel","target":"owner"}]}"""));
+            var catalog = SkillProgramCatalog.Load(rules.ToJsonString(), Presentation);
             foreach (var (id, p) in catalog.Programs) b.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description) { Program = p, ProgramPresentation = catalog.Presentations[id] });
             b.AddGeneral(new(Peer, "真实安静同桌", "", Quiet, "wei", 20));
             b.AddDeck(new(Deck, "固定原生杀实体", 0, 0, []) { PhysicalCards = Enumerable.Range(0, 96).Select(i => new ContentDeckPhysicalCard("standard:slash", Suit.Club, i % 13 + 1)).ToArray() });

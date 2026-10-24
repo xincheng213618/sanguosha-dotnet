@@ -36,6 +36,39 @@ internal static class BianFuRenChecks
                 "A second native foreign loss in the same actual turn cannot consume a second Wanwei use.");
             _ = Cold(g, r);
         }
+        DeclaredTrueUseStillAdoptsYuejianPaymentCold();
+    }
+
+    private static void DeclaredTrueUseStillAdoptsYuejianPaymentCold()
+    {
+        var (g, r) = Start(red: true, declaration: true);
+        var action = g.GetHumanLegalActions().First(a => a.ConversionSource?.SkillId == "classic:guhuo" &&
+            a.PlayedCardKind == CardKind.IronChain && a.Kind != LegalActionKind.Recast && a.TargetSeats.SequenceEqual([1]));
+        Accept(g, new PlayCardCommand(0, action.CardId!.Value, action.TargetSeats, g.Revision, P(g)!.PromptId,
+            action.PlayedCardKind, action.TargetCardId) { ConversionSource = action.ConversionSource });
+        var declared = g.ResolutionStack.OfType<CardDeclarationFrame>().Single();
+        Require(declared.Payment.ReturnPurpose == CardDeclarationPurpose.Use && declared.Payment.OriginalRank == 7 &&
+            declared.Payment.BianFuRenPaymentSequence is not null, "A true Use keeps its typed declaration purpose and original paid entity.");
+        g = Cold(g, r);
+        while (g.ResolutionStack.LastOrDefault() is CardDeclarationChallengeFrame)
+            Answer(g, choice => choice.Parameters.GetValueOrDefault("declaration-answer") == "pass");
+        Reach(g, prompt => Activation(prompt, Yuejian));
+        var receipt = g.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Last().Batch.BianFuRenUsedDiscards!
+            .Single(item => item.Action.PhysicalCards.Any(cost => cost.CardId == action.CardId));
+        var used = receipt.Action;
+        g = Cold(g, r); Activate(g); Play(g);
+        var claimed = E<YuejianAcquisitionIssuedEvent>(g).Single();
+        Require(claimed.OwnerSeat == 1 && claimed.DifferentSuits && claimed.ActualCount == 1 && claimed.ActionId == used.ActionId &&
+            claimed.NativeUseId == receipt.NativeUseId && used.Type == CardActionType.Use &&
+            receipt.Materials.Single().OriginalPayment?.MovementSequence == declared.Payment.BianFuRenPaymentSequence &&
+            used.ProviderSeat == 0 && used.PhysicalCards.Single() == declared.Payment.Cost && used.ConversionChain.Contains(declared.Payment.Source) &&
+            V(g, 1).Hand.Any(card => card.Id == action.CardId) &&
+            g.CardMovements.Count(move => move.CardId == action.CardId && move.From == CardLocation.Hand(0) &&
+                move.To == CardLocation.Processing && move.Reason.Value == "conversion.declaration.pay") == 1 &&
+            g.CardMovements.Count(move => move.CardId == action.CardId && move.From == CardLocation.DiscardPile &&
+                move.To == CardLocation.Hand(1) && move.Reason.Value == "skill-program.yuejian.exact-used-card") == 1,
+            "Yuejian still adopts a genuine declared Use's exact original payment and source, then obtains that same finished entity once.");
+        _ = Cold(g, r);
     }
 
     private static int Use(GameEngine g, CardKind kind, int target)

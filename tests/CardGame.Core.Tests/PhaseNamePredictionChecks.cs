@@ -23,6 +23,58 @@ internal static class PhaseNamePredictionChecks
         VerifyRoundCostShortageAndEmptyHand();
     }
 
+    public static void LethalSettlementReturnsColdChildWithoutDeadActorPhases()
+    {
+        var (g, r) = Create(humanRole: Role.Renegade, lowHp: true);
+        Reach(g, p => IsOffer(p, null) && g.State.CurrentSeat == 0);
+        var origin = ArmNext(ref g, r, false);
+        Require(origin.TargetSeat == 0 && origin.ActualTurnOwnerSeat == 0,
+            "The accepted forecast must belong to the human actor's own actual Play phase, after declining earlier actors' offers.");
+        Play(g);
+        Use(g, "wound", []);
+        Play(g);
+        Require(V(g, 0).Hp == 1 && V(g, 0).IsAlive && g.State.Winner == Winner.None,
+            "The real HP-loss activation leaves the current non-Lord actor alive at one HP before its accepted forecast settles.");
+        End(g);
+        // The low-HP fixture retains a real Peach, so lethal damage must expose
+        // an observable human rescue prompt before this native child returns.
+        Reach(g, p => p is { Kind: DecisionKind.RescueDying, PlayerSeat: 0 });
+        var settled = F<PhaseNamePredictionSettledEvent>(g).Single(e => e.OriginalFrameId == origin.FrameId);
+        var resolver = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == settled.FrameId);
+        var dying = g.ResolutionStack.OfType<DyingFrame>().Single(child => child.VictimSeat == 0);
+        Require(settled is { Correct: true, PredictedUse: false, ActualUse: false, TargetSeat: 0 } &&
+            V(g, 0).Hp == 0 && V(g, 0).IsAlive &&
+            V(g, 0).Hand.Any(card => card.Kind == CardKind.Peach && P(g)!.ValidCardIds.Contains(card.Id)) &&
+            resolver.PhaseNamePrediction is { Stage: PhaseNamePredictionStage.DamageIssued } &&
+            dying.Continuation == DyingContinuationKind.Damage && dying.KillerSeat == origin.Source.OwnerSeat &&
+            g.ResolutionStack.OfType<DamageFrame>().Any(damage => damage.Id == dying.ParentFrameId &&
+                damage.ParentFrameId == resolver.Id && damage.TargetSeat == 0 && damage.Amount == 1) &&
+            resolver.WindowContext is { } context && context.PhaseNamePrediction?.Origin == origin &&
+            g.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Any(window =>
+                window.Id == context.ParentFrameId && window.Window == SkillProgramTriggerWindow.PlayEnding &&
+                window.Continuation == ProgramLifecycleContinuation.CompletePlayPhase) &&
+            !F<TurnEndedEvent>(g).Any(e => e.TurnNumber == origin.ActualTurnNumber && e.ActorSeat == 0),
+            "The lethal damage pauses in its exact native dying child and damage parent while the issued forecast and Play-ending window still own the unfinished turn.");
+        g = Cold(g, r);
+        Until(g, e => F<ActualTurnCursorReturnedEvent>(e).Any(returned =>
+            returned.ActualTurn == origin.ActualTurnNumber && returned.OwnerSeat == 0));
+        Require(!V(g, 0).IsAlive && g.State.Winner == Winner.None && g.State.CurrentSeat != 0 &&
+            g.State.Status != EngineStatus.Faulted && g.ResolutionStack.Count == 0 &&
+            F<PlayerDiedEvent>(g).Count(e => e.VictimSeat == 0) == 1 &&
+            F<PhaseNamePredictionSettledEvent>(g).Count(e => e.OriginalFrameId == origin.FrameId) == 1 &&
+            F<DamageAppliedEvent>(g).Count(e => !e.SourceLess && e.SourceSeat == origin.Source.OwnerSeat &&
+                e.TargetSeat == 0 && e.Amount == 1) == 1 &&
+            F<ActualPhaseEndedEvent>(g).Count(e => e.Phase.TurnNumber == origin.ActualTurnNumber &&
+                e.Phase.ActorSeat == 0 && e.Phase.Kind == ActualDiscardRecoveryPhaseKind.Play) == 1 &&
+            !F<ActualDiscardRecoveryPhaseStartedEvent>(g).Any(e => e.Phase.TurnNumber == origin.ActualTurnNumber &&
+                e.Phase.ActorSeat == 0 && e.Phase.Kind is ActualDiscardRecoveryPhaseKind.Discard or ActualDiscardRecoveryPhaseKind.Ending) &&
+            F<ActualDiscardRecoveryPhaseClearedEvent>(g).Any(e => e.TurnNumber == origin.ActualTurnNumber) &&
+            F<TurnEndedEvent>(g).Count(e => e.TurnNumber == origin.ActualTurnNumber && e.ActorSeat == 0) == 1 &&
+            F<ActualTurnCursorReturnedEvent>(g).Count(e => e.ActualTurn == origin.ActualTurnNumber && e.OwnerSeat == 0) == 1,
+            "After cold child return and a real unrescued death, the original Play and actual turn finish once, clear their token and reach the next living actor without manufacturing corpse Discard/Ending phases.");
+        _ = Cold(g, r);
+    }
+
     private static void VerifyNoUseDamageAndSourceLoss()
     {
         var (g, r) = Create();
@@ -397,6 +449,9 @@ internal static class PhaseNamePredictionChecks
             b.AddSkill(new("fixture:phase-name-selection", "固定候选", "固定小夹具") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => 100d) });
             if (lowHp)
             {
+                // Register the existing actual-phase producer and confirmation
+                // capabilities without adding either general to this roster.
+                CharacterFixtureContent.Register(b, "ol:ya-dan", "ol:du-fu-ren");
                 b.AddSkill(new("fixture:phase-name-owner-selection", "反贼公开候选", "正式角色评分保留玩家候选")
                 { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, role => role == Role.Renegade ? 10000d : -10000d) });
                 b.AddSkill(new("fixture:phase-name-peer-selection", "主公公开候选", "正式角色评分选择其他将")
@@ -422,6 +477,7 @@ internal static class PhaseNamePredictionChecks
             }
             var card = kind switch { CardKind.Crossbow => "standard:crossbow", CardKind.FireSlash => "standard:fire_slash",
                 CardKind.SilverLion => "fixture:phase-name-silver-lion", CardKind.Nullification => "standard:nullification", _ => "standard:dodge" };
+            if (lowHp) card = "standard:peach";
             b.AddDeck(new("fixture:phase-name-deck", "固定真实实体", 0, 0, [])
             { PhysicalCards = Enumerable.Range(0, 40).Select(i => new ContentDeckPhysicalCard(card, Suit.Spade, i % 13 + 1)).ToArray() });
             b.AddMode(new(kind == CardKind.SilverLion ? EquipmentMode : Mode, "真实阶段预测", 4, 4, new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Renegade)] = 3 },

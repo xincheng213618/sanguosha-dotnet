@@ -101,6 +101,17 @@ public sealed partial class GameEngine
                     !IsChenglieAppliedTargetFact(use, chenglie, designated, out var chenglieTargets)) return false;
                 designated = chenglieTargets.ToList(); actual = chenglieTargets.ToList();
             }
+            else if (fact is BingzhongTargetsAppliedEvent { AddedCount: > 0 } bingzhong && bingzhong.UseId == use.Id)
+            {
+                IReadOnlyList<int> preceding = designated;
+                if (kind == CardKind.DrawTwo && designated.Count == 0 && actual.Count == 0 &&
+                    use.BingzhongTail?.OriginalTargets is [var self] && self == actor)
+                    preceding = [actor];
+                if (!actual.SequenceEqual(designated) ||
+                    !IsBingzhongAcceptedUseTargetFact(use, bingzhong, preceding, actor, completed.ProviderSeat, history,
+                        out var resultTargets)) return false;
+                designated = resultTargets.ToList(); actual = resultTargets.ToList();
+            }
             else if (fact is PijingTargetsAppliedEvent pijing && pijing.UseId == use.Id)
             {
                 IReadOnlyList<int> preceding = designated;
@@ -109,6 +120,16 @@ public sealed partial class GameEngine
                 if (!actual.SequenceEqual(designated) ||
                     !IsPijingAppliedTargetFact(use, pijing, preceding, out var resultTargets)) return false;
                 designated = resultTargets.ToList(); actual = resultTargets.ToList();
+            }
+            else if (fact is WeifuTargetAddedEvent weifu && weifu.UseId == use.Id)
+            {
+                IReadOnlyList<int> preceding = designated;
+                if (kind == CardKind.DrawTwo && designated.Count == 0 && actual.Count == 0 &&
+                    use.WeifuUse?.OriginalTargets is [var self] && self == actor)
+                    preceding = [actor];
+                if (!actual.SequenceEqual(designated) ||
+                    !IsWeifuAcceptedUseTargetFact(use, weifu, preceding, actor, completed.ProviderSeat, history)) return false;
+                designated = preceding.Append(weifu.TargetSeat).ToList(); actual = designated.ToList();
             }
             else if (fact is MouLidanTargetsAppliedEvent lidan && lidan.UseId == use.Id && lidan.AddedCount > 0)
             {
@@ -343,6 +364,66 @@ public sealed partial class GameEngine
                 if (!IsDesignatedExtraTargetRedirectFact(use, redirectedExtra, actual)) return false;
                 actual[redirectedExtra.TargetIndex] = redirectedExtra.NewTargetSeat;
             }
+            else if (fact is BingzhongRedirectedEvent bingzhongRedirect && bingzhongRedirect.UseId == use.Id)
+            {
+                if (!HasBingzhongTargetTail(use) || bingzhongRedirect.ActionId != completed.ActionId ||
+                    history.OfType<BingzhongRedirectedEvent>().Count(e => e.FrameId == bingzhongRedirect.FrameId &&
+                        e.UseId == use.Id && e.InstructionIndex == bingzhongRedirect.InstructionIndex) != 1) return false;
+                // A native redirect may also acknowledge a fire/short-range or
+                // designated-target receipt. Its existing branch owns the mutation.
+                if (history.OfType<ProgramActualSlashTargetRedirectedEvent>().Any(e =>
+                        e.ProgramFrameId == bingzhongRedirect.FrameId && e.CardUseFrameId == use.Id && e.ActionId == completed.ActionId &&
+                        e.Source == bingzhongRedirect.Source && e.GameplayHash == bingzhongRedirect.GameplayHash &&
+                        e.InstructionIndex == bingzhongRedirect.InstructionIndex && e.TargetIndex == bingzhongRedirect.TargetIndex &&
+                        e.OriginalTargetSeat == bingzhongRedirect.PreviousSeat && e.NewTargetSeat == bingzhongRedirect.Seat) ||
+                    history.OfType<ProgramCurrentSlashFireRedirectedEvent>().Any(e =>
+                        e.ProgramFrameId == bingzhongRedirect.FrameId && e.CardUseFrameId == use.Id && e.ActionId == completed.ActionId &&
+                        e.Source == bingzhongRedirect.Source && e.TargetIndex == bingzhongRedirect.TargetIndex &&
+                        e.OriginalTargetSeat == bingzhongRedirect.PreviousSeat && e.NewTargetSeat == bingzhongRedirect.Seat) ||
+                    history.OfType<DesignatedExtraTargetRedirectedEvent>().Any(e =>
+                        e.ProgramFrameId == bingzhongRedirect.FrameId && e.CardUseFrameId == use.Id && e.ActionId == completed.ActionId &&
+                        e.Source == bingzhongRedirect.Source && e.GameplayHash == bingzhongRedirect.GameplayHash &&
+                        e.InstructionIndex == bingzhongRedirect.InstructionIndex && e.TargetIndex == bingzhongRedirect.TargetIndex &&
+                        e.OriginalTargetSeat == bingzhongRedirect.PreviousSeat && e.NewTargetSeat == bingzhongRedirect.Seat) ||
+                    history.OfType<SoleTargetAfterProtectionRedirectedEvent>().Any(e =>
+                        e.ProgramFrameId == bingzhongRedirect.FrameId && e.CardUseFrameId == use.Id && e.ActionId == completed.ActionId &&
+                        e.Source == bingzhongRedirect.Source && e.GameplayHash == bingzhongRedirect.GameplayHash &&
+                        e.InstructionIndex == bingzhongRedirect.InstructionIndex && e.TargetIndex == bingzhongRedirect.TargetIndex &&
+                        e.PreviousTargetSeat == bingzhongRedirect.PreviousSeat && e.NewTargetSeat == bingzhongRedirect.Seat)) continue;
+                if (bingzhongRedirect.TargetIndex < 0 || bingzhongRedirect.TargetIndex >= actual.Count ||
+                    actual[bingzhongRedirect.TargetIndex] != bingzhongRedirect.PreviousSeat) return false;
+                actual[bingzhongRedirect.TargetIndex] = bingzhongRedirect.Seat;
+            }
+            else if (fact is WeifuRedirectedEvent weifuRedirect && weifuRedirect.UseId == use.Id)
+            {
+                if (!HasWeifuTargetTail(use) || weifuRedirect.ActionId != completed.ActionId ||
+                    history.OfType<WeifuRedirectedEvent>().Count(e => e.FrameId == weifuRedirect.FrameId &&
+                        e.UseId == use.Id && e.InstructionIndex == weifuRedirect.InstructionIndex) != 1) return false;
+                // Companion receipts acknowledge this same native redirect; the
+                // existing dedicated branch consumes its actual target change.
+                if (history.OfType<ProgramActualSlashTargetRedirectedEvent>().Any(e =>
+                        e.ProgramFrameId == weifuRedirect.FrameId && e.CardUseFrameId == use.Id && e.ActionId == completed.ActionId &&
+                        e.Source == weifuRedirect.Source && e.GameplayHash == weifuRedirect.GameplayHash &&
+                        e.InstructionIndex == weifuRedirect.InstructionIndex && e.TargetIndex == weifuRedirect.TargetIndex &&
+                        e.OriginalTargetSeat == weifuRedirect.PreviousSeat && e.NewTargetSeat == weifuRedirect.TargetSeat) ||
+                    history.OfType<ProgramCurrentSlashFireRedirectedEvent>().Any(e =>
+                        e.ProgramFrameId == weifuRedirect.FrameId && e.CardUseFrameId == use.Id && e.ActionId == completed.ActionId &&
+                        e.Source == weifuRedirect.Source && e.TargetIndex == weifuRedirect.TargetIndex &&
+                        e.OriginalTargetSeat == weifuRedirect.PreviousSeat && e.NewTargetSeat == weifuRedirect.TargetSeat) ||
+                    history.OfType<DesignatedExtraTargetRedirectedEvent>().Any(e =>
+                        e.ProgramFrameId == weifuRedirect.FrameId && e.CardUseFrameId == use.Id && e.ActionId == completed.ActionId &&
+                        e.Source == weifuRedirect.Source && e.GameplayHash == weifuRedirect.GameplayHash &&
+                        e.InstructionIndex == weifuRedirect.InstructionIndex && e.TargetIndex == weifuRedirect.TargetIndex &&
+                        e.OriginalTargetSeat == weifuRedirect.PreviousSeat && e.NewTargetSeat == weifuRedirect.TargetSeat) ||
+                    history.OfType<SoleTargetAfterProtectionRedirectedEvent>().Any(e =>
+                        e.ProgramFrameId == weifuRedirect.FrameId && e.CardUseFrameId == use.Id && e.ActionId == completed.ActionId &&
+                        e.Source == weifuRedirect.Source && e.GameplayHash == weifuRedirect.GameplayHash &&
+                        e.InstructionIndex == weifuRedirect.InstructionIndex && e.TargetIndex == weifuRedirect.TargetIndex &&
+                        e.PreviousTargetSeat == weifuRedirect.PreviousSeat && e.NewTargetSeat == weifuRedirect.TargetSeat)) continue;
+                if (weifuRedirect.TargetIndex < 0 || weifuRedirect.TargetIndex >= actual.Count ||
+                    actual[weifuRedirect.TargetIndex] != weifuRedirect.PreviousSeat) return false;
+                actual[weifuRedirect.TargetIndex] = weifuRedirect.TargetSeat;
+            }
             else if (fact is CardActionAcceptedEvent finalized && finalized.Action.ActionId == completed.ActionId)
             {
                 if (finalized.Action.ActorSeat != actor || finalized.Action.ProviderSeat != completed.ProviderSeat ||
@@ -353,5 +434,61 @@ public sealed partial class GameEngine
         }
         return actor == completed.ActorSeat && kind == completed.EffectiveKind && chain.SequenceEqual(completed.ConversionChain) &&
             designated.SequenceEqual(completed.TargetSeats) && actual.SequenceEqual(use.TargetSeats);
+    }
+
+    private bool IsBingzhongAcceptedUseTargetFact(CardUseFrame use, BingzhongTargetsAppliedEvent fact,
+        IReadOnlyList<int> precedingTargets, int actor, int provider, IReadOnlyList<IGameEvent> history,
+        out IReadOnlyList<int> resultTargets)
+    {
+        resultTargets = [];
+        if (use.BingzhongTail is not { AddedTargets.Count: > 0 } tail || tail.OriginalActor != actor ||
+            tail.ProviderSeat != provider || !tail.OriginalTargets.SequenceEqual(precedingTargets) ||
+            fact != new BingzhongTargetsAppliedEvent(tail.FrameId, tail.UseId, tail.ActionId, tail.Source,
+                tail.GameplayHash, tail.X, tail.Ordinal, tail.OriginalActor, tail.ProviderSeat,
+                tail.OriginalTargets.Count, tail.AddedTargets.Count) || !HasBingzhongTargetTail(use) ||
+            history.OfType<BingzhongTargetsAppliedEvent>().Where(e => e.UseId == use.Id).ToArray() is not [var applied] ||
+            applied != fact ||
+            history.OfType<ProgramBindingStartedEvent>().Where(e => e.FrameId == tail.FrameId).ToArray() is not [var binding] ||
+            binding.SkillId != tail.Source.SkillId || binding.BindingId != tail.Source.BindingId ||
+            binding.SkillInstanceId != tail.Source.SkillInstanceId || binding.OwnerSeat != actor ||
+            binding.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized ||
+            !ActualHandGainMutationBinding(tail.FrameId, tail.Source.SkillId, actor,
+                SkillProgramTriggerWindow.CardUseTargetsFinalized, SkillProgramEffectOp.ResolveBingzhongExtraTargets) ||
+            history.OfType<YangFuStartedEvent>().Where(e => e.FrameId == tail.FrameId).ToArray() is not [var start] ||
+            start.Source != tail.Source || start.GameplayHash != tail.GameplayHash ||
+            start.Op != SkillProgramEffectOp.ResolveBingzhongExtraTargets || start.TargetSeat != actor ||
+            start.X != tail.X || start.Ordinal != tail.Ordinal || start.UseId != use.Id || start.ActionId != tail.ActionId ||
+            start.OriginalTargetCount != precedingTargets.Count || start.ActualTurn < 1 || start.ParentId <= 0)
+            return false;
+        var original = history.OfType<BingzhongOriginalTargetEvent>().Where(e => e.FrameId == tail.FrameId).OrderBy(e => e.Index).ToArray();
+        var selected = history.OfType<BingzhongTargetSelectedEvent>().Where(e => e.FrameId == tail.FrameId).OrderBy(e => e.Index).ToArray();
+        if (!original.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, original.Length)) ||
+            !original.Select(e => e.Seat).SequenceEqual(precedingTargets) ||
+            !selected.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, selected.Length)) ||
+            !selected.Select(e => e.Seat).SequenceEqual(tail.AddedTargets)) return false;
+        resultTargets = tail.OriginalTargets.Concat(tail.AddedTargets).ToArray();
+        return true;
+    }
+
+    private bool IsWeifuAcceptedUseTargetFact(CardUseFrame use, WeifuTargetAddedEvent fact,
+        IReadOnlyList<int> precedingTargets, int actor, int provider, IReadOnlyList<IGameEvent> history)
+    {
+        if (use.WeifuUse is not { Offered: true, AddedTargets.Count: > 0 } receipt ||
+            use.SourceSeat != actor || receipt.ProviderSeat != provider || !HasWeifuTargetTail(use) ||
+            fact.ActionId != receipt.ActionId || fact.Source.OwnerSeat != receipt.ActorSeat ||
+            fact.Source.SkillId != "ol:weifu" || fact.Source.BindingId != "issued-category-targets" ||
+            fact.Index < 0 || fact.Index >= receipt.AddedTargets.Count || receipt.AddedTargets[fact.Index] != fact.TargetSeat ||
+            !precedingTargets.SequenceEqual(receipt.OriginalTargets.Concat(receipt.AddedTargets.Take(fact.Index))) ||
+            history.OfType<ProgramBindingStartedEvent>().Where(e => e.FrameId == fact.FrameId).ToArray() is not [var binding] ||
+            binding.SkillId != fact.Source.SkillId || binding.BindingId != fact.Source.BindingId ||
+            binding.SkillInstanceId != fact.Source.SkillInstanceId || binding.OwnerSeat != receipt.ActorSeat ||
+            binding.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized ||
+            !ActualHandGainMutationBinding(fact.FrameId, fact.Source.SkillId, receipt.ActorSeat,
+                SkillProgramTriggerWindow.CardUseTargetsFinalized, SkillProgramEffectOp.OfferWeifuCategoryTargets)) return false;
+        var added = history.OfType<WeifuTargetAddedEvent>().Where(e => e.UseId == use.Id).ToArray();
+        return added.Length == receipt.AddedTargets.Count && added[fact.Index] == fact &&
+            added.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, added.Length)) &&
+            added.Select(e => e.TargetSeat).SequenceEqual(receipt.AddedTargets) &&
+            added.All(e => e.FrameId == fact.FrameId && e.ActionId == receipt.ActionId && e.Source == fact.Source);
     }
 }

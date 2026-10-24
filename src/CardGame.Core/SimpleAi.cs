@@ -124,6 +124,11 @@ public sealed partial class SimpleAiBrain
     /// </summary>
     public void ObservePublicAttack(PublicAttackEvidence evidence)
     {
+        if (_policyVersion >= AiDecisionPolicy.IdentityStrategyVersion)
+        {
+            ObserveIdentityPublicAttack(evidence);
+            return;
+        }
         var sourceSeat = evidence.SourceSeat;
         var targetSeat = evidence.TargetSeat;
         var lordSeat = evidence.LordSeat;
@@ -218,6 +223,11 @@ public sealed partial class SimpleAiBrain
     /// </summary>
     public void ObserveDeath(int? killerSeat, Role revealedVictimRole)
     {
+        if (_policyVersion >= AiDecisionPolicy.IdentityStrategyVersion)
+        {
+            ObserveIdentityDeath(killerSeat, revealedVictimRole);
+            return;
+        }
         if (killerSeat is null || killerSeat == Seat)
         {
             return;
@@ -252,6 +262,8 @@ public sealed partial class SimpleAiBrain
         // is decided from the public/private faction fields below.
         var selfRole = self.Role ?? Role.Renegade;
         var candidates = new List<AiCandidateScore>(legalActions.Count);
+        if (_policyVersion >= AiDecisionPolicy.IdentityStrategyVersion)
+            ResetIdentityDecisionCache();
 
         foreach (var action in legalActions)
         {
@@ -260,6 +272,11 @@ public sealed partial class SimpleAiBrain
                 : _policyVersion >= 2
                     ? ScoreTacticalAction(view, self, selfRole, action, legalActions, damagePrediction)
                     : ScoreAction(view, self, selfRole, action, damagePrediction);
+            if (_policyVersion >= AiDecisionPolicy.TacticalPlanningVersion)
+            {
+                (score, reason) = ScorePlanningAction(view, self, selfRole, action, legalActions,
+                    (score, reason), damagePrediction);
+            }
             // A very small seeded jitter resolves exact ties without making replays unstable.
             score += _random.NextDouble() * 0.001d;
             candidates.Add(new AiCandidateScore(action, Math.Round(score, 3), reason));
@@ -293,6 +310,25 @@ public sealed partial class SimpleAiBrain
         return (selected.Action, thought);
     }
 
+    private (double Score, string Reason) ScorePlanningAction(
+        GameSnapshot view, PlayerSnapshot self, Role role, LegalAction action,
+        IReadOnlyList<LegalAction> legalActions, (double Score, string Reason) baseline,
+        Func<LegalAction, int, PublicDamagePrediction>? damagePrediction)
+    {
+        var score = ScoreShortPlanAction(view, self, role, action, legalActions,
+            ScoreDuelReadiness(view, self, action,
+                ScoreSkillAwareAction(view, self, action, baseline)), damagePrediction);
+        if (_policyVersion >= AiDecisionPolicy.RebelCoordinationVersion)
+            return ScoreRebelCoordinationAction(view, self, role, action, legalActions, score, damagePrediction);
+        if (_policyVersion >= AiDecisionPolicy.RebelPressureVersion && role == Role.Rebel)
+            return ScoreRebelPressureAction(view, self, role, action, legalActions, score, damagePrediction);
+        if (_policyVersion >= AiDecisionPolicy.RebelStrategyVersion && role == Role.Rebel)
+            return ScoreRebelAction(view, self, role, action, legalActions, score, damagePrediction);
+        return _policyVersion >= AiDecisionPolicy.IdentityStrategyVersion
+            ? ScoreIdentityAction(view, self, role, action, legalActions, score, damagePrediction)
+            : score;
+    }
+
     /// <summary>
     /// Selects the smallest legal private card subset for an active-skill
     /// action. The engine passes only this AI's filtered snapshot, so the
@@ -314,8 +350,9 @@ public sealed partial class SimpleAiBrain
 
         var self = view.Players.Single(player => player.Seat == Seat);
         var selectableCards = GetActiveSkillSelectableCards(self, action);
+        double KeepValue(CardSnapshot card) => GetPolicyCardKeepValue(view, self, card);
         if (action.ProgramAiHint?.ArbitraryOwnedRecastInput == true)
-            return selectableCards.OrderBy(card => CardCatalog.Get(card.Kind).HandKeepValue).ThenBy(card => card.Id)
+            return selectableCards.OrderBy(KeepValue).ThenBy(card => card.Id)
                 .Take(Math.Min(action.MaxCardCount, Math.Max(1, self.HandCount - self.Hp))).Select(card => card.Id).ToArray();
         if (action.ProgramAiHint?.PreferPindianInputOrder == true)
             return action.SelectableCardIds.Take(action.MinCardCount).ToArray();
@@ -326,16 +363,16 @@ public sealed partial class SimpleAiBrain
                 .Select(group => group.ToArray())
                 .Append(selectableCards.Where(card => EquipmentCatalog.IsEquipment(card.Kind)).ToArray());
             return groups.Where(group => group.Length >= action.MinCardCount)
-                .Select(group => group.OrderBy(card => CardCatalog.Get(card.Kind).HandKeepValue).ThenBy(card => card.Id)
+                .Select(group => group.OrderBy(KeepValue).ThenBy(card => card.Id)
                     .Take(action.MinCardCount).ToArray())
-                .OrderBy(cards => cards.Sum(card => CardCatalog.Get(card.Kind).HandKeepValue))
+                .OrderBy(cards => cards.Sum(KeepValue))
                 .ThenBy(cards => cards.FirstOrDefault()?.Id ?? -1)
                 .FirstOrDefault()?.Select(card => card.Id).ToArray() ?? [];
         }
         if (action.SelectedCardsDistinctSuits)
             return selectableCards.GroupBy(card => card.Suit)
-                .Select(group => group.OrderBy(card => CardCatalog.Get(card.Kind).HandKeepValue).ThenBy(card => card.Id).First())
-                .OrderBy(card => CardCatalog.Get(card.Kind).HandKeepValue).ThenBy(card => card.Id)
+                .Select(group => group.OrderBy(KeepValue).ThenBy(card => card.Id).First())
+                .OrderBy(KeepValue).ThenBy(card => card.Id)
                 .Take(action.MinCardCount).Select(card => card.Id).ToArray();
         if (action.SelectedCardsSameSuit)
         {
@@ -343,11 +380,11 @@ public sealed partial class SimpleAiBrain
                 .GroupBy(card => card.Suit)
                 .Where(group => group.Count() >= action.MinCardCount)
                 .Select(group => group
-                    .OrderBy(card => CardCatalog.Get(card.Kind).HandKeepValue)
+                    .OrderBy(KeepValue)
                     .ThenBy(card => card.Id)
                     .Take(action.MinCardCount)
                     .ToArray())
-                .OrderBy(cards => cards.Sum(card => CardCatalog.Get(card.Kind).HandKeepValue))
+                .OrderBy(cards => cards.Sum(KeepValue))
                 .ThenBy(cards => cards.FirstOrDefault()?.Id ?? -1)
                 .FirstOrDefault()?
                 .Select(card => card.Id)
@@ -364,12 +401,17 @@ public sealed partial class SimpleAiBrain
         }
 
         return selectableCards
-            .OrderBy(card => CardCatalog.Get(card.Kind).HandKeepValue)
+            .OrderBy(KeepValue)
             .ThenBy(card => card.Id)
             .Take(action.MinCardCount)
             .Select(card => card.Id)
             .ToArray();
     }
+
+    private double GetPolicyCardKeepValue(GameSnapshot view, PlayerSnapshot self, CardSnapshot card) =>
+        _policyVersion >= AiDecisionPolicy.TacticalPlanningVersion
+            ? GetSkillAwareCardKeepValue(view, self, card)
+            : CardCatalog.Get(card.Kind).HandKeepValue;
 
     private static IReadOnlyList<CardSnapshot> GetActiveSkillSelectableCards(
         PlayerSnapshot self,
@@ -1303,14 +1345,18 @@ public sealed partial class SimpleAiBrain
             .Select(seat => view.Players.Single(player => player.Seat == seat))
             .ToArray();
         var effectName = CardCatalog.Get(effectCardKind).DisplayName;
+        double Favor(PlayerSnapshot? target)
+        {
+            var baseline = ScoreNullificationFavor(view, selfRole, source, target, effectCardKind);
+            if (_policyVersion >= AiDecisionPolicy.IdentityStrategyVersion && target is not null)
+                baseline = ScoreIdentityNullificationFavor(view, selfRole, target, effectCardKind, baseline);
+            return _policyVersion >= AiDecisionPolicy.RebelStrategyVersion &&
+                _policyVersion < AiDecisionPolicy.RebelCoordinationVersion && target is not null
+                ? ScoreRebelNullificationFavor(view, selfRole, target, effectCardKind, baseline) : baseline;
+        }
         var effectFavor = targets.Length == 0
-            ? ScoreNullificationFavor(
-                view,
-                selfRole,
-                source,
-                target: null,
-                effectCardKind: effectCardKind)
-            : targets.Sum(target => ScoreNullificationFavor(view, selfRole, source, target, effectCardKind));
+            ? Favor(null)
+            : targets.Sum(target => Favor(target));
         var actionScore = effectCurrentlyNullified
             ? effectFavor > 0d ? 48d + effectFavor : -12d
             : effectFavor < 0d ? 54d - effectFavor : 2d;
@@ -1972,7 +2018,7 @@ public sealed partial class SimpleAiBrain
         var self = view.Players.Single(player => player.Seat == Seat);
         var ownValues = self.Hand.Concat(self.Equipment)
             .GroupBy(card => card.Id)
-            .ToDictionary(group => group.Key, group => CardCatalog.Get(group.First().Kind).HandKeepValue);
+            .ToDictionary(group => group.Key, group => GetPolicyCardKeepValue(view, self, group.First()));
         var scored = choices.Select(choice =>
         {
             var keepValue = choice.Cards.Count == 1 && ownValues.TryGetValue(choice.Cards[0], out var value)
@@ -2146,14 +2192,15 @@ public sealed partial class SimpleAiBrain
         var correlatedInputs = _policyVersion >= AiDecisionPolicy.CorrelatedActiveSkillVersion &&
             (action.SelectableCardTargets is not null || action.SelectableTargetSequences is not null);
         var selectableCards = GetActiveSkillSelectableCards(self, action);
-        var selectedCardIds = correlatedInputs ? ChooseActiveSkillCards(view, action) : null;
+        var selectedCardIds = correlatedInputs || _policyVersion >= AiDecisionPolicy.TacticalPlanningVersion
+            ? ChooseActiveSkillCards(view, action) : null;
         var selectedCards = selectedCardIds is not null
             ? selectableCards.Where(card => selectedCardIds.Contains(card.Id)).ToArray()
             : selectableCards.OrderBy(card => CardCatalog.Get(card.Kind).HandKeepValue)
                 .ThenBy(card => card.Id).Take(action.MinCardCount).ToArray();
         if (selectedCards.Length < action.MinCardCount)
             return (-1000d, "配置技能没有足够的合法自有牌支付公开选牌要求。");
-        var cardCost = selectedCards.Sum(card => CardCatalog.Get(card.Kind).HandKeepValue) * .35d;
+        var cardCost = selectedCards.Sum(card => GetPolicyCardKeepValue(view, self, card)) * .35d;
 
         var targetValue = 0d;
         var targetReason = string.Empty;
@@ -2249,11 +2296,14 @@ public sealed partial class SimpleAiBrain
             }
 
             var equipmentHostility = GetHostility(view, selfRole, equipmentTarget);
-            var cost = GetActiveSkillSelectableCards(self, action)
-                .OrderBy(card => CardCatalog.Get(card.Kind).HandKeepValue)
-                .ThenBy(card => card.Id)
-                .Take(2)
-                .Sum(card => CardCatalog.Get(card.Kind).HandKeepValue) * .18d;
+            var spearCards = GetActiveSkillSelectableCards(self, action);
+            var spearPaymentIds = _policyVersion >= AiDecisionPolicy.TacticalPlanningVersion
+                ? ChooseActiveSkillCards(view, action) : null;
+            var spearPayments = spearPaymentIds is not null
+                ? spearCards.Where(card => spearPaymentIds.Contains(card.Id))
+                : spearCards.OrderBy(card => CardCatalog.Get(card.Kind).HandKeepValue)
+                    .ThenBy(card => card.Id).Take(2);
+            var cost = spearPayments.Sum(card => GetPolicyCardKeepValue(view, self, card)) * .18d;
             return equipmentHostility > 0
                 ? (18d + equipmentHostility * .45d + (equipmentTarget.Hp <= 1 ? 35d : 0d) - cost,
                     $"发动【丈八蛇矛】对座位 {equipmentTarget.Seat + 1} 使用虚拟【杀】，支付两张最低保留价值手牌。")
@@ -2264,7 +2314,7 @@ public sealed partial class SimpleAiBrain
             action.EquipmentKind == CardKind.WoodenOx)
         {
             var stored = GetActiveSkillSelectableCards(self, action)
-                .OrderBy(card => CardCatalog.Get(card.Kind).HandKeepValue)
+                .OrderBy(card => GetPolicyCardKeepValue(view, self, card))
                 .ThenBy(card => card.Id)
                 .FirstOrDefault();
             return stored is null
@@ -2279,7 +2329,7 @@ public sealed partial class SimpleAiBrain
 
         // Jixi-style conversions may play an authority-zone card (e.g. a Tuntian
         // field as Snatch), so the lookup must mirror the engine's playable sources.
-        var card = AiActionPhysicalCard(self, action);
+        var card = AiActionPhysicalCard(view, self, action);
         var playedCardKind = action.PlayedCardKind ?? card.Kind;
         var cardProfile = CardCatalog.Get(playedCardKind);
         if (TryScoreWenheCard(view, self, selfRole, action, cardProfile, out var wenheScore)) return wenheScore;
@@ -2685,7 +2735,7 @@ public sealed partial class SimpleAiBrain
         LegalAction action,
         Func<LegalAction, int, PublicDamagePrediction>? damagePrediction = null)
     {
-        var card = AiActionPhysicalCard(self, action);
+        var card = AiActionPhysicalCard(view, self, action);
         var effectiveKind = action.PlayedCardKind ?? card.Kind;
         var profile = CardCatalog.Get(effectiveKind);
         var targets = action.TargetSeats
@@ -2826,6 +2876,8 @@ public sealed partial class SimpleAiBrain
                     : 100d;
         }
 
+        if (_policyVersion >= AiDecisionPolicy.IdentityStrategyVersion && view.ModeKind == ContentModeKind.Identity)
+            return GetIdentityHostility(view, selfRole, target);
         if (_policyVersion >= 2) return GetTacticalHostility(view, selfRole, target);
         var visibleRole = target.Role;
         var suspicion = _rebelSuspicion.GetValueOrDefault(target.Seat);

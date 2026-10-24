@@ -78,9 +78,11 @@ public sealed class CardViewModel : ObservableObject
     public required string Description { get; init; }
     public required bool IsPlayable { get => _isPlayable; set => SetProperty(ref _isPlayable, value); }
     public bool IsPublicChoice { get; init; }
+    public bool IsSubsetChoice { get; init; }
     public bool IsPrivateReveal { get; init; }
     public string PublicHandOwnerLabel { get; init; } = string.Empty;
-    public string PublicCardLabel => IsPrivateReveal ? "仅你可见" : IsPublicChoice ? "点击选取" :
+    public string PublicCardLabel => IsSubsetChoice ? (IsPrivateReveal ? "私密 · " : string.Empty) +
+        (IsSelected ? "已选择 · 点击取消" : "点击选择") : IsPrivateReveal ? "仅你可见" : IsPublicChoice ? "点击选取" :
         string.IsNullOrWhiteSpace(PublicHandOwnerLabel) ? "公开牌" : PublicHandOwnerLabel + "·展示手牌";
     public string VerticalName => string.Join("\n", DisplayName.ToCharArray());
     public double NameFontSize => DisplayName.Length > 3 ? 23 : DisplayName.Length == 1 ? 38 : 30;
@@ -100,7 +102,7 @@ public sealed class CardViewModel : ObservableObject
     public bool IsSelected
     {
         get => _isSelected;
-        set => SetProperty(ref _isSelected, value);
+        set { if (SetProperty(ref _isSelected, value)) RaisePropertyChanged(nameof(PublicCardLabel)); }
     }
 
     public Brush SuitBrush => SuitGlyph is "♥" or "♦"

@@ -49,7 +49,13 @@ public sealed partial class GameEngine
         ReplaceRuntimeFrame(parent.Id, parent with { AcceptedDeclarationPayment = payment with { Claimed = true } });
         CaptureClaimedDeclarationTrueUse(payment);
         CaptureShanheClaimedDeclarationUse(payment);
-        CaptureBianFuRenClaimedDeclarationPayment(parent.Id);
+        // A Dodge/Played response may be owned by the incoming card's frame.
+        // Its receipt is not a payment for that frame's attacking Use action.
+        if (payment.ReturnPurpose is not (CardDeclarationPurpose.Dodge or CardDeclarationPurpose.Duel or
+            CardDeclarationPurpose.Group or CardDeclarationPurpose.Counterspell or CardDeclarationPurpose.FactionDefense or
+            CardDeclarationPurpose.FactionSlash or CardDeclarationPurpose.QizhengResponse or
+            CardDeclarationPurpose.MouLuSuAnniversaryPlayed or CardDeclarationPurpose.MouSimaYiPlayed))
+            CaptureBianFuRenClaimedDeclarationPayment(parent.Id);
         return true;
     }
 
@@ -120,7 +126,7 @@ public sealed partial class GameEngine
     {
         if (UnclaimedDeclarationPayment(owner.Seat, card.Id) is { } paid) return paid.Source;
         var hasPublishedSource = explicitSource is not null || _hasSelectedResponseConversionChoice || use && _hasSelectedUseConversionChoice;
-        var selected = explicitSource ?? (_hasSelectedResponseConversionChoice ? _selectedResponseConversion : use ? _selectedUseConversion : _selectedResponseConversion);
+        var selected = explicitSource ?? (use && _hasSelectedUseConversionChoice ? _selectedUseConversion : _hasSelectedResponseConversionChoice ? _selectedResponseConversion : use ? _selectedUseConversion : _selectedResponseConversion);
         if (selected is not null) return ViewAsRule(selected)?.DeclarationValidation is not null ? selected : null;
         if (hasPublishedSource || MatchesRequiredCard(card.Kind, kind)) return null;
         return GetProgramViewAsConversions(owner, card, kind, !use, ActiveDying is not null)
@@ -142,13 +148,16 @@ public sealed partial class GameEngine
     {
         if (source is null || ViewAsRule(source)?.DeclarationValidation is null ||
             UnclaimedDeclarationPayment(provider.Seat, card.Id) is not null) return false;
+        if (source.OwnerSeat != provider.Seat)
+            throw new InvalidOperationException("A declaration requires its actual provider's own selected source.");
         if (_cardZones.GetLocation(card.Id) != CardLocation.Hand(provider.Seat) ||
             !CanDeclareCard(provider, source.SkillId)) throw new InvalidOperationException("A declaration requires a new legal hand payment in the actual turn.");
         var id = ++_resolutionSequence;
         var declared = ViewAsRule(source)!.OutputKind;
         var payment = new DeclaredCardPayment(id, id, provider.Seat,
             new(card.Id, card.Kind, CardLocation.Hand(provider.Seat), CapturePhysicalCardColor(provider.Seat, card)), source, declared, ActorSeat: parent.ActorSeat, FrozenSuit: EffectiveSuit(provider, card))
-        { JuewuEffectiveRank = JuewuForeignHandRank(provider, card) };
+        { JuewuEffectiveRank = JuewuForeignHandRank(provider, card), ReturnPurpose = parent.Purpose,
+            OriginalRank = EffectiveOwnedCardRank(provider, card) };
         payment = CaptureBeifenDeclarationPayment(payment, parent);
         payment = CaptureMouZhaJiangDeclaration(payment, parent);
         payment = CaptureWuLuKangDixianDeclaration(payment, parent);
@@ -166,7 +175,17 @@ public sealed partial class GameEngine
         if (!_skillRuntimeState.TryConsumeUsage(provider.Seat, source.SkillId, DeclarationTurnUsage, SkillUsageScope.Turn, 1))
             throw new InvalidOperationException("Declaration quota changed during acceptance.");
         AdvanceEventRulesAndQueueFact(new SkillUsageConsumedEvent(provider.Seat, source.SkillId, DeclarationTurnUsage, SkillUsageScope.Turn, 1));
-        MoveCard(card, CardLocation.Hand(provider.Seat), CardLocation.Processing, new("conversion.declaration.pay"));
+        MoveCard(card, CardLocation.Hand(provider.Seat), CardLocation.Processing, new("conversion.declaration.pay"), movement =>
+        {
+            var current = (CardDeclarationFrame)_resolutionStack.Single(frame => frame.Id == id);
+            if (movement.CardId != current.Payment.Cost.CardId || movement.CardKind != current.Payment.Cost.CardKind ||
+                movement.From != current.Payment.Cost.From || movement.To != CardLocation.Processing ||
+                current.Payment.BianFuRenPaymentSequence is { } prior && prior != movement.Sequence)
+                throw new InvalidOperationException("A declaration must retain its exact original physical payment.");
+            // Reuse the existing declaration payment sequence, even in a small
+            // registry without a Yuejian observer; this is the same real move.
+            ReplaceRuntimeFrame(id, current with { Payment = current.Payment with { BianFuRenPaymentSequence = movement.Sequence } });
+        });
         RecordMoQuanyuDeclarationPayment(id);
         AdvanceEventRulesAndQueueFact(new CardDeclarationCommittedEvent(id, provider.Seat, parent.ActorSeat, declared, Array.AsReadOnly(targets.ToArray())));
         AdvanceRuntimeFrame(id);
@@ -291,6 +310,7 @@ public sealed partial class GameEngine
             if (frame.Payment.DeclarationId != frame.Id || frame.Payment.OwnerFrameId != frame.Id ||
                 frame.Payment.ProviderSeat != frame.OwnerSeat || frame.Payment.Cost.From != CardLocation.Hand(frame.OwnerSeat) ||
                 frame.Payment.Source.OwnerSeat != frame.OwnerSeat || frame.TurnNumber != _turnNumber ||
+                frame.Payment.ReturnPurpose != frame.Return.Purpose || frame.Payment.OriginalRank is not (>= 0 and <= 13) ||
                 _skillRuntimeState.GetUsage(frame.OwnerSeat, frame.Payment.Source.SkillId, DeclarationTurnUsage, SkillUsageScope.Turn) != 1 ||
                 frame.Return.ParentFrameId > 0 && !_resolutionStack.Any(parent => parent.Id == frame.Return.ParentFrameId && parent.Kind == frame.Return.ParentKind && parent.Step == frame.Return.ParentStep) ||
                 frame.Stage is not (CardDeclarationStage.Paying or CardDeclarationStage.Cleaning or CardDeclarationStage.Returning) && _cardZones.GetLocation(frame.Payment.Cost.CardId) != CardLocation.Processing)
@@ -332,6 +352,14 @@ public sealed partial class GameEngine
             ReplaceRuntimeTop(frame = frame with { Stage = CardDeclarationStage.Applying });
             if (TryApplyQigongDeclaration(frame)) return;
             ExecuteAction(owner, parent.UseAction!); return;
+        }
+        if (success && parent.Purpose == CardDeclarationPurpose.Recovery && parent.ParentFrameId == 0 && parent.DyingResponse is null)
+        {
+            ReplaceRuntimeTop(frame = frame with { Stage = CardDeclarationStage.Applying });
+            ResolveRecoveryCard(owner, _players[parent.TargetSeat!.Value], card, CardCatalog.Get(frame.Payment.DeclaredKind).DisplayName,
+                frame.Payment.DeclaredKind, parent.RecoveryAmount, parent.RecoveryPolicies?.Select(policy => (policy.SkillId,policy.PolicyId)).ToArray(),
+                frame.Payment.Source);
+            return;
         }
         PopResolutionFrame(frame.Id, ResolutionFrameKind.CardDeclaration);
         if (TryReturnQigongDeclaration(frame, success)) return;

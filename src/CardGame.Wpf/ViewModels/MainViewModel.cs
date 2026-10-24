@@ -588,6 +588,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             ? _game.CreateSnapshot(snapshot.HumanSeat, revealAll: true)
             : snapshot;
         RaisePropertyChanged(nameof(ChoiceSnapshot));
+        SyncRevealedSubsetSelection();
+        SyncDeckReorder();
         SyncResponseConversionSelection();
         SyncPrivateReserveDialog();
         SyncDiscardSelection();

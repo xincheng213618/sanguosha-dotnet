@@ -441,6 +441,8 @@
                                     <Setter Property="Grid.Row" Value="1" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsHarvestDisplayVisible}" Value="True"><Setter Property="Grid.Row" Value="0" /><Setter Property="Grid.RowSpan" Value="2" /></DataTrigger>
+                                        <DataTrigger Binding="{Binding IsRevealedSubsetSelectionPending}" Value="True"><Setter Property="Grid.Row" Value="0" /><Setter Property="Grid.RowSpan" Value="2" /></DataTrigger>
+                                        <DataTrigger Binding="{Binding IsDeckReorderPending}" Value="True"><Setter Property="Grid.Row" Value="0" /><Setter Property="Grid.RowSpan" Value="2" /></DataTrigger>
                                         <DataTrigger Binding="{Binding HasTargetCardPicker}" Value="True"><Setter Property="Grid.Row" Value="0" /><Setter Property="Grid.RowSpan" Value="2" /></DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -637,8 +639,25 @@
                                         </ItemsControl>
                                     </StackPanel>
                                     <ItemsControl Grid.Row="1" x:Name="PinnedPublicModuleChoices" ItemsSource="{Binding UngroupedCenterSkillChoices}" ItemTemplate="{StaticResource SkillChoiceTemplate}" ItemsPanel="{StaticResource ChoicePanel}" Margin="0,0,0,6" Visibility="{Binding HasPinnedPublicModuleChoices, Converter={StaticResource BoolToVisibility}}" />
+                                    <Viewbox Grid.Row="2" Stretch="Uniform" StretchDirection="DownOnly" Visibility="{Binding IsDeckReorderPending, Converter={StaticResource BoolToVisibility}}">
+                                        <controls:DeckReorderPicker x:Name="DeckReorderSelection" Width="520" />
+                                    </Viewbox>
+                                    <Viewbox Grid.Row="2" Stretch="Uniform" StretchDirection="DownOnly" Visibility="{Binding IsRevealedSubsetSelectionPending, Converter={StaticResource BoolToVisibility}}">
+                                        <StackPanel>
+                                            <ItemsControl ItemsSource="{Binding PublicRevealedCards}" ItemTemplate="{StaticResource HarvestCardTemplate}">
+                                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                            </ItemsControl>
+                                            <ItemsControl ItemsSource="{Binding PrivatelyViewedCards}" ItemTemplate="{StaticResource HarvestCardTemplate}">
+                                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Viewbox>
                                     <ScrollViewer Grid.Row="2" x:Name="ResponseViewport" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" MaxWidth="760">
-                                        <ScrollViewer.Style><Style TargetType="ScrollViewer"><Style.Triggers><DataTrigger Binding="{Binding IsGodFactionSelectionPending}" Value="True"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger></Style.Triggers></Style></ScrollViewer.Style>
+                                        <ScrollViewer.Style><Style TargetType="ScrollViewer"><Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsDeckReorderPending}" Value="True"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                                            <DataTrigger Binding="{Binding IsRevealedSubsetSelectionPending}" Value="True"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                                            <DataTrigger Binding="{Binding IsGodFactionSelectionPending}" Value="True"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                                        </Style.Triggers></Style></ScrollViewer.Style>
                                         <StackPanel>
                                             <ItemsControl x:Name="DeclaredCards" ItemsSource="{Binding DeclaredCards}">
                                                 <ItemsControl.ItemTemplate>
@@ -665,12 +684,20 @@
                                                 <ItemsControl.Style>
                                                     <Style TargetType="ItemsControl">
                                                         <Setter Property="ItemTemplate" Value="{StaticResource RevealedCardTemplate}" />
-                                                        <Style.Triggers><DataTrigger Binding="{Binding IsHarvestDisplayVisible}" Value="True"><Setter Property="ItemTemplate" Value="{StaticResource HarvestCardTemplate}" /></DataTrigger></Style.Triggers>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsHarvestDisplayVisible}" Value="True"><Setter Property="ItemTemplate" Value="{StaticResource HarvestCardTemplate}" /></DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsRevealedSubsetSelectionPending}" Value="True"><Setter Property="ItemTemplate" Value="{StaticResource HarvestCardTemplate}" /></DataTrigger>
+                                                        </Style.Triggers>
                                                     </Style>
                                                 </ItemsControl.Style>
                                             </ItemsControl>
                                             <TextBlock Text="{Binding PrivateRevealTitle}" Foreground="{StaticResource GoldBrush}" HorizontalAlignment="Center" FontSize="11" Margin="0,2,0,5" Visibility="{Binding HasPrivatelyViewedCards, Converter={StaticResource BoolToVisibility}}" />
-                                            <ItemsControl x:Name="PrivatelyViewedCards" ItemsSource="{Binding PrivatelyViewedCards}" ItemTemplate="{StaticResource RevealedCardTemplate}" ItemsPanel="{StaticResource ChoicePanel}" />
+                                            <ItemsControl x:Name="PrivatelyViewedCards" ItemsSource="{Binding PrivatelyViewedCards}" ItemsPanel="{StaticResource ChoicePanel}">
+                                                <ItemsControl.Style><Style TargetType="ItemsControl">
+                                                    <Setter Property="ItemTemplate" Value="{StaticResource RevealedCardTemplate}" />
+                                                    <Style.Triggers><DataTrigger Binding="{Binding IsRevealedSubsetSelectionPending}" Value="True"><Setter Property="ItemTemplate" Value="{StaticResource HarvestCardTemplate}" /></DataTrigger></Style.Triggers>
+                                                </Style></ItemsControl.Style>
+                                            </ItemsControl>
                                             <TextBlock Text="{Binding TargetCardPickerTitle}" Foreground="#E3C58A" FontFamily="KaiTi" FontSize="18" TextAlignment="Center" Margin="4,2,4,12" Visibility="{Binding HasTargetCardPicker, Converter={StaticResource BoolToVisibility}}" />
                                             <Grid>
                                                 <Grid.Style><Style TargetType="Grid"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers>

@@ -227,6 +227,9 @@ internal static class Program
             Check("Native additional discard UI: Shimou reset clears recovered and local draft", () => NativeAdditionalDiscardUiChecks.ShimouNativeResetClearsRecoveredAndLocalDraft(output));
             Check("Multi-card drafts UI: active discard survives release and committed clock refresh", () => MultiCardDraftUiChecks.ActiveDiscardSurvivesReleaseAndClock(output));
             Check("Multi-card drafts UI: owned and payment require explicit confirmation", () => MultiCardDraftUiChecks.MultiCardPromptsRequireExplicitConfirmation(output));
+            Check("Revealed subsets UI: Chengxiang rank draft confirmation and empty cancel", () => RevealedSubsetUiChecks.RankDraftConfirmationAndEmptyCancel(output));
+            Check("Revealed subsets UI: shared private count and public suit drafts", () => RevealedSubsetUiChecks.SharedPrivateCountAndPublicSuitDrafts(output));
+            Check("Revealed subsets UI: Xunxun Guanxing top and bottom rows", () => RevealedSubsetUiChecks.TopAndBottomRowsExactAndFlexible(output));
             Check("Public pile UI: multi-card storage lower dock and portrait inspection", () => PublicPileInteractionUiChecks.StoreSetsAndInspectPortraitPiles(output));
             Check("hand responses label actual decline and retain native press feedback", () => NativeActionFeedbackChecks.ResponseSemantics(output));
             Check("Tieqi UI: cancel declines suit discard without paying selected cards", () => TieqiUiChecks.CancelDeclinesSuitDiscard(output));

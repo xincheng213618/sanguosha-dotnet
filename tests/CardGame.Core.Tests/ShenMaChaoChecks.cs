@@ -8,6 +8,38 @@ internal static class ShenMaChaoChecks
     private const string Owner = "fixture:shen-ma-chao-owner", Driver = "fixture:shen-ma-chao-driver", Quiet = "fixture:shen-ma-chao-quiet", Probe = "fixture:shen-ma-chao-probe";
     public static (GameEngine Game, ContentRegistry Registry) CreateForeignMountUiScenario()
     { var scene = new Scene(false); scene.Play(); return (scene.G, scene.Registry); }
+    public static void PublishedForeignMountAiMaterialAndWineFollowupStayPublic()
+    {
+        var s = new Scene(false, withWine: true); s.Play();
+        // Use actual native draws only if this fixed opening has no wine yet.
+        for (var draws = 0; draws < 32 && !s.V(0).Hand.Any(card => card.Kind == CardKind.Alcohol); draws++)
+        { s.Use("one", []); s.Play(); }
+        var view = s.G.CreateSnapshot(0);
+        Need(view.Players[0].Hand.Any(card => card.Kind == CardKind.Alcohol),
+            "The small native mixed deck must supply one actual physical wine.");
+        var actions = s.G.GetHumanLegalActions();
+        var foreign = actions.First(action => action.Kind == LegalActionKind.Slash &&
+            action.ConversionSource is { SkillId: "anniversary:shouli", BindingId: "field-offensive-mount-slash", OwnerSeat: 0 } &&
+            action.TargetSeat == 1 && action.CardId is { } id && view.Players[1].Equipment.Any(card => card.Id == id));
+        var wine = actions.First(action => action.Kind == LegalActionKind.Alcohol &&
+            view.Players[0].Hand.Any(card => card.Id == action.CardId && card.Kind == CardKind.Alcohol));
+        var end = actions.Single(action => action.Kind == LegalActionKind.EndPlay);
+        var before = SnapshotJson.Serialize(view);
+        Need(foreign.CardId is > 0 && view.Players.Skip(1).All(player => player.Hand.Count == 0),
+            "The published Slash has a real public foreign mount cost and the AI receives no foreign hand faces.");
+        foreach (var policy in new[] { AiDecisionPolicy.TacticalPlanningVersion, AiDecisionPolicy.IdentityStrategyVersion })
+        {
+            var direct = new SimpleAiBrain(0, 83, policy, includeJudgmentMaterials: false)
+                .ChoosePlay(view, [foreign, end], 1);
+            var prepare = new SimpleAiBrain(0, 83, policy, includeJudgmentMaterials: false)
+                .ChoosePlay(view, [wine, foreign, end], 1);
+            Need(direct.Action == foreign && direct.Thought.Candidates.Single(candidate => candidate.Action == foreign).Score > 0 &&
+                 prepare.Action == wine && prepare.Thought.Candidates.All(candidate => double.IsFinite(candidate.Score)),
+                "Both recorded policies must score the exact published foreign mount, including Alcohol's recursive follow-up Slash evaluation, without inventing a hand material or skipping the legal action.");
+        }
+        Need(SnapshotJson.Serialize(view) == before,
+            "Public material lookup and its recursive wine planning must leave the supplied native player view unchanged.");
+    }
     public static void StartingMountsForeignSlashDebtAndHengwuCold()
     {
         var s = new Scene(false);
@@ -85,9 +117,9 @@ internal static class ShenMaChaoChecks
             return (int)typeof(GameEngine).GetMethod("GetHandLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G, [players[seat]])!;
         }
         public IEnumerable<T> E<T>() where T : IGameEvent => G.Events.Select(e => e.Payload).OfType<T>();
-        public Scene(bool defense)
+        public Scene(bool defense, bool withWine = false)
         {
-            _registry = ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(true), new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(), new Fixture(defense));
+            _registry = ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(true), new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(), new Fixture(defense, withWine));
             G = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord,
                 ModeId = "identity:classic-shen-ma-chao-fixture", UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 12 }, _registry);
             Accept(new StartGameCommand()); Reach(() => P is { Kind: DecisionKind.SelectGeneral });
@@ -117,7 +149,7 @@ internal static class ShenMaChaoChecks
         public void Cold() { var state = State(); G = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), _registry); Need(state == State(), "Cold restore must preserve the original setup/use parent and native accepted costs."); }
         public void Replay() { var state = State(); G = GameReplay.Replay(G.CreateCheckpoint().Options, G.AcceptedCommands, _registry); Need(state == State(), "Accepted-command replay preserves Shouli and Hengwu's genuine entity movements."); }
     }
-    private sealed class Fixture(bool defense) : IGameContentPackage
+    private sealed class Fixture(bool defense, bool withWine = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-shen-ma-chao", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
@@ -129,7 +161,7 @@ internal static class ShenMaChaoChecks
             b.AddGeneral(new(Owner, "神马超夹具", "supporter", "anniversary:shouli", "god", 4, ["anniversary:hengwu", Driver], GeneralGender.Male));
             var peers = Enumerable.Range(1, 3).Select(i => "fixture:shen-ma-chao-peer-" + i).ToArray();
             foreach (var peer in peers) b.AddGeneral(new(peer, "安静同桌", "supporter", Quiet, "wei", 20, [Probe]));
-            b.AddDeck(new("fixture:shen-ma-chao-deck", "真实坐骑实体牌堆", 4, 0, []) { PhysicalCards = Enumerable.Range(0, 96).Select(_ => new ContentDeckPhysicalCard(defense ? "standard:defensive_horse" : "standard:offensive_horse", Suit.Spade, 5)).ToArray() });
+            b.AddDeck(new("fixture:shen-ma-chao-deck", "真实坐骑实体牌堆", 4, 0, []) { PhysicalCards = Enumerable.Range(0, 96).Select(index => new ContentDeckPhysicalCard(withWine && index % 3 != 0 ? "standard:alcohol" : defense ? "standard:defensive_horse" : "standard:offensive_horse", Suit.Spade, 5)).ToArray() });
             b.AddMode(new("identity:classic-shen-ma-chao-fixture", "神马超原生检查", 4, 4, new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 3 }, "fixture:shen-ma-chao-deck", GeneralCandidateCount: 4, GeneralPoolIds: [Owner, .. peers]));
         }
     }

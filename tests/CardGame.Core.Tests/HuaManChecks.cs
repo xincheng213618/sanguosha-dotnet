@@ -7,10 +7,30 @@ internal static class HuaManChecks
  private const string Owner="fixture:huaman-general",Driver="fixture:huaman-driver",Quiet="fixture:huaman-quiet",Incoming="fixture:huaman-incoming",Watch="fixture:huaman-watch",Mode="identity:classic-huaman-fixture";
  public static void ActualMansiAllHandBarbarianAndManyiNativeImmunityCold()
  {
+  SouyingClaimedDelayedEntityFinishesWithoutPlacementCold();
   foreach(var scenario in new[]{"mansi","mansi-wide"})
   {var(g,r)=Start(scenario);Play(g);var hand=V(g,0).Hand.Select(c=>c.Id).ToArray();Need(hand.Length==(scenario=="mansi-wide"?65:4),"The wide scenario really obtains sixty-five physical initial Hand entities, rather than merely accepting a schema bound.");Accept(g,new UseProgramSkillCommand(0,"ol:mansi","all-hand-barbarian",hand,[],g.Revision,P(g)!.PromptId));Reach(g,()=>P(g)?.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="use-all-hand-as-ordinary-trick")==true);g=Cold(g,r);Answer(g,_=>true);Play(g);g=Cold(g,r);var use=E<CardActionAcceptedEvent>(g).Select(e=>e.Action).Single(a=>a.ActorSeat==0&&a.Type==CardActionType.Use&&a.EffectiveKind==CardKind.BarbarianAssault);var immune=g.CreateSnapshot(0).Players.Single(p=>p.GeneralId=="fixture:huaman-manyi-peer").Seat;Need(use.PhysicalCards.Select(c=>c.CardId).Order().SequenceEqual(hand.Order())&&!use.EffectiveDesignatedTargetSeats.Contains(immune)&&!E<DamageAppliedEvent>(g).Any(e=>e.TargetSeat==immune),"All real original Hand entities pay one native Barbarian use; a real Manyi holder is excluded without damage.");Need(E<MansiActualCardsObtainedEvent>(g).Sum(e=>e.ActualObtained)==2&&E<DamageAppliedEvent>(g).Count()==2&&!g.GetHumanLegalActions().Any(a=>a.SkillId=="ol:mansi"),"Each actual Barbarian damage draws one, and the whole-hand conversion cannot be used twice in this actual Play.");
   }
  }
+ private static void SouyingClaimedDelayedEntityFinishesWithoutPlacementCold()
+ {
+  var(g,r)=Start("souying-delayed");Play(g);
+  var slash=g.GetHumanLegalActions().First(a=>a.Kind==LegalActionKind.Slash&&a.ConversionSource?.SkillId==Driver&&a.TargetSeats.SequenceEqual([1]));
+  Accept(g,new PlayCardCommand(0,slash.CardId!.Value,slash.TargetSeats,g.Revision,P(g)!.PromptId,slash.PlayedCardKind){ConversionSource=slash.ConversionSource});Play(g);
+  var delayed=g.GetHumanLegalActions().First(a=>a.Kind==LegalActionKind.Indulgence&&a.ConversionSource is null&&a.TargetSeats.SequenceEqual([1]));var id=delayed.CardId!.Value;
+  Accept(g,new PlayCardCommand(0,id,delayed.TargetSeats,g.Revision,P(g)!.PromptId,delayed.PlayedCardKind));
+  Reach(g,()=>P(g)?.SkillPrompt?.SkillId=="ol:souying"&&P(g)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="activate"));
+  Answer(g,c=>c.Parameters.GetValueOrDefault("program-action")=="activate");
+  Reach(g,()=>P(g)?.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="huaman"&&c.Cards.Count==1)==true);g=Cold(g,r);
+  var cost=P(g)!.Choices.First(c=>c.Parameters.GetValueOrDefault("program-action")=="huaman"&&c.Cards.Count==1).Cards.Single();Answer(g,c=>c.Cards.SequenceEqual([cost]));Play(g);
+  var mutation=E<SouyingNativeMutationEvent>(g).Single(e=>e.ClaimedCount==1&&E<CardUseDeclaredEvent>(g).Any(d=>d.ResolutionId==e.NativeUseId&&d.CardId==id));
+  Need(!mutation.Cancelled&&g.CardMovements.Count(m=>m.CardId==id&&m.From==CardLocation.Hand(0)&&m.To==CardLocation.Processing)==1&&
+   g.CardMovements.Count(m=>m.CardId==id&&m.From==CardLocation.Processing&&m.To==CardLocation.Hand(0)&&m.Reason.Value=="skill-program.huaman.claim")==1&&
+   ZoneAt(g,id)==CardLocation.Hand(0)&&E<CardUseFinishedEvent>(g).Count(e=>e.ResolutionId==mutation.NativeUseId)==1&&
+   !E<DelayedCardPlacedEvent>(g).Any(e=>e.ResolutionId==mutation.NativeUseId)&&!g.CardMovements.Any(m=>m.CardId==id&&m.Reason==CardMoveReasons.DelayedCardPlace),
+   "The actual second sole-target delayed Use pays Souying once and claims its exact original Processing entity; native return finishes once without placing that acquired Hand entity into Judgment or manufacturing a placement fact.");g=Cold(g,r);
+ }
+ private static CardLocation ZoneAt(GameEngine g,int id)=>g.CreateCardZoneDiagnostics().Single(c=>c.CardId==id).Location;
  private static PlayerSnapshot V(GameEngine g,int seat)=>g.CreateSnapshot(seat).Players[seat];
  private static PendingDecision?P(GameEngine g)=>Enumerable.Range(0,4).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);
  private static IEnumerable<T>E<T>(GameEngine g)where T:IGameEvent=>g.Events.Select(e=>e.Payload).OfType<T>();
@@ -32,6 +52,7 @@ internal static class HuaManChecks
    void Add(SkillProgramCatalog c){foreach(var(id,p)in c.Programs)b.AddSkill(new(id,c.Presentations[id].Name,c.Presentations[id].Description){Program=p,ProgramPresentation=c.Presentations[id],SelectionWeights=Enum.GetValues<Role>().ToDictionary(role=>role,_=>id==Incoming?100000d:id=="ol:manyi"?50000d:id==Quiet?10000d:-10000d)});}Add(SkillProgramCatalog.Load(Read("rules.json"),Read("presentation.json")));
    var node=JsonNode.Parse("""{"skills":[]} """)!;node["schemaVersion"]=SkillProgramCatalog.RulesSchemaVersion;var skills=node["skills"]!.AsArray();skills.Add(JsonNode.Parse("""{"id":"fixture:huaman-driver","revision":1,"modifiers":[{"id":"actual-slash-limit","query":"slashLimit","operation":"add","value":4,"priority":0}]}"""));skills.Add(JsonNode.Parse("""{"id":"fixture:huaman-quiet","revision":1,"triggers":[{"id":"empty-original-hand","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"discardOwnedZoneCards","target":"owner","zones":["hand"]}]},{"id":"skip-play","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}"""));
    if(scenario=="mansi-wide")skills[0]!["modifiers"]!.AsArray().Add(JsonNode.Parse("""{"id":"actual-wide-initial-hand","query":"initialHandSize","operation":"add","value":61,"priority":0}"""));
+   if(scenario=="souying-delayed")skills[0]!["viewAs"]=JsonNode.Parse("""[{"id":"real-first-slash","inputKinds":["indulgence"],"inputSuits":[],"outputKind":"slash","forPlay":true,"forResponse":false}]""");
    if(scenario is "souying-fire" or "souying-snatch" or "souying-dismantlement")skills[1]!["triggers"]!.AsArray().RemoveAt(0);
    if(scenario=="souying-grain")skills[0]!["activations"]=JsonNode.Parse("""[{"id":"gear","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"useRandomDeckEquipment","target":"owner","resultBind":"gear"}]}]""");
    if(scenario is "souying-borrowed" or "souying-group")skills[0]!["activations"]=JsonNode.Parse("""[{"id":"wake","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":1,"effects":[{"op":"useVirtualSlash","target":"selectedTarget"}]},{"id":"gear","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"useRandomDeckEquipment","target":"owner","resultBind":"gear"}]},{"id":"stock","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":1,"effects":[{"op":"draw","target":"selectedTarget","amount":2}]}]""");
@@ -71,6 +92,7 @@ internal static class HuaManChecks
     "souying-fire"=>"standard:fire_attack",
     "souying-snatch"=>"standard:snatch",
     "souying-dismantlement"=>"standard:dismantlement",
+    "souying-delayed"=>"standard:indulgence",
     _=>"standard:slash"
    };
    b.AddDeck(new("fixture:huaman-deck","small",4,0,[]){PhysicalCards=Enumerable.Range(0,80).Select(index=>new ContentDeckPhysicalCard(DeckCard(index),Suit.Heart,7)).ToArray()});b.AddMode(new(Mode,"真实花鬘",4,4,new Dictionary<string,int>{{nameof(Role.Lord),1},{nameof(Role.Rebel),3}},"fixture:huaman-deck",GeneralCandidateCount:4,GeneralPoolIds:[Owner,..peers]));

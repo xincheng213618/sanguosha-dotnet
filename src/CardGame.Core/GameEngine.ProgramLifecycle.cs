@@ -189,6 +189,16 @@ public sealed partial class GameEngine
         ResetPlayPhaseProgramStates(_currentSeat);
         if (TryFinishMoLuBuOpeningPlay()) return;
         if (ResumeScheduledProgramPhase()) return;
+        if (_winner != Winner.None || !_players[_currentSeat].IsAlive)
+        {
+            // Paid Play-ending children have returned. A dead actor has no
+            // actual Discard or Ending phase; keep turn expiry and cursor
+            // progression on the existing finalizer after all phase cleanup.
+            ClearActualDiscardRecoveryPhase();
+            if (_winner == Winner.None) FinalizeEndTurn(_players[_currentSeat]);
+            else AdvanceRulesAndPublishState();
+            return;
+        }
         BeginDiscardPhase();
     }
 
@@ -1889,6 +1899,9 @@ public sealed partial class GameEngine
                 TargetSeat = ownerSeat,
                 SkillPrompt = new SkillPromptPresentation(frame.SkillId, skill.Name,
                     $"{skill.Name} · 牌堆底顺序", "选择剩余牌从牌堆底向上的顺序。"),
+                DeckReorder = new(frame.Id,
+                    Array.AsReadOnly(selected.Select(item => ToSnapshot(_cardZones.CardsAt(item.Location).Single(card => card.Id == item.CardId))).ToArray()),
+                    Array.AsReadOnly(Array.Empty<int>()), Array.AsReadOnly(Array.Empty<int>()), true, 0) { BottomOnly = true },
                 Choices = Array.AsReadOnly(choices)
             };
             _status = _players[ownerSeat].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
@@ -4440,6 +4453,7 @@ public sealed partial class GameEngine
         if (TryChooseColdDamageAi(decision, out var coldChoice)) selected = coldChoice;
         else if (TryChooseTousuiAi(decision, out var tousuiChoice)) selected = tousuiChoice;
         else if (TryChooseKenshangAi(decision, out var kenshangChoice)) selected = kenshangChoice;
+        else if (TryChooseKemingEchoAi(decision, out var kemingChoice)) selected = kemingChoice;
         else if (_resolutionStack.LastOrDefault() is ProgramSkillFrame frame)
         {
             var paused = ProgramInstructionResolver.Default

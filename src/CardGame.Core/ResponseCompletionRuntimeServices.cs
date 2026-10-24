@@ -55,6 +55,7 @@ internal interface IResponseCompletionNativeProtocols : IProgramRuntimeOperation
     bool IsExchangedCardClaim(long actionId, int cardId);
     bool IsWuZglReturnedCopyCost(CardActionContext action, CardActionCost cost, CardMovementRecord finish);
     bool IsShanheStartingResourceResponseFinish(CardActionContext action, CardActionCost cost, CardMovementRecord finish);
+    bool IsHappyZuoCiDestroyedResponseFinish(CardActionContext action, CardActionCost cost, CardMovementRecord finish);
     bool HasNullificationEffectOwner(NullificationWindowFrame window);
     long? NullificationParentActionId(NullificationWindowFrame window);
     void CapturePairedColorResponseLink(ProgramCardTriggerWindowFrame window);
@@ -162,6 +163,7 @@ public sealed partial class GameEngine
         public bool IsExchangedCardClaim(long actionId, int cardId) => engine.IsExchangedCardClaim(actionId, cardId);
         public bool IsWuZglReturnedCopyCost(CardActionContext action, CardActionCost cost, CardMovementRecord finish) => engine.IsWuZglReturnedCopyCost(action, cost, finish);
         public bool IsShanheStartingResourceResponseFinish(CardActionContext action, CardActionCost cost, CardMovementRecord finish) => engine.IsShanheStartingResourceResponseFinish(action, cost, finish);
+        public bool IsHappyZuoCiDestroyedResponseFinish(CardActionContext action, CardActionCost cost, CardMovementRecord finish) => engine.IsHappyZuoCiDestroyedResponseFinish(action, cost, finish);
         public bool HasNullificationEffectOwner(NullificationWindowFrame window) => engine.HasNullificationEffectOwner(window);
         public long? NullificationParentActionId(NullificationWindowFrame window) => engine.NullificationParentActionId(window);
         public void CapturePairedColorResponseLink(ProgramCardTriggerWindowFrame window) => engine.CapturePairedColorResponseLink(window);

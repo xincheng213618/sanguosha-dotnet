@@ -99,6 +99,8 @@ internal static class YangFuChecks
                 Reach(g,()=>Targets(g));var f=g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.YangFu?.Stage==YangFuStage.Targets);
                 Need(f.YangFu!.Ordinal==1&&f.YangFu.X==2&&E<SuyiNativeIssuedEvent>(g).Count(e=>e.Origin.Kind==CardKind.Slash)==1,"The foreign equipment Use belongs to its real actor; Suyi's own zero-entity Slash is the owner's first Use and can receive Bingzhong.");
                 g=Cold(g,r);Answer(g,c=>c.Targets.SequenceEqual([3]));if(Targets(g))FinishTargets(g);
+                Reach(g,()=>P(g)?.SkillPrompt?.SkillId==Watch);
+                AssertBingzhongAcceptedMutation(g);g=Cold(g,r);AssertBingzhongAcceptedMutation(g);Continue(g);
             }
             Play(g);var started=E<YangFuStartedEvent>(g).Single(e=>e.Op==SkillProgramEffectOp.ResolveSuyiEquipmentThenSlash);var native=E<SuyiNativeIssuedEvent>(g).Where(e=>e.Origin.ProgramFrameId==started.FrameId).Select(e=>e.Origin).ToArray();
             var noEquipment=scene is"suyi-no-stock"or"suyi-range"or"suyi-quota"or"suyi-abolished";
@@ -107,6 +109,13 @@ internal static class YangFuChecks
             if(!noEquipment)Need(native.Single(o=>o.Kind!=CardKind.Slash)is{ActorSeat:1,ProviderSeat:1,CardId:>0}eq&&g.CardMovements.Count(m=>m.CardId==eq.CardId&&m.From==CardLocation.DrawPile&&m.To==CardLocation.Processing)==1,"The selected foreign actor really uses its original random stock entity once instead of receiving it into Hand.");
             if(grain is{}gr)Need(g.CardMovements.Count(m=>m.CardId==gr&&m.From==CardLocation.WoodenOxGrain(1)&&m.To==CardLocation.DiscardPile)==1,"Replacement really spills the original foreign Ox grain through native cleanup once.");
             if(scene is"suyi-empty-hand"or"suyi-fire")Need(E<DamageAppliedEvent>(g).Count(e=>e.SourceSeat==0&&e.TargetSeat is 1 or 3)==2&&E<CardUseDebitRecordedEvent>(g).Count(e=>e.Debit.ActorSeat==0&&e.Debit.Query==SkillRuleQuery.SlashLimit)==1,"The one paid Suyi Slash resolves both native targets, charges its normal quota only once, and fully returns to its original activation.");
+            if(scene is"suyi-empty-hand"or"suyi-fire")
+            {
+                var added=E<BingzhongTargetsAppliedEvent>(g).Single();var ledger=E<CompletedUndamagedUseDamageRecordedEvent>(g).Where(e=>e.CardUseFrameId==added.UseId).ToArray();
+                Need(ledger.Length==2&&ledger.All(e=>e.CardActionId==added.ActionId&&e.ActorSeat==0)&&ledger.Select(e=>e.TargetSeat).Order().SequenceEqual([1,3])&&
+                    E<CardActionAcceptedEvent>(g).Where(e=>e.Action.ActionId==added.ActionId).Select(e=>e.Action.TargetSeats).All(t=>t.SequenceEqual([1])),
+                    "The real classic whole-Use ledger attributes both added-target damages to the original accepted native Slash without publishing a replacement acceptance.");
+            }
             if(scene=="suyi-fire")Need(E<ProgramCurrentSlashFireChangedEvent>(g).Length==1&&E<DamageAppliedEvent>(g).Count(e=>e.SourceSeat==0&&e.Nature==DamageNature.Fire)==2,"The native committed fire conversion keeps Suyi's exact original zero-material invoice while its added conversion source and both genuine fire targets complete.");
             var before=State(g);Need(!g.Submit(new UseProgramSkillCommand(0,Suyi,"equipment-then-slash",[],[target],g.Revision,P(g)!.PromptId)).Accepted&&State(g)==before,"Suyi's actual once-per-Play activation cannot be paid or issued twice.");_=Cold(g,r);
         }
@@ -150,6 +159,24 @@ internal static class YangFuChecks
     private static int? Ordinal(GameEngine g,CardActionContext a)=>(int?)typeof(GameEngine).GetMethod("CapturedWholeActualTurnActorUseOrdinal",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(g,[a]);
     private static bool Action(GameEngine g,string a)=>P(g)?.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")==a)==true;
     private static bool Targets(GameEngine g)=>Action(g,"bingzhong-target");
+    private static void AssertBingzhongAcceptedMutation(GameEngine g)
+    {
+        var use=g.ResolutionStack.OfType<CardUseFrame>().Single(u=>u.BingzhongTail is{AddedTargets.Count:>0});var tail=use.BingzhongTail!;
+        var history=g.Events.Select(e=>e.Payload).ToArray();var accepted=history.OfType<CardActionAcceptedEvent>().Where(e=>e.Action.ActionId==tail.ActionId).ToArray();
+        Need(accepted is[var original]&&original.Action.TargetSeats.SequenceEqual([1])&&use.Action!.TargetSeats.SequenceEqual([1,3])&&
+            tail.OriginalTargets.SequenceEqual([1])&&tail.AddedTargets.SequenceEqual([3]),
+            "Bingzhong extends the owning native action from its frozen single-target acceptance and retains the exact typed target tail.");
+        var proof=typeof(GameEngine).GetMethod("RebuildAcceptedActualHandGainUse",BindingFlags.Instance|BindingFlags.NonPublic)!;
+        bool Rebuild(CardUseFrame candidate,IGameEvent[] facts)
+        {
+            var at=Array.FindIndex(facts,e=>e is CardActionAcceptedEvent a&&a.Action.ActionId==tail.ActionId);
+            return (bool)proof.Invoke(g,[candidate,accepted[0].Action,candidate.Action!,facts,at])!;
+        }
+        Need(Rebuild(use,history)&&!Rebuild(use with{BingzhongTail=tail with{OriginalTargets=[3],AddedTargets=[1]}},history)&&
+            !Rebuild(use,history.Where(e=>e is not YangFuStartedEvent s||s.FrameId!=tail.FrameId).ToArray())&&
+            !Rebuild(use,history.Where(e=>e is not BingzhongTargetSelectedEvent s||s.FrameId!=tail.FrameId).ToArray()),
+            "Acceptance reconstruction requires the genuine preceding targets, Yang Fu start and every selected extra target; an applied summary alone cannot authorize the mutation.");
+    }
     private static void Need(bool yes,string message){if(!yes)throw new InvalidOperationException(message);}
     private static void Accept(GameEngine g,GameCommand c){var result=g.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single());Need(result.Accepted,result.Error?.Message??"Rejected actual Yang Fu command.");}
     private static void Answer(GameEngine g,Func<PromptChoice,bool> pick){var p=P(g);var c=p?.Choices.FirstOrDefault(pick);Need(p?.PlayerSeat==0&&c is not null,"Missing actual human Yang Fu choice: "+Diagnostic(g));Accept(g,new AnswerPromptCommand(0,p!.PromptId,c!.Id,g.Revision));}
@@ -194,6 +221,9 @@ internal static class YangFuChecks
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b,"ol:yang-fu");if(scene=="tail")CharacterFixtureContent.Register(b,"ol:zhang-yi");
+            // The normal classic catalog tracks whole-Use damage even when its
+            // observing general is not at this table. Exercise that real ledger.
+            CharacterFixtureContent.Register(b,"ol:wang-guan");
             var kind=scene=="draw-two"?CardKind.DrawTwo:scene=="peach"?CardKind.Peach:scene=="alcohol"?CardKind.Alcohol:scene=="surprise"?CardKind.UnexpectedAssault:scene=="issued-distance"?CardKind.Snatch:
                 scene=="suyi-lion"?CardKind.SilverLion:scene=="suyi-ox"?CardKind.WoodenOx:scene is"suyi-no-stock"or"suyi-range"?CardKind.Dodge:scene=="suyi-quota"?CardKind.Slash:CardKind.Crossbow;
             var text=char.ToLowerInvariant(kind.ToString()[0])+kind.ToString()[1..];
@@ -219,6 +249,7 @@ internal static class YangFuChecks
                 defs.Add($$"""{"id":"fixture:yfu-gain","revision":1,"triggers":[{"id":"actual-draw-child","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["skill-program.yang-fu.bingzhong.draw"],"usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}{{(amount==0?"":",{\"op\":\"loseHp\",\"target\":\"owner\",\"amount\":"+amount+"}")}}]}]}""");
             }
             if(scene is"draw-loss"or"suyi-loss")defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"actual-health-child","window":"afterHealthChanged","subject":"owner","condition":{"kind":"healthChangeKindIs","hpChangeKind":"loss"},"usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"health","options":[{"id":"continue"}]}]}]}""");
+            if(scene is"suyi-empty-hand"or"suyi-fire")defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"real-adjusted-use-child","window":"cardUseBeforeTargetEffects","ownerRelation":"actor","cardKinds":["slash","fireSlash"],"usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"proof","options":[{"id":"continue"}]}]}]}""");
             if(scene=="suyi-lion")defs.Add($$"""{"id":"{{Health}}","revision":1,"triggers":[{"id":"native-recovery","window":"afterHealthChanged","subject":"owner","condition":{"kind":"healthChangeKindIs","hpChangeKind":"recovery"},"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"lion","options":[{"id":"continue"}]}]}]}""");
             if(scene is"suyi-loss"or"suyi-death")defs.Add($$"""{"id":"fixture:yfu-equipment-child","revision":1,"triggers":[{"id":"actual-equipment-finalization","window":"cardUseTargetsFinalized","ownerRelation":"actor","cardCategories":["equipment"],"usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"selectTarget","target":"owner","targetKind":"currentTurnPlayer"},{"op":"loseHp","target":"selectedTarget","amount":{{(scene=="suyi-loss"?1:20)}}}]}]}""");
             if(scene=="suyi-target-death")defs.Add("""{"id":"fixture:yfu-equipment-child","revision":1,"triggers":[{"id":"actual-equipment-owner-death","window":"cardUseTargetsFinalized","ownerRelation":"actor","cardCategories":["equipment"],"usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"loseHp","target":"owner","amount":20}]}]}""");
@@ -227,7 +258,7 @@ internal static class YangFuChecks
             foreach(var(id,p)in catalog.Programs)b.AddSkill(new(id,id,"杨阜原生真实用牌与付款子链"){Program=p,ProgramPresentation=catalog.Presentations[id]});
             b.AddSkill(new("fixture:yfu-pick","真实杨阜","固定公开选将权重"){SelectionWeights=Enum.GetValues<Role>().ToDictionary(role=>role,_=>-100000d)});
             var own=new List<string>{Driver};own.Add(scene=="draw-loss"?"fixture:yfu-conditional":Bing);own.Add(scene=="suyi-loss"?"fixture:yfu-conditional":Suyi);
-            if(scene.StartsWith("draw",StringComparison.Ordinal))own.Add("fixture:yfu-gain");if(scene is"draw-loss"or"suyi-loss")own.Add(Watch);if(scene=="actor")own.Add("fixture:yfu-actor");if(scene=="tail")own.Add("ol:dianjun");if(scene=="issued-distance")own.Add("fixture:yfu-first-distance");if(scene=="suyi-fire")own.Add("fixture:yfu-fire");
+            if(scene.StartsWith("draw",StringComparison.Ordinal))own.Add("fixture:yfu-gain");if(scene is"draw-loss"or"suyi-loss"or"suyi-empty-hand"or"suyi-fire")own.Add(Watch);if(scene=="actor")own.Add("fixture:yfu-actor");if(scene=="tail")own.Add("ol:dianjun");if(scene=="issued-distance")own.Add("fixture:yfu-first-distance");if(scene=="suyi-fire")own.Add("fixture:yfu-fire");
             b.AddGeneral(new(Owner,"实际杨阜","ol-yang-fu","fixture:yfu-pick","wei",12,own,GeneralGender.Male));
             var peers=Enumerable.Range(1,3).Select(i=>$"fixture:yfu-peer-{i}").ToArray();foreach(var peer in peers)
             {

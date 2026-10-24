@@ -96,7 +96,7 @@ public sealed partial class GameEngine
             }
             if (preparedEvents.Length > 0)
                 _eventSequence = preparedEvents[^1].Event.Sequence;
-            _pendingEvents.Clear();
+            ClearPendingProgramEvents();
             committed = true;
 
             _commandSession.ResultBeingDelivered = result;
@@ -125,7 +125,7 @@ public sealed partial class GameEngine
             // events. Ordinary observer failures are already contained by
             // InvokeObservers; this catches only pipeline/infrastructure failure.
             _pendingNotifications.Clear();
-            _pendingEvents.Clear();
+            ClearPendingProgramEvents();
             _pendingStatePublication = false;
             throw;
         }

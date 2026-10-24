@@ -44,6 +44,49 @@ internal static class WuAnGuoChecks
             { ConversionSource = E<WuAnGuoLiyongYangConsumedEvent>(g).First().Source }).Accepted && State(g) == state,
             "A forged repeat-suit Yang cannot pay a card, flip conversion state or change the accepted command journal."); _ = Cold(g, r);
     }
+    public static void LiyongLordDeathReturnsPaidNativeDuelBeforeGameEndCold()
+    {
+        var (g, r) = Start("lord-death");
+        PlayCard(g, YangActions(g).First(action => action.TargetSeats.SequenceEqual([1])));
+        Play(g);
+        Need(Yin(g), "The real Yang use must establish Yin before issuing its paid incoming Duel.");
+        while (V(g).Hp > 1) { Use(g, "lose"); Play(g); }
+        YinUse(g, 2);
+        Reach(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.RescueDying });
+        var origin = E<WuAnGuoLiyongDuelIssuedEvent>(g).Single().Origin;
+        var gain = E<WuAnGuoLiyongGainPaidEvent>(g).Single();
+        var parent = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == origin.ProgramFrameId);
+        var dying = g.ResolutionStack.OfType<DyingFrame>().Single(frame => frame.VictimSeat == 0);
+        Need(g.State.CurrentSeat == 0 && g.State.Phase == TurnPhase.Play && g.State.Winner == Winner.None &&
+            V(g) is { Hp: 0, IsAlive: true, Role: Role.Lord } &&
+            parent.WuAnGuoLiyong is { Stage: WuAnGuoLiyongStage.DuelIssued } &&
+            g.ResolutionStack.OfType<CardUseFrame>().Any(use => use.Id == origin.CardUseFrameId &&
+                use.WuAnGuoLiyong == (origin with { AttackStarted = true })) &&
+            dying.Continuation == DyingContinuationKind.Damage &&
+            V(g).Hand.Any(card => card.Kind == CardKind.Peach && P(g)!.ValidCardIds.Contains(card.Id)),
+            "The actual Lord is dying in the original issued native Duel with a real self-rescue choice and its paid Liyong parent still in the original Play phase.");
+        g = Cold(g, r);
+        Answer(g, choice => choice.Parameters.GetValueOrDefault("response") == "let-die");
+        for (var step = 0; step < 80 && g.State.Status != EngineStatus.Completed; step++)
+            Accept(g, new AdvanceOneStepCommand(g.Revision));
+        Need(g.State is { Status: EngineStatus.Completed, Winner: Winner.Rebels, ProcessingCardCount: 0 } &&
+            !V(g).IsAlive && g.ResolutionStack.Count == 0 &&
+            E<WuAnGuoLiyongGainPaidEvent>(g).Count(paid => paid.FrameId == origin.ProgramFrameId) == 1 &&
+            gain.CardId is { } cardId && g.CardMovements.Count(move => move.CardId == cardId &&
+                move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0) && move.Reason.Value == "skill-program.wu-an-guo.liyong.obtain") == 1 &&
+            E<CardUseFinishedEvent>(g).Count(finished => finished.ResolutionId == origin.CardUseFrameId) == 1 &&
+            E<WuAnGuoLiyongCompletedEvent>(g).Count(finished => finished.FrameId == origin.ProgramFrameId && finished.DuelIssued) == 1 &&
+            E<ProgramSkillResolvedEvent>(g).Count(finished => finished.FrameId == origin.ProgramFrameId && finished.Completed) == 1 &&
+            E<GameEndedEvent>(g).Length == 1,
+            "Cold native dying/death completion must finish the exact Liyong use and paid source once before the Lord's defeat completes the game, without repeating the gain or retaining frames.");
+        var tail = g.Events.Select((envelope, index) => (envelope.Payload, index)).ToArray();
+        Need(tail.Single(item => item.Payload is WuAnGuoLiyongCompletedEvent e && e.FrameId == origin.ProgramFrameId).index <
+                tail.Single(item => item.Payload is GameEndedEvent).index &&
+            tail.Single(item => item.Payload is ProgramSkillResolvedEvent e && e.FrameId == origin.ProgramFrameId).index <
+                tail.Single(item => item.Payload is GameEndedEvent).index,
+            "GameEnded must follow both the native paid-operation receipt and its original program completion.");
+        _ = Cold(g, r);
+    }
     private static PlayerSnapshot V(GameEngine g, int seat = 0) => g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 4).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static T[] E<T>(GameEngine g) where T : IGameEvent => g.Events.Select(e => e.Payload).OfType<T>().ToArray();
@@ -136,9 +179,11 @@ internal static class WuAnGuoChecks
             b.AddCard(new("fixture:wag-lion", "白银狮子", "装备牌", "实际离场回复", CardKind.SilverLion));
             var dodge = scenario is "dodge" or "regrant" or "gain-child" or "paid-loss" or "source-death" or "actor-death";
             b.AddDeck(new("fixture:wag-deck", "固定实体小牌堆", 4, 2, []) { PhysicalCards = Enumerable.Range(0, scenario is "boundary" or "deck-miss" ? 24 : 96).Select(i => new ContentDeckPhysicalCard(
-                scenario == "lion" ? "fixture:wag-lion" : scenario == "counterspell" ? "standard:nullification" : dodge ? "standard:dodge" : "standard:slash",
+                scenario == "lord-death" ? "standard:peach" : scenario == "lion" ? "fixture:wag-lion" : scenario == "counterspell" ? "standard:nullification" : dodge ? "standard:dodge" : "standard:slash",
                 scenario == "plain" ? new[] { Suit.Spade, Suit.Heart, Suit.Club, Suit.Diamond }[i % 4] : scenario == "counterspell" ? Suit.Heart : Suit.Spade, i % 13 + 1)).ToArray() });
-            b.AddMode(new(Mode, "武安国真实原生命令", 4, 4, new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Renegade)] = 3 }, "fixture:wag-deck", GeneralCandidateCount: 4, GeneralPoolIds: [Owner, .. peers]));
+            b.AddMode(new(Mode, "武安国真实原生命令", 4, 4, new Dictionary<string, int>
+                { [nameof(Role.Lord)] = 1, [scenario == "lord-death" ? nameof(Role.Rebel) : nameof(Role.Renegade)] = 3 },
+                "fixture:wag-deck", GeneralCandidateCount: 4, GeneralPoolIds: [Owner, .. peers]));
         }
     }
 }

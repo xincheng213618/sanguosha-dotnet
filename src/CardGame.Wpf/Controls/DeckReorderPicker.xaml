@@ -1,0 +1,35 @@
+<UserControl x:Class="CardGame.Wpf.Controls.DeckReorderPicker"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="DeckBoolToVisibility" />
+        <DataTemplate x:Key="OrderFace">
+            <StackPanel Margin="4,3" PreviewMouseLeftButtonDown="Card_PreviewMouseLeftButtonDown" PreviewMouseMove="Card_PreviewMouseMove">
+                <Button Command="{Binding DataContext.TransferDeckOrderCardCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Style="{DynamicResource BareButton}" ToolTip="点击移到另一排；拖动可调整位置">
+                    <Border Width="78" Height="109" BorderBrush="#C5A366" BorderThickness="1" CornerRadius="3" Background="#E6D5AE">
+                        <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource CardFaceTemplate}" IsHitTestVisible="False" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+                    </Border>
+                </Button>
+                <Grid Margin="0,2,0,0">
+                    <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition /></Grid.ColumnDefinitions>
+                    <Button Content="◀" FontSize="10" Padding="2,0" Command="{Binding DataContext.MoveDeckOrderCardLeftCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="向左移动" />
+                    <Button Grid.Column="1" Content="▶" FontSize="10" Padding="2,0" Command="{Binding DataContext.MoveDeckOrderCardRightCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" ToolTip="向右移动" />
+                </Grid>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+    <StackPanel>
+        <TextBlock Text="{Binding DeckTopLabel}" Foreground="#F2D28A" HorizontalAlignment="Center" Margin="0,0,0,3" Visibility="{Binding HasDeckTopRow, Converter={StaticResource DeckBoolToVisibility}}" />
+        <Border x:Name="DeckTopRow" Tag="top" Background="#50312419" BorderBrush="#A78E5D" BorderThickness="1" CornerRadius="4" MinHeight="146" AllowDrop="True" DragOver="Row_DragOver" Drop="Row_Drop" Visibility="{Binding HasDeckTopRow, Converter={StaticResource DeckBoolToVisibility}}">
+            <ItemsControl ItemsSource="{Binding DeckTopCards}" ItemTemplate="{StaticResource OrderFace}" HorizontalAlignment="Center">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Border>
+        <TextBlock Text="{Binding DeckBottomLabel}" Foreground="#F2D28A" HorizontalAlignment="Center" Margin="0,8,0,3" />
+        <Border x:Name="DeckBottomRow" Tag="bottom" Background="#50312419" BorderBrush="#A78E5D" BorderThickness="1" CornerRadius="4" MinHeight="146" AllowDrop="True" DragOver="Row_DragOver" Drop="Row_Drop">
+            <ItemsControl ItemsSource="{Binding DeckBottomCards}" ItemTemplate="{StaticResource OrderFace}" HorizontalAlignment="Center">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Border>
+    </StackPanel>
+</UserControl>

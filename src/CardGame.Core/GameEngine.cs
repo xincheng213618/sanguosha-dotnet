@@ -3368,6 +3368,18 @@ public sealed partial class GameEngine
 
     private void ContinueTurnAfterForeignActualContests(CharacterState current)
     {
+        if (_winner != Winner.None || !current.IsAlive)
+        {
+            if (current.Seat != _currentSeat || current.Seat != _turnProgression.OwnerSeat ||
+                _turnProgression.TurnNumber != _turnNumber || _resolutionStack.Count != 0 || _pendingDecision is not null)
+                throw new InvalidOperationException("A completed actual-turn prelude lost its original clean owner return.");
+            // Deferred offers have already paid and returned their HP/death
+            // children. They may end this actor before Preparation even starts.
+            ClearActualDiscardRecoveryPhase();
+            if (_winner == Winner.None) FinalizeEndTurn(current);
+            else AdvanceRulesAndPublishState();
+            return;
+        }
         if (TryBeginDeferredPrivateOffers(current)) return;
         ExpirePrepDiscardEndingPromises();
         ConsumeSkippedNextTurnDrawBenefits(current);
@@ -4674,6 +4686,11 @@ public sealed partial class GameEngine
         Card? selectedCard,
         CardConversionSource? selectedConversionSource = null)
     {
+        if (selectedCard is not null)
+        {
+            _selectedResponseConversion = selectedConversionSource;
+            _hasSelectedResponseConversionChoice = true;
+        }
         if (selectedCard is not null && IsWenjiNullificationResponseForbidden(pending, responder.Seat))
             throw new InvalidOperationException("Wenji forbids this exact actual counterspell responder.");
         if (selectedCard is {} declaredCounter && TryBeginCardDeclaration(responder, declaredCounter, CardKind.Nullification,
@@ -5507,6 +5524,7 @@ public sealed partial class GameEngine
         var finishedIronChain = GetNullificationEffectCard(pending);
         if (!HasUnstartedExtraCardEffect(pending.ParentFrameId) &&
             !SkipTieredRoundZeroFinishedMovement(pending.ParentFrameId, finishedIronChain) && !SkipDiouFinishedMovement(pending.ParentFrameId, finishedIronChain) && !SkipMouXqJueyanFinishedMovement(pending.ParentFrameId, finishedIronChain) &&
+            !IsClaimedUseCardEntity(pending.ParentFrameId, finishedIronChain.Id) &&
             !IsProgramVirtualOrdinaryTrickUse(pending.ParentFrameId) &&
             !(IsSiruiOutsideGeneralWeaponMaterial(pending.ParentFrameId,finishedIronChain.Id) || IsMouLixianRemovedMaterial(pending.ParentFrameId,finishedIronChain.Id)))
             MoveCard(finishedIronChain, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.IronChainFinished);
@@ -5774,6 +5792,12 @@ public sealed partial class GameEngine
     {
         if (PlaceOriginalUseLightning(pending)) return;
         if (TrySkipAnniversaryCuiLieDelayedTarget(pending)) return;
+        if (IsClaimedUseCardEntity(pending.ParentFrameId, pending.EffectCardId))
+        {
+            FinishCardUse(pending.ParentFrameId, GetNullificationEffectCard(pending), pending.EffectCardKind);
+            AddLog("CardEffect", "延时锦囊的原实体已被取得，不能置入判定区。", pending.SourceSeat);
+            return;
+        }
         var source = _players[pending.SourceSeat];
         var targetSeat = GetNullificationTargetSeat(pending) ??
             throw new InvalidOperationException("A delayed card must retain one target.");
@@ -5915,8 +5939,8 @@ public sealed partial class GameEngine
             }
         }
 
-        var sourceLocation = FindOwnedCardLocation(source, effectCard);
         var resolutionId = BeginCardUse(effectCard, source.Seat, [target.Seat], effectiveCardKind);
+        var sourceLocation = FindOwnedCardLocation(source, effectCard);
         if (preselection is not null)
             UpdateLifecycleCardUse(resolutionId, frame => frame with { TargetHandPreselection = preselection });
         MoveCard(
@@ -11302,6 +11326,7 @@ public sealed partial class GameEngine
             AddThought(thought);
             if (useResponse && responseCards.Count > 0)
             {
+                if (TryResolveExtendedAiResponse(responder, responseCards[0], requiredCardKind)) { AdvanceRulesAndPublishState(); return; }
                 CaptureAiCardResponseChoice(responseDecision, responseCards[0],
                     GetEffectiveResponseKind(responder, responseCards[0], requiredCardKind));
                 ResolveGroupResponse(group, responder, responseCards[0]);
@@ -13784,6 +13809,7 @@ public sealed partial class GameEngine
 
         if (_winner != Winner.None && ActiveQinglongFollowup is null &&
             _status != EngineStatus.Completed &&
+            !HasWuAnGuoLiyongCompletedUseParent(attack.ResolutionId) &&
             (ActiveBorrowedSword?.ActiveAttack is not { } borrowedAttack ||
              !SameAttackOwner(borrowedAttack, attack)))
         {
@@ -14134,6 +14160,8 @@ public sealed partial class GameEngine
         IReadOnlyList<Card>? physicalCards = null,
         DrawFundedDistinctBasicPayment? drawFundedPayment = null, HuanpeiPaidOrigin? huanpeiOrigin = null)
     {
+        _selectedUseConversion = conversionSource;
+        _hasSelectedUseConversionChoice = true;
         if (TryBeginCardDeclaration(source, card, playedCardKind ?? card.Kind,
             PeekDeclarationConversion(source, card, playedCardKind ?? card.Kind, true, conversionSource),
             DeclarationReturn(CardDeclarationPurpose.Recovery, source.Seat, target: target.Seat, recovery: recoveryAmount,
@@ -14691,6 +14719,7 @@ public sealed partial class GameEngine
         CardConversionSource? conversionSource = null, bool actualUnconvertedPhysical = false, bool countsTowardLimit = true)
     {
         if (!TargetRules.AllowsSlash(new(source, target, effectiveKind, conversionSource, physicalCardIds))) return false;
+        if (IsProgramMaterialUseForbidden(source.Seat, effectiveKind, physicalCardIds ?? [])) return false;
         ignoreDistance |= IsMoGangquanSource(conversionSource);
         if (actualUnconvertedPhysical && conversionSource is null && physicalCardIds is [var physicalId])
         {
@@ -15568,6 +15597,8 @@ public sealed partial class GameEngine
             actions.Add(new LegalAction(LegalActionKind.EndPlay, null, null, "结束出牌"));
         var physicalKinds = allPhysicalPlayableCards.ToDictionary(card => card.Id, card => card.Kind);
         var physicalSuits = allPhysicalPlayableCards.ToDictionary(card => card.Id, card => EffectiveSuit(actor, card));
+        var slashTraits = new Dictionary<LegalAction, PublicSlashTraits>();
+        GameSnapshot? slashTraitsView = null;
         var permittedActions = actions
             .Where(action => selectedPhysicalCardId is null || action.CardId == selectedPhysicalCardId)
             .Where(action =>
@@ -15604,6 +15635,12 @@ public sealed partial class GameEngine
                 declaredSuit = WuJingLiubingUsedSuit(actor.Seat, liubingCard, effectiveKind.Value, [liubingId], conversions, declaredSuit);
                 declaredColor = SuitColor(declaredSuit);
             }
+            if (action.Kind == LegalActionKind.Slash && action.CardId is > 0)
+            {
+                if (declaredColor == false && HasYuanchouCardPolicy)
+                    slashTraitsView ??= CreateSnapshot(actor.Seat);
+                slashTraits[action] = CreatePublicSlashTraits(actor, action, effectiveKind.Value, declaredColor, slashTraitsView);
+            }
             if (action.Kind != LegalActionKind.Recast && action.MaxCardCount <= 1 && declaredSuit is { } useSuit && IsTurnSuitUseForbidden(actor.Seat, useSuit)) return false;
             if (action.Kind != LegalActionKind.Recast && action.MaxCardCount <= 1 && IsCuiYanNextUseForbidden(actor.Seat, action.CardId is { } cuiCardId ? [cuiCardId] : [], action.ConversionSource is { } cuiConversion && ViewAsRule(cuiConversion)?.InheritPreviousPlaySuit == true ? PreviousPlayCard(actor.Seat)?.EffectiveSuit ?? declaredSuit : declaredSuit)) return false;
             // Global tricks drop individually shielded targets instead of the whole
@@ -15618,7 +15655,9 @@ public sealed partial class GameEngine
                 !IsDirectedCardTargetProhibited(actor.Seat, target, effectiveKind.Value) &&
                 !IsCardTargetProhibited(_players[target], effectiveKind.Value, declaredSuit, declaredColor));
         });
-        var result = FilterMoGangquanActions(actor, FilterBeneficiarySuitShieldActions(actor, FilterTurnCardUseRestrictions(actor, permittedActions, nativeOriginalCard)));
+        var projectedPermittedActions = permittedActions.Select(action => slashTraits.TryGetValue(action, out var traits)
+            ? action with { SlashTraits = traits } : action);
+        var result = FilterMoGangquanActions(actor, FilterBeneficiarySuitShieldActions(actor, FilterTurnCardUseRestrictions(actor, projectedPermittedActions, nativeOriginalCard)));
         if (nativeOriginalCard is not null) return result;
         var originalPileActions = NativePublicPileOriginalPlayActions(actor, selectedPhysicalCardId);
         var allActions = originalPileActions.Count == 0 ? result : result.Concat(originalPileActions).ToArray();
@@ -15839,7 +15878,8 @@ public sealed partial class GameEngine
         if (TryGetLastZoneJudgmentConversionLocation(actor, card, out var lastJudgmentLocation))
             return lastJudgmentLocation;
 
-        throw new InvalidOperationException("The chosen card is no longer in the actor's playable zones.");
+        throw new InvalidOperationException($"The chosen card is no longer in the actor's playable zones. " +
+            $"Actor={actor.Seat}; card={card.Id}; location={_cardZones.GetLocation(card.Id)}.");
     }
 
     private static bool IsPublicTargetZone(CardZoneKind zone) =>
@@ -16308,8 +16348,9 @@ public sealed partial class GameEngine
                           !attack.IsSourceLess && MatchesSlashUseOrdinalModifier(item.modifier, attack, attack.CardUserSeat, kind),
                       _ => false
                   }))))
-            .Select(item => (new CardUseEffectSource(item.instance.SkillId, item.modifier.Id,
-                item.seat, item.instance.SkillInstanceId), ShanheS5JiaoziModifierAmount(item.modifier)))
+            .SelectMany(item => Enumerable.Repeat((new CardUseEffectSource(item.instance.SkillId, item.modifier.Id,
+                item.seat, item.instance.SkillInstanceId), ShanheS5JiaoziModifierAmount(item.modifier)),
+                ClassicJiaoziDamageOccurrences(item.modifier, attack.SourceSeat, attack.TargetSeat, attack.IsSourceLess)))
             .ToArray();
     }
 
@@ -20229,7 +20270,7 @@ public sealed partial class GameEngine
     {
         if (_started)
         {
-            _pendingEvents.Add(CapturePublicPlayedCard(payload));
+            AppendPendingProgramEvent(CapturePublicPlayedCard(payload));
             CaptureMouSmSecretFact(_pendingEvents[^1], checked(_eventSequence + _pendingEvents.Count));
         }
     }

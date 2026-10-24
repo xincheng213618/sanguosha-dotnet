@@ -9,6 +9,36 @@ internal static class OrdinaryGuanYinPingChecks
     private const string Hp = "fixture:gyp-hp", Gain = "fixture:gyp-gain", Chain = "fixture:gyp-chain", SourceGain = "fixture:gyp-source-gain";
     private const string Snow = "ol:xuehen", Roar = "ol:huxiao", Awake = "ol:wuji";
 
+    public static void ActualWujiNamedCardPromptUsesRegisteredAiChoiceAndColdReturn()
+    {
+        var (g, registry) = Create(weapon: true); Play(g);
+        Use(g, "fire-three", [1]); Play(g);
+        Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
+        Reach(g, prompt => prompt.SkillPrompt?.SkillId == Awake && Action(prompt, "named-card-acquisition"));
+        g = Cold(g, registry);
+        var prompt = P(g)!;
+        var root = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.NamedCardAcquisition is not null);
+        var effect = ProgramInstructionResolver.Default.Resolve(root, registry.GetSkill(root.SkillId).Program!)
+            .GetPausedInstruction(root.InstructionIndex).Effect;
+        var router = (ProgramInteractionRouter)typeof(GameEngine).GetProperty("ProgramInteractions",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(g)!;
+        var before = State(g);
+        var selected = router.SelectAi(prompt, root, effect);
+        Require(prompt.Choices.Any(choice => ReferenceEquals(choice, selected)) && State(g) == before,
+            "The registered AI fallback must choose one actual native Wuji source choice without creating a card, choice or engine mutation.");
+        Answer(g, selected);
+        Reach(g, decision => decision.SkillPrompt?.SkillId == Gain);
+        var paid = E<ProgramNamedCardAcquiredEvent>(g).Single(e => e.ProgramFrameId == root.Id);
+        Require(paid.Obtained && E<ProgramSelectedSkillsLostEvent>(g).Count(e => e.ProgramFrameId == root.Id) == 1 &&
+            g.CardMovements.Count(move => move.To == CardLocation.Hand(0) &&
+                move.Reason.Value == "skill-program.ol:wuji.LoseSkillsAndObtainNamedCard") == 1,
+            "The AI-selected exact source must perform one actual named weapon acquisition after the already paid skill loss.");
+        g = Cold(g, registry); Continue(g); Play(g);
+        Require(E<ProgramNamedCardAcquiredEvent>(g).Count(e => e.ProgramFrameId == root.Id) == 1 &&
+            g.ResolutionStack.All(frame => frame.Id != root.Id),
+            "Cold return must finish the original awakening without repeating the selected source, skill loss or acquisition.");
+    }
+
     public static void RedEquipmentCostFinishesBeforeLostHpTargetsAndRealFireDraw()
     {
         foreach (var snowLoss in new[] { false, true })

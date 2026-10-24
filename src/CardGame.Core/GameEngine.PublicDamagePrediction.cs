@@ -145,7 +145,8 @@ public sealed partial class GameEngine
         if (!finalized && issuedAttack is { } originalAttack)
             cardLayer = checked(cardLayer + BoundaryAnjianDamage(originalAttack));
         if (!finalized)
-            additional = checked(additional + ShanheS5JiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards));
+            additional = checked(additional + ShanheS5JiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards) +
+                ClassicJiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards));
         cardLayer = Math.Max(0, cardLayer);
         if (!sourceLess && (HasVisiblePolicy(sourceState, sourceVisible, SkillProgramCardPolicyKind.DamageBecomesHpLoss) ||
             sourceSeat != targetSeat && (HasVisiblePolicy(sourceState, sourceVisible, SkillProgramCardPolicyKind.OtherParticipantDamageBecomesHpLoss) ||

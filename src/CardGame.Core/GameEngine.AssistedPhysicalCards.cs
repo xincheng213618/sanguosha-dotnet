@@ -114,7 +114,9 @@ public sealed partial class GameEngine
             choices.Add(new PromptChoice(new ChoiceId($"assisted-slash.{frame.Id}.faction"), "发动技能请求其他角色提供【杀】", [], [targetSeat], parameters));
         }
         choices.Add(new PromptChoice(new ChoiceId($"assisted-slash.{frame.Id}.decline"), "不使用【杀】", [], [], Parameters("decline")));
-        return choices.Where(c => c.Parameters.GetValueOrDefault("request-option") != "use" || !IsTurnSlashChoiceUseForbidden(actor.Seat,c)).ToArray();
+        return choices.Where(c => c.Parameters.GetValueOrDefault("request-option") != "use" ||
+            !IsTurnSlashChoiceUseForbidden(actor.Seat,c) &&
+            !IsProgramMaterialUseForbidden(actor.Seat, Enum.Parse<CardKind>(c.Parameters["effective-kind"]), c.Cards)).ToArray();
     }
 
     private bool AssistedSlashPaymentHasRange(CharacterState actor, int targetSeat, IReadOnlyList<Card> cards, CardConversionSource? conversionSource = null) =>

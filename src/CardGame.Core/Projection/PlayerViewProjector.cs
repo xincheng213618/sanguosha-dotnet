@@ -288,6 +288,12 @@ public sealed partial class GameEngine
             WinnerTeamId = IsTeamMode ? _winnerTeamId : null,
             WinnerFactionId = IsNationalWarMode ? _winnerFactionId : null,
             ModeKind = _modeDefinition.ModeKind,
+            IdentityComposition = _modeDefinition.ModeKind == ContentModeKind.Identity
+                ? new PublicIdentityComposition(
+                    _modeDefinition.RoleCounts.GetValueOrDefault(nameof(Role.Lord)),
+                    _modeDefinition.RoleCounts.GetValueOrDefault(nameof(Role.Loyalist)),
+                    _modeDefinition.RoleCounts.GetValueOrDefault(nameof(Role.Rebel)),
+                    _modeDefinition.RoleCounts.GetValueOrDefault(nameof(Role.Renegade))) : null,
             PublicRevealedCards = ViewContributors.Cards(ProgramViewContribution.PublicCardsBeforeResolution).Concat(publicRevealedCards)
                 .Concat(ViewContributors.Cards(ProgramViewContribution.PublicCardsAfterResolution))
                 .Where(card => ViewContributors.IsPublicCardVisible(card.Id, revealAll))

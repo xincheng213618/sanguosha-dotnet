@@ -925,6 +925,7 @@ public sealed partial class GameEngine
                                program.WindowContext?.ParentFrameId == frame.Id && GuoSiNativeRidesOn(program, use)))) &&
                      !IsWuZglReturnedCopyCost(frame.Action, cost) &&
                      !_cardMovements.Any(m => IsShanheStartingResourceResponseFinish(frame.Action, cost, m)) &&
+                     !_cardMovements.Any(m => IsHappyZuoCiDestroyedResponseFinish(frame.Action, cost, m)) &&
                      !(frame.Action.Type == CardActionType.Use && LifecycleCardUse(frame.ParentFrameId)?.Action is { } startingUse &&
                          startingUse.ActionId == frame.Action.ActionId && startingUse.PhysicalCards.Contains(cost) &&
                          IsShanheStartingResourceDestroyedUseMaterial(frame.ParentFrameId, cost.CardId)) &&
