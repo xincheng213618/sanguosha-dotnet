@@ -48,7 +48,8 @@ public sealed partial class GameEngine
     // 引弦①: +1 Slash damage against the farthest in-range characters.
     private bool ShiZrYinXianFarthest(int user, int target)
     {
-        if (!HasShiZrCapability || _winner != Winner.None || !_players[user].IsAlive) return false;
+        if (!HasShiZrCapability || _winner != Winner.None || !_players[user].IsAlive ||
+            !HasRuntimeSkill(_players[user], ShiZhangRenComposition.YinXianSkill)) return false;
         var range = GetAttackRange(user);
         if (range <= 0) return false;
         var farthest = -1;
