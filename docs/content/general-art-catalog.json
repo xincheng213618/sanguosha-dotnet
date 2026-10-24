@@ -19771,6 +19771,23 @@
       ]
     },
     {
+      "key": "mobile-shi-chen-jiao",
+      "characterName": "势陈矫",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象（低清放大，待官方高清）",
+          "sourcePage": "https://wiki.biligame.com/msgs/%E5%8A%BF%E9%99%88%E7%9F%AB",
+          "imageUrl": "https://patchwiki.biligame.com/images/msgs/6/69/f36ktt3no886poa6fx0cctg5r1rh411.png",
+          "sha256": "d23389a5e5451e009fc1a8328c0401dd66049de475074adff10bbe455dc6d019",
+          "pixelWidth": 530,
+          "pixelHeight": 750,
+          "localPath": "src/CardGame.Wpf/Assets/mobile-shi-chen-jiao.jpg"
+        }
+      ]
+    },
+    {
       "key": "mobile-shi-deng-ai",
       "characterName": "势邓艾",
       "defaultSkinId": "86100",
