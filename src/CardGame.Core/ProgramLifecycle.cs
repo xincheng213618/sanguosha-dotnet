@@ -122,7 +122,7 @@ public sealed record ProgramOwnedCardDistribution(
     IReadOnlyList<int> TargetSeats);
 
 /// <summary>Frozen sequential responders for one attack-range aid instruction.</summary>
-public sealed record ProgramAttackRangeAid(
+public sealed partial record ProgramAttackRangeAid(
     int TargetSeat,
     IReadOnlyList<int> ResponderSeats,
     int ResponderIndex);

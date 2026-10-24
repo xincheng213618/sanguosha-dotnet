@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:luoying-mobile", "revision": 1,
+      "triggers": [{ "id": "other-club-discard-or-judgment", "window": "discardPileReceived", "subject": "owner", "movementOccurrence": "perCard", "suits": ["club"], "optional": true,
+        "effects": [{ "op": "claimDiscardedEntityWithProvenance", "target": "owner", "provenanceId": "mobile-luoying" }, { "op": "offerFaceUpForOutsideClaims", "target": "owner", "provenanceId": "mobile-luoying" }] }] },
+    { "id": "boundary:jiushi-mobile", "revision": 1,
+      "activations": [{ "id": "virtual-alcohol", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving", "usesPerTurn": null,
+        "condition": { "kind": "not", "children": [{ "kind": "faceDown" }] }, "effects": [{ "op": "useVirtualAlcohol", "target": "owner" }] }],
+      "triggers": [
+        { "id": "dying-alcohol", "window": "selfDyingResponse", "subject": "owner", "optional": false,
+          "effects": [
+            { "op": "chooseOption", "target": "owner", "resultBind": "jiushi-choice", "options": [{ "id": "flip", "condition": { "kind": "not", "children": [{ "kind": "faceDown" }] } }, { "id": "pass" }] },
+            { "op": "turnOver", "target": "owner", "condition": { "kind": "choiceIs", "sourceBind": "jiushi-choice", "optionId": "flip" } },
+            { "op": "useVirtualDyingAlcohol", "target": "owner", "condition": { "kind": "choiceIs", "sourceBind": "jiushi-choice", "optionId": "flip" } }
+          ] },
+        { "id": "face-up-after-original-face-down-damage", "window": "afterDamageApplied", "subject": "owner", "damageOccurrence": "perDamage", "optional": true, "condition": { "kind": "faceDown" },
+          "effects": [
+            { "op": "turnOver", "target": "owner" },
+            { "op": "selectBoundaryCaoZhiTrick", "target": "owner", "resultBind": "jiushi-trick" },
+            { "op": "moveBoundCards", "target": "owner", "sourceBind": "jiushi-trick", "destination": "ownerHand", "awaitMovementTriggers": true }
+          ] }
+      ] },
+    { "id": "boundary:chengzhang-mobile", "revision": 1,
+      "triggers": [{ "id": "seven-damage-awakening", "window": "turnStartBeforeNormalFlow", "subject": "owner", "turnOwnerScope": "own", "optional": false, "usageScope": "game", "usageLimit": 1,
+        "effects": [{ "op": "recover", "target": "owner", "amount": 1 }, { "op": "draw", "target": "owner", "amount": 1 }, { "op": "upgradeBoundaryCaoZhiJiushi", "target": "owner" }] }] },
+    { "id": "boundary:jiushi-mobile-upgraded", "revision": 1,
+      "activations": [{ "id": "virtual-alcohol", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving", "usesPerTurn": null,
+        "condition": { "kind": "not", "children": [{ "kind": "faceDown" }] }, "effects": [{ "op": "useVirtualAlcohol", "target": "owner" }] }],
+      "triggers": [
+        { "id": "dying-alcohol", "window": "selfDyingResponse", "subject": "owner", "optional": false,
+          "effects": [
+            { "op": "chooseOption", "target": "owner", "resultBind": "jiushi-choice", "options": [{ "id": "flip", "condition": { "kind": "not", "children": [{ "kind": "faceDown" }] } }, { "id": "pass" }] },
+            { "op": "turnOver", "target": "owner", "condition": { "kind": "choiceIs", "sourceBind": "jiushi-choice", "optionId": "flip" } },
+            { "op": "useVirtualDyingAlcohol", "target": "owner", "condition": { "kind": "choiceIs", "sourceBind": "jiushi-choice", "optionId": "flip" } }
+          ] },
+        { "id": "face-up-after-original-face-down-damage", "window": "afterDamageApplied", "subject": "owner", "damageOccurrence": "perDamage", "optional": true, "condition": { "kind": "faceDown" },
+          "effects": [{ "op": "turnOver", "target": "owner" }] },
+        { "id": "trick-after-any-turnover", "window": "characterTurnedOver", "subject": "owner", "optional": false, "isSkillInvocation": false,
+          "effects": [{ "op": "selectBoundaryCaoZhiTrick", "target": "owner", "resultBind": "jiushi-trick" }, { "op": "moveBoundCards", "target": "owner", "sourceBind": "jiushi-trick", "destination": "ownerHand", "awaitMovementTriggers": true }] }
+      ] }
+  ]
+}

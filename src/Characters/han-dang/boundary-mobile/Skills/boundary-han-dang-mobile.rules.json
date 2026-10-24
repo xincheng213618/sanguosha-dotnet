@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 62, "skills": [
+    { "id": "boundary:gongqi-mobile", "revision": 1,
+      "modifiers": [{ "id": "mounted-unlimited-range", "query": "attackRange", "operation": "unlimited", "value": 0, "priority": 0, "condition": { "kind": "not", "children": [{ "kind": "noMounts" }] } }],
+      "activations": [{ "id": "discard-nonbasic-and-target-card", "minCards": 1, "maxCards": 1, "sourceZones": ["hand", "equipment"], "cardCategories": ["trick", "equipment"],
+        "minTargets": 1, "maxTargets": 1, "targetKind": "otherLivingWithDiscardableHandOrEquipment", "usesPerTurn": null, "usesPerPhase": 1,
+        "effects": [
+          { "op": "discardSelected", "target": "owner", "amount": 1 },
+          { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "selectedTarget" }, "zones": ["hand", "equipment"], "count": 1, "destination": "discardPile", "skipIfNoCards": true, "awaitMovementTriggers": true }
+        ] }] },
+    { "id": "boundary:jiefan-mobile", "revision": 1,
+      "activations": [{ "id": "aid-by-attack-range", "minCards": 0, "maxCards": 0, "minTargets": 1, "maxTargets": 1, "targetKind": "anyLiving", "usesPerTurn": null, "usesPerGame": 1,
+        "effects": [{ "op": "requestAttackRangeAid", "target": "selectedTarget" }] }] }
+  ]
+}

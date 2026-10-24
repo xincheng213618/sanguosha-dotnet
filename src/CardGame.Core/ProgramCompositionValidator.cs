@@ -585,7 +585,10 @@ internal static class ProgramCompositionValidator
                     case ReadTargetSet read:
                     {
                         var selection = effects.Take(index)
-                            .LastOrDefault(item => item.Op is SkillProgramEffectOp.SelectTargets or SkillProgramEffectOp.SelectAllPublicTeamTargets or SkillProgramEffectOp.SelectRandomPublicTeamTarget);
+                            .LastOrDefault(item => item.Op is SkillProgramEffectOp.SelectTargets or SkillProgramEffectOp.SelectAllPublicTeamTargets or SkillProgramEffectOp.SelectRandomPublicTeamTarget or SkillProgramEffectOp.SelectBoundaryLingTongEquipmentPair);
+                        if (selection?.Op == SkillProgramEffectOp.SelectBoundaryLingTongEquipmentPair &&
+                            !ImpliesChoiceBranch(effect.Condition, selection.Condition))
+                            Fail("the equipment pair requires its original matching choice branch");
                         if (selection is null && effects.Take(index)
                                 .Any(item => item.Op == SkillProgramEffectOp.SelectEquipmentPairAndPayment))
                             break; // The paid pair selection produces exactly its two exchange targets.

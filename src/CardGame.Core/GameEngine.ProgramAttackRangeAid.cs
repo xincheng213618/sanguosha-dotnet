@@ -42,7 +42,7 @@ public sealed partial class GameEngine
             AttackRangeAid = new ProgramAttackRangeAid(
                 targetSeat,
                 Array.AsReadOnly(responders),
-                ResponderIndex: 0)
+                ResponderIndex: 0) { InstructionIndex = active.InstructionIndex }
         };
         ReplaceRuntimeTop(active);
         PublishProgramAttackRangeAid(active, reason);
@@ -57,10 +57,11 @@ public sealed partial class GameEngine
         while (responderIndex < aid.ResponderSeats.Count &&
                !_players[aid.ResponderSeats[responderIndex]].IsAlive)
         {
+            AdvanceEventRulesAndQueueFact(new ProgramAttackRangeAidResponderSkippedEvent(frame.Id, responderIndex, aid.ResponderSeats[responderIndex]));
             responderIndex++;
         }
 
-        if (responderIndex >= aid.ResponderSeats.Count)
+        if (responderIndex >= aid.ResponderSeats.Count || !_players[aid.TargetSeat].IsAlive)
         {
             ClearPendingDecision();
             ReplaceRuntimeTop(frame with { AttackRangeAid = null });
@@ -77,8 +78,7 @@ public sealed partial class GameEngine
 
         var responder = _players[aid.ResponderSeats[aid.ResponderIndex]];
         var target = _players[aid.TargetSeat];
-        var choices = GetEquipment(responder)
-            .Where(card => FieldEquipmentSlot(card) == EquipmentSlot.Weapon)
+        var choices = ProgramAttackRangeAidWeapons(responder.Seat)
             .OrderBy(card => card.Id)
             .Select(card => new PromptChoice(
                 new ChoiceId(
@@ -96,6 +96,7 @@ public sealed partial class GameEngine
                 AttackRangeAidParameters(frame, aid, reason, "attack-range-aid-draw")))
             .ToArray();
         var skill = _contentRegistry!.GetSkill(frame.SkillId);
+        ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.AwaitingResponse });
         _pendingDecision = new PendingDecision(
             DecisionKind.ProgramTrigger,
             responder.Seat,
@@ -146,63 +147,36 @@ public sealed partial class GameEngine
         var responderSeat = aid.ResponderSeats[aid.ResponderIndex];
         var responder = _players[responderSeat];
         var target = _players[aid.TargetSeat];
-        int? discardedWeaponCardId = null;
-        IReadOnlyList<int> drawnCardIds = [];
+        if (aid.Payment is not null || _pendingDecision?.PlayerSeat != responderSeat ||
+            !_pendingDecision.Choices.Any(choice => AssistedChoicesEqual([choice], [selected])))
+            throw new InvalidOperationException("Attack-range aid must pay the current original responder exactly once.");
+        var before = _movementSequence; ClearPendingDecision();
         switch (selected.Parameters.GetValueOrDefault("program-action"))
         {
             case "attack-range-aid-discard-weapon" when selected.Cards.Count == 1 && selected.Targets.Count == 0:
             {
-                var weapon = GetEquipment(responder).SingleOrDefault(card =>
-                    card.Id == selected.Cards.Single() &&
-                    FieldEquipmentSlot(card) == EquipmentSlot.Weapon) ??
-                    throw new InvalidOperationException("The selected aid-response weapon is no longer equipped.");
-                discardedWeaponCardId = weapon.Id;
-                var discardInvocation = CaptureNativeLogicalDiscardInvocation(frame.OwnerSeat,
-                    responderSeat, [weapon.Id], expectedReason, frame.Id);
-                MoveCard(weapon, CardLocation.Equipment(responderSeat), CardLocation.Processing, expectedReason);
+                var weapon = ProgramAttackRangeAidWeapons(responderSeat).SingleOrDefault(card => card.Id == selected.Cards.Single()) ??
+                    throw new InvalidOperationException("The selected aid-response weapon is no longer in its owner's actual hand or equipment.");
+                var from = _cardZones.GetLocation(weapon.Id);
+                ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect,
+                    AttackRangeAid = aid with { Payment = new(aid.ResponderIndex, responderSeat, ProgramAttackRangeAidPaymentStage.MovementChildren,
+                        before, before, weapon.Id, weapon.Kind, from) }, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
+                var discardInvocation = CaptureNativeLogicalDiscardInvocation(frame.OwnerSeat, responderSeat, [weapon.Id], expectedReason, frame.Id);
+                MoveCard(weapon, from, CardLocation.Processing, expectedReason);
                 MoveCard(weapon, CardLocation.Processing, CardLocation.DiscardPile, expectedReason);
                 CompleteNativeLogicalDiscardInvocation(discardInvocation);
-                AddLog(
-                    "SkillTriggered",
-                    $"{responder.Name} 响应【{_contentRegistry!.GetSkill(frame.SkillId).Name}】，弃置武器【{weapon.DisplayName}】。",
-                    responderSeat,
-                    aid.TargetSeat);
-                break;
+                frame = GetActiveProgramFrame(frame.Id);
+                ReplaceRuntimeTop(frame = frame with { AttackRangeAid = frame.AttackRangeAid! with { Payment = frame.AttackRangeAid!.Payment! with { After = _movementSequence } } });
+                AdvanceEventRulesAndQueueFact(new ProgramAttackRangeAidChoiceResolvedEvent(frame.Id, frame.SkillId, GetProgramBindingId(frame), frame.OwnerSeat,
+                    responderSeat, aid.TargetSeat, weapon.Id, Array.AsReadOnly(Array.Empty<int>())));
+                ContinueProgramAttackRangeAidPayment(frame.Id); return;
             }
-            case "attack-range-aid-draw" when selected.Cards.Count == 0 &&
-                                                    selected.Targets.SequenceEqual([aid.TargetSeat]):
-            {
-                var drawn = target.IsAlive
-                    ? DrawCards(target, 1, log: true, reason: expectedReason)
-                    : [];
-                drawnCardIds = Array.AsReadOnly(drawn.ToArray());
-                AddLog(
-                    "SkillTriggered",
-                    $"{responder.Name} 响应【{_contentRegistry!.GetSkill(frame.SkillId).Name}】，令 {target.Name} 摸一张牌。",
-                    responderSeat,
-                    aid.TargetSeat);
-                break;
-            }
-            default:
-                throw new InvalidOperationException("The attack-range aid choice is malformed.");
+            case "attack-range-aid-draw" when selected.Cards.Count == 0 && selected.Targets.SequenceEqual([aid.TargetSeat]):
+                ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect,
+                    AttackRangeAid = aid with { Payment = new(aid.ResponderIndex, responderSeat, ProgramAttackRangeAidPaymentStage.Drawing, before, before) } });
+                ContinueProgramAttackRangeAidPayment(frame.Id); return;
+            default: throw new InvalidOperationException("The attack-range aid choice is malformed.");
         }
-
-        AdvanceEventRulesAndQueueFact(new ProgramAttackRangeAidChoiceResolvedEvent(
-            frame.Id,
-            frame.SkillId,
-            GetProgramBindingId(frame),
-            frame.OwnerSeat,
-            responderSeat,
-            aid.TargetSeat,
-            discardedWeaponCardId,
-            drawnCardIds));
-        ClearPendingDecision();
-        frame = frame with
-        {
-            AttackRangeAid = aid with { ResponderIndex = aid.ResponderIndex + 1 }
-        };
-        ReplaceRuntimeTop(frame);
-        PublishProgramAttackRangeAid(frame, expectedReason);
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.RequestAttackRangeAid)]
@@ -233,12 +207,11 @@ public sealed partial class GameEngine
         }
         if (frame.AttackRangeAid is not { } aid)
             throw new InvalidOperationException("A suspended attack-range aid response lost its frozen progress.");
-        if (aid.ResponderIndex < 0 || aid.ResponderIndex >= aid.ResponderSeats.Count)
-            throw new InvalidOperationException("The attack-range aid responder cursor is invalid.");
+        if (!ValidProgramAttackRangeAid(frame))
+            throw new InvalidOperationException("The attack-range aid lost its frozen original responders or paid native return.");
+        if (aid.Payment is not null) return;
         var responderSeat = aid.ResponderSeats[aid.ResponderIndex];
-        var weapons = GetEquipment(_players[responderSeat])
-            .Where(card => FieldEquipmentSlot(card) == EquipmentSlot.Weapon)
-            .ToArray();
+        var weapons = ProgramAttackRangeAidWeapons(responderSeat);
         var expectedReason = $"skill-program.{frame.SkillId}.{paused.Op}";
         if (frame.SelectedTargetSeats.Count != 1 || frame.SelectedTargetSeats.Single() != aid.TargetSeat ||
             aid.ResponderSeats.Count == 0 || aid.ResponderSeats.Distinct().Count() != aid.ResponderSeats.Count ||

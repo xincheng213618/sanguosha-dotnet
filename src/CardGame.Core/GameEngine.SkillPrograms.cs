@@ -1064,12 +1064,12 @@ public sealed partial class GameEngine
             }
 
             if (plan.Instructions.Take(frame.InstructionIndex).Any(effect =>
-                    effect is { Op: SkillProgramEffectOp.SelectTarget, Condition.Kind: SkillProgramConditionKind.ChoiceIs } &&
+                    effect is { Op: SkillProgramEffectOp.SelectTarget or SkillProgramEffectOp.SelectBoundaryLingTongEquipmentPair, Condition.Kind: SkillProgramConditionKind.ChoiceIs } &&
                     !frame.ChoiceBindings.Any(binding => binding.Name == effect.Condition.SourceBind)))
                 throw new InvalidOperationException("A choice-guarded target selection lost its committed choice.");
             var executedSelection = plan.Instructions.Take(frame.InstructionIndex)
                 .LastOrDefault(effect =>
-                    (effect.Op != SkillProgramEffectOp.SelectTarget || effect.Condition.Kind != SkillProgramConditionKind.ChoiceIs ||
+                    (effect.Op is not (SkillProgramEffectOp.SelectTarget or SkillProgramEffectOp.SelectBoundaryLingTongEquipmentPair) || effect.Condition.Kind != SkillProgramConditionKind.ChoiceIs ||
                      frame.ChoiceBindings.Any(binding => binding.Name == effect.Condition.SourceBind &&
                          binding.OptionId == effect.Condition.OptionId)) &&
                     effect.Op is (
@@ -1077,7 +1077,7 @@ public sealed partial class GameEngine
                     SkillProgramEffectOp.SelectChainedByMarker or SkillProgramEffectOp.SelectOneSelectedTarget or
                     SkillProgramEffectOp.DamageFarthestCharacter or SkillProgramEffectOp.OfferCompletedCardGift or
                     SkillProgramEffectOp.RequestLegalSlashByNearest or SkillProgramEffectOp.OfferUnlimitedVirtualSlash or
-                    SkillProgramEffectOp.SelectIssuedFixedRecipientWithDeathReturn or SkillProgramEffectOp.SelectEquipmentPairAndPayment or SkillProgramEffectOp.SelectBoundaryBuLianShiAnxuLeast or
+                    SkillProgramEffectOp.SelectIssuedFixedRecipientWithDeathReturn or SkillProgramEffectOp.SelectEquipmentPairAndPayment or SkillProgramEffectOp.SelectBoundaryBuLianShiAnxuLeast or SkillProgramEffectOp.SelectBoundaryLingTongEquipmentPair or
                     SkillProgramEffectOp.SelectDyingOwnedCard or SkillProgramEffectOp.RequestFulueZeroDamageCounterSlash));
             var awaitingCurrentSelection = executedSelection is not null &&
                 ReferenceEquals(executedSelection, plan.Instructions[frame.InstructionIndex - 1]) &&
@@ -1098,6 +1098,7 @@ public sealed partial class GameEngine
             {
                 SkillProgramEffectOp.BindOwnTurnEnemyHandGain => HasExactOwnTurnEnemyHandGainSelection(frame),
                 SkillProgramEffectOp.SelectBoundaryBuLianShiAnxuLeast => ValidBoundaryBuLianShiAnxuLeastSelection(frame),
+                SkillProgramEffectOp.SelectBoundaryLingTongEquipmentPair => ValidBoundaryLingTongEquipmentSelection(frame),
                 SkillProgramEffectOp.SelectAllPublicTeamTargets or SkillProgramEffectOp.SelectRandomPublicTeamTarget => IsExactPublicTeamTargetSelection(frame, executedSelection, plan),
                 SkillProgramEffectOp.RequestFulueZeroDamageCounterSlash => HasIssuedFulueRequest(frame),
                 SkillProgramEffectOp.RequestLegalSlashByNearest or SkillProgramEffectOp.OfferUnlimitedVirtualSlash =>

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "boundary:xuanfeng-mobile", "revision": 1, "triggers": [
+    { "id": "equipment-left", "window": "cardsMoved", "subject": "owner", "sourceZones": ["equipment"], "movementOccurrence": "perOwnerBatch", "optional": true,
+      "effects": [
+        { "op": "chooseOption", "target": "owner", "resultBind": "xuanfeng-branch", "options": [{ "id": "discard" }, { "id": "move", "requiredTargetKind": "boundaryLingTongMovableEquipmentSource" }] },
+        { "op": "chooseOtherOwnedCardDiscard", "target": "owner", "chooserRef": { "kind": "owner" }, "zones": ["hand", "equipment"], "condition": { "kind": "choiceIs", "sourceBind": "xuanfeng-branch", "optionId": "discard" } },
+        { "op": "chooseOtherOwnedCardDiscard", "target": "owner", "chooserRef": { "kind": "owner" }, "zones": ["hand", "equipment"], "condition": { "kind": "choiceIs", "sourceBind": "xuanfeng-branch", "optionId": "discard" } },
+        { "op": "selectBoundaryLingTongEquipmentPair", "target": "owner", "condition": { "kind": "choiceIs", "sourceBind": "xuanfeng-branch", "optionId": "move" } },
+        { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "selectedFirst" }, "targetRef": { "kind": "selectedSecond" }, "zones": ["equipment"], "count": 1, "destination": "selectedTargetCorrespondingZone", "skipIfNoCards": true, "awaitMovementTriggers": true, "prohibitReplacingEquipment": true, "condition": { "kind": "choiceIs", "sourceBind": "xuanfeng-branch", "optionId": "move" } }
+      ] },
+    { "id": "discard-phase", "window": "discardPhaseEnded", "turnOwnerScope": "own", "allowOwnDiscardPhaseEnded": true, "subject": "owner", "optional": true,
+      "effects": [
+        { "op": "chooseOption", "target": "owner", "resultBind": "xuanfeng-branch", "options": [{ "id": "discard" }, { "id": "move", "requiredTargetKind": "boundaryLingTongMovableEquipmentSource" }] },
+        { "op": "chooseOtherOwnedCardDiscard", "target": "owner", "chooserRef": { "kind": "owner" }, "zones": ["hand", "equipment"], "condition": { "kind": "choiceIs", "sourceBind": "xuanfeng-branch", "optionId": "discard" } },
+        { "op": "chooseOtherOwnedCardDiscard", "target": "owner", "chooserRef": { "kind": "owner" }, "zones": ["hand", "equipment"], "condition": { "kind": "choiceIs", "sourceBind": "xuanfeng-branch", "optionId": "discard" } },
+        { "op": "selectBoundaryLingTongEquipmentPair", "target": "owner", "condition": { "kind": "choiceIs", "sourceBind": "xuanfeng-branch", "optionId": "move" } },
+        { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "selectedFirst" }, "targetRef": { "kind": "selectedSecond" }, "zones": ["equipment"], "count": 1, "destination": "selectedTargetCorrespondingZone", "skipIfNoCards": true, "awaitMovementTriggers": true, "prohibitReplacingEquipment": true, "condition": { "kind": "choiceIs", "sourceBind": "xuanfeng-branch", "optionId": "move" } }
+      ] }
+  ] }]
+}

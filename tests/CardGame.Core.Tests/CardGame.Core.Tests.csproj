@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Include="..\Shared\BoundaryFuHuangHouScenario.cs" Link="BoundaryFuHuangHouScenario.cs" />
     <Compile Include="..\Shared\BoundaryCaiFuRenScenario.cs" Link="BoundaryCaiFuRenScenario.cs" />
+    <Compile Include="..\Shared\BoundaryHanDangScenario.cs" Link="BoundaryHanDangScenario.cs" />
     <Compile Include="..\Shared\BoundaryLiuBiaoScenario.cs" Link="BoundaryLiuBiaoScenario.cs" />
     <Compile Include="..\Shared\BoundaryLiaoHuaScenario.cs" Link="BoundaryLiaoHuaScenario.cs" />
     <Compile Include="..\Shared\BoundaryYuFanScenario.cs" Link="BoundaryYuFanScenario.cs" />

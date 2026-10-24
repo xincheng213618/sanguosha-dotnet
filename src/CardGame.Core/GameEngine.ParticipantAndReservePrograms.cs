@@ -303,6 +303,8 @@ public sealed partial class GameEngine
                 IsIssuedOrdinaryCaiFuRenXianzhou(frame) && IsValidAllEquipmentDonation(frame),
             SkillProgramEffectOp.ResolveOrdinaryCaiFuRenQieting or SkillProgramEffectOp.ResolveBoundaryMobileQieting =>
                 CanContinueIssuedOrdinaryCaiFuRen(frame),
+            SkillProgramEffectOp.RequestAttackRangeAid =>
+                frame.AttackRangeAid is not null && ValidProgramAttackRangeAid(frame),
             SkillProgramEffectOp.ChooseEquipmentOrDrawAfterOtherActualTurn =>
                 frame.ActualEndedEquipment is not null && IsValidActualEndedEquipment(frame),
             SkillProgramEffectOp.OfferSlashTargetBenefit =>

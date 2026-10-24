@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:gongqi-mobile": { "name": "弓骑", "description": "坐骑区有牌时攻击范围无限；出牌阶段限一次，弃置一张非基本牌并选择一名其他角色，然后弃置其一张牌。", "activationLabels": { "discard-nonbasic-and-target-card": "弃置一张非基本牌，弃置所选角色一张牌" } },
+    "boundary:jiefan-mobile": { "name": "解烦", "description": "限定技，出牌阶段选择一名角色，令攻击范围内包含其的所有角色依次弃置一张武器牌或令其摸一张牌。", "activationLabels": { "aid-by-attack-range": "令攻击范围内包含所选角色的各角色响应" } }
+  }
+}

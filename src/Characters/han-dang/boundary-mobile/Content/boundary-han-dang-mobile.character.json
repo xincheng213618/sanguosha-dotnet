@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:han-dang",
+  "skills": [
+    { "registrationOrder": 56900, "programBundle": "boundary-han-dang-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:gongqi-mobile", "name": "弓骑", "description": "当你的坐骑区有牌时，你的攻击范围无限；出牌阶段限一次，你可以弃置一张非基本牌并选择一名其他角色，然后你弃置其一张牌。", "executionForms": "State", "actionForms": "Active" } },
+    { "registrationOrder": 56901, "programBundle": "boundary-han-dang-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:jiefan-mobile", "name": "解烦", "description": "限定技，出牌阶段，你可以选择一名角色，然后令攻击范围内含有该角色的所有角色各选择一项：1.弃置一张武器牌；2.令其摸一张牌。", "tags": "Limited", "actionForms": "Active" } }
+  ],
+  "generals": [{ "registrationOrder": 56902, "pools": { "current": 56902 }, "definition": {
+    "id": "boundary:han-dang-mobile", "name": "界韩当·移动版", "portraitKey": "boundary-han-dang-mobile", "skillId": "boundary:gongqi-mobile", "additionalSkillIds": ["boundary:jiefan-mobile"],
+    "factionId": "wu", "baseHp": 4, "gender": "Male", "characterId": "character:han-dang", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

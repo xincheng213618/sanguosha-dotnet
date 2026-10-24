@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": { "boundary:xuanfeng-mobile": {
+    "name": "旋风", "description": "弃牌阶段弃置至少两张牌或失去装备区里的牌后，可依次弃置其他角色共计至多两张牌，或在另外两名角色间移动一张装备。",
+    "optionLabels": { "discard": "依次弃置其他角色至多两张牌", "move": "移动其他角色的一张装备" }
+  } }
+}

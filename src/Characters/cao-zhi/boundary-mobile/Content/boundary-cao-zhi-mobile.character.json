@@ -1,0 +1,19 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cao-zhi",
+  "skills": [
+    { "registrationOrder": 56700, "programBundle": "boundary-cao-zhi-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:luoying-mobile", "name": "落英", "description": "当其他角色的一张梅花牌因弃置或判定而置入弃牌堆时，你可以获得之。", "executionForms": "Trigger" } },
+    { "registrationOrder": 56701, "programBundle": "boundary-cao-zhi-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:jiushi-mobile", "name": "酒诗", "description": "当你需要使用【酒】时，若你的武将牌正面朝上，你可以翻面，视为使用一张【酒】；当你受到伤害后，若受到此伤害时及此时你的武将牌均背面朝上，你可以翻面并随机获得牌堆中的一张普通锦囊牌或延时锦囊牌。", "executionForms": "Trigger", "actionForms": "Active" } },
+    { "registrationOrder": 56702, "programBundle": "boundary-cao-zhi-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:chengzhang-mobile", "name": "成章", "description": "觉醒技，准备阶段，若你本局游戏造成与受到的伤害值之和不小于7，你回复1点体力并摸一张牌，然后升级“酒诗”。", "tags": "Awakening", "executionForms": "Trigger" } },
+    { "registrationOrder": 56703, "programBundle": "boundary-cao-zhi-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:jiushi-mobile-upgraded", "name": "酒诗·改", "description": "当你需要使用【酒】时，若你的武将牌正面朝上，你可以翻面，视为使用一张【酒】；当你受到伤害后，若受到此伤害时及此时你的武将牌均背面朝上，你可以翻面；当你翻面后，你随机获得牌堆中的一张普通锦囊牌或延时锦囊牌。", "executionForms": "Trigger", "actionForms": "Active" } }
+  ],
+  "generals": [
+    { "registrationOrder": 56704, "pools": { "current": 56704 },
+      "definition": { "id": "boundary:cao-zhi-mobile", "name": "界曹植·移动版", "portraitKey": "boundary-cao-zhi-mobile", "skillId": "boundary:luoying-mobile", "additionalSkillIds": ["boundary:jiushi-mobile", "boundary:chengzhang-mobile"], "factionId": "wei", "baseHp": 3, "gender": "Male", "characterId": "character:cao-zhi", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile" } }
+  ]
+}

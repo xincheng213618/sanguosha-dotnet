@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:luoying-mobile": { "name": "落英", "description": "当其他角色的一张梅花牌因弃置或判定而置入弃牌堆时，你可以获得之。" },
+    "boundary:jiushi-mobile": { "name": "酒诗", "description": "正面朝上时可翻面视为使用【酒】；受到伤害时及此时均背面朝上，可翻面并随机获得牌堆中的一张普通或延时锦囊。", "optionLabels": { "flip": "翻面并视为使用酒", "pass": "不发动酒诗" } },
+    "boundary:chengzhang-mobile": { "name": "成章", "description": "觉醒技，准备阶段，若本局造成与受到的伤害值之和不小于7，回复1点体力并摸一张牌，然后升级酒诗。" },
+    "boundary:jiushi-mobile-upgraded": { "name": "酒诗·改", "description": "正面朝上时可翻面视为使用【酒】；受到伤害时及此时均背面朝上，可翻面；每次翻面后随机获得牌堆中的一张普通或延时锦囊。", "optionLabels": { "flip": "翻面并视为使用酒", "pass": "不发动酒诗" } }
+  }
+}
