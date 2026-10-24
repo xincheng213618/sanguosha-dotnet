@@ -20400,6 +20400,23 @@
       ]
     },
     {
+      "key": "mobile-shi-pang-xi",
+      "characterName": "势庞羲",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象（BWIKI，画师 铁杵）",
+          "sourcePage": "https://wiki.biligame.com/msgs/%E5%8A%BF%E5%BA%9E%E7%BE%B2",
+          "imageUrl": "https://patchwiki.biligame.com/images/msgs/7/71/qjtlxlqw3h05rq84gelzh251nn55nua.jpg",
+          "sha256": "fc8a751e154a61fff760615aa299f889371284a7a417093713a473fc51783711",
+          "pixelWidth": 530,
+          "pixelHeight": 750,
+          "localPath": "src/CardGame.Wpf/Assets/mobile-shi-pang-xi.png"
+        }
+      ]
+    },
+    {
       "key": "mobile-shi-deng-ai",
       "characterName": "势邓艾",
       "defaultSkinId": "86100",
