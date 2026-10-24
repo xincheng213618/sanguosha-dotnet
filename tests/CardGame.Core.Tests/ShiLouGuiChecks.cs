@@ -75,8 +75,6 @@ internal static class ShiLouGuiChecks
         public bool Offered(string skill) =>
             G.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.UseProgramSkill && a.ProgramSkillId == skill);
 
-        private int _gainedOrdinal;
-
         public void ArmGuanSha()
         {
             Reach(() => P is { PlayerSeat: 0 } p && p.Kind == DecisionKind.ProgramTrigger &&
