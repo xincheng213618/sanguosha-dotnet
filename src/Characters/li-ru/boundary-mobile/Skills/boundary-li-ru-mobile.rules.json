@@ -1,0 +1,8 @@
+{"schemaVersion":62,"skills":[
+ {"id":"boundary:juece-mobile","revision":1,"triggers":[{"id":"lost-card-ending","window":"turnEnding","subject":"owner","optional":true,"effects":[{"op":"selectTarget","target":"owner","targetKind":"boundaryLiRuLostCardsThisTurn"},{"op":"damage","target":"selectedTarget","amount":1}]}]},
+ {"id":"boundary:mieji-mobile","revision":1,"activations":[{"id":"black-trick-top","minCards":1,"maxCards":1,"sourceZones":["hand"],"cardCategories":["trick"],"cardSuits":["spade","club"],"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"usesPerPhase":1,"effects":[
+  {"op":"captureSelectedCards","target":"owner","resultBind":"mieji-cost"},{"op":"revealBoundCards","target":"owner","sourceBind":"mieji-cost"},
+  {"op":"moveBoundCards","target":"owner","sourceBind":"mieji-cost","destination":"drawPileTop","awaitMovementTriggers":true},{"op":"resolveBoundaryLiRuMieji","target":"owner"}
+ ]}]},
+ {"id":"boundary:fencheng-mobile","revision":1,"activations":[{"id":"clockwise-fire","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"otherLiving","usesPerTurn":null,"usesPerGame":1,"effects":[{"op":"escalatingDiscardOrDamage","target":"owner","amount":2,"nature":"fire","zones":["hand","equipment"]}]}]}
+]}

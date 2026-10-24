@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "boundary:jiangchi-mobile", "revision": 1,
+    "triggers": [
+      { "id": "draw-restraint", "window": "playPhaseStarting", "subject": "owner", "turnOwnerScope": "own", "optional": true, "choiceGroup": "play-mode",
+        "effects": [
+          { "op": "prepareBoundaryCaoZhangJiangchi", "target": "owner", "mode": "restraint" },
+          { "op": "draw", "target": "owner", "amount": 1 },
+          { "op": "armBoundaryCaoZhangJiangchi", "target": "owner", "mode": "restraint" }
+        ] },
+      { "id": "discard-assault", "window": "playPhaseStarting", "subject": "owner", "turnOwnerScope": "own", "optional": true, "choiceGroup": "play-mode",
+        "effects": [
+          { "op": "prepareBoundaryCaoZhangJiangchi", "target": "owner", "mode": "assault" },
+          { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "owner" }, "zones": ["hand", "equipment"], "count": 1, "destination": "discardPile", "resultBind": "jiangchi-cost", "awaitMovementTriggers": true },
+          { "op": "armBoundaryCaoZhangJiangchi", "target": "owner", "mode": "assault" }
+        ] }
+    ] }]
+}

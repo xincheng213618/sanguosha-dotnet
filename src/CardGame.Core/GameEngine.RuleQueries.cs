@@ -264,7 +264,8 @@ public sealed partial class GameEngine
             .Concat(HappyZlNumericContributions(player, query))
             .Concat(AnniversaryZhangXunSlashContributions(player, query))
             .Concat(AnniversaryHaoMengSlashContributions(player, query))
-            .Concat(AnniversaryHanSongNumericContributions(player, query)).ToArray();
+            .Concat(AnniversaryHanSongNumericContributions(player, query))
+            .Concat(BoundaryCaoZhangPhaseContributions(player, query)).ToArray();
         var context = new SkillProgramRuleContext(
             CreateSkillContext(player),
             GetLivingFactionCount(),
@@ -305,7 +306,8 @@ public sealed partial class GameEngine
             .Concat(HappyZlNumericContributions(player, query))
             .Concat(AnniversaryZhangXunSlashContributions(player, query))
             .Concat(AnniversaryHaoMengSlashContributions(player, query))
-            .Concat(AnniversaryHanSongNumericContributions(player, query)).ToArray();
+            .Concat(AnniversaryHanSongNumericContributions(player, query))
+            .Concat(BoundaryCaoZhangPhaseContributions(player, query)).ToArray();
     }
 
     private static void AddFiniteContribution(

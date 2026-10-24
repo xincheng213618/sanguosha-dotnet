@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:liao-hua",
+  "skills": [
+    { "registrationOrder": 55600, "programBundle": "boundary-liao-hua-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:dangxian-mobile", "name": "当先", "description": "锁定技，回合开始时，你从弃牌堆获得一张杀并执行一个额外的出牌阶段。", "tags": "Locked", "executionForms": "Trigger" } },
+    { "registrationOrder": 55601, "programBundle": "boundary-liao-hua-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:fuli-mobile", "name": "伏枥", "description": "限定技，当你处于濒死状态时，你可以将体力回复至X点（X为全场势力数）。然后若你的体力值为全场唯一最高，你翻面。", "tags": "Limited", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 55602, "pools": { "current": 55602 }, "definition": {
+    "id": "boundary:liao-hua-mobile", "name": "界廖化·移动版", "portraitKey": "boundary-liao-hua-mobile", "skillId": "boundary:dangxian-mobile", "additionalSkillIds": ["boundary:fuli-mobile"],
+    "factionId": "shu", "baseHp": 4, "gender": "Male", "characterId": "character:liao-hua", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

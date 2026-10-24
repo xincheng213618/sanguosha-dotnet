@@ -1,0 +1,4 @@
+{
+  "schemaVersion": 3,
+  "skills": { "boundary:jiangchi-mobile": { "name": "将驰", "description": "出牌阶段开始时，你可以摸一张牌且本阶段不能使用杀，或弃置一张牌且本阶段杀无距离限制并可多使用一张杀。", "triggerChoices": { "draw-restraint": "摸一张牌，本阶段不能使用杀", "discard-assault": "弃置一张牌，本阶段杀无距离且可多使用一张" } } }
+}

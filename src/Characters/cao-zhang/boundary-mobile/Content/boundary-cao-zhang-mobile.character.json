@@ -1,0 +1,9 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cao-zhang",
+  "skills": [{ "registrationOrder": 55500, "programBundle": "boundary-cao-zhang-mobile", "includeProgramPresentation": true,
+    "definition": { "id": "boundary:jiangchi-mobile", "name": "将驰", "description": "出牌阶段开始时，你可以选择一项：1.摸一张牌，本阶段你不能使用【杀】；2.弃置一张牌，本阶段你使用【杀】无距离限制且可以多使用一张【杀】。", "executionForms": "Trigger" } }],
+  "generals": [{ "registrationOrder": 55501, "pools": { "current": 55501 },
+    "definition": { "id": "boundary:cao-zhang-mobile", "name": "界曹彰·移动版", "portraitKey": "boundary-cao-zhang-mobile", "skillId": "boundary:jiangchi-mobile", "factionId": "wei", "baseHp": 4, "gender": "Male", "characterId": "character:cao-zhang", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile" } }]
+}

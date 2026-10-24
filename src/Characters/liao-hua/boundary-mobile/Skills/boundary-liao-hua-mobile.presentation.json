@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3, "skills": {
+    "boundary:dangxian-mobile": { "name": "当先", "description": "锁定技，回合开始从弃牌堆获得一张杀，然后在正常准备阶段前执行额外出牌阶段。弃牌堆没有杀时仍执行该阶段。", "triggerChoices": { "discard-slash-extra-play": "当先：获得弃牌堆中的杀并执行额外出牌阶段" } },
+    "boundary:fuli-mobile": { "name": "伏枥", "description": "限定技，自身濒死时可回复至现存势力数；实际回复及其子窗结束后，若当前体力值全场唯一最高，则翻面。", "triggerChoices": { "self-dying-recovery": "伏枥：回复至现存势力数，唯一最高时翻面" } }
+  }
+}
