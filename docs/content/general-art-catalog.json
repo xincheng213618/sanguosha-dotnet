@@ -20060,6 +20060,23 @@
       ]
     },
     {
+      "key": "mobile-shi-lou-gui",
+      "characterName": "势娄圭",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象（BWIKI，画师 铁杵文化）",
+          "sourcePage": "https://wiki.biligame.com/msgs/%E5%8A%BF%E5%A8%84%E5%9C%AD",
+          "imageUrl": "https://patchwiki.biligame.com/images/msgs/f/f7/6x8588did1mw6zh0a7wbqhl1v22lbu6.jpg",
+          "sha256": "bcca2f1fbde319d125558c032b03f14f4da76e5ebcdda3fc95bb69d199e2af8e",
+          "pixelWidth": 452,
+          "pixelHeight": 640,
+          "localPath": "src/CardGame.Wpf/Assets/mobile-shi-lou-gui.png"
+        }
+      ]
+    },
+    {
       "key": "mobile-shi-deng-ai",
       "characterName": "势邓艾",
       "defaultSkinId": "86100",
