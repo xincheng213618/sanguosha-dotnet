@@ -213,6 +213,7 @@ public sealed partial class GameEngine
             baseTerms,
             contributions)));
         ordinary = ApplyBoundaryZhuZhiHandLimit(player, ordinary);
+        ordinary = ApplyBoundaryLiuShanHandLimit(player, ordinary);
         return suppressHanSongYinbi ? ordinary : ApplyAnniversaryHanSongHandLimit(player, ordinary);
     }
 

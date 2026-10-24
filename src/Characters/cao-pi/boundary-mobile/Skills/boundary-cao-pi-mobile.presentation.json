@@ -1,0 +1,5 @@
+{"schemaVersion":3,"skills":{
+ "boundary:xingshang-mobile":{"name":"行殇","description":"其他角色死亡时，可获得其所有手牌和装备牌，或回复1点体力。"},
+ "boundary:fangzhu-mobile":{"name":"放逐","description":"受伤后，可令其他角色本人选择：摸你已损失体力值张牌后翻面，或弃置等量手牌/装备牌后失去1点体力。"},
+ "boundary:songwei-mobile":{"name":"颂威","description":"主公技，其他魏势力角色黑色判定牌生效后，其可令你摸1张牌。","optionLabels":{"draw":"令主公摸一张牌","decline":"不发动颂威"}}
+}}

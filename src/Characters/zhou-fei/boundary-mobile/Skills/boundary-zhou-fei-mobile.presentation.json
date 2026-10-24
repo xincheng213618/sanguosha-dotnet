@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3, "skills": {
+    "boundary:liangyin-mobile": { "name": "良姻", "description": "全局牌置于武将牌上可令任一角色摸1，获得武将牌上的牌可令任一角色弃1；轮末按本轮唯一目标或唯一未被选者回复／失去体力。", "triggerChoices": { "global-general-pile": "良姻：选择摸牌或弃牌角色", "round-unique": "良姻：轮末唯一目标奖惩" } },
+    "boundary:kongsheng-mobile": { "name": "箜声", "description": "准备阶段或自己回复／失去体力后，可将当前回合角色任意手牌装备扣于其武将牌；其结束阶段可用其中一张，其获得其余。", "triggerChoices": { "prepare-store": "箜声：扣置当前回合角色的牌", "health-store": "箜声：体力变化后扣牌", "return-held": "箜声：选用一张并归还其余" } }
+  }
+}

@@ -301,7 +301,7 @@ public sealed partial class SimpleAiBrain
             CardKind.Dodge => copies == 0 ? (self.Hp <= 2 ? 13 : 8) * defense : copies == 1 ? 4 : 1,
             CardKind.Alcohol => copies > 0 || self.HasAlcoholEffect ? 1 : self.Hp <= 1 ? 10 : self.Hand.Any(c => IsSlashCard(c.Kind)) ? 6 : 2,
             CardKind.DrawTwo => 13,
-            CardKind.Dismantle or CardKind.Snatch => opponent is not null && opponent.HandCount + opponent.Equipment.Count > 0 ? 8 : 0,
+            CardKind.Dismantlement or CardKind.Snatch => opponent is not null && opponent.HandCount + opponent.Equipment.Count > 0 ? 8 : 0,
             CardKind.Duel => self.Hand.Count(c => IsSlashCard(c.Kind)) > 0 ? 7 : 3,
             CardKind.Nullification => copies == 0 ? 6 : 2,
             CardKind.Indulgence or CardKind.SupplyShortage => 7,

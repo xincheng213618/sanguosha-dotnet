@@ -1,0 +1,5 @@
+{"schemaVersion":3,"skills":{
+ "boundary:xiangle-mobile":{"name":"享乐","description":"锁定技，当你成为一名角色使用【杀】的目标后，除非该角色弃置一张基本牌，否则此【杀】对你无效。","optionLabels":{"pay":"弃置一张基本牌","decline":"不弃置，此杀对刘禅无效"}},
+ "boundary:fangquan-mobile":{"name":"放权","description":"你可以跳过出牌阶段，若如此做，本回合你的手牌上限等于体力上限值，然后此回合结束时，你可以弃置一张手牌并令一名其他角色获得一个额外的回合。"},
+ "boundary:ruoyu-mobile":{"name":"若愚","description":"主公技，觉醒技，准备阶段，若你是体力值最小的角色（或之一），你加1点体力上限，回复1点体力，然后获得“激将”。"}
+}}

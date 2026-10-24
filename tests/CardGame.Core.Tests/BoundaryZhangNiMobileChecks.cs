@@ -17,7 +17,9 @@ internal static class BoundaryZhangNiMobileChecks
             s.Begin(); s.Strategy(suppress ? "suppress" : "appease");
             s.Need(s.P?.PlayerSeat == 1 && s.Facts<BoundaryWurongCommittedEvent>() is [{ First: true }] && s.Facts<BoundaryWurongRevealedEvent>().Length == 0,
                 "The second strategy participant receives the same private pair after only a public commitment, before either result is revealed.");
-            s.Strategy(resist ? "resist" : "submit"); s.Settle();
+            s.Strategy(resist ? "resist" : "submit");
+            var consequencesStart = s.G.AcceptedCommands.Count;
+            s.Settle();
             var reveal = s.Facts<BoundaryWurongRevealedEvent>();
             s.Need(reveal is [var outcome] && outcome.Suppress == suppress && outcome.Resist == resist &&
                 !s.G.GetHumanLegalActions().Any(a => a.ProgramSkillId == Skill), "The original Play resolves exactly one four-way result and spends the per-phase activation.");
@@ -36,6 +38,10 @@ internal static class BoundaryZhangNiMobileChecks
                     s.V().Hand.Count == ownerHand + (suppress ? -1 : 2) && s.V(1).Hand.Count == targetHand + (suppress ? 1 : -2) &&
                     s.Facts<DamageAppliedEvent>().Length == 0 && s.Facts<BoundaryWurongSkipIssuedEvent>().Length == 0,
                     "Suppression first obtains one then returns two; full appeasement submission transfers two in the opposite direction without damage or a phase debt.");
+                if (!suppress)
+                    s.Need(!s.G.AcceptedCommands.Skip(consequencesStart).OfType<AnswerPromptCommand>().Any(command => command.ActorSeat == 1) &&
+                        s.G.AcceptedCommands.Skip(consequencesStart).OfType<AdvanceOneStepCommand>().Any(),
+                        "The actual AI giver completes both entity selections and confirmation through native stepping, without a scripted human payment answer or an unpick/reselect loop.");
             }
         }
     }
@@ -97,6 +103,8 @@ internal static class BoundaryZhangNiMobileChecks
                 if (P?.SkillPrompt?.SkillId == Hold) { Release(); continue; }
                 if (P?.SkillPrompt?.SkillId == Skill)
                 {
+                    if (P.PlayerSeat != 0 && Root?.BoundaryWurong is { Stage: BoundaryWurongStage.GiftChoice, Giver: not 0 })
+                    { Accept(new AdvanceOneStepCommand(G.Revision)); continue; }
                     var choice = P.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "pay") ??
                         P.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("program-action") == "select-and-move-owned-card") ??
                         P.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "card");

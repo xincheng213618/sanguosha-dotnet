@@ -34,7 +34,9 @@ public sealed partial class GameEngine
     private bool CanStartShiCaoShuangNiZunUse(CharacterState owner, string skill) =>
         skill != ShiCaoShuangNiZunSkill || ShiCaoShuangStashedIds(owner.Seat).Count > 0;
 
-    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 67900)]
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 67900,
+        SkillProgramEffectOp.ResolveShiCaoShuangSheQuan, SkillProgramEffectOp.ResolveShiCaoShuangDianYi,
+        SkillProgramEffectOp.ResolveShiCaoShuangJianZhuan, SkillProgramEffectOp.ResolveShiCaoShuangNiZunStash)]
     private bool CanOfferShiCaoShuang(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (!_players[candidate.OwnerSeat].IsAlive) return false;

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 62, "skills": [
+    { "id": "boundary:liangyin-mobile", "revision": 1, "triggers": [
+      { "id": "global-general-pile", "window": "cardsMoved", "subject": "owner", "sourceZones": ["hand"], "movementOccurrence": "perBatch", "optional": true,
+        "effects": [{ "op": "resolveBoundaryZhouFeiLiangyin", "target": "owner" }] },
+      { "id": "round-unique", "window": "roundEnding", "subject": "owner", "optional": true,
+        "effects": [{ "op": "resolveBoundaryZhouFeiLiangyin", "target": "owner" }] }
+    ] },
+    { "id": "boundary:kongsheng-mobile", "revision": 1, "triggers": [
+      { "id": "prepare-store", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": true,
+        "effects": [{ "op": "storeBoundaryZhouFeiKongsheng", "target": "owner" }] },
+      { "id": "health-store", "window": "afterHealthChanged", "subject": "owner", "optional": true,
+        "effects": [{ "op": "storeBoundaryZhouFeiKongsheng", "target": "owner" }] },
+      { "id": "return-held", "window": "turnEnding", "subject": "owner", "turnOwnerScope": "anyLiving", "optional": false, "isSkillInvocation": false,
+        "effects": [{ "op": "returnBoundaryZhouFeiKongsheng", "target": "owner" }] }
+    ] }
+  ]
+}

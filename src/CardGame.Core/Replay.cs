@@ -13,8 +13,9 @@ public static class AiDecisionPolicy
     public const int RebelStrategyVersion = 8;
     public const int RebelPressureVersion = 9;
     public const int RebelCoordinationVersion = 10;
+    public const int WushuangStrategyVersion = 11;
     public const int RuleBasedGeneralSelectionVersion = CooperativeCategoryGiftVersion;
-    public const int CurrentVersion = RebelCoordinationVersion;
+    public const int CurrentVersion = WushuangStrategyVersion;
 
     public static bool IsSupported(int version) => version >= 1 && version <= CurrentVersion;
 }

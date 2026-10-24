@@ -128,6 +128,9 @@ internal static class Program
             Check("Mobile boundary Gu Yong UI: mixed-color reveal and native self recipient draft", () => BoundaryGuYongUiChecks.MixedColorSameTypeRevealAndNativeSelfRecipientDraft(output));
             Check("Mobile boundary batch 48 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
                 new HashSet<string>(StringComparer.Ordinal) { "boundary:zhang-ni-mobile", "boundary:yan-yan-mobile", "boundary:wang-ji-mobile" }));
+            Check("Mobile boundary batch 49 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
+                new HashSet<string>(StringComparer.Ordinal) { "boundary:cao-pi-mobile", "boundary:liu-shan-mobile", "boundary:zhou-fei-mobile" }));
+            Check("Mobile boundary Zhou Fei UI: opaque storage original ending use and remainder cold", () => BoundaryZhouFeiUiChecks.ForeignOpaqueStoreOriginalEndingUseAndRemainderCold(output));
             Check("Mobile boundary Yan Yan UI: structured state counter and persistent quota cold", () => BoundaryYanYanUiChecks.StructuredPolarityOccurrenceAndPersistentQuotaRailCold(output));
             Check("Mobile boundary Wang Ji UI: actual inspected foreign hand and card button cold", () => BoundaryWangJiUiChecks.ActualInspectedForeignHandAndPaidCardButtonCold(output));
             Check("Mobile boundary batch 47 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,

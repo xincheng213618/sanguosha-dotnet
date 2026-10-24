@@ -2,6 +2,57 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "key": "boundary-cao-pi-mobile",
+      "characterName": "界曹丕",
+      "defaultSkinId": "45000",
+      "skins": [
+        {
+          "id": "45000",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-282.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/45000.jpg",
+          "sha256": "ca72e7ece466c368f62d71d8dedce6af0bcac0b3f6db09316882458f9d132fdd",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-cao-pi-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-liu-shan-mobile",
+      "characterName": "界刘禅",
+      "defaultSkinId": "48300",
+      "skins": [
+        {
+          "id": "48300",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-297.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/48300.jpg",
+          "sha256": "68ce12c674254883185c4eef7f4e39cd219c72f4aa0165642c637c27674f3555",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-liu-shan-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-zhou-fei-mobile",
+      "characterName": "界周妃",
+      "defaultSkinId": "89900",
+      "skins": [
+        {
+          "id": "89900",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-663.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/89900.jpg",
+          "sha256": "573ec7c3e8d406bb97d566f92afc6620eea46027176a5f3dbbfc306b712f298d",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-zhou-fei-mobile.jpg",
+          "pixelWidth": 1500,
+          "pixelHeight": 2122
+        }
+      ]
+    },
+    {
       "key": "boundary-zhang-ni-mobile",
       "characterName": "界张嶷",
       "defaultSkinId": "68500",

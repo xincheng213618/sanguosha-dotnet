@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:zhou-fei",
+  "skills": [
+    { "registrationOrder": 54700, "programBundle": "boundary-zhou-fei-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:liangyin-mobile", "name": "良姻", "description": "当有牌被置于武将牌上时，你可令一名角色摸一张牌；当任意角色获得一名角色武将牌上的牌时，你可令一名角色弃置一张牌。每轮结束时，你可令本轮内：唯一成为“良姻”目标的角色回复1点体力，或唯一未成为“良姻”目标的角色失去1点体力。", "executionForms": "Trigger" } },
+    { "registrationOrder": 54701, "programBundle": "boundary-zhou-fei-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:kongsheng-mobile", "name": "箜声", "description": "准备阶段，或你回复或失去体力后，你可将当前回合角色任意张牌扣置于其武将牌上；其结束阶段，你可使用其中一张牌，其获得其余的牌。", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 54702, "pools": { "current": 54702 }, "definition": {
+    "id": "boundary:zhou-fei-mobile", "name": "界周妃·移动版", "portraitKey": "boundary-zhou-fei-mobile", "skillId": "boundary:liangyin-mobile", "additionalSkillIds": ["boundary:kongsheng-mobile"],
+    "factionId": "wu", "baseHp": 3, "gender": "Female", "characterId": "character:zhou-fei", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

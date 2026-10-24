@@ -123,7 +123,8 @@ public sealed partial class GameEngine
         f.TriggerId == BoundaryZhangNiComposition.Skip && f.InstructionIndex is 0 or 1 && f.WindowContext is { } context &&
         AdmitBoundaryWurongSkip(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 1000, context.OccurrenceIndex), context);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryZhangNiWurong)]
-    private static PromptChoice BoundaryWurongAi(PendingDecision p) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "pay") ?? p.Choices.First();
+    private static PromptChoice BoundaryWurongAi(PendingDecision p) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "pay") ??
+        p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "card") ?? p.Choices.First();
     private bool IsBoundaryWurongChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding b) => f.SkillId == BoundaryZhangNiComposition.Skill && f.BoundaryWurong is { Stage: >= BoundaryWurongStage.Revealed, Outcome: { } outcome } r &&
         b == new ProgramChoiceResultBinding(BoundaryZhangNiComposition.Result, outcome, f.OwnerSeat) && ProgramEventHistory<BoundaryWurongRevealedEvent>().Where(e => e.FrameId == f.Id).ToArray() is [var revealed] &&
         revealed == new BoundaryWurongRevealedEvent(f.Id, r.Suppress!.Value, r.Resist!.Value, outcome);

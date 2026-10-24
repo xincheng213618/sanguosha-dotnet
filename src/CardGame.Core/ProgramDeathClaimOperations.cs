@@ -10,12 +10,15 @@ internal sealed class ClaimDeathCleanupCardsProgramOperationDescriptor : Program
 
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "condition");
+        r.AllowOnly("op", "target", "zones", "condition");
         var target = r.RequiredEnum<SkillProgramEffectTarget>("target");
         if (target != SkillProgramEffectTarget.Owner)
             throw new InvalidOperationException(
                 $"Invalid skill program at {r.Path}.target: death cleanup cards always belong to the skill owner.");
-        return new(Op, target, 0, r.Condition());
+        var zones = r.OptionalEnumArray<CardZoneKind>("zones") ?? [];
+        if (r.Has("zones") && (zones.Count == 0 || zones.Any(z => z is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment))))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}.zones: death claims accept a nonempty hand/equipment/judgment source filter.");
+        return new(Op, target, 0, r.Condition(), zones: zones);
     }
 
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [];

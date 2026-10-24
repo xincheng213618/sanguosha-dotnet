@@ -1,0 +1,9 @@
+{
+ "formatVersion":1,"packageId":"standard-classic-generals","characterId":"character:cao-pi",
+ "skills":[
+  {"registrationOrder":54500,"programBundle":"boundary-cao-pi-mobile","includeProgramPresentation":true,"definition":{"id":"boundary:xingshang-mobile","name":"行殇","description":"其他角色死亡时，你可以选择一项：获得其所有牌；回复1点体力。","executionForms":"Trigger"}},
+  {"registrationOrder":54501,"programBundle":"boundary-cao-pi-mobile","includeProgramPresentation":true,"definition":{"id":"boundary:fangzhu-mobile","name":"放逐","description":"当你受到伤害后，你可以令一名其他角色选择一项：摸X张牌并将武将牌翻面；弃置X张牌并失去1点体力（X为你已损失的体力值）。","executionForms":"Trigger"}},
+  {"registrationOrder":54502,"programBundle":"boundary-cao-pi-mobile","includeProgramPresentation":true,"definition":{"id":"boundary:songwei-mobile","name":"颂威","description":"主公技，其他魏势力角色的黑色判定牌生效后，该角色可以令你摸一张牌。","tags":"Lord","executionForms":"Trigger"}}
+ ],
+ "generals":[{"registrationOrder":54503,"pools":{"current":54503},"definition":{"id":"boundary:cao-pi-mobile","name":"界曹丕·移动版","portraitKey":"boundary-cao-pi-mobile","skillId":"boundary:xingshang-mobile","additionalSkillIds":["boundary:fangzhu-mobile","boundary:songwei-mobile"],"factionId":"wei","baseHp":3,"gender":"Male","characterId":"character:cao-pi","variantId":"boundary-mobile","rulesetId":"sanguosha-mobile"}}]
+}

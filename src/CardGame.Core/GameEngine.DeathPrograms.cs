@@ -601,15 +601,24 @@ public sealed partial class GameEngine
         if (frame.OwnerSeat == death.VictimSeat)
             throw new InvalidOperationException("A death-claim cannot target its own death.");
 
-        var claimable = death.CleanedUpCardIds
-            .Where(cardId => _cardZones.GetLocation(cardId) == CardLocation.DiscardPile)
-            .Select(cardId => _cardZones.CardsAt(CardLocation.DiscardPile).Single(item => item.Id == cardId))
-            .ToArray();
+        var paused = ProgramInstructionResolver.Default.Resolve(active, _contentRegistry.GetSkill(active.SkillId).Program!).GetPausedInstruction(active.InstructionIndex).Effect;
+        var claimable = QueryProgramDeathCleanupCards(death, paused.Zones);
         if (claimable.Length == 0) return;
         var reason = new CardMoveReason(
             $"skill-program.{frame.SkillId}.{GetProgramBindingId(active)}.claim-death-cleanup");
         MoveCards(claimable, CardLocation.DiscardPile, CardLocation.Hand(frame.OwnerSeat), reason);
     }
+
+    // The death frame remains the native cleanup ledger. An additive source
+    // filter reads each actual last cleanup movement; it cannot claim a special
+    // pile, a different death's entity, or a card moved away and later returned.
+    private Card[] QueryProgramDeathCleanupCards(DeathFrame death, IReadOnlyList<CardZoneKind> sourceZones) => death.CleanedUpCardIds
+        .Where(id => _cardZones.GetLocation(id) == CardLocation.DiscardPile && (sourceZones.Count == 0 ||
+            _cardMovements.LastOrDefault(m => m.CardId == id) is { } movement && movement.From.OwnerSeat == death.VictimSeat &&
+            sourceZones.Contains(movement.From.Zone) && movement.To == CardLocation.DiscardPile &&
+            (movement.From.Zone == CardZoneKind.Equipment ? movement.Reason == CardMoveReasons.DeathEquipmentDiscard :
+                movement.From.Zone is CardZoneKind.Hand or CardZoneKind.Judgment && movement.Reason == CardMoveReasons.DeathDiscard)))
+        .Select(id => _cardZones.CardsAt(CardLocation.DiscardPile).Single(c => c.Id == id)).ToArray();
 
     private void ClearAttributedMarkerSources(CharacterState owner, long resolutionId)
     {
@@ -710,6 +719,7 @@ public sealed partial class GameEngine
                 new CardLocation(CardZoneKind.PrivateReserve, victim.Seat), new CardMoveReason("program.private-reserve.death"));
             deathCleanupCardIds.AddRange(DiscardQushiHolderDeathSeals(_resolutionStack.OfType<DeathFrame>().Single(frame => frame.Id == deathFrameId)));
             deathCleanupCardIds.AddRange(DiscardShiCaoZHolderDeathPiles(_resolutionStack.OfType<DeathFrame>().Single(frame => frame.Id == deathFrameId)));
+            deathCleanupCardIds.AddRange(DiscardBoundaryZhouFeiHolderDeathPiles(_resolutionStack.OfType<DeathFrame>().Single(frame => frame.Id == deathFrameId)));
             deathCleanupCardIds.AddRange(DiscardAnniversarySunQuanMingOnDeath(_resolutionStack.OfType<DeathFrame>().Single(frame => frame.Id == deathFrameId)));
             UpdateDeathFrame(deathFrameId, frame => frame with { CleanedUpCardIds = deathCleanupCardIds });
 

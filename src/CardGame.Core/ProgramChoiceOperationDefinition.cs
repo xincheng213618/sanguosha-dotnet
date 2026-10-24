@@ -32,8 +32,10 @@ internal sealed class ChooseOptionProgramOperationDescriptor : ProgramOperationD
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         WithSelectedTarget(effect, [new CreateChoiceResult(effect.ResultBind!, effect.Options.Select(option => option.Id).ToArray())])
             .Concat(effect.ChooserRef is { Kind: ProgramParticipantRef.SelectedTarget } ? [new ReadSelectedTarget()] : [])
-            .Concat(effect.ChooserRef is { Kind: ProgramParticipantRef.EventSource or ProgramParticipantRef.EventTarget }
+            .Concat(effect.ChooserRef is { Kind: ProgramParticipantRef.EventSource }
                 ? [new RequireAnyContext(ProgramContextCapability.Damage)] : [])
+            .Concat(effect.ChooserRef is { Kind: ProgramParticipantRef.EventTarget }
+                ? [new RequireAnyContext(ProgramContextCapability.Damage | ProgramContextCapability.Judgment)] : [])
             .ToArray();
 
     private static void ValidateOptionCondition(SkillProgramCondition condition, string path)

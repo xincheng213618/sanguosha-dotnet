@@ -1,0 +1,19 @@
+{"schemaVersion":62,"skills":[
+ {"id":"boundary:xiangle-mobile","revision":1,"triggers":[{"id":"nullify-unless-actor-discards-basic","window":"cardUseBeforeTargetEffects","ownerRelation":"target","cardKinds":["slash","fireSlash","thunderSlash"],"optional":false,"effects":[
+  {"op":"chooseOption","target":"actor","resultBind":"xiangle-answer","options":[{"id":"pay","condition":{"kind":"hasOwnedCardCategory","zones":["hand"],"cardCategories":["basic"]}},{"id":"decline"}]},
+  {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"actor"},"cardOwnerRef":{"kind":"actor"},"zones":["hand"],"cardCategories":["basic"],"count":1,"destination":"discardPile","awaitMovementTriggers":true,"condition":{"kind":"choiceIs","sourceBind":"xiangle-answer","optionId":"pay"}},
+  {"op":"nullifyCurrentCardEffect","target":"owner","condition":{"kind":"choiceIs","sourceBind":"xiangle-answer","optionId":"decline"}}
+ ]}]},
+ {"id":"boundary:fangquan-mobile","revision":1,"states":[{"id":"fangquan-pending","initialValue":false,"visibility":"public","resetScope":"turn","reacquirePolicy":"preserveUntilGameEnd"}],"triggers":[
+  {"id":"declare-skip-play","window":"afterNormalDraw","subject":"owner","optional":true,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]},{"op":"setBooleanState","target":"owner","stateId":"fangquan-pending","value":true}]},
+  {"id":"grant-extra-turn","window":"turnEnding","subject":"owner","optional":true,"usageScope":"turn","usageLimit":1,"condition":{"kind":"all","children":[{"kind":"booleanState","stateId":"fangquan-pending","expectedValue":true},{"kind":"compare","left":{"kind":"currentHandCount"},"operator":"greaterThanOrEqual","right":{"kind":"integerConstant","value":1}}]},"effects":[
+   {"op":"selectOwnedCards","target":"owner","amount":1,"zones":["hand"],"resultBind":"fangquan-cost"},
+   {"op":"moveBoundCards","target":"owner","sourceBind":"fangquan-cost","destination":"discardPile","awaitMovementTriggers":true},
+   {"op":"selectTarget","target":"owner","targetKind":"otherLiving"},
+   {"op":"pendExtraTurn","target":"owner","targetRef":{"kind":"selectedTarget"}}
+  ]}
+ ]},
+ {"id":"boundary:ruoyu-mobile","revision":1,"triggers":[{"id":"awakening","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"condition":{"kind":"compare","left":{"kind":"currentHp"},"operator":"lessThanOrEqual","right":{"kind":"livingPlayersMinHp"}},"effects":[
+  {"op":"changeMaximumHp","target":"owner","amount":1},{"op":"recover","target":"owner","amount":1},{"op":"grantSkills","target":"owner","skillIds":["classic:jijiang"]}
+ ]}]}
+]}

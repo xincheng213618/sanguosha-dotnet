@@ -324,6 +324,7 @@ public sealed partial class GameEngine
             {
                 var trigger = GetProgramTrigger(candidate);
                 if (IsBoundaryYiJiGiveCandidate(candidate)) continue;
+                if (IsBoundaryZhouFeiMovement(candidate)) continue;
                 if (IsAnniversaryMaMiaoCongfengTrigger(trigger)) continue;
                 if (IsShiHqMarkTrigger(trigger)) continue;
                 if (IsOwnTurnEnemyHandGainTrigger(trigger)) continue;
@@ -378,6 +379,7 @@ public sealed partial class GameEngine
         candidates.AddRange(CollectMouCaEquipmentCandidates(batch));
         candidates.AddRange(CollectMouHqGiveCandidates(batch));
         candidates.AddRange(CollectBoundaryYiJiGiveCandidates(batch));
+        candidates.AddRange(CollectBoundaryZhouFeiMovementCandidates(batch));
         candidates.AddRange(CollectNianJingjueCandidates(batch));
         candidates.AddRange(CollectHellZhiwangCandidates(batch));
         candidates.AddRange(CollectNeighborDiscardCandidates(batch));
@@ -620,6 +622,8 @@ public sealed partial class GameEngine
     {
         if (IsBoundaryYiJiGiveCandidate(candidate))
             return CreateBoundaryYiJiGiveContext(frame, candidate);
+        if (IsBoundaryZhouFeiMovement(candidate))
+            return CreateBoundaryZhouFeiMovementContext(frame, candidate);
         if (IsShiHqMarkTrigger(GetProgramTrigger(candidate)))
             return CreateShiHqMovementContext(frame, candidate);
         if (IsAnniversaryMaMiaoCongfengTrigger(GetProgramTrigger(candidate)))
