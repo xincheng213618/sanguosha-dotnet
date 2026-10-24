@@ -14,7 +14,8 @@ public sealed class ModeRuleSet
         bool publishesCardMovementDisclosure = false, bool revealsTeamsOnStart = false,
         ModeVisibilityRules? visibility = null, IEnumerable<Type>? requiredFeatureContracts = null,
         bool isClassicIdentityContext = false, bool requiresRoundTracking = false,
-        bool requiresRecipientDamageReevaluation = false, ModeRuntimeRequirements? runtimeRequirements = null)
+        bool requiresRecipientDamageReevaluation = false, ModeRuntimeRequirements? runtimeRequirements = null,
+        bool allowsArmorGain = true)
     {
         Opening = opening ?? throw new ArgumentNullException(nameof(opening));
         Death = death ?? throw new ArgumentNullException(nameof(death));
@@ -28,6 +29,7 @@ public sealed class ModeRuleSet
         SupportsGodFactionSelection = supportsGodFactionSelection;
         ReducesFirstActorInitialHand = reducesFirstActorInitialHand;
         AllowsDiscardRecycling = allowsDiscardRecycling;
+        AllowsArmorGain = allowsArmorGain;
         PublishesCardMovementDisclosure = publishesCardMovementDisclosure;
         RevealsTeamsOnStart = revealsTeamsOnStart;
         Visibility = visibility ?? new ModeVisibilityRules();
@@ -51,6 +53,7 @@ public sealed class ModeRuleSet
     public bool SupportsGodFactionSelection { get; }
     public bool ReducesFirstActorInitialHand { get; }
     public bool AllowsDiscardRecycling { get; }
+    public bool AllowsArmorGain { get; }
     public bool PublishesCardMovementDisclosure { get; }
     public bool RevealsTeamsOnStart { get; }
     public ModeVisibilityRules Visibility { get; }

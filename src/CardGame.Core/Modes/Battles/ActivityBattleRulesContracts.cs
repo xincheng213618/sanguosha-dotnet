@@ -21,6 +21,8 @@ public sealed record ModeBattleDraftFacts(int Seat, bool GeneralSelected, string
 }
 public sealed record ModeActivityDamageFacts(long ResolutionId, int SourceSeat, int TargetSeat, int CardUserSeat,
     bool IsSourceLess, bool IsChainPropagation, CardKind? EffectiveCardKind);
+public sealed record ModeWenhePoisonMovementFacts(CardKind PrintedKind, CardMovementDisclosure Disclosure,
+    CardZoneKind FromZone, int? FromOwnerSeat, CardZoneKind ToZone, int? ToOwnerSeat, bool OwnerIsAlive);
 
 /// <summary>Match-local primitive services. Rule choices are made by the installed activity feature.</summary>
 public interface IModeBattleRulesHost
@@ -99,6 +101,8 @@ public interface IWenheBattleRulesFeature : IGameModeFeature
     int SweepDamageBonus(bool isChainPropagation);
     int? PoisonRound { get; }
     bool IsPhysicalPoison(CardKind kind, int cardId, bool alive, bool inOwnerHand);
+    bool AllowsPoisonDeparture(ModeWenhePoisonMovementFacts movement);
+    int PoisonHpLoss { get; }
     bool AllowsActivation(string skillId, int ownerSeat);
     bool AllowsTrigger(ModeWenheTriggerFacts facts);
     bool HasDeadOwnerEnding(int actualOwner);

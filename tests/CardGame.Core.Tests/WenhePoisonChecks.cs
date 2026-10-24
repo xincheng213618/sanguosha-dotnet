@@ -28,7 +28,8 @@ internal static class WenhePoisonChecks
         var receiverHp = V(g, 1).Hp;
         Use(g, "give-public", [], [1]); Until(g, () => P(g)?.SkillPrompt?.SkillId == Watch); Cold(g, registry); Play(g);
         var publicGift = E<WenhePoisonLossAppliedEvent>(g).Last();
-        Need(publicGift.OwnerSeat == 0 && V(g, 0).Hp == hp - 1 && V(g, 1).Hp == receiverHp &&
+        Need(publicGift.OwnerSeat == 0 && publicGift.HpBefore - publicGift.HpAfter == 1 &&
+            V(g, 0).Hp == hp - 1 && V(g, 1).Hp == receiverHp &&
             V(g, 1).Hand.Any(c => c.Id == publicGift.CardId && c.IdentityKind == CardKind.Poison) &&
             g.CardMovements.Any(m => m.CardId == publicGift.CardId && m.From == CardLocation.Hand(0) && m.Disclosure == CardMovementDisclosure.FaceUp),
             "An explicitly revealed native gift charges only the original holder once and grants the same poisoned physical entity to the recipient.");

@@ -47,7 +47,7 @@ public static class StandardModeRuleProfiles
                 TracksNativeDrawInvocations: wushuang,
                 TracksRoundEnding: dragonBoat,
                 CapturesRecipientDamageBase: guandu,
-                TracksFinalizedCardTargets: guandu))
+                TracksFinalizedCardTargets: guandu), allowsArmorGain: !wushuang)
         {
             FixedDistance = wushuang ? 1 : null,
             InitialHandSizeOverride = wushuang ? 5 : null

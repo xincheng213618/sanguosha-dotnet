@@ -112,6 +112,11 @@ internal sealed class WenheBattleRulesFeature : IWenheBattleRulesFeature, IMatch
         CurrentRule == WenheRuleKind.Poison ? facts.RoundNumber : null;
     public bool IsPhysicalPoison(CardKind kind, int cardId, bool alive, bool inOwnerHand) => Active &&
         CurrentRule == WenheRuleKind.Poison && kind == CardKind.Peach && cardId > 0 && alive && inOwnerHand;
+    public bool AllowsPoisonDeparture(ModeWenhePoisonMovementFacts movement) => Active &&
+        movement.PrintedKind == CardKind.Peach && movement.Disclosure == CardMovementDisclosure.FaceUp &&
+        movement.FromZone == CardZoneKind.Hand && movement.FromOwnerSeat is not null && movement.OwnerIsAlive &&
+        (movement.ToZone != movement.FromZone || movement.ToOwnerSeat != movement.FromOwnerSeat);
+    public int PoisonHpLoss => 1;
     public bool AllowsActivation(string skillId, int ownerSeat) => skillId switch
     {
         "wenhe:chaos-resolution" => false,

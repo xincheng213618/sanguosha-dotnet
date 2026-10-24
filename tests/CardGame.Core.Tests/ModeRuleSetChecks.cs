@@ -16,7 +16,7 @@ internal static class ModeRuleSetChecks
         var identity = StandardModeRuleProfiles.Create(Mode("identity:classic-4", ContentModeKind.Identity), options);
         Require(identity.Opening.GetStartingSeat(players, NoRandom) == 2 && identity.UsesGeneralBaseHp &&
             identity.SupportsGodFactionSelection && !identity.ReducesFirstActorInitialHand && identity.IsClassicIdentityContext &&
-            identity.Visibility.PublishesIdentityComposition,
+            identity.Visibility.PublishesIdentityComposition && identity.AllowsArmorGain,
             "Identity initiative belongs to its Lord, without consuming the deterministic random sequence.");
 
         var teams = new Dictionary<string, int> { ["team:red"] = 2, ["team:blue"] = 2 };
@@ -37,7 +37,7 @@ internal static class ModeRuleSetChecks
         Require(duel.Opening.GetStartingSeat(players, count =>
             { calls++; Require(count == 2, "Duel initiative requests its actual player count."); return 1; }) == 1 && calls == 1 &&
             duel.UsesClassicBattleRules && !duel.IsClassicIdentityContext && !duel.Visibility.PublishesIdentityComposition &&
-            duel.RequiresRoundTracking && duel.RequiresRecipientDamageReevaluation,
+            duel.RequiresRoundTracking && duel.RequiresRecipientDamageReevaluation && !duel.AllowsArmorGain,
             "Random initiative consumes exactly one bounded draw instead of evaluating every installed mode.");
 
         var bossMode = Mode("activity:boss", ContentModeKind.Team) with

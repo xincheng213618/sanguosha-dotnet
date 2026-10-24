@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Reflection;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
@@ -14,6 +15,25 @@ internal static class WushuangCombatChecks
         foreach (var item in new (int Seed, int Tactic, int Armor, int Lost, int Amount)[] { (36, 2210, 0, 2, 2) })
         {
             var g = Start(item.Seed, item.Tactic); var hp = Player(g, 1).Hp;
+            Require(V(g, 0).Players.All(player => player.Armor == 0) && !E<ArmorGrantedEvent>(g).Any() &&
+                E<ProgramBindingResolvedEvent>(g).Any(e => e.SkillId == Driver && e.BindingId == "initial-armor" && e.Completed),
+                "The real initial armor instruction completes under the duel's no-gain policy without creating an Armor payment.");
+            Use(g, "armor-probe", 1);
+            var probe = g.ResolutionStack.OfType<ProgramSkillFrame>().Last(frame => frame.SkillId == Driver && frame.ActivationId == "armor-probe");
+            var revision = g.Revision;
+            try
+            {
+                typeof(GameEngine).GetMethod("GrantProgramArmor", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(g, [probe]);
+                throw new InvalidOperationException("The no-gain policy bypassed the native instruction proof.");
+            }
+            catch (TargetInvocationException error) when (error.InnerException is InvalidOperationException failure &&
+                failure.Message == "An armor grant lost its exact configured instruction.") { }
+            Require(g.Revision == revision && !E<ArmorGrantedEvent>(g).Any(),
+                "A paused option cannot masquerade as a native armor instruction even when the mode forbids armor gain.");
+            Answer(g, _ => true); Play(g);
+            Require(V(g, 0).Players.All(player => player.Armor == 0) && !E<ArmorGrantedEvent>(g).Any(),
+                "Returning through the actual option runs the validated armor instruction and suppresses gain without fabricating a payment.");
+            Cold(g);
             Use(g, "hit-three", 1); Play(g);
             var damage = E<DamageAppliedEvent>(g).Last(e => e.SourceSeat == 0 && e.TargetSeat == 1);
             Require(damage.Amount == item.Amount && Player(g, 1).Armor == item.Armor && Player(g, 1).Hp == hp - item.Lost,
@@ -195,6 +215,10 @@ internal static class WushuangCombatChecks
             foreach (var x in source.Decks.Values) b.AddDeck(x);
             foreach (var x in source.Modes.Values.Where(x => x.Id != WushuangMode.ModeId)) b.AddMode(x);
             var activations = new List<object>();
+            activations.Add(new { id = "armor-probe", minCards = 0, maxCards = 0, minTargets = 1, maxTargets = 1,
+                targetKind = "anyLiving", usesPerTurn = (int?)null, effects = new object[] {
+                    new { op = "chooseOption", target = "owner", resultBind = "armor-probe", options = new[] { new { id = "continue" } } },
+                    new { op = "grantArmor", target = "selectedTarget", amount = 4 } } });
             foreach (var (id, amount) in new[] { ("hit-one", 1), ("hit-three", 3), ("hit-four", 4), ("hit-nine", 9), ("hit-twenty", 20) })
                 activations.Add(new { id, minCards = 0, maxCards = 0, minTargets = 1, maxTargets = 1, targetKind = "anyLiving", usesPerTurn = (int?)null,
                     effects = new[] { new { op = "damage", target = "selectedTarget", amount } } });
@@ -209,7 +233,9 @@ internal static class WushuangCombatChecks
             var rules = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills = new object[] {
                 new { id = Driver, revision = 1, activations, triggers = ownerTriggers }, new { id = Quiet, revision = 1, triggers = armor } } });
             var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = new Dictionary<string, object> {
-                [Driver] = new { name = "战法代表机制", description = "原生伤害、摸牌与指定实体取得。" }, [Quiet] = new { name = "安静对手", description = "初始护甲。" } } });
+                [Driver] = new { name = "战法代表机制", description = "原生伤害、摸牌与指定实体取得。",
+                    optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } },
+                [Quiet] = new { name = "安静对手", description = "初始护甲。" } } });
             var catalog = SkillProgramCatalog.Load(rules, presentation);
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, id, "Combat fixture") { Program = program, ProgramPresentation = catalog.Presentations[id] });
             b.AddGeneral(new(Human, "战法测试主将", "", Driver, "qun", BaseHp: 30));

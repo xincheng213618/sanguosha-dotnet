@@ -178,10 +178,10 @@ public sealed partial class GameEngine
 
     private CardMovementBatchContext CaptureWenhePoisonDepartures(CardMovementBatchContext batch, int? poisonRound)
     {
-        if (poisonRound is not > 0 || _modeDefinition.WenheActivity is null) return batch;
-        var departures = batch.Movements.Where(move => GetAttackCard(move.CardId).Kind == CardKind.Peach &&
-            move.Disclosure == CardMovementDisclosure.FaceUp && move.From is { Zone: CardZoneKind.Hand, OwnerSeat: { } owner } &&
-            IsValidPlayerSeat(owner) && _players[owner].IsAlive && move.To != move.From)
+        if (poisonRound is not > 0 || WenheRules is not { } rules) return batch;
+        var departures = batch.Movements.Where(move => move.From.OwnerSeat is { } owner && IsValidPlayerSeat(owner) &&
+            rules.AllowsPoisonDeparture(new(GetAttackCard(move.CardId).Kind, move.Disclosure, move.From.Zone,
+                owner, move.To.Zone, move.To.OwnerSeat, _players[owner].IsAlive)))
             .OrderBy(move => move.Sequence)
             .Select(move => new WenhePoisonDeparture(poisonRound.Value, move.Sequence, move.From.OwnerSeat!.Value, move.CardId)).ToArray();
         return departures.Length == 0 ? batch : batch with { WenhePoisonDepartures = departures };
@@ -309,7 +309,7 @@ public sealed partial class GameEngine
             {
                 var owner = _players[departure.OwnerSeat];
                 var before = owner.Hp;
-                var after = owner.IsAlive ? checked(before - 1) : before;
+                var after = owner.IsAlive ? checked(before - WenheRules!.PoisonHpLoss) : before;
                 ReplaceRuntimeTop(frame = frame with { WenhePoisonLoss = receipt with
                 { Stage = WenhePoisonLossStage.HealthChildren, HpBefore = before, HpAfter = after } });
                 owner.Hp = after;
@@ -383,11 +383,12 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("Poison changed its serial departure cursor or native child.");
         var applied = ProgramEventHistory<WenhePoisonLossAppliedEvent>().Where(e => e.WindowFrameId == frame.Id).ToArray();
         var settled = ProgramEventHistory<WenhePoisonDepartureSettledEvent>().Where(e => e.WindowFrameId == frame.Id).ToArray();
+        var loss = WenheRules!.PoisonHpLoss;
         var activeIssued = receipt.Stage is WenhePoisonLossStage.HealthChildren or WenhePoisonLossStage.Dying ? 1 : 0;
         if (applied.Length != receipt.Cursor + activeIssued || settled.Length != receipt.Cursor ||
             applied.Where((e, i) => e.BatchId != frame.Batch.Id || e.RoundNumber != departures[i].RoundNumber ||
                 e.MovementSequence != departures[i].MovementSequence || e.OwnerSeat != departures[i].OwnerSeat || e.CardId != departures[i].CardId ||
-                (long)e.HpBefore - e.HpAfter is < 0 or > 1).Any() ||
+                ((long)e.HpBefore - e.HpAfter < 0 || (long)e.HpBefore - e.HpAfter > loss)).Any() ||
             settled.Where((e, i) => e.BatchId != frame.Batch.Id || e.MovementSequence != departures[i].MovementSequence ||
                 e.OwnerSeat != departures[i].OwnerSeat || e.CardId != departures[i].CardId).Any() ||
             activeIssued != 0 && (applied[^1].HpBefore != receipt.HpBefore || applied[^1].HpAfter != receipt.HpAfter))
