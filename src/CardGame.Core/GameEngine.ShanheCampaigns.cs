@@ -80,45 +80,6 @@ public sealed partial class GameEngine
         }
     }
 
-    private void SetupShanhePlayers()
-    {
-        var setup = _options.ShanheBattle!;
-        var members = new[] { new ShanheCombatantDefinition(setup.PlayerGeneralId, setup.MaxHpBonus, setup.Hp,
-            setup.InitialHandBonus, setup.DrawBonus, setup.SlashBonus, setup.ExtraSkillIds) }
-            .Concat(setup.AllyRoster).Concat(setup.EnemyRoster).ToArray();
-        for (var seat = 0; seat < members.Length; seat++)
-        {
-            var member = members[seat];
-            var general = _generalPool.Single(g => g.Id == member.GeneralId);
-            var team = seat <= setup.AllyRoster.Count ? ShanheBattleSetup.PlayerTeamId : ShanheBattleSetup.EnemyTeamId;
-            var player = new CharacterState
-            {
-                Seat = seat, Name = seat == 0 ? "你" : $"{(team == ShanheBattleSetup.PlayerTeamId ? "同行" : "敌军")} · {general.Name}",
-                IsHuman = seat == _options.HumanSeat, Role = GetTeamRole(team), TeamId = team,
-                TeamRevealed = true, RoleRevealed = true, General = general, GeneralSelected = true, GeneralRevealed = true,
-                MaxHp = general.BaseHp + member.MaxHpBonus, Hp = member.Hp ?? general.InitialHp ?? general.BaseHp + member.MaxHpBonus
-            };
-            foreach (var id in member.ExtraSkillIds ?? [])
-            {
-                if (general.Skills.Any(skill => skill.ContentId == id)) continue;
-                var grantId = $"campaign:shanhe:{seat}:{id}";
-                player.SkillGrants.Grant(new(grantId, id, grantId, "campaign:shanhe"));
-            }
-            if (seat == 0)
-            {
-                var tacticPrograms = new HashSet<string>(StringComparer.Ordinal);
-                for (var index = 0; index < setup.TacticSkillIds.Count; index++)
-                {
-                    var id = setup.TacticSkillIds[index];
-                    var grantId = tacticPrograms.Add(id) ? $"campaign:shanhe-tactic:{id}" :
-                        $"campaign:shanhe-tactic-copy:{index.ToString(System.Globalization.CultureInfo.InvariantCulture)}:{id}";
-                    player.SkillGrants.Grant(new(grantId, id, grantId, "campaign:shanhe-tactic"));
-                }
-            }
-            _players.Add(player);
-        }
-    }
-
     private IEnumerable<RuleQueryContribution> ShanheRuleContributions(CharacterState player, SkillRuleQuery query)
     {
         if (_options.ShanheBattle is not { } setup) yield break;

@@ -214,6 +214,8 @@ internal static class MouHuaXiongMobileChecks
         public PackageManifest Manifest { get; } = new("fixture-mou-hua-xiong-mobile", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
+            if (spec.LeanRegistry && !b.HasModeFeatureFactory("mode:standard-setup"))
+                b.AddModeFeatureFactory(new CardGame.Modes.Standard.StandardModeSetupFactory());
             void Real(string bundle, params string[] ids)
             {
                 string Read(string suffix) { using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms." + bundle + "." + suffix + ".json") ?? throw new InvalidOperationException("Missing complete native bundle " + bundle); using var reader = new StreamReader(stream); return reader.ReadToEnd(); }

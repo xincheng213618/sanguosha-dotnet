@@ -24,47 +24,6 @@ public sealed partial class GameEngine
         return EnabledRuntimeSkillGrants(player).Any(grant => grant.SkillId == skill.ContentId && !grant.IsModeRule);
     }
 
-    private void GrantWenheModeRules(CharacterState player)
-    {
-        var a = _modeDefinition.WenheActivity!;
-        foreach (var id in new[] { "wenhe:rules", "wenhe:chaos-resolution" }
-            .Concat(a.PlayerTier >= 5 ? new[] { "wenhe:niepan" } : [])
-            .Concat(a.EnableAspirations ? new[] { "wenhe:champion-mark" } : []))
-        {
-            var grantId = $"mode:wenhe:{player.Seat}:{id}";
-            player.SkillGrants.Grant(new(grantId, id, grantId, "mode:wenhe") { IsModeRule = true });
-        }
-    }
-
-    private void InitializeWenheHealth(CharacterState player)
-    {
-        var tier = _modeDefinition.WenheActivity!.PlayerTier;
-        var bonus = (tier >= 2 ? 1 : 0) + (tier >= 5 ? 1 : 0);
-        player.MaxHp = player.General.BaseHp + bonus;
-        player.Hp = (player.General.InitialHp ?? player.General.BaseHp) + bonus;
-    }
-    private void SetupWenhePlayers()
-    {
-        if (_modeDefinition.WenheActivity is null) throw new InvalidOperationException("Survival requires an explicit activity definition.");
-        var generals = _generalPool.Where(IsGeneralSelectionCandidate).ToList();
-        _random.Shuffle(generals);
-        if (generals.Count < _playerCount) throw new InvalidOperationException("Wenhe needs eight eligible generals.");
-        for (var seat = 0; seat < _playerCount; seat++)
-        {
-            var p = new CharacterState { Seat = seat, Name = seat == _options.HumanSeat ? "你" : $"人机对手 {seat + 1}",
-                IsHuman = seat == _options.HumanSeat, Role = Role.Contestant, RoleRevealed = true,
-                General = _options.UseInteractiveSetup ? CreateHiddenGeneral() : generals[seat],
-                GeneralSelected = !_options.UseInteractiveSetup, GeneralRevealed = !_options.UseInteractiveSetup, Hp = 4, MaxHp = 4 };
-            _players.Add(p);
-            GrantWenheModeRules(p);
-            if (!_options.UseInteractiveSetup) InitializeWenheHealth(p);
-        }
-        if (_options.UseInteractiveSetup)
-        {
-            _availableGenerals.AddRange(generals);
-            _selectionOrder.AddRange(_players.OrderByDescending(p => p.IsHuman).ThenBy(p => p.Seat).Select(p => p.Seat));
-        }
-    }
     private IEnumerable<RuleQueryContribution> WenheActivityRuleContributions(CharacterState p, SkillRuleQuery query)
     {
         if (_modeDefinition.WenheActivity is not { } a) yield break;
@@ -73,14 +32,6 @@ public sealed partial class GameEngine
             SkillRuleQuery.SlashLimit => a.PlayerTier >= 3 ? 1 : 0, _ => 0 };
         if (amount != 0) yield return new FiniteRuleQueryContribution($"wenhe:tier:{query}", SkillRuleOperation.Add, amount);
     }
-    private IReadOnlyList<Card> PrepareWenheActivityDeck(IReadOnlyList<Card> cards) => _modeDefinition.WenheActivity is null ? cards :
-        Array.AsReadOnly(cards.Where(c => c.Kind != CardKind.Indulgence).Select(c => c with { Kind = c.Kind switch
-        {
-            CardKind.PeachGarden or CardKind.WoodenOx => CardKind.StarShift,
-            CardKind.Nullification => c.Suit is Suit.Spade or Suit.Club ? CardKind.BeamSwap : CardKind.HandRedistribution,
-            CardKind.SupplyShortage => CardKind.WenheChaos, _ => c.Kind
-        } }).ToArray());
-
     private void RecordWenheDeathRank(long deathId, int seat)
     {
         if (WenheSurvivalRank(seat) is not null) throw new InvalidOperationException("A Wenhe death cannot award its rank twice.");

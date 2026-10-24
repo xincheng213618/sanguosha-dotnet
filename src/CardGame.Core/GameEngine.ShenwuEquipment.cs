@@ -56,16 +56,6 @@ public sealed partial class GameEngine
             LifecycleCardUse(attack.ResolutionId)?.Action?.EffectiveDesignatedTargetSeats.Contains(attack.TargetSeat) == true;
     }
 
-    private IReadOnlyList<Card> PrepareShenwuActivityDeck(IReadOnlyList<Card> original) =>
-        _modeDefinition.ShenwuActivity is null ? original : Array.AsReadOnly(original
-            .Where(card => card.Kind is not (CardKind.Indulgence or CardKind.SupplyShortage))
-            .Select(card => card.Kind switch
-            {
-                CardKind.DrawTwo => card with { Kind = CardKind.SowBeans },
-                CardKind.BorrowedSword => card with { Kind = CardKind.TransplantWood },
-                _ => card
-            }).ToArray());
-
     private void PrepareShenwuSelectedEquipmentAndDeck()
     {
         if (_modeDefinition.ShenwuActivity is not { } activity || CompleteProgramEventHistory()
@@ -73,33 +63,18 @@ public sealed partial class GameEngine
         if (_setupComplete || _turnNumber != 0 || _players.Any(player => !player.GeneralSelected) || _cardMovements.Count != 0 ||
             _cardZones.Count(CardLocation.DrawPile) != _cardZones.TotalCards)
             throw new InvalidOperationException("Shenwu god equipment must be prepared after all drafts and before the first physical movement.");
-        var selected = ShenwuPlayerSlots.Select(seat => _players[seat])
-            .Where(player => activity.GodPoolIds.Contains(player.General.Id, StringComparer.Ordinal))
-            .Select(player => (Player: player, Equipment: ShenwuGodEquipment(
-                _contentRegistry.Generals[player.General.Id].CharacterId ?? ShenwuLegacyGodFamily(player.General.Id))))
-            .Where(entry => entry.Equipment is not null).ToArray();
-        var replacements = selected.Where(entry => entry.Equipment!.Value.Replaces is not null)
-            .ToDictionary(entry => entry.Equipment!.Value.Replaces!.Value, entry => entry.Equipment!.Value.Kind);
-        var cards = _cardZones.CardsAt(CardLocation.DrawPile).Select(card =>
-            replacements.TryGetValue(card.Kind, out var kind) ? card with { Kind = kind } : card).ToList();
-        var nextId = cards.Select(card => card.Id).DefaultIfEmpty().Max();
-        foreach (var (_, equipment) in selected.Where(entry => entry.Equipment!.Value.Replaces is null))
-            cards.Add(new(++nextId, equipment!.Value.Kind, Suit.Spade, 1));
-        _cardZones.RebuildPristineDrawPile(cards);
+        var plan = ModeSetup.PrepareSelectedEquipment(Array.AsReadOnly(_cardZones.CardsAt(CardLocation.DrawPile).ToArray()), CaptureModeSetupSeats()) ??
+            throw new InvalidOperationException("Shenwu setup did not produce its selected-equipment plan.");
+        _cardZones.RebuildPristineDrawPile(plan.Cards);
         _initialCardCount = _cardZones.TotalCards;
-        foreach (var (player, equipment) in selected)
+        foreach (var placement in plan.Placements)
         {
-            var card = _cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(card => card.Kind == equipment!.Value.Kind) ??
+            var card = _cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(card => card.Id == placement.CardId) ??
                 throw new InvalidOperationException("A chosen god's original dedicated equipment entity is missing from the military deck.");
-            PlaceAdvancedEquipment(card, player.Seat);
+            PlaceAdvancedEquipment(card, placement.Seat);
         }
-        AdvanceEventRulesAndQueueFact(new ShenwuEquipmentInitializedEvent(selected.Length));
+        foreach (var fact in plan.CompletionFacts) AdvanceEventRulesAndQueueFact(fact);
     }
-    private static (CardKind Kind, CardKind? Replaces)? ShenwuGodEquipment(string? family) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ShenwuEquipment.ShenwuGodEquipment(family);
-    private static string? ShenwuLegacyGodFamily(string id) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ShenwuEquipment.ShenwuLegacyGodFamily(id);
-
     [ProgramDistanceRule(ProgramDistanceStage.DistanceBaseTerms, 20)]
     private void AddShenwuDistanceBaseTerms(ProgramDistanceQuery query, List<RuleQueryBaseTerm> terms)
     {

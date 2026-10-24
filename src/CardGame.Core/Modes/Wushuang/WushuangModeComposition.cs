@@ -11,11 +11,8 @@ public sealed partial class GameEngine
     // services. Common command and turn execution depend on their contracts.
     private MatchModeRuntime CreateMatchModeRuntime()
     {
-        var context = new ModeFeatureCreationContext(_options.Seed, _contentRegistry,
-            contract => contract == typeof(IWushuangModeHost) ? new WushuangModeHost(this) : null);
-        var features = _contentRegistry.ModeFeatureFactories
-            .Where(factory => factory.ModeId == _modeDefinition.Id)
-            .Select(factory => (object)factory.Create(context)).ToList();
+        var context = new ModeFeatureCreationContext(_options, _modeDefinition, _contentRegistry, CreateModeHostServices());
+        var features = ModeFeatureComposition.Create(context);
         if (_modeDefinition.Id == WushuangMode.ModeId && !features.OfType<IWushuangModeFeature>().Any())
             throw new InvalidOperationException("The Wushuang mode requires its explicitly registered mode feature factory.");
         if (features.OfType<IWushuangModeFeature>().Any())

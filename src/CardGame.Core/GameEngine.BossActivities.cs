@@ -5,55 +5,6 @@ public sealed partial class GameEngine
     private int BossActivitySeat => (Math.Max(0, _options.HumanSeat) + 3) % _playerCount;
     private int BossActivityStageIndex => CompleteProgramEventHistory().OfType<BossActivityStageStartedEvent>()
         .Select(e => e.StageIndex).DefaultIfEmpty(0).Last();
-    private IReadOnlyList<string> BossActivitySeatPool(int seat) => _modeDefinition.HellActivity is { } hell && seat == HellAuxiliarySeat ? [hell.AuxiliaryGeneralId] : seat == BossActivitySeat
-        ? _modeDefinition.NianActivity is { } nian ? [nian.FormGeneralIds[0]] : _modeDefinition.BossActivity!.Stages[0].GeneralPoolIds
-        : _modeDefinition.BossActivity!.PlayerPoolIds;
-
-    private GeneralDefinition BossActivityGeneral(CharacterState player, GeneralDefinition general) =>
-        _modeDefinition.BossActivity is { } a && player.TeamId == a.PlayerTeamId
-            ? general with { Skills = general.Skills.Concat(a.PlayerSkillIds.Select(id =>
-                ToRuntimeSkillDefinition(_contentRegistry.GetSkill(id)))).ToArray() } : general;
-
-    private void InitializeBossActivityHealth(CharacterState player)
-    {
-        if (_modeDefinition.HellActivity is not null) { InitializeHellActivityHealth(player); return; }
-        var tier = _modeDefinition.BossActivity!.PlayerTier;
-        var bonus = player.Seat == BossActivitySeat ? 0 : (tier >= 2 ? 1 : 0) + (tier >= 5 ? 1 : 0);
-        player.MaxHp = checked(player.General.BaseHp + bonus);
-        player.Hp = checked((player.General.InitialHp ?? player.General.BaseHp) + bonus);
-    }
-
-    private void SetupBossActivityPlayers()
-    {
-        if (_modeDefinition.HellActivity is not null) { SetupHellActivityPlayers(); return; }
-        var activity = _modeDefinition.BossActivity!;
-        for (var seat = 0; seat < _playerCount; seat++)
-        {
-            var team = seat == BossActivitySeat ? activity.EnemyTeamId : activity.PlayerTeamId;
-            _players.Add(new CharacterState
-            {
-                Seat = seat, Name = seat == _options.HumanSeat ? "你" : seat == BossActivitySeat ?
-                    _modeDefinition.HulaoActivity is not null ? "神吕布" : _modeDefinition.NianActivity is not null ? "年兽" : "鬼怪首领" : $"人机搭档 {seat + 1} · {activity.PlayerTier}阶",
-                IsHuman = seat == _options.HumanSeat, Role = GetTeamRole(team), TeamId = team,
-                TeamRevealed = true, RoleRevealed = true, General = CreateHiddenGeneral(),
-                GeneralSelected = false, GeneralRevealed = false, Hp = 4, MaxHp = 4
-            });
-        }
-        _availableGenerals.AddRange(_generalPool);
-        _random.Shuffle(_availableGenerals);
-        if (_options.UseInteractiveSetup)
-            _selectionOrder.AddRange(_players.OrderBy(p => p.IsHuman ? 0 : 1).ThenBy(p => p.Seat).Select(p => p.Seat));
-        else
-            foreach (var player in _players)
-            {
-                var general = _availableGenerals.First(g => BossActivitySeatPool(player.Seat).Contains(g.Id, StringComparer.Ordinal));
-                _availableGenerals.Remove(general);
-                player.General = BossActivityGeneral(player, general);
-                player.GeneralSelected = player.GeneralRevealed = true;
-                InitializeBossActivityHealth(player);
-            }
-    }
-
     private IEnumerable<RuleQueryContribution> BossActivityRuleContributions(CharacterState player, SkillRuleQuery query)
     {
         if (_modeDefinition.BossActivity is not { } a) yield break;

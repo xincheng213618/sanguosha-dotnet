@@ -16,11 +16,6 @@ public sealed partial class GameEngine
         _contentRegistry.Skills.TryGetValue(grant.SkillId, out var skill) && WushuangCatalogue.IsSkillAllowed(skill);
     public bool IsWushuangClockRunning => WushuangFeature is not null && _started && _setupComplete && _winner == Winner.None;
     public int? WushuangRemainingMilliseconds => WushuangFeature?.RemainingMilliseconds;
-    private void InitializeWushuangAutomaticHealth()
-    {
-        if (!IsWushuangMode || _options.UseInteractiveSetup) return;
-        foreach (var p in _players) { p.MaxHp = p.General.BaseHp; p.Hp = p.General.InitialHp ?? p.MaxHp; }
-    }
     private WushuangIntermissionFrame? ActiveWushuangWindow(int seat) => WushuangFeature?.ActiveWushuangWindow(seat);
     private bool HasWushuangIntermissionBoundary() => WushuangFeature?.HasWushuangIntermissionBoundary() ?? false;
     public WushuangSnapshot? CreateWushuangSnapshot(int viewerSeat) => WushuangFeature?.CreateWushuangSnapshot(viewerSeat) is { } shop

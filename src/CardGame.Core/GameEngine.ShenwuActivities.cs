@@ -13,71 +13,11 @@ public sealed partial class GameEngine
     private bool IsShenwuPlayerSlot(int seat) => _modeDefinition.ShenwuActivity is { } activity &&
         activity.PlayerSeatOffsets.Contains(ShenwuSeatOffset(seat));
 
-    private void SetupShenwuPlayers()
-    {
-        var activity = _modeDefinition.ShenwuActivity!;
-        var gods = activity.GodPoolIds.ToList();
-        _random.Shuffle(gods);
-        var leader = activity.LeaderPoolIds[_random.Next(activity.LeaderPoolIds.Count)];
-        _shenwuDraft = new(Array.AsReadOnly(gods.Take(3).ToArray()), leader);
-        for (var seat = 0; seat < _playerCount; seat++)
-        {
-            var allied = IsShenwuPlayerSlot(seat);
-            var team = allied ? activity.PlayerTeamId : activity.EnemyTeamId;
-            _players.Add(new CharacterState
-            {
-                Seat = seat, Name = seat == _options.HumanSeat ? "你" : allied ? $"人机搭档 {seat + 1} · {activity.PlayerTier}阶"
-                    : seat == ShenwuLeaderSeat ? "凶兽首领" : $"烛阴 {seat + 1}",
-                IsHuman = seat == _options.HumanSeat, TeamId = team, Role = GetTeamRole(team),
-                TeamRevealed = true, RoleRevealed = true, General = CreateHiddenGeneral(),
-                GeneralSelected = false, GeneralRevealed = false,
-                Hp = 4, MaxHp = 4
-            });
-        }
-        _availableGenerals.AddRange(_generalPool);
-        _random.Shuffle(_availableGenerals);
-        var order = ShenwuPlayerSlots.Concat(Enumerable.Range(0, _playerCount).Where(seat => !IsShenwuPlayerSlot(seat))).ToArray();
-        if (_options.UseInteractiveSetup) _selectionOrder.AddRange(order);
-        else
-            foreach (var seat in order)
-            {
-                var player = _players[seat];
-                var general = GetShenwuGeneralOffers(player).First().General;
-                _availableGenerals.Remove(general);
-                player.General = ShenwuActivityGeneral(player, general);
-                player.GeneralSelected = player.GeneralRevealed = true;
-                InitializeShenwuHealth(player);
-            }
-    }
-
     private void RecordShenwuDraftFacts()
     {
         if (_shenwuDraft is not { } draft) return;
         AdvanceEventRulesAndQueueFact(new ShenwuSharedGodCandidatesEvent(draft.SharedGods));
         AdvanceEventRulesAndQueueFact(new ShenwuLeaderChosenEvent(ShenwuLeaderSeat, draft.LeaderId));
-    }
-
-    private IReadOnlyList<(GeneralDefinition General, string CandidateId)> GetShenwuGeneralOffers(CharacterState player, bool fullRoster = false)
-    {
-        var activity = _modeDefinition.ShenwuActivity!;
-        if (!IsShenwuPlayerSlot(player.Seat))
-        {
-            var id = player.Seat == ShenwuLeaderSeat
-                ? _shenwuDraft!.LeaderId
-                : activity.MinionGeneralIds[activity.MinionSeatOffsets.ToList().IndexOf(ShenwuSeatOffset(player.Seat))];
-            return _availableGenerals.Where(general => general.Id == id).Select(general => (general, general.Id)).ToArray();
-        }
-        var ordinary = _availableGenerals.Where(general => activity.PlayerPoolIds.Contains(general.Id, StringComparer.Ordinal));
-        var representatives = ordinary.DistinctBy(general => _contentRegistry.Generals[general.Id].CharacterId ?? general.Id,
-            StringComparer.Ordinal).Take(fullRoster ? int.MaxValue : 5).ToArray();
-        var offers = representatives.SelectMany(representative => ordinary.Where(general =>
-                (_contentRegistry.Generals[general.Id].CharacterId ?? general.Id) ==
-                (_contentRegistry.Generals[representative.Id].CharacterId ?? representative.Id)),
-            (representative, general) => (General: general, CandidateId: representative.Id)).ToList();
-        var shared = _shenwuDraft!.SharedGods;
-        offers.AddRange(_availableGenerals.Where(general => shared.Contains(general.Id, StringComparer.Ordinal))
-            .Select(general => (general, general.Id)));
-        return offers;
     }
 
     private PromptChoice WithShenwuGeneralChoice(PromptChoice choice, GeneralDefinition general, string candidateId)
@@ -97,25 +37,8 @@ public sealed partial class GameEngine
         };
     }
 
-    private GeneralDefinition ShenwuActivityGeneral(CharacterState player, GeneralDefinition general)
-    {
-        if (_modeDefinition.ShenwuActivity is not { } activity) return general;
-        var extras = IsShenwuPlayerSlot(player.Seat) ? activity.PlayerSkillIds :
-            activity.Edition != 0 ? new[] { "shenwu:enemy-tier" }.Concat(activity.EnemyTier == 5 ? new[] { "shenwu:kunshou" } : []) : [];
-        return general with { Skills = general.Skills.Concat(extras.Select(id => ToRuntimeSkillDefinition(_contentRegistry.GetSkill(id)))).ToArray() };
-    }
-
     private static int ShenwuPlayerHealthBonus(ShenwuActivityDefinition activity) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ShenwuActivities.ShenwuPlayerHealthBonus(activity);
-
-    private void InitializeShenwuHealth(CharacterState player)
-    {
-        var activity = _modeDefinition.ShenwuActivity!;
-        var bonus = IsShenwuPlayerSlot(player.Seat) ? ShenwuPlayerHealthBonus(activity) :
-            activity.Edition == 2020 ? activity.EnemyTier switch { >= 4 => 2, >= 2 => 1, _ => 0 } : 0;
-        player.MaxHp = checked(player.General.BaseHp + bonus);
-        player.Hp = checked((player.General.InitialHp ?? player.General.BaseHp) + bonus);
-    }
 
     private IEnumerable<RuleQueryContribution> ShenwuActivityRuleContributions(CharacterState player, SkillRuleQuery query)
     {

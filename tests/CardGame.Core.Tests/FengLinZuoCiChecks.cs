@@ -17,7 +17,7 @@ internal static class FengLinZuoCiChecks
     private sealed class WithoutLibrary(ContentRegistry source):IGameContentPackage
     {
         public PackageManifest Manifest{get;}=new("fixture:zc-old",new Version(1,0,0),[]);
-        public void Register(IContentRegistryBuilder b){foreach(var c in source.Cards.Values)b.AddCard(c);foreach(var s in source.Skills.Values)b.AddSkill(s.Id is "classic:huashen" or "classic:xinsheng"?s with{Program=null}:s);foreach(var g in source.Generals.Values)b.AddGeneral(g);foreach(var d in source.Decks.Values)b.AddDeck(d);foreach(var m in source.Modes.Values)b.AddMode(m);}
+        public void Register(IContentRegistryBuilder b){b.CopyModeFeatureFactoriesFrom(source);foreach(var c in source.Cards.Values)b.AddCard(c);foreach(var s in source.Skills.Values)b.AddSkill(s.Id is "classic:huashen" or "classic:xinsheng"?s with{Program=null}:s);foreach(var g in source.Generals.Values)b.AddGeneral(g);foreach(var d in source.Decks.Values)b.AddDeck(d);foreach(var m in source.Modes.Values)b.AddMode(m);}
     }
     private static (GameEngine,ContentRegistry) Start(bool multi=false,bool god=false,bool weidi=false)
     {

@@ -128,6 +128,7 @@ internal static class EquipmentContentChecks
 
         public void Register(IContentRegistryBuilder builder)
         {
+            builder.AddModeFeatureFactory(new CardGame.Modes.Standard.StandardModeSetupFactory());
             var weapon = EquipmentCatalog.Get(CardKind.Xuanjian);
             builder.AddCard(new("test:runtime-xuanjian", weapon.DisplayName, "装备牌", weapon.Description, CardKind.Xuanjian));
             builder.AddDeck(new("test:runtime-equipment-deck", "装备运行测试牌堆", 4, 2,

@@ -1229,7 +1229,7 @@ internal static class WushuangUiChecks
         public void Register(IContentRegistryBuilder builder)
         {
             var source = StandardWushuangContentRegistry.Create();
-            foreach (var factory in source.ModeFeatureFactories) builder.AddModeFeatureFactory(factory);
+            builder.CopyModeFeatureFactoriesFrom(source);
             foreach (var skill in source.Skills.Values.Where(s =>
                 s.Id.StartsWith("wushuang:", StringComparison.Ordinal) || s.Id.StartsWith("shanhe:", StringComparison.Ordinal) ||
                 s.Id.StartsWith("hulao:", StringComparison.Ordinal) || s.Id.StartsWith("shenwu:", StringComparison.Ordinal) ||

@@ -226,13 +226,14 @@ internal static class MultiCardDraftUiChecks
         internal const string Owner = "fixture:multi-card-draft-owner";
         internal const string OwnedSkill = "fixture:multi-card-draft-owned";
         internal const string PlainMode = "identity:multi-card-draft";
-        public PackageManifest Manifest { get; } = new("fixture-multi-card-draft", new(1, 0, 0));
+        public PackageManifest Manifest { get; } = new("fixture-multi-card-draft", new(1, 0, 0),
+            [new("standard", StandardContentPackage.CurrentVersion)]);
         public void Register(IContentRegistryBuilder builder)
         {
             if (timed)
             {
                 var source = StandardWushuangContentRegistry.Create();
-                foreach (var factory in source.ModeFeatureFactories) builder.AddModeFeatureFactory(factory);
+                builder.CopyModeFeatureFactoriesFrom(source);
                 foreach (var skill in source.Skills.Values.Where(skill =>
                     skill.Id.StartsWith("wushuang:", StringComparison.Ordinal) || skill.Id.StartsWith("shanhe:", StringComparison.Ordinal) ||
                     skill.Id.StartsWith("hulao:", StringComparison.Ordinal) || skill.Id.StartsWith("shenwu:", StringComparison.Ordinal) ||

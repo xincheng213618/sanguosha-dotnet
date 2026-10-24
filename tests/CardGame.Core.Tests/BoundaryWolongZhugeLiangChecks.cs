@@ -155,6 +155,7 @@ internal static class BoundaryWolongZhugeLiangChecks
         public void Register(IContentRegistryBuilder builder)
         {
             if (source is null) return;
+            builder.CopyModeFeatureFactoriesFrom(source);
             foreach (var definition in source.Cards.Values) builder.AddCard(definition);
             foreach (var definition in source.Skills.Values) builder.AddSkill(definition);
             foreach (var definition in source.Generals.Values) builder.AddGeneral(definition);

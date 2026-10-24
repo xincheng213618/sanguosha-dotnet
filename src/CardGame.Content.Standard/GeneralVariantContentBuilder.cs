@@ -11,6 +11,9 @@ internal sealed class GeneralVariantContentBuilder(IContentRegistryBuilder targe
     public void AddSkill(ContentSkillDefinition definition) => target.AddSkill(definition);
     public void AddDeck(ContentDeckRecipe definition) => target.AddDeck(definition);
     public void AddMode(ContentModeDefinition definition) => target.AddMode(definition);
+    public void AddModeFeatureFactory(IGameModeFeatureFactory factory) => target.AddModeFeatureFactory(factory);
+    public bool HasModeFeatureFactory(string id) => target.HasModeFeatureFactory(id);
+    public void AddEquipmentContent(EquipmentContentPackage package) => target.AddEquipmentContent(package);
     public void AddGeneral(ContentGeneralDefinition definition)
     {
         target.AddGeneral(definition);

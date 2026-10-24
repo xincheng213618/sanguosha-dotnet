@@ -128,45 +128,6 @@ internal static class RuntimeRules_Core_CommonRules
         }
     }
 
-    internal static List<Role> CreateIdentityRoles(ContentModeDefinition mode, int playerCount)
-    {
-        var roles = new List<Role>();
-        foreach (var role in Enum.GetValues<Role>())
-        {
-            if (!mode.RoleCounts.TryGetValue(role.ToString(), out var count))
-            {
-                continue;
-            }
-
-            if (count < 0)
-            {
-                throw new InvalidOperationException($"Mode '{mode.Id}' has a negative {role} count.");
-            }
-
-            for (var index = 0; index < count; index++)
-            {
-                roles.Add(role);
-            }
-        }
-
-        var unknownRoles = mode.RoleCounts.Keys
-            .Where(key => !Enum.TryParse<Role>(key, ignoreCase: false, out _))
-            .ToArray();
-        if (unknownRoles.Length > 0)
-        {
-            throw new InvalidOperationException(
-                $"Mode '{mode.Id}' contains unknown role ids: {string.Join(", ", unknownRoles)}.");
-        }
-
-        if (roles.Count != playerCount || roles.Count(role => role == Role.Lord) != 1)
-        {
-            throw new InvalidOperationException(
-                $"Mode '{mode.Id}' does not provide exactly one valid {playerCount}-seat identity distribution.");
-        }
-
-        return roles;
-    }
-
     internal static string FormatRoleSummary(ContentModeDefinition mode)
     {
         var roleNames = new Dictionary<Role, string>

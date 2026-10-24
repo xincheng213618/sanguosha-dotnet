@@ -25,40 +25,6 @@ public sealed partial class GameEngine
         beforeFact?.Invoke(move);
     }
 
-    private void SetupHellActivityPlayers()
-    {
-        var activity = _modeDefinition.BossActivity!;
-        var hell = _modeDefinition.HellActivity!;
-        for (var seat = 0; seat < _playerCount; seat++)
-        {
-            var npc = seat == BossActivitySeat || seat == HellAuxiliarySeat;
-            var auxiliary = seat == HellAuxiliarySeat;
-            var team = npc ? activity.EnemyTeamId : activity.PlayerTeamId;
-            var player = new CharacterState
-            {
-                Seat = seat, Name = seat == _options.HumanSeat ? "你" : auxiliary ? "孟婆" : npc ? "十殿阎罗" : $"人机搭档 {seat + 1} · 5阶",
-                IsHuman = seat == _options.HumanSeat, Role = GetTeamRole(team), TeamId = team,
-                TeamRevealed = true, RoleRevealed = true,
-                General = auxiliary ? _generalPool.Single(g => g.Id == hell.AuxiliaryGeneralId) : CreateHiddenGeneral(),
-                GeneralSelected = auxiliary, GeneralRevealed = false, IsAlive = !auxiliary, Hp = auxiliary ? 0 : 4, MaxHp = 4
-            };
-            if (auxiliary) { InitializeHellActivityHealth(player); player.Hp = 0; }
-            _players.Add(player);
-        }
-        _availableGenerals.AddRange(_generalPool.Where(g => g.Id != hell.AuxiliaryGeneralId));
-        _random.Shuffle(_availableGenerals);
-        if (_options.UseInteractiveSetup)
-            _selectionOrder.AddRange(_players.Where(p => p.Seat != HellAuxiliarySeat).OrderBy(p => p.IsHuman ? 0 : 1).ThenBy(p => p.Seat).Select(p => p.Seat));
-        else foreach (var player in _players.Where(p => p.Seat != HellAuxiliarySeat))
-        {
-            var general = _availableGenerals.First(g => BossActivitySeatPool(player.Seat).Contains(g.Id, StringComparer.Ordinal));
-            _availableGenerals.Remove(general);
-            player.General = BossActivityGeneral(player, general);
-            player.GeneralSelected = player.GeneralRevealed = true;
-            InitializeHellActivityHealth(player);
-        }
-    }
-
     private void InitializeHellActivityHealth(CharacterState player)
     {
         var bonus = IsHellNpc(player) ? _modeDefinition.HellActivity!.BossTier switch { >= 5 => 2, >= 3 => 1, _ => 0 } : 2;
@@ -79,9 +45,6 @@ public sealed partial class GameEngine
         };
         if (amount != 0) yield return new FiniteRuleQueryContribution($"activity:{_modeDefinition.Id}:tier-{query}", SkillRuleOperation.Add, amount);
     }
-
-    private IReadOnlyList<Card> PrepareHellActivityDeck(IReadOnlyList<Card> cards) => _modeDefinition.HellActivity is null
-        ? cards : Array.AsReadOnly(cards.Where(card => card.Kind != CardKind.WoodenOx).ToArray());
 
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeDeclaration, 29)]
     private bool TryAdvanceHellActivity()

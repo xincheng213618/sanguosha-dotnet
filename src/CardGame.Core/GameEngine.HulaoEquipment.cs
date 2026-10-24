@@ -49,30 +49,6 @@ public sealed partial class GameEngine
             !HasCardArmorBypass(_players[useAction.ActorSeat], gate.Owner, useAction.EffectiveKind);
     }
 
-    private IReadOnlyList<Card> PrepareHulaoActivityDeck(IReadOnlyList<Card> original)
-    {
-        if (_modeDefinition.HulaoActivity is null) return original;
-        var candidates = new List<CardKind> { CardKind.WushuangHalberd, CardKind.PurpleGoldCrown,
-            CardKind.RedCottonRobe, CardKind.LionBelt };
-        _random.Shuffle(candidates);
-        var selected = candidates.Take(_random.Next(4) + 1).ToHashSet();
-        var cards = original.Select(card => card.Kind switch
-        {
-            CardKind.FiveGrains or CardKind.PeachGarden => card with { Kind = CardKind.AllianceFeast },
-            CardKind.FangtianHalberd when selected.Contains(CardKind.WushuangHalberd) =>
-                card with { Kind = CardKind.WushuangHalberd },
-            CardKind.BaguaFormation when selected.Contains(CardKind.LionBelt) =>
-                card with { Kind = CardKind.LionBelt },
-            _ => card
-        }).ToList();
-        var id = cards.Select(card => card.Id).DefaultIfEmpty(0).Max();
-        // Added card faces use explicit local printed suits/ranks; replacement
-        // entities retain the military deck's exact physical identity and face.
-        if (selected.Contains(CardKind.PurpleGoldCrown)) cards.Add(new(++id, CardKind.PurpleGoldCrown, Suit.Club, 1));
-        if (selected.Contains(CardKind.RedCottonRobe)) cards.Add(new(++id, CardKind.RedCottonRobe, Suit.Diamond, 1));
-        return Array.AsReadOnly(cards.ToArray());
-    }
-
     private void EquipHulaoBossInitialEquipment()
     {
         if (_modeDefinition.HulaoActivity is null || CompleteProgramEventHistory()

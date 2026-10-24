@@ -1011,6 +1011,9 @@ var tests = new (string Name, Action Body)[]
     ("character manifests preserve ordered registration and package isolation", CharacterContentCatalogChecks.OrderedRegistrationAndPackageIsolation),
     ("program capability registration isolates adapters and preserves typed host compatibility", ProgramCapabilityChecks.RegistrationAndIsolationPreserveBoundaries),
     ("program runtime modules share match instances and reject engine dependencies", ProgramRuntimeModuleChecks.IndependentFactoriesShareMatchInstancesAndRejectEngineDependencies),
+    ("Mode setup composition: exact override preserves independent features and rejects conflicts", ModeSetupCompositionChecks.ExactSetupReplacesOnlyDefaultAndConflictsStayExplicit),
+    ("Mode setup: frozen private drafts use shared deterministic random", ModeSetupPlanChecks.FrozenPrivateDraftsUseSharedDeterministicRandom),
+    ("Mode setup: pure names selected equipment and primary dual health", ModeSetupPlanChecks.PureCardNamesSelectedEquipmentAndPrimaryDualHealth),
     ("Mode extensions: ordered native and external rules", ModeFlowExtensionChecks.NativeAndExternalRulesShareOrderedPipeline),
     ("Mode extensions: ordered runtime continuations", ModeFlowExtensionChecks.NativeAndExternalRuntimeHooksShareOrderedScheduler),
     ("Mode extensions: controlled hosts and wildcard factories", ModeFlowExtensionChecks.ControlledHostsAndWildcardFactoryQueries),
@@ -4392,6 +4395,10 @@ sealed class ModifiedStandardContentPackage : IGameContentPackage
 
 sealed class ModifiedStandardContentBuilder(IContentRegistryBuilder inner) : IContentRegistryBuilder
 {
+    public void AddModeFeatureFactory(IGameModeFeatureFactory factory) => inner.AddModeFeatureFactory(factory);
+    public bool HasModeFeatureFactory(string id) => inner.HasModeFeatureFactory(id);
+    public void AddEquipmentContent(EquipmentContentPackage package) => inner.AddEquipmentContent(package);
+
     public void AddCard(ContentCardDefinition definition) => inner.AddCard(
         definition.Id == "standard:slash"
             ? definition with { Description = $"{definition.Description}（同版本内容漂移）" }

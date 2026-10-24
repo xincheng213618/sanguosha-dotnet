@@ -38,5 +38,8 @@ internal static class HistoricalGeneralSelectionContent
         public void AddGeneral(ContentGeneralDefinition definition) => builder.AddGeneral(definition);
         public void AddDeck(ContentDeckRecipe definition) => builder.AddDeck(definition);
         public void AddMode(ContentModeDefinition definition) => builder.AddMode(definition with { GeneralSelectionPoolIds = null });
+        public void AddModeFeatureFactory(IGameModeFeatureFactory factory) => builder.AddModeFeatureFactory(factory);
+        public bool HasModeFeatureFactory(string id) => builder.HasModeFeatureFactory(id);
+        public void AddEquipmentContent(EquipmentContentPackage package) => builder.AddEquipmentContent(package);
     }
 }

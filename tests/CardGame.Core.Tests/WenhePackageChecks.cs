@@ -98,6 +98,7 @@ internal static class WenhePackageChecks
         public void Register(IContentRegistryBuilder builder)
         {
             if (source is null) return;
+            builder.CopyModeFeatureFactoriesFrom(source);
             foreach (var card in source.Cards.Values) builder.AddCard(card);
             foreach (var skill in source.Skills.Values) builder.AddSkill(skill);
             foreach (var general in source.Generals.Values) builder.AddGeneral(general);

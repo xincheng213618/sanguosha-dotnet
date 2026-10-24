@@ -7,64 +7,12 @@ public sealed partial class GameEngine
     private bool IsActivityPlayerSlot(int seat) => ActivitySeatOffset(seat) is 0 or 5;
     private bool IsActivitySpiritSlot(int seat) => ActivitySeatOffset(seat) is 2 or 3;
 
-    private IReadOnlyList<string> ActivitySeatPool(int seat)
-    {
-        var activity = _modeDefinition.TeamActivity!;
-        return (IsActivityPlayerSlot(seat) ? activity.PlayerPools : IsActivitySpiritSlot(seat)
-            ? activity.SpiritPools : activity.MachinePools)[_players[seat].TeamId!];
-    }
-
     private int ActivityTier(int seat)
     {
         var a = _modeDefinition.TeamActivity!;
         return IsActivityPlayerSlot(seat) ? a.PlayerTier : IsActivitySpiritSlot(seat)
             ? a.SpiritTierMinimum + (int)(((uint)_options.Seed + (uint)ActivitySeatOffset(seat)) % (uint)(a.SpiritTierMaximum - a.SpiritTierMinimum + 1))
             : a.MachineTier;
-    }
-
-    private void SetupActivityPlayers()
-    {
-        var otherTeam = GetModeTeamIds().Single(team => team != ActivityPlayerTeam);
-        for (var seat = 0; seat < _playerCount; seat++)
-        {
-            var team = ActivitySeatOffset(seat) is 0 or 4 or 5 or 6 ? ActivityPlayerTeam : otherTeam;
-            _players.Add(new CharacterState
-            {
-                Seat = seat, Name = seat == _options.HumanSeat ? "你" :
-                    $"{(IsActivityPlayerSlot(seat) ? "人机搭档" : IsActivitySpiritSlot(seat) ? "英灵" : "器械")} {seat + 1} · {ActivityTier(seat)}阶",
-                IsHuman = seat == _options.HumanSeat, Role = GetTeamRole(team), TeamId = team,
-                TeamRevealed = true, RoleRevealed = true, General = CreateHiddenGeneral(),
-                GeneralSelected = false, GeneralRevealed = false, Hp = 4, MaxHp = 4
-            });
-        }
-        _availableGenerals.AddRange(_generalPool);
-        _random.Shuffle(_availableGenerals);
-        if (_options.UseInteractiveSetup)
-            _selectionOrder.AddRange(_players.OrderBy(p => p.IsHuman ? 0 : 1).ThenBy(p => p.Seat).Select(p => p.Seat));
-        else
-            foreach (var player in _players)
-            {
-                var general = _availableGenerals.First(g => ActivitySeatPool(player.Seat).Contains(g.Id, StringComparer.Ordinal));
-                _availableGenerals.Remove(general);
-                player.General = ActivityGeneral(player, general);
-                player.GeneralSelected = player.GeneralRevealed = true;
-                InitializeActivityHealth(player);
-            }
-    }
-
-    private GeneralDefinition ActivityGeneral(CharacterState player, GeneralDefinition general) =>
-        _modeDefinition.TeamActivity is { } a && IsActivityPlayerSlot(player.Seat)
-            ? general with { Skills = general.Skills.Concat(a.PlayerSkillIds[player.TeamId!]
-                .Select(id => ToRuntimeSkillDefinition(_contentRegistry.GetSkill(id)))).ToArray() }
-            : general;
-
-    private void InitializeActivityHealth(CharacterState player)
-    {
-        var tier = ActivityTier(player.Seat);
-        var bonus = IsActivityPlayerSlot(player.Seat) ? (tier >= 2 ? 1 : 0) + (tier >= 5 ? 1 : 0)
-            : (tier >= 2 ? 1 : 0) + (tier >= 3 ? 1 : 0) + (tier >= 4 ? 1 : 0);
-        player.MaxHp = checked(player.General.BaseHp + bonus);
-        player.Hp = player.General.InitialHp is { } hp ? checked(hp + bonus) : player.MaxHp;
     }
 
     private bool SamePublicTeam(CharacterState a, CharacterState b) => a.TeamId is not null && a.TeamId == b.TeamId;

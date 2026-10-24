@@ -49,7 +49,7 @@ internal static class WangYunChecks
         public PackageManifest Manifest{get;}=new("wang-yun-fixture",new(1,0,0),[]);
         public void Register(IContentRegistryBuilder b)
         {
-            var baseRegistry=ContentRegistry.Build(new StandardContentPackage());foreach(var card in baseRegistry.Cards.Values.Where(c=>scenario!="trick" || c.CategoryName!="锦囊牌" || c.LegacyKind is CardKind.DrawTwo or CardKind.Duel or CardKind.Lightning))b.AddCard(card);foreach(var skill in baseRegistry.Skills.Values)b.AddSkill(skill);
+            var baseRegistry=ContentRegistry.Build(new StandardContentPackage());b.CopyModeFeatureFactoriesFrom(baseRegistry);foreach(var card in baseRegistry.Cards.Values.Where(c=>scenario!="trick" || c.CategoryName!="锦囊牌" || c.LegacyKind is CardKind.DrawTwo or CardKind.Duel or CardKind.Lightning))b.AddCard(card);foreach(var skill in baseRegistry.Skills.Values)b.AddSkill(skill);
             void Add(SkillProgramCatalog c){foreach(var(id,p)in c.Programs)b.AddSkill(new(id,c.Presentations[id].Name,c.Presentations[id].Description){Program=p,ProgramPresentation=c.Presentations[id],SelectionWeights=Enum.GetValues<Role>().ToDictionary(role=>role,_=>id==Quiet?10000d:-10000d)});}
             Add(SkillProgramCatalog.Load(Embedded("rules.json"),Embedded("presentation.json")));
             if(scenario is "cardless" or "cardless-actor")

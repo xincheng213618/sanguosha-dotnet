@@ -357,7 +357,6 @@ public sealed partial class GameEngine
         _initialHandSize = deckDefinition.InitialHandSize;
         _drawPerTurn = deckDefinition.DrawPerTurn;
         SetupPlayers();
-        InitializeWushuangAutomaticHealth();
         if(HasPrivateGeneralLibraryCapability)foreach(var player in _players)player.GeneralLibraryGenderQuery=GetPrivateGeneralLibraryGender;
         SetupDeck();
         _currentSeat = GetStartingSeat();
@@ -2756,9 +2755,6 @@ public sealed partial class GameEngine
         ContentModeDefinition mode) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.ValidateModeOptions(options,mode);
 
-    private static List<Role> CreateIdentityRoles(ContentModeDefinition mode, int playerCount) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.CreateIdentityRoles(mode,playerCount);
-
     private static string FormatRoleSummary(ContentModeDefinition mode) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.FormatRoleSummary(mode);
 
@@ -2877,284 +2873,7 @@ public sealed partial class GameEngine
         return definition;
     }
 
-    private void SetupPlayers()
-    {
-        if (IsSurvivalMode) { SetupWenhePlayers(); return; }
-        if (IsTeamMode)
-        {
-            SetupTeamPlayers();
-            return;
-        }
-
-        if (IsNationalWarMode)
-        {
-            SetupNationalWarPlayers();
-            return;
-        }
-
-        var availableRoles = CreateIdentityRoles(_modeDefinition, _playerCount);
-        var assigned = new Role[_playerCount];
-
-        if (_options.HumanSeat >= 0 && _options.HumanRole is { } forcedRole)
-        {
-            assigned[_options.HumanSeat] = forcedRole;
-            if (!availableRoles.Remove(forcedRole))
-            {
-                throw new ArgumentException(
-                    $"Mode '{_modeDefinition.Id}' does not contain a {forcedRole} seat.",
-                    nameof(_options.HumanRole));
-            }
-            _random.Shuffle(availableRoles);
-            var roleIndex = 0;
-            for (var seat = 0; seat < _playerCount; seat++)
-            {
-                if (seat != _options.HumanSeat)
-                {
-                    assigned[seat] = availableRoles[roleIndex++];
-                }
-            }
-        }
-        else
-        {
-            _random.Shuffle(availableRoles);
-            for (var seat = 0; seat < _playerCount; seat++)
-            {
-                assigned[seat] = availableRoles[seat];
-            }
-        }
-
-        var generalsPerSeat = _modeDefinition.DualGenerals ? 2 : 1;
-        if (_generalPool.Count < _playerCount * generalsPerSeat)
-        {
-            throw new InvalidOperationException(
-                $"Mode '{_modeDefinition.Id}' needs {_playerCount * generalsPerSeat} generals but only {_generalPool.Count} are available.");
-        }
-
-        // Setup eligibility is separate from the complete library used by avatars
-        // and other general replacement rules.
-        var generals = _generalPool.Where(IsGeneralSelectionCandidate).ToList();
-        if (!_options.UseInteractiveSetup)
-        {
-            _random.Shuffle(generals);
-            if (UsesFamilyGeneralDraft)
-                generals = DraftGeneralFamilies(generals, _playerCount * generalsPerSeat).ToList();
-        }
-
-        var hiddenGeneral = CreateHiddenGeneral();
-        for (var seat = 0; seat < _playerCount; seat++)
-        {
-            var role = assigned[seat];
-            var assignedGeneral = _options.UseInteractiveSetup ? hiddenGeneral : generals[seat * generalsPerSeat];
-            var maxHp = UsesGeneralBaseHp
-                ? assignedGeneral.BaseHp + (role == Role.Lord ? 1 : 0)
-                : role == Role.Lord ? 5 : 4;
-            if (assignedGeneral.Skills.Any(skill => skill.Id == "anniversary:kunyu")) maxHp = 1;
-            _players.Add(new CharacterState
-            {
-                Seat = seat,
-                Name = IsHumanControlledSeat(seat) ? (_options.HumanSeats is null ? "你" : $"玩家 {seat + 1}") : $"AI {seat + 1}",
-                IsHuman = IsHumanControlledSeat(seat),
-                Role = role,
-                TeamId = null,
-                TeamRevealed = false,
-                RoleRevealed = role == Role.Lord,
-                General = assignedGeneral,
-                GeneralSelected = !_options.UseInteractiveSetup,
-                GeneralRevealed = !_options.UseInteractiveSetup,
-                SecondaryGeneral = !_options.UseInteractiveSetup && _modeDefinition.DualGenerals ? generals[seat * 2 + 1] : null,
-                SecondaryGeneralSelected = !_options.UseInteractiveSetup && _modeDefinition.DualGenerals,
-                SecondaryGeneralRevealed = !_options.UseInteractiveSetup && _modeDefinition.DualGenerals,
-                MaxHp = maxHp,
-                Hp = Math.Min(maxHp, UsesGeneralBaseHp && assignedGeneral.InitialHp is { } initialHp
-                    ? initialHp + (role == Role.Lord ? 1 : 0) : maxHp)
-            });
-        }
-
-        if (_options.UseInteractiveSetup)
-        {
-            _availableGenerals.AddRange(generals);
-            _random.Shuffle(_availableGenerals);
-            // Only the public Lord may consume the shared roster before the
-            // local player sees it; missing IDs must not expose private AI picks.
-            _selectionOrder.AddRange(_players
-                .OrderBy(player => player.Role == Role.Lord ? 0 : 1)
-                .ThenBy(player => player.IsHuman ? 0 : 1)
-                .ThenBy(player => player.Seat)
-                .SelectMany(player => Enumerable.Repeat(player.Seat, generalsPerSeat)));
-        }
-    }
-
-    private void SetupTeamPlayers()
-    {
-        if (_options.ShanheBattle is not null) { SetupShanhePlayers(); return; }
-        if (IsGuanduActivity) { SetupGuanduPlayers(); return; }
-        if (IsDragonBoatActivity) { SetupDragonBoatPlayers(); return; }
-        if (_modeDefinition.ShenwuActivity is not null) { SetupShenwuPlayers(); return; }
-        if (_modeDefinition.TeamActivity is not null) { SetupActivityPlayers(); return; }
-        if (_modeDefinition.BossActivity is not null) { SetupBossActivityPlayers(); return; }
-        var teamIds = GetModeTeamIds();
-        if (teamIds.Count != 2 || _modeDefinition.TeamCounts is null)
-        {
-            throw new InvalidOperationException(
-                $"Mode '{_modeDefinition.Id}' requires exactly two public teams for this engine adapter.");
-        }
-
-        var availableTeams = _modeDefinition.TeamCounts
-            .OrderBy(entry => entry.Key, StringComparer.Ordinal)
-            .SelectMany(entry => Enumerable.Repeat(entry.Key, entry.Value))
-            .ToList();
-        var assignedTeams = new string[_playerCount];
-        if (_options.HumanSeat >= 0 && _options.HumanTeamId is { } humanTeamId)
-        {
-            assignedTeams[_options.HumanSeat] = humanTeamId;
-            if (!availableTeams.Remove(humanTeamId))
-            {
-                throw new ArgumentException(
-                    $"Mode '{_modeDefinition.Id}' has no remaining seat for team '{humanTeamId}'.",
-                    nameof(_options.HumanTeamId));
-            }
-
-            _random.Shuffle(availableTeams);
-            var teamIndex = 0;
-            for (var seat = 0; seat < _playerCount; seat++)
-            {
-                if (seat != _options.HumanSeat)
-                {
-                    assignedTeams[seat] = availableTeams[teamIndex++];
-                }
-            }
-        }
-        else
-        {
-            _random.Shuffle(availableTeams);
-            for (var seat = 0; seat < _playerCount; seat++)
-            {
-                assignedTeams[seat] = availableTeams[seat];
-            }
-        }
-
-        if (_generalPool.Count < _playerCount)
-        {
-            throw new InvalidOperationException(
-                $"Mode '{_modeDefinition.Id}' needs {_playerCount} generals but only {_generalPool.Count} are available.");
-        }
-
-        var generals = _generalPool.ToList();
-        if (!_options.UseInteractiveSetup)
-        {
-            _random.Shuffle(generals);
-        }
-
-        var hiddenGeneral = CreateHiddenGeneral();
-        for (var seat = 0; seat < _playerCount; seat++)
-        {
-            var teamId = assignedTeams[seat];
-            _players.Add(new CharacterState
-            {
-                Seat = seat,
-                Name = IsHumanControlledSeat(seat) ? (_options.HumanSeats is null ? "你" : $"玩家 {seat + 1}") : $"AI {seat + 1}",
-                IsHuman = IsHumanControlledSeat(seat),
-                Role = GetTeamRole(teamId),
-                TeamId = teamId,
-                TeamRevealed = true,
-                RoleRevealed = true,
-                General = _options.UseInteractiveSetup ? hiddenGeneral : generals[seat],
-                GeneralSelected = !_options.UseInteractiveSetup,
-                GeneralRevealed = !_options.UseInteractiveSetup,
-                MaxHp = 4,
-                Hp = 4
-            });
-        }
-
-        if (_options.UseInteractiveSetup)
-        {
-            _availableGenerals.AddRange(generals);
-            _random.Shuffle(_availableGenerals);
-            _selectionOrder.AddRange(_players
-                .OrderBy(player => player.IsHuman ? 0 : 1)
-                .ThenBy(player => player.Seat)
-                .Select(player => player.Seat));
-        }
-    }
-
-    private void SetupNationalWarPlayers()
-    {
-        if (_modeDefinition.FactionCounts is not { Count: >= 2 } factionCounts ||
-            factionCounts.Values.Sum() != _playerCount)
-        {
-            throw new InvalidOperationException(
-                $"Mode '{_modeDefinition.Id}' requires at least two hidden factions totaling {_playerCount} seats.");
-        }
-
-        var availableFactions = factionCounts
-            .OrderBy(entry => entry.Key, StringComparer.Ordinal)
-            .SelectMany(entry => Enumerable.Repeat(entry.Key, entry.Value))
-            .ToList();
-        _random.Shuffle(availableFactions);
-
-        var generals = _generalPool.ToList();
-        if (!_options.UseInteractiveSetup)
-        {
-            _random.Shuffle(generals);
-        }
-
-        var hiddenGeneral = CreateHiddenGeneral();
-        for (var seat = 0; seat < _playerCount; seat++)
-        {
-            var factionId = availableFactions[seat];
-            var seatGenerals = generals
-                .Where(general => string.Equals(general.FactionId, factionId, StringComparison.Ordinal))
-                .Take(2)
-                .ToArray();
-            if (!_options.UseInteractiveSetup && seatGenerals.Length != 2)
-            {
-                throw new InvalidOperationException(
-                    $"Mode '{_modeDefinition.Id}' could not reserve two generals for faction '{factionId}'.");
-            }
-
-            if (!_options.UseInteractiveSetup)
-            {
-                foreach (var general in seatGenerals)
-                {
-                    generals.Remove(general);
-                }
-            }
-
-            _players.Add(new CharacterState
-            {
-                Seat = seat,
-                Name = IsHumanControlledSeat(seat) ? (_options.HumanSeats is null ? "你" : $"玩家 {seat + 1}") : $"AI {seat + 1}",
-                IsHuman = IsHumanControlledSeat(seat),
-                // The legacy combat adapter still needs a non-null Role for
-                // old AI/scoring contracts. National snapshots never expose
-                // this compatibility value as an identity role.
-                Role = Role.Renegade,
-                TeamId = null,
-                TeamRevealed = false,
-                NationalFactionId = factionId,
-                FactionRevealed = false,
-                RoleRevealed = false,
-                General = _options.UseInteractiveSetup ? hiddenGeneral : seatGenerals[0],
-                GeneralSelected = !_options.UseInteractiveSetup,
-                GeneralRevealed = false,
-                SecondaryGeneral = _options.UseInteractiveSetup ? null : seatGenerals[1],
-                SecondaryGeneralSelected = !_options.UseInteractiveSetup,
-                SecondaryGeneralRevealed = false,
-                MaxHp = 4,
-                Hp = 4
-            });
-        }
-
-        if (_options.UseInteractiveSetup)
-        {
-            _availableGenerals.AddRange(_generalPool);
-            _random.Shuffle(_availableGenerals);
-            _selectionOrder.AddRange(_players
-                .OrderBy(player => player.IsHuman ? 0 : 1)
-                .ThenBy(player => player.Seat)
-                .SelectMany(player => new[] { player.Seat, player.Seat }));
-        }
-    }
+    private void SetupPlayers() => ApplyModeSetupPlan(ModeSetup.BuildPlayers());
 
     private static IReadOnlyList<Card> CreateDeckFromRegistry(
         ContentRegistry contentRegistry,
@@ -3208,12 +2927,7 @@ public sealed partial class GameEngine
         var cards = CreateDeckFromRegistry(
             _contentRegistry,
             ResolveDeckDefinition(_contentRegistry, _options.DeckId ?? _modeDefinition.DeckId));
-        cards = PrepareHulaoActivityDeck(cards);
-        cards = PrepareShenwuActivityDeck(cards);
-        cards = PrepareHellActivityDeck(cards);
-        cards = PrepareWenheActivityDeck(cards);
-        cards = PrepareDragonBoatDeck(cards);
-        cards = PrepareGuanduDeck(cards);
+        cards = ModeSetup.PrepareDeck(cards);
         _cardZones.LoadInitialDeck(cards);
         _initialCardCount = _cardZones.TotalCards;
         if (!_options.UseInteractiveSetup)
@@ -3699,31 +3413,8 @@ public sealed partial class GameEngine
         if (advanceToHumanBoundary) AdvanceToHumanBoundary();
     }
 
-    private IReadOnlyList<(GeneralDefinition General, string CandidateId)> GetAvailableGeneralOffers(CharacterState player, bool fullRoster = false)
-    {
-        if (IsGuanduActivity) return GetGuanduOffers(player);
-        if (IsDragonBoatActivity) return GetDragonBoatOffers(player);
-        if (_modeDefinition.ShenwuActivity is not null) return GetShenwuGeneralOffers(player, fullRoster);
-        if (UsesFamilyGeneralDraft)
-            return GetDraftGeneralOffers(player, fullRoster);
-        var families = _modeDefinition.GeneralVariantGroups;
-        var familyKeys = families?.SelectMany(group => group.Value.Select(id => (Id: id, Family: group.Key)))
-            .ToDictionary(entry => entry.Id, entry => entry.Family, StringComparer.Ordinal);
-        var candidates = _availableGenerals
-            .Where(general => _modeDefinition.TeamActivity is null || ActivitySeatPool(player.Seat).Contains(general.Id, StringComparer.Ordinal))
-            .Where(general => _modeDefinition.BossActivity is null || BossActivitySeatPool(player.Seat).Contains(general.Id, StringComparer.Ordinal))
-            .Where(general => !IsNationalWarMode ||
-                              string.Equals(general.FactionId, player.NationalFactionId, StringComparison.Ordinal))
-            .DistinctBy(general => familyKeys?.GetValueOrDefault(general.Id, general.Id) ?? general.Id, StringComparer.Ordinal)
-            .Take(fullRoster ? int.MaxValue : player.Role is { } role && _modeDefinition.RoleGeneralCandidateCounts is { } roleCandidates
-                ? roleCandidates.GetValueOrDefault(role.ToString(), _modeDefinition.GeneralCandidateCount)
-                : _modeDefinition.GeneralCandidateCount)
-            .ToArray();
-        return candidates.SelectMany(candidate => new[] { candidate }.Concat(
-                familyKeys is not null && familyKeys.TryGetValue(candidate.Id, out var family)
-                    ? _availableGenerals.Where(general => general.Id != candidate.Id && families![family].Contains(general.Id, StringComparer.Ordinal))
-                    : []), (candidate, general) => (general, candidate.Id)).ToArray();
-    }
+    private IReadOnlyList<(GeneralDefinition General, string CandidateId)> GetAvailableGeneralOffers(
+        CharacterState player, bool fullRoster = false) => GetModeGeneralOffers(player, fullRoster);
 
     private void RequestHumanGeneralSelection(
         CharacterState player,
@@ -3857,22 +3548,8 @@ public sealed partial class GameEngine
         {
             player.General = general;
             player.GeneralSelected = true;
-            player.General = ActivityGeneral(player, general);
-            player.General = BossActivityGeneral(player, player.General);
-            player.General = ShenwuActivityGeneral(player, player.General);
-            if (_modeDefinition.TeamActivity is not null) InitializeActivityHealth(player);
-            if (_modeDefinition.BossActivity is not null) InitializeBossActivityHealth(player);
-            if (_modeDefinition.ShenwuActivity is not null) InitializeShenwuHealth(player);
+            ApplyModeSelectedGeneral(player, general);
             player.GeneralRevealed = !IsTeamMode && player.Role == Role.Lord && !GeneralHasIdentityConcealment(general);
-            if (UsesGeneralBaseHp)
-            {
-                player.MaxHp = general.BaseHp + (player.Role == Role.Lord ? 1 : 0);
-                player.Hp = Math.Min(player.MaxHp, general.InitialHp is { } initialHp
-                    ? initialHp + (player.Role == Role.Lord ? 1 : 0) : player.MaxHp);
-            }
-            if (IsSurvivalMode) InitializeWenheHealth(player);
-            if (IsGuanduActivity) InitializeGuanduHealth(player);
-            if (IsDragonBoatActivity) InitializeDragonBoatHealth(player);
             AddLog("GeneralSelected", player.GeneralRevealed
                 ? $"主公 {player.Name} 选择了 {general.Name}。"
                 : $"座位 {player.Seat + 1} 完成私有选将。", player.Seat);

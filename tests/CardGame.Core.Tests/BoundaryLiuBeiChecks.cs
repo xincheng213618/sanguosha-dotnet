@@ -19,7 +19,7 @@ internal static class BoundaryLiuBeiChecks
     {
         public PackageManifest Manifest{get;}=new("fixture:lb-legacy",new Version(1,0,0),[]);
         public void Register(IContentRegistryBuilder b)
-        {foreach(var c in source.Cards.Values)b.AddCard(c);foreach(var s in source.Skills.Values)b.AddSkill(s.Id=="boundary:jijiang"?s with{Program=null}:s);foreach(var g in source.Generals.Values)b.AddGeneral(g);foreach(var d in source.Decks.Values)b.AddDeck(d);foreach(var m in source.Modes.Values)b.AddMode(m);}
+        {b.CopyModeFeatureFactoriesFrom(source);foreach(var c in source.Cards.Values)b.AddCard(c);foreach(var s in source.Skills.Values)b.AddSkill(s.Id=="boundary:jijiang"?s with{Program=null}:s);foreach(var g in source.Generals.Values)b.AddGeneral(g);foreach(var d in source.Decks.Values)b.AddDeck(d);foreach(var m in source.Modes.Values)b.AddMode(m);}
     }
     private static (GameEngine,ContentRegistry) Start(string mode="gift",bool legacy=false)
     {

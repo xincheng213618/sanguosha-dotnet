@@ -128,7 +128,7 @@ internal static class WushuangAuditCombatChecks
         public void Register(IContentRegistryBuilder b)
         {
             var source = StandardWushuangContentRegistry.Create();
-            foreach (var factory in source.ModeFeatureFactories) b.AddModeFeatureFactory(factory);
+            b.CopyModeFeatureFactoriesFrom(source);
             foreach (var x in source.Cards.Values) b.AddCard(x);
             foreach (var x in source.Skills.Values) b.AddSkill(x);
             foreach (var x in source.Generals.Values) b.AddGeneral(x);

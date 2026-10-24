@@ -23,6 +23,7 @@ public sealed class StandardContentPackage : IGameContentPackage
     public void Register(IContentRegistryBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
+        builder.AddModeFeatureFactory(new CardGame.Modes.Standard.StandardModeSetupFactory());
         EmbeddedSkillProgramCatalog.RegisterBundle(builder, "mobile-mantian-guohai");
         builder.AddCard(new ContentCardDefinition("mobile:mantian-guohai", "瞒天过海", "锦囊牌",
             CardCatalog.Get(CardKind.MantianGuohai).Description, CardKind.MantianGuohai,
