@@ -144,6 +144,8 @@ internal static class Program
                   new HashSet<string>(StringComparer.Ordinal) { "boundary:guo-huai-mobile", "boundary:jian-yong-mobile", "boundary:cai-fu-ren-mobile" }));
             Check("Mobile boundary batch 56 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
                   new HashSet<string>(StringComparer.Ordinal) { "boundary:cao-zhi-mobile", "boundary:ling-tong-mobile", "boundary:han-dang-mobile" }));
+            Check("Mobile boundary batch 57 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
+                  new HashSet<string>(StringComparer.Ordinal) { "boundary:xu-sheng-mobile", "boundary:wu-guo-tai-mobile", "boundary:ma-dai-mobile" }));
             Check("Mobile boundary Cai Fu Ren UI: private two-card view actual paid choice cold", () => BoundaryCaiFuRenMobileUiChecks.ActualPrivateTwoCardViewAndPaidChoiceCold(output));
             Check("Mobile boundary Zuo Ci UI: private exchange actual Back selected draft cold", () => BoundaryZuoCiUiChecks.ActualPrivateExchangeBackAndSelectedDraftCold(output));
             Check("Mobile boundary Zhou Fei UI: opaque storage original ending use and remainder cold", () => BoundaryZhouFeiUiChecks.ForeignOpaqueStoreOriginalEndingUseAndRemainderCold(output));

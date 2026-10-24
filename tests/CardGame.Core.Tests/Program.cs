@@ -1722,6 +1722,8 @@ var tests = new (string Name, Action Body)[]
     ("Mobile boundary Han Dang: frozen responders HE weapons native draw children cold", BoundaryHanDangMobileChecks.FrozenRespondersHandEquippedWeaponsAndNativeDrawChildrenCold),
     ("Mobile boundary Cao Zhi: provenance claims native wine damage and dying face cold", CardGame.Core.Tests.BoundaryCaoZhiMobileChecks.ProvenanceClaimsBaseWineNativeDamageAndDyingFaceSnapshotCold),
     ("Mobile boundary Cao Zhi: Chengzhang native upgrade every turnover wine children cold", CardGame.Core.Tests.BoundaryCaoZhiMobileChecks.ChengzhangNativeUpgradeAndEveryTurnoverWineChildrenCold),
+    ("Mobile boundary Wu Guo Tai: self pair native equipment exchange children cold", BoundaryWuGuoTaiMobileChecks.SelfPairBypassesDifferenceAndNativeExchangeReturnsCold),
+    ("Mobile boundary Wu Guo Tai: dying holder native discard before recovery cold", BoundaryWuGuoTaiMobileChecks.BuyiDyingHolderPerformsRevealedHandDiscardBeforeRecoveryCold),
     ("winner rules cover all three camps", WinnerRules),
     ("manual discards reject invalid subsets without mutation", ManualDiscardChecks.Rejections),
     ("manual discard checkpoints and commands replay exactly", ManualDiscardChecks.Replay),

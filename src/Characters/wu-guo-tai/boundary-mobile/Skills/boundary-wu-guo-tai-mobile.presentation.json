@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:ganlu-mobile": { "name": "甘露", "description": "出牌阶段限一次，交换两名角色的装备；双方装备差不超过已损体力，包含你时不受差值限制。" },
+    "boundary:buyi-mobile": { "name": "补益", "description": "角色进入濒死时，可展示其一张手牌；若非基本牌，其弃置后回复1点体力。" }
+  }
+}

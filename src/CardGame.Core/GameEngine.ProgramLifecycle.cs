@@ -231,10 +231,11 @@ public sealed partial class GameEngine
         var ids = cardIds.ToArray();
         var locations = (sourceLocations ?? ids
             .Select(cardId => _cardZones.GetLocation(cardId)).ToArray()).ToArray();
-        if (selectionActorSeat is { } actor && !IsValidPlayerSeat(actor))
-            throw new InvalidOperationException("The selection producer has an invalid actual actor.");
         if (ids.Distinct().Count() != ids.Length || ids.Length != locations.Length)
             throw new InvalidOperationException("A program card-set binding requires unique cards and aligned source locations.");
+        selectionActorSeat ??= BoundaryWuGuoTaiBuyiDiscardActor(frame, bind, ids, locations);
+        if (selectionActorSeat is { } actor && !IsValidPlayerSeat(actor))
+            throw new InvalidOperationException("The selection producer has an invalid actual actor.");
         ReplaceRuntimeTop(frame with
         {
             CardSetBindings = Array.AsReadOnly(frame.CardSetBindings

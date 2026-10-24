@@ -1,0 +1,9 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:ma-dai",
+  "skills": [{ "registrationOrder": 57200, "programBundle": "boundary-ma-dai-mobile", "includeProgramPresentation": true,
+    "definition": { "id": "boundary:qianxi-mobile", "name": "潜袭", "description": "准备阶段，你可以摸一张牌，并弃置一张牌。若如此做，你选择距离为1的一名角色，然后本回合该角色不能使用或打出与你以此法弃置的牌颜色相同的手牌。", "executionForms": "State, Trigger" } }],
+  "generals": [{ "registrationOrder": 57201, "pools": { "current": 57201 }, "definition": {
+    "id": "boundary:ma-dai-mobile", "name": "界马岱·移动版", "portraitKey": "boundary-ma-dai-mobile", "skillId": "classic:mashu", "additionalSkillIds": ["boundary:qianxi-mobile"],
+    "factionId": "shu", "baseHp": 4, "gender": "Male", "characterId": "character:ma-dai", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

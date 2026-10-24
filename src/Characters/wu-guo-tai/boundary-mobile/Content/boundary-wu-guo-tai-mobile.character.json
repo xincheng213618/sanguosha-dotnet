@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:wu-guo-tai",
+  "skills": [
+    { "registrationOrder": 57100, "programBundle": "boundary-wu-guo-tai-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:ganlu-mobile", "name": "甘露", "description": "出牌阶段限一次，你可以选择两名装备区里的牌数之差不大于你已损失的体力值的角色，交换他们装备区里的牌；若你选择的角色中含有你，则不受牌数之差的限制。", "actionForms": "Active" } },
+    { "registrationOrder": 57101, "programBundle": "boundary-wu-guo-tai-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:buyi-mobile", "name": "补益", "description": "当一名角色进入濒死状态时，你可以展示其一张手牌，然后若此牌不为基本牌，则该角色弃置此牌，然后回复1点体力。", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 57102, "pools": { "current": 57102 }, "definition": {
+    "id": "boundary:wu-guo-tai-mobile", "name": "界吴国太·移动版", "portraitKey": "boundary-wu-guo-tai-mobile", "skillId": "boundary:ganlu-mobile", "additionalSkillIds": ["boundary:buyi-mobile"],
+    "factionId": "wu", "baseHp": 3, "gender": "Female", "characterId": "character:wu-guo-tai", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

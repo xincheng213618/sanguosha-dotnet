@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:qianxi-mobile": { "name": "潜袭", "description": "准备阶段，你可以摸一张牌，并弃置一张牌。若如此做，你选择距离为1的一名角色，然后本回合该角色不能使用或打出与你以此法弃置的牌颜色相同的手牌。",
+      "triggerChoices": { "preparation-draw-discard-color-ban": "摸一张并弃一张，限制距离1的角色使用或打出同色手牌" } }
+  }
+}

@@ -26,9 +26,18 @@ public sealed partial class GameEngine
             if (active.SelectedTargetSeats.All(seat => GetEquipment(_players[seat]).Count == 0))
                 return SkillProgramStepOutcome.Continue;
         }
-        else if (active.SelectedTargetSeats.Count != 2 ||
-            !IsProgramEquipmentExchangePair(active.OwnerSeat, active.SelectedTargetSeats[0], active.SelectedTargetSeats[1]))
-            throw new InvalidOperationException("Equipment exchange requires a current legal equipment pair.");
+        else
+        {
+            var legalPair = active.SelectedTargetSeats.Count == 2 &&
+                (active.SkillId == "boundary:ganlu-mobile"
+                    ? IsBoundaryWuGuoTaiGanluPair(active.OwnerSeat, active.SelectedTargetSeats[0], active.SelectedTargetSeats[1])
+                    : IsProgramEquipmentExchangePair(active.OwnerSeat, active.SelectedTargetSeats[0], active.SelectedTargetSeats[1]));
+            if (!legalPair)
+                throw new InvalidOperationException("Equipment exchange requires a current legal equipment pair.");
+            if (active.SkillId == "boundary:ganlu-mobile" &&
+                active.SelectedTargetSeats.All(seat => GetEquipment(_players[seat]).Count == 0))
+                return SkillProgramStepOutcome.Continue;
+        }
         var first = active.SelectedTargetSeats[0];
         var second = active.SelectedTargetSeats[1];
         var incoming = GetEquipment(_players[first]).OrderBy(card => card.Id)

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "boundary:qianxi-mobile", "revision": 1,
+    "triggers": [{ "id": "preparation-draw-discard-color-ban", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": true,
+      "effects": [
+        { "op": "draw", "target": "owner", "amount": 1 },
+        { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "owner" },
+          "zones": ["hand", "equipment"], "count": 1, "destination": "discardPile", "resultBind": "discarded", "freezeMovedCardSuit": true, "awaitMovementTriggers": true },
+        { "op": "selectTarget", "target": "owner", "targetKind": "otherLivingAtDistanceOne" },
+        { "op": "grantTurnHandColorRestriction", "target": "selectedTarget", "sourceBind": "discarded", "useFrozenSuit": true }
+      ] }]
+  }]
+}
