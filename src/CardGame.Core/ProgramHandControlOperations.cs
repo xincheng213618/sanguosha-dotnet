@@ -32,12 +32,15 @@ internal abstract class HandControlDescriptor : ProgramOperationDescriptorBase
         static (_, _) => { });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "amount", "useMaximumHp", "condition");
+        r.AllowOnly("op", "target", "amount", "useMaximumHp", "stateId", "condition");
         var target = FilterBoundCardsProgramOperationDescriptor.Owner(r);
         var maximumHp = r.Has("useMaximumHp") && r.RequiredBool("useMaximumHp");
         if (r.Has("amount") || r.Has("useMaximumHp") && Op != SkillProgramEffectOp.DrawThenPutOwnedCardOnTopParticipants)
             throw new InvalidOperationException($"Invalid hand-control parameters at {r.Path}.");
-        var effect = new SkillProgramEffect(Op, target, 0, r.Condition(), booleanValue: maximumHp);
+        var policy = r.OptionalIdentifier("stateId");
+        if (r.Has("stateId") && (Op != SkillProgramEffectOp.RevealHandColorDiscardAndTake || policy != "two-colors"))
+            throw new InvalidOperationException($"Invalid hand-control color policy at {r.Path}: two-colors requires revealHandColorDiscardAndTake.");
+        var effect = new SkillProgramEffect(Op, target, 0, r.Condition(), booleanValue: maximumHp, stateId: policy);
         RequireAlways(effect, r.Path);
         return effect;
     }

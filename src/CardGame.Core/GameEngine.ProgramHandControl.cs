@@ -50,8 +50,12 @@ public sealed partial class GameEngine
             };
             var hand = GetHand(owner).ToArray();
             if (stage == "color" && hand.Length == 0) return SkillProgramStepOutcome.Continue;
-            if (stage == "color") AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId,
-                GetProgramBindingId(frame), owner.Seat, "hand-color-cost", hand.Select(ToSnapshot).ToArray()));
+            if (stage == "color")
+            {
+                AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId,
+                    GetProgramBindingId(frame), owner.Seat, "hand-color-cost", hand.Select(ToSnapshot).ToArray()));
+                frame = GetActiveProgramFrame(frame.Id);
+            }
             var maximum = stage == "participants" ? Math.Max(0, effect.BooleanValue == true ? owner.MaxHp : owner.Hp) : 1;
             if (maximum == 0) return SkillProgramStepOutcome.Continue;
             frame = frame with { HandControlDraft = new(effect.Op, stage, maximum, [], RevealedCardIds: stage == "color" ? hand.Select(card => card.Id).ToArray() : null) };
@@ -155,6 +159,9 @@ public sealed partial class GameEngine
         }
         else if (draft.Stage == "color")
         {
+            if (GetPausedPrivateOfferEffect(frame)?.StateId == "two-colors" &&
+                draft.RevealedCardIds!.Select(id => HandControlIsRed(frame.OwnerSeat, GetAdvancedCard(id))).Distinct().Count() != 2)
+                return result;
             var hand = GetHand(_players[frame.OwnerSeat]);
             foreach (var red in new[] { false, true })
                 if (hand.Any(card => HandControlIsRed(frame.OwnerSeat, card) == red) && !hand.Any(card => HandControlIsRed(frame.OwnerSeat, card) == red &&
@@ -382,7 +389,8 @@ public sealed partial class GameEngine
     {
         if(frame.HandControlDraft is not{Stage:"color"})throw new InvalidOperationException("Hand color control lost its original displayed roster.");
         var effect=ProgramInstructionResolver.Default.Resolve(frame,_contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        ExecuteProgramHandControl(effect,frame);
+        if (ExecuteProgramHandControl(effect,frame) == SkillProgramStepOutcome.Continue)
+            AdvanceRuntimeProgram(frame.Id);
     }
 
 }

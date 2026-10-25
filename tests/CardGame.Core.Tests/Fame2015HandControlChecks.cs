@@ -5,19 +5,78 @@ using CardGame.Core;
 
 internal static class Fame2015HandControlChecks
 {
-    private const string Mode = "identity:classic-hand-control-check";
+    private const string Mode = "identity:classic-hand-control-check", RevealHold = "fixture:hand-control-public-reveal-child";
 
     public static void RevealColorRealCostOpaqueGainAndHpLossReplay()
     {
-        var registry = Registry();
+        CompleteTwoColorFlow("classic:huaiyi");
+        var monoRegistry = Registry(["classic:huaiyi"], monochrome: true);
+        var mono = Start(monoRegistry, 13); ReachPlay(mono);
+        var monoHand = mono.CreateSnapshot(0, true).Players[0].Hand.ToArray();
+        var monoHp = mono.CreateSnapshot(0, true).Players[0].Hp;
+        Activate(mono, "classic:huaiyi", "reveal-color-take");
+        Require(Pending(mono)!.Choices.Count == 1, "A monochrome actual hand must allow payment of its one existing color in the current edition.");
+        Require(Enumerable.Range(0, 5).All(seat => mono.CreateSnapshot(seat, revealAll: false).PublicRevealedCards.Count == monoHand.Length),
+            "A monochrome reveal must also publish every actual face to all ordinary viewers.");
+        AssertReplay(mono, monoRegistry);
+        AnswerAction(mono, "red"); ReachHandChoice(mono, "take-targets"); AnswerAction(mono, "finish"); Finish(mono); ReachPlay(mono);
+        Require(mono.CreateSnapshot(0, true).Players[0].Hand.Count == 0 && mono.CreateSnapshot(0, true).Players[0].Hp == monoHp &&
+            monoHand.All(card => mono.CardMovements.Any(move => move.CardId == card.Id && move.To == CardLocation.DiscardPile)) &&
+            Enumerable.Range(0, 5).All(seat => mono.CreateSnapshot(seat, revealAll: false).PublicRevealedCards.Count == 0),
+            "A zero-target choice must still pay all actual monochrome cards and must not lose HP.");
+        AssertReplay(mono, monoRegistry);
+    }
+
+    public static void MobileRequiresBothColorsWithPaidCold()
+    {
+        const string mobile = "mobile:huaiyi";
+        foreach (var withRevealChild in new[] { false, true })
+        {
+            var registry = Registry(withRevealChild ? [mobile, "mou-ol:jueyan", RevealHold] : [mobile], monochrome: true);
+            var game = Start(registry, 13); ReachPlay(game);
+            var hand = game.CreateSnapshot(0, true).Players[0].Hand.ToArray();
+            var hp = game.CreateSnapshot(0, true).Players[0].Hp;
+            var targets = Enumerable.Range(1, 4).Select(seat => game.CreateSnapshot(seat, true).Players[seat].Hand.Select(c => c.Id).ToArray()).ToArray();
+            Activate(game, mobile, "reveal-color-take");
+            if (withRevealChild)
+            {
+                for (var step = 0; step < 100 && Pending(game)?.SkillPrompt?.SkillId != RevealHold; step++) Advance(game);
+                Require(Pending(game)?.SkillPrompt?.SkillId == RevealHold && game.ResolutionStack.OfType<PublicHandRevealWindowFrame>()
+                    .Any(frame => frame.ReturnKey == "hand-color-whole-hand"),
+                    "The actual whole-hand reveal must wait for its native first-suit draw child before returning to the two-color guard.");
+                Require(Enumerable.Range(0, 5).All(seat => game.CreateSnapshot(seat, false).PublicRevealedCards.Count == hand.Length),
+                    "The original monochrome hand remains publicly shown while the real reveal child is pending.");
+                AssertReplay(game, registry);
+                Answer(game, Pending(game)!.Choices.Single(c => c.Parameters.GetValueOrDefault("option-id") == "continue"));
+            }
+            ReachPlay(game);
+            var drawn = game.CardMovements.Count(m => m.Reason.Value == "skill-program.mou-ol:jueyan.draw" && m.To == CardLocation.Hand(0));
+            Require(game.Events.Count(e => e.Payload is ProgramCardsRevealedEvent reveal && reveal.SkillId == mobile &&
+                    reveal.Cards.Select(c => c.Id).SequenceEqual(hand.Select(c => c.Id))) == 1 &&
+                game.CreateSnapshot(0, true).Players[0].Hand.Count == hand.Length + drawn && drawn == (withRevealChild ? 1 : 0) &&
+                hand.All(card => game.CreateSnapshot(0, true).Players[0].Hand.Any(c => c.Id == card.Id)) &&
+                Enumerable.Range(1, 4).All(seat => game.CreateSnapshot(seat, true).Players[seat].Hand.Select(c => c.Id).SequenceEqual(targets[seat - 1])) &&
+                !game.CardMovements.Any(m => m.Reason.Value is "program.hand-color.discard" or "program.hand-color.obtain") &&
+                game.CreateSnapshot(0, true).Players[0].Hp == hp &&
+                Enumerable.Range(0, 5).All(seat => game.CreateSnapshot(seat, false).PublicRevealedCards.Count == 0) &&
+                !game.GetHumanLegalActions().Any(action => action.ProgramSkillId == mobile),
+                "Mobile monochrome Huaiyi shows every original entity once and then completes, with no color payment, target gain or HP loss; its Play use stays spent after either immediate or native-child return.");
+            AssertReplay(game, registry);
+        }
+        CompleteTwoColorFlow(mobile);
+    }
+
+    private static void CompleteTwoColorFlow(string skill)
+    {
+        var registry = Registry(skill == "classic:huaiyi" ? null : [skill]);
         var game = Start(registry, 11);
         ReachPlay(game);
         var hand = game.CreateSnapshot(0, true).Players[0].Hand.ToArray();
         var countBefore = hand.Length;
         var hpBefore = game.CreateSnapshot(0, true).Players[0].Hp;
-        Activate(game, "classic:huaiyi", "reveal-color-take");
+        Activate(game, skill, "reveal-color-take");
         var prompt = Pending(game)!;
-        Require(game.Events.Any(item => item.Payload is ProgramCardsRevealedEvent revealed && revealed.OwnerSeat == 0 && revealed.SkillId == "classic:huaiyi" &&
+        Require(game.Events.Any(item => item.Payload is ProgramCardsRevealedEvent revealed && revealed.OwnerSeat == 0 && revealed.SkillId == skill &&
                 revealed.Cards.Select(card => card.Id).SequenceEqual(hand.Select(card => card.Id))),
             "All physical hand cards must be publicly revealed before selecting color.");
         Require(Enumerable.Range(0, 5).All(seat =>
@@ -53,24 +112,8 @@ internal static class Fame2015HandControlChecks
         Finish(game); ReachPlay(game);
         Require(game.CreateSnapshot(0, true).Players[0].Hp == hpBefore - 1 && game.CreateSnapshot(0, true).Players[0].Hand.Count == countBefore - paid.Length + 2,
             "Obtaining two cards must lose exactly one HP after real color payment and gains.");
-        Require(!game.GetHumanLegalActions().Any(action => action.ProgramSkillId == "classic:huaiyi"), "The phase usage ledger must retain Huaiyi's paid activation.");
+        Require(!game.GetHumanLegalActions().Any(action => action.ProgramSkillId == skill), "The phase usage ledger must retain Huaiyi's paid activation.");
         AssertReplay(game, registry);
-
-        var monoRegistry = Registry(["classic:huaiyi"], monochrome: true);
-        var mono = Start(monoRegistry, 13); ReachPlay(mono);
-        var monoHand = mono.CreateSnapshot(0, true).Players[0].Hand.ToArray();
-        var monoHp = mono.CreateSnapshot(0, true).Players[0].Hp;
-        Activate(mono, "classic:huaiyi", "reveal-color-take");
-        Require(Pending(mono)!.Choices.Count == 1, "A monochrome actual hand must allow payment of its one existing color in the current edition.");
-        Require(Enumerable.Range(0, 5).All(seat => mono.CreateSnapshot(seat, revealAll: false).PublicRevealedCards.Count == monoHand.Length),
-            "A monochrome reveal must also publish every actual face to all ordinary viewers.");
-        AssertReplay(mono, monoRegistry);
-        AnswerAction(mono, "red"); ReachHandChoice(mono, "take-targets"); AnswerAction(mono, "finish"); Finish(mono); ReachPlay(mono);
-        Require(mono.CreateSnapshot(0, true).Players[0].Hand.Count == 0 && mono.CreateSnapshot(0, true).Players[0].Hp == monoHp &&
-            monoHand.All(card => mono.CardMovements.Any(move => move.CardId == card.Id && move.To == CardLocation.DiscardPile)) &&
-            Enumerable.Range(0, 5).All(seat => mono.CreateSnapshot(seat, revealAll: false).PublicRevealedCards.Count == 0),
-            "A zero-target choice must still pay all actual monochrome cards and must not lose HP.");
-        AssertReplay(mono, monoRegistry);
     }
 
     private static int ReadHandLimit(GameEngine game, int seat)
@@ -152,6 +195,19 @@ internal static class Fame2015HandControlChecks
                 {"id":"equip-target","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"targetRef":{"kind":"selectedTarget"},"zones":["hand"],"cardCategories":["equipment"],"count":1,"destination":"selectedTargetEquipment"}]}]}]}
                 """, """{"schemaVersion":3,"skills":{"fixture:hand-control-driver":{"name":"规则测试","description":"真实伤害测试"}}}""");
             builder.AddSkill(new ContentSkillDefinition("fixture:hand-control-driver", "规则测试", "测试") { Program = driver.Programs["fixture:hand-control-driver"] });
+            if (skills?.Contains(RevealHold, StringComparer.Ordinal) == true)
+            {
+                var hold = SkillProgramCatalog.Load($$"""
+                    {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{RevealHold}}","revision":1,"triggers":[
+                    {"id":"first-real-reveal-draw","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementOccurrence":"perBatch",
+                    "movementReasons":["skill-program.mou-ol:jueyan.draw"],"usageScope":"game","usageLimit":1,"optional":false,
+                    "effects":[{"op":"chooseOption","target":"owner","resultBind":"held","options":[{"id":"continue"}]}]}]}]}
+                    """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                        skills = new Dictionary<string, object> { [RevealHold] = new { name = "实际展示子窗", description = "原生展示收益摸牌已完成，尚未返回原展示。",
+                            optionLabels = new Dictionary<string, string> { ["continue"] = "继续展示返回" } } } }));
+                builder.AddSkill(new(RevealHold, "实际展示子窗", "原生展示收益摸牌已完成，尚未返回原展示。")
+                    { Program = hold.Programs[RevealHold], ProgramPresentation = hold.Presentations[RevealHold] });
+            }
             if (factionDefense)
             {
                 var defense = SkillProgramCatalog.Load("""

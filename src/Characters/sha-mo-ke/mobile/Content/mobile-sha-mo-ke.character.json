@@ -1,0 +1,22 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:sha-mo-ke",
+  "skills": [],
+  "generals": [{
+    "registrationOrder": 80299,
+    "pools": { "current": 80299 },
+    "definition": {
+      "id": "mobile:sha-mo-ke",
+      "name": "沙摩柯·移动版",
+      "portraitKey": "mobile-sha-mo-ke",
+      "skillId": "classic:jili",
+      "factionId": "shu",
+      "baseHp": 4,
+      "gender": "Male",
+      "characterId": "character:sha-mo-ke",
+      "variantId": "mobile",
+      "rulesetId": "sanguosha-mobile"
+    }
+  }]
+}

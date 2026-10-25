@@ -1,0 +1,30 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:qin-mi",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 80099,
+      "pools": {
+        "current": 80099
+      },
+      "definition": {
+        "id": "mobile:qin-mi",
+        "name": "秦宓·移动版",
+        "portraitKey": "mobile-qin-mi",
+        "skillId": "classic:jianzheng",
+        "additionalSkillIds": [
+          "classic:zhuandui",
+          "classic:tianbian"
+        ],
+        "factionId": "shu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:qin-mi",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

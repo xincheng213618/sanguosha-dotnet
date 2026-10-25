@@ -1597,6 +1597,7 @@ var tests = new (string Name, Action Body)[]
     ("Fame 2015 Wei top deck basic use name ledger replay", Fame2015WeiChecks.TopDeckBasicUseNameLedgerAndReplay),
     ("Fame 2015 Shu all hand Duel draw limit replay", Fame2015ShuChecks.AllHandDuelDrawLimitPaymentAndReplay),
     ("Fame 2015 hand control color real cost opaque gain replay", Fame2015HandControlChecks.RevealColorRealCostOpaqueGainAndHpLossReplay),
+    ("Mobile Huaiyi: monochrome reveal completion and native return with paid two color cold", Fame2015HandControlChecks.MobileRequiresBothColorsWithPaidCold),
     ("Program trigger resource contracts", ProgramTriggerResourceChecks.TriggerWindowAndFrozenSuitContracts),
     ("Fame 2014 control Pindi categories targets physical cost and replay", Fame2014ControlChecks.PindiPhysicalCategoriesTargetLimitsAndReplay),
     ("Fame 2013 Li Ru fire chain dying resume and replay", Fame2013LiRuChecks.FireChainAndDyingResumeReplay),

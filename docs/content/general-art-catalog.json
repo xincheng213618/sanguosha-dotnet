@@ -23135,6 +23135,125 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-yue-jin",
+      "characterName": "乐进",
+      "defaultSkinId": "12100",
+      "skins": [
+        {
+          "id": "12100",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-82.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/12100.jpg",
+          "sha256": "0309232c5756e0eec91af13afe114fe3f2e14c1909b085ae463861a2eabcf26e",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-yue-jin.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-fu-wan",
+      "characterName": "伏完",
+      "defaultSkinId": "7200",
+      "skins": [
+        {
+          "id": "7200",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-60.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/7200.jpg",
+          "sha256": "af58acbbe7661c9f01d4f3305ae685c2480292324242b1b31675907c0bdef91a",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-fu-wan.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-xiahou-ba",
+      "characterName": "夏侯霸",
+      "defaultSkinId": "11600",
+      "skins": [
+        {
+          "id": "11600",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-78.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/11600.jpg",
+          "sha256": "dd59c4a8e5d8221309a8f4b0a332eca07726583809260a3a416884dbcacf324d",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-xiahou-ba.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-qin-mi",
+      "characterName": "秦宓",
+      "defaultSkinId": "39300",
+      "skins": [
+        {
+          "id": "39300",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-230.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/39300.jpg",
+          "sha256": "8a66e67b3252db5230d0a218c19568c596e87e1fd29612bc8194adcf07261f46",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-qin-mi.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-gongsun-yuan",
+      "characterName": "公孙渊",
+      "defaultSkinId": "34100",
+      "skins": [
+        {
+          "id": "34100",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-194.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/34100.jpg",
+          "sha256": "11992e573ff0e570ced69c304c507290c809b6aad647e3fae0f40ea7f0adf5d4",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-gongsun-yuan.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-sha-mo-ke",
+      "characterName": "沙摩柯",
+      "defaultSkinId": "47500",
+      "skins": [
+        {
+          "id": "47500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-293.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/47500.jpg",
+          "sha256": "79c821380d938964c98ae7869f1d028a81c2393026926b521924b131c0c19d2c",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-sha-mo-ke.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-hao-zhao",
+      "characterName": "郝昭",
+      "defaultSkinId": "46600",
+      "skins": [
+        {
+          "id": "46600",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-345.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/46600.jpg",
+          "sha256": "c0f57b2dd6baf36fa2352b58cb8423a7ddecb8cf4e825e8c2bf65e842f06f3ab",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-hao-zhao.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }
