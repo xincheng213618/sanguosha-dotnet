@@ -164,6 +164,13 @@ public static class StandardModeConfigurationRules
                 throw new ArgumentException("A unique campaign tactic cannot be acquired more than once.");
         }
         foreach (var member in setup.EnemyRoster.Concat(setup.AllyRoster)) ValidateMember(member);
+        if (setup.BossTransition is { } transition &&
+            (transition.EnemyIndex < 0 || transition.EnemyIndex >= setup.EnemyRoster.Count ||
+             !registry.Generals.ContainsKey(transition.GeneralId) || !registry.IsGeneralPlayable(transition.GeneralId) ||
+             mode.GeneralPoolIds?.Contains(transition.GeneralId, StringComparer.Ordinal) != true ||
+             transition.MaxHp is < 1 or > 1000 || transition.Hp < 1 || transition.Hp > transition.MaxHp ||
+             transition.DrawCards is < 0 or > 40))
+            throw new ArgumentException("The Shanhe second form must be a reserved playable general with bounded health and draw count.");
         foreach (var card in setup.StartingCards.Concat(setup.StartingEquipment))
         {
             if (!Enum.IsDefined(card.Kind) || !Enum.IsDefined(card.Suit) || card.Suit == Suit.None ||

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:current-touxi-2009": { "name": "偷袭", "description": "传说战法。黑桃杀无次数限制；按当前实际使用牌的最终花色判断。" },
+    "shanhe:current-tiebushan-2074": { "name": "铁布衫Ⅳ", "description": "传说战法。每场战斗开局，你获得6点护甲。" },
+    "shanhe:current-jingjijia-2116": { "name": "荆棘甲", "description": "传说战法。每次受到伤害后，对该次伤害的来源造成1点普通伤害。每个伤害事件反伤一次，承受多点伤害不按点重复。" },
+    "shanhe:current-pianzhuanjia-2117": { "name": "偏转甲", "description": "传说战法。每次受到伤害后，对一名随机存活敌方造成1点普通伤害。没有存活敌方时不产生反伤。" }
+  }
+}

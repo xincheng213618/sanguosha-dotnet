@@ -117,6 +117,7 @@ public static class ShanheCodexLoadouts
             FormatVersion = FileShanheCodexStore.CurrentFormatVersion,
             UnlockedRewardIds = [.. profile.UnlockedRewardIds],
             ClaimedRewards = [.. profile.ClaimedRewards],
+            RunRecords = [.. profile.RunRecords],
             EquippedTacticIds = [.. selected.EquippedTacticIds],
             LoadoutPlans = plans.Select(plan => plan with { EquippedTacticIds = [.. plan.EquippedTacticIds] }).ToArray(),
             SelectedLoadoutPlanId = selectedId

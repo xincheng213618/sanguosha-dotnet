@@ -28,10 +28,11 @@ public sealed partial class MainViewModel
     private ShanheScenarioOption? _selectedShanheScenario;
 
     public IReadOnlyList<ShanheScenarioOption> ShanheScenarios { get; } =
-        StandardShanheCampaignCatalog.Editions.Select(edition => new ShanheScenarioOption(edition.Id, edition.Name)).ToArray();
+        StandardShanheCampaignCatalog.Editions.Select(edition => new ShanheScenarioOption(edition.Id,
+            edition.Name + (edition.Id == StandardShanheCampaignCatalog.Returning2026EditionId ? "（推荐）" : ""))).ToArray();
     public ShanheScenarioOption SelectedShanheScenario
     {
-        get => _selectedShanheScenario ?? ShanheScenarios[0];
+        get => _selectedShanheScenario ?? ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.Returning2026EditionId);
         set
         {
             if (IsShanheRunInProgress && value?.Id != StandardShanheCampaignCatalog.EditionIdForCampaign(_shanheSession!.Definition.Id, _shanheRunDifficulty)) return;
@@ -226,10 +227,10 @@ public sealed partial class MainViewModel
     private void StartShanheCampaign()
     {
         if (!CanPrepareShanheExpedition || SelectedShanheGeneral is not { } general) return;
-        if (_shanheSession is { } previous && ShanheCodexSettlement.ConfirmedBookAmount(previous, _shanheRunDifficulty) > 0 &&
+        if (_shanheSession is { } previous && ShanheCodexSettlement.CanSettle(previous, _shanheRunDifficulty) &&
             !ShanheCodexSettlement.HasClaimed(_shanheCodexProfile, previous) &&
             (!SaveShanheProgress() || !ShanheCodexSettlement.HasClaimed(_shanheCodexProfile, previous)))
-        { ShanheStatusText = "上次通关图册尚未保存，请先重试结算，避免覆盖未领取的征程。"; return; }
+        { ShanheStatusText = "上次征程结算尚未保存，请先重试结算，避免覆盖图册与征程记录。"; return; }
         try
         {
             var difficulty = SelectedShanheDifficulty.Value;

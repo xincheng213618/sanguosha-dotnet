@@ -188,98 +188,112 @@ public static partial class StandardShanheCampaignCatalog
             .Concat(setup.AllyRoster.Concat(setup.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .Contains(ShanheGeneralRanks.RebirthSkillId, StringComparer.Ordinal))
             throw new InvalidOperationException("The rank-five rebirth skill requires this campaign's unspent rebirth privilege.");
-        var ids = new[] { setup.PlayerGeneralId }.Concat(setup.AllyRoster.Select(m => m.GeneralId))
-            .Concat(setup.EnemyRoster.Select(m => m.GeneralId)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal);
-        var codexEquipment = RequiresCodexEquipmentRegistry(setup);
-        var currentFarStrike = RequiresCurrentFarStrikeRegistry(setup);
-        var currentJinnangJi = RequiresCurrentJinnangJiRegistry(setup);
-        var currentDuoduoYishan = RequiresCurrentDuoduoYishanRegistry(setup);
-        var currentYaoli = RequiresCurrentYaoliRegistry(setup);
-        var currentSlashTactics = RequiresCurrentSlashTacticsRegistry(setup);
-        var s5Chengxiong = RequiresChengxiongBossRegistry(setup);
-        var s5CaoxingHigh = RequiresCaoxingHighRegistry(setup);
-        var s5Shidu = RequiresShiduBossRegistry(setup) || s5CaoxingHigh;
-        var s5Huaxiong = RequiresHuaxiongBossRegistry(setup);
-        var s5Taishici = RequiresTaishiciBossRegistry(setup);
-        var s5Caocao = RequiresCaocaoBossRegistry(setup);
-        var s5Yujin = RequiresYujinBossRegistry(setup);
-        var s5Yudu = RequiresYuduBossRegistry(setup);
-        var s5Liru = RequiresLiruBossRegistry(setup);
-        var s5Yuanshao = RequiresThreeBossRegistry(setup, StandardShanheS5YuanshaoPackage.YuanshaoId,
+        // Reserve the second form only for content dependency discovery. This
+        // view never becomes a playable roster; the mode below uses the real setup.
+        var requirements = setup.BossTransition is { } second
+            ? setup with { EnemyRoster = Array.AsReadOnly(setup.EnemyRoster.Append(new ShanheCombatantDefinition(second.GeneralId)).ToArray()) }
+            : setup;
+        var ids = new[] { requirements.PlayerGeneralId }.Concat(requirements.AllyRoster.Select(m => m.GeneralId))
+            .Concat(requirements.EnemyRoster.Select(m => m.GeneralId)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal);
+        var localTroops = ids.Any(id => id is StandardShanheLocalTroopPackage.FootmanId or
+            StandardShanheLocalTroopPackage.ArcherId or StandardShanheLocalTroopPackage.GuardId);
+        var codexEquipment = RequiresCodexEquipmentRegistry(requirements);
+        var currentFarStrike = RequiresCurrentFarStrikeRegistry(requirements);
+        var currentJinnangJi = RequiresCurrentJinnangJiRegistry(requirements);
+        var currentDuoduoYishan = RequiresCurrentDuoduoYishanRegistry(requirements);
+        var currentYaoli = RequiresCurrentYaoliRegistry(requirements);
+        var currentLegendaryTactics = RequiresCurrentLegendaryTacticsRegistry(requirements);
+        var buildTactics = RequiresBuildTacticsRegistry(requirements);
+        var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
+            .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
+            .ToHashSet(StringComparer.Ordinal);
+        var currentFuqi = extraSkills.Contains(StandardShanheFuqiPackage.SkillId);
+        var currentWangong = extraSkills.Contains(StandardShanheWangongPackage.SkillId);
+        var currentSlashTactics = RequiresCurrentSlashTacticsRegistry(requirements);
+        var s5Chengxiong = RequiresChengxiongBossRegistry(requirements);
+        var s5CaoxingHigh = RequiresCaoxingHighRegistry(requirements);
+        var s5Shidu = RequiresShiduBossRegistry(requirements) || s5CaoxingHigh;
+        var s5Huaxiong = RequiresHuaxiongBossRegistry(requirements);
+        var s5Taishici = RequiresTaishiciBossRegistry(requirements);
+        var s5Caocao = RequiresCaocaoBossRegistry(requirements);
+        var s5Yujin = RequiresYujinBossRegistry(requirements);
+        var s5Yudu = RequiresYuduBossRegistry(requirements);
+        var s5Liru = RequiresLiruBossRegistry(requirements);
+        var s5Yuanshao = RequiresThreeBossRegistry(requirements, StandardShanheS5YuanshaoPackage.YuanshaoId,
             StandardShanheS5YuanshaoPackage.LuanjiId);
-        var s5Zhangliang = RequiresThreeBossRegistry(setup, StandardShanheS5ZhangliangPackage.ZhangliangId,
+        var s5Zhangliang = RequiresThreeBossRegistry(requirements, StandardShanheS5ZhangliangPackage.ZhangliangId,
             StandardShanheS5ZhangliangPackage.BaoyuId, StandardShanheS5ZhangliangPackage.WuyingId);
-        var s5Xuchu = RequiresThreeBossRegistry(setup, StandardShanheS5XuchuPackage.XuchuId,
+        var s5Xuchu = RequiresThreeBossRegistry(requirements, StandardShanheS5XuchuPackage.XuchuId,
             StandardShanheS5XuchuPackage.LuoyiId);
-        var s5Zhuling = RequiresThreeBossRegistry(setup, StandardShanheS5ZhulingPackage.ZhulingId,
+        var s5Zhuling = RequiresThreeBossRegistry(requirements, StandardShanheS5ZhulingPackage.ZhulingId,
             StandardShanheS5ZhulingPackage.JixianId, StandardShanheS5ZhulingPackage.BaoliId);
-        var s5YanliangWenchou = RequiresThreeBossRegistry(setup, StandardShanheS5YanliangWenchouPackage.YanliangWenchouId,
+        var s5YanliangWenchou = RequiresThreeBossRegistry(requirements, StandardShanheS5YanliangWenchouPackage.YanliangWenchouId,
             StandardShanheS5YanliangWenchouPackage.ShuangxiongId);
-        var s5Quyi = RequiresThreeBossRegistry(setup, StandardShanheS5QuyiPackage.QuyiId,
+        var s5Quyi = RequiresThreeBossRegistry(requirements, StandardShanheS5QuyiPackage.QuyiId,
             StandardShanheS5QuyiPackage.FuqiId, StandardShanheS5QuyiPackage.JiaoziId);
-        var s5Zhanghe = RequiresThreeBossRegistry(setup, StandardShanheS5ZhanghePackage.ZhangheId,
+        var s5Zhanghe = RequiresThreeBossRegistry(requirements, StandardShanheS5ZhanghePackage.ZhangheId,
             StandardShanheS5ZhanghePackage.ZhouxuanId);
-        var s5Yuanshu = RequiresThreeBossRegistry(setup, StandardShanheS5YuanshuPackage.YuanshuId,
+        var s5Yuanshu = RequiresThreeBossRegistry(requirements, StandardShanheS5YuanshuPackage.YuanshuId,
             StandardShanheS5YuanshuPackage.TongjiId, StandardShanheS5YuanshuPackage.WuzangId) ||
             ids.Contains(StandardShanheS5YuanshuPackage.YuanyaoId, StringComparer.Ordinal) ||
             ids.Contains(StandardShanheS5YuanshuPackage.YuanyinId, StringComparer.Ordinal);
-        var s5Gongsun = RequiresThreeBossRegistry(setup, StandardShanheS5GongsunZanPackage.GongsunZanId,
+        var s5Gongsun = RequiresThreeBossRegistry(requirements, StandardShanheS5GongsunZanPackage.GongsunZanId,
             StandardShanheS5GongsunZanPackage.QiaomengId, StandardShanheS5GongsunZanPackage.JiuzhuId) ||
             ids.Contains(StandardShanheS5GongsunZanPackage.GongsunYueId, StringComparer.Ordinal);
-        var s5Taoyuan = RequiresThreeBossRegistry(setup, StandardShanheS5TaoyuanPackage.ZhangfeiId,
+        var s5Taoyuan = RequiresThreeBossRegistry(requirements, StandardShanheS5TaoyuanPackage.ZhangfeiId,
             StandardShanheS5TaoyuanPackage.TishenId) ||
             ids.Contains(StandardShanheS5TaoyuanPackage.LiubeiId, StringComparer.Ordinal) ||
             ids.Contains(StandardShanheS5TaoyuanPackage.GuanyuId, StringComparer.Ordinal);
-        var s5Lijue = RequiresThreeBossRegistry(setup, StandardShanheS5LiJuePackage.LijueId,
+        var s5Lijue = RequiresThreeBossRegistry(requirements, StandardShanheS5LiJuePackage.LijueId,
             StandardShanheS5LiJuePackage.LangxiId);
-        var s5Guosi = RequiresThreeBossRegistry(setup, StandardShanheS5GuosiPackage.GuosiId,
+        var s5Guosi = RequiresThreeBossRegistry(requirements, StandardShanheS5GuosiPackage.GuosiId,
             StandardShanheS5GuosiPackage.ZhanhunDaoSkillId) || ShanheRecipeCards(setup).Any(card => card.Kind == CardKind.ZhanhunDao);
-        var s5MaPair = RequiresThreeBossRegistry(setup, StandardShanheS5MaPairPackage.MaPairId,
+        var s5MaPair = RequiresThreeBossRegistry(requirements, StandardShanheS5MaPairPackage.MaPairId,
             StandardShanheS5MaPairPackage.AnqiFeirenSkillId) || ShanheRecipeCards(setup).Any(card => card.Kind == CardKind.AnqiFeiren);
-        var s5XuRong = RequiresThreeBossRegistry(setup, StandardShanheS5XuRongPackage.XurongId,
+        var s5XuRong = RequiresThreeBossRegistry(requirements, StandardShanheS5XuRongPackage.XurongId,
             StandardShanheS5XuRongPackage.ShajueId, StandardShanheS5XuRongPackage.YaodaoChitongSkillId) ||
             ShanheRecipeCards(setup).Any(card => card.Kind == CardKind.YaodaoChitong);
-        var s5XiliangDark = RequiresThreeBossRegistry(setup, StandardShanheS5XiliangDarkPackage.QinyiId,
+        var s5XiliangDark = RequiresThreeBossRegistry(requirements, StandardShanheS5XiliangDarkPackage.QinyiId,
             StandardShanheS5XiliangDarkPackage.YimieId) ||
             ids.Any(id => id is StandardShanheS5XiliangDarkPackage.ChenweiId or StandardShanheS5XiliangDarkPackage.LiheiId);
-        var s5Simayi = RequiresThreeBossRegistry(setup, StandardShanheS5SimayiPackage.SimayiId,
+        var s5Simayi = RequiresThreeBossRegistry(requirements, StandardShanheS5SimayiPackage.SimayiId,
             StandardShanheS5SimayiPackage.RenjieId, StandardShanheS5SimayiPackage.BaiyinId);
-        var s5Dianwei = RequiresThreeBossRegistry(setup, StandardShanheS5DianweiWeiziPackage.DianweiId,
+        var s5Dianwei = RequiresThreeBossRegistry(requirements, StandardShanheS5DianweiWeiziPackage.DianweiId,
             StandardShanheS5DianweiWeiziPackage.QiangxiId) || ids.Contains(StandardShanheS5DianweiWeiziPackage.WeiziId, StringComparer.Ordinal);
-        var s5Xiahou = RequiresThreeBossRegistry(setup, StandardShanheS5XiahouPairPackage.XiahoudunId,
+        var s5Xiahou = RequiresThreeBossRegistry(requirements, StandardShanheS5XiahouPairPackage.XiahoudunId,
             StandardShanheS5XiahouPairPackage.GanglieId, StandardShanheS5XiahouPairPackage.ShensuId) ||
             ids.Contains(StandardShanheS5XiahouPairPackage.XiahouyuanId, StringComparer.Ordinal);
-        var s5Zhangxiu = RequiresThreeBossRegistry(setup, StandardShanheS5ZhangxiuPackage.ZhangxiuId,
+        var s5Zhangxiu = RequiresThreeBossRegistry(requirements, StandardShanheS5ZhangxiuPackage.ZhangxiuId,
             StandardShanheS5ZhangxiuPackage.XiongluanId, StandardShanheS5ZhangxiuPackage.LeizhenSkillId) ||
             ShanheRecipeCards(setup).Any(c => c.Kind == CardKind.Leizhen);
-        var s5Zuoci = RequiresThreeBossRegistry(setup, StandardShanheS5ZuociHuatuoPackage.ZuociId,
+        var s5Zuoci = RequiresThreeBossRegistry(requirements, StandardShanheS5ZuociHuatuoPackage.ZuociId,
             StandardShanheS5ZuociHuatuoPackage.HuashenId, StandardShanheS5ZuociHuatuoPackage.XinshengId) ||
             ids.Contains(StandardShanheS5ZuociHuatuoPackage.HuatuoId, StringComparer.Ordinal);
-        var s5CaoWei = RequiresThreeBossRegistry(setup, StandardShanheS5CaoWeiPioneersPackage.CaocaoId,
+        var s5CaoWei = RequiresThreeBossRegistry(requirements, StandardShanheS5CaoWeiPioneersPackage.CaocaoId,
             StandardShanheS5CaoWeiPioneersPackage.JianxiongId, StandardShanheS5CaoWeiPioneersPackage.HujiaId) ||
             ids.Any(id => id is StandardShanheS5CaoWeiPioneersPackage.CaozhenId or StandardShanheS5CaoWeiPioneersPackage.CaohongId);
         var s5Xingtian = ShanheRecipeCards(setup).Any(c => c.Kind == CardKind.ShanheXingtianAxe) ||
             setup.TacticSkillIds.Concat(setup.ExtraSkillIds)
                 .Concat(setup.AllyRoster.Concat(setup.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
                 .Contains(StandardShanheXingtianPackage.SkillId, StringComparer.Ordinal);
-        var s5Zhangliao = RequiresThreeBossRegistry(setup, StandardShanheS5BossPackage.ZhangliaoBaseId,
+        var s5Zhangliao = RequiresThreeBossRegistry(requirements, StandardShanheS5BossPackage.ZhangliaoBaseId,
             StandardShanheS5BossPackage.TuxiId);
-        var s5MaSiblings = s5MaPair || RequiresThreeBossRegistry(setup, StandardShanheS5MaSiblingsPackage.MachaoId,
+        var s5MaSiblings = s5MaPair || RequiresThreeBossRegistry(requirements, StandardShanheS5MaSiblingsPackage.MachaoId,
             StandardShanheS5MaSiblingsPackage.MashuId, StandardShanheS5MaSiblingsPackage.TieqiId) ||
             ids.Contains(StandardShanheS5MaSiblingsPackage.MayunluId, StringComparer.Ordinal);
-        var s5Dongwu = RequiresThreeBossRegistry(setup, StandardShanheS5DongwuVeteransPackage.ChengpuId,
+        var s5Dongwu = RequiresThreeBossRegistry(requirements, StandardShanheS5DongwuVeteransPackage.ChengpuId,
             StandardShanheS5DongwuVeteransPackage.ChunlaoId) || ids.Contains(StandardShanheS5DongwuVeteransPackage.HandangId, StringComparer.Ordinal);
-        var s5Moushi = RequiresThreeBossRegistry(setup, StandardShanheS5MoushiPackage.XunchenId,
+        var s5Moushi = RequiresThreeBossRegistry(requirements, StandardShanheS5MoushiPackage.XunchenId,
             StandardShanheS5MoushiPackage.MoushiId, StandardShanheS5MoushiPackage.JiemingId) ||
             ids.Contains(StandardShanheS5MoushiPackage.GuotuId, StringComparer.Ordinal) ||
             ids.Contains(StandardShanheS5MoushiPackage.ShenpeiId, StringComparer.Ordinal);
-        var s5HanEmperors = RequiresThreeBossRegistry(setup, StandardShanheS5HanEmperorsPackage.LiuxieId,
+        var s5HanEmperors = RequiresThreeBossRegistry(requirements, StandardShanheS5HanEmperorsPackage.LiuxieId,
             StandardShanheS5HanEmperorsPackage.ShiyuanId) || ids.Contains(StandardShanheS5HanEmperorsPackage.LiubianId, StringComparer.Ordinal);
-        var s5Xuncan = RequiresThreeBossRegistry(setup, StandardShanheS5XuncanCaoshiPackage.XuncanId,
+        var s5Xuncan = RequiresThreeBossRegistry(requirements, StandardShanheS5XuncanCaoshiPackage.XuncanId,
             StandardShanheS5XuncanCaoshiPackage.YunshenId, StandardShanheS5XuncanCaoshiPackage.ShangshenId,
             StandardShanheS5XuncanCaoshiPackage.FenchaiId, StandardShanheS5XuncanCaoshiPackage.LeijieId) ||
             ids.Contains(StandardShanheS5XuncanCaoshiPackage.CaoshiId, StringComparer.Ordinal);
-        var s5Zaiqi = RequiresS5ZaiqiRegistry(setup);
+        var s5Zaiqi = RequiresS5ZaiqiRegistry(requirements);
         var key = $"{setup.AllyRoster.Count}/{setup.EnemyRoster.Count}/" + string.Join("|", ids) +
             (s5MaPair ? "/s5-ma-pair-2640" : "") + (s5XuRong ? "/s5-xurong-2641" : "") +
             (s5XiliangDark ? "/s5-xiliang-dark-2663" : "") +
@@ -287,6 +301,11 @@ public static partial class StandardShanheCampaignCatalog
             (currentJinnangJi ? "/current-jinnangji-2011" : "") +
             (currentDuoduoYishan ? "/current-duoduo-yishan" : "") +
             (currentYaoli ? "/current-yaoli" : "") +
+            (currentLegendaryTactics ? "/current-legendary-tactics" : "") +
+            (buildTactics ? "/current-build-tactics" : "") +
+            (currentFuqi ? "/current-fuqi-3100" : "") +
+            (currentWangong ? "/current-wangong-3263" : "") +
+            (localTroops ? "/local-troops" : "") +
             (currentSlashTactics ? "/current-slash-tactics" : "") +
             (s5Chengxiong ? "/s5-chengxiong-14055" : "") +
             (s5Shidu ? "/s5-shidu-7003" : "") +
@@ -327,6 +346,11 @@ public static partial class StandardShanheCampaignCatalog
         return BattleRegistries.GetOrAdd(key, _ => new Lazy<ContentRegistry>(() =>
         {
             var packages = new List<IGameContentPackage> { new StandardShanheBossPackage() };
+            if (localTroops) packages.Add(new StandardShanheLocalTroopPackage());
+            if (currentLegendaryTactics) packages.Add(new StandardShanheLegendaryTacticsPackage());
+            if (buildTactics) packages.Add(new StandardShanheBuildTacticsPackage());
+            if (currentFuqi) packages.Add(new StandardShanheFuqiPackage());
+            if (currentWangong) packages.Add(new StandardShanheWangongPackage());
             if (s5Zhangliao || ids.Any(id => id == StandardShanheS5BossPackage.ZhangliaoBaseId ||
                 id == StandardShanheS5BossPackage.ZhangliaoLingdongId || id == StandardShanheS5BossPackage.ZhangliaoHuangkongId ||
                 id == StandardShanheS5BossPackage.DongZhuoLuoyangId || id == StandardShanheS5BossPackage.DongMinBaseId ||
@@ -335,11 +359,11 @@ public static partial class StandardShanheCampaignCatalog
                 id == StandardShanheS5GaichaoPackage.DongZhuoGaichaoId ||
                 id == StandardShanheS5DongshiPackage.DongZhuoBaxinId || id == StandardShanheS5DongshiPackage.DongJiQiaoxiaoId))
                 packages.Add(new StandardShanheS5BossPackage());
-            if (RequiresFengyiBossRegistry(setup)) packages.Add(new StandardShanheS5FengyiPackage());
-            if (RequiresGaichaoBossRegistry(setup)) packages.Add(new StandardShanheS5GaichaoPackage());
-            if (RequiresDongshiBossRegistry(setup)) packages.Add(new StandardShanheS5DongshiPackage());
-            if (RequiresGaoshunBossRegistry(setup)) packages.Add(new StandardShanheS5GaoshunPackage());
-            if (RequiresCaoxingBossRegistry(setup)) packages.Add(new StandardShanheS5CaoxingPackage());
+            if (RequiresFengyiBossRegistry(requirements)) packages.Add(new StandardShanheS5FengyiPackage());
+            if (RequiresGaichaoBossRegistry(requirements)) packages.Add(new StandardShanheS5GaichaoPackage());
+            if (RequiresDongshiBossRegistry(requirements)) packages.Add(new StandardShanheS5DongshiPackage());
+            if (RequiresGaoshunBossRegistry(requirements)) packages.Add(new StandardShanheS5GaoshunPackage());
+            if (RequiresCaoxingBossRegistry(requirements)) packages.Add(new StandardShanheS5CaoxingPackage());
             if (s5Shidu) packages.Add(new StandardShanheS5ShiduPackage());
             if (s5CaoxingHigh) packages.Add(new StandardShanheS5CaoxingHighPackage());
             if (s5Huaxiong) packages.Add(new StandardShanheS5HuaxiongPackage());
@@ -508,8 +532,13 @@ public static partial class StandardShanheCampaignCatalog
                     // The one-copy expedition limit is an explicit local choice.
                     : skill.Id == "shanhe:duisha-2026" ? new(skill.Id, Repeatable: false) : null
             });
-            var ids = new[] { setup.PlayerGeneralId }.Concat(setup.AllyRoster.Select(m => m.GeneralId))
-                .Concat(setup.EnemyRoster.Select(m => m.GeneralId)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
+            // The runtime pool also supplies native private general libraries.
+            // Campaign seats remain fixed by the opening recipe in BuildCampaignPlayers;
+            // a pool containing only occupied seats leaves Zuo Ci with no avatars.
+            var ids = GetPlayerGeneralIds().Append(setup.PlayerGeneralId).Concat(setup.AllyRoster.Select(m => m.GeneralId))
+                .Concat(setup.EnemyRoster.Select(m => m.GeneralId))
+                .Concat(setup.BossTransition is { } transition ? new[] { transition.GeneralId } : [])
+                .Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
             var count = 1 + setup.AllyRoster.Count + setup.EnemyRoster.Count;
             builder.AddMode(new(ShanheBattleSetup.BattleModeId, "山河图 · 剧情战斗", count, count,
                 new Dictionary<string, int>(), "classic:standard-deck", GeneralPoolIds: ids,

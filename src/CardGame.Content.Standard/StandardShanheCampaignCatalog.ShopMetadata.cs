@@ -30,7 +30,11 @@ public static partial class StandardShanheCampaignCatalog
                 CurrentYaoliRewardId, CurrentYaoli2RewardId, CurrentYaoli3RewardId,
                 CurrentYaoli5RewardId, CurrentYaoli6RewardId,
                 CurrentDangtouRewardId, CurrentDangtou2RewardId, CurrentCommonDangtouRewardId,
-                CurrentLeihuoRewardId, CurrentLianjiRewardId, CurrentErlianjiRewardId])
+                CurrentLeihuoRewardId, CurrentLianjiRewardId, CurrentErlianjiRewardId,
+                CurrentTiebushan4RewardId, CurrentJingjijiaRewardId, "codex-card-4059"])
+            .Concat(CurrentEconomyTactics.Where(source => source.RewardId != CurrentInterest2RewardId).Select(source => source.RewardId))
+            .Concat([CurrentMuniuLiumaRewardId, CurrentSougua3RewardId, CurrentFenjinRewardId])
+            .Concat(CurrentBuildSkillDefaultUnlockedRewardIds)
             .Where(available.Contains).ToArray());
     }
 
@@ -64,6 +68,15 @@ public static partial class StandardShanheCampaignCatalog
                 [CurrentDuoduoYishanRewardId] = new(2082, 200, 1, "战法"),
                 [CurrentDuoduoYishan2RewardId] = new(2083, 300, 2, "战法"),
                 [CurrentDuoduoYishan3RewardId] = new(2084, 700, 4, "战法"),
+                [CurrentTouxiRewardId] = new(2009, 700, 4, "战法"),
+                [CurrentTiebushan4RewardId] = new(2074, 700, 4, "战法"),
+                [CurrentJingjijiaRewardId] = new(2116, 700, 4, "战法"),
+                [CurrentPianzhuanjiaRewardId] = new(2117, 700, 4, "战法"),
+                [CurrentCuixue2RewardId] = new(2049, 500, 3, "战法"),
+                [CurrentYuanzhu3RewardId] = new(2078, 700, 4, "战法"),
+                [CurrentMuniuLiumaRewardId] = new(2088, 500, 3, "战法"),
+                [CurrentSougua3RewardId] = new(2170, 500, 3, "战法"),
+                [CurrentFenjinRewardId] = new(2228, 200, 1, "战法"),
                 [CurrentYaoliRewardId] = new(2319, 200, 1, "战法"),
                 [CurrentYaoli2RewardId] = new(2320, 300, 2, "战法"),
                 [CurrentYaoli3RewardId] = new(2321, 500, 3, "战法"),
@@ -79,6 +92,12 @@ public static partial class StandardShanheCampaignCatalog
                 [CurrentLianji2RewardId] = new(2052, 700, 4, "战法"),
                 [CurrentErlianjiRewardId] = new(2053, 200, 1, "战法"),
                 [S5ShuangxiongRewardId] = new(3006, 1000, 4, "技能"),
+                ["chapter-skill-3017"] = new(3017, 1000, 4, "技能"),
+                ["chapter-skill-3038"] = new(3038, 1000, 4, "技能"),
+                ["chapter-skill-3091"] = new(3091, 1000, 4, "技能"),
+                ["chapter-skill-3020"] = new(3020, 1000, 4, "技能"),
+                ["chapter-skill-3070"] = new(3070, 1000, 4, "技能"),
+                ["chapter-skill-3261"] = new(3261, 1000, 4, "技能"),
                 ["codex-67"] = new(3112, 600, 3, "技能"),
                 ["codex-81"] = new(3010, 600, 3, "技能"),
                 ["codex-97"] = new(3048, 1000, 4, "技能"),
@@ -135,9 +154,13 @@ public static partial class StandardShanheCampaignCatalog
                 ["blade"] = new(4004, 200, 2, "装备", CardKind.QinggangSword, Suit.Spade, 6),
                 ["codex-card-4004"] = new(4004, 200, 2, "装备", CardKind.QinggangSword, Suit.Spade, 6),
                 ["codex-card-4008"] = new(4008, 100, 1, "装备", CardKind.QilinBow, Suit.Heart, 5),
+                ["codex-card-4059"] = new(4059, 600, 4, "装备", CardKind.ShanheXingtianAxe, Suit.Heart, 5),
                 ["codex-card-4076"] = new(4076, 250, 3, "牌", CardKind.Peach, Suit.Club, 8),
                 ["codex-card-4092"] = new(4092, 150, 1, "牌", CardKind.FiveGrains, Suit.Club, 5),
                 ["codex-card-4107"] = new(4107, 200, 2, "牌", CardKind.Lightning, Suit.Heart, 1)
-            });
+            }.Concat(CurrentBuildSkillShopMetadata)
+                .Concat(CurrentEconomyTactics.Select(source => new KeyValuePair<string, ShanheShopMetadata>(source.RewardId,
+                new(source.SourceId, source.Price, source.Rarity, "战法"))))
+                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal));
     }
 }

@@ -56,6 +56,11 @@ internal static class ShanheCodexSettlementChecks
             earned.UnlockedRewardIds.SequenceEqual(profile.UnlockedRewardIds) && earned.EquippedTacticIds.SequenceEqual(profile.EquippedTacticIds) &&
             !ReferenceEquals(earned.UnlockedRewardIds, profile.UnlockedRewardIds) && !ReferenceEquals(earned.EquippedTacticIds, profile.EquippedTacticIds),
             "Preparation must detach the new profile, preserve unrelated research/loadout/claims and leave the original balance untouched.");
+        Program.Assert(earned.RunRecords is [{ Won: true, Difficulty: 1, BooksEarned: 10, Battles: 1 }] &&
+            earned.RunRecords[0].ExpeditionKey == "expedition:" + expeditionId.ToString("N") &&
+            earned.RunRecords[0].CampaignId == definition.Id && earned.RunRecords[0].PlayerGeneralId == Player &&
+            profile.RunRecords.Length == 0,
+            "The same settled victory stores its actual campaign, general, difficulty, battle count and ten-book receipt independently of the next campaign save.");
         var store = new MemoryShanheCodexStore();
         store.Write(earned);
         var coldSession = ShanheCampaignSession.Restore(ShanheCampaignJson.Deserialize(ShanheCampaignJson.Serialize(session.CreateCheckpoint())), definition, _ => Registry.Value);
@@ -65,7 +70,17 @@ internal static class ShanheCodexSettlementChecks
             "The completion view must retain the confirmed award and claimed status after persistence without offering a second credit.");
         var sameIdentityDifferentFormat = ShanheCampaignSession.Replay(definition, options with { ExpeditionId = expeditionId.ToString("D").ToUpperInvariant() }, session.AcceptedCommands, _ => Registry.Value);
         Refuse(store.Read(), sameIdentityDifferentFormat, 1);
-        foreach (var difficulty in new[] { 0, 2, 3 }) Refuse(profile, session, difficulty);
+        foreach (var difficulty in new[] { 2, 3 })
+        {
+            Program.Assert(ShanheCodexSettlement.TryPrepare(profile, session, difficulty, out var localTier) &&
+                localTier.Books == 17 && localTier.RunRecords is [{ Won: true, BooksEarned: 10 }] &&
+                localTier.RunRecords[0].Difficulty == difficulty,
+                "Every current local difficulty awards its explicitly local ten-book completion floor and records the selected tier.");
+            var localStore = new MemoryShanheCodexStore(); localStore.Write(localTier);
+            Program.Assert(localStore.Read().RunRecords.Single().Difficulty == difficulty,
+                "The higher-tier receipt is written and read with its actual difficulty.");
+        }
+        foreach (var difficulty in new[] { 0, 4 }) Refuse(profile, session, difficulty);
         foreach (var invalid in new[]
         {
             options with { UseCodexRewardPool = false }, options with { ExpeditionId = null },
@@ -73,12 +88,61 @@ internal static class ShanheCodexSettlementChecks
         }) Refuse(profile, ShanheCampaignSession.Replay(definition, invalid, session.AcceptedCommands, _ => Registry.Value), 1);
         Refuse(profile with { Books = int.MaxValue }, session, 1);
         VerifyVmSaveOrderingColdReceiptAndActualPanel(session, definition, output);
+        VerifyAccountFailureBlocksReplacementAndKeepsRecord(session);
 
         var loss = ShanheCampaignSession.Create(definition, options with { ExpeditionId = Guid.NewGuid().ToString("N") }, _ => Registry.Value);
         Accept(loss, new MoveShanheNodeCommand("battle", loss.Revision));
         CompleteBattle(loss, "surrender");
         Program.Assert(loss.Snapshot.Phase == ShanheCampaignPhase.Lost, "The rejected loss case must also come from a genuine completed battle.");
-        Refuse(profile, loss, 1);
+        var preparedLoss = ShanheCodexSettlement.TryPrepare(profile, loss, 1, out var lost);
+        Program.Assert(ShanheCodexSettlement.EligibleBookAmount(profile, loss, 1) == 0 &&
+            preparedLoss && lost.Books == profile.Books &&
+            lost.RunRecords is [{ Won: false, BooksEarned: 0 }],
+            "A genuine loss grants no books but retains a durable expedition record instead of disappearing.");
+        Refuse(lost, loss, 1);
+        var both = new MemoryShanheCodexStore(); both.Write(lost);
+        Program.Assert(ShanheCodexSettlement.TryPrepare(both.Read(), session, 1, out var afterLoss) &&
+            afterLoss.RunRecords.Length == 2 && afterLoss.RunRecords[0].Won && !afterLoss.RunRecords[1].Won,
+            "A later complete expedition appends its own settlement without replacing the previous outcome.");
+        both.Write(afterLoss);
+        var plans = ShanheCodexLoadouts.Rename(both.Read(), "default", "通关构筑");
+        Program.Assert(plans.RunRecords.SequenceEqual(afterLoss.RunRecords) && !ReferenceEquals(plans.RunRecords, afterLoss.RunRecords),
+            "Editing a later loadout keeps detached completed-run records intact.");
+        var older = Enumerable.Range(0, ShanheCodexSettlement.MaximumRunRecords)
+            .Select(index => earned.RunRecords[0] with { ExpeditionKey = "expedition:" + index.ToString("x32") }).ToArray();
+        var fullHistory = profile with { RunRecords = older, ClaimedRewards = older.Select(record => record.ExpeditionKey).ToArray() };
+        Program.Assert(ShanheCodexSettlement.TryPrepare(fullHistory, session, 1, out var trimmed) &&
+            trimmed.RunRecords.Length == ShanheCodexSettlement.MaximumRunRecords &&
+            trimmed.RunRecords[0].ExpeditionKey == ShanheCodexSettlement.GetSettlementKey(session) &&
+            !trimmed.RunRecords.Any(record => record.ExpeditionKey == older[^1].ExpeditionKey) &&
+            trimmed.ClaimedRewards.Contains(older[^1].ExpeditionKey, StringComparer.Ordinal) && fullHistory.RunRecords.Length == older.Length,
+            "The recent history is bounded without evicting its durable duplicate-settlement receipts or mutating the source history.");
+        both.Write(trimmed);
+    }
+
+    private static void VerifyAccountFailureBlocksReplacementAndKeepsRecord(ShanheCampaignSession won)
+    {
+        var progress = new FailingCampaignStore { FailWrites = false };
+        var account = new FailingCodexStore();
+        account.Write(new() { Books = 7 }); account.FailWrites = true;
+        using var vm = new MainViewModel(false, 71, true, new MemorySaveStore(), contentRegistry: Registry.Value,
+            shanheSaveStore: progress, shanheCodexStore: account);
+        Attach(vm, won);
+        Program.Assert(vm.FlushShanheProgress() && vm.IsShanheSettlementPending && account.Read().Books == 7 &&
+            account.Read().RunRecords.Length == 0 && vm.ShanheRunRecords.Count == 0,
+            "A successful campaign journal write followed by an account failure does not publish unsaved books or records.");
+        vm.StartShanheCommand.Execute(null);
+        Program.Assert(ReferenceEquals(typeof(MainViewModel).GetField("_shanheSession", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(vm), won) &&
+            vm.ShanheStatusText.Contains("尚未保存", StringComparison.Ordinal),
+            "Starting another expedition cannot discard an unpaid terminal record when the account store is unavailable.");
+        account.FailWrites = false;
+        Program.Assert(vm.FlushShanheProgress() && !vm.IsShanheSettlementPending && vm.ShanheBookBalance == 17 &&
+            vm.ShanheRunRecords is [{ Record.Won: true, Record.BooksEarned: 10 }] && vm.HasShanheRunRecords,
+            "Retrying the same terminal journal commits both the books and its visible history record exactly once.");
+        vm.StartShanheCommand.Execute(null);
+        Program.Assert(!ReferenceEquals(typeof(MainViewModel).GetField("_shanheSession", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(vm), won) &&
+            account.Read().RunRecords.Length == 1 && vm.ShanheRunRecords.Count == 1 && vm.ShanheBookBalance == 17,
+            "Replacing the active expedition after settlement leaves its completed-run history and book balance available.");
     }
 
     private static void VerifyVmSaveOrderingColdReceiptAndActualPanel(ShanheCampaignSession won,
@@ -106,7 +170,8 @@ internal static class ShanheCodexSettlementChecks
                     "Closing an unpaid settlement must dismiss only the overlay, without attempting a save or granting books.");
                 progress.FailWrites = false;
                 Program.Assert(vm.FlushShanheProgress() && vm.ShanheBookBalance == 17 && account.Read().Books == 17 &&
-                    account.Read().ClaimedRewards.SequenceEqual([ShanheCodexSettlement.GetSettlementKey(won)!]),
+                    account.Read().ClaimedRewards.SequenceEqual([ShanheCodexSettlement.GetSettlementKey(won)!]) &&
+                    vm.ShanheRunRecords.Count == 1 && account.Read().RunRecords.Length == 1,
                     "Retrying after the expedition store recovers must persist exactly one ten-book credit and its expedition claim.");
                 Program.Assert(vm.FlushShanheProgress() && account.Read().Books == 17 && account.Read().ClaimedRewards.Length == 1,
                     "Further ordinary flushes must not award the completed expedition again.");
@@ -174,6 +239,19 @@ internal static class ShanheCodexSettlementChecks
             WriteAttempts++;
             if (FailWrites) throw new IOException("Settlement fixture journal write failure.");
             _inner.Write(save);
+        }
+    }
+
+    private sealed class FailingCodexStore : IShanheCodexStore
+    {
+        private readonly MemoryShanheCodexStore _inner = new();
+        public bool FailWrites { get; set; }
+        public bool Exists => _inner.Exists;
+        public ShanheCodexProfile Read() => _inner.Read();
+        public void Write(ShanheCodexProfile profile)
+        {
+            if (FailWrites) throw new IOException("Settlement fixture account write failure.");
+            _inner.Write(profile);
         }
     }
 

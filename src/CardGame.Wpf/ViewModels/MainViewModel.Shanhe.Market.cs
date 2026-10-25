@@ -33,7 +33,7 @@ public sealed partial class MainViewModel
         _ => "购买战法加入本次征程，不占六个初始战法位。"
     };
     public string ShanheMarketSurchargeNotice => IsShanheShopActive && _shanheSession!.CreateCheckpoint().Options.UseCodexRewardPool &&
-        SelectedShanheMarketCategory is "战法" or "装备" or "卡牌"
+        SelectedShanheMarketCategory is "战法" or "装备" or "卡牌" or "技能"
         ? $"每购买一次{SelectedShanheMarketCategory}，本店同类商品额外消耗铜币 +100" : "货品及价格以当前商店为准";
     public string ShanheMarketRefreshText => $"刷新 · {_shanheSession?.Snapshot.ShopRefreshCost ?? 100} 铜币";
     public string ShanheMarketRefreshRemaining => IsShanheShopActive ? $"剩余刷新次数：{_shanheSession!.Snapshot.ShopRefreshRemaining}" : "到达集市后可刷新货品";

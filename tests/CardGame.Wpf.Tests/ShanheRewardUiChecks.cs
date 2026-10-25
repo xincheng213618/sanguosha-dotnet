@@ -291,7 +291,8 @@ internal static class ShanheRewardUiChecks
         {
             var session = CreateThreeBossSession();
             var ordinaryRevision = Program.Engine(vm).Revision;
-            for (var chapter = 1; chapter <= 3; chapter++)
+            Button? lastContinue = null;
+            for (var chapter = 1; chapter <= 2; chapter++)
             {
                 var beforeGold = session.Snapshot.Gold;
                 var beforeSlots = session.Snapshot.ExtraSkillSlots;
@@ -302,6 +303,7 @@ internal static class ShanheRewardUiChecks
                 var summary = (FrameworkElement)panel.FindName("ShanheBossRewardOverlay");
                 var cardOverlay = (FrameworkElement)panel.FindName("ShanheRewardOverlay");
                 var finish = (Button)panel.FindName("ShanheConfirmBossRewardButton");
+                lastContinue = finish;
                 var confirmCard = (Button)panel.FindName("ShanheConfirmRewardButton");
                 var rewardBack = (Button)panel.FindName("ShanheRewardBackButton");
                 Program.Assert(vm.IsShanheBossRewardOpen && !vm.IsShanheRewardOpen &&
@@ -312,7 +314,7 @@ internal static class ShanheRewardUiChecks
                     vm.ShanheBossSkillSlotsText.Contains("1", StringComparison.Ordinal) &&
                     session.Snapshot.AvailableNodes.Count == 0 && vm.ShanheBossRewardGroups.Count == 2 &&
                     vm.ShanheChapterTitle == "第" + chapter + "章 · 渡口",
-                    "Each real chapter boss victory must show the bound completion overview, credit 500 coins and one slot once, and keep the next chapter closed.");
+                    "The first two real chapter boss victories show the bound overview, credit 500 coins and one slot once, and keep the next chapter closed.");
                 var initial = Snapshot(session);
                 RawClick(finish);
                 vm.ConfirmShanheBossRewardCommand.Execute(null);
@@ -334,11 +336,17 @@ internal static class ShanheRewardUiChecks
                     vm.ShanheBossRewardGroups.All(group => !group.IsResolved),
                     "Returning from an unselected group must preserve both frozen boss groups without granting anything.");
 
-                foreach (var groupId in new[] { "tactics", "cards" })
+                foreach (var groupId in new[] { "tactics", "skills" })
                 {
                     var group = vm.ShanheBossRewardGroups.Single(item => item.Id == groupId);
                     Click(Bound(panel, vm.OpenShanheBossRewardGroupCommand, group), panel);
                     var card = vm.ShanheRewardCards.First(item => item.IsEnabled);
+                    var offered = session.Snapshot.BossRewardSummary!.Groups.Single(item => item.Id == groupId).Offers
+                        .Single(reward => reward.Id == card.Id);
+                    Program.Assert(vm.ShanheRewardCards.Count == 3 && vm.ShanheRewardCards.All(item => !item.IsSkip &&
+                        item.Category == (groupId == "skills" ? "额外技能" : "战法") &&
+                        StandardShanheCampaignCatalog.ShopMetadataByRewardId[item.Id].Rarity == 4),
+                        "The actual chapter selector presents three highest-quality tactics or native skills, with no physical-card or decline substitute.");
                     var beforeSelection = Snapshot(session);
                     var revision = session.Revision;
                     Click(Bound(panel, vm.SelectShanheRewardCardCommand, card), panel);
@@ -348,8 +356,8 @@ internal static class ShanheRewardUiChecks
                     var resolved = vm.ShanheBossRewardGroups.Single(item => item.Id == groupId);
                     var boundSummary = Bound(panel, vm.OpenShanheBossRewardGroupCommand, resolved);
                     Program.Assert(vm.IsShanheBossRewardOpen && !vm.IsShanheRewardOpen && resolved.IsResolved &&
-                        resolved.SelectedName == card.Name && !boundSummary.IsEnabled &&
-                        Program.Find<TextBlock>(boundSummary).Any(text => text.Text == card.Name) &&
+                        resolved.SelectedName == offered.Name && !boundSummary.IsEnabled &&
+                        Program.Find<TextBlock>(boundSummary).Any(text => text.Text == offered.Name) &&
                         session.Revision == revision + 1 && session.Snapshot.Phase == ShanheCampaignPhase.Reward &&
                         session.Snapshot.AvailableNodes.Count == 0 && session.Snapshot.Gold == beforeGold + 500 &&
                         session.Snapshot.ExtraSkillSlots == beforeSlots + 1,
@@ -362,7 +370,9 @@ internal static class ShanheRewardUiChecks
                     Layout(panel);
                     Program.Assert(Snapshot(session) == claimed && vm.IsShanheBossRewardOpen,
                         "Retired group and reward buttons cannot re-open or claim an already resolved group.");
-                    Program.Assert(finish.IsEnabled == (groupId == "cards"),
+                    Program.Assert(groupId != "skills" || session.Snapshot.ExtraSkillIds.Contains(offered.SkillId!),
+                        "Confirming the skill selector grants its actual program to the expedition rather than issuing a physical card.");
+                    Program.Assert(finish.IsEnabled == (groupId == "skills"),
                         "Final continuation becomes enabled only when both separate reward choices have been claimed.");
                 }
                 if (chapter == 1) Program.Render(panel, 1440, 880, Path.Combine(output, "shanhe-boss-reward-claimed.png"));
@@ -370,60 +380,86 @@ internal static class ShanheRewardUiChecks
                 Click(finish, panel);
                 Program.Assert(session.Revision == completedRevision + 1 && !vm.IsShanheBossRewardOpen &&
                     session.Snapshot.BossRewardSummary is null && session.Snapshot.CompletedNodeIds.Count == chapter &&
-                    session.Snapshot.TacticIds.Count == chapter && session.Snapshot.StartingCards.Count == chapter &&
+                    session.Snapshot.TacticIds.Count == chapter && session.Snapshot.ExtraSkillIds.Count == chapter &&
+                    session.Snapshot.StartingCards.Count == 0 &&
                     Program.Engine(vm).Revision == ordinaryRevision,
-                    "The final overview confirmation must complete exactly one chapter after its tactic and card reward have been received, leaving the ordinary table untouched.");
-                if (chapter < 3)
-                    Program.Assert(session.Snapshot.Phase == ShanheCampaignPhase.Map &&
+                    "The overview confirmation completes one of the first two chapters after its tactic and native skill have been received, leaving the ordinary table untouched.");
+                Program.Assert(session.Snapshot.Phase == ShanheCampaignPhase.Map &&
                         session.Snapshot.AvailableNodes.Single().Id == "boss" + (chapter + 1) &&
                         vm.ShanheMapNodes.Select(node => node.Node.Id).SequenceEqual(["boss" + (chapter + 1)]) &&
                         vm.ShanheChapterTitle == "第" + (chapter + 1) + "章 · 渡口",
                         "Only the completed overview may reveal the next numbered chapter, even when chapter nodes have adjacent graph depths.");
-                else Program.Assert(session.Snapshot.Phase == ShanheCampaignPhase.Won && vm.IsShanhePreparation &&
-                    !vm.IsShanheRunInProgress && vm.CanPrepareShanheExpedition,
-                    "The third boss's completed reward overview must finish the expedition and restore preparation.");
-                if (chapter == 3)
-                {
-                    vm.SelectedShanheScenario = vm.ShanheScenarios.Single(s => s.Id == StandardShanheCampaignCatalog.Returning2026EditionId);
-                    Program.Assert(vm.ShanheScenarioDetails == StandardShanheCampaignCatalog.CreateCodexDefinition(
-                        vm.SelectedShanheDifficulty.Value, StandardShanheCampaignCatalog.Returning2026EditionId).IntroText,
-                        "After a real completed expedition, preparation details follow the newly selected scenario rather than the retained finished session.");
-                }
                 var finished = Snapshot(session);
                 RawClick(finish);
                 vm.ConfirmShanheBossRewardCommand.Execute(null);
                 Layout(panel);
                 Program.Assert(Snapshot(session) == finished, "Repeated chapter continuation cannot credit or advance a second time.");
             }
+            var finalGold = session.Snapshot.Gold;
+            var finalSlots = session.Snapshot.ExtraSkillSlots;
+            Accept(session, new MoveShanheNodeCommand("boss3", session.Revision));
+            Program.Assert(session.PendingBattleSetup!.ExtraSkillIds.SequenceEqual(session.Snapshot.ExtraSkillIds),
+                "The two selected chapter skills enter the final actual battle's native setup.");
+            WinPendingBattle(session);
+            Attach(vm, session); Layout(panel);
+            Program.Assert(session.Snapshot.Phase == ShanheCampaignPhase.Won && vm.IsShanhePreparation &&
+                !vm.IsShanheRunInProgress && vm.CanPrepareShanheExpedition && vm.IsShanheSettlementOpen &&
+                ((FrameworkElement)panel.FindName("ShanheSettlementHost")).Visibility == Visibility.Visible &&
+                !vm.IsShanheBossRewardOpen && !vm.IsShanheRewardOpen &&
+                ((FrameworkElement)panel.FindName("ShanheBossRewardOverlay")).Visibility == Visibility.Collapsed &&
+                ((FrameworkElement)panel.FindName("ShanheRewardOverlay")).Visibility == Visibility.Collapsed &&
+                session.Snapshot.BossRewardSummary is null && session.Snapshot.RewardOffers.Count == 0 &&
+                session.Snapshot.Gold == finalGold + 500 && session.Snapshot.ExtraSkillSlots == finalSlots &&
+                session.Snapshot.CompletedNodeIds.Count == 3 && session.Snapshot.TacticIds.Count == 2 &&
+                session.Snapshot.ExtraSkillIds.Count == 2 && session.Snapshot.StartingCards.Count == 0 &&
+                session.AcceptedCommands.OfType<ChooseShanheBossRewardCommand>().Count() == 4 &&
+                session.AcceptedCommands.OfType<ConfirmShanheBossRewardCommand>().Count() == 2 &&
+                Program.Engine(vm).Revision == ordinaryRevision,
+                "The third actual boss victory directly opens final settlement, pays copper once and grants no further tactic, skill, card or slot.");
+            var finalSnapshot = Snapshot(session);
+            RawClick(lastContinue!); vm.ConfirmShanheBossRewardCommand.Execute(null); Layout(panel);
+            Program.Assert(Snapshot(session) == finalSnapshot,
+                "A stale chapter continuation button cannot reopen or re-credit the final settlement.");
+            vm.SelectedShanheScenario = vm.ShanheScenarios.Single(s => s.Id == StandardShanheCampaignCatalog.Returning2026EditionId);
+            Program.Assert(vm.ShanheScenarioDetails == StandardShanheCampaignCatalog.CreateCodexDefinition(
+                vm.SelectedShanheDifficulty.Value, StandardShanheCampaignCatalog.Returning2026EditionId).IntroText,
+                "Completed preparation details follow the newly selected scenario rather than the retained finished session.");
         }
         finally { panel.DataContext = null; }
     }
 
     private static ShanheCampaignSession CreateThreeBossSession()
     {
+        string[] tacticRewardIds = [StandardShanheCampaignCatalog.CurrentDangtou2RewardId,
+            StandardShanheCampaignCatalog.CurrentLeihuo2RewardId, StandardShanheCampaignCatalog.CurrentLianji2RewardId,
+            StandardShanheCampaignCatalog.CurrentDuoduoYishan3RewardId, StandardShanheCampaignCatalog.CurrentYaoli4RewardId,
+            StandardShanheCampaignCatalog.CurrentYaoli6RewardId];
+        string[] skillRewardIds = ["chapter-skill-3017", "chapter-skill-3038", "chapter-skill-3091",
+            "chapter-skill-3020", "chapter-skill-3070", "chapter-skill-3261"];
         var rewards = new List<ShanheRewardDefinition>();
         var nodes = new List<ShanheNodeDefinition>();
         for (var chapter = 1; chapter <= 3; chapter++)
         {
             var tacticIds = new List<string>();
-            var cardIds = new List<string>();
-            for (var choice = 1; choice <= 3; choice++)
+            var skillIds = new List<string>();
+            for (var choice = 1; chapter < 3 && choice <= 3; choice++)
             {
                 var ordinal = (chapter - 1) * 3 + choice;
-                var tacticId = "tactic" + ordinal;
-                var cardId = "card" + ordinal;
-                tacticIds.Add(tacticId); cardIds.Add(cardId);
+                var tacticId = tacticRewardIds[ordinal - 1];
+                var skillId = skillRewardIds[ordinal - 1];
+                tacticIds.Add(tacticId); skillIds.Add(skillId);
                 rewards.Add(new(tacticId, "战法·军阵" + ordinal)
                     { TacticSkillId = "fixture:shanhe-ui-tactic" + ordinal, Description = "本次征程每战攻击范围加一。" });
-                rewards.Add(new(cardId, "行军手札" + ordinal, StartingCards: [new(CardKind.Peach, Suit.Heart, choice)])
-                    { Description = "后续每场开局获得一张桃。" });
+                rewards.Add(new(skillId, "传习·军阵" + ordinal, SkillId: "fixture:shanhe-ui-reward-skill" + ordinal)
+                    { Description = "实际获得一个额外技能，后续战斗攻击范围加一，占一个技能槽。" });
             }
             nodes.Add(new("boss" + chapter, "渡口首领" + chapter, ShanheNodeKind.BossBattle,
                 chapter == 3 ? [] : ["boss" + (chapter + 1)],
-                [new("encounter" + chapter, "守军", [new(Enemy)], VictoryGold: 7)])
+                [new("encounter" + chapter, "守军", [new(Enemy)], VictoryGold: chapter == 3 ? 500 : 7)],
+                RewardIds: chapter == 3 ? skillRewardIds : null)
             {
                 ChapterNumber = chapter, ChapterTitle = "第" + chapter + "章 · 渡口",
-                BossRewards = new(500, 1, [new("tactics", "战法", tacticIds), new("cards", "卡牌", cardIds)]),
+                BossRewards = chapter < 3 ? new(500, 1, [new("tactics", "传说战法", tacticIds), new("skills", "传说技能", skillIds)]) : null,
                 StoryText = "守军已退，整理本章收获。"
             });
         }
@@ -479,8 +515,8 @@ internal static class ShanheRewardUiChecks
         Accept(battle, new UseProgramSkillCommand(0, Force, "victory", [], [1], battle.Revision, battle.PendingDecision!.PromptId));
         for (var step = 0; step < 40 && battle.State.Status != EngineStatus.Completed; step++)
         {
-            // Later chapters carry the chosen Peach into the next real battle. Decline the
-            // published rescue of the defeated enemy instead of waiting at a human prompt.
+            // A supplied Peach in any fixture recipe can open the real rescue prompt.
+            // Decline its published rescue instead of waiting at a human prompt.
             if (battle.PendingDecision is { Kind: DecisionKind.RescueDying, PlayerSeat: 0 } rescue)
                 Accept(battle, new AnswerPromptCommand(rescue.PlayerSeat, rescue.PromptId,
                     rescue.Choices.Single(choice => choice.Parameters.GetValueOrDefault("response") == "let-die").Id,
@@ -532,6 +568,8 @@ internal static class ShanheRewardUiChecks
         public PackageManifest Manifest { get; } = new("fixture-shanhe-reward-ui", new Version(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
+            var rangeSkillIds = Enumerable.Range(1, 9).Select(ordinal => "fixture:shanhe-ui-tactic" + ordinal)
+                .Concat(Enumerable.Range(1, 6).Select(ordinal => "fixture:shanhe-ui-reward-skill" + ordinal)).ToArray();
             var programs = new object[]
             {
                 new { id = Force, revision = 1, activations = new[]
@@ -542,15 +580,15 @@ internal static class ShanheRewardUiChecks
                 } },
                 new { id = Guard, revision = 1, modifiers = new[] { new { id = "guard", query = "attackRange", operation = "add", value = 1, priority = 0 } } },
                 new { id = Learned, revision = 1, modifiers = new[] { new { id = "learned", query = "attackRange", operation = "add", value = 1, priority = 0 } } }
-            }.Concat(Enumerable.Range(1, 9).Select(ordinal => (object)new
+            }.Concat(rangeSkillIds.Select(id => (object)new
             {
-                id = "fixture:shanhe-ui-tactic" + ordinal, revision = 1,
+                id, revision = 1,
                 modifiers = new[] { new { id = "range", query = "attackRange", operation = "add", value = 1, priority = 0 } }
             })).ToArray();
             var catalog = SkillProgramCatalog.Load(
                 JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills = programs }),
                 JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
-                    skills = new[] { Force, Guard, Learned }.Concat(Enumerable.Range(1, 9).Select(ordinal => "fixture:shanhe-ui-tactic" + ordinal))
+                    skills = new[] { Force, Guard, Learned }.Concat(rangeSkillIds)
                         .ToDictionary(id => id, id => new { name = id, description = "Small native reward interaction fixture" }) }));
             foreach (var entry in catalog.Programs)
                 builder.AddSkill(new(entry.Key, entry.Key == Learned ? "振奋" : entry.Key == Guard ? "守御" : "破阵", "攻击范围加一。") { Program = entry.Value });

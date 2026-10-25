@@ -14,7 +14,11 @@ public sealed class StandardBattleFeatureFactory : IGameModeFeatureFactory
         var mode = context.ModeDefinition ?? throw new InvalidOperationException("Battle rules require the selected mode definition.");
         var features = new List<IGameModeFeature>();
         if (options.ShanheBattle is { } campaign)
+        {
             features.Add(new ShanheBattleFeature(campaign, context.GetHost<IStandardBattleHost>()));
+            if (campaign.BossTransition is not null)
+                features.Add(new ShanheBossStageFeature(campaign, context.GetHost<IModeEncounterHost>()));
+        }
         if (mode.ShenwuActivity is not null)
             features.Add(new ShenwuBattleFeature(options, mode.ShenwuActivity, context.ContentRegistry,
                 context.GetHost<IStandardBattleHost>(), context.GetHost<IModeEncounterHost>()));

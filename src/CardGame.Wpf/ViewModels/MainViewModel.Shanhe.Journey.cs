@@ -39,7 +39,7 @@ public sealed partial class MainViewModel
         ShanheCampaignPhase.Battle => "返回牌桌，击败本场全部敌军",
         ShanheCampaignPhase.OpeningSkillDraft => "传承触发，先选择一项稀有技能",
         ShanheCampaignPhase.Reward => _shanheSession?.Snapshot.BossRewardSummary is not null
-            ? "分别领取战法和卡牌，确认后进入下一章" : "领取一项战利品，或放弃并领取铜币",
+            ? "分别领取红色战法和技能，确认后进入下一章" : "领取一项战利品，或放弃并领取铜币",
         ShanheCampaignPhase.NodeChoice => "完成当前地点的选择，继续行军",
         ShanheCampaignPhase.Won => "此番征程已完成，可重新整备出征",
         ShanheCampaignPhase.Lost => "此番征程已结束，可重新整备出征",
@@ -90,43 +90,59 @@ public sealed partial class MainViewModel
         var encounters = definition.Encounters!;
         var enemies = encounters.SelectMany(encounter => encounter.Enemies).Distinct().ToArray();
         var first = encounters[0];
+        var requiredEnemies = enemies.Concat(encounters.Where(encounter => encounter.BossTransition is not null)
+            .Select(encounter => new ShanheCombatantDefinition(encounter.BossTransition!.GeneralId))).Distinct().ToArray();
         var state = session.Snapshot;
         // A registry probe reads only published content. No campaign command, battle engine,
         // random roll or save is produced until the player confirms the challenge.
         var probe = new ShanheBattleSetup(1, state.EncounterOrdinal + 1, definition.Id, state.PlayerGeneralId,
             state.Hp, state.Bonuses.MaxHp, state.Bonuses.InitialHand, state.Bonuses.Draw, state.Bonuses.Slash,
-            state.ExtraSkillIds, state.StartingCards, state.StartingEquipment, enemies,
+            state.ExtraSkillIds, state.StartingCards, state.StartingEquipment, requiredEnemies,
             encounters.SelectMany(encounter => encounter.Allies ?? []).Distinct().ToArray(), session.ContentHash);
         var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(probe);
         _shanhePreviewNode = node;
         _shanheEncounterEnemyName = string.Join(" · ", enemies.Select(enemy => registry.Generals[enemy.GeneralId].Name));
         ShanheEncounterEnemyPortraitName = registry.Generals[enemies[0].GeneralId].Name;
         _shanheEncounterEnemyPortrait = GeneralArt.GetPortrait(enemies[0].GeneralId, decodeWidth: 360);
-        _shanheEncounterEnemyDetail = (encounters.Count > 1 ? "可能出现的敌军：\n" : string.Empty) +
-            string.Join("\n\n", enemies.Select(enemy =>
+        _shanheEncounterEnemyDetail = (encounters.Count > 1 ? "可能出现的完整阵容：\n" : string.Empty) +
+            string.Join("\n\n", encounters.Select(encounter =>
             {
-                var general = registry.Generals[enemy.GeneralId];
-                var maxHp = general.BaseHp + enemy.MaxHpBonus;
-                var skillIds = general.SkillIds.Concat(enemy.ExtraSkillIds ?? []).Distinct(StringComparer.Ordinal);
-                var fixedCards = enemy.StartingCards is { Count: > 0 } cards
-                    ? "\n额外起手牌（随机起手之外）：\n" + string.Join("\n", cards.Select(card =>
-                    {
-                        var face = CardCatalog.Get(card.Kind);
-                        return $"【{face.DisplayName}】{face.Description}";
-                    })) : string.Empty;
-                return $"{general.Name}  体力 {enemy.Hp ?? general.InitialHp ?? maxHp}/{maxHp}\n" +
-                    string.Join(" · ", skillIds.Select(id => registry.GetSkill(id).Name)) + fixedCards;
+                var totalSeats = 1 + encounter.Enemies.Count + (encounter.Allies?.Count ?? 0);
+                var roster = string.Join("\n", encounter.Enemies.Select(enemy =>
+                {
+                    var general = registry.Generals[enemy.GeneralId];
+                    var maxHp = general.BaseHp + enemy.MaxHpBonus;
+                    var skillIds = general.SkillIds.Concat(enemy.ExtraSkillIds ?? []).Distinct(StringComparer.Ordinal);
+                    var hand = (enemy.StartingHand?.Count ?? 4) + enemy.InitialHandBonus;
+                    var fixedCards = enemy.StartingCards is { Count: > 0 } cards
+                        ? "\n额外起手牌（随机起手之外）：\n" + string.Join("\n", cards.Select(card =>
+                        {
+                            var face = CardCatalog.Get(card.Kind);
+                            return $"【{face.DisplayName}】{face.Description}";
+                        })) : string.Empty;
+                    return $"{general.Name}  体力 {enemy.Hp ?? general.InitialHp ?? maxHp}/{maxHp}\n" +
+                        $"起手 {hand} · 摸牌阶段基础 {2 + enemy.DrawBonus} · 出杀基础 {1 + enemy.SlashBonus}\n" +
+                        string.Join(" · ", skillIds.Select(id => registry.GetSkill(id).Name)) + fixedCards;
+                }));
+                var stage = encounter.BossTransition is { } transition
+                    ? $"\n二阶段：{registry.Generals[transition.GeneralId].Name}  体力 {transition.Hp}/{transition.MaxHp}" +
+                        $" · 补牌 {transition.DrawCards}\n第一阶段血量打空后同席转换，不结算胜利；中断当前回合，由首领开始新的自然回合。"
+                    : string.Empty;
+                return $"{encounter.Name}\n{totalSeats}人阵容：敌军 {encounter.Enemies.Count} · 同行 {encounter.Allies?.Count ?? 0} · 玩家 1\n" + roster + stage;
             }));
         var gold = encounters.Select(encounter => encounter.VictoryGold).Distinct().Order().ToArray();
         var goldText = gold.Length == 1 ? gold[0].ToString() : $"{gold[0]}–{gold[^1]}";
-        _shanheEncounterRewardText = (definition.BossRewards is { } boss
+        var finalEncounter = definition.ChapterNumber >= 3 && definition.NextNodeIds.Count == 0;
+        _shanheEncounterRewardText = finalEncounter
+            ? $"铜币 × {goldText}\n第三章通关直接进入最终结算，发放图册并保存征程记录，不再选择战法或技能奖励。"
+            : (definition.BossRewards is { } boss
                 ? $"铜币 × {boss.FixedGold}    技能槽 +{boss.SkillSlots}\n" +
                     string.Join("    ", boss.Groups.Select(group => $"{group.Name}（{group.ChoiceCount}选一）"))
                 : $"铜币 × {goldText}" +
                     (definition.RewardIds?.Count > 0 ? $"    战利品 {definition.RewardChoiceCount} 选一" : string.Empty) +
                     (definition.RewardSkipGold > 0 ? $"\n放弃战利品可额外获得 {definition.RewardSkipGold} 铜币" : string.Empty)) +
-            (first.HealAfterVictory > 0 && encounters.All(encounter => encounter.HealAfterVictory == first.HealAfterVictory)
-                ? $"\n胜利后恢复 {first.HealAfterVictory} 点体力，剩余体力带入后续战斗" : string.Empty);
+                (first.HealAfterVictory > 0 && encounters.All(encounter => encounter.HealAfterVictory == first.HealAfterVictory)
+                    ? $"\n胜利后恢复 {first.HealAfterVictory} 点体力，剩余体力带入后续战斗" : string.Empty);
         NotifyShanheEncounterPreview();
     }
 

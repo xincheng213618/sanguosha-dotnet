@@ -79,6 +79,8 @@ public sealed partial class GameEngine
         { entrySequence = used.EntrySequence; parentFrame = used.UseFrameId; actionId = used.ActionId; return true; }
         if (from != CardLocation.Processing || _cardMovements.LastOrDefault(m => m.CardId == cardId && m.Sequence < before) is not { To.Zone: CardZoneKind.Processing } entry)
             return false;
+        if (TryDescribeShanheBossCancelledMaterial(cardId, entry, reason, out var cancelled))
+        { entrySequence = entry.Sequence; parentFrame = cancelled.FrameId; actionId = cancelled.ActionId; return true; }
         if (used is not null && used.EntrySequence == entry.Sequence && (IsNativeUseFinishReason(reason) || reason.Value == "area.abolished.equipment") &&
             LifecycleCardUse(used.UseFrameId) is { Action: { } action } && action.ActionId == used.ActionId &&
             action.PhysicalCards.Any(c => c.CardId == cardId && c.From == entry.From && c.CardKind == entry.CardKind))
@@ -137,7 +139,9 @@ public sealed partial class GameEngine
              e.UseFrameId == fact.ParentFrameId && e.ActionId == fact.ActionId) ||
          move.From == CardLocation.Processing && entry.Sequence < move.Sequence &&
          (entry.Reason == CardMoveReasons.Respond || entry.Reason == CardMoveReasons.Nullification || entry.Reason.Value == "conversion.declaration.pay") &&
-         (move.Reason == CardMoveReasons.ResponseFinished || move.Reason == CardMoveReasons.NullificationFinished));
+         (move.Reason == CardMoveReasons.ResponseFinished || move.Reason == CardMoveReasons.NullificationFinished) ||
+         TryDescribeShanheBossCancelledMaterial(move.CardId, entry, move.Reason, out var cancelled) &&
+         cancelled.FrameId == fact.ParentFrameId && cancelled.ActionId == fact.ActionId);
 
     private bool IsShanheStartingResourceResponseFinish(CardActionContext action, CardActionCost cost, CardMovementRecord finish) =>
         action.Type == CardActionType.Response && action.PhysicalCards.Contains(cost) && finish.CardId == cost.CardId && finish.CardKind == cost.CardKind &&

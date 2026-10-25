@@ -12,6 +12,7 @@ public sealed record ShanheCodexProfile
     public string[] UnlockedRewardIds { get; init; } = [];
     public string?[] EquippedTacticIds { get; init; } = new string?[6];
     public string[] ClaimedRewards { get; init; } = [];
+    public ShanheRunRecord[] RunRecords { get; init; } = [];
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ShanheCodexLoadoutPlan[]? LoadoutPlans { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -19,6 +20,11 @@ public sealed record ShanheCodexProfile
 }
 
 public sealed record ShanheCodexLoadoutPlan(string Id, string Name, string?[] EquippedTacticIds);
+
+/// <summary>One settled expedition, independent of the next replaceable campaign save.</summary>
+public sealed record ShanheRunRecord(string ExpeditionKey, string CampaignId, string CampaignName,
+    string PlayerGeneralId, string PlayerGeneralName, int Difficulty, bool Won, int BooksEarned,
+    int CompletedNodes, int Battles, DateTimeOffset CompletedAtUtc, string EndingText);
 
 public interface IShanheCodexStore
 {
@@ -90,5 +96,6 @@ public sealed class FileShanheCodexStore : IShanheCodexStore
             profile.EquippedTacticIds.OfType<string>().Any(id => !profile.UnlockedRewardIds.Contains(id, StringComparer.Ordinal)))
             throw new InvalidDataException("山河册进度无效，原文件已保留。");
         ShanheCodexLoadouts.ValidatePlans(profile);
+        ShanheCodexSettlement.ValidateRecords(profile);
     }
 }

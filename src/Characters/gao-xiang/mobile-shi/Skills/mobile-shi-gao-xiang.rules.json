@@ -1,0 +1,52 @@
+{
+ "schemaVersion": 62,
+ "skills": [
+  {
+   "id": "mobile:shi-chiyuan",
+   "revision": 1,
+   "activations": [
+    {
+     "id": "chiyuan-gift",
+     "minCards": 1,
+     "maxCards": 1,
+     "sourceZones": ["hand"],
+     "minTargets": 0,
+     "maxTargets": 0,
+     "targetKind": "anyLiving",
+     "usesPerTurn": null,
+     "usesPerPhase": 1,
+     "condition": {
+      "kind": "always"
+     },
+     "effects": [
+      {
+       "op": "resolveShiZxChiyuan",
+       "target": "owner"
+      }
+     ]
+    }
+   ],
+   "triggers": []
+  },
+  {
+   "id": "mobile:shi-erdi",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "erdi-ending",
+     "window": "playEnding",
+     "subject": "owner",
+     "optional": true,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiZxErdi",
+       "target": "owner"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

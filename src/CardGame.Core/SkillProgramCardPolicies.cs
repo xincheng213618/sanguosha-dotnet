@@ -26,6 +26,7 @@ public enum SkillProgramCardPolicyKind
     ClaimedEntitiesFaceDownUse = 4500,
     RandomRevealColorFireAttack = 4400, UnrespondableNullification = 4401,
     CannotNullifyOwnOrdinaryTrick = 8102,
+    // Value 0 prohibits all others; value 1 limits this policy to distance one.
     ProhibitOthersResponse = 5724,
     SlashMustTargetOverHpHandOwner = 5744,
     IgnoreUseDistanceBeforeDealingDamage = 3800,

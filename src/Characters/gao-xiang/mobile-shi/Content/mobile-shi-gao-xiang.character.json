@@ -1,0 +1,54 @@
+{
+ "formatVersion": 1,
+ "packageId": "standard-classic-generals",
+ "characterId": "character:gao-xiang",
+ "skills": [
+  {
+   "registrationOrder": 51916,
+   "programBundle": "mobile-shi-gao-xiang",
+   "includeProgramPresentation": true,
+   "definition": {
+    "id": "mobile:shi-chiyuan",
+    "name": "驰援",
+    "description": "出牌阶段限一次，你可以交给一名体力值小于你的角色一张牌，然后视为对攻击范围内包含其的一名其他角色使用一张普通【杀】；若如此做，此【杀】结算完毕后，若此牌：造成过伤害，令其回复1点体力值；未造成过伤害，目标角色依次视为对你使用一张普通【杀】。",
+    "actionForms": "Active",
+    "executionForms": "Trigger"
+   }
+  },
+  {
+   "registrationOrder": 51917,
+   "programBundle": "mobile-shi-gao-xiang",
+   "includeProgramPresentation": true,
+   "definition": {
+    "id": "mobile:shi-erdi",
+    "name": "饵敌",
+    "description": "结束阶段，你可以选择一名手牌数大于你的角色。若如此做，你失去1点体力值并摸一张牌，然后你与其同时弃置任意张手牌。当你以此法弃置牌后，若你弃置的牌数：大于其，你回复1点体力值并对其造成1点伤害；小于其，你摸X张牌（X为其本次以此法弃置的牌数）。",
+    "actionForms": "Active",
+    "executionForms": "Trigger"
+   }
+  }
+ ],
+ "generals": [
+  {
+   "registrationOrder": 51918,
+   "pools": {
+    "current": 51918
+   },
+   "definition": {
+    "id": "mobile:shi-gao-xiang",
+    "name": "势高翔",
+    "portraitKey": "mobile-shi-gao-xiang",
+    "skillId": "mobile:shi-chiyuan",
+    "additionalSkillIds": [
+     "mobile:shi-erdi"
+    ],
+    "factionId": "shu",
+    "baseHp": 4,
+    "gender": "Male",
+    "characterId": "character:gao-xiang",
+    "variantId": "mobile-shi",
+    "rulesetId": "sanguosha-mobile"
+   }
+  }
+ ]
+}

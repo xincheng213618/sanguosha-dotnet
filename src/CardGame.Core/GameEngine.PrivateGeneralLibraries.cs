@@ -123,6 +123,9 @@ public sealed partial class GameEngine
     {
         var excluded=_players.Where(p=>p.IsAlive).SelectMany(p=>new[]{p.GeneralSelected?p.General.Id:null,p.SecondaryGeneralSelected?p.SecondaryGeneral?.Id:null}).OfType<string>()
             .Concat(_privateGeneralLibraries.Values.SelectMany(l=>l.GeneralIds)).ToHashSet(StringComparer.Ordinal);
+        // A campaign's undeployed second form is reserved for its original seat.
+        if (_options.ShanheBattle?.BossTransition is { } transition &&
+            ProgramEventHistory<ShanheBossStageStartedEvent>().Count == 0) excluded.Add(transition.GeneralId);
         return _generalPool.Select(g=>g.Id).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).Where(id=>!excluded.Contains(id));
     }
     private PrivateGeneralLibrary DrawPrivateGeneralAvatars(PrivateGeneralLibrary library,int amount,
