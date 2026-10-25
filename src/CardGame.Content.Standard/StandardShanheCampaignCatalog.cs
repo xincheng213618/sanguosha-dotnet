@@ -461,6 +461,8 @@ public static partial class StandardShanheCampaignCatalog
                 packages.Add(new StandardShanheBossOpeningTacticsPackage());
                 packages.Add(new StandardShanheCycleTacticsPackage());
                 packages.Add(new StandardShanheSustainOpeningTacticsPackage());
+                packages.Add(new StandardShanheHandStockTacticsPackage());
+                packages.Add(new StandardShanheResponseTacticsPackage());
             }
             return ComposedSkillContentRegistry.CreateShowcase(additionalPackages: packages);
         })).Value;

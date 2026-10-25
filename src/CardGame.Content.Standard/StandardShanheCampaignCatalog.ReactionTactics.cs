@@ -113,6 +113,18 @@ public static partial class StandardShanheCampaignCatalog
             "你受到1点伤害后，摸一张牌"),
         new ReactionTacticSource(2182, "粮草储备", StandardShanheSustainOpeningTacticsPackage.LiangcaoChubeiSkillId, 200, 1, 17,
             "游戏开始时，你回复1点体力"),
+        new ReactionTacticSource(2132, "皮囊", StandardShanheHandStockTacticsPackage.PinangSkillId, 200, 1, null,
+            "手牌上限+1"),
+        new ReactionTacticSource(2133, "皮囊Ⅱ", StandardShanheHandStockTacticsPackage.Pinang2SkillId, 300, 2, null,
+            "手牌上限+2"),
+        new ReactionTacticSource(2135, "皮囊Ⅲ", StandardShanheHandStockTacticsPackage.Pinang3SkillId, 700, 4, null,
+            "手牌上限+5"),
+        new ReactionTacticSource(2194, "精于谋略", StandardShanheHandStockTacticsPackage.JingyuMoulueSkillId, 300, 2, null,
+            "手牌数小于4时，你使用【杀】造成的伤害+1"),
+        new ReactionTacticSource(2167, "绝对无懈", StandardShanheResponseTacticsPackage.JueduiWuxieSkillId, 500, 3, null,
+            "其他角色无法响应你的【无懈可击】"),
+        new ReactionTacticSource(2308, "赌术II", StandardShanheResponseTacticsPackage.Dushu2SkillId, 300, 2, 46,
+            "你的拼点牌点数+6（最大为K）"),
     });
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentReactionTacticShopMetadata =>
