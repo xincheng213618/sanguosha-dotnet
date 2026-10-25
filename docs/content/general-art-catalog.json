@@ -21097,6 +21097,23 @@
       ]
     },
     {
+      "key": "mobile-shi-zang-hong",
+      "characterName": "势臧洪",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象（BWIKI）",
+          "sourcePage": "https://wiki.biligame.com/msgs/%E5%8A%BF%E8%87%A7%E6%B4%AA",
+          "imageUrl": "https://patchwiki.biligame.com/images/msgs/1/1c/eav1h0zwygbqx4lbk1elf90k3t82vbj.png",
+          "sha256": "4c9c0d4e7b10f5d48b94c561932719843dfe0a96f12e1e30fd2493401c4786a9",
+          "pixelWidth": 530,
+          "pixelHeight": 750,
+          "localPath": "src/CardGame.Wpf/Assets/mobile-shi-zang-hong.png"
+        }
+      ]
+    },
+    {
       "key": "mobile-shi-deng-ai",
       "characterName": "势邓艾",
       "defaultSkinId": "86100",
