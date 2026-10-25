@@ -1,0 +1,1 @@
+{"claimed":"mobile-shi batch (lv-yi)","note":"implementation in agent worktree .artifacts/agent-lv-yi"}

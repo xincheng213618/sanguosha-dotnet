@@ -35,6 +35,7 @@ public sealed partial class GameEngine
 
     private bool IsSelectedActorDuelUse(long id) => LifecycleCardUse(id) is {SelectedActorDuelOrigin:not null,CardId:0,CardKind:CardKind.Duel,PhysicalCardIds.Count:0};
     private Card GetTrickRepresentation(long frameId,int cardId,bool requireProcessing=false) =>
+        cardId == 0 && IsShiLySongyanDrawTwo(frameId) ? new Card(0,CardKind.DrawTwo,Suit.None,0) :
         cardId == 0 && IsOriginalUseLightning(frameId) ? new Card(0,CardKind.Lightning,Suit.None,0) :
         cardId==0 && IsMouDcZeroUse(frameId) ? new Card(0,LifecycleCardUse(frameId)!.CardKind,Suit.None,0) :
         cardId==0 && IsMouZyZeroFireUse(frameId) ? new Card(0,CardKind.FireAttack,Suit.None,0) :
