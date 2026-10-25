@@ -50,9 +50,10 @@ public sealed partial class GameEngine
     private bool MoCaoCaoIssuedHandUse(long id,int actor) => MoCaoCaoEquipment.HasUsePrivilege(id,actor);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount,33800)]
     private int MoCaoCaoQiBaoDamage(IDamageAttempt attack) =>
-        !attack.IsChainPropagation && !attack.IsSourceLess && attack.EffectiveCardKind is { } kind && IsSlashCard(kind) &&
-        attack.CardUserSeat==attack.SourceSeat && HasWeaponAbility(_players[attack.SourceSeat],CardKind.QiBaoDao) &&
-        _players[attack.TargetSeat].HasHpValue && _players[attack.TargetSeat].Hp==_players[attack.TargetSeat].MaxHp ? 1 : 0;
+        QiBaoDaoDamageBonus(attack.EffectiveCardKind is { } kind && IsSlashCard(kind) &&
+            attack.CardUserSeat == attack.SourceSeat, attack.IsSourceLess, attack.IsChainPropagation,
+            HasWeaponAbility(_players[attack.SourceSeat], CardKind.QiBaoDao),
+            _players[attack.TargetSeat].HasHpValue, _players[attack.TargetSeat].Hp, _players[attack.TargetSeat].MaxHp);
     private string? MoCaoCaoEquipmentDescription(int seat) =>
         MoCaoCaoEquipment.VirtualKind(seat,EquipmentSlot.Weapon) is { } weapon && MoCaoCaoEquipment.VirtualKind(seat,EquipmentSlot.Armor) is { } armor ?
             $"视为装备【{EquipmentRules.Get(weapon).DisplayName}】、【{EquipmentRules.Get(armor).DisplayName}】。真实装备区非空时暂停；体力变化重新签发。" : null;

@@ -67,6 +67,7 @@ public static partial class StandardShanheCampaignCatalog
         new ReadOnlyDictionary<int, string>(CodexRewardBindings.Concat(Codex2026RewardBindings).Select(binding => new KeyValuePair<int, string>(binding.NodeId, binding.Reward.Id))
             .Concat(CurrentBuildSkillCodexBindings)
             .Concat(CurrentReactionTacticCodexBindings)
+            .Concat(CurrentShopCardCodexBindings)
             .Append(new(2, OpeningInheritanceRewardId))
             // Availability still requires this reward in the selected edition.
             .Append(new(42, CurrentJinnangJiRewardId))
@@ -164,6 +165,11 @@ public static partial class StandardShanheCampaignCatalog
         {
             [CardKind.CrimsonSoulZither] = "crimson-soul-zither",
             [CardKind.PurpleGoldCrown] = "purple-gold-crown",
+            [CardKind.WushuangHalberd] = "wushuang-halberd",
+            [CardKind.RedCottonRobe] = "red-cotton-robe",
+            [CardKind.ShuraInfernoHalberd] = "shura-inferno-halberd",
+            [CardKind.QiBaoDao] = "qibao-dao",
+            [CardKind.BaiBiDao] = "baibi-dao",
             [CardKind.LionBelt] = "lion-belt",
             [CardKind.DelusionCrown] = "delusion-crown",
             [CardKind.GhostDragonCrescentBlade] = "ghost-dragon-crescent-blade",
@@ -171,9 +177,7 @@ public static partial class StandardShanheCampaignCatalog
         });
 
     private static bool RequiresCodexEquipmentRegistry(ShanheBattleSetup setup) =>
-        setup.StartingEquipment.Any(card => CodexAdditionalEquipment.ContainsKey(card.Kind)) ||
-        setup.AllyRoster.Concat(setup.EnemyRoster).SelectMany(member => member.StartingCards ?? [])
-            .Any(card => CodexAdditionalEquipment.ContainsKey(card.Kind));
+        ShanheRecipeCards(setup).Any(card => CodexAdditionalEquipment.ContainsKey(card.Kind));
 
     // Only recipes that actually carry a newly available equipment kind receive
     // this package. Historical battle registries therefore keep their old hash.
@@ -191,6 +195,9 @@ public static partial class StandardShanheCampaignCatalog
             }
             builder.AddSkill(EmbeddedSkillProgramCatalog.Definition("hulao-equipment", "hulao:lion-belt"));
             builder.AddSkill(EmbeddedSkillProgramCatalog.Definition("hulao-equipment", "hulao:purple-gold-crown"));
+            builder.AddSkill(EmbeddedSkillProgramCatalog.Definition("hulao-equipment", "hulao:wushuang-halberd"));
+            builder.AddSkill(EmbeddedSkillProgramCatalog.Definition("hulao-equipment", "hulao:red-cotton-robe") with { Tags = SkillTag.Locked });
+            builder.AddSkill(EmbeddedSkillProgramCatalog.Definition("shenwu-equipment", "shenwu:shura-inferno-halberd") with { Tags = SkillTag.Locked });
             builder.AddSkill(EmbeddedSkillProgramCatalog.Definition("shenwu-equipment", "shenwu:delusion-crown") with { Tags = SkillTag.Locked });
         }
     }

@@ -287,6 +287,8 @@ public sealed partial class GameEngine
                     p.TeamId is not null && player.TeamId is not null && p.TeamId != player.TeamId) : null,
             OtherPublicTeamAllyCount = bindings.Any(binding => binding.Modifier.ValueExpression == SkillRuleValueExpression.OtherPublicTeamAllyCount)
                 ? _players.Count(p => p.IsAlive && OtherRevealedPublicTeamAlly(player, p)) : null,
+            OtherLivingPlayerCount = bindings.Any(binding => binding.Modifier.ValueExpression == SkillRuleValueExpression.OtherLivingPlayerCount)
+                ? _players.Count(p => p.IsAlive && p.Seat != player.Seat) : null,
             LivingFemaleCount = bindings.Any(binding => binding.Modifier.ValueExpression == SkillRuleValueExpression.NegatedLivingFemaleCount)
                 ? _players.Count(p => p.IsAlive && p.Gender == GeneralGender.Female) : null,
             CurrentTurnUsedHandSuitCount = bindings.Any(binding => binding.Modifier.ValueExpression == SkillRuleValueExpression.CurrentTurnUsedHandSuitCount)

@@ -5,7 +5,7 @@
       "id": "hulao:wushuang-halberd", "revision": 1,
       "triggers": [{
         "id": "slash-damage-reward", "window": "afterDamageApplied", "subject": "damageSource",
-        "damageCardKinds": ["slash", "fireSlash", "thunderSlash"],
+        "damageCardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"],
         "damageOccurrence": "perDamage", "optional": true, "priority": 0,
         "effects": [
           { "op": "chooseOption", "target": "owner", "resultBind": "reward",
@@ -38,7 +38,8 @@
         "optional": false, "priority": 0,
         "condition": { "kind": "any", "children": [
           { "kind": "damageNatureIs", "damageNature": "fire" },
-          { "kind": "damageNatureIs", "damageNature": "thunder" }
+          { "kind": "damageNatureIs", "damageNature": "thunder" },
+          { "kind": "damageNatureIs", "damageNature": "cold" }
         ] },
         "effects": [{ "op": "preventCurrentDamage", "target": "owner" }]
       }]

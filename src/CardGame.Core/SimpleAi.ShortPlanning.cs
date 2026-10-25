@@ -163,9 +163,8 @@ public sealed partial class SimpleAiBrain
             CardKind.SilverLion when (self.HasAlcoholEffect || target.HandCount == 0 &&
                 self.Equipment.Any(card => card.Kind == CardKind.GudingBlade)) &&
                 target.IncomingDamageCap is not 1 => new(36d),
-            // The registered robe rule prevents fire and thunder damage, not
-            // cold damage or an elemental card whose damage became normal.
-            CardKind.RedCottonRobe when nature is DamageNature.Fire or DamageNature.Thunder => new(FullyBlocks: true),
+            // Match the registered robe rule after effective damage-nature changes.
+            CardKind.RedCottonRobe when nature is DamageNature.Fire or DamageNature.Thunder or DamageNature.Cold => new(FullyBlocks: true),
             _ => new()
         };
     }

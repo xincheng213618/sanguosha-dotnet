@@ -71,8 +71,10 @@ public sealed partial class GameEngine
         {
             get
             {
-                if (engine.CurrentDamageAttempt is not { } a || a.EffectiveCardKind is not { } kind ||
-                    engine.LifecycleCardUse(a.ResolutionId)?.Action is not { } action ||
+                if (engine.CurrentDamageAttempt is not { IsChainPropagation: false, IsSourceLess: false } a ||
+                    a.CardUserSeat != a.SourceSeat || a.EffectiveCardKind is not { } kind ||
+                    engine.LifecycleCardUse(a.ResolutionId)?.Action is not { Type: CardActionType.Use } action ||
+                    action.ActorSeat != a.SourceSeat || !IsSlashCard(action.EffectiveKind) ||
                     engine._resolutionStack.OfType<DamageFrame>().LastOrDefault(d=>d.ParentFrameId==a.ResolutionId && d.SourceSeat==a.SourceSeat && d.TargetSeat==a.TargetSeat) is not { } damage) return null;
                 return new(damage.Id,a.ResolutionId,action.ActionId,a.SourceSeat,a.TargetSeat,kind,a.DamageAmount,a.IsSourceLess);
             }
