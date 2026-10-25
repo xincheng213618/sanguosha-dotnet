@@ -15,7 +15,8 @@ public sealed partial class GameEngine
              !(effect.Op == SkillProgramEffectOp.ResolveAnniversaryRuanJiJiudun && IsExactRuanJiVirtualBasicDraft(frame, draft)) &&
              !(effect.Op == SkillProgramEffectOp.ResolveAnniversaryLiuLiDehua && IsExactAnniversaryLiuLiBasicDraft(frame, draft)) &&
              !(effect.Op == SkillProgramEffectOp.ResolveAnniversaryDagongCheAttack && IsExactDagongCheBasicDraft(frame, draft)) &&
-             !(effect.Op == SkillProgramEffectOp.ResolveAnniversaryYangBiaoJuee && IsExactAnniversaryYangBiaoBasicDraft(frame, draft))) || draft.InstructionIndex != frame.InstructionIndex)
+             !(effect.Op == SkillProgramEffectOp.ResolveAnniversaryYangBiaoJuee && IsExactAnniversaryYangBiaoBasicDraft(frame, draft)) &&
+             !(effect.Op == SkillProgramEffectOp.ResolveShiZhLiezhi && frame.SkillId == ShiZangHongComposition.LiezhiSkill)) || draft.InstructionIndex != frame.InstructionIndex)
             throw new InvalidOperationException("A virtual basic draft lost its exact instruction.");
         if (draft.ChildFrameId is { } childId)
         {
