@@ -1,0 +1,100 @@
+using System.Globalization;
+using CardGame.Core.Campaigns;
+
+namespace CardGame.Content.Standard;
+
+public static partial class StandardShanheCampaignCatalog
+{
+    public const string CurrentCuixueSkillId = "shanhe:current-cuixue-2048";
+    public const string CurrentXialuXiangfengSkillId = "shanhe:current-xialu-xiangfeng-2028";
+    public const string CurrentZhongjijiSkillId = "shanhe:current-zhongjiji-2130";
+    public const string CurrentCedingTianxiaSkillId = "shanhe:current-ceding-tianxia-2085";
+    public const string CurrentCedingTianxia2SkillId = "shanhe:current-ceding-tianxia-2086";
+    public const string CurrentYuanzhuSkillId = "shanhe:current-yuanzhu-2076";
+    public const string CurrentYuanzhu2SkillId = "shanhe:current-yuanzhu-2077";
+    public const string CurrentSouguaSkillId = "shanhe:current-sougua-2168";
+    public const string CurrentSougua2SkillId = "shanhe:current-sougua-2169";
+
+    private sealed record ReactionTacticSource(int SourceId, string Name, string SkillId, int Price, int Rarity,
+        int? CodexNodeId, string Description)
+    {
+        public string RewardId => "tactic-build-" + SourceId.ToString(CultureInfo.InvariantCulture);
+        public ShanheRewardDefinition Reward => new(RewardId, "战法·" + Name)
+        { TacticSkillId = SkillId, Description = Description + "不占额外技能槽，本次征程限获得一份。" };
+    }
+
+    // Keep projections independent of partial-class static initialization order.
+    private static IReadOnlyList<ReactionTacticSource> CurrentReactionTactics => Array.AsReadOnly(new[]
+    {
+        new ReactionTacticSource(2071, "铁布衫", "shanhe:current-tiebushan-2071", 200, 1, null,
+            "游戏开始时，你获得1点护甲"),
+        new ReactionTacticSource(2072, "铁布衫Ⅱ", "shanhe:current-tiebushan-2072", 300, 2, null,
+            "游戏开始时，你获得2点护甲"),
+        new ReactionTacticSource(2073, "铁布衫Ⅲ", "shanhe:current-tiebushan-2073", 500, 3, null,
+            "游戏开始时，你获得4点护甲"),
+        new ReactionTacticSource(2069, "护甲Ⅰ", "shanhe:current-hujia-2069", 300, 2, null,
+            "每轮开始时，你获得1点护甲"),
+        new ReactionTacticSource(2070, "护甲Ⅱ", "shanhe:current-hujia-2070", 500, 3, null,
+            "每轮开始时，你获得2点护甲"),
+        new ReactionTacticSource(2054, "体魄Ⅰ", "shanhe:current-tipo-2054", 300, 2, null,
+            "游戏开始时，你增加1点体力上限并回复等量体力"),
+        new ReactionTacticSource(2055, "体魄Ⅱ", "shanhe:current-tipo-2055", 500, 3, null,
+            "游戏开始时，你增加2点体力上限并回复等量体力"),
+        new ReactionTacticSource(2056, "体魄Ⅲ", "shanhe:current-tipo-2056", 700, 4, 102,
+            "游戏开始时，你增加3点体力上限并回复等量体力"),
+        new ReactionTacticSource(2048, "淬血", CurrentCuixueSkillId, 200, 1, null,
+            "你每轮【杀】首次造成伤害后摸1张牌"),
+        new ReactionTacticSource(2028, "狭路相逢", CurrentXialuXiangfengSkillId, 200, 1, null,
+            "受到【决斗】伤害后回复1点体力"),
+        new ReactionTacticSource(2130, "重击技", CurrentZhongjijiSkillId, 300, 2, null,
+            "对敌方造成伤害一次大于等于3点时，摸1张牌"),
+        new ReactionTacticSource(2085, "策定天下", CurrentCedingTianxiaSkillId, 300, 2, null,
+            "出牌阶段限一次,你使用锦囊牌造成伤害后,摸1张牌"),
+        new ReactionTacticSource(2086, "策定天下Ⅱ", CurrentCedingTianxia2SkillId, 500, 3, null,
+            "出牌阶段限一次,你使用锦囊牌造成伤害后,摸2张牌"),
+        new ReactionTacticSource(2076, "援助", CurrentYuanzhuSkillId, 300, 2, null,
+            "回合结束时，你摸1张牌"),
+        new ReactionTacticSource(2077, "援助Ⅱ", CurrentYuanzhu2SkillId, 500, 3, null,
+            "回合结束时，你摸2张牌"),
+        new ReactionTacticSource(2168, "搜刮Ⅰ", CurrentSouguaSkillId, 200, 1, null,
+            "当你击杀其他角色后，你回复1点体力值"),
+        new ReactionTacticSource(2169, "搜刮Ⅱ", CurrentSougua2SkillId, 300, 2, null,
+            "当你击杀其他角色后，你回复2点体力值"),
+    });
+
+    private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentReactionTacticShopMetadata =>
+        CurrentReactionTactics.Select(source => new KeyValuePair<string, ShanheShopMetadata>(source.RewardId,
+            new(source.SourceId, source.Price, source.Rarity, "战法")));
+    private static IEnumerable<KeyValuePair<int, string>> CurrentReactionTacticCodexBindings =>
+        CurrentReactionTactics.Where(source => source.CodexNodeId.HasValue)
+            .Select(source => new KeyValuePair<int, string>(source.CodexNodeId.GetValueOrDefault(), source.RewardId));
+    private static IEnumerable<string> CurrentReactionTacticDefaultUnlockedRewardIds =>
+        CurrentReactionTactics.Where(source => source.CodexNodeId is null).Select(source => source.RewardId);
+
+    private static ShanheCampaignDefinition WithCurrentReactionTactics(ShanheCampaignDefinition definition)
+    {
+        var sources = CurrentReactionTactics;
+        var rewardIds = sources.Select(source => source.RewardId).ToArray();
+        var choices = sources.Select(source => new ShanheNodeChoiceDefinition("buy-" + source.RewardId,
+            $"战法·{source.Name} · {source.Price}钱", source.Price, RewardId: source.RewardId, LeavesNode: false)
+            { Description = source.Reward.Description }).ToArray();
+        return definition with
+        {
+            Rewards = definition.Rewards.Concat(sources.Select(source => source.Reward)).ToArray(),
+            Nodes = definition.Nodes.Select(node => node with
+            {
+                RewardIds = node.Kind is ShanheNodeKind.Battle or ShanheNodeKind.EliteBattle or ShanheNodeKind.BossBattle
+                    ? (node.RewardIds ?? []).Concat(rewardIds).ToArray() : node.RewardIds,
+                Choices = node.Kind == ShanheNodeKind.Shop ? (node.Choices ?? []).Concat(choices).ToArray() : node.Choices
+            }).ToArray()
+        };
+    }
+
+    private static bool RequiresReactionTacticsRegistry(ShanheBattleSetup setup)
+    {
+        var skills = setup.ExtraSkillIds.Concat(setup.TacticSkillIds)
+            .Concat(setup.AllyRoster.Concat(setup.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
+            .ToHashSet(StringComparer.Ordinal);
+        return CurrentReactionTactics.Any(source => skills.Contains(source.SkillId));
+    }
+}

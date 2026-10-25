@@ -204,6 +204,7 @@ public static partial class StandardShanheCampaignCatalog
         var currentYaoli = RequiresCurrentYaoliRegistry(requirements);
         var currentLegendaryTactics = RequiresCurrentLegendaryTacticsRegistry(requirements);
         var buildTactics = RequiresBuildTacticsRegistry(requirements);
+        var reactionTactics = RequiresReactionTacticsRegistry(requirements);
         var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
@@ -305,6 +306,7 @@ public static partial class StandardShanheCampaignCatalog
             (currentYaoli ? "/current-yaoli" : "") +
             (currentLegendaryTactics ? "/current-legendary-tactics" : "") +
             (buildTactics ? "/current-build-tactics" : "") +
+            (reactionTactics ? "/current-reaction-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
             (currentLonghun ? "/current-longhun-3023" : "") +
@@ -353,6 +355,12 @@ public static partial class StandardShanheCampaignCatalog
             if (localTroops) packages.Add(new StandardShanheLocalTroopPackage());
             if (currentLegendaryTactics) packages.Add(new StandardShanheLegendaryTacticsPackage());
             if (buildTactics) packages.Add(new StandardShanheBuildTacticsPackage());
+            if (reactionTactics)
+            {
+                packages.Add(new StandardShanheArmorTacticsPackage());
+                packages.Add(new StandardShanheDamageDrawTacticsPackage());
+                packages.Add(new StandardShanheSustainTacticsPackage());
+            }
             if (currentFuqi) packages.Add(new StandardShanheFuqiPackage());
             if (currentWangong) packages.Add(new StandardShanheWangongPackage());
             if (currentLonghun) packages.Add(new StandardShanheLonghunPackage());

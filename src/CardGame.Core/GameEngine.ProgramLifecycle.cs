@@ -5050,6 +5050,17 @@ public sealed partial class GameEngine
             EventTargetMaxHp = _players[attack.TargetSeat].MaxHp,
             EventTargetDamageInstancesTakenThisTurn = damage.EventTargetDamageInstancesTakenThisTurn,
             DamageTargetIsOther = candidate.OwnerSeat != attack.TargetSeat,
+            AppliedDamageAmount = _contentRegistry.ProgramDependencies.UsesTriggerValue(SkillProgramTriggerValueKind.AppliedDamageAmount)
+                ? attack.DamageAmount : null,
+            DamageTargetIsPublicTeamEnemy = _contentRegistry.ProgramDependencies.UsesTriggerCondition(SkillProgramTriggerConditionKind.DamageTargetIsPublicTeamEnemy)
+                ? candidate.OwnerSeat != attack.TargetSeat && owner.TeamRevealed &&
+                  _players[attack.TargetSeat].TeamRevealed && PublicTeamEnemy(candidate.OwnerSeat, _players[attack.TargetSeat]) : null,
+            DamageFromOwnerTrickUse = _contentRegistry.ProgramDependencies.UsesTriggerCondition(SkillProgramTriggerConditionKind.DamageFromOwnerTrickUse)
+                ? !attack.IsSourceLess && !attack.IsChainPropagation && attack.SourceSeat == candidate.OwnerSeat &&
+                  attack.CardUserSeat == candidate.OwnerSeat && LifecycleCardUse(attack.ResolutionId)?.Action is
+                      { Type: CardActionType.Use } trickUse && trickUse.ActorSeat == candidate.OwnerSeat &&
+                  trickUse.EffectiveKind == attack.EffectiveCardKind &&
+                  GetProgramCardCategory(trickUse.EffectiveKind) == SkillProgramCardCategory.Trick : null,
             DamageSourceIsOwner = !attack.IsSourceLess && candidate.OwnerSeat == attack.SourceSeat,
             EventSourceMarkerCounts = HasAttributedEventOperations() && !attack.IsSourceLess &&
                 IsValidPlayerSeat(attack.SourceSeat)

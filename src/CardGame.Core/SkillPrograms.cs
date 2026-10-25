@@ -58,6 +58,8 @@ public enum SkillProgramTriggerConditionKind
     DamageSourceFactionIs = 26,
     FaceDown = 27,
     CardActionMatchesPreviousPlayCard = 28,
+    DamageTargetIsPublicTeamEnemy = 29,
+    DamageFromOwnerTrickUse = 30,
     CardActionCardIsBlack = 800,
     DamageSourceGenderIs = 801,
     DamageNatureIs = 804,
@@ -112,6 +114,7 @@ public enum SkillProgramTriggerValueKind
     LivingPlayersMinHp = 25,
     TurnOwnerDiscardPhaseHandDiscardCount = 26,
     DamageInstancesTakenThisTurn = 27,
+    AppliedDamageAmount = 28,
     EventTargetDamageInstancesTakenThisTurn = 4100,
     CardActionPhysicalCardCount = 400,
     MarkerParity = 450,
@@ -2270,6 +2273,12 @@ public sealed record SkillProgramTriggerFacts(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? EventTargetDamageInstancesTakenThisTurn { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? AppliedDamageAmount { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? DamageTargetIsPublicTeamEnemy { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? DamageFromOwnerTrickUse { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? CurrentTurnUsedCardCategoryCount { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? ActualTurnActorUseOrdinal { get; init; }
@@ -2400,6 +2409,8 @@ public sealed record SkillProgramTriggerValue(SkillProgramTriggerValueKind Kind,
         SkillProgramTriggerValueKind.ActualTurnDeathCount => facts.ActualTurnDeathCount ??
             throw new InvalidOperationException("Actual turn deaths require frozen death facts."),
         SkillProgramTriggerValueKind.IntegerConstant => Value,
+        SkillProgramTriggerValueKind.AppliedDamageAmount => facts.AppliedDamageAmount ??
+            throw new InvalidOperationException("Applied damage facts were not captured."),
         SkillProgramTriggerValueKind.CurrentActualPlayPhysicalSlashLossCount => facts.CurrentActualPlayPhysicalSlashLossCount ??
             throw new InvalidOperationException("Actual Play physical Slash loss facts were not captured."),
         SkillProgramTriggerValueKind.TurnOwnerDamageDealtThisTurn => facts.TurnOwnerDamageDealtThisTurn ??
@@ -2545,6 +2556,8 @@ public sealed class SkillProgramTriggerCondition
         SkillProgramTriggerConditionKind.DirectCardUseDamage => facts.DirectCardUseDamage == true,
         SkillProgramTriggerConditionKind.DamageCardIsRed => facts.DamageCardIsRed == true,
         SkillProgramTriggerConditionKind.DamageTargetIsOther => facts.DamageTargetIsOther == true,
+        SkillProgramTriggerConditionKind.DamageTargetIsPublicTeamEnemy => facts.DamageTargetIsPublicTeamEnemy == true,
+        SkillProgramTriggerConditionKind.DamageFromOwnerTrickUse => facts.DamageFromOwnerTrickUse == true,
         SkillProgramTriggerConditionKind.CardActionCategoryIs =>
             facts.CardActionCategory is { } category && CardCategories.Contains(category),
         SkillProgramTriggerConditionKind.CardActionTargetIsOwner => facts.CardActionTargetIsOwner == true,
@@ -5538,6 +5551,9 @@ public sealed class SkillProgramCatalog
                 item.Kind is SkillProgramTriggerValueKind.DamageInstancesTakenThisTurn or SkillProgramTriggerValueKind.EventTargetDamageInstancesTakenThisTurn) &&
             window != SkillProgramTriggerWindow.AfterDamageApplied)
             Fail(path + ".condition", "damage-instance count requires afterDamageApplied");
+        if (EnumerateTriggerValues(condition).Any(item => item.Kind == SkillProgramTriggerValueKind.AppliedDamageAmount) &&
+            window != SkillProgramTriggerWindow.AfterDamageApplied)
+            Fail(path + ".condition", "appliedDamageAmount requires an afterDamageApplied trigger");
         if (EnumerateTriggerConditions(condition).Any(item => item.Kind is
                 SkillProgramTriggerConditionKind.CardActionActorIsCurrentTurn or
                 SkillProgramTriggerConditionKind.CardActionPhaseIsPlay) &&
@@ -5603,6 +5619,14 @@ public sealed class SkillProgramCatalog
                 item.Kind == SkillProgramTriggerConditionKind.DamageTargetIsOther) &&
             window != SkillProgramTriggerWindow.AfterDamageApplied)
             Fail(path + ".condition", "damageTargetIsOther requires an afterDamageApplied trigger");
+        if (EnumerateTriggerConditions(condition).Any(item =>
+                item.Kind == SkillProgramTriggerConditionKind.DamageTargetIsPublicTeamEnemy) &&
+            window != SkillProgramTriggerWindow.AfterDamageApplied)
+            Fail(path + ".condition", "damageTargetIsPublicTeamEnemy requires an afterDamageApplied trigger");
+        if (EnumerateTriggerConditions(condition).Any(item =>
+                item.Kind == SkillProgramTriggerConditionKind.DamageFromOwnerTrickUse) &&
+            window != SkillProgramTriggerWindow.AfterDamageApplied)
+            Fail(path + ".condition", "damageFromOwnerTrickUse requires an afterDamageApplied trigger");
         if (EnumerateTriggerConditions(condition).Any(item =>
                 item.Kind is SkillProgramTriggerConditionKind.DamageSourceIsOwner or
                     SkillProgramTriggerConditionKind.DamageSourceFactionIs) &&

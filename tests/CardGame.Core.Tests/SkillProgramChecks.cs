@@ -55,6 +55,27 @@ internal static class SkillProgramChecks
         AssertReject(RulesA, PresentationA.Replace("scenario:composed", "scenario:missing", StringComparison.Ordinal),
             "unknown skill");
         AssertReject("{", PresentationA, "rules");
+        foreach (var condition in new[]
+        {
+            """{"kind":"damageTargetIsPublicTeamEnemy"}""",
+            """{"kind":"damageFromOwnerTrickUse"}""",
+            """{"kind":"compare","left":{"kind":"appliedDamageAmount"},"operator":"greaterThanOrEqual","right":{"kind":"integerConstant","value":3}}"""
+        })
+        {
+            var outsideDamage = $$"""
+                {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"scenario:damage-facts","revision":1,
+                "triggers":[{"id":"opening","window":"gameStarting","subject":"owner","optional":false,
+                "condition":{{condition}},"effects":[{"op":"draw","target":"owner","amount":1}]}]}]}
+                """;
+            AssertReject(outsideDamage, System.Text.Json.JsonSerializer.Serialize(new
+            {
+                schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                skills = new Dictionary<string, object>
+                {
+                    ["scenario:damage-facts"] = new { name = "Damage facts", description = "Only a real after-damage window supplies these facts." }
+                }
+            }), "afterDamageApplied");
+        }
         var ownDiscardRules = $$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"scenario:own-discard","revision":1,
             "triggers":[{"id":"end","window":"discardPhaseEnded","turnOwnerScope":"own","allowOwnDiscardPhaseEnded":true,
