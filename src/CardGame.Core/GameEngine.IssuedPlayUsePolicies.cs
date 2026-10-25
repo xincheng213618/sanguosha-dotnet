@@ -28,6 +28,7 @@ public sealed partial class GameEngine
         IsBoundaryAnjianUnrespondable(frameId) ||
         IsMobileShiWanglieUnrespondable(frameId) ||
         IsMobileShiZhuangshiUnrespondable(frameId) ||
+        IsShiHcSiliSlashUnrespondable(frameId) ||
         IsMouZhaJiangUnrespondable(frameId) || IsQigongUnrespondable(frameId) || HasIssuedNonBasicSlashDistance(frameId) || IsZhangYanLangdaoUnrespondable(frameId) ||
         _resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId) is { Action: { } action, IssuedNoResponse: { } issued } &&
         issued.CardActionId == action.ActionId && issued.ParentFrameId == frameId;

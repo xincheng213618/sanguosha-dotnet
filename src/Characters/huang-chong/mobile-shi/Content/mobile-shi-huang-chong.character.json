@@ -1,0 +1,54 @@
+{
+ "formatVersion": 1,
+ "packageId": "standard-classic-generals",
+ "characterId": "character:huang-chong",
+ "skills": [
+  {
+   "registrationOrder": 51920,
+   "programBundle": "mobile-shi-huang-chong",
+   "includeProgramPresentation": true,
+   "definition": {
+    "id": "mobile:shi-cujun",
+    "name": "促军",
+    "description": "弃牌阶段开始时，你可以选择一名角色并令其攻击范围内的角色同时选择一项：【1】交给其一张牌；【2】令其下个出牌阶段使用【杀】的次数+1。然后若其手牌数小于你，其获得你弃牌阶段弃置的伤害牌。",
+    "actionForms": "Active",
+    "executionForms": "Trigger"
+   }
+  },
+  {
+   "registrationOrder": 51921,
+   "programBundle": "mobile-shi-huang-chong",
+   "includeProgramPresentation": true,
+   "definition": {
+    "id": "mobile:shi-sili",
+    "name": "死励",
+    "description": "当你每回合首次体力值变化后，你可以选择一项：【1】从牌堆或者弃牌堆中获得一张【杀】且你使用此【杀】不可被响应；【2】下个摸牌阶段摸牌数+1。背水：你的下个回合开始时，失去1点体力。",
+    "actionForms": "Active",
+    "executionForms": "Trigger"
+   }
+  }
+ ],
+ "generals": [
+  {
+   "registrationOrder": 51922,
+   "pools": {
+    "current": 51922
+   },
+   "definition": {
+    "id": "mobile:shi-huang-chong",
+    "name": "势黄崇",
+    "portraitKey": "mobile-shi-huang-chong",
+    "skillId": "mobile:shi-cujun",
+    "additionalSkillIds": [
+     "mobile:shi-sili"
+    ],
+    "factionId": "shu",
+    "baseHp": 4,
+    "gender": "Male",
+    "characterId": "character:huang-chong",
+    "variantId": "mobile-shi",
+    "rulesetId": "sanguosha-mobile"
+   }
+  }
+ ]
+}

@@ -132,6 +132,7 @@ public sealed partial class GameEngine
         };
         var contributions = CollectNumericRuleContributions(player, SkillRuleQuery.SlashLimit).ToList();
         AddFiniteContribution(contributions, $"issued:{player.Seat}:mobile:shi-kuanggu:slash-limit", MobileShiWeiYanPhaseSlashBonus(player.Seat));
+        AddFiniteContribution(contributions, $"issued:{player.Seat}:mobile:shi-cujun:slash-limit", ShiHcCujunSlashBonus(player.Seat));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:mobile:shi-xiezhi:slash-limit", ShiZhHuiOverflowCount(player.Seat));
         if (HasMobileShiZhuangshiQuota(player.Seat)) contributions.Add(new UnlimitedRuleQueryContribution("skill:mobile:shi-zhuangshi:quota"));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:sequential-deck-shortfall:slash-limit", SequentialDeckKindGrowthBonus(player.Seat));
