@@ -146,10 +146,12 @@ public static partial class StandardShanheCampaignCatalog
         // This opt-in shop contains catalogue-priced stock only. Local medicine
         // and additive training remain available through their original route
         // choices and battle rewards, without inventing an original shop price.
+        var openingOnly = rewards.Where(reward => reward.CampaignEconomy?.StartingGold > 0)
+            .Select(reward => reward.Id).ToHashSet(StringComparer.Ordinal);
         var authored = (node.Choices ?? []).Where(choice => choice.RewardId is null ||
-            choice.RewardId is not ("peach" or "duel") && ShopMetadataByRewardId.ContainsKey(choice.RewardId)).ToArray();
+            !openingOnly.Contains(choice.RewardId) && choice.RewardId is not ("peach" or "duel") && ShopMetadataByRewardId.ContainsKey(choice.RewardId)).ToArray();
         var existing = authored.Select(choice => choice.RewardId).ToHashSet(StringComparer.Ordinal);
-        return authored.Concat(rewards.Where(reward => ShopMetadataByRewardId.ContainsKey(reward.Id) && !existing.Contains(reward.Id))
+        return authored.Concat(rewards.Where(reward => !openingOnly.Contains(reward.Id) && ShopMetadataByRewardId.ContainsKey(reward.Id) && !existing.Contains(reward.Id))
             .Select(reward => new ShanheNodeChoiceDefinition("buy-" + reward.Id, reward.Name, RewardId: reward.Id, LeavesNode: false)))
             .Select(choice => choice.RewardId is { } rewardId && ShopMetadataByRewardId.TryGetValue(rewardId, out var metadata)
                 ? choice with

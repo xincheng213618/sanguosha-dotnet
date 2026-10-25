@@ -1,5 +1,7 @@
 # 山河图 S5 征程经济战法
 
+后续已补集市霸王、家财万贯四档和守财奴四档；详见[2026-10-26经济构筑扩展](shanhe-wealth-tactics-2026-10-26.md)。本页保留最初九项的来源与规则。
+
 核对来源为[战法表](https://s.xiaochao.org/data/tactics.json)、[研习树](https://s.xiaochao.org/data/tactic-tree.json)及[清单](https://s.xiaochao.org/data/manifest.json)，快照生成于 `2026-10-21T11:39:31.85Z`，当前赛期为5。下列九项的适用赛期均包含5，未标废弃。
 
 | 战法ID | 名称 | 品级／原价 | 原规则对应的执行量 |

@@ -212,6 +212,10 @@ public static partial class StandardShanheCampaignCatalog
         var currentWangong = extraSkills.Contains(StandardShanheWangongPackage.SkillId);
         var currentLonghun = extraSkills.Contains(StandardShanheLonghunPackage.SkillId);
         var currentYiji = extraSkills.Contains(StandardShanheYijiPackage.SkillId);
+        var wealthTactics = extraSkills.Contains(StandardShanheWealthPackage.WealthHandLimitSkillId) ||
+            extraSkills.Contains(StandardShanheWealthPackage.WealthInitialHandSkillId) ||
+            extraSkills.Contains(StandardShanheWealthPackage.WealthDrawSkillId) ||
+            extraSkills.Contains(StandardShanheWealthPackage.WealthDamageSkillId);
         var currentSlashTactics = RequiresCurrentSlashTacticsRegistry(requirements);
         var s5Chengxiong = RequiresChengxiongBossRegistry(requirements);
         var s5CaoxingHigh = RequiresCaoxingHighRegistry(requirements);
@@ -307,6 +311,7 @@ public static partial class StandardShanheCampaignCatalog
             (currentLegendaryTactics ? "/current-legendary-tactics" : "") +
             (buildTactics ? "/current-build-tactics" : "") +
             (reactionTactics ? "/current-reaction-tactics" : "") +
+            (wealthTactics ? "/current-wealth-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
             (currentLonghun ? "/current-longhun-3023" : "") +
@@ -447,6 +452,7 @@ public static partial class StandardShanheCampaignCatalog
             if (setup.RebirthAvailable) packages.Add(new StandardShanheRankPrivilegePackage());
             packages.Add(new ShanheEncounterPackage(setup));
             if (codexEquipment) packages.Add(new ShanheCodexEquipmentPackage());
+            if (wealthTactics) packages.Add(new StandardShanheWealthPackage());
             return ComposedSkillContentRegistry.CreateShowcase(additionalPackages: packages);
         })).Value;
     }
