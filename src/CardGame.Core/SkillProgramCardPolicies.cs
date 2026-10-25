@@ -91,7 +91,8 @@ public enum SkillProgramCardPolicyKind
     OtherWuTreatedWoundedDuringOwnTurn = 27330,
     EmptyHandDamageTakenBonus = 27332,
     BlackSlashIgnoresArmorBothDirections = 27350,
-    EmptyWeaponStoneAxe = 27482
+    EmptyWeaponStoneAxe = 27482,
+    OtherWuTreatedWoundedForCanshi = 80400
 }
 
 public sealed record SkillProgramCardPolicy(

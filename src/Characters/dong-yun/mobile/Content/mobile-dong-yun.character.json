@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:dong-yun",
+  "skills": [
+    {
+      "registrationOrder": 80700,
+      "programBundle": "mobile-dong-yun",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:sheyan",
+        "name": "舍宴",
+        "description": "当你成为一张普通锦囊牌的目标时，你可以为此牌增加一个目标或减少一个目标（调整后的目标数至少为一），以此法增加的目标不受距离限制。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 80799,
+      "pools": { "current": 80799 },
+      "definition": {
+        "id": "mobile:dong-yun",
+        "name": "董允·移动版",
+        "portraitKey": "mobile-dong-yun",
+        "skillId": "ol:bingzheng",
+        "additionalSkillIds": ["mobile:sheyan"],
+        "factionId": "shu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:dong-yun",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

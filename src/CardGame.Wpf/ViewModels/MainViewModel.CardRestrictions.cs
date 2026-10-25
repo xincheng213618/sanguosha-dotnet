@@ -53,9 +53,10 @@ public sealed partial class MainViewModel
     }
 
     private static string PhaseSuitAllowanceTooltip(PlayerSnapshot player) =>
-        player.IssuedPlayPhaseSuitUseAllowances is { Count: > 0 }
-            ? $"本出牌阶段使用{string.Join("、", player.IssuedPlayPhaseSuitUseAllowances.SelectMany(allowance => allowance.Suits).Distinct().OrderBy(suit => (int)suit).Select(GetSuitGlyph))}牌无距离和次数限制；其他使用条件仍适用。结束出牌阶段后解除。"
-            : string.Empty;
+        string.Join("\n", (player.IssuedPlayPhaseSuitUseAllowances ?? [])
+            .GroupBy(allowance => allowance.Expiry == SkillProgramTurnSkillExpiry.ActualTurnEnd)
+            .OrderBy(group => group.Key)
+            .Select(group => $"本{(group.Key ? "回合" : "出牌阶段")}使用{string.Join("、", group.SelectMany(allowance => allowance.Suits).Distinct().OrderBy(suit => (int)suit).Select(GetSuitGlyph))}牌无距离和次数限制；其他使用条件仍适用。{(group.Key ? "回合结束后解除。" : "结束出牌阶段后解除。")}"));
 
     private static string DeferredHandAlignmentTooltip(PlayerSnapshot player) =>
         string.Join("\n", (player.DeferredHandAlignments ?? []).Select(due =>

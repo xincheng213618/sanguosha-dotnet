@@ -29,23 +29,42 @@ public sealed partial class GameEngine
     private int[] TargetedTrickPrimaryTargets(CardUseFrame use) => use.CardKind == CardKind.BorrowedSword
         ? use.TargetSeats.Where((_, index) => index % 2 == 0).ToArray()
         : use.CardKind == CardKind.DrawTwo && use.TargetSeats.Count == 0 ? [use.SourceSeat] : use.TargetSeats.ToArray();
-    private IReadOnlyList<PromptChoice> TargetedTrickChoices(long frameId, CardUseFrame use)
+    private static bool TargetedTrickRemovesTargets(SkillProgramEffect effect) => effect.StateId == "remove-target";
+    private bool TargetedTrickRemovesTargets(ProgramSkillFrame frame) => TargetedTrickRemovesTargets(GetPausedPrivateOfferEffect(frame)!);
+    private bool CanAddTargetedTrickTarget(CardUseFrame use, CharacterState target, bool removeTargets) =>
+        !removeTargets || use.CardKind != CardKind.Snatch ? CanBeUniqueLeaderTrickTarget(use, target) :
+        use.Action is { } action && (!HasTurnCardTargetRestriction(action.ActorSeat, SkillProgramCardTargetRestriction.SelfOnly) || target.Seat == action.ActorSeat) &&
+        CanBeDistanceFreeDesignatedTarget(use, target);
+    private static int TargetedTrickTargetIndex(CardKind kind, IReadOnlyList<int> targets, int primary) =>
+        Enumerable.Range(0, targets.Count).FirstOrDefault(index => targets[index] == primary &&
+            (kind != CardKind.BorrowedSword || index % 2 == 0), -1);
+    private static IReadOnlyList<int> RemoveTargetedTrickTarget(CardKind kind, IReadOnlyList<int> targets, int primary)
+    {
+        var index = TargetedTrickTargetIndex(kind, targets, primary);
+        var count = kind == CardKind.BorrowedSword ? 2 : 1;
+        if (index < 0 || kind == CardKind.BorrowedSword && index % 2 != 0 || targets.Count <= count)
+            throw new InvalidOperationException("A targeted trick removal must retain another complete primary target.");
+        return Array.AsReadOnly(targets.Where((_, cursor) => cursor < index || cursor >= index + count).ToArray());
+    }
+    private IReadOnlyList<PromptChoice> TargetedTrickChoices(long frameId, CardUseFrame use, bool removeTargets = false)
     {
         Dictionary<string, string> Parameters(string branch) => new() { ["program-action"] = "targeted-ordinary-trick", ["branch"] = branch,
             ["frame-id"] = frameId.ToString(CultureInfo.InvariantCulture), ["card-use-id"] = use.Id.ToString(CultureInfo.InvariantCulture),
             ["action-id"] = use.Action!.ActionId.ToString(CultureInfo.InvariantCulture) };
         var choices = new List<PromptChoice>(); var primary = TargetedTrickPrimaryTargets(use);
-        foreach (var target in _players.Where(p => !primary.Contains(p.Seat) && CanBeUniqueLeaderTrickTarget(use, p)).OrderBy(p => p.Seat))
+        foreach (var target in _players.Where(p => !primary.Contains(p.Seat) && CanAddTargetedTrickTarget(use, p, removeTargets)).OrderBy(p => p.Seat))
         {
             if (use.CardKind == CardKind.BorrowedSword)
                 foreach (var victim in _players.Where(v => IsLegalBorrowedSwordSlashTarget(target, v)).OrderBy(v => v.Seat))
                     choices.Add(new(new($"targeted-trick.{frameId}.add.{target.Seat}.{victim.Seat}"), $"增加目标：{target.Name} 对 {victim.Name} 使用杀", [], [target.Seat, victim.Seat], Parameters("add")));
             else choices.Add(new(new($"targeted-trick.{frameId}.add.{target.Seat}"), $"增加目标：{target.Name}", [], [target.Seat], Parameters("add")));
         }
-        var effective = primary.Where(s => TargetedTrickEffectIsEffective(use, s)).ToArray();
-        if (effective.Length > 1)
-            foreach (var seat in effective)
-                choices.Add(new(new($"targeted-trick.{frameId}.ineffective.{seat}"), $"令此牌对 {_players[seat].Name} 无效", [], [seat], Parameters("ineffective")));
+        var removable = removeTargets ? primary : primary.Where(s => TargetedTrickEffectIsEffective(use, s)).ToArray();
+        if (removable.Length > 1)
+            foreach (var seat in removable)
+                choices.Add(removeTargets
+                    ? new(new($"targeted-trick.{frameId}.remove.{seat}"), $"减少目标：{_players[seat].Name}", [], [seat], Parameters("remove"))
+                    : new(new($"targeted-trick.{frameId}.ineffective.{seat}"), $"令此牌对 {_players[seat].Name} 无效", [], [seat], Parameters("ineffective")));
         choices.Add(new(new($"targeted-trick.{frameId}.decline"), "不改变效果", [], [], Parameters("decline")));
         return Array.AsReadOnly(choices.Select(PromptChoiceProjection.Freeze).ToArray());
     }
@@ -58,7 +77,7 @@ public sealed partial class GameEngine
             TargetedTrickPrimaryTargets(use).Contains(candidate.OwnerSeat) && _players[candidate.OwnerSeat].IsAlive &&
             !CompleteProgramEventHistory().OfType<TargetedOrdinaryTrickOfferedEvent>().Any(e => e.Receipt.CardUseFrameId == use.Id &&
                 e.Receipt.Source.OwnerSeat == candidate.OwnerSeat && e.Receipt.Source.SkillId == candidate.SkillId && e.Receipt.Source.BindingId == candidate.BindingId) &&
-            TargetedTrickChoices(0, use).Any(c => c.Parameters["branch"] != "decline");
+            TargetedTrickChoices(0, use, TargetedTrickRemovesTargets(trigger.Effects.Single())).Any(c => c.Parameters["branch"] != "decline");
     }
     private CardUseFrame RequireTargetedOrdinaryTrickParent(ProgramSkillFrame f, out ProgramCardTriggerWindowFrame window)
     {
@@ -80,11 +99,12 @@ public sealed partial class GameEngine
         if (f.TargetedOrdinaryTrick is not null) throw new InvalidOperationException("A targeted trick adjustment was already issued.");
         var r = new TargetedOrdinaryTrickReceipt { WindowFrameId = window.Id, CardUseFrameId = use.Id, ActionId = use.Action!.ActionId,
             Source = TargetedTrickHandHpSource(f), GameplayHash = f.GameplayHash, InstructionIndex = f.InstructionIndex,
-            OriginalTargets = use.TargetSeats, Choices = TargetedTrickChoices(f.Id, use) };
+            OriginalTargets = use.TargetSeats, Choices = TargetedTrickChoices(f.Id, use, TargetedTrickRemovesTargets(f)) };
         ReplaceRuntimeTop(f = f with { TargetedOrdinaryTrick = r });
         AdvanceEventRulesAndQueueFact(new TargetedOrdinaryTrickOfferedEvent(f.Id, r));
         var skill = _contentRegistry.GetSkill(f.SkillId);
-        _pendingDecision = new(DecisionKind.ProgramTrigger, f.OwnerSeat, "增加一个普通锦囊目标或令其对一个目标无效（保留至少一个有效目标）。", [],
+        _pendingDecision = new(DecisionKind.ProgramTrigger, f.OwnerSeat, TargetedTrickRemovesTargets(f)
+            ? "增加或减少一个普通锦囊目标（保留至少一个目标）。" : "增加一个普通锦囊目标或令其对一个目标无效（保留至少一个有效目标）。", [],
             r.Choices.SelectMany(c => c.Targets).Distinct().ToArray(), f.OwnerSeat)
         { PromptId = CreatePromptId(), IsPrivate = false, Choices = r.Choices, TargetSeat = f.OwnerSeat, SkillPrompt = new(f.SkillId, skill.Name, skill.Name, skill.Description) };
         _status = _players[f.OwnerSeat].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
@@ -97,21 +117,22 @@ public sealed partial class GameEngine
         var use = RequireTargetedOrdinaryTrickParent(f, out _); var r = f.TargetedOrdinaryTrick ?? throw new InvalidOperationException("No issued target receipt.");
         AssertTargetedOrdinaryTrickReceipt(f);
         if (!AssistedChoicesEqual([selected], r.Choices.Where(c => c.Id == selected.Id).ToArray()) ||
-            !AssistedChoicesEqual([selected], TargetedTrickChoices(f.Id, use).Where(c => c.Id == selected.Id).ToArray()))
+            !AssistedChoicesEqual([selected], TargetedTrickChoices(f.Id, use, TargetedTrickRemovesTargets(f)).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("A targeted trick answer lost its current legal participant or last-effective-target protection.");
         var branch = selected.Parameters["branch"]; var before = use.TargetSeats;
         IReadOnlyList<int> added = branch == "add" ? selected.Targets : [];
         int? ineffective = branch == "ineffective" ? selected.Targets.Single() : null;
+        int? removed = branch == "remove" ? selected.Targets.Single() : null;
         if (ineffective is { } seat) MarkCardEffectIneffective(use.Id, seat);
-        if (added.Count > 0)
+        if (added.Count > 0 || removed is not null)
         {
-            var result = Array.AsReadOnly(before.Concat(added).ToArray());
+            var result = removed is { } primary ? RemoveTargetedTrickTarget(use.CardKind, before, primary) : Array.AsReadOnly(before.Concat(added).ToArray());
             var action = CloneDesignatedExtraTargetAction(use.Action!, result);
             UpdateProgramRoleCardUse(use with { TargetSeats = result, Action = action, TargetsAdjusted = true }, action);
         }
         use = LifecycleCardUse(use.Id)!;
         AdvanceEventRulesAndQueueFact(new TargetedOrdinaryTrickResolvedEvent(f.Id, use.Id, use.Action!.ActionId,
-            r.Source, r.GameplayHash, before, added, ineffective, use.TargetSeats));
+            r.Source, r.GameplayHash, before, added, ineffective, use.TargetSeats) { RemovedTarget = removed });
         if (ineffective is { } canceled) AdvanceEventRulesAndQueueFact(new CardEffectSkippedEvent(use.Id, use.SourceSeat, canceled, use.CardKind, CardEffectSkipReason.SkillNullified));
         if (added.Count > 0) RefreshCurrentUseAddedTargetCandidates(use, [added[0]]);
         ClearPendingDecision(); ReplaceRuntimeTop(f with { TargetedOrdinaryTrick = null }); AdvanceRuntimeProgram(f.Id);
@@ -126,7 +147,7 @@ public sealed partial class GameEngine
             r.GameplayHash != f.GameplayHash || r.InstructionIndex != 1 || !r.OriginalTargets.SequenceEqual(use.TargetSeats) ||
             offered is not [var fact] || fact.Receipt.Source != r.Source || fact.Receipt.ActionId != r.ActionId ||
             !fact.Receipt.OriginalTargets.SequenceEqual(r.OriginalTargets) || !AssistedChoicesEqual(fact.Receipt.Choices, r.Choices) ||
-            !AssistedChoicesEqual(r.Choices, TargetedTrickChoices(f.Id, use)))
+            !AssistedChoicesEqual(r.Choices, TargetedTrickChoices(f.Id, use, TargetedTrickRemovesTargets(f))))
             throw new InvalidOperationException("An issued targeted-trick receipt lost its frozen actual action or current legal choices.");
     }
     [ProgramAiChoice(SkillProgramEffectOp.AdjustTargetedOrdinaryTrick)]
@@ -138,10 +159,18 @@ public sealed partial class GameEngine
     private bool IsTargetedOrdinaryTrickResolvedFact(CardUseFrame use, TargetedOrdinaryTrickResolvedEvent fact, IReadOnlyList<int> before)
     {
         var pair = use.CardKind == CardKind.BorrowedSword ? 2 : 1;
+        var program = _contentRegistry.GetSkill(fact.Source.SkillId).Program;
+        var removesTargets = program?.Triggers.SingleOrDefault(t => t.Id == fact.Source.BindingId)?.Effects is [var effect] &&
+            effect.Op == SkillProgramEffectOp.AdjustTargetedOrdinaryTrick && TargetedTrickRemovesTargets(effect);
+        var removedIndex = fact.RemovedTarget is { } removed ? TargetedTrickTargetIndex(use.CardKind, before, removed) : -1;
+        if (fact.RemovedTarget is not null && (!removesTargets || removedIndex < 0 || removedIndex % pair != 0 || before.Count <= pair ||
+            fact.AddedTargets.Count != 0 || fact.IneffectiveTarget is not null)) return false;
+        if (removesTargets && fact.IneffectiveTarget is not null) return false;
+        IEnumerable<int> result = fact.RemovedTarget is { } removedPrimary ? RemoveTargetedTrickTarget(use.CardKind, before, removedPrimary) : before.Concat(fact.AddedTargets);
         if (fact.CardUseFrameId != use.Id || fact.ActionId != use.Action?.ActionId || !IsOrdinaryTrick(use.CardKind) ||
             !fact.BeforeTargets.SequenceEqual(before) || fact.AddedTargets.Count is not 0 && fact.AddedTargets.Count != pair ||
             fact.AddedTargets.Count > 0 && fact.IneffectiveTarget is not null ||
-            !fact.ResultTargets.SequenceEqual(before.Concat(fact.AddedTargets)) ||
+            !fact.ResultTargets.SequenceEqual(result) ||
             !ActualHandGainMutationBinding(fact.ProgramFrameId, fact.Source.SkillId, fact.Source.OwnerSeat, SkillProgramTriggerWindow.CardUseTargetsFinalized,
                 SkillProgramEffectOp.AdjustTargetedOrdinaryTrick) || _contentRegistry.GetSkill(fact.Source.SkillId).Program?.GameplayHash != fact.GameplayHash) return false;
         var original = before.Where((_, index) => index % pair == 0).ToArray();
@@ -150,10 +179,10 @@ public sealed partial class GameEngine
         return CompleteProgramEventHistory().OfType<TargetedOrdinaryTrickOfferedEvent>().Count(e => e.ProgramFrameId == fact.ProgramFrameId &&
             e.Receipt.CardUseFrameId == use.Id && e.Receipt.ActionId == fact.ActionId && e.Receipt.Source == fact.Source &&
             e.Receipt.GameplayHash == fact.GameplayHash && e.Receipt.OriginalTargets.SequenceEqual(before) &&
-            e.Receipt.Choices.Any(c => c.Parameters["branch"] == (fact.AddedTargets.Count > 0 ? "add" : fact.IneffectiveTarget is not null ? "ineffective" : "decline") &&
-                c.Targets.SequenceEqual(fact.AddedTargets.Count > 0 ? fact.AddedTargets : fact.IneffectiveTarget is { } canceled ? [canceled] : []))) == 1;
+            e.Receipt.Choices.Any(c => c.Parameters["branch"] == (fact.AddedTargets.Count > 0 ? "add" : fact.RemovedTarget is not null ? "remove" : fact.IneffectiveTarget is not null ? "ineffective" : "decline") &&
+                c.Targets.SequenceEqual(fact.AddedTargets.Count > 0 ? fact.AddedTargets : fact.RemovedTarget is { } reduced ? [reduced] : fact.IneffectiveTarget is { } canceled ? [canceled] : []))) == 1;
     }
     private bool HasTargetedOrdinaryTrickTail(CardUseFrame use) => CompleteProgramEventHistory().OfType<TargetedOrdinaryTrickResolvedEvent>().Any(e =>
-        e.AddedTargets.Count > 0 && IsTargetedOrdinaryTrickResolvedFact(use, e, e.BeforeTargets) && use.TargetSeats.Count >= e.ResultTargets.Count &&
+        (e.AddedTargets.Count > 0 || e.RemovedTarget is not null) && IsTargetedOrdinaryTrickResolvedFact(use, e, e.BeforeTargets) && use.TargetSeats.Count >= e.ResultTargets.Count &&
         use.TargetSeats.Take(e.ResultTargets.Count).SequenceEqual(e.ResultTargets));
 }

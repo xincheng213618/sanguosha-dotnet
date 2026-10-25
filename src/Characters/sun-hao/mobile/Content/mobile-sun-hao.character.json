@@ -1,0 +1,16 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:sun-hao",
+  "skills": [
+    { "registrationOrder": 80400, "programBundle": "mobile-sun-hao", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:sun-hao-canshi", "name": "残蚀", "description": "摸牌阶段，你可以改为摸X张牌（X为已受伤的角色数），然后当你本回合使用基本牌或锦囊牌时，你弃置一张牌。", "executionForms": "Trigger" } },
+    { "registrationOrder": 80401, "programBundle": "mobile-sun-hao", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:guiming", "name": "归命", "description": "主公技，锁定技，当你发动“残蚀”时，其他吴势力角色视为已受伤。", "tags": "Locked, Lord", "executionForms": "State" } }
+  ],
+  "generals": [{ "registrationOrder": 80499, "pools": { "current": 80499 }, "definition": {
+    "id": "mobile:sun-hao", "name": "孙皓·移动版", "portraitKey": "mobile-sun-hao",
+    "skillId": "mobile:sun-hao-canshi", "additionalSkillIds": ["ol:chouhai", "mobile:guiming"],
+    "factionId": "wu", "baseHp": 5, "gender": "Male", "characterId": "character:sun-hao", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

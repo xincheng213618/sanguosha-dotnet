@@ -18,7 +18,7 @@ public sealed partial class GameEngine
         if (choice.Targets.Count == 0) return 0d;
         var branch = choice.Parameters["branch"]; var target = choice.Targets[0];
         var score = _aiBrains[owner].ScoreCardEffectIntervention(CreateSnapshot(owner), use.CardKind, target);
-        return branch == "ineffective" ? score : -score;
+        return branch is "ineffective" or "remove" ? score : -score;
     }
     private double GetTargetedTrickHandHpPublicScore(int owner, IReadOnlyList<SkillProgramEffect> effects, ProgramSkillWindowContext? context)
     {
@@ -27,6 +27,7 @@ public sealed partial class GameEngine
                 .SelectMany(p => new[] { UnequalHandHpPublicChoiceScore(owner, p.Seat, true), UnequalHandHpPublicChoiceScore(owner, p.Seat, false) })
                 .Append(0d).Max();
         return context is not null && TryGetTargetedOrdinaryTrickUse(context, out var use, out _)
-            ? TargetedTrickChoices(0, use).Select(c => TargetedTrickPublicChoiceScore(owner, use, c)).DefaultIfEmpty(0d).Max() : 0d;
+            ? TargetedTrickChoices(0, use, effects.Any(e => e.Op == SkillProgramEffectOp.AdjustTargetedOrdinaryTrick && TargetedTrickRemovesTargets(e)))
+                .Select(c => TargetedTrickPublicChoiceScore(owner, use, c)).DefaultIfEmpty(0d).Max() : 0d;
     }
 }

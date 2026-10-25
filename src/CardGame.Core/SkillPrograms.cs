@@ -3761,7 +3761,7 @@ public sealed class SkillProgramCatalog
         Suit? outputSuit = node.TryGetProperty("outputSuit", out _)
             ? EnumValue<Suit>(node, "outputSuit", path) : null;
         if (kind is SkillProgramCardPolicyKind.BypassOtherParticipantArmor or SkillProgramCardPolicyKind.DoubleArmorDamage or
-            SkillProgramCardPolicyKind.ReserveNextDamageAfterOffTurnHit)
+            SkillProgramCardPolicyKind.ReserveNextDamageAfterOffTurnHit or SkillProgramCardPolicyKind.OtherWuTreatedWoundedForCanshi)
         {
             var condition = OptionalCondition(node, path);
             if (cardKinds.Count != 0 || requiredKinds.Count != 0 || value != 0 ||

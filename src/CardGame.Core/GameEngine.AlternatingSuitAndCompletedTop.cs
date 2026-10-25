@@ -1,7 +1,13 @@
 namespace CardGame.Core;
 
 public sealed record IssuedPlayPhaseSuitUseAllowance(int OwnerSeat, string SkillId, string SkillInstanceId,
-    int TurnNumber, int PhaseInstanceId, IReadOnlyList<Suit> Suits);
+    int TurnNumber, int PhaseInstanceId, IReadOnlyList<Suit> Suits)
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SkillProgramTurnSkillExpiry? Expiry { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public int? ActualTurnOwnerSeat { get; init; }
+}
 
 public sealed partial class GameEngine
 {
@@ -30,14 +36,20 @@ public sealed partial class GameEngine
             at==CardLocation.Equipment(a.ActorSeat) && EquipmentRules.IsEquipment(a.EffectiveKind) &&
             CompleteProgramEventHistory().OfType<EquipmentChangedEvent>().Any(e=>e.ResolutionId==parentFrameId&&e.PlayerSeat==a.ActorSeat&&e.CardId==c.CardId&&e.CardKind==a.EffectiveKind);
     }).Select(c=>c.CardId).Distinct().ToArray();
-    private bool HasPhaseSuitAllowance(int seat,Suit? suit)=>suit is { } s && s!=Suit.None && _phase==TurnPhase.Play && seat==_currentSeat &&
-        CompleteProgramEventHistory().OfType<PlayPhaseSuitAllowanceGrantedEvent>().Any(e=>e.OwnerSeat==seat&&e.TurnNumber==_turnNumber&&e.PhaseInstanceId==_cardUseDebitPhaseInstanceId&&e.Suits.Contains(s));
+    private bool IsLiveSuitAllowance(PlayPhaseSuitAllowanceGrantedEvent e, int seat) => e.OwnerSeat == seat && e.TurnNumber == _turnNumber &&
+        (e.Expiry == SkillProgramTurnSkillExpiry.ActualTurnEnd
+            ? e.ActualTurnOwnerSeat == _turnProgression.OwnerSeat && _turnProgression.TurnNumber == e.TurnNumber &&
+                !CompleteProgramEventHistory().OfType<ActualTurnCursorReturnedEvent>()
+                    .Any(ended => ended.ActualTurn == e.TurnNumber && ended.OwnerSeat == e.ActualTurnOwnerSeat)
+            : _phase == TurnPhase.Play && seat == _currentSeat && e.PhaseInstanceId == _cardUseDebitPhaseInstanceId);
+    private bool HasPhaseSuitAllowance(int seat,Suit? suit)=>suit is { } s && s!=Suit.None &&
+        CompleteProgramEventHistory().OfType<PlayPhaseSuitAllowanceGrantedEvent>().Any(e=>IsLiveSuitAllowance(e,seat)&&e.Suits.Contains(s));
     private IReadOnlyList<IssuedPlayPhaseSuitUseAllowance>? GetIssuedPlayPhaseSuitUseAllowances(int seat)
     {
-        if (_phase != TurnPhase.Play || seat != _currentSeat) return null;
         var issued = CompleteProgramEventHistory().OfType<PlayPhaseSuitAllowanceGrantedEvent>()
-            .Where(e => e.OwnerSeat == seat && e.TurnNumber == _turnNumber && e.PhaseInstanceId == _cardUseDebitPhaseInstanceId)
-            .Select(e => new IssuedPlayPhaseSuitUseAllowance(e.OwnerSeat, e.SkillId, e.SkillInstanceId, e.TurnNumber, e.PhaseInstanceId, e.Suits)).ToArray();
+            .Where(e => IsLiveSuitAllowance(e,seat))
+            .Select(e => new IssuedPlayPhaseSuitUseAllowance(e.OwnerSeat, e.SkillId, e.SkillInstanceId, e.TurnNumber, e.PhaseInstanceId, e.Suits)
+                { Expiry = e.Expiry, ActualTurnOwnerSeat = e.ActualTurnOwnerSeat }).ToArray();
         return issued.Length == 0 ? null : issued;
     }
     private Suit? PhysicalGroupSuit(CharacterState owner,IReadOnlyList<Card> cards) { var suits=cards.Select(c=>EffectiveSuit(owner,c)).Distinct().ToArray(); return suits.Length==1?suits[0]:null; }
@@ -129,7 +141,12 @@ public sealed partial class GameEngine
         finally{CompleteCardMovementBatch(batch,records,committed);}
         CompleteNativeLogicalDiscardInvocation(discardInvocation);
         if(d.Mode=="alternating")
-            AdvanceEventRulesAndQueueFact(new PlayPhaseSuitAllowanceGrantedEvent(f.OwnerSeat,f.SkillId,f.SkillInstanceId,_turnNumber,_cardUseDebitPhaseInstanceId,suits,ids));
+        {
+            var expiry = ProgramInstructionResolver.Default.Resolve(f, _contentRegistry.GetSkill(f.SkillId).Program!)
+                .GetPausedInstruction(f.InstructionIndex).Effect.SuitAllowanceExpiry;
+            AdvanceEventRulesAndQueueFact(new PlayPhaseSuitAllowanceGrantedEvent(f.OwnerSeat,f.SkillId,f.SkillInstanceId,_turnNumber,_cardUseDebitPhaseInstanceId,suits,ids)
+                { Expiry = expiry, ActualTurnOwnerSeat = expiry == SkillProgramTurnSkillExpiry.ActualTurnEnd ? _turnProgression.OwnerSeat : null });
+        }
         if(AwaitProgramBoundCardMovements(f.Id,f.OwnerSeat)==SkillProgramStepOutcome.Continue)AdvanceRuntimeProgram(f.Id);
     }
     private void AssertAlternatingSuitTop(ProgramSkillFrame f,SkillProgramEffect paused)

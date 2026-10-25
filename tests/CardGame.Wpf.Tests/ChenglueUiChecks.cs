@@ -8,21 +8,23 @@ internal static class ChenglueUiChecks
 {
     public static void BatchAndIncrementalDiscards(string output)
     {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
-        foreach (var batch in new[] { true, false })
+        foreach (var (batch, mobile) in new[] { (true, false), (false, false), (true, true) })
         {
+            var general = mobile ? "mobile:xu-you" : "classic:xu-you";
+            var skill = mobile ? "mobile:chenglue" : "classic:chenglue";
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(mobile));
             var source = GameEngine.CreateStandard(new GameOptions
             {
                 Seed = 17, PlayerCount = 4, HumanRole = Role.Lord, UseInteractiveSetup = true,
                 ModeId = Fixture.ModeId, AdvanceAfterHumanCommands = false
             }, registry);
             Accept(source.Submit(new StartGameCommand()));
-            Accept(source.Submit(new SelectGeneralCommand(0, "classic:xu-you", source.Revision, source.PendingDecision!.PromptId)));
+            Accept(source.Submit(new SelectGeneralCommand(0, general, source.Revision, source.PendingDecision!.PromptId)));
             for (var step = 0; step < 32 && source.PendingDecision?.Kind != DecisionKind.PlayCard; step++)
                 Accept(source.Submit(new AdvanceOneStepCommand(source.Revision)));
-            Accept(source.Submit(new UseProgramSkillCommand(0, "classic:chenglue", "alternate", [], [],
+            Accept(source.Submit(new UseProgramSkillCommand(0, skill, "alternate", [], [],
                 source.Revision, source.PendingDecision!.PromptId)));
-            for (var step = 0; step < 32 && source.CreateSnapshot(0).PendingDecision?.SkillPrompt?.SkillId != "classic:chenglue"; step++)
+            for (var step = 0; step < 32 && source.CreateSnapshot(0).PendingDecision?.SkillPrompt?.SkillId != skill; step++)
                 Accept(source.Submit(new AdvanceOneStepCommand(source.Revision)));
             var store = new MemorySaveStore();
             store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, source.CreateCheckpoint()));
@@ -54,7 +56,7 @@ internal static class ChenglueUiChecks
             Select(ids[0]);
             if (batch) Select(ids[1]);
             using var host = new NativeResponseStatusChecks.NativeHost(model);
-            host.Capture(output, batch ? "chenglue-two-selected" : "chenglue-one-selected", 1120);
+            host.Capture(output, mobile ? "mobile-chenglue-two-selected" : batch ? "chenglue-two-selected" : "chenglue-one-selected", 1120);
             model.ConfirmSelectedCommand.Execute(null);
             if (!batch)
             {
@@ -78,6 +80,13 @@ internal static class ChenglueUiChecks
                 moves.All(move => move.From == CardLocation.Hand(0) && move.To == CardLocation.DiscardPile) &&
                 allowance.DiscardedCardIds.ToHashSet().SetEquals(ids) && model.Hand.Count == handCount - 2,
                 "Batch and incremental confirmations discard the same exact two physical cards once and grant one suit allowance.");
+            var tooltip = (string)typeof(MainViewModel).GetMethod("PhaseSuitAllowanceTooltip",
+                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!.Invoke(null,
+                    [game.CreateSnapshot(0).Players.Single(player => player.Seat == 0)])!;
+            Program.Assert(mobile
+                    ? tooltip.Contains("本回合使用", StringComparison.Ordinal) && tooltip.EndsWith("回合结束后解除。", StringComparison.Ordinal) && !tooltip.Contains("结束出牌阶段后解除", StringComparison.Ordinal)
+                    : tooltip.Contains("本出牌阶段使用", StringComparison.Ordinal) && tooltip.EndsWith("结束出牌阶段后解除。", StringComparison.Ordinal),
+                "The real paid allowance tooltip must distinguish the mobile actual-turn expiry from the classic Play expiry.");
             var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
             Program.Assert(JsonSerializer.Serialize(game.CreateSnapshot(0)) == JsonSerializer.Serialize(restored.CreateSnapshot(0)),
                 "The committed batch remains replayable after either UI confirmation path.");
@@ -88,19 +97,20 @@ internal static class ChenglueUiChecks
 
     private static void Accept(CommandResult result) => Program.Assert(result.Accepted, result.Error?.Message ?? "Chenglue fixture command rejected.");
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool mobile) : IGameContentPackage
     {
         internal const string ModeId = "identity:classic-ui-chenglue";
         public PackageManifest Manifest { get; } = new("fixture-ui-chenglue", new Version(1, 0));
         public void Register(IContentRegistryBuilder builder)
         {
-            CharacterFixtureContent.Register(builder, "classic:xu-you");
+            var general = mobile ? "mobile:xu-you" : "classic:xu-you";
+            CharacterFixtureContent.Register(builder, general, "classic:xu-you");
             for (var seat = 1; seat < 4; seat++)
                 builder.AddGeneral(new($"fixture:ui-chenglue-{seat}", $"目标{seat}", "supporter", "standard:none", "wei", 4));
             builder.AddMode(new(ModeId, "成略界面测试", 4, 4,
                 new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Loyalist)] = 1, [nameof(Role.Rebel)] = 2 },
                 "standard:basic-demo", GeneralCandidateCount: 4,
-                GeneralPoolIds: ["classic:xu-you", "fixture:ui-chenglue-1", "fixture:ui-chenglue-2", "fixture:ui-chenglue-3"]));
+                GeneralPoolIds: [general, "fixture:ui-chenglue-1", "fixture:ui-chenglue-2", "fixture:ui-chenglue-3"]));
         }
     }
 }

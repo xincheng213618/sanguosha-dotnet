@@ -26,15 +26,22 @@ internal sealed class SunHaoCommittedUseContract : IProgramCommittedUseContract
     public string SkillId => "ol:sun-hao-canshi";
     public void ValidateTrigger(SkillProgramTrigger t) => SunHaoComposition.ValidateCanshiTrigger(t);
 }
+internal sealed class MobileSunHaoCommittedUseContract : IProgramCommittedUseContract
+{
+    public string SkillId => SunHaoComposition.MobileCanshi;
+    public void ValidateTrigger(SkillProgramTrigger t) => SunHaoComposition.ValidateCanshiTrigger(t, mobile: true);
+}
 internal static class SunHaoComposition
 {
+    internal const string MobileCanshi = "mobile:sun-hao-canshi", MobileGuiming = "mobile:guiming";
     internal static bool Handles(SkillProgramEffectOp op) => op is SkillProgramEffectOp.GrantSunHaoCanshiDrawObligation or SkillProgramEffectOp.ResolveSunHaoCanshiUseDiscard;
-    internal static void ValidateCanshiTrigger(SkillProgramTrigger t)
+    internal static void ValidateCanshiTrigger(SkillProgramTrigger t, bool mobile = false)
     {
-        var draw = t.Id == "normal-draw-add-wounded";
+        var draw = t.Id == (mobile ? "normal-draw-replace-wounded" : "normal-draw-add-wounded");
         if (t.Effects is not [var e] || e.Op != (draw ? SkillProgramEffectOp.GrantSunHaoCanshiDrawObligation : SkillProgramEffectOp.ResolveSunHaoCanshiUseDiscard) ||
             e.Target != SkillProgramEffectTarget.Owner || e.Condition.Kind != SkillProgramConditionKind.Always ||
             t.Window != (draw ? SkillProgramTriggerWindow.DrawPhaseStarting : SkillProgramTriggerWindow.CardUseCommitted) || t.Optional != draw ||
+            t.DrawPhaseMode != (draw && mobile ? SkillProgramDrawPhaseMode.Replacement : SkillProgramDrawPhaseMode.Additive) ||
             (draw ? t.Subject != SkillProgramTriggerSubject.Owner || t.OwnerRelation is not null || t.IncludeResponseUses :
                 t.Id != "issued-turn-use-discard" || t.Subject is not null || t.OwnerRelation != SkillProgramCardActionOwnerRelation.Actor || !t.IncludeResponseUses) ||
             t.Priority != 0 || t.Condition.Kind != SkillProgramTriggerConditionKind.Always || t.UsageLimit is not null || t.UsageScope is not null || t.MarkerCost is not null ||
@@ -45,17 +52,17 @@ internal static class SunHaoComposition
     [ProgramCatalogValidation(510)]
     internal static void ValidateProgram(string path, SkillProgram p)
     {
-        var own = p.Triggers.Any(t => t.Effects.Any(e => Handles(e.Op))) || p.CardPolicies.Any(x => x.Kind is SkillProgramCardPolicyKind.OtherWuTreatedWoundedDuringOwnTurn or SkillProgramCardPolicyKind.EmptyHandDamageTakenBonus);
+        var own = p.Triggers.Any(t => t.Effects.Any(e => Handles(e.Op))) || p.CardPolicies.Any(x => x.Kind is SkillProgramCardPolicyKind.OtherWuTreatedWoundedDuringOwnTurn or SkillProgramCardPolicyKind.OtherWuTreatedWoundedForCanshi or SkillProgramCardPolicyKind.EmptyHandDamageTakenBonus);
         if (!own) return;
         if (p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.Contributions.Count != 0 || p.BooleanStates.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.HpSkillGrants.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection)
             throw new InvalidOperationException(path+": Sun Hao's operations and native metadata cannot be combined with unrelated producers.");
-        if (p.Id == "ol:sun-hao-canshi")
+        if (p.Id is "ol:sun-hao-canshi" or MobileCanshi)
         {
             if (p.Triggers.Count != 2 || p.CardPolicies.Count != 0 || p.Triggers.Select(t=>t.Id).Distinct().Count()!=2) throw new InvalidOperationException(path+": incomplete Canshi.");
-            foreach (var t in p.Triggers) ValidateCanshiTrigger(t);
+            foreach (var t in p.Triggers) ValidateCanshiTrigger(t, p.Id == MobileCanshi);
         }
         else if (p.Triggers.Count != 0 || p.CardPolicies is not [var policy] ||
-            policy.Kind != (p.Id == "ol:guiming" ? SkillProgramCardPolicyKind.OtherWuTreatedWoundedDuringOwnTurn : p.Id == "ol:chouhai" ? SkillProgramCardPolicyKind.EmptyHandDamageTakenBonus : (SkillProgramCardPolicyKind)(-1)) ||
+            policy.Kind != (p.Id == "ol:guiming" ? SkillProgramCardPolicyKind.OtherWuTreatedWoundedDuringOwnTurn : p.Id == MobileGuiming ? SkillProgramCardPolicyKind.OtherWuTreatedWoundedForCanshi : p.Id == "ol:chouhai" ? SkillProgramCardPolicyKind.EmptyHandDamageTakenBonus : (SkillProgramCardPolicyKind)(-1)) ||
             policy.Value != 0 || policy.CardKinds.Count != 0 || policy.RequiredCardKinds.Count != 0 || policy.Condition.Kind != SkillProgramConditionKind.Always ||
             policy.InputSuit is not null || policy.OutputSuit is not null || policy.FactionId is not null || policy.OwnerRole is not null || policy.DiscardCost != 0 || policy.ProviderDrawCount != 0)
             throw new InvalidOperationException(path+": Chouhai and Guiming require only their exact zero-value native metadata.");

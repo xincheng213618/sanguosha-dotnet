@@ -23254,6 +23254,74 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-sun-hao",
+      "characterName": "孙皓",
+      "defaultSkinId": "13700",
+      "skins": [
+        {
+          "id": "13700",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-98.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/13700.jpg",
+          "sha256": "0439f650ea661adf4d053c4914230d351e9452d14bd0f3133cdd8e00a6961a2d",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-sun-hao.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-lu-ji",
+      "characterName": "陆绩",
+      "defaultSkinId": "41800",
+      "skins": [
+        {
+          "id": "41800",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-251.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/41800.jpg",
+          "sha256": "9c68d0e72e0ca6cbcbbd2ea4d5b0f234c1c46e5e577f130b16fe6411aae3de5a",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-lu-ji.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-xu-you",
+      "characterName": "许攸",
+      "defaultSkinId": "42100",
+      "skins": [
+        {
+          "id": "42100",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-254.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/42100.jpg",
+          "sha256": "f6f4b2fde71d253c2145db89b972936b4ffdd10bd34fbfca1c025ddc2d0355b8",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-xu-you.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-dong-yun",
+      "characterName": "董允",
+      "defaultSkinId": "40900",
+      "skins": [
+        {
+          "id": "40900",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-242.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/40900.jpg",
+          "sha256": "77f26e1908d6d29aa68446cb48b15fa974acfaaf9b83d05fd1af33a69d516aed",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-dong-yun.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

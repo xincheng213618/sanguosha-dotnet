@@ -166,6 +166,8 @@ internal static class Program
                   new HashSet<string>(StringComparer.Ordinal) { "boundary:wolong-zhuge-liang-mobile", "boundary:dong-zhuo-mobile", "boundary:yuan-shao-mobile", "boundary:meng-huo-mobile", "boundary:zhu-rong-mobile", "boundary:sun-ce-mobile", "boundary:deng-ai-mobile", "boundary:jiang-wei-mobile", "boundary:zhang-zhao-zhang-hong-mobile", "boundary:xiao-qiao-mobile" }));
             Check("Mobile standard batch 67 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
                   new HashSet<string>(StringComparer.Ordinal) { "mobile:li-dian", "mobile:taishi-ci", "mobile:cao-chong", "mobile:chen-gong", "mobile:liu-feng", "mobile:lu-su", "mobile:xiahou-shi", "mobile:sp-xu-shu", "mobile:jia-xu", "mobile:zhang-song" }));
+            Check("Mobile standard batch 75 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
+                new HashSet<string>(StringComparer.Ordinal) { "mobile:sun-hao", "mobile:lu-ji", "mobile:xu-you", "mobile:dong-yun" }));
             Check("Mobile standard batch 74 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
                 new HashSet<string>(StringComparer.Ordinal) { "mobile:yue-jin", "mobile:fu-wan", "mobile:xiahou-ba", "mobile:qin-mi", "mobile:gongsun-yuan", "mobile:sha-mo-ke", "mobile:hao-zhao" }));
             Check("Mobile standard batch 73 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,

@@ -10,16 +10,16 @@ public sealed partial class GameEngine
             !Enum.IsDefined(r.Stage)||ProgramEventHistory<SunHaoCanshiStartedEvent>().Where(e=>e.FrameId==f.Id).ToArray() is not[var start]||
             start!=new SunHaoCanshiStartedEvent(f.Id,r.Source,r.GameplayHash,r.GrantId,r.ActualTurn,r.TurnOwner,r.WindowId,r.ActionId,r.UseId,r.OriginalTargets.Count,r.GrantIds.Count)||
             ProgramEventHistory<SunHaoCanshiGrantedEvent>().SingleOrDefault(e=>e.FrameId==r.GrantId) is not{} grant||grant.Source.SkillId!=f.SkillId||grant.Source.SkillInstanceId!=f.SkillInstanceId||grant.Source.OwnerSeat!=f.OwnerSeat||
-            grant.GameplayHash!=f.GameplayHash||grant.ActualTurn!=r.ActualTurn||grant.TurnOwner!=r.TurnOwner||grant.X<1||
+            grant.GameplayHash!=f.GameplayHash||grant.ActualTurn!=r.ActualTurn||grant.TurnOwner!=r.TurnOwner||grant.X<(f.SkillId==SunHaoComposition.MobileCanshi?0:1)||
             r.GrantIds.Count==0||r.GrantIds[0]!=r.GrantId||r.GrantIds.Distinct().Count()!=r.GrantIds.Count||r.Cursor<0||r.Cursor>r.GrantIds.Count||
             !ProgramEventHistory<SunHaoCanshiFrozenGrantEvent>().Where(e=>e.FrameId==f.Id).OrderBy(e=>e.Index).Select(e=>e.GrantId).SequenceEqual(r.GrantIds)||
             r.GrantIds.Any(id=>!ProgramEventHistory<SunHaoCanshiGrantedEvent>().Any(g=>g.FrameId==id&&g.Source==grant.Source&&g.GameplayHash==r.GameplayHash&&g.ActualTurn==r.ActualTurn&&g.TurnOwner==r.TurnOwner))||
-            _resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w=>w.Id==r.WindowId) is not{} w||w.Action.ActionId!=r.ActionId||w.Action.ActorSeat!=f.OwnerSeat||!SunHaoCanshiUseKind(w.Action)||
+            _resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w=>w.Id==r.WindowId) is not{} w||w.Action.ActionId!=r.ActionId||w.Action.ActorSeat!=f.OwnerSeat||!SunHaoCanshiUseKind(w.Action,f.SkillId)||
             w.CandidateIndex<0||w.CandidateIndex>=w.Candidates.Count||!MountObserverCandidateMatches(f,ToSharedCandidate(w.Candidates[w.CandidateIndex]))||
             !ProgramEventHistory<SunHaoCanshiOriginalTargetEvent>().Where(e=>e.FrameId==f.Id).OrderBy(e=>e.Index).Select(e=>e.TargetSeat).SequenceEqual(r.OriginalTargets))
             throw new InvalidOperationException("Canshi lost its exact original grant, actual turn, committed native action or scalar target invoices.");
         if(r.UseId is{} id ? LifecycleCardUse(id) is not{} use||use.Id!=w.ParentFrameId||use.Action?.ActionId!=r.ActionId||use.SourceSeat!=f.OwnerSeat||!r.OriginalTargets.SequenceEqual(use.TargetSeats) :
-            r.OriginalTargets.Count!=0||w.CompletedResponseReturn is not{Kind:ProgramCompletedResponseKind.Nullification,IsCommitted:true}||!IsCompletedResponseUse(w.Action,ProgramCardContinuation.NullificationResponse))
+            r.OriginalTargets.Count!=0||w.CompletedResponseReturn is not{IsCommitted:true} typed||!IsCompletedResponseUse(w.Action,typed.Kind))
             throw new InvalidOperationException("Canshi changed the whole native Use or its genuine committed Nullification return.");
         if(r.Stage==SunHaoCanshiStage.SelectDiscard ? r.Payment is not null||r.WoodenOxGrain.Count!=0||f.PendingMovementContinuation is not null :
             r.Payment is not{} paid||f.PendingMovementContinuation is not{BeforeCount:0,CoverageResultBind:null} pending||pending.SubjectSeat!=f.OwnerSeat||
@@ -44,8 +44,10 @@ public sealed partial class GameEngine
         (m.CardId==p.CardId&&m.From==p.From&&m.To==p.To&&m.Reason.Value==SunHaoCanshiDiscardReason||
             p.Kind==CardKind.WoodenOx&&p.From==CardLocation.Equipment(f.OwnerSeat)&&r.WoodenOxGrain.Contains(m.CardId)&&m.From==CardLocation.WoodenOxGrain(f.OwnerSeat)&&m.To==CardLocation.DiscardPile&&m.Reason==CardMoveReasons.WoodenOxGrainDiscard);
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 310)]
-    private bool IsSunHaoMovement(ProgramSkillFrame f,SkillProgramEffect? e,ProgramMovementContinuation p)=>f.SunHaoCanshi is{Stage:SunHaoCanshiStage.DiscardChildren,Payment:not null}&&
-        e?.Op==SkillProgramEffectOp.ResolveSunHaoCanshiUseDiscard&&p==f.PendingMovementContinuation&&p.SubjectSeat==f.OwnerSeat&&p.BeforeCount==0&&p.CoverageResultBind is null;
+    private bool IsSunHaoMovement(ProgramSkillFrame f,SkillProgramEffect? e,ProgramMovementContinuation p)=>
+        p==f.PendingMovementContinuation&&p.SubjectSeat==f.OwnerSeat&&p.BeforeCount==0&&p.CoverageResultBind is null&&
+        (f.SunHaoCanshi is{Stage:SunHaoCanshiStage.DiscardChildren,Payment:not null}&&e?.Op==SkillProgramEffectOp.ResolveSunHaoCanshiUseDiscard||
+         f.MobileSunHaoDraw is{Outcome:not null}&&e?.Op==SkillProgramEffectOp.GrantSunHaoCanshiDrawObligation);
     private bool SunHaoLion(ProgramSkillFrame f)=>f.SunHaoCanshi is{Payment:{Kind:CardKind.SilverLion,From.Zone:CardZoneKind.Equipment}};
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 110)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 100)]
@@ -54,6 +56,7 @@ public sealed partial class GameEngine
         recovery.Attempt.Completion.Producer==RecoveryAttemptProducer.SilverLion&&recovery.Attempt.Completion.MoveReason?.Value==SunHaoCanshiDiscardReason;
     private bool SunHaoFirstChild(ProgramSkillFrame f,ResolutionFrame child)
     {
+        if(f.MobileSunHaoDraw is not null)return MobileSunHaoDrawFirstChild(f,child);
         if(f.SunHaoCanshi is not{Stage:SunHaoCanshiStage.DiscardChildren} r)return false;AssertSunHao(f);
         if(child is ProgramLifecycleTriggerWindowFrame{Window:SkillProgramTriggerWindow.SkillsChanged} skills)return skills.ResumeProgramFrameId==f.Id&&skills.Continuation==ProgramLifecycleContinuation.ResumeParentProgram;
         if(child is RecoveryReplacementFrame recovery)return IsSunHaoRecoveryParent(f,recovery);

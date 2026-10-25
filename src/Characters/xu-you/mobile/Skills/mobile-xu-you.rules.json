@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:chenglue",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "alternate",
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 0,
+          "maxTargets": 0,
+          "targetKind": "anyLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "alternatingSuitDrawDiscard",
+              "target": "owner",
+              "allowanceExpiry": "actualTurnEnd"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,11 @@
 namespace CardGame.Core;
 
+public sealed partial class SkillProgramEffect
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SkillProgramTurnSkillExpiry? SuitAllowanceExpiry { get; internal init; }
+}
+
 internal sealed record RequireActivationEntry : ProgramResourceOperation;
 internal interface IAlternatingSuitAndCompletedTopHost
 {
@@ -12,14 +18,20 @@ internal abstract class AlternatingSuitAndCompletedTopDescriptor : ProgramOperat
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (e,c)=>c.Draw(e));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op","target","condition");
+        if (Op == SkillProgramEffectOp.AlternatingSuitDrawDiscard) r.AllowOnly("op","target","condition","allowanceExpiry");
+        else r.AllowOnly("op","target","condition");
         if(r.RequiredEnum<SkillProgramEffectTarget>("target")!=SkillProgramEffectTarget.Owner) throw new InvalidOperationException($"Invalid program at {r.Path}: owner required.");
-        var e=new SkillProgramEffect(Op,SkillProgramEffectTarget.Owner,1,r.Condition());RequireAlways(e,r.Path);return e;
+        var expiry = r.Has("allowanceExpiry") ? r.RequiredEnum<SkillProgramTurnSkillExpiry>("allowanceExpiry") : (SkillProgramTurnSkillExpiry?)null;
+        if (expiry is not (null or SkillProgramTurnSkillExpiry.ActualTurnEnd))
+            throw new InvalidOperationException($"Invalid program at {r.Path}.allowanceExpiry: only actualTurnEnd is supported; omission retains the original Play expiry.");
+        var e=new SkillProgramEffect(Op,SkillProgramEffectTarget.Owner,1,r.Condition()) { SuitAllowanceExpiry = expiry };
+        RequireAlways(e,r.Path);return e;
     }
 }
 internal sealed class AlternatingSuitDrawDiscardDescriptor : AlternatingSuitAndCompletedTopDescriptor
 {
     public override SkillProgramEffectOp Op=>SkillProgramEffectOp.AlternatingSuitDrawDiscard;
+    public override ProgramDependencyKinds TracksActualTurnCursorReturn => ProgramDependencyKinds.Activation;
     public override ISkillProgramEffectHandler Handler { get; }=new AlternatingSuitDrawDiscardHandler();
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new RequireActivationEntry()];
 }
@@ -42,4 +54,10 @@ public sealed class FirstCategoryCompletedTopHandler : ISkillProgramEffectHandle
 }
 public sealed record AlternatingSuitTopDraft(string Mode,string Stage,int Required,IReadOnlyList<int> CardIds,IReadOnlyList<int> SelectedIds,long? ActionId=null,IReadOnlyList<Suit>? PaidSuits=null);
 public sealed record AlternatingSuitStateCommittedEvent(int OwnerSeat,string SkillId,string SkillInstanceId,bool NextYin,int TurnNumber,int PhaseInstanceId) : IGameEvent;
-public sealed record PlayPhaseSuitAllowanceGrantedEvent(int OwnerSeat,string SkillId,string SkillInstanceId,int TurnNumber,int PhaseInstanceId,IReadOnlyList<Suit> Suits,IReadOnlyList<int> DiscardedCardIds) : IGameEvent;
+public sealed record PlayPhaseSuitAllowanceGrantedEvent(int OwnerSeat,string SkillId,string SkillInstanceId,int TurnNumber,int PhaseInstanceId,IReadOnlyList<Suit> Suits,IReadOnlyList<int> DiscardedCardIds) : IGameEvent
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SkillProgramTurnSkillExpiry? Expiry { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public int? ActualTurnOwnerSeat { get; init; }
+}

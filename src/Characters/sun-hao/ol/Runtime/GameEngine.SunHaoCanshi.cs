@@ -7,8 +7,11 @@ public sealed partial class GameEngine
         global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_hao_ol_SunHaoCanshi.SunHaoSource(f);
     [ProgramCapability] private sealed class SunHaoCapability(GameEngine engine):ISunHaoHost
     { public SkillProgramStepOutcome Resolve(ProgramSkillFrame f,SkillProgramEffectOp op)=>engine.BeginSunHao(f,op); }
-    private bool SunHaoCanshiUseKind(CardActionContext a)=>a.Type==CardActionType.Use ? IsSlashCard(a.EffectiveKind)||IsOrdinaryTrick(a.EffectiveKind) :
-        a.Type==CardActionType.Response && a.EffectiveKind==CardKind.Nullification;
+    private bool SunHaoCanshiUseKind(CardActionContext a,string skillId)=>skillId==SunHaoComposition.MobileCanshi
+        ? a.Type==CardActionType.Use ? GetProgramCardCategory(a.EffectiveKind) is SkillProgramCardCategory.Basic or SkillProgramCardCategory.Trick :
+            a.Type==CardActionType.Response && a.EffectiveKind is CardKind.Dodge or CardKind.Nullification
+        : skillId=="ol:sun-hao-canshi" && (a.Type==CardActionType.Use ? IsSlashCard(a.EffectiveKind)||IsOrdinaryTrick(a.EffectiveKind) :
+            a.Type==CardActionType.Response && a.EffectiveKind==CardKind.Nullification);
     private IReadOnlyList<SunHaoCanshiGrantedEvent> CurrentSunHaoGrants(int owner)
     {
         if(!IsValidPlayerSeat(owner)||_turnNumber<=0)return [];
@@ -16,16 +19,16 @@ public sealed partial class GameEngine
         return grants.Length==0||!SunHaoActualTurnOpen?[]:Array.AsReadOnly(grants);
     }
     private bool HasSunHaoCanshiResponseObligation(CardActionContext action,ProgramCardContinuation continuation)=>HasSunHaoCanshiCapability&&
-        continuation==ProgramCardContinuation.NullificationResponse&&action.Type==CardActionType.Response&&action.EffectiveKind==CardKind.Nullification&&
-        IsValidPlayerSeat(action.ActorSeat)&&_players[action.ActorSeat].IsAlive&&CurrentSunHaoGrants(action.ActorSeat).Count>0;
+        IsCompletedResponseUse(action,continuation)&&IsValidPlayerSeat(action.ActorSeat)&&_players[action.ActorSeat].IsAlive&&
+        CurrentSunHaoGrants(action.ActorSeat).Any(g=>SunHaoCanshiUseKind(action,g.Source.SkillId)&&_contentRegistry.GetSkill(g.Source.SkillId).Program?.GameplayHash==g.GameplayHash);
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 18)]
     private void CollectIssuedSunHaoCanshiCandidates(CardActionContext action,SkillProgramTriggerWindow window,List<ProgramCardTriggerCandidate> result)
     {
-        if(!HasSunHaoCanshiCapability||window!=SkillProgramTriggerWindow.CardUseCommitted||!SunHaoCanshiUseKind(action)||_winner!=Winner.None||!_players[action.ActorSeat].IsAlive)return;
+        if(!HasSunHaoCanshiCapability||window!=SkillProgramTriggerWindow.CardUseCommitted||_winner!=Winner.None||!_players[action.ActorSeat].IsAlive)return;
         foreach(var g in CurrentSunHaoGrants(action.ActorSeat).DistinctBy(g=>(g.Source.SkillId,g.Source.SkillInstanceId)))
         {
             var p=_contentRegistry.GetSkill(g.Source.SkillId).Program;
-            if(p is null||p.GameplayHash!=g.GameplayHash)continue;
+            if(p is null||p.GameplayHash!=g.GameplayHash||!SunHaoCanshiUseKind(action,g.Source.SkillId))continue;
             var t=p.Triggers.Single(t=>t.Id=="issued-turn-use-discard");
             if(result.Any(c=>c.OwnerSeat==action.ActorSeat&&c.SkillId==g.Source.SkillId&&c.SkillInstanceId==g.Source.SkillInstanceId&&c.TriggerId==t.Id))continue;
             var c=CreateCardActionProgramContext(action,window,0,action.ActorSeat,action.ActorSeat,CaptureProgramTriggerFacts(_players[action.ActorSeat],action));
@@ -34,13 +37,13 @@ public sealed partial class GameEngine
     }
     private bool IsIssuedSunHaoCanshiCandidate(ProgramTriggerCandidate candidate,ProgramSkillWindowContext c)
     {
-        if(candidate.SkillId!="ol:sun-hao-canshi"||candidate.BindingId!="issued-turn-use-discard"||c is not{Window:SkillProgramTriggerWindow.CardUseCommitted,CardUse:{} card}||c.OwnerSeat!=candidate.OwnerSeat||
+        if(candidate.SkillId is not("ol:sun-hao-canshi" or SunHaoComposition.MobileCanshi)||candidate.BindingId!="issued-turn-use-discard"||c is not{Window:SkillProgramTriggerWindow.CardUseCommitted,CardUse:{} card}||c.OwnerSeat!=candidate.OwnerSeat||
             _resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w=>w.Id==c.ParentFrameId) is not{} w||w.CandidateIndex<0||w.CandidateIndex>=w.Candidates.Count||
             !MaMiDiCandidateMatches(candidate,ToSharedCandidate(w.Candidates[w.CandidateIndex]))||CreateCardActionProgramContext(w,w.Candidates[w.CandidateIndex])!=c||
-            w.Action.ActionId!=card.CardActionId||w.Action.ActorSeat!=candidate.OwnerSeat||!SunHaoCanshiUseKind(w.Action)||!_players[candidate.OwnerSeat].IsAlive||_winner!=Winner.None)return false;
+            w.Action.ActionId!=card.CardActionId||w.Action.ActorSeat!=candidate.OwnerSeat||!SunHaoCanshiUseKind(w.Action,candidate.SkillId)||!_players[candidate.OwnerSeat].IsAlive||_winner!=Winner.None)return false;
         if(w.Action.Type==CardActionType.Use)
         { if(LifecycleCardUse(w.ParentFrameId) is not{} use||use.Action?.ActionId!=w.Action.ActionId||use.SourceSeat!=candidate.OwnerSeat||!ProgramEventHistory<CardUseDeclaredEvent>().Any(e=>e.ResolutionId==use.Id))return false; }
-        else if(w.CompletedResponseReturn is not{Kind:ProgramCompletedResponseKind.Nullification,IsCommitted:true}||!IsCompletedResponseUse(w.Action,ProgramCardContinuation.NullificationResponse))return false;
+        else if(w.CompletedResponseReturn is not{IsCommitted:true} typed||!IsCompletedResponseUse(w.Action,typed.Kind))return false;
         return CurrentSunHaoGrants(candidate.OwnerSeat).Any(g=>g.Source.SkillId==candidate.SkillId&&g.Source.SkillInstanceId==candidate.SkillInstanceId&&g.GameplayHash==candidate.GameplayHash)&&
             !ProgramEventHistory<SunHaoCanshiStartedEvent>().Any(e=>e.WindowId==w.Id&&e.Source.SkillInstanceId==candidate.SkillInstanceId);
     }
@@ -49,9 +52,10 @@ public sealed partial class GameEngine
     {
         if(trigger.Effects is not[var e]||!SunHaoComposition.Handles(e.Op))return true;
         if(e.Op==SkillProgramEffectOp.ResolveSunHaoCanshiUseDiscard)return IsIssuedSunHaoCanshiCandidate(candidate,c);
-        return candidate.SkillId=="ol:sun-hao-canshi"&&candidate.BindingId=="normal-draw-add-wounded"&&c.Window==SkillProgramTriggerWindow.DrawPhaseStarting&&c.OwnerSeat==candidate.OwnerSeat&&
+        var mobile=candidate.SkillId==SunHaoComposition.MobileCanshi;
+        return (mobile||candidate.SkillId=="ol:sun-hao-canshi")&&candidate.BindingId==(mobile?"normal-draw-replace-wounded":"normal-draw-add-wounded")&&c.Window==SkillProgramTriggerWindow.DrawPhaseStarting&&c.OwnerSeat==candidate.OwnerSeat&&
             _resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w=>w.Id==c.ParentFrameId) is{NormalDrawReplaced:false,Continuation:ProgramLifecycleContinuation.CompleteDrawPhase}&&
-            SunHaoActualTurnOpen&&candidate.OwnerSeat==_currentSeat&&_players.Any(p=>p.IsAlive&&IsRuleWounded(p));
+            SunHaoActualTurnOpen&&candidate.OwnerSeat==_currentSeat&&(mobile||_players.Any(p=>p.IsAlive&&IsRuleWounded(p)));
     }
     private SkillProgramStepOutcome BeginSunHao(ProgramSkillFrame supplied,SkillProgramEffectOp op)
     {
@@ -61,6 +65,7 @@ public sealed partial class GameEngine
         if(!CanOfferSunHao(candidate,GetProgramTrigger(f),c))throw new InvalidOperationException("Sun Hao lost his current normal-draw or already-issued actual-turn entitlement.");
         if(op==SkillProgramEffectOp.GrantSunHaoCanshiDrawObligation)
         {
+            if(f.SkillId==SunHaoComposition.MobileCanshi)return BeginMobileSunHaoDraw(f);
             var x=_players.Count(p=>p.IsAlive&&IsRuleWounded(p));if(x<=0)throw new InvalidOperationException("Zero wounded characters cannot issue Canshi.");
             AdjustProgramNormalDraw(f,x);
             AdvanceEventRulesAndQueueFact(new SunHaoCanshiGrantedEvent(f.Id,SunHaoSource(f),f.GameplayHash,_turnNumber,_currentSeat,c.ParentFrameId,x));
@@ -130,12 +135,13 @@ public sealed partial class GameEngine
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,27330)]
     private bool ContinueIssuedSunHao(ProgramSkillFrame f)
     {
+        if(f.MobileSunHaoDraw is not null){AssertMobileSunHaoDraw(f);return true;}
         if(f.SunHaoCanshi is not null){AssertSunHao(f);return true;}
         return f.InstructionIndex is 0 or 1&&f.TriggerId=="issued-turn-use-discard"&&f.WindowContext is{} c&&
             IsIssuedSunHaoCanshiCandidate(new(f.OwnerSeat,f.SkillId,f.TriggerId,f.SkillInstanceId,f.GameplayHash,GetProgramTrigger(f).Priority,c.OccurrenceIndex),c);
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,27330)] private bool ContinueDeadSunHao(ProgramSkillFrame f)
-    {if(f.SunHaoCanshi is null)return false;AssertSunHao(f);return true;}
+    {if(f.MobileSunHaoDraw is not null){AssertMobileSunHaoDraw(f);return true;}if(f.SunHaoCanshi is null)return false;AssertSunHao(f);return true;}
     [ProgramAiChoice(SkillProgramEffectOp.ResolveSunHaoCanshiUseDiscard)]
     private PromptChoice AiSunHao(PendingDecision p,ProgramSkillFrame f)=>p.Choices.OrderBy(c=>c.Cards is[var id]?GetKeepValue(GetAdvancedCard(id),_players[p.PlayerSeat]):0).ThenBy(c=>c.Id.Value,StringComparer.Ordinal).First();
     private bool HasSunHaoCanshiIssuedDistance(long? useId,int actorSeat,int targetSeat)

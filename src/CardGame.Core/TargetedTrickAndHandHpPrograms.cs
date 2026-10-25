@@ -47,7 +47,10 @@ public sealed record TargetedOrdinaryTrickReceipt
 public sealed record TargetedOrdinaryTrickOfferedEvent(long ProgramFrameId, TargetedOrdinaryTrickReceipt Receipt) : IGameEvent;
 public sealed record TargetedOrdinaryTrickResolvedEvent(long ProgramFrameId, long CardUseFrameId, long ActionId,
     CardConversionSource Source, string GameplayHash, IReadOnlyList<int> BeforeTargets,
-    IReadOnlyList<int> AddedTargets, int? IneffectiveTarget, IReadOnlyList<int> ResultTargets) : IGameEvent;
+    IReadOnlyList<int> AddedTargets, int? IneffectiveTarget, IReadOnlyList<int> ResultTargets) : IGameEvent
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public int? RemovedTarget { get; init; }
+}
 public sealed partial record ProgramSkillFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public UnequalHandHpReceipt? UnequalHandHp { get; init; }
@@ -84,6 +87,15 @@ internal sealed class ResolveUnequalHandHpEndingDescriptor : TargetedTrickAndHan
 internal sealed class AdjustTargetedOrdinaryTrickDescriptor : TargetedTrickAndHandHpDescriptor
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.AdjustTargetedOrdinaryTrick;
+    public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
+    {
+        r.AllowOnly("op", "target", "condition", "stateId");
+        var stateId = r.OptionalIdentifier("stateId");
+        if (stateId is not (null or "remove-target"))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}.stateId: targeted trick policy must be remove-target when specified.");
+        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(), stateId: stateId);
+        RequireAlways(effect, r.Path); return effect;
+    }
     public override ProgramContextCapability RequiredCapabilities => ProgramContextCapability.CardAction;
     public override ISkillProgramEffectHandler Handler { get; } = new TargetedTrickAndHandHpHandler(SkillProgramEffectOp.AdjustTargetedOrdinaryTrick);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [new RequireTriggerWindow(SkillProgramTriggerWindow.CardUseTargetsFinalized)];

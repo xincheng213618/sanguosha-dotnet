@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:yili",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "give",
+          "window": "playPhaseStarting",
+          "subject": "owner",
+          "optional": true,
+          "effects": [
+            { "op": "spendMarkerOrLoseHp", "target": "owner", "marker": "orange", "amount": 1 },
+            { "op": "selectTarget", "target": "owner", "targetKind": "otherLiving" },
+            { "op": "changeParticipantMarker", "target": "selectedTarget", "marker": "orange", "amount": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:zhenglun",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "skip",
+          "window": "drawPhaseStarting",
+          "drawPhaseMode": "replacement",
+          "subject": "owner",
+          "optional": true,
+          "condition": {
+            "kind": "compare",
+            "left": { "kind": "ownerAttributedMarkerCount", "marker": "orange" },
+            "operator": "equal",
+            "right": { "kind": "integerConstant", "value": 0 }
+          },
+          "effects": [
+            { "op": "draw", "target": "owner", "amount": 0 },
+            { "op": "changeParticipantMarker", "target": "owner", "marker": "orange", "amount": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

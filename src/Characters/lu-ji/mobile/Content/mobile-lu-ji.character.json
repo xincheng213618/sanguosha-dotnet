@@ -1,0 +1,48 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:lu-ji",
+  "skills": [
+    {
+      "registrationOrder": 80500,
+      "programBundle": "mobile-lu-ji",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:yili",
+        "name": "遗礼",
+        "description": "出牌阶段开始时，若你拥有技能“怀橘”，你可以失去1点体力或移去1个“橘”，令一名其他角色获得1个“橘”。",
+        "executionForms": "Trigger"
+      }
+    },
+    {
+      "registrationOrder": 80501,
+      "programBundle": "mobile-lu-ji",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:zhenglun",
+        "name": "整论",
+        "description": "摸牌阶段开始前，若你没有“橘”且拥有技能“怀橘”，你可以跳过此阶段，获得1个“橘”。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 80599,
+      "pools": { "current": 80599 },
+      "definition": {
+        "id": "mobile:lu-ji",
+        "name": "陆绩·移动版",
+        "portraitKey": "mobile-lu-ji",
+        "skillId": "classic:huaiju",
+        "additionalSkillIds": ["mobile:yili", "mobile:zhenglun"],
+        "factionId": "wu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:lu-ji",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

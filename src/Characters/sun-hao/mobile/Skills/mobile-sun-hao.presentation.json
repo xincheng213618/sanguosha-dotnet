@@ -1,0 +1,4 @@
+{"schemaVersion":3,"skills":{
+ "mobile:sun-hao-canshi":{"name":"残蚀","description":"摸牌阶段，你可以改为摸X张牌（X为已受伤的角色数），然后当你本回合使用基本牌或锦囊牌时，你弃置一张牌。"},
+ "mobile:guiming":{"name":"归命","description":"主公技，锁定技，当你发动“残蚀”时，其他吴势力角色视为已受伤。"}
+}}
