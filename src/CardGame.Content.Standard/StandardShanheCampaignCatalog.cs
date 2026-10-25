@@ -453,6 +453,12 @@ public static partial class StandardShanheCampaignCatalog
             packages.Add(new ShanheEncounterPackage(setup));
             if (codexEquipment) packages.Add(new ShanheCodexEquipmentPackage());
             if (wealthTactics) packages.Add(new StandardShanheWealthPackage());
+            if (reactionTactics)
+            {
+                packages.Add(new StandardShanheDrawTacticsPackage());
+                packages.Add(new StandardShanhePreparationTacticsPackage());
+                packages.Add(new StandardShanheLogisticsTacticsPackage());
+            }
             return ComposedSkillContentRegistry.CreateShowcase(additionalPackages: packages);
         })).Value;
     }
