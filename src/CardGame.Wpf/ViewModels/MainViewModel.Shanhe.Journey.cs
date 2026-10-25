@@ -38,7 +38,8 @@ public sealed partial class MainViewModel
     {
         ShanheCampaignPhase.Battle => "返回牌桌，击败本场全部敌军",
         ShanheCampaignPhase.OpeningSkillDraft => "传承触发，先选择一项稀有技能",
-        ShanheCampaignPhase.Reward => _shanheSession?.Snapshot.BossRewardSummary is not null
+        ShanheCampaignPhase.Reward => _shanheSession?.Snapshot.BossRewardSummary is { IsBonusOnly: true }
+            ? "领取追加奖励，确认后继续行军" : _shanheSession?.Snapshot.BossRewardSummary is not null
             ? "分别领取红色战法和技能，确认后进入下一章" : "领取一项战利品，或放弃并领取铜币",
         ShanheCampaignPhase.NodeChoice => "完成当前地点的选择，继续行军",
         ShanheCampaignPhase.Won => "此番征程已完成，可重新整备出征",

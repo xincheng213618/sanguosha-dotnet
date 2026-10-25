@@ -13,5 +13,6 @@ public sealed record ShanheBossRewardGroupSnapshot(string Id, string Name,
 public sealed record ShanheBossRewardSummary(int ChapterNumber, string Title, int FixedGold, int SkillSlots,
     IReadOnlyList<ShanheBossRewardGroupSnapshot> Groups, long Revision)
 {
+    public bool IsBonusOnly { get; init; }
     public bool CanConfirm => Groups.All(group => group.IsResolved);
 }

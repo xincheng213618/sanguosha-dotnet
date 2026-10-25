@@ -239,6 +239,7 @@ internal static class Program
             Check("Shanhe run records: real history tab keeps completed runs and credited books", () => ShanheRunRecordUiChecks.CompletedRunsRemainVisibleInTheRealHistoryTab(output));
             Check("Shanhe reward UI: real victory cards confirmation skip skill and replacement", () => ShanheRewardUiChecks.RealVictoryRewardCardsConfirmSkipSkillAndReplacement(output));
             Check("Shanhe reward UI: boss bundles advance through three chapters", () => ShanheRewardUiChecks.BossBundlesRequireEachGroupThenAdvanceThreeChapters(output));
+            Check("Shanhe reward UI: categories four choices bonus-only and three boss groups", () => ShanheRewardUiChecks.CategoriesFourChoicesBonusOnlyAndThreeBossGroups(output));
             Check("Shanhe reward UI: shop skill replacement confirms before payment", () => ShanheRewardUiChecks.ShopSkillsUseReplacementModalAndChargeOnlyOnConfirmation(output));
             Check("Boss activity UI: real coalition setup stage and cross-mode restore", () => BossActivityUiChecks.RealSetupAndCrossModeRestore(output));
             Check("Hulao activity UI: forms shuffle counters and cross-mode restore", () => HulaoActivityUiChecks.SetupFormCounterAndCrossModeRestore(output));

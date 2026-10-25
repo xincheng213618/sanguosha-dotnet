@@ -5,7 +5,7 @@
       "id": "shanhe:jingyu-moulue-2-2026", "revision": 1,
       "damageModifiers": [
         {
-          "id": "low-hand-slash-damage", "cardKinds": ["slash", "fireSlash", "thunderSlash"],
+          "id": "low-hand-slash-damage", "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"],
           "amount": 1, "condition": "sourceHandBelowLimit", "sourceHandCountLimit": 6,
           "damageLayer": "additionalDamage"
         }

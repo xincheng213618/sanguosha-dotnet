@@ -5,7 +5,9 @@ public sealed record ShanheCampaignEconomy(
     int BattleGoldPercent = 0, int PostBattleInterestPercent = 0, int ShopDiscountPercent = 0,
     int ShopRefreshLimit = 0, int ExtraStockPerCategory = 0, int ReplacedEquipmentGold = 0,
     bool SuppressShopPriceEscalation = false, int StartingGold = 0,
-    int? GoldAbove = null, string? BattleSkillId = null);
+    int? GoldAbove = null, string? BattleSkillId = null,
+    int TacticRewardChoiceCount = 0, int CardRewardChoiceCount = 0,
+    int ExtraEliteRareTactics = 0, int ExtraBossEpicSkills = 0, int SkillRewardChoiceCount = 0);
 
 public static partial class ShanheCampaignContent
 {
@@ -21,6 +23,9 @@ public static partial class ShanheCampaignContent
             economy.ShopDiscountPercent is >= 0 and <= 100 && economy.ShopRefreshLimit is >= 0 and <= 20 &&
             economy.ExtraStockPerCategory is >= 0 and <= 12 && economy.ReplacedEquipmentGold is >= 0 and <= 100000 &&
             economy.StartingGold is >= 0 and <= 100000 &&
+            economy.TacticRewardChoiceCount is 0 or >= 3 and <= 8 && economy.CardRewardChoiceCount is 0 or >= 3 and <= 8 &&
+            economy.SkillRewardChoiceCount is 0 or >= 3 and <= 8 &&
+            economy.ExtraEliteRareTactics is >= 0 and <= 4 && economy.ExtraBossEpicSkills is >= 0 and <= 4 &&
             (economy.GoldAbove is null && economy.BattleSkillId is null ||
                 economy.GoldAbove is >= 0 and <= 1000000 && !string.IsNullOrWhiteSpace(economy.BattleSkillId)) &&
             economy != new ShanheCampaignEconomy(), "Invalid or empty campaign economy tactic.");

@@ -29,9 +29,16 @@ public static partial class ShanheCampaignContent
             ValidateOpeningSkillReward(definition, reward);
             ValidateEconomy(reward);
             RequireText(reward.Name, "reward name");
+            Require(reward.Rarity is >= 0 and <= 4, "Reward rarity must be between zero and four.");
             Require(reward.Gold is >= 0 and <= 100_000 && reward.Heal is >= 0 and <= 1000 && reward.AddSkillSlots is >= 0 and <= 8, "Invalid reward amounts.");
             if (reward.SkillId is not null) RequireText(reward.SkillId, "reward skill");
             if (reward.TacticSkillId is not null) RequireText(reward.TacticSkillId, "tactic skill");
+            if (reward.BossBattleOnly)
+                Require(reward.TacticSkillId is not null && reward.SkillId is null && reward.CampaignEconomy is null &&
+                    reward.OpeningSkillRewardIds is null && reward.Gold == 0 && reward.Heal == 0 && reward.AddSkillSlots == 0 &&
+                    (reward.Bonuses is null or { MaxHp: 0, InitialHand: 0, Draw: 0, Slash: 0 }) &&
+                    (reward.StartingCards?.Count ?? 0) == 0 && (reward.StartingEquipment?.Count ?? 0) == 0,
+                    "A boss-only tactic must contain only a battle tactic program.");
             ValidateBonuses(reward.Bonuses);
             ValidateCards(reward.StartingCards, equipmentOnly: false);
             ValidateCards(reward.StartingEquipment, equipmentOnly: true);
@@ -49,6 +56,7 @@ public static partial class ShanheCampaignContent
             UniqueIds(node.RewardIds ?? [], "node reward");
             Require((node.RewardIds ?? []).All(rewardIds.Contains), "A node references an unknown reward.");
             var battle = IsBattle(node.Kind);
+            Require(battle || !node.CategorizedRewards, "Only battle nodes may offer categorized rewards.");
             Require(node.RewardSkipGold is >= 0 and <= 100_000 && (battle || node.RewardSkipGold == 0),
                 "Only battle nodes can grant bounded reward-skip compensation.");
             Require(battle ? node.Encounters is { Count: > 0 and <= 64 } && (node.Choices?.Count ?? 0) == 0 :

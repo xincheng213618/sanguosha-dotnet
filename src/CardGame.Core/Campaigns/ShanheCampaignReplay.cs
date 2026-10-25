@@ -39,6 +39,7 @@ public sealed record ShanheCampaignOptions(int Seed, string PlayerGeneralId)
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
 [JsonDerivedType(typeof(MoveShanheNodeCommand), "move-node")]
 [JsonDerivedType(typeof(ChooseShanheRewardCommand), "choose-reward")]
+[JsonDerivedType(typeof(ChooseShanheRewardCategoryCommand), "choose-reward-category")]
 [JsonDerivedType(typeof(ChooseShanheOpeningSkillCommand), "choose-opening-skill")]
 [JsonDerivedType(typeof(ChooseShanheBossRewardCommand), "choose-boss-reward")]
 [JsonDerivedType(typeof(ConfirmShanheBossRewardCommand), "confirm-boss-reward")]
@@ -50,6 +51,7 @@ public abstract record ShanheCampaignCommand(long ExpectedRevision);
 
 public sealed record MoveShanheNodeCommand(string NodeId, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record ChooseShanheRewardCommand(string RewardId, string? ReplaceSkillId, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
+public sealed record ChooseShanheRewardCategoryCommand(ShanheRewardCategory Category, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record ChooseShanheOpeningSkillCommand(string RewardId, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record ChooseShanheBossRewardCommand(string GroupId, string RewardId, string? ReplaceSkillId, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record ConfirmShanheBossRewardCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
@@ -95,6 +97,13 @@ public sealed record ShanheCampaignSnapshot(
     public int ChapterNumber { get; init; }
     public string? ChapterTitle { get; init; }
     public ShanheBossRewardSummary? BossRewardSummary { get; init; }
+    private readonly IReadOnlyList<ShanheRewardCategory> _rewardCategories = Array.Empty<ShanheRewardCategory>();
+    /// <summary>Available categories before the run commits to one frozen candidate group.</summary>
+    public IReadOnlyList<ShanheRewardCategory> RewardCategories
+    {
+        get => _rewardCategories;
+        init => _rewardCategories = ShanheCampaignContent.Freeze(value);
+    }
     private readonly IReadOnlyList<ShanheRewardDefinition> _openingSkillOffers = Array.Empty<ShanheRewardDefinition>();
     public IReadOnlyList<ShanheRewardDefinition> OpeningSkillOffers
     {

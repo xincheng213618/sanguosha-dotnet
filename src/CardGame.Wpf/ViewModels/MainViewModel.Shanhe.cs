@@ -184,7 +184,8 @@ public sealed partial class MainViewModel
             if (_shanheSession is not { } session) return StandardShanheCampaignCatalog.CreateCodexDefinition(SelectedShanheDifficulty?.Value ?? 1, SelectedShanheScenario.Id).IntroText;
             var state = session.Snapshot;
             if (state.Phase is ShanheCampaignPhase.Won or ShanheCampaignPhase.Lost) return state.EndingText;
-            return state.StoryText + (state.BossRewardSummary is not null ? "\n\n首领已败，分别领取战法与卡牌，确认奖励后继续征程。"
+            return state.StoryText + (state.BossRewardSummary is { IsBonusOnly: true } ? "\n\n领取本次胜利的追加奖励，确认后继续行军。"
+                : state.BossRewardSummary is not null ? "\n\n首领已败，分别领取战法与技能，确认奖励后继续征程。"
                 : state.Phase == ShanheCampaignPhase.Reward ? "\n\n从下方奖励中选择一项，再继续征程。"
                 : state.Phase == ShanheCampaignPhase.Battle ? "\n\n此战的体力和收获会影响后续路程。可返回牌桌继续战斗。" : "");
         }

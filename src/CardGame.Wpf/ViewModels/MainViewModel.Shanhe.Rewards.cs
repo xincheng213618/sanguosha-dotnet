@@ -17,17 +17,24 @@ public sealed partial class MainViewModel
     public bool IsShanheRewardOpen => IsShanheOpeningSkillDraft || _shanheSession?.Snapshot.Phase == ShanheCampaignPhase.Reward &&
         (_shanheSession.Snapshot.BossRewardSummary is null || HasShanheBossRewardGroup);
     public string ShanheRewardHeading => IsShanheOpeningSkillDraft ? "传 承 · 技 能 选 择" :
-        ActiveShanheBossRewardGroup is { } group ? group.Id switch
+        _shanheSession?.Snapshot.RewardCategories.Count > 0 ? "奖 励 类 别" :
+        ActiveShanheBossRewardGroup is { } group ? IsShanheBonusRewardOnly ? "追 加 奖 励 · 选 择" : group.Id switch
         { "tactics" => "战 法 选 择", "cards" => "卡 牌 选 择", _ => group.Name + " · 选择" } :
         _shanheSession?.Snapshot.RewardOffers is { Count: > 0 } offers && offers.All(reward => reward.SkillId is not null)
             ? "技 能 选 择" : "战 利 品 选 择";
     public string ShanheRewardNotice => IsShanheOpeningSkillDraft ? "传承已触发。从三个随机稀有技能中选择一项，获得后开始征程。" :
-        HasShanheBossRewardGroup ? "从本组候选中选择一项，确认后回到首领奖励。每组奖励分别领取。" :
+        _shanheSession?.Snapshot.RewardCategories.Count > 0 ? "先选择一类奖励，再从该类候选中领取一项。类别确认后不能更换。" :
+        ActiveShanheBossRewardGroup is { } group ? IsShanheBonusRewardOnly
+            ? $"从 {group.Offers.Count} 项追加候选中选择一项，领取后返回追加奖励总览。各组分别领取。"
+            : $"从本组 {group.Offers.Count} 项候选中选择一项，领取后返回奖励总览。各组分别领取。" :
         _shanheSession?.Snapshot is { CanSkipReward: true } state
         ? $"通关奖励已结算。选择一项收获，或放弃本次战利品，额外获得 {state.RewardSkipGold} 铜币。"
         : "通关奖励已结算。选择一项收获，带着新的力量继续前行。";
     public ShanheRewardCard? SelectedShanheRewardCard => _selectedShanheRewardCard;
     public bool ShanheRewardNeedsReplacement => SelectedShanheRewardReplacements.Count > 0;
+    public string ShanheRewardConfirmText => _selectedShanheRewardCard?.IsSkip == true ? "领 取 铜 币" :
+        _shanheSession?.Snapshot.RewardCategories.Count > 0 ? "确 认 类 别" :
+        HasShanheBossRewardGroup && IsShanheBonusRewardOnly ? "领 取 追 加 奖 励" : "领 取 奖 励";
 
     public ICommand SelectShanheRewardCardCommand { get; private set; } = null!;
     public ICommand ConfirmShanheRewardCommand { get; private set; } = null!;
@@ -54,6 +61,7 @@ public sealed partial class MainViewModel
             SelectedShanheRewardReplacements.Add(choice);
         RaisePropertyChanged(nameof(SelectedShanheRewardCard));
         RaisePropertyChanged(nameof(ShanheRewardNeedsReplacement));
+        RaisePropertyChanged(nameof(ShanheRewardConfirmText));
         (ConfirmShanheRewardCommand as RelayCommand)?.NotifyCanExecuteChanged();
     }
 
@@ -61,6 +69,8 @@ public sealed partial class MainViewModel
     {
         if (_selectedShanheRewardCard is not { } card || !IsCurrentShanheRewardCard(card)) return false;
         if (card.IsSkip) return _shanheSession!.Snapshot.CanSkipReward;
+        if (card.RewardCategoryChoice is { } category)
+            return _shanheSession!.Snapshot.RewardCategories.Contains(category);
         return ShanheRewardNeedsReplacement
             ? SelectedShanheRewardReplacements.Any(IsCurrentShanheRewardChoice)
             : CurrentShanheRewardChoices.Any(choice => choice.IsReward && choice.Id == card.Id &&
@@ -84,6 +94,8 @@ public sealed partial class MainViewModel
         if (!IsCurrentShanheRewardCard(card) || replacement is not null && !IsCurrentShanheRewardChoice(replacement)) return;
         if (IsShanheOpeningSkillDraft)
             ApplyShanheCommand(new ChooseShanheOpeningSkillCommand(card.Id, card.Revision));
+        else if (card.RewardCategoryChoice is { } category)
+            ApplyShanheCommand(new ChooseShanheRewardCategoryCommand(category, card.Revision));
         else if (ActiveShanheBossRewardGroup is { } group)
             ApplyShanheCommand(new ChooseShanheBossRewardCommand(group.Id, card.Id,
                 replacement?.ReplaceSkillId, card.Revision));
@@ -111,6 +123,19 @@ public sealed partial class MainViewModel
             if (IsShanheOpeningSkillDraft)
                 foreach (var reward in state.OpeningSkillOffers)
                     _shanheOpeningChoices.Add(new(reward.Id, reward.Name, reward.Description, true, null, true, state.Revision));
+            foreach (var category in state.RewardCategories)
+            {
+                var name = category switch
+                {
+                    ShanheRewardCategory.Tactic => "战法奖励",
+                    ShanheRewardCategory.Card => "卡牌奖励",
+                    ShanheRewardCategory.Skill => "技能奖励",
+                    _ => "补给奖励"
+                };
+                ShanheRewardCards.Add(new("reward-category:" + category, name,
+                    "选择此类别后，从本轮已确定的候选中领取一项。", "类别确认后不能更换。", "奖励类别", false,
+                    "", state.Revision, true) { RewardCategoryChoice = category });
+            }
             foreach (var reward in IsShanheOpeningSkillDraft ? state.OpeningSkillOffers : ActiveShanheBossRewardGroup?.Offers ?? state.RewardOffers)
             {
                 var rule = RewardRule(reward);
@@ -129,6 +154,7 @@ public sealed partial class MainViewModel
             }
         }
         foreach (var property in new[] { nameof(IsShanheRewardOpen), nameof(ShanheRewardHeading), nameof(ShanheRewardNotice),
+                     nameof(ShanheRewardConfirmText),
                      nameof(SelectedShanheRewardCard), nameof(ShanheRewardNeedsReplacement) }) RaisePropertyChanged(property);
         (ConfirmShanheRewardCommand as RelayCommand)?.NotifyCanExecuteChanged();
     }
@@ -146,6 +172,7 @@ public sealed class ShanheRewardCard(string id, string name, string description,
     public string Category { get; } = category;
     public string CategoryText => Category;
     public ImageSource? CardImage { get; init; }
+    public ShanheRewardCategory? RewardCategoryChoice { get; init; }
     public bool HasCardImage => CardImage is not null;
     public bool IsSkip { get; } = isSkip;
     public string BonusText { get; } = bonusText;

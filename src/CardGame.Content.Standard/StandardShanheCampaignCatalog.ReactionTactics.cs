@@ -19,11 +19,11 @@ public static partial class StandardShanheCampaignCatalog
     public const string CurrentSougua2SkillId = "shanhe:current-sougua-2169";
 
     private sealed record ReactionTacticSource(int SourceId, string Name, string SkillId, int Price, int Rarity,
-        int? CodexNodeId, string Description)
+        int? CodexNodeId, string Description, bool BossBattleOnly = false)
     {
         public string RewardId => "tactic-build-" + SourceId.ToString(CultureInfo.InvariantCulture);
         public ShanheRewardDefinition Reward => new(RewardId, "战法·" + Name)
-        { TacticSkillId = SkillId, Description = Description + "不占额外技能槽，本次征程限获得一份。" };
+        { TacticSkillId = SkillId, BossBattleOnly = BossBattleOnly, Description = Description + "不占额外技能槽，本次征程限获得一份。" };
     }
 
     // Keep projections independent of partial-class static initialization order.
@@ -97,6 +97,56 @@ public static partial class StandardShanheCampaignCatalog
             "初始手牌-2，摸牌数+3"),
         new ReactionTacticSource(2201, "队·牌", StandardShanheDrawTacticsPackage.DuipaiSkillId, 200, 1, null,
             "你的所有队友摸牌数+2"),
+        new ReactionTacticSource(2025, "未雨绸缪", StandardShanheBossOpeningTacticsPackage.WeiyuChoumouSkillId, 200, 1, null,
+            "仅首领战中，你随机获得2张初始手牌", BossBattleOnly: true),
+        new ReactionTacticSource(2026, "未雨绸缪Ⅱ", StandardShanheBossOpeningTacticsPackage.WeiyuChoumou2SkillId, 300, 2, null,
+            "仅首领战中，你随机获得3张初始手牌", BossBattleOnly: true),
+        new ReactionTacticSource(2027, "未雨绸缪Ⅲ", StandardShanheBossOpeningTacticsPackage.WeiyuChoumou3SkillId, 500, 3, null,
+            "仅首领战中，你随机获得4张初始手牌", BossBattleOnly: true),
+        new ReactionTacticSource(2079, "手到擒来", StandardShanheCycleTacticsPackage.ShoudaoQinlaiSkillId, 200, 1, null,
+            "每回合你使用第7张牌后,你摸1张牌"),
+        new ReactionTacticSource(2080, "手到擒来Ⅱ", StandardShanheCycleTacticsPackage.ShoudaoQinlai2SkillId, 300, 2, null,
+            "每回合你使用第5张牌后,你摸1张牌"),
+        new ReactionTacticSource(2081, "手到擒来Ⅲ", StandardShanheCycleTacticsPackage.ShoudaoQinlai3SkillId, 500, 3, 65,
+            "每回合你使用第6张牌后,你摸2张牌"),
+        new ReactionTacticSource(2227, "弱反馈", StandardShanheSustainOpeningTacticsPackage.RuoFankuiSkillId, 500, 3, null,
+            "你受到1点伤害后，摸一张牌"),
+        new ReactionTacticSource(2182, "粮草储备", StandardShanheSustainOpeningTacticsPackage.LiangcaoChubeiSkillId, 200, 1, 17,
+            "游戏开始时，你回复1点体力"),
+        new ReactionTacticSource(2132, "皮囊", StandardShanheHandStockTacticsPackage.PinangSkillId, 200, 1, null,
+            "手牌上限+1"),
+        new ReactionTacticSource(2133, "皮囊Ⅱ", StandardShanheHandStockTacticsPackage.Pinang2SkillId, 300, 2, null,
+            "手牌上限+2"),
+        new ReactionTacticSource(2135, "皮囊Ⅲ", StandardShanheHandStockTacticsPackage.Pinang3SkillId, 700, 4, null,
+            "手牌上限+5"),
+        new ReactionTacticSource(2194, "精于谋略", StandardShanheHandStockTacticsPackage.JingyuMoulueSkillId, 300, 2, null,
+            "手牌数小于4时，你使用【杀】造成的伤害+1"),
+        new ReactionTacticSource(2167, "绝对无懈", StandardShanheResponseTacticsPackage.JueduiWuxieSkillId, 500, 3, null,
+            "其他角色无法响应你的【无懈可击】"),
+        new ReactionTacticSource(2308, "赌术II", StandardShanheResponseTacticsPackage.Dushu2SkillId, 300, 2, 46,
+            "你的拼点牌点数+6（最大为K）"),
+        new ReactionTacticSource(2093, "拂衣去·杀", StandardShanheFuyiTacticsPackage.FuyiSlashSkillId, 300, 2, null,
+            "回合开始时，你获得1张【杀】"),
+        new ReactionTacticSource(2144, "拂衣去·闪", StandardShanheFuyiTacticsPackage.FuyiDodgeSkillId, 300, 2, null,
+            "回合开始时，你获得1张【闪】"),
+        new ReactionTacticSource(2094, "拂衣去·桃", StandardShanheFuyiTacticsPackage.FuyiPeachSkillId, 700, 4, 138,
+            "回合开始时，你获得2张【桃】"),
+        new ReactionTacticSource(2095, "拂衣去·拆", StandardShanheFuyiTacticsPackage.FuyiDismantleSkillId, 500, 3, null,
+            "回合开始时，你获得1张【过河拆桥】"),
+        new ReactionTacticSource(2096, "拂衣去·顺", StandardShanheFuyiTacticsPackage.FuyiStealSkillId, 500, 3, null,
+            "回合开始时，你获得1张【顺手牵羊】"),
+        new ReactionTacticSource(2097, "拂衣去·决", StandardShanheFuyiTacticsPackage.FuyiDuelSkillId, 500, 3, null,
+            "回合开始时，你获得1张【决斗】"),
+        new ReactionTacticSource(2098, "拂衣去·锁", StandardShanheFuyiTacticsPackage.FuyiIronChainSkillId, 500, 3, null,
+            "回合开始时，你获得1张【铁索连环】"),
+        new ReactionTacticSource(2099, "拂衣去·火", StandardShanheFuyiTacticsPackage.FuyiFireAttackSkillId, 300, 2, null,
+            "回合开始时，你获得1张【火攻】"),
+        new ReactionTacticSource(2249, "博闻Ⅰ", StandardShanheBowenTacticsPackage.BowenSkillId, 300, 2, 53,
+            "你的回合开始时，从牌堆中获得1张随机锦囊牌"),
+        new ReactionTacticSource(2250, "博闻Ⅱ", StandardShanheBowenTacticsPackage.Bowen2SkillId, 500, 3, null,
+            "你的回合开始时，从牌堆中获得2张随机锦囊牌"),
+        new ReactionTacticSource(2251, "博闻Ⅲ", StandardShanheBowenTacticsPackage.Bowen3SkillId, 700, 4, null,
+            "你的回合开始时，从牌堆中获得3张随机锦囊牌"),
     });
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentReactionTacticShopMetadata =>

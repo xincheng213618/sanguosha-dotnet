@@ -6,6 +6,7 @@ namespace CardGame.Core.Campaigns;
 
 public enum ShanheNodeKind { Battle, EliteBattle, BossBattle, Event, Shop, Camp }
 public enum ShanheCampaignPhase { Map, Battle, Reward, NodeChoice, Won, Lost, OpeningSkillDraft }
+public enum ShanheRewardCategory { Tactic, Card, Skill, Supply }
 
 /// <summary>Content-defined, additive bonuses. A campaign never changes the global rules epoch.</summary>
 public sealed record ShanheTacticBonuses(int MaxHp = 0, int InitialHand = 0, int Draw = 0, int Slash = 0);
@@ -131,8 +132,14 @@ public sealed record ShanheRewardDefinition(
     IReadOnlyList<ShanheStartingCard>? StartingEquipment = null, int AddSkillSlots = 0)
 {
     public string Description { get; init; } = "";
+    /// <summary>Authored reward rarity: zero unspecified, one common through four legendary.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int Rarity { get; init; }
     /// <summary>A campaign tactic program. This never consumes an extra general-skill slot.</summary>
     public string? TacticSkillId { get; init; }
+    /// <summary>Projects this owned tactic program only when entering a boss battle.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool BossBattleOnly { get; init; }
     /// <summary>A native expedition-only tactic; it never consumes a general-skill slot.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ShanheCampaignEconomy? CampaignEconomy { get; init; }
@@ -164,6 +171,9 @@ public sealed record ShanheNodeDefinition(
     /// <summary>Compensation for declining this node's published reward offer; zero disables it.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int RewardSkipGold { get; init; }
+    /// <summary>Choose a reward category before revealing its frozen candidate offer.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool CategorizedRewards { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int ChapterNumber { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

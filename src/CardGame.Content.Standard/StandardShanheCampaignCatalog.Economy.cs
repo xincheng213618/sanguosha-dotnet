@@ -49,7 +49,17 @@ public static partial class StandardShanheCampaignCatalog
         new(2180, "tactic-economy-2180", "守财奴Ⅲ", 1, 200,
             "铜币大于700时，你的摸牌数+2", new(GoldAbove: 700, BattleSkillId: StandardShanheWealthPackage.WealthDrawSkillId)),
         new(2181, "tactic-economy-2181", "守财奴Ⅳ", 3, 500,
-            "铜币大于1000时，你的伤害+1", new(GoldAbove: 1000, BattleSkillId: StandardShanheWealthPackage.WealthDamageSkillId))
+            "铜币大于1000时，你的伤害+1", new(GoldAbove: 1000, BattleSkillId: StandardShanheWealthPackage.WealthDamageSkillId)),
+        new(2013, "tactic-economy-2013", "王牌战法", 2, 300,
+            "击败精英关卡后，额外获得一个稀有战法", new(ExtraEliteRareTactics: 1)),
+        new(2014, "tactic-economy-2014", "王牌战技", 2, 300,
+            "击败首领关卡后，额外获得一个史诗技能", new(ExtraBossEpicSkills: 1)),
+        new(2017, "tactic-economy-2017", "谋略过人", 2, 300,
+            "选择【战法奖励】时，候选项从三个变为四个", new(TacticRewardChoiceCount: 4)),
+        new(2018, "tactic-economy-2018", "慧黠", 1, 200,
+            "选择【卡牌奖励】时，候选项从三个变为四个", new(CardRewardChoiceCount: 4)),
+        new(2016, "tactic-economy-2016", "思维敏捷", 2, 300,
+            "选择【技能奖励】时，候选项从三个变为四个", new(SkillRewardChoiceCount: 4))
     });
 
     private static ShanheCampaignDefinition WithCurrentEconomyTactics(ShanheCampaignDefinition definition)

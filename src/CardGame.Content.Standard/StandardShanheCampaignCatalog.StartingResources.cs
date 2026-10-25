@@ -4,10 +4,15 @@ namespace CardGame.Content.Standard;
 
 public static partial class StandardShanheCampaignCatalog
 {
-    // Apply only after the full new definition has been composed. Historical
-    // constructors keep their original descriptions and entire content hash.
-    private static ShanheCampaignDefinition WithStartingResourcesContract(ShanheCampaignDefinition definition)
+    // Project metadata and physical-card rules after the full definition is composed.
+    private static ShanheCampaignDefinition WithStartingResourcesContract(ShanheCampaignDefinition definition,
+        bool categorizeNormalRewards = false)
     {
+        definition = definition with
+        {
+            Rewards = definition.Rewards.Select(reward => ShopMetadataByRewardId.TryGetValue(reward.Id, out var metadata)
+                ? reward with { Rarity = metadata.Rarity } : reward).ToArray()
+        };
         const string useNotice = "使用或响应结束时，若原应进入弃牌堆，则移出游戏；若先被技能获得，仍保留该牌。";
         var physical = definition.Rewards.Where(reward => reward.StartingCards?.Count > 0 || reward.StartingEquipment?.Count > 0)
             .ToDictionary(reward => reward.Id, reward => reward with
@@ -25,6 +30,8 @@ public static partial class StandardShanheCampaignCatalog
             Rewards = definition.Rewards.Select(reward => physical.GetValueOrDefault(reward.Id) ?? reward).ToArray(),
             Nodes = definition.Nodes.Select(node => node with
             {
+                CategorizedRewards = node.CategorizedRewards || categorizeNormalRewards &&
+                    node.Kind is ShanheNodeKind.Battle or ShanheNodeKind.EliteBattle,
                 // Codex shops copy the reward text before adding the price. Keep
                 // that authored price and update only the copied resource contract.
                 Choices = node.Choices?.Select(choice => choice.RewardId is { } id && physical.TryGetValue(id, out var updated) &&
