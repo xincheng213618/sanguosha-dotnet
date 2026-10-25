@@ -1,0 +1,4 @@
+{
+  "schemaVersion": 3,
+  "skills": { "boundary:jieming-mobile": { "name": "节命", "description": "当你受到1点伤害后，你可以令一名角色摸两张牌，然后若其手牌数小于其体力上限，你摸一张牌。" } }
+}

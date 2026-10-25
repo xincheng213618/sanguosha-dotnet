@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:lianhuan-mobile", "revision": 1,
+      "modifiers": [{ "id": "iron-chain-extra-target", "query": "cardTargetCount", "operation": "add", "value": 1, "cardKinds": ["ironChain"], "priority": 0 }],
+      "viewAs": [{ "id": "club-hand-as-iron-chain", "sourceZones": ["hand"], "inputKinds": [], "inputSuits": ["club"], "outputKind": "ironChain", "forPlay": true, "forResponse": false }] },
+    { "id": "boundary:niepan-mobile", "revision": 1,
+      "activations": [{ "id": "rebirth", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving",
+        "usesPerTurn": null, "usesPerGame": 1, "usageGroup": "named-group:rebirth",
+        "effects": [
+          { "op": "discardOwnedZoneCards", "target": "owner", "zones": ["hand", "equipment", "judgment"] },
+          { "op": "draw", "target": "owner", "amount": 3 },
+          { "op": "recoverTo", "target": "owner", "numberExpression": "integerConstant", "minimumValue": 3, "clampToMaxHp": true },
+          { "op": "setChainedState", "target": "owner", "chained": false },
+          { "op": "setFaceState", "target": "owner", "faceDown": false }
+        ] }],
+      "triggers": [{ "id": "dying-rebirth", "window": "selfDyingResponse", "subject": "owner", "optional": true,
+        "usageScope": "game", "usageLimit": 1, "namedUsageGroup": "rebirth",
+        "effects": [
+          { "op": "discardOwnedZoneCards", "target": "owner", "zones": ["hand", "equipment", "judgment"] },
+          { "op": "draw", "target": "owner", "amount": 3 },
+          { "op": "recoverTo", "target": "owner", "numberExpression": "integerConstant", "minimumValue": 3, "clampToMaxHp": true },
+          { "op": "setChainedState", "target": "owner", "chained": false },
+          { "op": "setFaceState", "target": "owner", "faceDown": false }
+        ] }]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "schemaVersion": 3,
+  "skills": { "boundary:qiangxi-mobile": { "name": "强袭", "description": "出牌阶段对每名角色限一次，你可以失去1点体力或弃置一张武器牌，然后对攻击范围内的一名其他角色造成1点伤害。" } }
+}

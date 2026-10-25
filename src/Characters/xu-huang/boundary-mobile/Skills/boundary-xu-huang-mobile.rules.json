@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:duanliang-mobile", "revision": 1,
+      "viewAs": [{ "id": "black-basic-or-equipment-as-supply-shortage", "sourceZones": ["hand", "equipment"],
+        "inputKinds": [], "inputCategories": ["basic", "equipment"], "inputSuits": ["spade", "club"],
+        "outputKind": "supplyShortage", "forPlay": true, "forResponse": false }] },
+    { "id": "boundary:jiezi-mobile", "revision": 1,
+      "triggers": [{ "id": "draw-after-other-skipped-draw", "window": "drawPhaseSkipped", "subject": "owner", "optional": false,
+        "effects": [{ "op": "draw", "target": "owner", "amount": 1 }] }] }
+  ]
+}

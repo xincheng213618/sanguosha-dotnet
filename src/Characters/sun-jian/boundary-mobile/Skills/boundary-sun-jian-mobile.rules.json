@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "boundary:polu-mobile",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "killed-other",
+          "window": "characterDied",
+          "subject": "owner",
+          "optional": true,
+          "condition": {
+            "kind": "deathKillerIsOwner"
+          },
+          "effects": [
+            {
+              "op": "selectTargets",
+              "target": "owner",
+              "targetKind": "anyLiving",
+              "minimumTargets": 0,
+              "maximumTargets": 8,
+              "targetAiOrder": "supportDraw"
+            },
+            {
+              "op": "resolveMobileSunJianPolu",
+              "target": "owner"
+            }
+          ]
+        },
+        {
+          "id": "owner-died",
+          "window": "ownerDied",
+          "subject": "owner",
+          "optional": true,
+          "effects": [
+            {
+              "op": "selectTargets",
+              "target": "owner",
+              "targetKind": "anyLiving",
+              "minimumTargets": 0,
+              "maximumTargets": 8,
+              "targetAiOrder": "supportDraw"
+            },
+            {
+              "op": "resolveMobileSunJianPolu",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

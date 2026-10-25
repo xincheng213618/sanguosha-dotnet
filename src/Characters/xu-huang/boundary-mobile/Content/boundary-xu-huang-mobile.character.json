@@ -1,0 +1,16 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:xu-huang",
+  "skills": [
+    { "registrationOrder": 65601, "programBundle": "boundary-xu-huang-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:duanliang-mobile", "name": "断粮", "description": "你可以将一张黑色的基本牌或装备牌当【兵粮寸断】使用；你对手牌数大于等于你的其他角色使用【兵粮寸断】无距离限制。" } },
+    { "registrationOrder": 65602, "programBundle": "boundary-xu-huang-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:jiezi-mobile", "name": "截辎", "description": "锁定技，一名其他角色跳过摸牌阶段后，你摸一张牌。", "tags": "Locked" } }
+  ],
+  "generals": [{ "registrationOrder": 65600, "pools": { "current": 65600 }, "definition": {
+    "id": "boundary:xu-huang-mobile", "name": "界徐晃·移动版", "portraitKey": "boundary-xu-huang-mobile",
+    "skillId": "boundary:duanliang-mobile", "additionalSkillIds": ["boundary:jiezi-mobile"],
+    "factionId": "wei", "baseHp": 4, "gender": "Male", "characterId": "character:xu-huang", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

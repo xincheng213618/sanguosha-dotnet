@@ -1,0 +1,12 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:yan-liang-wen-chou",
+  "skills": [{ "registrationOrder": 65701, "programBundle": "boundary-yan-liang-wen-chou-mobile", "includeProgramPresentation": true,
+    "definition": { "id": "boundary:shuangxiong-mobile", "name": "双雄", "description": "摸牌阶段，你可以改为展示牌堆顶两张牌，获得其中一张牌，然后此回合你可以将一张与该牌颜色不同的手牌当【决斗】使用；当你因“双雄”受到伤害后，你可以获得此次【决斗】中其他角色打出的【杀】。" } }],
+  "generals": [{ "registrationOrder": 65700, "pools": { "current": 65700 }, "definition": {
+    "id": "boundary:yan-liang-wen-chou-mobile", "name": "界颜良文丑·移动版", "portraitKey": "boundary-yan-liang-wen-chou-mobile",
+    "skillId": "boundary:shuangxiong-mobile", "factionId": "qun", "baseHp": 4, "gender": "Male",
+    "characterId": "character:yan-liang-wen-chou", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

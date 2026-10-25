@@ -1,0 +1,41 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:sun-jian",
+  "skills": [
+    {
+      "registrationOrder": 65001,
+      "programBundle": "boundary-sun-jian-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:polu-mobile",
+        "name": "破虏",
+        "description": "当你杀死一名其他角色后或死亡后，你可以令任意名角色各摸X张牌（X为你本局发动此技能的次数，包含本次）。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 65000,
+      "pools": {
+        "current": 65000
+      },
+      "definition": {
+        "id": "boundary:sun-jian-mobile",
+        "name": "界孙坚·移动版",
+        "portraitKey": "boundary-sun-jian-mobile",
+        "skillId": "boundary:yinghun",
+        "additionalSkillIds": [
+          "boundary:polu-mobile"
+        ],
+        "factionId": "wu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:sun-jian",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

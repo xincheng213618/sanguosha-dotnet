@@ -1,0 +1,8 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:dian-wei",
+  "skills": [{ "registrationOrder": 65301, "programBundle": "boundary-dian-wei-mobile", "includeProgramPresentation": true,
+    "definition": { "id": "boundary:qiangxi-mobile", "name": "强袭", "actionForms": "Active", "description": "出牌阶段对每名角色限一次，你可以失去1点体力或弃置一张武器牌，然后对攻击范围内的一名其他角色造成1点伤害。" } }],
+  "generals": [{ "registrationOrder": 65300, "pools": { "current": 65300 },
+    "definition": { "id": "boundary:dian-wei-mobile", "name": "界典韦·移动版", "portraitKey": "boundary-dian-wei-mobile", "skillId": "boundary:qiangxi-mobile",
+      "factionId": "wei", "baseHp": 4, "gender": "Male", "characterId": "character:dian-wei", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile" } }]
+}

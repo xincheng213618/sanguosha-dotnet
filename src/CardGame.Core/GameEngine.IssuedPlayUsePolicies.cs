@@ -24,6 +24,7 @@ public sealed partial class GameEngine
         IsBoundaryZhangFeiLiyongUnrespondable(frameId) ||
         IsBoundaryHuangZhongUnrespondable(frameId) ||
         IsBoundaryMaChaoUnrespondable(frameId) ||
+        IsBoundaryPangDeUnrespondable(frameId) ||
         IsBoundaryAnjianUnrespondable(frameId) ||
         IsMobileShiWanglieUnrespondable(frameId) ||
         IsMobileShiZhuangshiUnrespondable(frameId) ||

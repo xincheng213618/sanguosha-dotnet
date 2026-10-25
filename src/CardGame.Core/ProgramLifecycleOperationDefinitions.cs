@@ -199,7 +199,7 @@ internal sealed class SelectTargetsProgramOperationDescriptor : ProgramOperation
             throw new InvalidOperationException("Lost-HP-at-least-one targets require anyLiving and minimum one.");
         var plannedHandTargets = kind == SkillProgramTargetKind.OtherLivingWithHand &&
             numberExpression == SkillProgramNumberExpression.PlannedNormalDrawCount;
-        if ((minimum < 1 && !(minimum == 0 && (named || kind is SkillProgramTargetKind.OtherLiving or SkillProgramTargetKind.OtherLivingWithHand or SkillProgramTargetKind.OtherLivingWithoutEndingSupport or SkillProgramTargetKind.AnyLivingChained))) || maximum < minimum || maximum > (named ? 8 : kind == SkillProgramTargetKind.CurrentCardUseTargets
+        if ((minimum < 1 && !(minimum == 0 && (named || kind is SkillProgramTargetKind.AnyLiving or SkillProgramTargetKind.OtherLiving or SkillProgramTargetKind.OtherLivingWithHand or SkillProgramTargetKind.OtherLivingWithoutEndingSupport or SkillProgramTargetKind.AnyLivingChained))) || maximum < minimum || maximum > (named ? 8 : kind == SkillProgramTargetKind.CurrentCardUseTargets
             ? 64 : kind is SkillProgramTargetKind.AnyLiving or SkillProgramTargetKind.AnyLivingChained or SkillProgramTargetKind.LivingWhoseAttackRangeIncludesLord or SkillProgramTargetKind.AnyWounded or
                 SkillProgramTargetKind.OtherLiving or SkillProgramTargetKind.OtherLivingHandAtLeastOwner || plannedHandTargets ? 8 : 2))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: target bounds exceed the supported participant count.");

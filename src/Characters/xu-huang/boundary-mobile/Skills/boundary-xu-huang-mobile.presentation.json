@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:duanliang-mobile": { "name": "断粮", "description": "你可以将一张黑色的基本牌或装备牌当【兵粮寸断】使用；你对手牌数大于等于你的其他角色使用【兵粮寸断】无距离限制。" },
+    "boundary:jiezi-mobile": { "name": "截辎", "description": "锁定技，一名其他角色跳过摸牌阶段后，你摸一张牌。" }
+  }
+}

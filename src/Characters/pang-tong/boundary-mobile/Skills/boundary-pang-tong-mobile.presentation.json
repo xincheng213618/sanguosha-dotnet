@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:lianhuan-mobile": { "name": "连环", "description": "你可以将一张梅花手牌当【铁索连环】使用或重铸；你使用【铁索连环】可以额外指定一个目标。" },
+    "boundary:niepan-mobile": { "name": "涅槃", "description": "限定技，出牌阶段或当你处于濒死状态时，你可以弃置你区域内的所有牌，摸三张牌，将体力回复至3点，然后复原武将牌。", "activationLabels": { "rebirth": "涅槃重生" } }
+  }
+}

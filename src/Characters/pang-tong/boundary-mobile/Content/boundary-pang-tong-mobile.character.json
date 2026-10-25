@@ -1,0 +1,16 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:pang-tong",
+  "skills": [
+    { "registrationOrder": 65400, "programBundle": "boundary-pang-tong-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:lianhuan-mobile", "name": "连环", "description": "你可以将一张梅花手牌当【铁索连环】使用或重铸；你使用【铁索连环】可以额外指定一个目标。" } },
+    { "registrationOrder": 65401, "programBundle": "boundary-pang-tong-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:niepan-mobile", "name": "涅槃", "description": "限定技，出牌阶段或当你处于濒死状态时，你可以弃置你区域内的所有牌，摸三张牌，将体力回复至3点，然后复原武将牌。", "tags": "Limited", "actionForms": "Active", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 65402, "pools": { "current": 65402 }, "definition": {
+    "id": "boundary:pang-tong-mobile", "name": "界庞统·移动版", "portraitKey": "boundary-pang-tong-mobile",
+    "skillId": "boundary:lianhuan-mobile", "additionalSkillIds": ["boundary:niepan-mobile"],
+    "factionId": "shu", "baseHp": 3, "gender": "Male", "characterId": "character:pang-tong", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

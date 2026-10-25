@@ -20,7 +20,7 @@ public sealed partial class GameEngine
         var owner = CurrentFinalTargetSlashOwner(frame);
         var target = frame.WindowContext!.TargetSeat!.Value;
         if (_winner != Winner.None || !_players[frame.OwnerSeat].IsAlive || !_players[target].IsAlive ||
-            !HasRuntimeSkillInstance(_players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+            !HasRuntimeSkillInstance(_players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && !HasBoundaryPangDePaidDiscard(frame))
             return SkillProgramStepOutcome.Continue;
         var effectIndex = frame.InstructionIndex - 1;
         var claims = owner.CurrentUsePhysicalClaims ?? [];

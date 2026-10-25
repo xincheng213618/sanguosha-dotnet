@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:jianchu-mobile": { "name": "鞬出", "description": "当你使用【杀】指定其他角色为目标后，你可以弃置其一张牌。若弃置的是装备牌，其不能使用【闪】响应此【杀】；若不是装备牌，其获得此【杀】。" }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:xun-yu",
+  "skills": [{
+    "registrationOrder": 65201, "programBundle": "boundary-xun-yu-mobile", "includeProgramPresentation": true,
+    "definition": { "id": "boundary:jieming-mobile", "name": "节命", "description": "当你受到1点伤害后，你可以令一名角色摸两张牌，然后若其手牌数小于其体力上限，你摸一张牌。", "executionForms": "Trigger" }
+  }],
+  "generals": [{
+    "registrationOrder": 65200, "pools": { "current": 65200 },
+    "definition": { "id": "boundary:xun-yu-mobile", "name": "界荀彧·移动版", "portraitKey": "boundary-xun-yu-mobile",
+      "skillId": "boundary:quhu-current", "additionalSkillIds": ["boundary:jieming-mobile"], "factionId": "wei", "baseHp": 3, "gender": "Male",
+      "characterId": "character:xun-yu", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile" }
+  }]
+}

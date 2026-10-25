@@ -21435,6 +21435,125 @@
           "localPath": "src/CardGame.Wpf/Assets/official-mobile-shi-he-qi.jpg"
         }
       ]
+    },
+    {
+      "key": "boundary-sun-jian-mobile",
+      "characterName": "界孙坚·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-283.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/45100.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-sun-jian-mobile.jpg",
+          "sha256": "2e3193d20cfd6d2fb1e98d4df626e85dd9aa963cfbdb8bff3ab4e0fd6197dfa2",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-xun-yu-mobile",
+      "characterName": "界荀彧·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-264.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/43100.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-xun-yu-mobile.jpg",
+          "sha256": "0da8467858427fc032baf7100c0d3e9cd6e1ccc59b79cd5451e08b516d7d3aa5",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-dian-wei-mobile",
+      "characterName": "界典韦·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-263.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/43000.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-dian-wei-mobile.jpg",
+          "sha256": "b1450b5395cf4a28f7a58d4b0662704b59416d2b6dbd6155786ff5a969d85663",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-pang-tong-mobile",
+      "characterName": "界庞统·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-268.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/43600.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-pang-tong-mobile.jpg",
+          "sha256": "04d3db8a7392e2b4da9a5667fe0d9c9deafbb5a188348b353cfa2ec4833f55e0",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-pang-de-mobile",
+      "characterName": "界庞德·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-267.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/43400.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-pang-de-mobile.jpg",
+          "sha256": "a87d96f32e32a0d9dcdc034fb3784bb5df8d8747fdc93fe86c0278cbdc3e1c9a",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-xu-huang-mobile",
+      "characterName": "界徐晃·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-275.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/62000.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-xu-huang-mobile.jpg",
+          "sha256": "035e3320e30959903a429dbe147f783ed929669048ad4f0c522418fdb197ccc2",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-yan-liang-wen-chou-mobile",
+      "characterName": "界颜良文丑·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-269.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/43700.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-yan-liang-wen-chou-mobile.jpg",
+          "sha256": "6c16a743624e102ecd41e397a2a201b66f7b75becb3a817d687c188d08e042a4",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

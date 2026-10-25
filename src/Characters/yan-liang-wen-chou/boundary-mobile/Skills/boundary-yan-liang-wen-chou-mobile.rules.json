@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "boundary:shuangxiong-mobile", "revision": 1,
+    "triggers": [
+      { "id": "reveal-two-instead-of-drawing", "window": "drawPhaseStarting", "subject": "owner", "optional": true, "priority": 95, "drawPhaseMode": "replacement",
+        "effects": [
+          { "op": "revealTopCards", "target": "owner", "amount": 2, "resultBind": "revealed", "visibility": "public" },
+          { "op": "selectCardSubset", "target": "owner", "sourceBind": "revealed", "resultBind": "chosen", "minimumCards": 1, "maximumCards": 1,
+            "allowFewerWhenInsufficient": true, "maximumRankSum": 208, "aiOrder": "mostCardsThenRankSum" },
+          { "op": "grantTurnCardConversion", "target": "owner", "sourceBind": "chosen", "colorRelation": "oppositeBoundCard", "outputKind": "duel" },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "chosen", "destination": "ownerHand", "awaitMovementTriggers": true },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "revealed", "exceptBind": "chosen", "destination": "discardPile", "awaitMovementTriggers": true }
+        ] },
+      { "id": "obtain-opponent-duel-slashes", "window": "afterDamageApplied", "subject": "owner", "optional": true, "damageOccurrence": "perDamage",
+        "effects": [{ "op": "claimBoundaryYanLiangWenChouDuelResponses", "target": "owner" }] }
+    ]
+  }]
+}
