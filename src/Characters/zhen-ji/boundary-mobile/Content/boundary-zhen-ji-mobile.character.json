@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhen-ji",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 58500,
+      "pools": { "current": 58500 },
+      "definition": {
+        "id": "boundary:zhen-ji-mobile",
+        "name": "界甄姬·移动版",
+        "portraitKey": "boundary-zhen-ji-mobile",
+        "skillId": "boundary:luoshen",
+        "additionalSkillIds": ["classic:qingguo"],
+        "factionId": "wei",
+        "baseHp": 3,
+        "gender": "Female",
+        "characterId": "character:zhen-ji",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "boundary:jianxiong-mobile", "revision": 1, "triggers": [
+    { "id": "claim-then-draw", "window": "afterDamageApplied", "subject": "owner", "damageOccurrence": "perDamage", "optional": true,
+      "effects": [
+        { "op": "claimBoundaryCaoCaoJianxiongDamageCards", "target": "owner" },
+        { "op": "draw", "target": "owner", "amount": 1 }
+      ] }
+  ] }]
+}

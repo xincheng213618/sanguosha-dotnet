@@ -20,6 +20,7 @@ public sealed partial class SimpleAiBrain
                 JudgmentReasons.Lightning => suit == Suit.Spade && rank is >= 2 and <= 9,
                 JudgmentReasons.Indulgence => suit == Suit.Heart,
                 JudgmentReasons.SupplyShortage => suit == Suit.Club,
+                JudgmentReasons.Ganglie => suit != Suit.Heart,
                 _ => suit is Suit.Heart or Suit.Diamond
             };
         var currentDesired = Succeeds(currentSuit, currentRank) == wantsSuccess;

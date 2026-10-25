@@ -1,0 +1,11 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:cao-cao",
+  "skills": [
+    { "registrationOrder": 58700, "programBundle": "boundary-cao-cao-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:jianxiong-mobile", "name": "奸雄", "description": "当你受到伤害后，你可以获得对你造成伤害的牌并摸一张牌。", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 58701, "pools": { "current": 58701 }, "definition": {
+    "id": "boundary:cao-cao-mobile", "name": "界曹操·移动版", "portraitKey": "boundary-cao-cao-mobile", "skillId": "boundary:jianxiong-mobile", "additionalSkillIds": ["boundary:hujia"],
+    "factionId": "wei", "baseHp": 4, "gender": "Male", "characterId": "character:cao-cao", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

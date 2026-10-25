@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:zhang-fei",
+  "skills": [
+    { "registrationOrder": 58600, "programBundle": "boundary-zhang-fei-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:paoxiao-mobile", "name": "咆哮", "description": "锁定技，你使用杀无次数限制。你的出牌阶段，若你于当前阶段内使用过杀，你于此阶段使用杀无距离限制。", "tags": "Locked", "executionForms": "State" } },
+    { "registrationOrder": 58601, "programBundle": "boundary-zhang-fei-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:liyong-mobile", "name": "厉勇", "description": "锁定技，出牌阶段，若你使用的杀被闪抵消，则你本阶段下一次使用杀指定的目标本回合非锁定技失效，且此杀不可被响应且伤害值+1；此杀造成伤害后若目标角色未死亡，你失去1点体力。", "tags": "Locked", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 58602, "pools": { "current": 58602 }, "definition": {
+    "id": "boundary:zhang-fei-mobile", "name": "界张飞·移动版", "portraitKey": "boundary-zhang-fei-mobile", "skillId": "boundary:paoxiao-mobile", "additionalSkillIds": ["boundary:liyong-mobile"],
+    "factionId": "shu", "baseHp": 4, "gender": "Male", "characterId": "character:zhang-fei", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

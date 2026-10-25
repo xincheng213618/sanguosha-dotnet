@@ -144,7 +144,7 @@ public sealed partial class GameEngine
             }
         }
         if (!finalized && issuedAttack is { } originalAttack)
-            cardLayer = checked(cardLayer + BoundaryAnjianDamage(originalAttack) + BoundaryChengPuLihuoDamage(originalAttack) + BoundaryHuangZhongCardDamage(originalAttack));
+            cardLayer = checked(cardLayer + BoundaryAnjianDamage(originalAttack) + BoundaryChengPuLihuoDamage(originalAttack) + BoundaryHuangZhongCardDamage(originalAttack) + BoundaryZhangFeiLiyongCardDamage(originalAttack));
         if (!finalized)
             additional = checked(additional + ShanheS5JiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards) +
                 ClassicJiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards));

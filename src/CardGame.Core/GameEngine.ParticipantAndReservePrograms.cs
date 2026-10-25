@@ -296,6 +296,8 @@ public sealed partial class GameEngine
         {
             SkillProgramEffectOp.DamageOtherLiving => IsValidStrategicDamageBatchContinuation(frame, paused),
             SkillProgramEffectOp.LuochongResolve => IsValidLuochongDyingContinuation(frame, paused),
+            SkillProgramEffectOp.PayBoundaryZhangFeiLiyong =>
+                frame.BoundaryLiyongPenalty is not null && ValidBoundaryZhangFeiLiyongPenalty(frame),
             SkillProgramEffectOp.ZhuihuanRetaliate => IsValidZhuihuanContinuation(frame, paused),
             SkillProgramEffectOp.DonateAllEquipmentAndOfferRecipientBenefits =>
                 frame.EquipmentDonation is not null && IsValidAllEquipmentDonation(frame),

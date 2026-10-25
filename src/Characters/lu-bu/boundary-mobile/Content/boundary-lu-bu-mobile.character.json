@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:lu-bu",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 58300,
+      "pools": { "current": 58300 },
+      "definition": {
+        "id": "boundary:lu-bu-mobile",
+        "name": "界吕布·移动版",
+        "portraitKey": "boundary-lu-bu-mobile",
+        "skillId": "classic:wushuang",
+        "additionalSkillIds": ["boundary:liyu-current"],
+        "factionId": "qun",
+        "baseHp": 5,
+        "gender": "Male",
+        "characterId": "character:lu-bu",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

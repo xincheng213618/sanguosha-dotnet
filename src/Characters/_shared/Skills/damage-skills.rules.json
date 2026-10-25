@@ -186,7 +186,7 @@
           "optional": true,
           "priority": 0,
           "effects": [
-            { "op": "selectSourceCard", "target": "owner", "zones": ["hand", "equipment"], "resultBind": "selected" },
+            { "op": "selectSourceCard", "target": "owner", "zones": ["hand", "equipment"], "allowSameSource": true, "resultBind": "selected" },
             { "op": "moveBoundCards", "target": "owner", "sourceBind": "selected", "destination": "ownerHand" }
           ]
         }
