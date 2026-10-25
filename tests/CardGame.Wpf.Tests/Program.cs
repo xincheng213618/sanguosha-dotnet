@@ -154,6 +154,8 @@ internal static class Program
                   new HashSet<string>(StringComparer.Ordinal) { "boundary:hua-xiong-mobile", "boundary:zhou-tai-mobile", "boundary:huang-zhong-mobile", "boundary:wei-yan-mobile" }));
             Check("Mobile boundary batch 61 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
                   new HashSet<string>(StringComparer.Ordinal) { "boundary:lu-bu-mobile", "boundary:zhuge-liang-mobile", "boundary:zhen-ji-mobile", "boundary:zhang-fei-mobile", "boundary:cao-cao-mobile", "boundary:sima-yi-mobile" }));
+            Check("Mobile boundary batch 62 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
+                  new HashSet<string>(StringComparer.Ordinal) { "boundary:huang-gai-mobile", "boundary:gan-ning-mobile", "boundary:diao-chan-mobile", "boundary:sun-quan-mobile", "boundary:huang-yueying-mobile", "boundary:guo-jia-mobile" }));
             Check("Mobile boundary Cai Fu Ren UI: private two-card view actual paid choice cold", () => BoundaryCaiFuRenMobileUiChecks.ActualPrivateTwoCardViewAndPaidChoiceCold(output));
             Check("Mobile boundary Zuo Ci UI: private exchange actual Back selected draft cold", () => BoundaryZuoCiUiChecks.ActualPrivateExchangeBackAndSelectedDraftCold(output));
             Check("Mobile boundary Zhou Fei UI: opaque storage original ending use and remainder cold", () => BoundaryZhouFeiUiChecks.ForeignOpaqueStoreOriginalEndingUseAndRemainderCold(output));

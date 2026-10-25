@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:jizhi-mobile": {
+      "name": "集智",
+      "description": "当你使用一张普通锦囊牌时，你可以摸一张牌。若此牌是基本牌，你可以弃置此牌，然后本回合手牌上限+1。",
+      "optionLabels": {
+        "keep": "保留本次摸得的牌",
+        "discard": "弃置本次摸得的基本牌，本回合手牌上限+1"
+      }
+    }
+  }
+}

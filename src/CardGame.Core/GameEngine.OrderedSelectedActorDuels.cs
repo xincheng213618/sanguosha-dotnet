@@ -111,8 +111,9 @@ public sealed partial class GameEngine
         if (LifecycleCardUse(useId)?.SelectedActorDuelOrigin is not { OrderedPairPayment: not null } origin) return false;
         if (_resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == origin.ParentProgramFrameId) is not { } parent ||
             !MatchesOrderedSelectedActorDuel(parent, origin, useId))
-            throw new InvalidOperationException("Unnullifiable ordered Duel lost its exact paid native origin.");
-        return true;
+            throw new InvalidOperationException("Ordered Duel lost its exact paid native origin.");
+        return ProgramInstructionResolver.Default.Resolve(parent, _contentRegistry.GetSkill(parent.SkillId).Program!)
+            .GetPausedInstruction(origin.InstructionIndex).Effect.ProhibitNullification == true;
     }
 
     private void CompleteOrderedSelectedActorDuel(ProgramSkillFrame frame, ProgramSelectedActorDuelOrigin origin, long useId)

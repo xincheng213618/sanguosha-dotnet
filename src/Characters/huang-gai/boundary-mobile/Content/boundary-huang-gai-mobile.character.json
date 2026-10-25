@@ -1,0 +1,19 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:huang-gai",
+  "skills": [],
+  "generals": [{
+    "registrationOrder": 58900,
+    "pools": { "current": 58900 },
+    "definition": {
+      "id": "boundary:huang-gai-mobile",
+      "name": "界黄盖·移动版",
+      "portraitKey": "boundary-huang-gai-mobile",
+      "skillId": "boundary:kurou",
+      "additionalSkillIds": ["boundary:zhaxiang"],
+      "factionId": "wu", "baseHp": 4, "gender": "Male",
+      "characterId": "character:huang-gai", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+    }
+  }]
+}

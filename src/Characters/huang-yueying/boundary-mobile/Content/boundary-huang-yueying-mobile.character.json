@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:huang-yueying",
+  "skills": [
+    {
+      "registrationOrder": 59300,
+      "programBundle": "boundary-huang-yueying-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:jizhi-mobile",
+        "name": "集智",
+        "description": "当你使用一张普通锦囊牌时，你可以摸一张牌。若此牌是基本牌，你可以弃置此牌，然后本回合手牌上限+1。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 59301,
+      "pools": { "current": 59301 },
+      "definition": {
+        "id": "boundary:huang-yueying-mobile",
+        "name": "界黄月英·移动版",
+        "portraitKey": "boundary-huang-yueying-mobile",
+        "skillId": "boundary:jizhi-mobile",
+        "additionalSkillIds": ["boundary:qicai-current"],
+        "factionId": "shu",
+        "baseHp": 3,
+        "gender": "Female",
+        "characterId": "character:huang-yueying",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

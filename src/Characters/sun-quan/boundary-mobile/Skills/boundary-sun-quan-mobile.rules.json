@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "boundary:jiuyuan-mobile",
+      "revision": 1,
+      "cardPolicies": [
+        {
+          "id": "redirect-self-peach",
+          "kind": "redirectOwnTurnFactionRecovery",
+          "factionId": "wu",
+          "ownerRole": "lord",
+          "value": 1,
+          "providerDrawCount": 1
+        }
+      ]
+    }
+  ]
+}

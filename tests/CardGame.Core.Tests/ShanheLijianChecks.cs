@@ -186,7 +186,7 @@ internal static class ShanheLijianChecks
     {
         const string paired = "\"participantMode\":\"orderedSelectedPair\",\"prohibitNullification\":true";
         foreach (var (members, cards) in new[] { ("\"participantMode\":\"orderedSelectedPair\"", 1),
-            ("\"prohibitNullification\":true", 1), (paired.Replace(":true", ":false"), 1), (paired, 0) })
+            ("\"prohibitNullification\":true", 1), ("\"prohibitNullification\":false", 1), (paired, 0) })
         {
             var rejected = false;
             try
@@ -197,7 +197,7 @@ internal static class ShanheLijianChecks
                     "{\"schemaVersion\":" + SkillProgramCatalog.PresentationSchemaVersion + ",\"skills\":{\"fixture:ordered-duel-invalid\":{\"name\":\"fixture\",\"description\":\"fixture\"}}}");
             }
             catch (InvalidOperationException) { rejected = true; }
-            Need(rejected, "Ordered real-use opt-in rejects unpaired flags, false prohibition and an unpaid zero-card activation.");
+            Need(rejected, "Ordered real-use opt-in rejects unpaired flags and unpaid or incorrectly targeted activations.");
         }
     }
     private sealed class Scene(GameEngine game, ContentRegistry registry, string scene)

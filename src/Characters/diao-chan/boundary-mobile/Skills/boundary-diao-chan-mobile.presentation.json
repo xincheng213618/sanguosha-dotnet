@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:lijian-mobile": {
+      "name": "离间",
+      "description": "出牌阶段限一次，弃置一张手牌或装备牌，选择两名其他男性角色，令其中一名视为对另一名使用一张【决斗】。此决斗可以被【无懈可击】抵消。"
+    }
+  }
+}

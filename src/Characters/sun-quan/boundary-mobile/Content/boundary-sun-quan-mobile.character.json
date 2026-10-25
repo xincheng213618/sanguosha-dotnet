@@ -1,0 +1,38 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:sun-quan",
+  "skills": [
+    {
+      "registrationOrder": 59200,
+      "programBundle": "boundary-sun-quan-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:jiuyuan-mobile",
+        "name": "救援",
+        "description": "主公技，其他吴势力角色对其自己使用桃时，若其体力值大于你，则该角色可以改为令你回复1点体力，然后其摸一张牌。",
+        "tags": "Lord",
+        "executionForms": "State"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 59201,
+      "pools": { "current": 59201 },
+      "definition": {
+        "id": "boundary:sun-quan-mobile",
+        "name": "界孙权·移动版",
+        "portraitKey": "boundary-sun-quan-mobile",
+        "skillId": "boundary:zhiheng",
+        "additionalSkillIds": ["boundary:jiuyuan-mobile"],
+        "factionId": "wu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:sun-quan",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

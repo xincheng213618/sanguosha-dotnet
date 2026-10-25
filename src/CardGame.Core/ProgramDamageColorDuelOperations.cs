@@ -46,8 +46,8 @@ internal sealed class UseSelectedActorDuelDescriptor : ProgramOperationDescripto
         var mode=r.Has("participantMode") ? r.RequiredEnum<SelectedActorDuelParticipantMode>("participantMode") : (SelectedActorDuelParticipantMode?)null;
         var prohibition=r.Has("prohibitNullification") ? r.RequiredBool("prohibitNullification") : (bool?)null;
         if (mode == SelectedActorDuelParticipantMode.OwnerToSelectedTarget ? prohibition is not null :
-            (mode is null) != (prohibition is null) || prohibition == false)
-            throw new InvalidOperationException($"Invalid skill program at {r.Path}: ordered participantMode and prohibitNullification:true must be paired.");
+            (mode is null) != (prohibition is null))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: ordered participantMode and an explicit prohibitNullification boolean must be paired.");
         var e=new SkillProgramEffect(Op,SkillProgramEffectTarget.Owner,0,r.Condition())
             { ParticipantMode=mode, ProhibitNullification=prohibition };RequireAlways(e,r.Path);return e;
     }

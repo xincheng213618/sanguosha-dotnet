@@ -1624,7 +1624,7 @@ public sealed partial class GameEngine
         _pendingDecision = new PendingDecision(
             DecisionKind.ProgramTrigger,
             ownerSeat,
-            $"【{presentation.Name}】可将一张本次获得的牌交给一名角色。",
+            $"【{presentation.Name}】可将一张牌交给一名角色。",
             available.Select(item => item.CardId).ToArray(),
             targetSeats,
             frame.WindowContext?.SourceSeat)

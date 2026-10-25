@@ -2,6 +2,108 @@
   "schemaVersion": 1,
   "entries": [
     {
+      "key": "boundary-huang-gai-mobile",
+      "characterName": "界黄盖",
+      "defaultSkinId": "30700",
+      "skins": [
+        {
+          "id": "30700",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-160.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/30700.jpg",
+          "sha256": "b5b0d1ab93fc7508090706e3df2300c72a796ec65f99ddf47258fc942e9f969c",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-huang-gai-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-gan-ning-mobile",
+      "characterName": "界甘宁",
+      "defaultSkinId": "900",
+      "skins": [
+        {
+          "id": "900",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-158.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/900.jpg",
+          "sha256": "1ea946956acf926ca2dc97427cfc1e93477de473a277a42b13a4ed38a0d5da09",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-gan-ning-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-diao-chan-mobile",
+      "characterName": "界貂蝉",
+      "defaultSkinId": "40500",
+      "skins": [
+        {
+          "id": "40500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-238.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/40500.jpg",
+          "sha256": "73f89fb21bacc9bef2674946b7496e7b7984943cb31c2c2af8394245c6c51de6",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-diao-chan-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-sun-quan-mobile",
+      "characterName": "界孙权",
+      "defaultSkinId": "800",
+      "skins": [
+        {
+          "id": "800",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-235.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/800.jpg",
+          "sha256": "8820390c9ce21535610b7a7984e096952e61a6d9ea3a63e154ae5c093a53487e",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-sun-quan-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-huang-yueying-mobile",
+      "characterName": "界黄月英",
+      "defaultSkinId": "700",
+      "skins": [
+        {
+          "id": "700",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-233.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/700.jpg",
+          "sha256": "45662df33e0a2e447b87ae81bb133647a859e4b1a4e6792e560a99bd7cae31bf",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-huang-yueying-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "boundary-guo-jia-mobile",
+      "characterName": "界郭嘉",
+      "defaultSkinId": "31600",
+      "skins": [
+        {
+          "id": "31600",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-169.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/31600.jpg",
+          "sha256": "26c22eb9e4baacf953a3cca8c40fc36909e3fa5ab0938c7527155aac1f62a549",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-guo-jia-mobile.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
       "key": "boundary-lu-bu-mobile",
       "characterName": "界吕布",
       "defaultSkinId": "31900",

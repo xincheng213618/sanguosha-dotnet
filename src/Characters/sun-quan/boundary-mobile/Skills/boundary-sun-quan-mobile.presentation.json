@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:jiuyuan-mobile": {
+      "name": "救援",
+      "description": "主公技，其他吴势力角色对其自己使用桃时，若其体力值大于你，则该角色可以改为令你回复1点体力，然后其摸一张牌。"
+    }
+  }
+}

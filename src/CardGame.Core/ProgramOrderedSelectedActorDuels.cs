@@ -33,7 +33,7 @@ internal static class OrderedSelectedActorDuelContract
         effect.ParticipantMode == SelectedActorDuelParticipantMode.OwnerToSelectedTarget && effect.ProhibitNullification is null;
     internal static bool IsOptIn(SkillProgramEffect effect) =>
         effect.Op == SkillProgramEffectOp.UseSelectedActorDuel &&
-        effect.ParticipantMode == SelectedActorDuelParticipantMode.OrderedSelectedPair && effect.ProhibitNullification == true;
+        effect.ParticipantMode == SelectedActorDuelParticipantMode.OrderedSelectedPair && effect.ProhibitNullification is not null;
 
     internal static void ValidateActivation(string path, SkillProgramActivation activation)
     {

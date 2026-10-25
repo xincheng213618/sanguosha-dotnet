@@ -207,7 +207,7 @@ public sealed partial class GameEngine
                 p.HappyQiaoHealth is { } other ? other.DaQiaoHp <= h || other.XiaoQiaoHp <= h : p.Hp <= h))
             .OrderBy(p => RelativeTableOrder(seat, p.Seat))
             .SelectMany(owner => CardPolicies(owner, SkillProgramCardPolicyKind.RedirectOwnTurnFactionRecovery)
-                .Where(item => item.Policy.FactionId == faction)
+                .Where(item => item.Policy.FactionId == faction && item.Source.SkillId != BoundarySunQuanMobileJiuyuan)
                 .Select(item => new RecoveryReplacementCandidate(owner.Seat, item.Source.SkillId,
                     item.Source.SkillInstanceId, item.Policy.Id, item.Policy.Value, item.Policy.ProviderDrawCount)))
             .GroupBy(c => (c.OwnerSeat, c.SkillId, c.PolicyId)).Select(g => g.First()).ToArray());
@@ -220,7 +220,8 @@ public sealed partial class GameEngine
         var qiao = _players[targetSeat].HappyQiaoHealth;
         if (qiao is null && !HasRecoveryReplacementCapability && !HasRecoveryAmountSupport(targetSeat) && !HasOwnRecoveryAmountSupport(targetSeat)) return false;
         var parent = parentFrameId > 0 ? _resolutionStack.Single(f => f.Id == parentFrameId) : null;
-        var candidates = RecoveryReplacementCandidates(targetSeat);
+        var candidates = BoundarySunQuanMobileRecoveryCandidates(parentFrameId, sourceSeat, targetSeat, completion,
+            RecoveryReplacementCandidates(targetSeat));
         if (qiao is null && candidates.Count == 0 && !HasRecoveryAmountSupport(targetSeat) && !HasOwnRecoveryAmountSupport(targetSeat) &&
             parent?.PendingRecoveryAttempts is not { Count: > 0 }) return false;
         var request = new RecoveryAttempt(++_resolutionSequence, sourceSeat, targetSeat, amount,
@@ -260,6 +261,7 @@ public sealed partial class GameEngine
 
     private bool IsRecoveryReplacementCandidateCurrent(RecoveryReplacementFrame frame, RecoveryReplacementCandidate c)
     {
+        if (c.SkillId == BoundarySunQuanMobileJiuyuan) return IsBoundarySunQuanMobileRecoveryCandidateCurrent(frame, c);
         var attempt = frame.Attempt;
         if (_winner != Winner.None || !IsValidPlayerSeat(c.OwnerSeat) ||
             !_players[c.OwnerSeat].IsAlive || !_players[attempt.TargetSeat].IsAlive ||

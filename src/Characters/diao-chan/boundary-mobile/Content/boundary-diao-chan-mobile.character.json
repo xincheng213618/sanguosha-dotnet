@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:diao-chan",
+  "skills": [
+    {
+      "registrationOrder": 59100,
+      "programBundle": "boundary-diao-chan-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:lijian-mobile",
+        "name": "离间",
+        "description": "出牌阶段限一次，你可以弃置一张牌并选择两名其他男性角色，然后令其中一名男性角色视为对另一名男性角色使用一张【决斗】。",
+        "actionForms": "Active"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 59101,
+      "pools": { "current": 59101 },
+      "definition": {
+        "id": "boundary:diao-chan-mobile",
+        "name": "界貂蝉·移动版",
+        "portraitKey": "boundary-diao-chan-mobile",
+        "skillId": "boundary:lijian-mobile",
+        "additionalSkillIds": ["boundary:biyue"],
+        "factionId": "qun",
+        "baseHp": 3,
+        "gender": "Female",
+        "characterId": "character:diao-chan",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}
