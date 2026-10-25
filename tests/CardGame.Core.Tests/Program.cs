@@ -300,6 +300,8 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe avatar pool: source Zuoci draws ordinary avatars with fixed seats", ShanheAvatarPoolChecks.PublishedZuociDrawsOrdinaryAvatarsWithoutChangingFixedSeats),
     ("Shanhe native skills: Mou Lumeng first gift repeated fire and growth", ShanheNativeSkillFlowChecks.MouLumengFirstGiftRepeatedFireAndGrowthUseActualCampaign),
     ("Shanhe native skills: bought Luanji and Yuce native payments recovery", ShanheNativeSkillFlowChecks.BoughtLuanjiAndYuceRunNativePaymentsAndRecovery),
+    ("Shanhe skill stock: purchased Qixi conversion and Wushuang responses", ShanheSkillStockUseChecks.PurchasedQixiAndWushuangUsePhysicalConversionAndTwoDodges),
+    ("Shanhe skill stock: purchased Enyuan Wangxi point payments and card gains", ShanheSkillStockChecks.BoughtEnyuanAndWangxiUsePerPointPaymentsAndRealCardGains),
     ("Shanhe Wangong: previous actual card paid distance quota damage", ShanheWangongChecks.PreviousActualCardControlsPaidSlashDistanceQuotaAndDamage),
     ("Shanhe Wangong: previous basic survives actual turn boundary", ShanheWangongChecks.LastActualBasicSurvivesTurnBoundaryWithoutKeepingAlcoholBonus),
     ("Shanhe player Fuqi: nearby non-targets and delayed cards", ShanhePlayerFuqiChecks.NearbyNonTargetsAndDelayedCardsRespectDistance),

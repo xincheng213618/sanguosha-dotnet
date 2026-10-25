@@ -65,7 +65,21 @@ public static partial class StandardShanheCampaignCatalog
         new CurrentBuildSkillSource(3089, "御策", "classic:yuce", 300, 2, 38,
             "当你受到伤害后，你可以展示一张手牌令伤害来源选择一项：\n1.弃置一张与你展示牌类型不同的手牌；2.你回复1点体力。"),
         new CurrentBuildSkillSource(3164, "绝境", "ol:juejing", 300, 2, null,
-            "锁定技，你的手牌上限+2。当你进入或脱离濒死状态时，你摸一张牌。")
+            "锁定技，你的手牌上限+2。当你进入或脱离濒死状态时，你摸一张牌。"),
+        new CurrentBuildSkillSource(3087, "恩怨", "classic:enyuan", 300, 2, 39,
+            "当你获得一名其他角色至少两张牌后，你可以令其摸一张牌。当你受到1点伤害后，你可以令伤害来源选择一项：\n1.交给你一张手牌；2.失去1点体力。"),
+        new CurrentBuildSkillSource(3021, "奇袭", "classic:qixi", 300, 2, null,
+            "你可以将一张黑色牌当【过河拆桥】使用。"),
+        new CurrentBuildSkillSource(3029, "无双", "classic:wushuang", 600, 3, null,
+            "锁定技，你使用的【杀】需两张【闪】才能抵消；与你【决斗】的角色每次需打出两张【杀】。"),
+        new CurrentBuildSkillSource(3120, "忘隙", "classic:wangxi", 600, 3, null,
+            "当你对其他角色造成1点伤害后，或受到其他角色的1点伤害后，你可以与其各摸一张牌。"),
+        new CurrentBuildSkillSource(3103, "暗箭", "classic:anjian", 300, 2, null,
+            "锁定技，当你使用【杀】对目标角色造成伤害时，若你不在其攻击范围内，此伤害+1。"),
+        new CurrentBuildSkillSource(3096, "克己", "classic:keji", 100, 1, null,
+            "若你未于本回合出牌阶段使用或打出过【杀】，你可以跳过弃牌阶段。"),
+        new CurrentBuildSkillSource(3137, "红颜", "classic:hongyan", 100, 1, null,
+            "锁定技，你的黑桃牌视为红桃牌。")
     });
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentBuildSkillShopMetadata =>
