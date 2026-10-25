@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 using CardGame.Core.Campaigns;
 
@@ -13,10 +14,20 @@ public sealed partial class MainViewModel
         .FirstOrDefault(group => group.Id == _shanheBossRewardGroupId && !group.IsResolved);
     public bool HasShanheBossRewardGroup => ActiveShanheBossRewardGroup is not null;
     public bool IsShanheBossRewardOpen => _shanheSession?.Snapshot.BossRewardSummary is not null && !HasShanheBossRewardGroup;
-    public string ShanheBossRewardTitle => (_shanheSession?.Snapshot.BossRewardSummary?.Title ?? "章节首领") + " · 奖 励";
+    public bool IsShanheBonusRewardOnly => _shanheSession?.Snapshot.BossRewardSummary?.IsBonusOnly == true;
+    public bool HasShanheBossFixedRewards => _shanheSession?.Snapshot.BossRewardSummary is { IsBonusOnly: false };
+    public GridLength ShanheBossFixedRewardColumnWidth => HasShanheBossFixedRewards ? new(1, GridUnitType.Star) : new(0);
+    public GridLength ShanheBossRewardGroupColumnWidth => new(
+        ShanheBossRewardGroups.Count > 2 ? ShanheBossRewardGroups.Count + 1 : 2, GridUnitType.Star);
+    public string ShanheBossRewardTitle => IsShanheBonusRewardOnly ? "追 加 奖 励" :
+        (_shanheSession?.Snapshot.BossRewardSummary?.Title ?? "章节首领") + " · 奖 励";
+    public string ShanheBossRewardNotice => IsShanheBonusRewardOnly
+        ? "战法效果已触发。领取下列追加奖励，确认后继续行军。"
+        : "铜币与技能槽已领取。请完成各组奖励选择，再踏下一程。";
     public string ShanheBossFixedGoldText => $"铜币 +{_shanheSession?.Snapshot.BossRewardSummary?.FixedGold ?? 0}";
     public string ShanheBossSkillSlotsText => $"技能槽 +{_shanheSession?.Snapshot.BossRewardSummary?.SkillSlots ?? 0}";
-    public string ShanheBossRewardContinueText => _shanheSession?.Snapshot.BossRewardSummary?.ChapterNumber is >= 3
+    public string ShanheBossRewardContinueText => IsShanheBonusRewardOnly ? "继 续 行 军" :
+        _shanheSession?.Snapshot.BossRewardSummary?.ChapterNumber is >= 3
         ? "完 成 征 程" : "进 入 下 一 章";
     public ICommand OpenShanheBossRewardGroupCommand { get; private set; } = null!;
     public ICommand CloseShanheBossRewardGroupCommand { get; private set; } = null!;
@@ -60,7 +71,7 @@ public sealed partial class MainViewModel
         {
             if (ActiveShanheBossRewardGroup is null) _shanheBossRewardGroupId = null;
             foreach (var group in summary.Groups)
-                ShanheBossRewardGroups.Add(new(group.Id, group.Name, group.SelectedReward?.Name ?? (group.IsExhausted ? "本组已集齐" : "多 选 一"),
+                ShanheBossRewardGroups.Add(new(group.Id, group.Name, group.SelectedReward?.Name ?? (group.IsExhausted ? "暂无可领取奖励" : $"{group.Offers.Count} 选 一"),
                     group.IsResolved, group.Id == _shanheBossRewardGroupId, state.Revision));
             if (ActiveShanheBossRewardGroup is { } active)
                 foreach (var reward in active.Offers)
@@ -75,6 +86,8 @@ public sealed partial class MainViewModel
         }
         else _shanheBossRewardGroupId = null;
         foreach (var property in new[] { nameof(HasShanheBossRewardGroup), nameof(IsShanheBossRewardOpen), nameof(ShanheBossRewardTitle),
+                     nameof(IsShanheBonusRewardOnly), nameof(HasShanheBossFixedRewards),
+                     nameof(ShanheBossFixedRewardColumnWidth), nameof(ShanheBossRewardGroupColumnWidth), nameof(ShanheBossRewardNotice),
                      nameof(ShanheBossFixedGoldText), nameof(ShanheBossSkillSlotsText), nameof(ShanheBossRewardContinueText) }) RaisePropertyChanged(property);
         (CloseShanheBossRewardGroupCommand as RelayCommand)?.NotifyCanExecuteChanged();
         (ConfirmShanheBossRewardCommand as RelayCommand)?.NotifyCanExecuteChanged();

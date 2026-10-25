@@ -57,8 +57,8 @@ public static partial class StandardShanheCampaignCatalog
                     AddSkillSlotsOnVictory = chapterBoss && chapter == 3 ? 0 : node.AddSkillSlotsOnVictory,
                     BossRewards = chapterBoss && chapter < 3 ? currentSeason
                         ? new(500, 1, [
-                            new("tactics", "传说战法三选一", tactics, Math.Min(3, tactics.Length)),
-                            new("skills", "传说技能三选一", skills, Math.Min(3, skills.Length))])
+                            new("tactics", "传说战法", tactics, Math.Min(3, tactics.Length)),
+                            new("skills", "传说技能", skills, Math.Min(3, skills.Length))])
                         : new(500, 1, [new("tactics", "战法三选一", tactics),
                             new("cards", "卡牌三选一", cards.Select(reward => reward.Id).ToArray())])
                         : null

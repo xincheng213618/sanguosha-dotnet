@@ -13,7 +13,7 @@ using CardGame.Wpf.Controls;
 using CardGame.Wpf.Persistence;
 using CardGame.Wpf.ViewModels;
 
-internal static class ShanheRewardUiChecks
+internal static partial class ShanheRewardUiChecks
 {
     private const string Player = "fixture:shanhe-ui-player";
     private const string Enemy = "fixture:shanhe-ui-enemy";
@@ -428,7 +428,7 @@ internal static class ShanheRewardUiChecks
         finally { panel.DataContext = null; }
     }
 
-    private static ShanheCampaignSession CreateThreeBossSession()
+    private static ShanheCampaignSession CreateThreeBossSession(bool includeBonusSkill = false)
     {
         string[] tacticRewardIds = [StandardShanheCampaignCatalog.CurrentDangtou2RewardId,
             StandardShanheCampaignCatalog.CurrentLeihuo2RewardId, StandardShanheCampaignCatalog.CurrentLianji2RewardId,
@@ -465,7 +465,18 @@ internal static class ShanheRewardUiChecks
         }
         var definition = new ShanheCampaignDefinition("fixture:shanhe-ui-boss-bundles", "三章渡口", [Player], ["boss1"],
             nodes, rewards, StartingGold: 10, ExtraSkillSlots: 1);
-        return ShanheCampaignSession.Create(definition, new(71, Player), _ => FixtureRegistry.Value);
+        var equipped = Array.Empty<string>();
+        if (includeBonusSkill)
+        {
+            var source = StandardShanheCampaignCatalog.CurrentEconomyTactics.Single(source => source.SourceId == 2014);
+            definition = definition with { Rewards = definition.Rewards.Concat(new ShanheRewardDefinition[]
+            {
+                new(source.RewardId, source.Name) { CampaignEconomy = source.Effect, Rarity = source.Rarity },
+                new("bonus-epic-skill", "追加·振奋", SkillId: Learned) { Rarity = 3 }
+            }).ToArray() };
+            equipped = [source.RewardId];
+        }
+        return ShanheCampaignSession.Create(definition, new(71, Player) { EquippedTacticIds = equipped }, _ => FixtureRegistry.Value);
     }
 
     private static ShanheCampaignSession WinRewardSession(bool fillSkillSlot = false)

@@ -19,11 +19,11 @@ public static partial class StandardShanheCampaignCatalog
     public const string CurrentSougua2SkillId = "shanhe:current-sougua-2169";
 
     private sealed record ReactionTacticSource(int SourceId, string Name, string SkillId, int Price, int Rarity,
-        int? CodexNodeId, string Description)
+        int? CodexNodeId, string Description, bool BossBattleOnly = false)
     {
         public string RewardId => "tactic-build-" + SourceId.ToString(CultureInfo.InvariantCulture);
         public ShanheRewardDefinition Reward => new(RewardId, "战法·" + Name)
-        { TacticSkillId = SkillId, Description = Description + "不占额外技能槽，本次征程限获得一份。" };
+        { TacticSkillId = SkillId, BossBattleOnly = BossBattleOnly, Description = Description + "不占额外技能槽，本次征程限获得一份。" };
     }
 
     // Keep projections independent of partial-class static initialization order.
@@ -97,6 +97,12 @@ public static partial class StandardShanheCampaignCatalog
             "初始手牌-2，摸牌数+3"),
         new ReactionTacticSource(2201, "队·牌", StandardShanheDrawTacticsPackage.DuipaiSkillId, 200, 1, null,
             "你的所有队友摸牌数+2"),
+        new ReactionTacticSource(2025, "未雨绸缪", StandardShanheBossOpeningTacticsPackage.WeiyuChoumouSkillId, 200, 1, null,
+            "仅首领战中，你随机获得2张初始手牌", BossBattleOnly: true),
+        new ReactionTacticSource(2026, "未雨绸缪Ⅱ", StandardShanheBossOpeningTacticsPackage.WeiyuChoumou2SkillId, 300, 2, null,
+            "仅首领战中，你随机获得3张初始手牌", BossBattleOnly: true),
+        new ReactionTacticSource(2027, "未雨绸缪Ⅲ", StandardShanheBossOpeningTacticsPackage.WeiyuChoumou3SkillId, 500, 3, null,
+            "仅首领战中，你随机获得4张初始手牌", BossBattleOnly: true),
     });
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentReactionTacticShopMetadata =>

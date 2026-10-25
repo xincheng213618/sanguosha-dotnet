@@ -28,7 +28,7 @@ public sealed partial class ShanheCampaignSession
     public ShanheBattleSetup? PendingBattleSetup => _snapshot.PendingBattleSetup;
     public IReadOnlyList<ShanheCampaignCommand> AcceptedCommands => ShanheCampaignContent.Freeze(_commands);
 
-    private sealed record RunState
+    private sealed partial record RunState
     {
         public ShanheCampaignPhase Phase { get; init; } = ShanheCampaignPhase.Map;
         public string? CurrentNodeId { get; init; }
@@ -216,6 +216,7 @@ public sealed partial class ShanheCampaignSession
             {
                 MoveShanheNodeCommand move => MoveToNode(move),
                 ChooseShanheRewardCommand reward => ChooseReward(reward),
+                ChooseShanheRewardCategoryCommand category => ChooseRewardCategory(category),
                 ChooseShanheOpeningSkillCommand skill => ChooseOpeningSkill(skill),
                 ChooseShanheBossRewardCommand reward => ChooseBossReward(reward),
                 ConfirmShanheBossRewardCommand => ConfirmBossReward(),
@@ -246,7 +247,11 @@ public sealed partial class ShanheCampaignSession
     {
         Require(_state.Phase == ShanheCampaignPhase.Map && _state.AvailableNodeIds.Contains(command.NodeId, StringComparer.Ordinal), "Choose an available map node.");
         var node = _nodes[command.NodeId];
-        var state = _state with { CurrentNodeId = node.Id, AvailableNodeIds = [], PurchasedChoiceIds = [], RewardOfferIds = [], BossRewardGroups = [] };
+        var state = ClearPrimaryRewardState(_state) with
+        {
+            CurrentNodeId = node.Id, AvailableNodeIds = [], PurchasedChoiceIds = [], BossRewardGroups = [],
+            PendingBonusRewardGroups = []
+        };
         if (!ShanheCampaignContent.IsBattle(node.Kind))
         {
             state = state with { Phase = ShanheCampaignPhase.NodeChoice };
@@ -267,7 +272,7 @@ public sealed partial class ShanheCampaignSession
             rebirthAvailable ? ShanheCampaignContent.Freeze(state.ExtraSkillIds.Append(ShanheGeneralRanks.RebirthSkillId)) : state.ExtraSkillIds,
             state.StartingCards, state.StartingEquipment, encounter.Enemies, encounter.Allies ?? [], ContentHash)
         {
-            TacticSkillIds = BattleTacticSkills(state),
+            TacticSkillIds = BattleTacticSkills(state, node.Kind),
             DefaultGodFactionId = Definition.DefaultGodFactionId,
             PlayerRank = _options.PlayerRank,
             RebirthAvailable = rebirthAvailable,
@@ -311,7 +316,10 @@ public sealed partial class ShanheCampaignSession
             RebirthUsed = rebirthUsed
         };
         if (result.WinnerTeamId != ShanheBattleSetup.PlayerTeamId || !player.IsAlive || player.Hp <= 0)
-            return state with { Phase = ShanheCampaignPhase.Lost, AvailableNodeIds = [], RewardOfferIds = [] };
+            return ClearPrimaryRewardState(state) with
+            {
+                Phase = ShanheCampaignPhase.Lost, AvailableNodeIds = [], BossRewardGroups = [], PendingBonusRewardGroups = []
+            };
         var node = _nodes[state.CurrentNodeId!];
         var encounter = node.Encounters!.Single(e => e.Id == state.EncounterId);
         state = state with
@@ -324,9 +332,11 @@ public sealed partial class ShanheCampaignSession
         // Completing the final encounter ends the expedition immediately. It must
         // not fall through to ordinary battle loot after its boss bundle is gone.
         if (node.NextNodeIds.Count == 0 && node.ChapterNumber >= 3) return FinishNode(state);
+        state = state with { PendingBonusRewardGroups = BuildBonusRewardGroups(state, node) };
         if (node.BossRewards is not null) return BeginBossRewards(state, node);
         var rewards = (node.RewardIds ?? []).Where(id => CanReceiveReward(state, _rewards[id])).ToList();
-        if (rewards.Count == 0) return FinishNode(state);
+        if (rewards.Count == 0) return BeginPendingBonusRewardsOrFinish(state);
+        if (node.CategorizedRewards) return BeginCategorizedRewards(state, node, rewards);
         var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, node.Id + ":rewards", state.EncounterOrdinal));
         random.Shuffle(rewards);
         return state with { Phase = ShanheCampaignPhase.Reward, RewardOfferIds = ShanheCampaignContent.Freeze(rewards.Take(node.RewardChoiceCount)) };
@@ -336,17 +346,17 @@ public sealed partial class ShanheCampaignSession
     {
         Require(_state.BossRewardGroups.Count == 0, "A chapter boss requires grouped choices and final confirmation.");
         Require(_state.Phase == ShanheCampaignPhase.Reward && _state.RewardOfferIds.Contains(command.RewardId, StringComparer.Ordinal), "Choose one of the published battle rewards.");
-        return FinishNode(ApplyReward(_state, _rewards[command.RewardId], command.ReplaceSkillId));
+        return BeginPendingBonusRewardsOrFinish(ApplyReward(_state, _rewards[command.RewardId], command.ReplaceSkillId));
     }
 
     private RunState SkipReward()
     {
         Require(_state.BossRewardGroups.Count == 0, "Chapter boss reward groups cannot be skipped for ordinary compensation.");
-        Require(_state.Phase == ShanheCampaignPhase.Reward && _state.RewardOfferIds.Count > 0,
+        Require(HasPrimaryReward(_state),
             "There is no published battle reward to decline.");
         var gold = _nodes[_state.CurrentNodeId!].RewardSkipGold;
         Require(gold > 0, "This reward offer does not grant compensation for declining.");
-        return FinishNode(_state with { Gold = checked(_state.Gold + gold) });
+        return BeginPendingBonusRewardsOrFinish(_state with { Gold = checked(_state.Gold + gold) });
     }
 
     private RunState ChooseOption(ChooseShanheNodeOptionCommand command) =>
@@ -446,10 +456,10 @@ public sealed partial class ShanheCampaignSession
     private RunState FinishNode(RunState state)
     {
         var node = _nodes[state.CurrentNodeId!];
-        return state with
+        return ClearPrimaryRewardState(state) with
         {
             Phase = node.NextNodeIds.Count == 0 ? ShanheCampaignPhase.Won : ShanheCampaignPhase.Map,
-            AvailableNodeIds = node.NextNodeIds, RewardOfferIds = [], BossRewardGroups = [], BattleSetup = null,
+            AvailableNodeIds = node.NextNodeIds, BossRewardGroups = [], PendingBonusRewardGroups = [], BattleSetup = null,
             CompletedNodeIds = ShanheCampaignContent.Freeze(state.CompletedNodeIds.Append(node.Id))
         };
     }
@@ -476,11 +486,13 @@ public sealed partial class ShanheCampaignSession
             ChapterNumber = state.CurrentNodeId is { } chapterNode ? _nodes[chapterNode].ChapterNumber : 0,
             ChapterTitle = state.CurrentNodeId is { } titleNode ? _nodes[titleNode].ChapterTitle : null,
             BossRewardSummary = CreateBossRewardSummary(state, revision),
+            RewardCategories = state.Phase == ShanheCampaignPhase.Reward && state.SelectedRewardCategory is null
+                ? ShanheCampaignContent.Freeze(state.CategoryRewardGroups.Select(group => group.Category)) : [],
             OpeningSkillOffers = ShanheCampaignContent.Freeze(state.OpeningSkillOfferIds.Select(id => _rewards[id])),
             ShopItems = CreateShopItems(state, revision),
             ShopRefreshRemaining = IsRandomShop(state) ? Math.Max(0, ShopRefreshLimit(state) - state.ShopRefreshCount) : 0,
             ShopRefreshCost = IsRandomShop(state) ? 100 : 0,
-            RewardSkipGold = state.Phase == ShanheCampaignPhase.Reward && state.BossRewardGroups.Count == 0
+            RewardSkipGold = HasPrimaryReward(state)
                 ? _nodes[state.CurrentNodeId!].RewardSkipGold : 0
         };
     }
