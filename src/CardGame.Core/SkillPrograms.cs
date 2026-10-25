@@ -814,6 +814,8 @@ public enum SkillProgramEffectOp
     ResolveShiZxErdi = 63681,
     ResolveShiHcCujun = 63700,
     ResolveShiHcSili = 63701,
+    ResolveShiHqCuixian = 63720,
+    ResolveShiHqGushi = 63721,
     ResolveGuanduShicai = 44000,
     ResolveGuanduZezhu = 44001,
     ResolveGuanduJieliang = 44002,

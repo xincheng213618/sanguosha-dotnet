@@ -659,6 +659,8 @@ public sealed partial record CardUseFrame(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ConditionalDiscardDuelOrigin? ConditionalDiscardDuelOrigin { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ShiQuanDuelOrigin? ShiQuanDuelOrigin { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public InspectedHandSlashReturn? InspectedHandSlashReturn { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public KuangfuSlashReturn? KuangfuSlashReturn { get; init; }
