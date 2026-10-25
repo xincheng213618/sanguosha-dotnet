@@ -1,0 +1,88 @@
+{
+ "schemaVersion": 62,
+ "skills": [
+  {
+   "id": "mobile:shi-cujun",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "cujun-discard",
+     "window": "discardPhaseStarting",
+     "subject": "owner",
+     "optional": true,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiHcCujun",
+       "target": "owner"
+      }
+     ]
+    },
+    {
+     "id": "cujun-claim",
+     "window": "discardPhaseEnded",
+     "subject": "owner",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiHcCujun",
+       "target": "owner"
+      }
+     ],
+     "allowOwnDiscardPhaseEnded": true
+    }
+   ]
+  },
+  {
+   "id": "mobile:shi-sili",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "sili-hp",
+     "window": "afterHealthChanged",
+     "subject": "owner",
+     "hpChangeOccurrence": "perEvent",
+     "usageScope": "turn",
+     "usageLimit": 1,
+     "optional": true,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiHcSili",
+       "target": "owner"
+      }
+     ]
+    },
+    {
+     "id": "sili-draw",
+     "window": "drawPhaseStarting",
+     "subject": "owner",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiHcSili",
+       "target": "owner"
+      }
+     ]
+    },
+    {
+     "id": "sili-beishui",
+     "window": "turnStartBeforeNormalFlow",
+     "subject": "owner",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiHcSili",
+       "target": "owner"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
