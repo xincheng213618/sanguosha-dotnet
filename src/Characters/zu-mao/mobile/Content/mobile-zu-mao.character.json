@@ -1,0 +1,29 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zu-mao",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 75400,
+      "pools": {
+        "current": 75400
+      },
+      "definition": {
+        "id": "mobile:zu-mao",
+        "name": "祖茂·移动版",
+        "portraitKey": "mobile-zu-mao",
+        "skillId": "ol:yinbing",
+        "additionalSkillIds": [
+          "ol:juedi"
+        ],
+        "factionId": "wu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:zu-mao",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

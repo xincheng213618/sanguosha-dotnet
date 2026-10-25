@@ -70,6 +70,16 @@ public sealed record SourceCurseDrawIssuedEvent(long ProgramFrameId, long Parent
     long Before, long After) : IGameEvent;
 public sealed record SourceCurseObtainedEvent(long ProgramFrameId, SourceCurseDeposit Deposit,
     long Before, long After) : IGameEvent;
+public sealed record SourceCurseRemovedEvent(long ProgramFrameId, SourceCurseDeposit Deposit,
+    long Before, long After) : IGameEvent;
+
+public sealed partial class SkillProgramEffect
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? SourceCurseMatchSuit { get; internal init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? SourceCurseDiscardAfterSecondDraw { get; internal init; }
+}
 public sealed record SourceCurseLossRosterIssuedEvent(long ProgramFrameId,
     long ActualTurnEndFrameId, int ActualTurn, IReadOnlyList<SourceCurseLoss> Losses) : IGameEvent;
 public sealed record SourceCurseHpLossIssuedEvent(long ProgramFrameId,
@@ -84,13 +94,19 @@ internal abstract class SourceCurseDescriptor : ProgramOperationDescriptorBase
     public override ISkillProgramEffectHandler Handler => new SourceCurseHandler(Op);
     protected SkillProgramEffect ParseOwner(ProgramOperationNodeReader r, bool reference)
     {
-        if (reference) r.AllowOnly("op", "target", "skillIds", "condition");
+        if (Op == SkillProgramEffectOp.DrawForSourceCurseUse)
+            r.AllowOnly("op", "target", "skillIds", "condition", "matchSuit", "discardAfterSecondDraw");
+        else if (reference) r.AllowOnly("op", "target", "skillIds", "condition");
         else r.AllowOnly("op", "target", "condition");
         var skills = reference ? r.RequiredIdentifierArray("skillIds") : [];
         if (reference && skills.Count != 1)
             throw new InvalidOperationException("A source curse requires one exact paired skill.");
         var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r),
-            0, r.Condition(), skillIds: skills);
+            0, r.Condition(), skillIds: skills)
+        {
+            SourceCurseMatchSuit = r.Has("matchSuit") ? r.RequiredBool("matchSuit") : null,
+            SourceCurseDiscardAfterSecondDraw = r.Has("discardAfterSecondDraw") ? r.RequiredBool("discardAfterSecondDraw") : null
+        };
         RequireAlways(effect, r.Path); return effect;
     }
 }
@@ -167,10 +183,10 @@ internal static class SourceCurseComposition
             a.MinCards != 1 || a.MaxCards != 1 || a.MinTargets != 1 || a.MaxTargets != 1 ||
             a.TargetKind != SkillProgramTargetKind.OtherLiving || a.UsesPerPhase != 1 ||
             a.UsesPerTurn is not null || a.UsesPerGame is not null ||
-            !a.SourceZones.SequenceEqual([CardZoneKind.Hand, CardZoneKind.Equipment]) ||
+            !(a.SourceZones.SequenceEqual([CardZoneKind.Hand, CardZoneKind.Equipment]) || a.SourceZones.SequenceEqual([CardZoneKind.Hand])) ||
             a.Condition.Kind != SkillProgramConditionKind.Always || a.MarkerCost is not null ||
             a.ContinueAfterOwnerDeath || a.CardCountExpression is not null)
-            throw new InvalidOperationException(path + ": curse deposit requires one unconditional HE transfer, one other living target and one actual-Play use.");
+            throw new InvalidOperationException(path + ": curse deposit requires one unconditional hand or HE transfer, one other living target and one actual-Play use.");
     }
     internal static void ValidateTrigger(string path, IReadOnlyList<SkillProgramEffect> effects,
         SkillProgramTriggerWindow window, SkillProgramTriggerSubject? subject,

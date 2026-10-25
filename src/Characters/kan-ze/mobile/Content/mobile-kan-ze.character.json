@@ -1,0 +1,41 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:kan-ze",
+  "skills": [
+    {
+      "registrationOrder": 75800,
+      "programBundle": "mobile-kan-ze",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:kuanshi",
+        "name": "宽释",
+        "description": "结束阶段，你可以选择一名角色。直到你的下回合开始，该角色下一次受到超过1点的伤害时，防止此伤害，然后你跳过下个回合的摸牌阶段。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 75801,
+      "pools": {
+        "current": 75801
+      },
+      "definition": {
+        "id": "mobile:kan-ze",
+        "name": "阚泽·移动版",
+        "portraitKey": "mobile-kan-ze",
+        "skillId": "ol:xiashu",
+        "factionId": "wu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:kan-ze",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile",
+        "additionalSkillIds": [
+          "mobile:kuanshi"
+        ]
+      }
+    }
+  ]
+}

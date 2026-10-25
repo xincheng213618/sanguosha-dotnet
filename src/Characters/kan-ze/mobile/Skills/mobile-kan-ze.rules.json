@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:kuanshi",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "next-heavy-damage-only",
+          "window": "turnEnding",
+          "subject": "owner",
+          "optional": true,
+          "effects": [
+            {
+              "op": "selectTarget",
+              "target": "owner",
+              "targetKind": "anyLiving"
+            },
+            {
+              "op": "armKuanshiProtection",
+              "target": "selectedTarget"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

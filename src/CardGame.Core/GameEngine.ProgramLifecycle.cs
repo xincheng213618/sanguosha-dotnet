@@ -2996,8 +2996,13 @@ public sealed partial class GameEngine
             GetProgramTrigger(candidate).Effects is [{ Op: SkillProgramEffectOp.Draw,
                 NumberExpression: SkillProgramNumberExpression.CurrentTurnUsedCardCategoryCount }]
             ? facts?.CurrentTurnUsedCardCategoryCount : null;
+        var actualPlayUses = context.Window == SkillProgramTriggerWindow.PlayEnding &&
+            GetProgramTrigger(candidate).Effects.Any(effect => effect.Op == SkillProgramEffectOp.PrepareMobileGuoHuaiJingce)
+            ? GetActualPlayPhaseUseCount(candidate.OwnerSeat) : (int?)null;
         var prompt = typeDrawCount is { } count
             ? $"出牌阶段结束：你本回合使用过的牌有 {count} 种类型。是否发动【{skill.Name}】摸 {count} 张牌？"
+            : actualPlayUses is { } phaseUses && facts is not null
+            ? $"出牌阶段结束：本出牌阶段已使用 {phaseUses} 张牌，当前体力为 {facts.CurrentHp}。是否发动【{skill.Name}】？"
             : context.Window == SkillProgramTriggerWindow.PlayEnding &&
             context.SourceSeat == candidate.OwnerSeat && facts is not null
             ? $"出牌阶段结束：本回合已使用 {facts.CardsUsedThisTurn} 张牌，当前体力为 {facts.CurrentHp}。是否发动【{skill.Name}】？"
@@ -3013,6 +3018,8 @@ public sealed partial class GameEngine
                 ["binding-id"] = candidate.BindingId,
                 ["skill-instance-id"] = candidate.SkillInstanceId
             };
+            if (actualPlayUses is { } used)
+                parameters["cards-used-this-play-phase"] = used.ToString(System.Globalization.CultureInfo.InvariantCulture);
             if (facts is not null)
             {
                 parameters["cards-used-this-turn"] = facts.CardsUsedThisTurn.ToString(

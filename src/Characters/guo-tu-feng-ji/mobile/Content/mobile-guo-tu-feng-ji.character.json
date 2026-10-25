@@ -1,0 +1,29 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:guo-tu-feng-ji",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 76000,
+      "pools": {
+        "current": 76000
+      },
+      "definition": {
+        "id": "mobile:guo-tu-feng-ji",
+        "name": "郭图逢纪·移动版",
+        "portraitKey": "mobile-guo-tu-feng-ji",
+        "skillId": "classic:jigong",
+        "additionalSkillIds": [
+          "classic:shifei"
+        ],
+        "factionId": "qun",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:guo-tu-feng-ji",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

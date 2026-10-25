@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:duanbing",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "one-short-range-final-target",
+          "window": "cardUseTargetsFinalized",
+          "ownerRelation": "actor",
+          "cardKinds": [
+            "slash",
+            "fireSlash",
+            "thunderSlash"
+          ],
+          "optional": false,
+          "effects": [
+            {
+              "op": "offerShortRangeSlashTarget",
+              "target": "owner"
+            }
+          ]
+        },
+        {
+          "id": "one-short-range-legacy-target",
+          "window": "otherActualUseTargeted",
+          "subject": "owner",
+          "optional": true,
+          "effects": [
+            {
+              "op": "offerShortRangeSlashTarget",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:fenxun",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "discard-fix-distance",
+          "minCards": 1,
+          "maxCards": 1,
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "effects": [
+            {
+              "op": "discardSelected",
+              "target": "owner",
+              "amount": 1
+            },
+            {
+              "op": "grantMobileFenxunDistance",
+              "target": "selectedTarget"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

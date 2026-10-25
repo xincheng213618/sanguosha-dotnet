@@ -39,16 +39,20 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new SourceCurseJudgmentIssuedEvent(frame.Id, curse));
         return card;
     }
+    private static bool MatchesSourceCurseCard(SourceCurseDeposit curse, CardActionContext action, SkillProgramEffect effect) =>
+        effect.SourceCurseMatchSuit == true
+            ? action.EffectiveSuit is { } suit && suit != Suit.None && suit == curse.PrintedSuit
+            : action.EffectiveIsRed is { } color && SuitColor(curse.PrintedSuit) == color;
     private SourceCurseDeposit? EligibleSourceCurseUse(int owner, string skill, string instance,
         CardActionContext action, SkillProgramEffect effect)
     {
-        if (action.Type != CardActionType.Use || action.EffectiveIsRed is not { } color ||
+        if (action.Type != CardActionType.Use ||
             !_players[owner].IsAlive || !HasRuntimeSkillInstance(_players[owner], skill, instance)) return null;
         var curse = SourceCurseAt(action.ActorSeat);
         if (curse is null || curse.Source.OwnerSeat != owner || curse.Source.SkillId != effect.SkillIds.Single() ||
             curse.BenefitSkillId != skill || curse.BenefitSkillInstanceId != instance ||
             curse.BenefitGameplayHash != _contentRegistry.GetSkill(skill).Program?.GameplayHash ||
-            SuitColor(curse.PrintedSuit) != color || curse.ActualDrawCount >= 2) return null;
+            !MatchesSourceCurseCard(curse, action, effect) || curse.ActualDrawCount >= 2) return null;
         // The locked reward has its own captured source. Suppressing nonlocked
         // Zhoufu must not disable this already issued curse's Yingbing reward.
         return curse;
@@ -124,7 +128,8 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("A curse deposit lost its exact one-card other-target Play selection.");
         var from = _cardZones.GetLocation(id);
         var card = _cardZones.CardsAt(from).Single(c => c.Id == id);
-        if (from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || card.IsGeneralWeapon)
+        if (from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) ||
+            !_contentRegistry.GetSkill(f.SkillId).Program!.Activations.Single(a => a.Id == f.ActivationId).SourceZones.Contains(from.Zone) || card.IsGeneralWeapon)
             throw new InvalidOperationException("A curse requires one transferable owner HE entity.");
         var sourceGrant = EnabledRuntimeSkillGrants(_players[f.OwnerSeat]).Single(g =>
             g.SkillId == f.SkillId && g.SkillInstanceId == f.SkillInstanceId);
@@ -226,11 +231,14 @@ public sealed partial class GameEngine
             ReplaceRuntimeTop(f = f with { SourceCurseReceipt = r with
             { Stage = SourceCurseStage.ObtainChildren, Before = before, After = before },
               PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+            var discard = SourceCursePausedEffect(f)!.SourceCurseDiscardAfterSecondDraw == true;
             MoveCard(_cardZones.CardsAt(due.Location).Single(c => c.Id == due.CardId),
-                due.Location, CardLocation.Hand(f.OwnerSeat), new("program.source-curse.obtain"));
+                due.Location, discard ? CardLocation.DiscardPile : CardLocation.Hand(f.OwnerSeat),
+                new(discard ? "program.source-curse.remove" : "program.source-curse.obtain"));
             f = GetActiveProgramFrame(f.Id);
             ReplaceRuntimeTop(f = f with { SourceCurseReceipt = f.SourceCurseReceipt! with { After = SourceCurseMovementSequence } });
-            AdvanceEventRulesAndQueueFact(new SourceCurseObtainedEvent(f.Id, due, before, SourceCurseMovementSequence));
+            if (discard) AdvanceEventRulesAndQueueFact(new SourceCurseRemovedEvent(f.Id, due, before, SourceCurseMovementSequence));
+            else AdvanceEventRulesAndQueueFact(new SourceCurseObtainedEvent(f.Id, due, before, SourceCurseMovementSequence));
             if (!TryDrainFireTargetMovement(f)) ReturnSourceCurseMovement(f);
             return true;
         }

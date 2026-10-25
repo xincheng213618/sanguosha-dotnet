@@ -18,7 +18,8 @@ public sealed partial class GameEngine
                 d.GameplayHash != f.GameplayHash || d.CreatedTurn != r.ActualTurn ||
                 !f.SelectedCardIds.SequenceEqual([d.CardId]) || !f.SelectedTargetSeats.SequenceEqual([d.TargetSeat]) ||
                 r.PaymentFrom is not { } from || from.OwnerSeat != f.OwnerSeat ||
-                from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || r.After <= r.Before ||
+                from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) ||
+                !_contentRegistry.GetSkill(f.SkillId).Program!.Activations.Single(a => a.Id == f.ActivationId).SourceZones.Contains(from.Zone) || r.After <= r.Before ||
                 !SourceCurseMovementMatches(r, d.CardId, from, d.Location, "program.source-curse.deposit")) return false;
             return CompleteProgramEventHistory().OfType<SourceCurseDepositedEvent>().Count(e =>
                 e.Deposit == d && e.From == from && _cardMovements.Any(m =>
@@ -51,10 +52,10 @@ public sealed partial class GameEngine
             f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCommitted, SourceCurseUse: { } original } c ||
             c.ParentFrameId != r.OriginalParentId || original.ActionId != r.ActionId ||
             !SameSourceCurse(original.Deposit, curse) || original.ActorSeat != curse.TargetSeat ||
-            original.EffectiveIsRed is not { } color || color != SuitColor(curse.PrintedSuit) ||
             _resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault(w => w.Id == r.OriginalParentId) is not { } window ||
             window.Action.ActionId != r.ActionId || window.Action.ActorSeat != original.ActorSeat ||
-            window.Action.Type != CardActionType.Use || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count ||
+            window.Action.Type != CardActionType.Use || window.Action.EffectiveIsRed != original.EffectiveIsRed ||
+            !MatchesSourceCurseCard(curse, window.Action, effect) || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count ||
             !MountObserverCandidateMatches(f, ToSharedCandidate(window.Candidates[window.CandidateIndex]))) return false;
         var facts = CompleteProgramEventHistory().OfType<SourceCurseDrawIssuedEvent>().Where(e =>
             e.ProgramFrameId == f.Id && e.ParentFrameId == r.OriginalParentId && e.ActionId == r.ActionId).ToArray();
@@ -64,9 +65,12 @@ public sealed partial class GameEngine
                 m.Reason.Value == "program.source-curse.draw") != r.DrawCount) return false;
         if (r.Stage == SourceCurseStage.DrawChildren)
             return r.Before == issued.Before && r.After == issued.After;
-        return r.Stage == SourceCurseStage.ObtainChildren && r.DrawCount == 1 && curse.ActualDrawCount == 2 &&
-            r.After > r.Before && SourceCurseMovementMatches(r, curse.CardId, curse.Location,
-                CardLocation.Hand(f.OwnerSeat), "program.source-curse.obtain") &&
+        if (r.Stage != SourceCurseStage.ObtainChildren || r.DrawCount != 1 || curse.ActualDrawCount != 2 || r.After <= r.Before) return false;
+        if (effect.SourceCurseDiscardAfterSecondDraw == true)
+            return SourceCurseMovementMatches(r, curse.CardId, curse.Location, CardLocation.DiscardPile, "program.source-curse.remove") &&
+                CompleteProgramEventHistory().OfType<SourceCurseRemovedEvent>().Count(e =>
+                    e.ProgramFrameId == f.Id && e.Deposit == curse && e.Before == r.Before && e.After == r.After) == 1;
+        return SourceCurseMovementMatches(r, curse.CardId, curse.Location, CardLocation.Hand(f.OwnerSeat), "program.source-curse.obtain") &&
             CompleteProgramEventHistory().OfType<SourceCurseObtainedEvent>().Count(e =>
                 e.ProgramFrameId == f.Id && e.Deposit == curse && e.Before == r.Before && e.After == r.After) == 1;
     }

@@ -340,6 +340,8 @@ public enum SkillProgramEffectOp
     ReduceMobileMaDaiDamageTargetMaximumHp = 72901,
     ConsumeMobileCaoZhenSidi = 74010,
     ApplyMobileWuYiBenxi = 74110,
+    PrepareMobileGuoHuaiJingce = 75000,
+    GrantMobileFenxunDistance = 75600,
     ResolveBoundaryCaoXiuQingxi = 51100,
     ResolveBoundaryQuanCongYaoming = 51200,
     SelectMobileShiKaijiTargets = 47400,

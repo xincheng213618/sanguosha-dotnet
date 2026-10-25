@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:fuhun",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "reveal-two-replace-normal-draw",
+          "window": "drawPhaseStarting",
+          "subject": "owner",
+          "optional": true,
+          "priority": 95,
+          "drawPhaseMode": "replacement",
+          "effects": [
+            {
+              "op": "revealTopCards",
+              "target": "owner",
+              "amount": 2,
+              "resultBind": "fuhun-revealed",
+              "visibility": "public"
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "fuhun-revealed",
+              "destination": "ownerHand",
+              "awaitMovementTriggers": true
+            },
+            {
+              "op": "grantTurnSkills",
+              "target": "owner",
+              "skillIds": [
+                "classic:wusheng",
+                "classic:paoxiao"
+              ],
+              "condition": {
+                "kind": "all",
+                "children": [
+                  {
+                    "kind": "boundCardsMatchSuits",
+                    "sourceBind": "fuhun-revealed",
+                    "suits": [
+                      "heart",
+                      "diamond",
+                      "spade",
+                      "club"
+                    ]
+                  },
+                  {
+                    "kind": "not",
+                    "children": [
+                      {
+                        "kind": "boundCardsSameColor",
+                        "sourceBind": "fuhun-revealed"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "expiry": "actualTurnEnd"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

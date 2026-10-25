@@ -1,0 +1,42 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:li-ru",
+  "skills": [
+    {
+      "registrationOrder": 75300,
+      "programBundle": "mobile-li-ru",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:mieji",
+        "name": "灭计",
+        "description": "出牌阶段限一次，你可以将一张黑色锦囊牌置于牌堆顶并选择一名有牌的其他角色，然后令其选择一项：1.弃置一张锦囊牌；2.依次弃置两张非锦囊牌（不足则全弃）。",
+        "actionForms": "Active"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 75399,
+      "pools": {
+        "current": 75399
+      },
+      "definition": {
+        "id": "mobile:li-ru",
+        "name": "李儒·移动版",
+        "portraitKey": "mobile-li-ru",
+        "skillId": "classic:juece",
+        "factionId": "qun",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:li-ru",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile",
+        "additionalSkillIds": [
+          "mobile:mieji",
+          "classic:fencheng"
+        ]
+      }
+    }
+  ]
+}

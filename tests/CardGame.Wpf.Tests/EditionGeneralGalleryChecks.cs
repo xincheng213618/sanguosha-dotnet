@@ -58,7 +58,11 @@ internal static class EditionGeneralGalleryChecks
                 "boundary:liu-bei-mobile", "boundary:guan-yu-mobile", "boundary:zhao-yun-mobile", "boundary:ma-chao-mobile", "boundary:lu-meng-mobile", "boundary:zhou-yu-mobile", "boundary:hua-tuo-mobile", "boundary:zhang-jiao-mobile" }.All(id =>
                 model.GeneralGalleryEntries.Any(entry => entry.GeneralId == id)),
             "The added distinct editions are present in the gallery.");
+        if (detailGeneralIds is not null)
+            Program.Assert(detailGeneralIds.All(id => model.GeneralGalleryEntries.Any(entry => entry.GeneralId == id)),
+                "Every requested edition must be registered before rendering its details.");
         var entries = model.GeneralGalleryEntries.Where(entry =>
+            detailGeneralIds?.Contains(entry.GeneralId) == true ||
             entry.GeneralId is "anniversary:kan-ze" or "anniversary:hu-zhao" or "anniversary:xu-jing" ||
             entry.GeneralId is "anniversary:du-kui" or "anniversary:liu-li" or "anniversary:liu-yong" ||
             entry.GeneralId is "anniversary:zhang-fen" or "anniversary:bai-ling-yun" or "anniversary:yang-biao" ||

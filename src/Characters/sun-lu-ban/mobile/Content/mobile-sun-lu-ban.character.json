@@ -19,7 +19,7 @@
         ],
         "factionId": "wu",
         "baseHp": 3,
-        "gender": "Male",
+        "gender": "Female",
         "characterId": "character:sun-lu-ban",
         "variantId": "mobile",
         "rulesetId": "sanguosha-mobile"

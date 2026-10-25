@@ -1,0 +1,38 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:guan-xing-zhang-bao",
+  "skills": [
+    {
+      "registrationOrder": 75100,
+      "programBundle": "mobile-guan-xing-zhang-bao",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:fuhun",
+        "name": "父魂",
+        "description": "摸牌阶段，你可以改为亮出牌堆顶的两张牌并获得之，然后若这两张牌颜色不同，你本回合视为拥有技能“武圣”和“咆哮”。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 75199,
+      "pools": {
+        "current": 75199
+      },
+      "definition": {
+        "id": "mobile:guan-xing-zhang-bao",
+        "name": "关兴张苞·移动版",
+        "portraitKey": "mobile-guan-xing-zhang-bao",
+        "skillId": "mobile:fuhun",
+        "factionId": "shu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:guan-xing-zhang-bao",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

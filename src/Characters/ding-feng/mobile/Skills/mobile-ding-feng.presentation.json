@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:duanbing": {
+      "name": "短兵",
+      "description": "你使用【杀】可以多选择一名距离为1的角色为目标。",
+      "triggerChoices": {
+        "one-short-range-final-target": "追加一名距离为1的目标",
+        "one-short-range-legacy-target": "追加一名距离为1的目标"
+      }
+    },
+    "mobile:fenxun": {
+      "name": "奋迅",
+      "description": "出牌阶段限一次，你可以弃置一张牌并选择一名其他角色，然后本回合你与其的距离视为1。",
+      "activationLabels": {
+        "discard-fix-distance": "奋迅 · 弃一张牌，令与目标距离为1"
+      }
+    }
+  }
+}

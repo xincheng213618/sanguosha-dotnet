@@ -1,0 +1,26 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:sun-deng",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 75900,
+      "pools": {
+        "current": 75900
+      },
+      "definition": {
+        "id": "mobile:sun-deng",
+        "name": "孙登·移动版",
+        "portraitKey": "mobile-sun-deng",
+        "skillId": "classic:kuangbi",
+        "factionId": "wu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:sun-deng",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

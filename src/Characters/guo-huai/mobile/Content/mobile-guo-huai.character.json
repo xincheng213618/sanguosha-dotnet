@@ -1,0 +1,38 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:guo-huai",
+  "skills": [
+    {
+      "registrationOrder": 75000,
+      "programBundle": "mobile-guo-huai",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:jingce",
+        "name": "精策",
+        "description": "出牌阶段结束时，若你本阶段使用过的牌数不小于你的体力值，你可以摸两张牌。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 75099,
+      "pools": {
+        "current": 75099
+      },
+      "definition": {
+        "id": "mobile:guo-huai",
+        "name": "郭淮·移动版",
+        "portraitKey": "mobile-guo-huai",
+        "skillId": "mobile:jingce",
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:guo-huai",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

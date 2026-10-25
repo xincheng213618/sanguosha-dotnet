@@ -1,0 +1,50 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:ding-feng",
+  "skills": [
+    {
+      "registrationOrder": 75601,
+      "programBundle": "mobile-ding-feng",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:duanbing",
+        "name": "短兵",
+        "description": "你使用【杀】可以多选择一名距离为1的角色为目标。"
+      }
+    },
+    {
+      "registrationOrder": 75602,
+      "programBundle": "mobile-ding-feng",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:fenxun",
+        "name": "奋迅",
+        "description": "出牌阶段限一次，你可以弃置一张牌并选择一名其他角色，然后本回合你与其的距离视为1。"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 75600,
+      "pools": {
+        "current": 75600
+      },
+      "definition": {
+        "id": "mobile:ding-feng",
+        "name": "丁奉·移动版",
+        "portraitKey": "mobile-ding-feng",
+        "skillId": "mobile:duanbing",
+        "additionalSkillIds": [
+          "mobile:fenxun"
+        ],
+        "factionId": "wu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:ding-feng",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

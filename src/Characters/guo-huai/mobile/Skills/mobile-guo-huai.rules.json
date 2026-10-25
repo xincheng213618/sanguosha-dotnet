@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:jingce",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "actual-play-count-draw-two",
+          "window": "playEnding",
+          "subject": "owner",
+          "optional": true,
+          "effects": [
+            {
+              "op": "prepareMobileGuoHuaiJingce",
+              "target": "owner"
+            },
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 2
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

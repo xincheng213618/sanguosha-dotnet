@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:mieji",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "topdeck-black-trick",
+          "minCards": 1,
+          "maxCards": 1,
+          "sourceZones": [
+            "hand"
+          ],
+          "cardCategories": [
+            "trick"
+          ],
+          "cardSuits": [
+            "spade",
+            "club"
+          ],
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherLivingWithHandOrEquipment",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "captureSelectedCards",
+              "target": "owner",
+              "resultBind": "mieji-cost"
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "mieji-cost",
+              "destination": "drawPileTop",
+              "awaitMovementTriggers": true
+            },
+            {
+              "op": "chooseCategoryAlternativeDiscard",
+              "target": "selectedTarget",
+              "amount": 1,
+              "secondaryAmount": 2,
+              "cardCategories": [
+                "trick"
+              ],
+              "zones": [
+                "hand",
+                "equipment"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
