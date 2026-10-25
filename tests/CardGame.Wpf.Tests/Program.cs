@@ -221,6 +221,7 @@ internal static class Program
             Check("Shanhe loadout plans: failed reads and writes preserve current plan and books", ShanheCodexLoadoutUiChecks.FailedReadsAndWritesKeepTheCurrentPlanAndBooks);
             Check("Shanhe Dong Ji UI: dynamic exact card confirmation and locked gift", () => ShanheDongJiUiChecks.DynamicRecipientCountConfirmsExactCardsAndExcludesLockedGift(output));
             Check("Shanhe codex settlement: actual victory one-time books and rejected outcomes", () => ShanheCodexSettlementChecks.ActualCompletedVictoryCreditsOnceAndRejectsOtherOutcomes(output));
+            Check("Shanhe run records: real history tab keeps completed runs and credited books", () => ShanheRunRecordUiChecks.CompletedRunsRemainVisibleInTheRealHistoryTab(output));
             Check("Shanhe reward UI: real victory cards confirmation skip skill and replacement", () => ShanheRewardUiChecks.RealVictoryRewardCardsConfirmSkipSkillAndReplacement(output));
             Check("Shanhe reward UI: boss bundles advance through three chapters", () => ShanheRewardUiChecks.BossBundlesRequireEachGroupThenAdvanceThreeChapters(output));
             Check("Shanhe reward UI: shop skill replacement confirms before payment", () => ShanheRewardUiChecks.ShopSkillsUseReplacementModalAndChargeOnlyOnConfirmation(output));

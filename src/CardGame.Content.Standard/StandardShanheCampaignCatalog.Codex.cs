@@ -69,6 +69,15 @@ public static partial class StandardShanheCampaignCatalog
             .Append(new(117, CurrentYaoli4RewardId))
             .Append(new(116, CurrentLianji2RewardId))
             .Append(new(132, CurrentLeihuo2RewardId))
+            .Append(new(141, CurrentPianzhuanjiaRewardId))
+            .Append(new(147, CurrentTouxiRewardId))
+            .Append(new(74, "chapter-skill-3020"))
+            .Append(new(93, "chapter-skill-3017"))
+            .Append(new(95, "chapter-skill-3070"))
+            .Append(new(96, "chapter-skill-3261"))
+            .Append(new(100, "chapter-skill-3091"))
+            .Append(new(108, "chapter-skill-3038"))
+            .Append(new(105, CurrentInterest2RewardId))
             .Append(new(35, CurrentFarStrikeRewardId)).ToDictionary(pair => pair.Key, pair => pair.Value));
 
     /// <summary>Adds the opt-in codex pool without altering the historical default campaign definition.</summary>
@@ -82,7 +91,7 @@ public static partial class StandardShanheCampaignCatalog
         var additionalRewards = bindings.Select(binding => binding.Reward).Concat(new[]
         {
             CodexBasicCard(4004), CodexBasicCard(4008), CodexBasicCard(4076), CodexBasicCard(4092), CodexBasicCard(4107)
-        }).ToArray();
+        }).Concat(editionId == Returning2026EditionId ? new[] { CodexBasicCard(4059) } : []).ToArray();
         var allRewards = original.Rewards.Concat(additionalRewards).ToArray();
         var rewardIds = additionalRewards.Select(reward => reward.Id).ToArray();
         return WithOpeningInheritance(WithChapterRewards(original with

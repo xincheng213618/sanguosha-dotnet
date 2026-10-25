@@ -17,8 +17,13 @@ public static partial class StandardShanheCampaignCatalog
 
     private static ShanheCampaignDefinition WithChapterRewards(ShanheCampaignDefinition definition)
     {
-        var rewards = definition.Rewards.Concat(ChapterLocalCards.Where(card => definition.Rewards.All(reward => reward.Id != card.Id))).ToArray();
-        var tactics = rewards.Where(IsChapterTactic).Select(reward => reward.Id).ToArray();
+        var currentSeason = definition.Id.StartsWith("shanhe:zhuhou-2026-", StringComparison.Ordinal);
+        var additions = currentSeason ? ChapterLegendarySkillRewards : ChapterLocalCards;
+        var rewards = definition.Rewards.Concat(additions.Where(addition => definition.Rewards.All(reward => reward.Id != addition.Id))).ToArray();
+        var tactics = rewards.Where(IsChapterTactic).Where(reward => !currentSeason || IsLegendaryChapterReward(reward, "战法"))
+            .Select(reward => reward.Id).ToArray();
+        var skills = rewards.Where(reward => reward.SkillId is not null && IsLegendaryChapterReward(reward, "技能"))
+            .Select(reward => reward.Id).ToArray();
         // Prefer the verified physical card faces when the codex catalogue is present; ordinary local editions
         // use their existing Peach/Duel recipes plus explicitly labelled local Slash/Dodge opening cards.
         var cards = rewards.Where(reward => reward.Id.StartsWith("codex-card-", StringComparison.Ordinal) && reward.StartingCards?.Count > 0).ToArray();
@@ -39,21 +44,33 @@ public static partial class StandardShanheCampaignCatalog
             {
                 var depth = depths[node.Id];
                 var chapter = depth <= 4 ? 1 : depth <= 8 ? 2 : 3;
+                var chapterBoss = ChapterBossIds.Contains(node.Id);
                 return node with
                 {
                     ChapterNumber = chapter,
                     ChapterTitle = ChapterRouteTitle(node.Id, chapter),
-                    BossRewards = ChapterBossIds.Contains(node.Id) ? new(500, 1,
-                    [
-                        new("tactics", "战法三选一", tactics),
-                        new("cards", "卡牌三选一", cards.Select(reward => reward.Id).ToArray())
-                    ]) : null
+                    // Final victories keep their fixed copper credit, but no longer award
+                    // unusable build choices or another skill slot after the expedition.
+                    Encounters = chapterBoss && chapter == 3
+                        ? node.Encounters!.Select(encounter => encounter with { VictoryGold = 500 }).ToArray()
+                        : node.Encounters,
+                    AddSkillSlotsOnVictory = chapterBoss && chapter == 3 ? 0 : node.AddSkillSlotsOnVictory,
+                    BossRewards = chapterBoss && chapter < 3 ? currentSeason
+                        ? new(500, 1, [
+                            new("tactics", "传说战法三选一", tactics, Math.Min(3, tactics.Length)),
+                            new("skills", "传说技能三选一", skills, Math.Min(3, skills.Length))])
+                        : new(500, 1, [new("tactics", "战法三选一", tactics),
+                            new("cards", "卡牌三选一", cards.Select(reward => reward.Id).ToArray())])
+                        : null
                 };
             }).ToArray()
         });
     }
 
-    private static bool IsChapterTactic(ShanheRewardDefinition reward) => reward.TacticSkillId is not null ||
+    private static bool IsLegendaryChapterReward(ShanheRewardDefinition reward, string kind) =>
+        ShopMetadataByRewardId.TryGetValue(reward.Id, out var metadata) && metadata.Rarity == 4 && metadata.Kind == kind;
+
+    private static bool IsChapterTactic(ShanheRewardDefinition reward) => reward.TacticSkillId is not null || reward.CampaignEconomy is not null ||
         reward.Bonuses is { } bonus && (bonus.MaxHp != 0 || bonus.InitialHand != 0 || bonus.Draw != 0 || bonus.Slash != 0);
 
     private static string ChapterRouteTitle(string nodeId, int chapter) => nodeId switch

@@ -102,7 +102,7 @@ public sealed partial class MainViewModel
             Accent = rarity switch { 2 => "#81619A", 3 => "#BF853C", 4 => "#A94531", _ => "#987653" }
         };
     }
-    private static bool IsShanheTactic(ShanheRewardDefinition reward) => reward.OpeningSkillRewardIds is not null || reward.TacticSkillId is not null || reward.Bonuses is { } bonuses && (bonuses.MaxHp != 0 || bonuses.InitialHand != 0 || bonuses.Draw != 0 || bonuses.Slash != 0);
+    private static bool IsShanheTactic(ShanheRewardDefinition reward) => reward.CampaignEconomy is not null || reward.OpeningSkillRewardIds is not null || reward.TacticSkillId is not null || reward.Bonuses is { } bonuses && (bonuses.MaxHp != 0 || bonuses.InitialHand != 0 || bonuses.Draw != 0 || bonuses.Slash != 0);
     private static string RewardCategory(ShanheRewardDefinition reward) => IsShanheTactic(reward) ? "战法" : reward.SkillId is not null ? "额外技能" : reward.StartingEquipment?.Count > 0 ? "随身装备" : reward.StartingCards?.Count > 0 ? "随身牌" : "补给";
     private string RewardRule(ShanheRewardDefinition reward) => reward.TacticSkillId is { } id && CurrentPresentationRegistry.Skills.TryGetValue(id, out var skill) ? skill.Description :
         reward.SkillId is { } extra && CurrentPresentationRegistry.Skills.TryGetValue(extra, out var learned) ? learned.Description : string.Empty;

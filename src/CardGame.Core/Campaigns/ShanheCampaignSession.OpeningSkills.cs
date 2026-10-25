@@ -35,7 +35,7 @@ public sealed partial class ShanheCampaignSession
         Require(_state.Phase == ShanheCampaignPhase.OpeningSkillDraft &&
             _state.OpeningSkillOfferIds.Contains(command.RewardId, StringComparer.Ordinal),
             "Choose one of the frozen initial skill offers.");
-        var next = ApplyReward(_state, _rewards[command.RewardId], null, allowLockedOpeningSkill: true) with
+        var next = ApplyReward(_state, _rewards[command.RewardId], null, allowLockedReward: true) with
         { OpeningDraftTacticIds = ShanheCampaignContent.Freeze(_state.OpeningDraftTacticIds.Skip(1)), OpeningSkillOfferIds = [] };
         return next.OpeningDraftTacticIds.Count > 0 ? PublishOpeningSkillOffer(next) : next with
         {

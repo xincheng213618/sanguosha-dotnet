@@ -50,12 +50,12 @@ public static partial class StandardShanheCampaignCatalog
     });
 
     public static ShanheCampaignDefinition CreateDefinition(int difficulty, string editionId) =>
-        WithStartingResourcesContract(CreateCurrentBaseDefinition(difficulty, editionId));
+        WithStartingResourcesContract(WithChapterRewards(CreateCurrentBaseDefinition(difficulty, editionId)));
 
     private static ShanheCampaignDefinition CreateCurrentBaseDefinition(int difficulty, string editionId) => editionId switch
     {
         LocalEditionId => CreateLegacyLocalDefinition(difficulty),
-        Returning2026EditionId => WithS5SpecialistGroupEncounters(CreateS5VanguardDefinition(difficulty)),
+        Returning2026EditionId => WithCurrentEconomyTactics(WithCurrentLegendaryTactics(WithS5SpecialistGroupEncounters(CreateS5VanguardDefinition(difficulty)))),
         _ => throw new ArgumentException("Unknown Shanhe campaign edition.", nameof(editionId))
     };
 

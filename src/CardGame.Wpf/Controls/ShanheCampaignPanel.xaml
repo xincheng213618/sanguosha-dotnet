@@ -179,6 +179,19 @@
     </TabItem>
     <TabItem AutomationProperties.Name="查看战法构筑与技能说明"><TabItem.Header><StackPanel><TextBlock Text="册" FontFamily="KaiTi" FontSize="31" TextAlignment="Center"/><TextBlock Text="山河册" FontSize="12" Margin="0,7,0,0" TextAlignment="Center"/></StackPanel></TabItem.Header><Grid><Grid.RowDefinitions><RowDefinition Height="26"/><RowDefinition Height="*"/></Grid.RowDefinitions><TextBlock Text="{Binding ShanheCodexPhaseText}" Foreground="#DBC393" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"/><controls:ShanheCodexPanel x:Name="ShanheCodexHost" Grid.Row="1"/></Grid></TabItem>
     <TabItem AutomationProperties.Name="山河图商店"><TabItem.Header><StackPanel><TextBlock Text="商" FontFamily="KaiTi" FontSize="31" TextAlignment="Center"/><TextBlock Text="行军商店" FontSize="12" Margin="0,7,0,0"/></StackPanel></TabItem.Header><controls:ShanheShopPanel x:Name="ShanheShopHost"/></TabItem>
+    <TabItem x:Name="ShanheRunHistoryTab" AutomationProperties.Name="查看山河图通关与征程记录"><TabItem.Header><StackPanel><TextBlock Text="录" FontFamily="KaiTi" FontSize="31" TextAlignment="Center"/><TextBlock Text="征程记录" FontSize="12" Margin="0,7,0,0"/></StackPanel></TabItem.Header>
+     <Grid Margin="28,22"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+      <Border Grid.RowSpan="2" Background="#E52C241B" BorderBrush="#795B37" BorderThickness="1" Margin="0,0,0,16"/>
+      <StackPanel Margin="17,12,17,0"><TextBlock Text="山河征程录" FontFamily="KaiTi" FontSize="32" Foreground="#F1D7A1"/><TextBlock Text="{Binding ShanheRunRecordSummary}" Foreground="#C7B18B" FontSize="13" Margin="0,9,0,0"/></StackPanel>
+      <TextBlock Grid.Row="1" Text="{Binding ShanheSettlementRewardRule}" Foreground="#C7B18B" FontSize="12" Margin="17,9,17,29" TextWrapping="Wrap"/>
+      <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"><ItemsControl x:Name="ShanheRunHistoryRows" ItemsSource="{Binding ShanheRunRecords}"><ItemsControl.ItemTemplate><DataTemplate>
+       <Border BorderBrush="#795B37" BorderThickness="1" Background="#D52C241B" Padding="17,13" Margin="0,0,0,10"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="165"/></Grid.ColumnDefinitions>
+        <StackPanel><TextBlock Text="{Binding Title}" Foreground="#F0D49A" FontSize="19" FontWeight="SemiBold"/><TextBlock Text="{Binding Detail}" Foreground="#C3AC85" FontSize="12" Margin="0,6,0,0" TextWrapping="Wrap"/><TextBlock Text="{Binding Ending}" Foreground="#A08D71" FontSize="12" Margin="0,5,0,0" TextWrapping="Wrap"/></StackPanel>
+        <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"><TextBlock Text="{Binding Reward}" Foreground="#F0CB75" FontSize="18" HorizontalAlignment="Right"/><TextBlock Text="{Binding Timestamp}" Foreground="#B09B7B" FontSize="11" Margin="0,8,0,0" HorizontalAlignment="Right"/></StackPanel>
+       </Grid></Border>
+      </DataTemplate></ItemsControl.ItemTemplate></ItemsControl></ScrollViewer>
+     </Grid>
+    </TabItem>
    </TabControl>
    <StackPanel Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="0,0,0,14">
     <Button x:Name="ShanheRulesButton" Content="玩法说明" Style="{StaticResource QuietCampaignButton}" Click="ShowRules" Padding="9,9" Width="86"/>

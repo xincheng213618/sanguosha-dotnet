@@ -5,14 +5,16 @@ using CardGame.Core.Campaigns;
 
 internal static class ShanheChapterRewardChecks
 {
-    public static void ThreeBossBundlesFreezeBothChoicesAndRequireExplicitChapterConfirmation()
+    public static void FirstTwoBossesGrantNativeTacticsAndSkillsThenFinalVictorySettlesDirectly()
     {
         var definition = FixtureDefinition();
         var session = Create(definition);
-        for (var chapter = 1; chapter <= 3; chapter++)
+        for (var chapter = 1; chapter <= 2; chapter++)
         {
             var node = "boss-" + chapter;
             Accept(session, new MoveShanheNodeCommand(node, session.Revision));
+            Require(session.PendingBattleSetup!.ExtraSkillIds.SequenceEqual(session.Snapshot.ExtraSkillIds),
+                "The selected native skills enter the next actual battle's setup.");
             var battle = ShanheCampaignChecks.CreateBattle(session.PendingBattleSetup!);
             ShanheCampaignChecks.FinishBattle(battle, "defeat");
             var gold = session.Snapshot.Gold;
@@ -22,10 +24,11 @@ internal static class ShanheChapterRewardChecks
             Require(session.Snapshot.Phase == ShanheCampaignPhase.Reward &&
                 summary.ChapterNumber == chapter && summary.FixedGold == 500 && summary.SkillSlots == 1 &&
                 session.Snapshot.Gold == gold + 500 && session.Snapshot.ExtraSkillSlots == slots + 1 &&
-                summary.Groups.Count == 2 && summary.Groups.All(group => group.Offers.Count == 3 && !group.IsResolved) &&
+                summary.Groups.Count == 2 && summary.Groups.Single(group => group.Id == "tactics").Offers.Count == 3 &&
+                summary.Groups.Single(group => group.Id == "skills").Offers.Count == 3 - chapter && summary.Groups.All(group => !group.IsResolved) &&
                 !summary.CanConfirm && session.Snapshot.AvailableNodes.Count == 0 &&
                 session.Snapshot.RewardOffers.Count == 0 && !session.Snapshot.CanSkipReward,
-                "Each chapter boss credits exactly 500 and one slot once, then freezes separate tactic/card three-choice groups before advancing.");
+                "The first two bosses freeze tactics and earned native skills, even on a zero-research account.");
             RejectMutation(summary.Groups);
             foreach (var group in summary.Groups) RejectMutation(group.Offers);
             Cold(session, definition);
@@ -37,21 +40,22 @@ internal static class ShanheChapterRewardChecks
                 !session.Submit(new MoveShanheNodeCommand("boss-" + (chapter + 1), session.Revision)).Accepted && Snapshot(session) == before,
                 "Duplicate victory, ordinary reward commands, skip, early confirmation and direct movement cannot bypass the boss bundle.");
 
-            var cards = summary.Groups.Single(group => group.Id == "cards");
+            var skills = summary.Groups.Single(group => group.Id == "skills");
             var tactics = summary.Groups.Single(group => group.Id == "tactics");
             var oldRevision = session.Revision;
-            var card = cards.Offers[0];
-            Accept(session, new ChooseShanheBossRewardCommand(cards.Id, card.Id, null, session.Revision));
-            var afterCard = session.Snapshot.BossRewardSummary!;
-            Require(session.Snapshot.StartingCards.Count == chapter && session.Snapshot.Gold == gold + 500 &&
-                afterCard.Groups.Single(group => group.Id == cards.Id).SelectedReward?.Id == card.Id &&
-                afterCard.Groups.Single(group => group.Id == tactics.Id).Offers.Select(reward => reward.Id).SequenceEqual(tactics.Offers.Select(reward => reward.Id)) &&
-                session.Snapshot.CompletedNodeIds.Count == chapter - 1 && !afterCard.CanConfirm,
-                "The card group can be claimed first, grants only its selected physical card, and cannot reroll the other frozen group or finish the chapter.");
+            var skill = skills.Offers[0];
+            Accept(session, new ChooseShanheBossRewardCommand(skills.Id, skill.Id, null, session.Revision));
+            var afterSkill = session.Snapshot.BossRewardSummary!;
+            Require(session.Snapshot.ExtraSkillIds.Count == chapter && session.Snapshot.ExtraSkillIds.Contains(skill.SkillId!) &&
+                session.Snapshot.StartingCards.Count == 0 && session.Snapshot.Gold == gold + 500 &&
+                afterSkill.Groups.Single(group => group.Id == skills.Id).SelectedReward?.Id == skill.Id &&
+                afterSkill.Groups.Single(group => group.Id == tactics.Id).Offers.Select(reward => reward.Id).SequenceEqual(tactics.Offers.Select(reward => reward.Id)) &&
+                session.Snapshot.CompletedNodeIds.Count == chapter - 1 && !afterSkill.CanConfirm,
+                "The skill group grants its actual native skill instead of a physical card, without rerolling the other group or finishing early.");
             if (chapter == 1) Cold(session, definition);
             before = Snapshot(session);
-            Require(!session.Submit(new ChooseShanheBossRewardCommand(cards.Id, card.Id, null, session.Revision)).Accepted &&
-                !session.Submit(new ChooseShanheBossRewardCommand(tactics.Id, card.Id, null, session.Revision)).Accepted &&
+            Require(!session.Submit(new ChooseShanheBossRewardCommand(skills.Id, skill.Id, null, session.Revision)).Accepted &&
+                !session.Submit(new ChooseShanheBossRewardCommand(tactics.Id, skill.Id, null, session.Revision)).Accepted &&
                 !session.Submit(new ChooseShanheBossRewardCommand(tactics.Id, tactics.Offers[0].Id, null, oldRevision)).Accepted &&
                 !session.Submit(new ConfirmShanheBossRewardCommand(session.Revision)).Accepted && Snapshot(session) == before,
                 "Claimed groups, a reward from another group, stale revisions and unfinished confirmation all reject without mutation.");
@@ -59,26 +63,35 @@ internal static class ShanheChapterRewardChecks
             Require(session.Snapshot.BossRewardSummary is { CanConfirm: true } &&
                 session.Snapshot.Phase == ShanheCampaignPhase.Reward && session.Snapshot.AvailableNodes.Count == 0 &&
                 session.Snapshot.Bonuses.Draw + session.Snapshot.Bonuses.Slash + session.Snapshot.Bonuses.InitialHand == chapter &&
-                session.Snapshot.ExtraSkillIds.Count == 0 && session.Snapshot.Gold == gold + 500,
+                session.Snapshot.ExtraSkillIds.Count == chapter && session.Snapshot.Gold == gold + 500,
                 "Claiming both groups still waits on the summary confirmation; a tactic does not consume the new skill slot or repeat fixed credits.");
-            if (chapter == 3) Cold(session, definition);
             Accept(session, new ConfirmShanheBossRewardCommand(session.Revision));
             Require(session.Snapshot.BossRewardSummary is null && session.Snapshot.CompletedNodeIds.Count == chapter &&
-                (chapter < 3 ? session.Snapshot.Phase == ShanheCampaignPhase.Map && session.Snapshot.AvailableNodes.Single().Id == "boss-" + (chapter + 1)
-                    : session.Snapshot.Phase == ShanheCampaignPhase.Won && session.Snapshot.EndingText == "第三章已定"),
-                "Only the final summary confirmation opens the next chapter, and the third chapter becomes Won only after that confirmation.");
+                session.Snapshot.Phase == ShanheCampaignPhase.Map && session.Snapshot.AvailableNodes.Single().Id == "boss-" + (chapter + 1),
+                "Confirming each of the first two summaries opens the next chapter.");
             before = Snapshot(session);
             Require(!session.Submit(new ConfirmShanheBossRewardCommand(session.Revision)).Accepted && Snapshot(session) == before,
                 "Chapter confirmation cannot be repeated after it has advanced the route.");
         }
-        Require(session.Snapshot.Gold == 1510 && session.Snapshot.ExtraSkillSlots == 4 &&
-            session.AcceptedCommands.OfType<ChooseShanheBossRewardCommand>().Count() == 6 &&
-            session.AcceptedCommands.OfType<ConfirmShanheBossRewardCommand>().Count() == 3,
-            "All three bundles retain exactly six group claims, three confirmations and their one-time fixed credits.");
+        Accept(session, new MoveShanheNodeCommand("boss-3", session.Revision));
+        var finalBattle = ShanheCampaignChecks.CreateBattle(session.PendingBattleSetup!);
+        ShanheCampaignChecks.FinishBattle(finalBattle, "defeat");
+        Require(session.CompleteBattle(finalBattle, session.Revision).Accepted && session.Snapshot.Phase == ShanheCampaignPhase.Won &&
+            session.Snapshot.EndingText == "第三章已定" && session.Snapshot.BossRewardSummary is null &&
+            session.Snapshot.RewardOffers.Count == 0 && session.Snapshot.AvailableNodes.Count == 0 && !session.Snapshot.CanSkipReward &&
+            session.Snapshot.Gold == 1510 && session.Snapshot.ExtraSkillSlots == 3 && session.Snapshot.ExtraSkillIds.Count == 2 &&
+            session.AcceptedCommands.OfType<ChooseShanheBossRewardCommand>().Count() == 4 &&
+            session.AcceptedCommands.OfType<ConfirmShanheBossRewardCommand>().Count() == 2,
+            "The actual third boss reaches final settlement immediately, retaining its copper but issuing no unusable build reward or slot.");
+        var finished = Snapshot(session);
+        Require(!session.Submit(new ConfirmShanheBossRewardCommand(session.Revision)).Accepted &&
+            !session.Submit(new ChooseShanheRewardCommand("opening", null, session.Revision)).Accepted &&
+            !session.CompleteBattle(finalBattle, session.Revision).Accepted && Snapshot(session) == finished,
+            "A finished expedition cannot reopen build rewards or settle its final battle twice.");
         Cold(session, definition);
     }
 
-    public static void ChapterMetadataNestedPoolsLegacyHashesAndLargeShopsKeepTheirBoundaries()
+    public static void CurrentChapterPoolsAreLegendaryAndNestedDefinitionsRemainBounded()
     {
         var source = FixtureDefinition();
         var candidateIds = source.Nodes[0].BossRewards!.Groups[0].RewardIds.ToList();
@@ -100,39 +113,36 @@ internal static class ShanheChapterRewardChecks
         MustThrow(() => ShanheCampaignContent.FreezeAndValidate(frozen with
         { Nodes = frozen.Nodes.Select((node, index) => index == 0 ? node with { BossRewards = node.BossRewards! with { Groups = [new("bad", "缺失奖励", ["missing"])] } } : node).ToArray() }));
 
-        foreach (var edition in StandardShanheCampaignCatalog.Editions)
+        foreach (var tier in new[] { 1, 2, 3 })
         foreach (var codex in new[] { false, true })
         {
-            var current = codex ? StandardShanheCampaignCatalog.CreateCodexDefinition(1, edition.Id)
-                : StandardShanheCampaignCatalog.CreateDefinition(1, edition.Id);
+            var current = codex ? StandardShanheCampaignCatalog.CreateCodexDefinition(tier, StandardShanheCampaignCatalog.Returning2026EditionId)
+                : StandardShanheCampaignCatalog.CreateDefinition(tier, StandardShanheCampaignCatalog.Returning2026EditionId);
             var bosses = current.Nodes.Where(node => node.BossRewards is not null).ToArray();
             Require(current.Nodes.All(node => node.ChapterNumber is >= 1 and <= 3 && !string.IsNullOrWhiteSpace(node.ChapterTitle)) &&
-                bosses.Select(node => node.Id).Order(StringComparer.Ordinal).SequenceEqual(new[] { "huaxiong", "lijue", "guosi", "luoyang", "suanzao", "henei" }.Order(StringComparer.Ordinal)) &&
+                bosses.Select(node => node.Id).Order(StringComparer.Ordinal).SequenceEqual(new[] { "huaxiong", "lijue", "guosi" }.Order(StringComparer.Ordinal)) &&
                 bosses.All(node => node.BossRewards is { FixedGold: 500, SkillSlots: 1 } && node.BossRewards.Groups.Count == 2 &&
-                    node.BossRewards.Groups.All(group => group.ChoiceCount == 3 && group.RewardIds.Count >= 3)) &&
-                bosses.Where(node => node.ChapterNumber == 3).Select(node => node.ChapterTitle).Distinct().Count() == 3,
-                "Both editions and their codex pools publish three real chapters, the six route-specific completion bosses and both three-choice groups.");
+                    node.BossRewards.Groups.Select(group => group.Id).SequenceEqual(["tactics", "skills"]) &&
+                    node.BossRewards.Groups.All(group => group.ChoiceCount == 3 && group.RewardIds.Count >= 3)),
+                "Every current S5 difficulty and codex pool publishes red tactic and skill choices only for its first two chapter bosses.");
             foreach (var boss in bosses)
-                Require(boss.BossRewards!.Groups.Single(group => group.Id == "cards").RewardIds.All(id => current.Rewards.Single(reward => reward.Id == id).StartingCards?.Count > 0),
-                    "Chapter card rewards must contain actual opening cards rather than equipment-only substitutes.");
-            var legacy = StripChapters(current);
-            var legacyJson = JsonSerializer.Serialize(legacy);
-            Require(!legacyJson.Contains("\"ChapterNumber\"", StringComparison.Ordinal) && !legacyJson.Contains("\"ChapterTitle\"", StringComparison.Ordinal) &&
-                !legacyJson.Contains("\"BossRewards\"", StringComparison.Ordinal), "Default chapter metadata must be absent from historical definition JSON.");
-            foreach (var compensation in new[] { true, false })
+            foreach (var group in boss.BossRewards!.Groups)
+            foreach (var id in group.RewardIds)
             {
-                var oldDefinition = compensation ? legacy : legacy with { Nodes = legacy.Nodes.Select(node => node with { RewardSkipGold = 0 }).ToArray() };
-                var saved = ShanheCampaignSession.Create(oldDefinition, new(71, oldDefinition.PlayerGeneralIds[0]) { UseCodexRewardPool = codex },
-                    StandardShanheCampaignCatalog.CreateBattleRegistry).CreateCheckpoint();
-                var reconstructed = StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(saved, 1);
-                Require(reconstructed.Nodes.All(node => node.BossRewards is null && node.ChapterNumber == 0) &&
-                    ShanheCampaignContent.GetContentHash(reconstructed) == saved.CampaignHash,
-                    "Only an exact pre-chapter fingerprint selects the matching old definition, including reward compensation metadata.");
-                _ = ShanheCampaignSession.Restore(saved, reconstructed, StandardShanheCampaignCatalog.CreateBattleRegistry);
-                MustThrow(() => StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(saved with { CampaignHash = "different" }, 1));
-                MustThrow(() => StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(saved with
-                { Commands = [new ConfirmShanheBossRewardCommand(0)], Revision = 1 }, 1));
+                var reward = current.Rewards.Single(reward => reward.Id == id);
+                var metadata = StandardShanheCampaignCatalog.ShopMetadataByRewardId[id];
+                Require(metadata.Rarity == 4 && (group.Id == "skills"
+                        ? metadata.Kind == "技能" && reward.SkillId is not null
+                        : metadata.Kind == "战法" && (reward.TacticSkillId is not null || reward.CampaignEconomy is not null)) &&
+                    (reward.StartingCards?.Count ?? 0) == 0 && (reward.StartingEquipment?.Count ?? 0) == 0,
+                    "Chapter offers contain actual legendary skills and tactics rather than physical-card substitutes.");
             }
+            var finals = current.Nodes.Where(node => node.NextNodeIds.Count == 0).ToArray();
+            Require(finals.Length == 3 && finals.All(node => node.ChapterNumber == 3 && node.BossRewards is null &&
+                node.AddSkillSlotsOnVictory == 0 && node.Encounters!.All(encounter => encounter.VictoryGold == 500)),
+                "All three final routes retain their fixed copper credit without another build reward or slot.");
+            _ = ShanheCampaignSession.Create(current, new(71, "classic:guan-yu") { UseCodexRewardPool = codex, UnlockedRewardIds = [] },
+                StandardShanheCampaignCatalog.CreateBattleRegistry);
         }
         var choices = Enumerable.Range(0, 65).Select(index => new ShanheNodeChoiceDefinition("stock-" + index, "军资", RewardId: "draw", LeavesNode: false)).ToArray();
         var shop = new ShanheNodeDefinition("large-shop", "行商目录", ShanheNodeKind.Shop, ["boss-1"], Choices: choices);
@@ -143,33 +153,34 @@ internal static class ShanheChapterRewardChecks
         { Nodes = shopDefinition.Nodes.Select(node => node.Id == shop.Id ? node with { Kind = ShanheNodeKind.Event } : node).ToArray() }));
         MustThrow(() => ShanheCampaignContent.FreezeAndValidate(shopDefinition with
         { Nodes = shopDefinition.Nodes.Select(node => node.Id == shop.Id ? node with { Choices = Enumerable.Range(0, 513).Select(index => choices[0] with { Id = "stock-" + index }).ToArray() } : node).ToArray() }));
+        var lockedShop = shop with { Choices = [new("locked-skill", "待研习技能", RewardId: "skill-guard", LeavesNode: false)] };
+        var locked = Create(shopDefinition with { Nodes = new[] { lockedShop }.Concat(frozen.Nodes).ToArray() });
+        Accept(locked, new MoveShanheNodeCommand(lockedShop.Id, locked.Revision));
+        var beforeShop = Snapshot(locked);
+        Require(!locked.Snapshot.NodeChoices.Any(choice => choice.Id == "locked-skill") &&
+            !locked.Submit(new ChooseShanheNodeOptionCommand("locked-skill", null, locked.Revision)).Accepted && Snapshot(locked) == beforeShop,
+            "The earned boss skill exception cannot bypass ordinary shop research requirements.");
     }
-
-    private static ShanheCampaignDefinition StripChapters(ShanheCampaignDefinition definition) => definition with
-    {
-        Rewards = definition.Rewards.Where(reward => reward.Id is not "chapter-card-slash" and not "chapter-card-dodge").ToArray(),
-        Nodes = definition.Nodes.Select(node => node with { ChapterNumber = 0, ChapterTitle = null, BossRewards = null }).ToArray()
-    };
     private static ShanheCampaignDefinition FixtureDefinition()
     {
         string[] tactics = ["opening", "draw", "slash"];
-        string[] cards = ["peach", "attack", "dodge"];
+        string[] skills = ["skill-guard", "skill-raid", "skill-guard-alias"];
         return new("fixture:chapter-rewards", "三章征程", [ShanheCampaignChecks.Player], ["boss-1"],
             Enumerable.Range(1, 3).Select(chapter => new ShanheNodeDefinition("boss-" + chapter, "第" + chapter + "章首领",
                 ShanheNodeKind.BossBattle, chapter < 3 ? ["boss-" + (chapter + 1)] : [],
-                [new("guard-" + chapter, "守军", [new(ShanheCampaignChecks.Enemy)], VictoryGold: 7)], tactics)
+                [new("guard-" + chapter, "守军", [new(ShanheCampaignChecks.Enemy)], VictoryGold: chapter == 3 ? 500 : 7)], tactics)
             {
                 ChapterNumber = chapter, ChapterTitle = "第" + chapter + "章", RewardSkipGold = 100,
                 AddSkillSlotsOnVictory = chapter < 3 ? 1 : 0, VictoryText = chapter == 3 ? "第三章已定" : "",
-                BossRewards = new(500, 1, [new("tactics", "战法三选一", tactics), new("cards", "卡牌三选一", cards)])
+                BossRewards = chapter < 3 ? new(500, 1, [new("tactics", "战法三选一", tactics), new("skills", "技能三选一", skills)]) : null
             }).ToArray(),
             [new("opening", "筹备", Bonuses: new(InitialHand: 1)), new("draw", "粮道", Bonuses: new(Draw: 1)),
-                new("slash", "连击", Bonuses: new(Slash: 1)), new("peach", "桃", StartingCards: [new(CardKind.Peach)]),
-                new("attack", "杀", StartingCards: [new(CardKind.Slash)]), new("dodge", "闪", StartingCards: [new(CardKind.Dodge)])],
+                new("slash", "连击", Bonuses: new(Slash: 1)), new("skill-guard", "守御", SkillId: "fixture:shanhe-guard"),
+                new("skill-raid", "突袭", SkillId: "fixture:shanhe-raid"), new("skill-guard-alias", "守御同源", SkillId: "fixture:shanhe-guard")],
             StartingGold: 10, ExtraSkillSlots: 1);
     }
     private static ShanheCampaignSession Create(ShanheCampaignDefinition definition) => ShanheCampaignSession.Create(definition,
-        new(71, ShanheCampaignChecks.Player), ShanheCampaignChecks.Registry);
+        new(71, ShanheCampaignChecks.Player) { UnlockedRewardIds = [] }, ShanheCampaignChecks.Registry);
     private static string Snapshot(ShanheCampaignSession session) => JsonSerializer.Serialize(session.Snapshot);
     private static void Cold(ShanheCampaignSession session, ShanheCampaignDefinition definition)
     {

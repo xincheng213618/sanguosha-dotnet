@@ -122,6 +122,9 @@ public sealed record ShanheRewardDefinition(
     public string Description { get; init; } = "";
     /// <summary>A campaign tactic program. This never consumes an extra general-skill slot.</summary>
     public string? TacticSkillId { get; init; }
+    /// <summary>A native expedition-only tactic; it never consumes a general-skill slot.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ShanheCampaignEconomy? CampaignEconomy { get; init; }
     private readonly IReadOnlyList<string>? _openingSkillRewardIds;
     /// <summary>An initial tactic's one-time three-choice skill pool; it is not a battle program.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

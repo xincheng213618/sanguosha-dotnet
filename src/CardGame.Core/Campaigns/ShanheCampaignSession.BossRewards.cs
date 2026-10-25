@@ -20,12 +20,16 @@ public sealed partial class ShanheCampaignSession
 
     private bool CanApplyBossReward(RunState state, ShanheRewardDefinition reward)
     {
-        if (!CanReceiveReward(state, reward)) return false;
+        // Chapter completion rewards are earned by this run. Account research
+        // gates shop stock and initial loadouts, not an earned boss skill.
+        if (reward.SkillId is { } skill && HasSkill(state, skill) ||
+            reward.OpeningSkillRewardIds is not null && state.TacticIds.Contains(reward.Id, StringComparer.Ordinal) ||
+            reward.TacticSkillId is { } tactic && !CanAcquireTactic(state, tactic)) return false;
         var replacements = reward.SkillId is not null && state.ExtraSkillIds.Count >= state.ExtraSkillSlots + reward.AddSkillSlots
             ? state.ExtraSkillIds.Cast<string?>() : new string?[] { null };
         foreach (var replacement in replacements)
         {
-            try { _ = ApplyReward(state, reward, replacement); return true; }
+            try { _ = ApplyReward(state, reward, replacement, allowLockedReward: true); return true; }
             catch (Exception error) when (error is ArgumentException or OverflowException) { }
         }
         return false;
@@ -38,7 +42,7 @@ public sealed partial class ShanheCampaignSession
         var group = _state.BossRewardGroups.SingleOrDefault(group => group.Id == command.GroupId);
         Require(group is not null && group.SelectedRewardId is null && group.OfferIds.Contains(command.RewardId, StringComparer.Ordinal),
             "Choose one of this unclaimed boss group's frozen rewards.");
-        var next = ApplyReward(_state, _rewards[command.RewardId], command.ReplaceSkillId);
+        var next = ApplyReward(_state, _rewards[command.RewardId], command.ReplaceSkillId, allowLockedReward: true);
         return next with
         {
             BossRewardGroups = ShanheCampaignContent.Freeze(_state.BossRewardGroups.Select(item =>

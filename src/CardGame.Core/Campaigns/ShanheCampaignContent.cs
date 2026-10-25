@@ -27,6 +27,7 @@ public static partial class ShanheCampaignContent
         foreach (var reward in definition.Rewards)
         {
             ValidateOpeningSkillReward(definition, reward);
+            ValidateEconomy(reward);
             RequireText(reward.Name, "reward name");
             Require(reward.Gold is >= 0 and <= 100_000 && reward.Heal is >= 0 and <= 1000 && reward.AddSkillSlots is >= 0 and <= 8, "Invalid reward amounts.");
             if (reward.SkillId is not null) RequireText(reward.SkillId, "reward skill");

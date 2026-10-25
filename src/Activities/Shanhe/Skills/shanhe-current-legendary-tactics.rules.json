@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:current-touxi-2009", "revision": 1,
+      "cardPolicies": [{ "id": "spade-slash-unlimited", "kind": "bypassSlashLimitBySuit", "cardKinds": ["slash", "fireSlash", "thunderSlash"], "inputSuit": "spade" }]
+    },
+    {
+      "id": "shanhe:current-tiebushan-2074", "revision": 1,
+      "triggers": [{ "id": "native-opening-six-armor", "window": "gameStarting", "subject": "owner", "optional": false,
+        "effects": [{ "op": "grantArmor", "target": "owner", "amount": 6 }] }]
+    },
+    {
+      "id": "shanhe:current-jingjijia-2116", "revision": 1,
+      "triggers": [{ "id": "every-damage-source-reflection", "window": "afterDamageApplied", "subject": "owner", "damageOccurrence": "perDamage", "requireDamageSource": true, "optional": false,
+        "effects": [{ "op": "damage", "target": "owner", "targetRef": { "kind": "eventSource" }, "sourceRef": { "kind": "owner" }, "amount": 1, "nature": "normal" }] }]
+    },
+    {
+      "id": "shanhe:current-pianzhuanjia-2117", "revision": 1,
+      "triggers": [{ "id": "every-damage-random-enemy-reflection", "window": "afterDamageApplied", "subject": "owner", "damageOccurrence": "perDamage", "optional": false,
+        "effects": [
+          { "op": "selectRandomPublicTeamTarget", "target": "owner", "targetKind": "publicTeamEnemies", "allowEmpty": true },
+          { "op": "damageParticipants", "target": "selectedTargets", "amount": 1, "nature": "normal" }
+        ] }]
+    }
+  ]
+}

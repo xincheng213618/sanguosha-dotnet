@@ -6,6 +6,8 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using CardGame.Content.Standard;
 using CardGame.Core;
@@ -280,20 +282,34 @@ internal static class ShanheCampaignUiChecks
             Program.Assert(bossNode.Id == "hulao", "The verified seed must enter the real first-chapter exclusive boss route.");
             vm.SelectShanheNodeCommand.Execute(bossNode);
             var game = Program.Engine(vm);
-            var bossId = game.CreateCheckpoint().Options.ShanheBattle!.EnemyRoster[0].GeneralId;
+            var setup = game.CreateCheckpoint().Options.ShanheBattle!;
+            var bossId = setup.EnemyRoster[0].GeneralId;
             var boss = game.CreateSnapshot(0).Players.Single(player => player.GeneralId == bossId);
-            var knownForm = bossId == StandardShanheBossPackage.ShenguiLvbuId
-                ? boss.Skills!.Select(skill => skill.Id).ToHashSet().SetEquals(["shanhe:shengui-wushuang", "shanhe:shengui-shenqu"]) &&
-                    game.CreateSnapshot(0).Players.Single(player => player.GeneralId == StandardShanheBossPackage.FenghuangId)
-                        .Skills!.Select(skill => skill.Id).ToHashSet().SetEquals(["ol:fudao", "ol:xiuhao"])
-                : bossId == StandardShanheS5BossPackage.ZhangliaoBaseId
-                    ? boss.Skills!.Select(skill => skill.Id).ToHashSet().SetEquals([StandardShanheS5BossPackage.TuxiId, "boundary:pojun"])
-                    : bossId == StandardShanheS5BossPackage.ZhangliaoLingdongId
-                        ? boss.Skills!.Select(skill => skill.Id).ToHashSet().SetEquals([StandardShanheS5BossPackage.TuxiId, "boundary:pojun", StandardShanheS5BossPackage.LingdongId])
-                        : bossId == StandardShanheS5BossPackage.ZhangliaoHuangkongId &&
-                            boss.Skills!.Select(skill => skill.Id).ToHashSet().SetEquals([StandardShanheS5BossPackage.TuxiId, "boundary:pojun", StandardShanheS5BossPackage.LingdongId, StandardShanheS5BossPackage.HuangkongId]);
-            Program.Assert(vm.IsShanheBattleSession && knownForm && GeneralArt.HasPortrait(bossId),
-                "The selected edition starts the actually drawn dedicated form, with its correct skills and portrait, rather than substituting an ordinary same-name general.");
+            // The S5 candidate pool now contains complete published groups beyond the
+            // original Lv Bu/Zhang Liao forms. Bind expectations to this exact drawn
+            // recipe and its registered source body rather than an old seed's four ids.
+            var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup);
+            var expectedGeneral = registry.Generals[bossId];
+            var expectedSkills = expectedGeneral.SkillIds.Concat(setup.EnemyRoster[0].ExtraSkillIds ?? []).ToHashSet(StringComparer.Ordinal);
+            var knownForm = bossId.StartsWith("shanhe:", StringComparison.Ordinal) &&
+                boss.Skills!.Select(skill => skill.Id).ToHashSet(StringComparer.Ordinal).SetEquals(expectedSkills);
+            if (bossId == StandardShanheBossPackage.ShenguiLvbuId)
+                knownForm &= game.CreateSnapshot(0).Players.Single(player => player.GeneralId == StandardShanheBossPackage.FenghuangId)
+                    .Skills!.Select(skill => skill.Id).ToHashSet().SetEquals(["ol:fudao", "ol:xiuhao"]);
+            var declaredMissingArt = expectedGeneral.PortraitKey == "supporter" ||
+                bossId == StandardShanheS5YuduPackage.YuduId && expectedGeneral.PortraitKey == "" ||
+                bossId == StandardShanheS5ZhangliangPackage.ZhangliangId && expectedGeneral.PortraitKey == "zhang_liang" ||
+                bossId == StandardShanheS5XuncanCaoshiPackage.XuncanId && expectedGeneral.PortraitKey == "";
+            var sourcePortraitKey = expectedGeneral.PortraitKey == "dong_bai" ? "ol-dong-bai" : expectedGeneral.PortraitKey.Replace('_', '-');
+            var expectedPortrait = GeneralArt.GetSkin(sourcePortraitKey);
+            var portraitMatchesSource = declaredMissingArt
+                ? !GeneralArt.HasPortrait(bossId) && GeneralArt.GetPortrait(bossId) is SolidColorBrush { Color.A: 0 }
+                : expectedPortrait is not null && GeneralArt.GetSkin(bossId)?.LocalPath == expectedPortrait.LocalPath &&
+                    GeneralArt.GetPortrait(bossId, decodeWidth: 96) is ImageBrush
+                        { ImageSource: BitmapSource { PixelWidth: > 0, PixelHeight: > 0 } };
+            Program.Assert(vm.IsShanheBattleSession && knownForm && portraitMatchesSource,
+                "The selected edition starts the actually drawn dedicated source form with its exact skills and declared portrait or missing-art fallback: " +
+                JsonSerializer.Serialize(new { bossId, ExpectedSkills = expectedSkills, ActualSkills = boss.Skills!.Select(skill => skill.Id), expectedGeneral.PortraitKey, declaredMissingArt }));
             Program.Assert(game.CreateCheckpoint().Options.ShanheBattle!.DefaultGodFactionId == "qun" &&
                 game.CreateSnapshot(0).Players[0].FactionId == "qun",
                 "The selected edition's visible god-faction notice reaches the actual battle recipe and public table faction.");
@@ -303,8 +319,9 @@ internal static class ShanheCampaignUiChecks
             var expected = SnapshotJson.Serialize(game.CreateSnapshot(0));
             Program.Render(root, 1440, 880, Path.Combine(output, "180-shanhe-2026-exclusive-boss.png"));
             using var cold = Create(ordinary, campaign);
+            cold.SelectedShanheScenario = cold.ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.LocalEditionId);
             Program.Assert(cold.SelectedShanheScenario.Id == StandardShanheCampaignCatalog.LocalEditionId,
-                "A fresh UI starts with the old edition selected so restoration must obtain the edition from its checkpoint.");
+                "Explicitly selecting the other edition requires restoration to obtain the saved edition from its checkpoint, independently of the new preparation default.");
             cold.ContinueShanheCommand.Execute(null);
             Program.Assert(cold.IsShanheBattleSession && cold.SelectedShanheScenario.Id == StandardShanheCampaignCatalog.Returning2026EditionId &&
                 cold.SelectedShanheGeneralMeta.Contains("出征默认群") &&

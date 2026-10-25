@@ -37,6 +37,7 @@ public sealed partial class ShanheCampaignSession
                 if (reward.TacticSkillId is { } tactic && _tacticAcquisitionRules[tactic] is { Repeatable: false } rule)
                     Check(("tactic", rule.IdentityId), group.Id);
                 if (reward.SkillId is { } skill) Check(("skill", skill), group.Id);
+                if (reward.CampaignEconomy is not null) Check(("economy", reward.Id), group.Id);
             }
 
             void Check((string Kind, string Id) identity, string groupId)

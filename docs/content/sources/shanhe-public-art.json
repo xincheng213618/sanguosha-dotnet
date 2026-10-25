@@ -771,6 +771,16 @@
       "path": "src/CardGame.Wpf/Assets/Shanhe/4052.png",
       "sha256": "f421e234460228bd4f2961070587769134cbd2cdfe046bc3dd010ed503dde352",
       "bytes": 86596
+    },
+    {
+      "sourceId": 4059,
+      "name": "刑天破军斧",
+      "sourceCatalog": "https://s.xiaochao.org/data/cards.json",
+      "originalUrl": "https://s.xiaochao.org/data/images/cf5ba6deb710b3b3c9a63a92.png",
+      "path": "src/CardGame.Wpf/Assets/Shanhe/4059.png",
+      "sha256": "cf5ba6deb710b3b3c9a63a92a6004c822aa920e0c26f5481d4330e3dfb5533b8",
+      "bytes": 85006,
+      "fetchedAtUtc": "2026-10-25T13:02:43.124089+00:00"
     }
   ],
   "missingSourceIds": [
@@ -783,7 +793,6 @@
     4040,
     4050,
     4056,
-    4059,
     4061
   ],
   "failures": []

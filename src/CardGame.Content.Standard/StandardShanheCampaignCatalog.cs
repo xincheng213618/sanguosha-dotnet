@@ -195,6 +195,7 @@ public static partial class StandardShanheCampaignCatalog
         var currentJinnangJi = RequiresCurrentJinnangJiRegistry(setup);
         var currentDuoduoYishan = RequiresCurrentDuoduoYishanRegistry(setup);
         var currentYaoli = RequiresCurrentYaoliRegistry(setup);
+        var currentLegendaryTactics = RequiresCurrentLegendaryTacticsRegistry(setup);
         var currentSlashTactics = RequiresCurrentSlashTacticsRegistry(setup);
         var s5Chengxiong = RequiresChengxiongBossRegistry(setup);
         var s5CaoxingHigh = RequiresCaoxingHighRegistry(setup);
@@ -287,6 +288,7 @@ public static partial class StandardShanheCampaignCatalog
             (currentJinnangJi ? "/current-jinnangji-2011" : "") +
             (currentDuoduoYishan ? "/current-duoduo-yishan" : "") +
             (currentYaoli ? "/current-yaoli" : "") +
+            (currentLegendaryTactics ? "/current-legendary-tactics" : "") +
             (currentSlashTactics ? "/current-slash-tactics" : "") +
             (s5Chengxiong ? "/s5-chengxiong-14055" : "") +
             (s5Shidu ? "/s5-shidu-7003" : "") +
@@ -327,6 +329,7 @@ public static partial class StandardShanheCampaignCatalog
         return BattleRegistries.GetOrAdd(key, _ => new Lazy<ContentRegistry>(() =>
         {
             var packages = new List<IGameContentPackage> { new StandardShanheBossPackage() };
+            if (currentLegendaryTactics) packages.Add(new StandardShanheLegendaryTacticsPackage());
             if (s5Zhangliao || ids.Any(id => id == StandardShanheS5BossPackage.ZhangliaoBaseId ||
                 id == StandardShanheS5BossPackage.ZhangliaoLingdongId || id == StandardShanheS5BossPackage.ZhangliaoHuangkongId ||
                 id == StandardShanheS5BossPackage.DongZhuoLuoyangId || id == StandardShanheS5BossPackage.DongMinBaseId ||
