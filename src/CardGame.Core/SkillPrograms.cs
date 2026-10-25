@@ -736,6 +736,7 @@ public enum SkillProgramEffectOp
     PrepareMouZhangHeQiaobian = 34200, ResolveMouZhangHeSkippedPhase = 34201, ResolveMouZhangHeEnding = 34202,
     ResolveMouZhuRanZhenwei = 34400, ResolveMouZhuRanHeyuan = 34401,
     ObtainWushuangDeckCards = 62000,
+    ObtainDeckCards = 62010,
     ResolveWushuangOriginalYiji = 61010,
     ResolveWushuangYashi = 61011,
     ResolveWushuangShenfu = 61012,

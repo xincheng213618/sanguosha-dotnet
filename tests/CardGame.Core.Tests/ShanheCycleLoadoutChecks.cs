@@ -12,6 +12,14 @@ internal static class ShanheCycleLoadoutChecks
         => StartRegisteredLoadout(["tactic-build-2132", "tactic-build-2133", "tactic-build-2135",
             "tactic-build-2194", "tactic-build-2167", "tactic-build-2308"], [46], 6);
 
+    public static void CurrentDeckTacticLoadoutsStartWithRegisteredNativePrograms()
+    {
+        StartRegisteredLoadout(["tactic-build-2093", "tactic-build-2144", "tactic-build-2094",
+            "tactic-build-2095", "tactic-build-2096", "tactic-build-2097"], [138], 6);
+        StartRegisteredLoadout(["tactic-build-2098", "tactic-build-2099", "tactic-build-2249",
+            "tactic-build-2250", "tactic-build-2251"], [53], 5);
+    }
+
     private static void StartRegisteredLoadout(string[] equipped, int[] researchNodes, int nativeCount)
     {
         var source = StandardShanheCampaignCatalog.CreateCodexDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
