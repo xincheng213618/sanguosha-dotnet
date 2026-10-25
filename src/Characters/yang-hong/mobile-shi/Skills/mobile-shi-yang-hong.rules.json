@@ -1,0 +1,66 @@
+{
+ "schemaVersion": 62,
+ "skills": [
+  {
+   "id": "mobile:shi-jijian",
+   "revision": 1,
+   "activations": [
+    {
+     "id": "jijian-contest",
+     "minCards": 1,
+     "maxCards": 1,
+     "sourceZones": ["hand"],
+     "minTargets": 2,
+     "maxTargets": 2,
+     "targetKind": "anyLiving",
+     "usesPerTurn": null,
+     "usesPerPhase": 1,
+     "condition": {
+      "kind": "always"
+     },
+     "effects": [
+      {
+       "op": "resolveShiYhJijian",
+       "target": "owner"
+      }
+     ]
+    }
+   ],
+   "triggers": []
+  },
+  {
+   "id": "mobile:shi-yuanmo",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "yuanmo-prep",
+     "window": "turnStartBeforeNormalFlow",
+     "subject": "owner",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiYhYuanmo",
+       "target": "owner"
+      }
+     ]
+    },
+    {
+     "id": "yuanmo-damage",
+     "window": "afterDamageApplied",
+     "subject": "owner",
+     "damageOccurrence": "perDamage",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiYhYuanmo",
+       "target": "owner"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

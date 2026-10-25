@@ -13205,11 +13205,14 @@ public sealed partial class GameEngine
                     var parentIndex = _resolutionStack.FindIndex(frame => frame.Id == programParentId);
                     if (parentIndex < 0 || _resolutionStack[parentIndex] is not ProgramSkillFrame parent)
                         throw new InvalidOperationException("The virtual Slash lost its selected-target program parent.");
-                    IReadOnlyList<int> primaryTarget = virtualUse.TargetSeats;
-                    if (virtualUse.TargetSeats.Count != 1 &&
-                        !TryGetOriginalTargetVirtualSlashReturn(virtualUse, parent, out primaryTarget))
-                        throw new InvalidOperationException("The virtual Slash lost its selected-target program parent.");
-                    ReplaceRuntimeFrame(parent.Id, parent with { SelectedTargetSeats = primaryTarget });
+                    if (parent.YangHong is null)
+                    {
+                        IReadOnlyList<int> primaryTarget = virtualUse.TargetSeats;
+                        if (virtualUse.TargetSeats.Count != 1 &&
+                            !TryGetOriginalTargetVirtualSlashReturn(virtualUse, parent, out primaryTarget))
+                            throw new InvalidOperationException("The virtual Slash lost its selected-target program parent.");
+                        ReplaceRuntimeFrame(parent.Id, parent with { SelectedTargetSeats = primaryTarget });
+                    }
                 }
                 SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.Completed);
                 AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(attack.ResolutionId, 0, virtualUse.CardKind));
