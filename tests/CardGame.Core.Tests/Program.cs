@@ -287,6 +287,8 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe Woxin: outside hits prevention and public prediction", ShanheWoxinChecks.OutsideHitsAccumulateAndPreventedDamagePreservesCredits),
     ("Shanhe Woxin: nested outside-turn reflections consume distinct credits", ShanheWoxinChecks.ReflectionsConsumeNewCreditsWithinTheOriginalOutsideTurn),
     ("Shanhe market: random stock category prices refresh and cold replay", ShanheMarketChecks.RandomStockCategoryPricesRefreshAndColdReplay),
+    ("Shanhe shop stock: purchases native equipment and cards", ShanheShopStockChecks.PurchasesNativeEquipmentAndCards),
+    ("Shanhe shop stock: purchased Crown native preparation damage", ShanheShopStockChecks.PurchasedCrownDealsNativePreparationDamage),
     ("Shanhe Longhun: two black compulsory discard", ShanheLonghunChecks.TwoBlackResponsesCompulsorilyDiscardCurrentTurnCard),
     ("Shanhe Longhun: single black and optional OL", ShanheLonghunChecks.SingleBlackHasNoBonusAndOrdinaryOlKeepsOptionalDiscard),
     ("Shanhe Yiji: bought skill private distribution per actual damage point", ShanheYijiChecks.BoughtSkillDistributesPrivateTopCardsPerActualDamagePoint),

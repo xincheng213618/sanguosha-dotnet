@@ -36,6 +36,7 @@ public static partial class StandardShanheCampaignCatalog
             .Concat([CurrentMuniuLiumaRewardId, CurrentSougua3RewardId, CurrentFenjinRewardId])
             .Concat(CurrentBuildSkillDefaultUnlockedRewardIds)
             .Concat(CurrentReactionTacticDefaultUnlockedRewardIds)
+            .Concat(CurrentShopCardSources.Select(source => source.RewardId))
             .Where(available.Contains).ToArray());
     }
 
@@ -161,6 +162,7 @@ public static partial class StandardShanheCampaignCatalog
                 ["codex-card-4107"] = new(4107, 200, 2, "牌", CardKind.Lightning, Suit.Heart, 1)
             }.Concat(CurrentBuildSkillShopMetadata)
                 .Concat(CurrentReactionTacticShopMetadata)
+                .Concat(CurrentShopCardMetadata)
                 .Concat(CurrentEconomyTactics.Select(source => new KeyValuePair<string, ShanheShopMetadata>(source.RewardId,
                 new(source.SourceId, source.Price, source.Rarity, "战法"))))
                 .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal));
