@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:lu-xun",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 59600,
+      "pools": { "current": 59600 },
+      "definition": {
+        "id": "boundary:lu-xun-mobile",
+        "name": "界陆逊·移动版",
+        "portraitKey": "boundary-lu-xun-mobile",
+        "skillId": "boundary:qianxun",
+        "additionalSkillIds": ["boundary:lianying"],
+        "factionId": "wu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:lu-xun",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

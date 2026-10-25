@@ -1,0 +1,24 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:xiahou-yuan",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 60100,
+      "pools": { "current": 60100 },
+      "definition": {
+        "id": "boundary:xiahou-yuan-mobile",
+        "name": "界夏侯渊·移动版",
+        "portraitKey": "boundary-xiahou-yuan-mobile",
+        "skillId": "boundary:shensu",
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:xiahou-yuan",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

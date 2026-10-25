@@ -24,6 +24,7 @@ public sealed partial class GameEngine
     [ProgramAiChoice(SkillProgramEffectOp.ChooseOption)]
     private PromptChoice SelectAiProgramOption(PendingDecision decision, ProgramSkillFrame frame)
     {
+        if (TrySelectBoundaryXuChuAiOption(decision, frame, out var xuChuChoice)) return xuChuChoice;
         var program = _contentRegistry!.GetSkill(frame.SkillId).Program!;
         var plan = ProgramInstructionResolver.Default.Resolve(frame, program);
         var effect = plan.GetPausedInstruction(frame.InstructionIndex).Effect;

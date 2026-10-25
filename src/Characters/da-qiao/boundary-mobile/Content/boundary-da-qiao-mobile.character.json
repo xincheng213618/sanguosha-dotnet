@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:da-qiao",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 59500,
+      "pools": { "current": 59500 },
+      "definition": {
+        "id": "boundary:da-qiao-mobile",
+        "name": "界大乔·移动版",
+        "portraitKey": "boundary-da-qiao-mobile",
+        "skillId": "boundary:guose",
+        "additionalSkillIds": ["boundary:liuli"],
+        "factionId": "wu",
+        "baseHp": 3,
+        "gender": "Female",
+        "characterId": "character:da-qiao",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

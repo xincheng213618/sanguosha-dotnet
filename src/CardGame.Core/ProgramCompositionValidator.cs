@@ -149,9 +149,15 @@ internal static class ProgramCompositionValidator
                 if (condition.Kind == SkillProgramConditionKind.BoundCardCountAtLeast)
                 {
                     var bound = Get(condition.SourceBind!);
+                    var publicReveal = effect.Op == SkillProgramEffectOp.ChooseOption &&
+                        effect.Target == SkillProgramEffectTarget.Owner && effect.ChooserRef is null &&
+                        bound.Root.NeedsCleanup && !bound.Atoms.Overlaps(bound.Root.Consumed) &&
+                        effects.Take(index).Any(prior => prior.Op == SkillProgramEffectOp.RevealTopCards &&
+                            prior.ResultBind == bound.Root.Name && prior.Target == SkillProgramEffectTarget.Owner &&
+                            prior.Visibility == SkillProgramCardSetVisibility.Public);
                     if (effect.Op is not (SkillProgramEffectOp.ChooseOption or SkillProgramEffectOp.SetBooleanState) ||
-                        bound.CardOwner != effect.Target || bound.Root.AlreadyMoved)
-                        Fail("bound-card count option must read the chooser's own stable cards");
+                        (!publicReveal && bound.CardOwner != effect.Target) || bound.Root.AlreadyMoved)
+                        Fail("bound-card count option must read stable chooser cards or an unconsumed public reveal");
                 }
                 if (condition.Kind == SkillProgramConditionKind.ActivationCardCountAtLeast &&
                     (window is not null || selectedCardCount < condition.Value))

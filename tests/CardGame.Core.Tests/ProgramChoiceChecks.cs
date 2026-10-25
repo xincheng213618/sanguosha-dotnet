@@ -73,6 +73,15 @@ internal static class ProgramChoiceChecks
             topRules.Replace("\"condition\":{\"kind\":\"choiceIs\",\"sourceBind\":\"benefit\",\"optionId\":\"draw\"}",
                 "\"condition\":{\"kind\":\"always\"}", StringComparison.Ordinal)
         }) Reject(invalid, Presentation("置顶", "摸牌", null), "top-deck");
+
+        const string privatePool = """
+            [{"op":"revealTopCards","target":"owner","amount":1,"resultBind":"pool","visibility":"private"},
+             {"op":"chooseOption","target":"owner","resultBind":"benefit","options":[
+              {"id":"draw","condition":{"kind":"boundCardCountAtLeast","sourceBind":"pool","value":1}},
+              {"id":"recover"}]},
+             {"op":"moveBoundCards","target":"owner","sourceBind":"pool","destination":"discardPile"}]
+            """;
+        Reject(BuildRules(privatePool), Presentation("取得", "放弃", null), "bound-card count option");
     }
 
     private static SkillProgram Load(string rules, string presentation) =>

@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:xiahou-dun",
+  "skills": [
+    {
+      "registrationOrder": 60001,
+      "programBundle": "boundary-xiahou-dun-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:qingjian-mobile",
+        "name": "清俭",
+        "description": "每回合限一次，当你于你的摸牌阶段外获得牌后，你可以将任意张手牌扣置于武将牌上；下个任意角色的结束阶段，你将这些牌交给其他角色，然后若你以此法交出的牌大于一张，则你摸一张牌。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 60000,
+      "pools": { "current": 60000 },
+      "definition": {
+        "id": "boundary:xiahou-dun-mobile",
+        "name": "界夏侯惇·移动版",
+        "portraitKey": "boundary-xiahou-dun-mobile",
+        "skillId": "boundary:ganglie",
+        "additionalSkillIds": ["boundary:qingjian-mobile"],
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:xiahou-dun",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

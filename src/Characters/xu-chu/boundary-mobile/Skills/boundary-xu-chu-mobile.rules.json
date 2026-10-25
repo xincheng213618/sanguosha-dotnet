@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "boundary:luoyi-mobile", "revision": 1,
+    "triggers": [{
+      "id": "reveal-three-then-choose", "window": "drawPhaseStarting", "subject": "owner",
+      "optional": false, "priority": 80, "drawPhaseMode": "additive",
+      "effects": [
+        { "op": "revealTopCards", "target": "owner", "amount": 3, "resultBind": "luoyi-revealed", "visibility": "public" },
+        { "op": "filterBoundCards", "target": "owner", "sourceBind": "luoyi-revealed", "resultBind": "luoyi-gained",
+          "categories": ["basic"], "equipmentSlots": ["weapon"], "cardKinds": ["duel"] },
+        { "op": "chooseOption", "target": "owner", "resultBind": "luoyi-draw-choice", "options": [
+          { "id": "skip-draw", "condition": { "kind": "boundCardCountAtLeast", "sourceBind": "luoyi-gained", "value": 1 } },
+          { "id": "normal-draw" }
+        ] },
+        { "op": "substituteBoundaryXuChuDraw", "target": "owner",
+          "condition": { "kind": "choiceIs", "sourceBind": "luoyi-draw-choice", "optionId": "skip-draw" } },
+        { "op": "moveBoundCards", "target": "owner", "sourceBind": "luoyi-gained", "destination": "ownerHand", "awaitMovementTriggers": true,
+          "condition": { "kind": "choiceIs", "sourceBind": "luoyi-draw-choice", "optionId": "skip-draw" } },
+        { "op": "moveBoundCards", "target": "owner", "sourceBind": "luoyi-revealed", "exceptBind": "luoyi-gained", "destination": "discardPile", "awaitMovementTriggers": true,
+          "condition": { "kind": "choiceIs", "sourceBind": "luoyi-draw-choice", "optionId": "skip-draw" } },
+        { "op": "moveBoundCards", "target": "owner", "sourceBind": "luoyi-revealed", "destination": "discardPile", "awaitMovementTriggers": true,
+          "condition": { "kind": "choiceIs", "sourceBind": "luoyi-draw-choice", "optionId": "normal-draw" } },
+        { "op": "grantTurnCardDamageModifier", "target": "owner", "amount": 1,
+          "cardKinds": ["slash", "fireSlash", "thunderSlash", "duel"], "expires": "nextOwnerTurnStart", "sourceScope": "damageSource",
+          "condition": { "kind": "choiceIs", "sourceBind": "luoyi-draw-choice", "optionId": "skip-draw" } }
+      ]
+    }]
+  }]
+}

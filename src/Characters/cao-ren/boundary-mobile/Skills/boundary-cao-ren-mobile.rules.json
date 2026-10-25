@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "boundary:jushou-mobile",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "ending-flip-draw-and-cost",
+          "window": "playEnding",
+          "subject": "owner",
+          "optional": true,
+          "priority": 0,
+          "effects": [
+            { "op": "turnOver", "target": "owner" },
+            { "op": "draw", "target": "owner", "amount": 4 },
+            { "op": "discardHandOrUseEquipment", "target": "owner" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "boundary:jiewei-mobile",
+      "revision": 1,
+      "viewAs": [
+        {
+          "id": "equipment-as-nullification",
+          "sourceZones": ["equipment"],
+          "inputKinds": [],
+          "inputSuits": [],
+          "outputKind": "nullification",
+          "forPlay": false,
+          "forResponse": true
+        }
+      ],
+      "triggers": [
+        {
+          "id": "face-up-relocation",
+          "window": "characterTurnedFaceUp",
+          "subject": "owner",
+          "optional": true,
+          "priority": 0,
+          "effects": [
+            {
+              "op": "selectAndMoveOwnedCard",
+              "target": "owner",
+              "chooserRef": { "kind": "owner" },
+              "cardOwnerRef": { "kind": "owner" },
+              "zones": ["hand"],
+              "count": 1,
+              "destination": "discardPile",
+              "awaitMovementTriggers": true
+            },
+            {
+              "op": "selectTargets",
+              "target": "owner",
+              "targetKind": "livingPairDistinct",
+              "minimumTargets": 2,
+              "maximumTargets": 2,
+              "targetAiOrder": "stable"
+            },
+            {
+              "op": "selectAndMoveOwnedCard",
+              "target": "owner",
+              "chooserRef": { "kind": "owner" },
+              "cardOwnerRef": { "kind": "selectedFirst" },
+              "targetRef": { "kind": "selectedSecond" },
+              "zones": ["equipment", "judgment"],
+              "count": 1,
+              "destination": "selectedTargetCorrespondingZone",
+              "skipIfNoCards": true,
+              "awaitMovementTriggers": true,
+              "prohibitReplacingEquipment": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

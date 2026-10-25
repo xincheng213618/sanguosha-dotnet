@@ -118,9 +118,11 @@ internal sealed partial class ProgramPaidCardRuntime
     internal int CountChooserProgramBoundCards(ProgramSkillFrame frame, string bind, int chooserSeat)
     {
         var cards = CardSet(frame, bind);
+        var publicProcessing = cards.Visibility == SkillProgramCardSetVisibility.Public &&
+            cards.SourceLocations.All(location => location == CardLocation.Processing);
         if (cards.CardIds.Count != cards.SourceLocations.Count ||
-            cards.SourceLocations.Any(location => location.OwnerSeat != chooserSeat ||
-                location.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)))
+            (!publicProcessing && cards.SourceLocations.Any(location => location.OwnerSeat != chooserSeat ||
+                location.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))))
             throw new InvalidOperationException("A chooser cannot inspect another player's private card set.");
         return cards.CardIds.Select((id, index) => (id, index))
             .Count(item => _facts.Location(item.id) == cards.SourceLocations[item.index]);
@@ -132,6 +134,9 @@ internal sealed partial class ProgramPaidCardRuntime
     internal int? TryCountChooserProgramBoundCards(ProgramSkillFrame frame, string bind, int chooserSeat)
     {
         var cards = frame.CardSetBindings.SingleOrDefault(item => item.Name == bind);
+        if (cards is { Visibility: SkillProgramCardSetVisibility.Public } &&
+            cards.SourceLocations.All(location => location == CardLocation.Processing))
+            return CountChooserProgramBoundCards(frame, bind, chooserSeat);
         if (cards is { Visibility: SkillProgramCardSetVisibility.Public })
             return cards.CardIds.Count(cardId =>
                 _facts.Location(cardId) is

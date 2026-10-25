@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "boundary:qingjian-mobile",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "store-after-gain",
+          "window": "cardsGained",
+          "subject": "owner",
+          "destinationZones": ["hand"],
+          "movementOccurrence": "perBatch",
+          "gainPhaseQualification": "outsideOwnerDraw",
+          "optional": true,
+          "usageScope": "turn",
+          "usageLimit": 1,
+          "namedUsageGroup": "store-after-gain",
+          "effects": [{ "op": "storeBoundaryXiahouDunQingjian", "target": "owner" }]
+        },
+        {
+          "id": "distribute-at-ending",
+          "window": "turnEnding",
+          "subject": "owner",
+          "turnOwnerScope": "anyLiving",
+          "optional": false,
+          "isSkillInvocation": false,
+          "effects": [{ "op": "distributeBoundaryXiahouDunQingjian", "target": "owner" }]
+        }
+      ]
+    }
+  ]
+}

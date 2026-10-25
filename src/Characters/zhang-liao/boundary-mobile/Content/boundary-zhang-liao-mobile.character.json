@@ -1,0 +1,36 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhang-liao",
+  "skills": [
+    {
+      "registrationOrder": 59801,
+      "programBundle": "boundary-zhang-liao-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:tuxi-mobile",
+        "name": "突袭",
+        "description": "摸牌阶段，你可以少摸任意张牌并获得等量的其他角色各一张手牌。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 59800,
+      "pools": { "current": 59800 },
+      "definition": {
+        "id": "boundary:zhang-liao-mobile",
+        "name": "界张辽·移动版",
+        "portraitKey": "boundary-zhang-liao-mobile",
+        "skillId": "boundary:tuxi-mobile",
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:zhang-liao",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}
