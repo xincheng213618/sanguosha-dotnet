@@ -32,6 +32,8 @@ public static partial class StandardShanheCampaignCatalog
             "锁定技，若你的手牌数为全场唯一最多，你造成或受到的伤害值+1。"),
         new CurrentBuildSkillSource(3254, "谋溃", "ol:moukui", 1000, 4, null,
             "当你使用【杀】指定目标后，你可以选择一项：\n1.摸一张牌；\n2.弃置其一张牌。\n然后若此【杀】被【闪】抵消，其弃置你一张牌。"),
+        new CurrentBuildSkillSource(3256, "乱击", "classic:luanji", 1000, 4, 110,
+            "你可以将两张花色相同的手牌当【万箭齐发】使用。"),
         new CurrentBuildSkillSource(3260, "奇谋", "boundary:qimou-mobile", 1000, 4, 99,
             "限定技，出牌阶段，你可以失去任意点体力，然后你本回合计算与其他角色的距离-X且使用【杀】的限制次数+X（X为你以此法失去的体力值）。"),
         new CurrentBuildSkillSource(3264, "咆哮", "classic:paoxiao", 1000, 4, null,
@@ -44,6 +46,8 @@ public static partial class StandardShanheCampaignCatalog
             "你可以将一张黑色手牌当【闪】使用或打出。"),
         new CurrentBuildSkillSource(3053, "矢北", "classic:shibei", 100, 1, null,
             "锁定技，当你每回合首次受到伤害后，你回复1点体力，然后当你本回合再受到伤害后，你失去1点体力。"),
+        new CurrentBuildSkillSource(3089, "御策", "classic:yuce", 300, 2, null,
+            "当你受到伤害后，你可以展示一张手牌令伤害来源选择一项：\n1.弃置一张与你展示牌类型不同的手牌；2.你回复1点体力。"),
         new CurrentBuildSkillSource(3164, "绝境", "ol:juejing", 300, 2, null,
             "锁定技，你的手牌上限+2。当你进入或脱离濒死状态时，你摸一张牌。")
     });

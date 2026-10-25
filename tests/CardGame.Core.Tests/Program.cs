@@ -269,6 +269,8 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe boss stages: native zero maximum transforms before direct death cold", ShanheBossStageChecks.ZeroMaximumNativeReplacementStillTransformsCold),
     ("Shanhe chapter progression: native three-chapter rosters", ShanheChapterProgressionChecks.ThreeChapterRecipesStartNativeBattlesWithinEightSeats),
     ("Shanhe avatar pool: source Zuoci draws ordinary avatars with fixed seats", ShanheAvatarPoolChecks.PublishedZuociDrawsOrdinaryAvatarsWithoutChangingFixedSeats),
+    ("Shanhe native skills: Mou Lumeng first gift repeated fire and growth", ShanheNativeSkillFlowChecks.MouLumengFirstGiftRepeatedFireAndGrowthUseActualCampaign),
+    ("Shanhe native skills: bought Luanji and Yuce native payments recovery", ShanheNativeSkillFlowChecks.BoughtLuanjiAndYuceRunNativePaymentsAndRecovery),
     ("Shanhe build tactics: first Slash quota and reflection kill recovery", ShanheBuildTacticChecks.FirstRoundSlashDrawAndReflectionKillsPayNativeRecovery),
     ("Shanhe build tactics: start threshold draw phase and turn ending", ShanheBuildTacticChecks.LogisticsKeepStartHpThresholdDrawPhaseAndEndingPaymentsSeparate),
     ("Shanhe market: random stock category prices refresh and cold replay", ShanheMarketChecks.RandomStockCategoryPricesRefreshAndColdReplay),

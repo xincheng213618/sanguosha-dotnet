@@ -2,8 +2,9 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
+    // Stateful ordinary skills share the battle capability used by program skills.
     private bool HasClassicGeneralPackage =>
-        IsClassicIdentityMode &&
+        UsesClassicBattleRules &&
         _contentRegistry.Packages.Any(package => package.Id == "standard-classic-generals");
 
     private IReadOnlyList<string> AcquireRuntimeSkills(
