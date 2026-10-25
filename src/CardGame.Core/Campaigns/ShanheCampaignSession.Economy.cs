@@ -9,10 +9,12 @@ public sealed partial class ShanheCampaignSession
         OwnedEconomy(state).Select(e => e.ShopRefreshLimit).DefaultIfEmpty(0).Max());
     private int ExtraShopStock(RunState state) => OwnedEconomy(state).Sum(e => e.ExtraStockPerCategory);
 
-    private int EconomyPurchasePrice(RunState state, int amount)
+    private int EconomyPurchasePrice(RunState state, int amount, int categoryPurchases)
     {
+        var price = OwnedEconomy(state).Any(e => e.SuppressShopPriceEscalation)
+            ? amount : checked(amount + categoryPurchases * 100);
         var discount = Math.Min(100, OwnedEconomy(state).Sum(e => e.ShopDiscountPercent));
-        return checked((int)((long)amount * (100 - discount) / 100));
+        return checked((int)((long)price * (100 - discount) / 100));
     }
 
     // Whole-coin rounding and the order are explicit local execution choices:

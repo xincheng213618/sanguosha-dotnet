@@ -111,19 +111,20 @@ public sealed partial class ShanheCampaignSession
             // This registry-only probe validates every reward, including skill
             // programs imported only by recipes that reference them. No engine
             // is created and no unearned skill is granted to a battle player.
-            TacticSkillIds = ShanheCampaignContent.Freeze(Definition.Rewards.Select(reward => reward.TacticSkillId)
-                .OfType<string>().Distinct(StringComparer.Ordinal))
+            TacticSkillIds = ShanheCampaignContent.Freeze(Definition.Rewards.SelectMany(PotentialBattleTacticSkills)
+                .Distinct(StringComparer.Ordinal))
         });
         var registry = battleRegistryFactory(probe) ?? throw new ArgumentException("The battle registry factory returned null.", nameof(battleRegistryFactory));
         if (!registry.Generals.TryGetValue(options.PlayerGeneralId, out var general) || !registry.IsGeneralPlayable(options.PlayerGeneralId))
             throw new ArgumentException("The battle content does not contain the player's general.", nameof(options));
         _baseMaxHp = general.BaseHp;
         _printedSkillIds = ShanheCampaignContent.Freeze(general.SkillIds);
-        foreach (var skill in Definition.Rewards.SelectMany(reward => new[] { reward.SkillId, reward.TacticSkillId }).OfType<string>())
+        foreach (var skill in Definition.Rewards.SelectMany(reward => new[] { reward.SkillId }
+                     .OfType<string>().Concat(PotentialBattleTacticSkills(reward))))
             if (!registry.Skills.TryGetValue(skill, out var skillDefinition) ||
                 skillDefinition.ImplementationStatus != SkillImplementationStatus.Complete)
                 throw new ArgumentException($"Campaign reward references unknown skill '{skill}'.", nameof(definition));
-        foreach (var tactic in Definition.Rewards.Select(reward => reward.TacticSkillId).OfType<string>())
+        foreach (var tactic in Definition.Rewards.SelectMany(PotentialBattleTacticSkills))
             if (registry.GetSkill(tactic).Program is null)
                 throw new ArgumentException($"Campaign tactic '{tactic}' requires a complete skill program.", nameof(definition));
         _tacticAcquisitionRules = CreateTacticAcquisitionRules(registry);
@@ -146,7 +147,7 @@ public sealed partial class ShanheCampaignSession
                 ? ShanheCampaignContent.Freeze(new[] { Definition.StartingNodeIds[new DeterministicRandom(ShanheBattleSetup.DeriveSeed(options.Seed, Definition.Id + ":entry", 0)).Next(Definition.StartingNodeIds.Count)] })
                 : Definition.StartingNodeIds
         };
-        foreach (var id in _options.EquippedTacticIds) _state = ApplyReward(_state, _rewards[id], null);
+        foreach (var id in _options.EquippedTacticIds) _state = ApplyReward(_state, _rewards[id], null, atExpeditionStart: true);
         _state = BeginOpeningSkillDraft(_state);
         _snapshot = CreateSnapshot(_state, 0);
     }
@@ -266,7 +267,7 @@ public sealed partial class ShanheCampaignSession
             rebirthAvailable ? ShanheCampaignContent.Freeze(state.ExtraSkillIds.Append(ShanheGeneralRanks.RebirthSkillId)) : state.ExtraSkillIds,
             state.StartingCards, state.StartingEquipment, encounter.Enemies, encounter.Allies ?? [], ContentHash)
         {
-            TacticSkillIds = ShanheCampaignContent.Freeze(state.TacticIds.Select(id => _rewards[id].TacticSkillId).OfType<string>()),
+            TacticSkillIds = BattleTacticSkills(state),
             DefaultGodFactionId = Definition.DefaultGodFactionId,
             PlayerRank = _options.PlayerRank,
             RebirthAvailable = rebirthAvailable,
@@ -391,9 +392,12 @@ public sealed partial class ShanheCampaignSession
         };
     }
 
-    private RunState ApplyReward(RunState state, ShanheRewardDefinition reward, string? replaceSkillId, bool allowLockedReward = false)
+    private RunState ApplyReward(RunState state, ShanheRewardDefinition reward, string? replaceSkillId, bool allowLockedReward = false,
+        bool atExpeditionStart = false)
     {
         Require(allowLockedReward || IsRewardUnlocked(reward), "This skill or equipment reward must first be unlocked in the codex.");
+        Require(atExpeditionStart || reward.CampaignEconomy?.StartingGold is not > 0,
+            "This tactic grants copper only when equipped before an expedition.");
         Require(reward.OpeningSkillRewardIds is null || !state.TacticIds.Contains(reward.Id, StringComparer.Ordinal), "This initial tactic is already equipped.");
         Require(reward.CampaignEconomy is null || !state.TacticIds.Contains(reward.Id, StringComparer.Ordinal), "This economy tactic is already acquired.");
         Require(reward.TacticSkillId is not { } tacticSkill || CanAcquireTactic(state, tacticSkill), "This unique tactic is already acquired; no resources were spent.");
@@ -431,7 +435,8 @@ public sealed partial class ShanheCampaignSession
         return state with
         {
             Hp = Math.Min(_baseMaxHp + bonuses.MaxHp, checked(state.Hp + reward.Heal)),
-            Gold = checked(state.Gold + reward.Gold + EconomyEquipmentRefund(state, reward.StartingEquipment)), Bonuses = bonuses, ExtraSkillSlots = slots,
+            Gold = checked(state.Gold + reward.Gold + (atExpeditionStart ? reward.CampaignEconomy?.StartingGold ?? 0 : 0) +
+                EconomyEquipmentRefund(state, reward.StartingEquipment)), Bonuses = bonuses, ExtraSkillSlots = slots,
             TacticIds = reward.TacticSkillId is null && reward.OpeningSkillRewardIds is null && reward.CampaignEconomy is null ? state.TacticIds : ShanheCampaignContent.Freeze(state.TacticIds.Append(reward.Id)),
             ExtraSkillIds = ShanheCampaignContent.Freeze(skills), StartingCards = ShanheCampaignContent.Freeze(cards),
             StartingEquipment = ShanheCampaignContent.Freeze(equipment)
@@ -529,6 +534,7 @@ public sealed partial class ShanheCampaignSession
         _unlockedRewardIds.Contains(reward.Id);
     private bool CanReceiveReward(RunState state, ShanheRewardDefinition reward) =>
         IsRewardUnlocked(reward) &&
+        reward.CampaignEconomy?.StartingGold is not > 0 &&
         (reward.SkillId is not { } skill || !HasSkill(state, skill)) &&
         (reward.OpeningSkillRewardIds is null || !state.TacticIds.Contains(reward.Id, StringComparer.Ordinal)) &&
         (reward.CampaignEconomy is null || !state.TacticIds.Contains(reward.Id, StringComparer.Ordinal)) &&
@@ -563,7 +569,7 @@ public sealed partial class ShanheCampaignSession
             ShopRewardCategory.Skill => state.ShopSkillPurchases,
             _ => 0
         };
-        return choice with { GoldCost = EconomyPurchasePrice(state, checked(choice.GoldCost + purchases * 100)) };
+        return choice with { GoldCost = EconomyPurchasePrice(state, choice.GoldCost, purchases) };
     }
 
     private IReadOnlyList<ShanheNodeChoiceDefinition> CreateShopStock(RunState state, ShanheNodeDefinition node)

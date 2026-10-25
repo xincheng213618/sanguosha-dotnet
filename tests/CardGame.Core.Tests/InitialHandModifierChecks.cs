@@ -171,7 +171,7 @@ internal static class InitialHandModifierChecks
             node => node["condition"] = new JsonObject { ["kind"] = "wounded" },
             node => node["valueExpression"] = "ownerLostHp",
             node => node["query"] = "drawCount",
-            node => { node.Remove("valueExpression"); node["value"] = -1; }
+            node => { node.Remove("valueExpression"); node["value"] = 0; }
         })
         {
             var invalid = JsonNode.Parse(valid.ToJsonString())!;

@@ -1,9 +1,11 @@
 namespace CardGame.Core.Campaigns;
 
-/// <summary>Expedition-only tactics. These run in campaign commands, not as empty battle skills.</summary>
+/// <summary>Expedition tactics, including battle programs qualified by the current campaign balance.</summary>
 public sealed record ShanheCampaignEconomy(
     int BattleGoldPercent = 0, int PostBattleInterestPercent = 0, int ShopDiscountPercent = 0,
-    int ShopRefreshLimit = 0, int ExtraStockPerCategory = 0, int ReplacedEquipmentGold = 0);
+    int ShopRefreshLimit = 0, int ExtraStockPerCategory = 0, int ReplacedEquipmentGold = 0,
+    bool SuppressShopPriceEscalation = false, int StartingGold = 0,
+    int? GoldAbove = null, string? BattleSkillId = null);
 
 public static partial class ShanheCampaignContent
 {
@@ -18,6 +20,9 @@ public static partial class ShanheCampaignContent
         Require(economy.BattleGoldPercent is >= 0 and <= 100 && economy.PostBattleInterestPercent is >= 0 and <= 100 &&
             economy.ShopDiscountPercent is >= 0 and <= 100 && economy.ShopRefreshLimit is >= 0 and <= 20 &&
             economy.ExtraStockPerCategory is >= 0 and <= 12 && economy.ReplacedEquipmentGold is >= 0 and <= 100000 &&
+            economy.StartingGold is >= 0 and <= 100000 &&
+            (economy.GoldAbove is null && economy.BattleSkillId is null ||
+                economy.GoldAbove is >= 0 and <= 1000000 && !string.IsNullOrWhiteSpace(economy.BattleSkillId)) &&
             economy != new ShanheCampaignEconomy(), "Invalid or empty campaign economy tactic.");
     }
 }

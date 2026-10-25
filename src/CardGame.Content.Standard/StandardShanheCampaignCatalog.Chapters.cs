@@ -70,7 +70,7 @@ public static partial class StandardShanheCampaignCatalog
     private static bool IsLegendaryChapterReward(ShanheRewardDefinition reward, string kind) =>
         ShopMetadataByRewardId.TryGetValue(reward.Id, out var metadata) && metadata.Rarity == 4 && metadata.Kind == kind;
 
-    private static bool IsChapterTactic(ShanheRewardDefinition reward) => reward.TacticSkillId is not null || reward.CampaignEconomy is not null ||
+    private static bool IsChapterTactic(ShanheRewardDefinition reward) => reward.TacticSkillId is not null || reward.CampaignEconomy is { StartingGold: 0 } ||
         reward.Bonuses is { } bonus && (bonus.MaxHp != 0 || bonus.InitialHand != 0 || bonus.Draw != 0 || bonus.Slash != 0);
 
     private static string ChapterRouteTitle(string nodeId, int chapter) => nodeId switch

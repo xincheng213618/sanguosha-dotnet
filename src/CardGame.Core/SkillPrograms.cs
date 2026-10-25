@@ -4195,9 +4195,9 @@ public sealed class SkillProgramCatalog
             (operation != SkillRuleOperation.Add || query is not (SkillRuleQuery.HandLimit or SkillRuleQuery.InitialHandSize)))
             Fail(path, "ownerMaxHp requires an additive hand-limit or initial-hand-size modifier");
         if (query == SkillRuleQuery.InitialHandSize &&
-            (operation != SkillRuleOperation.Add ||
-             !(valueExpression == SkillRuleValueExpression.OwnerMaxHp || valueExpression is null && value > 0)))
-            Fail(path, "initialHandSize requires a positive fixed addition or ownerMaxHp");
+            (recipientScope != SkillRuleRecipientScope.Owner || operation != SkillRuleOperation.Add ||
+             !(valueExpression == SkillRuleValueExpression.OwnerMaxHp || valueExpression is null && value != 0)))
+            Fail(path, "initialHandSize requires an owner-only non-zero fixed addition or ownerMaxHp");
         if (valueExpression == SkillRuleValueExpression.PublicLivingFactionCount &&
             (query != SkillRuleQuery.HandLimit || operation != SkillRuleOperation.Add))
             Fail(path, "public living factions require an additive hand-limit modifier");
