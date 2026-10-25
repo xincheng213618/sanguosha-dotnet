@@ -13206,7 +13206,7 @@ public sealed partial class GameEngine
                     var parentIndex = _resolutionStack.FindIndex(frame => frame.Id == programParentId);
                     if (parentIndex < 0 || _resolutionStack[parentIndex] is not ProgramSkillFrame parent)
                         throw new InvalidOperationException("The virtual Slash lost its selected-target program parent.");
-                    if (parent.YangHong is null)
+                    if (parent.YangHong is null && parent.GaoXiang is null)
                     {
                         IReadOnlyList<int> primaryTarget = virtualUse.TargetSeats;
                         if (virtualUse.TargetSeats.Count != 1 &&
