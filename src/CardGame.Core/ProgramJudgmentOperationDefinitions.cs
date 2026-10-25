@@ -16,12 +16,15 @@ internal sealed class ReplaceJudgmentProgramOperationDescriptor : ProgramOperati
         if (target != SkillProgramEffectTarget.Owner)
             throw new InvalidOperationException($"Invalid skill program at {reader.Path}.target: judgment replacement requires owner.");
         var zones = reader.RequiredEnumArray<CardZoneKind>("zones");
-        if (zones.Count == 0 || zones.Any(zone => zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)))
+        if (zones.Count == 0 || zones is not [CardZoneKind.DrawPile] && zones.Any(zone => zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)))
             throw new InvalidOperationException($"Invalid skill program at {reader.Path}.zones: replacement requires hand or equipment.");
         var suits = reader.RequiredEnumArray<Suit>("suits");
         if (suits.Count == 0)
             throw new InvalidOperationException($"Invalid skill program at {reader.Path}.suits: replacement requires at least one suit.");
         var destination = reader.RequiredEnum<SkillProgramOldJudgmentCardDestination>("oldCardDestination");
+        if (zones is [CardZoneKind.DrawPile] && (suits.Count != 4 || suits.Distinct().Count() != 4 ||
+            destination != SkillProgramOldJudgmentCardDestination.DiscardPile || reader.Has("requireDifferentColor")))
+            throw new InvalidOperationException($"Invalid skill program at {reader.Path}: unknown deck-top replacement requires all suits, discarded old card and no material-dependent color filter.");
         var effect = new SkillProgramEffect(Op, target, 0, reader.Condition(), zones: zones, suits: suits,
             oldCardDestination: destination)
         {

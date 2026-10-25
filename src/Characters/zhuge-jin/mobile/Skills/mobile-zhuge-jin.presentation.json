@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:hongyuan": { "name": "弘援", "description": "摸牌阶段，你可以少摸一张牌，然后令至多两名其他角色各摸一张牌。" },
+    "mobile:mingzhe": { "name": "明哲", "description": "回合外，每因使用、打出或弃置而实际失去一张红色牌，你可以摸一张牌。" }
+  }
+}

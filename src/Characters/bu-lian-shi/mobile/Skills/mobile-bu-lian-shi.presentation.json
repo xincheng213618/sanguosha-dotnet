@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 3,
+  "skills": { "mobile:anxu": {
+    "name": "安恤", "description": "出牌阶段限一次，手牌较多的其他角色自己选一张手牌交给较少者；结算后若双方手牌数相等，你摸一张牌或回复1点体力。",
+    "activationLabels": { "donor-gives-to-lower-hand": "安恤：令手牌较多者交牌" },
+    "optionLabels": { "draw": "摸一张牌", "recover": "回复1点体力" }
+  } }
+}

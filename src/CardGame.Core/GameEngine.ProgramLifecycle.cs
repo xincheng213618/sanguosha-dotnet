@@ -1163,6 +1163,7 @@ public sealed partial class GameEngine
             if (current.Count >= minimumTargets)
             {
                 var seats = current.ToArray();
+                seats = OrderMobileZhugeJinHongyuanTargets(frame, seats);
                 if (targetKind == SkillProgramTargetKind.EquipmentExchangePair &&
                     !IsProgramEquipmentExchangePair(ownerSeat, seats[0], seats[1])) return;
                 if (targetKind is SkillProgramTargetKind.OtherLivingUnequalHandPair or

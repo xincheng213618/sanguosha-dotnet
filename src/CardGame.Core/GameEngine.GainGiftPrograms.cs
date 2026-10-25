@@ -4,7 +4,7 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
-    private bool TracksRedOwnedLoss => _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RevealRedLossAndDraw);
+    private bool TracksRedOwnedLoss => _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RevealRedLossAndDraw) || HasMobileMingzheRegistration;
     private static bool OwnedLossZone(CardZoneKind zone) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GainGiftPrograms.OwnedLossZone(zone);
     private RedOwnedLossMaterial? CaptureRedOwnedLoss(Card card, CardLocation from, CardLocation to, long sequence)
@@ -13,7 +13,7 @@ public sealed partial class GameEngine
         // grants/removal observers change that owner. The snapshot keeps printed suit.
         if (!TracksRedOwnedLoss || from.OwnerSeat is not { } owner || !OwnedLossZone(from.Zone) ||
             to.OwnerSeat == owner && OwnedLossZone(to.Zone) || CaptureMovementTiming() is not { } timing ||
-            timing.Phase == TurnPhase.Play && timing.PhaseActorSeat == owner) return null;
+            timing.Phase == TurnPhase.Play && timing.PhaseActorSeat == owner && !(HasMobileMingzheRegistration && timing.ActualTurnOwnerSeat != owner)) return null;
         var suit = EffectiveSuit(_players[owner], card);
         return suit is Suit.Heart or Suit.Diamond ? new(owner, ToSnapshot(card), suit, timing, sequence) : null;
     }
@@ -31,7 +31,7 @@ public sealed partial class GameEngine
     }
     private int[] MatchingRedOwnerLossIndexes(CardMovementBatchContext batch, int owner, CardLocation location) =>
         batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.RedOwnedLoss is { } loss &&
-                loss.OwnerSeat == owner && loss.MovementSequence == x.m.Sequence)
+                loss.OwnerSeat == owner && loss.MovementSequence == x.m.Sequence && !(loss.Timing.Phase == TurnPhase.Play && loss.Timing.PhaseActorSeat == owner))
             .GroupBy(x => x.m.CardId).Select(g => g.OrderBy(x => x.m.Sequence).First())
             .Where(x => x.m.From == location).Select(x => x.i).Order().ToArray();
     private bool GainGiftPhaseUsed(int owner, string skill, ActualDiscardRecoveryPhaseKey phase) =>

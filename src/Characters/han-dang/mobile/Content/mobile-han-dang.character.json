@@ -1,0 +1,16 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:han-dang",
+  "skills": [],
+  "generals": [{
+    "registrationOrder": 72600,
+    "pools": { "current": 72600 },
+    "definition": {
+      "id": "mobile:han-dang", "name": "韩当·移动版", "portraitKey": "official-mobile-han-dang",
+      "skillId": "classic:gongqi", "additionalSkillIds": ["classic:jiefan"],
+      "factionId": "wu", "baseHp": 4, "gender": "Male",
+      "characterId": "character:han-dang", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+    }
+  }]
+}

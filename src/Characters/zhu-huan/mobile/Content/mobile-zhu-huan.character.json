@@ -1,0 +1,19 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhu-huan",
+  "skills": [{
+    "registrationOrder": 72500, "programBundle": "mobile-zhu-huan", "includeProgramPresentation": true,
+    "definition": { "id": "mobile:pingkou", "name": "平寇", "description": "回合结束时，你可以对至多X名其他角色各造成1点伤害（X为你本回合跳过的阶段数）。", "executionForms": "Trigger" }
+  }],
+  "generals": [{
+    "registrationOrder": 72501,
+    "pools": { "current": 72501 },
+    "definition": {
+      "id": "mobile:zhu-huan", "name": "朱桓·移动版", "portraitKey": "official-mobile-zhu-huan",
+      "skillId": "boundary:fenli-mobile", "additionalSkillIds": ["mobile:pingkou"],
+      "factionId": "wu", "baseHp": 4, "gender": "Male",
+      "characterId": "character:zhu-huan", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+    }
+  }]
+}

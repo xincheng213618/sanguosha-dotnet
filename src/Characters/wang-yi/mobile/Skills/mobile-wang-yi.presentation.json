@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:zhenlie": { "name": "贞烈", "description": "自己的判定牌生效前，可亮出牌堆顶的一张牌代替之。" },
+    "mobile:miji": { "name": "秘计", "description": "准备或结束阶段受伤时可判定；黑色则私看牌堆顶已损失体力值张牌，并全部交给一名角色（可以是自己）。",
+      "triggerChoices": { "prepare-black-top-gift": "进行秘计判定。", "ending-black-top-gift": "进行秘计判定。" } }
+  }
+}

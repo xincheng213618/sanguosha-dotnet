@@ -69,6 +69,7 @@ internal static class ProgramCompositionValidator
         var roots = new List<Root>();
         var topPayments = new HashSet<string>(StringComparer.Ordinal);
         var selectedTarget = initialSelectedTarget;
+        SkillProgramCondition? judgmentTargetGuard = null;
         var hpPairProduced = false;
         var capturedPlacementBindings = new HashSet<string>(StringComparer.Ordinal);
         var derivedPlacementRoots = new HashSet<Root>();
@@ -188,6 +189,10 @@ internal static class ProgramCompositionValidator
                 throw Error(nodePath, "card bindings cannot cross an independently interactive inserted phase");
             foreach (var resource in descriptor.Resources(effect))
             {
+                if (judgmentTargetGuard is not null && resource is (ReadSelectedTarget or RequireSelectedTargetKind or ReadVirtualDuelPair or
+                        ReadTargetSet or ReplaceSingleTarget or NarrowTargetSetToSingle or ConsumeTargetSet or ReleaseTargetSet) &&
+                    !ImpliesChoiceBranch(effect.Condition, judgmentTargetGuard))
+                    Fail("conditional selectedTarget requires its matching judgment outcome branch");
                 if (choiceTargetSelections.Count > 0 &&
                     resource is (ReadSelectedTarget or RequireSelectedTargetKind or ReadVirtualDuelPair or
                         ReadTargetSet or ReplaceSingleTarget or NarrowTargetSetToSingle or ConsumeTargetSet or ReleaseTargetSet) &&
@@ -212,6 +217,8 @@ internal static class ProgramCompositionValidator
                         roots.Add(root);
                         if (effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs &&
                             (effect.Op == SkillProgramEffectOp.UseRandomDeckEquipment || effect.Op == SkillProgramEffectOp.SelectAndMoveOwnedCard && effect.FreezeMovedCardSuit && effect.CardCategories is [SkillProgramCardCategory.Equipment]))
+                            choiceGuardedBindings.Add(create.Name, effect.Condition);
+                        if (effect.Condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits)
                             choiceGuardedBindings.Add(create.Name, effect.Condition);
                         Add(create.Name, new(root, root.Atoms.Keys.ToHashSet(), create.MaxCount, create.CardOwner));
                         if (create.AlreadyMoved)
@@ -612,6 +619,7 @@ internal static class ProgramCompositionValidator
                         var maximum = selection?.MaximumTargets ?? initialTargetSetMaximum;
                         if (read.AllowEmptyChainedDraw && minimum == 0 &&
                             !BoundaryGuYongComposition.AllowsEmptyRecipientDraw(effects, index, window) &&
+                            !MobileZhugeJinComposition.AllowsEmptyHongyuanDraw(effects, index, window) &&
                             (index == 0 || !ReferenceEquals(selection, effects[index - 1]) || selection is not
                                 { Op: SkillProgramEffectOp.SelectTargets, TargetKind: SkillProgramTargetKind.AnyLivingChained,
                                     MinimumTargets: 0, ReplaceSelection: true }))
@@ -685,6 +693,8 @@ internal static class ProgramCompositionValidator
                         break;
                     case SelectSingleTarget:
                         if (selectedTarget || targetSetAvailable) Fail("a composition may select its target only once");
+                        if (effect.Condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits)
+                            judgmentTargetGuard = effect.Condition;
                         if (effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs)
                         {
                             var branch = (Bind: effect.Condition.SourceBind!, Option: effect.Condition.OptionId!);
@@ -767,8 +777,15 @@ internal static class ProgramCompositionValidator
             void Fail(string message) => throw Error(nodePath, message);
         }
         foreach (var root in roots.Where(root => root.NeedsCleanup))
+        {
+            if (choiceGuardedBindings.TryGetValue(root.Name, out var guard) &&
+                guard.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits &&
+                guard.Suits.Any(suit => !root.ChoiceOptionConsumed.TryGetValue($"judgment-outcome:{guard.SourceBind}\u001f{suit}", out var consumed) ||
+                    !consumed.SetEquals(root.Atoms.Keys)))
+                throw Error(path + ".effects", $"conditional revealed card binding '{root.Name}' is not fully consumed in every producing judgment outcome");
             if (!root.Consumed.SetEquals(root.Atoms.Keys))
                 throw Error(path + ".effects", $"revealed card binding '{root.Name}' is not fully consumed");
+        }
         if (selectedCardCount > 0 && !cardsConsumed)
             throw Error(path + ".effects", "activation input cards are never consumed");
         return;

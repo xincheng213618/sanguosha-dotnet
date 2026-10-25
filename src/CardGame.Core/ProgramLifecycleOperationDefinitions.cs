@@ -217,6 +217,7 @@ internal sealed class SelectTargetsProgramOperationDescriptor : ProgramOperation
         if (!named && kind == SkillProgramTargetKind.OtherLiving &&
             (numberExpression is not null ||
              !(aiOrder == SkillProgramTargetAiOrder.SupportDraw && minimum == 1 && maximum == 1 ||
+               MobileZhugeJinComposition.IsSupportTargetShape(kind, minimum, maximum, numberExpression, sourceBind, aiOrder) ||
                aiOrder == SkillProgramTargetAiOrder.HostileThenHandCount)))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: otherLiving requires one supportDraw target or a bounded hostile target set, with no count expression.");
         if (aiOrder == SkillProgramTargetAiOrder.SupportRecovery && !named)

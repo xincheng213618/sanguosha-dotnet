@@ -1,0 +1,17 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhuge-jin",
+  "skills": [
+    { "registrationOrder": 72300, "programBundle": "mobile-zhuge-jin", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:hongyuan", "name": "弘援", "description": "摸牌阶段，你可以少摸一张牌，然后令至多两名其他角色各摸一张牌。", "executionForms": "Trigger, State" } },
+    { "registrationOrder": 72301, "programBundle": "mobile-zhuge-jin", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:mingzhe", "name": "明哲", "description": "当你于回合外因使用、打出或弃置而失去一张红色牌时，你可以摸一张牌。", "executionForms": "Trigger" } }
+  ],
+  "generals": [{
+    "registrationOrder": 72302, "pools": { "current": 72302 },
+    "definition": { "id": "mobile:zhuge-jin", "name": "诸葛瑾·移动版", "portraitKey": "official-mobile-zhuge-jin",
+      "skillId": "ol:huanshi", "additionalSkillIds": ["mobile:hongyuan", "mobile:mingzhe"], "factionId": "wu", "baseHp": 3, "gender": "Male",
+      "characterId": "character:zhuge-jin", "variantId": "mobile", "rulesetId": "sanguosha-mobile" }
+  }]
+}

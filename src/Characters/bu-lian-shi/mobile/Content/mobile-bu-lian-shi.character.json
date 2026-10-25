@@ -1,0 +1,19 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:bu-lian-shi",
+  "skills": [{
+    "registrationOrder": 72400, "programBundle": "mobile-bu-lian-shi", "includeProgramPresentation": true,
+    "definition": { "id": "mobile:anxu", "name": "安恤", "description": "出牌阶段限一次，你可以选择两名手牌数不同的其他角色，令其中手牌多的角色将一张手牌交给手牌少的角色，然后若这两名角色手牌数相等，你摸一张牌或回复1点体力。", "actionForms": "Active" }
+  }],
+  "generals": [{
+    "registrationOrder": 72401,
+    "pools": { "current": 72401 },
+    "definition": {
+      "id": "mobile:bu-lian-shi", "name": "步练师·移动版", "portraitKey": "official-mobile-bu-lian-shi",
+      "skillId": "mobile:anxu", "additionalSkillIds": ["classic:zhuiyi"],
+      "factionId": "wu", "baseHp": 3, "gender": "Female",
+      "characterId": "character:bu-lian-shi", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+    }
+  }]
+}

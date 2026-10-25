@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "mobile:zhenlie", "revision": 1, "triggers": [
+      { "id": "replace-own-judgment-with-top", "window": "judgmentReplacing", "subject": "owner", "excludedReasons": [], "optional": true,
+        "effects": [{ "op": "replaceJudgment", "target": "owner", "zones": ["drawPile"], "suits": ["spade", "club", "heart", "diamond"], "oldCardDestination": "discardPile" }] }
+    ] },
+    { "id": "mobile:miji", "revision": 1, "triggers": [
+      { "id": "prepare-black-top-gift", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": true,
+        "condition": { "kind": "compare", "left": { "kind": "currentHp" }, "operator": "lessThan", "right": { "kind": "currentMaxHp" } },
+        "effects": [
+          { "op": "startJudgment", "target": "owner", "judgmentReason": "skill.mobile-wang-yi.miji", "resultBind": "judgment-card", "outcomeBind": "judgment-outcome", "visibility": "public" },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "judgment-card", "destination": "discardPile" },
+          { "op": "revealTopCards", "target": "owner", "numberExpression": "ownerLostHp", "resultBind": "miji-cards", "visibility": "private",
+            "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "judgment-outcome", "suits": ["spade", "club"] } },
+          { "op": "selectTarget", "target": "owner", "targetKind": "anyLiving",
+            "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "judgment-outcome", "suits": ["spade", "club"] } },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "miji-cards", "destination": "selectedTargetHand",
+            "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "judgment-outcome", "suits": ["spade", "club"] } }
+        ] },
+      { "id": "ending-black-top-gift", "window": "turnEnding", "subject": "owner", "optional": true, "priority": 180,
+        "condition": { "kind": "compare", "left": { "kind": "currentHp" }, "operator": "lessThan", "right": { "kind": "currentMaxHp" } },
+        "effects": [
+          { "op": "startJudgment", "target": "owner", "judgmentReason": "skill.mobile-wang-yi.miji", "resultBind": "judgment-card", "outcomeBind": "judgment-outcome", "visibility": "public" },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "judgment-card", "destination": "discardPile" },
+          { "op": "revealTopCards", "target": "owner", "numberExpression": "ownerLostHp", "resultBind": "miji-cards", "visibility": "private",
+            "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "judgment-outcome", "suits": ["spade", "club"] } },
+          { "op": "selectTarget", "target": "owner", "targetKind": "anyLiving",
+            "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "judgment-outcome", "suits": ["spade", "club"] } },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "miji-cards", "destination": "selectedTargetHand",
+            "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "judgment-outcome", "suits": ["spade", "club"] } }
+        ] }
+    ] }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:hongyuan",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "reduce-and-support",
+          "window": "drawPhaseStarting",
+          "subject": "owner",
+          "optional": true,
+          "effects": [
+            {
+              "op": "adjustNormalDraw",
+              "target": "owner",
+              "amount": -1
+            },
+            {
+              "op": "selectTargets",
+              "target": "owner",
+              "targetKind": "otherLiving",
+              "minimumTargets": 0,
+              "maximumTargets": 2,
+              "targetAiOrder": "supportDraw"
+            },
+            {
+              "op": "draw",
+              "target": "selectedTargets",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:mingzhe",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "red-hand-use-response",
+          "window": "cardsMoved",
+          "subject": "owner",
+          "sourceZones": [
+            "hand"
+          ],
+          "movementOccurrence": "perCard",
+          "optional": true,
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "red-equipment-use-response",
+          "window": "cardsMoved",
+          "subject": "owner",
+          "sourceZones": [
+            "equipment"
+          ],
+          "movementOccurrence": "perCard",
+          "optional": true,
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "red-hand-discard",
+          "window": "cardsMoved",
+          "subject": "owner",
+          "sourceZones": [
+            "hand"
+          ],
+          "movementOccurrence": "perCard",
+          "movementDiscardOnly": true,
+          "optional": true,
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "red-equipment-discard",
+          "window": "cardsMoved",
+          "subject": "owner",
+          "sourceZones": [
+            "equipment"
+          ],
+          "movementOccurrence": "perCard",
+          "movementDiscardOnly": true,
+          "optional": true,
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

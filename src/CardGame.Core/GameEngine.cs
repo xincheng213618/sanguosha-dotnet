@@ -11170,8 +11170,9 @@ public sealed partial class GameEngine
                 var program = binding.Program;
                 var trigger = binding.Trigger;
                 if (!MatchesProgramJudgmentReplacement(owner, trigger, targetSeat, reason) ||
-                    GetProgramJudgmentReplacementCards(owner, trigger, targetSeat, reason,
-                        ignoreCurrentColor: true).Count == 0)
+                    (IsDeckTopJudgmentReplacement(trigger) ? !HasDeckTopJudgmentReplacementMaterial() :
+                        GetProgramJudgmentReplacementCards(owner, trigger, targetSeat, reason,
+                            ignoreCurrentColor: true).Count == 0))
                 {
                     continue;
                 }
@@ -18786,6 +18787,8 @@ public sealed partial class GameEngine
                 : isProgramReplacementChoice
                     ? IsDelegatedJudgment(programReplacementTrigger!)
                       ? IsDelegatedJudgmentPromptValid(pendingJudgment, coreDecision)
+                      : IsDeckTopJudgmentReplacement(programReplacementTrigger!)
+                      ? IsDeckTopJudgmentReplacementPromptValid(pendingJudgment, coreDecision)
                       : coreDecision is { Kind: DecisionKind.ProgramJudgmentReplacement } replacementDecision &&
                       replacementDecision.PlayerSeat == expectedJudgmentOwner &&
                       replacementDecision.ValidCardIds.SequenceEqual(

@@ -335,6 +335,9 @@ public enum SkillProgramEffectOp
     RewriteBoundaryXiaoQiaoJudgment = 66700,
     DrawMobileLiDianWangxi = 71000,
     ResolveMobileSpXuShuJianyan = 71700,
+    PrepareMobileBuLianShiAnxu = 72400,
+    ResolveMobileZhuHuanPingkou = 72500,
+    ReduceMobileMaDaiDamageTargetMaximumHp = 72901,
     ResolveBoundaryCaoXiuQingxi = 51100,
     ResolveBoundaryQuanCongYaoming = 51200,
     SelectMobileShiKaijiTargets = 47400,
@@ -5817,6 +5820,10 @@ public sealed class SkillProgramCatalog
             effects.Any(effect => effect.Op is SkillProgramEffectOp.ReplaceJudgment or SkillProgramEffectOp.DelegateJudgmentReplacement or SkillProgramEffectOp.ReplaceJudgmentFromPublicRice ||
                                   effect.ReplacementSuits.Count > 0))
             Fail(path + ".effects", "judgment replacement effects require judgmentReplacing");
+        if (effects.Any(effect => effect.Op == SkillProgramEffectOp.ReplaceJudgment && effect.Zones is [CardZoneKind.DrawPile]) &&
+            (window != SkillProgramTriggerWindow.JudgmentReplacing || effects.Count != 1 ||
+                subject != SkillProgramTriggerSubject.Owner || !optional || node.TryGetProperty("markerCost", out _)))
+            Fail(path + ".effects", "unknown deck-top replacement requires one optional owner-only native retrial without a marker cost");
         if (window != SkillProgramTriggerWindow.JudgmentFinalized &&
             effects.Any(effect => effect.Op == SkillProgramEffectOp.ClaimJudgmentCard))
             Fail(path + ".effects", "claimJudgmentCard requires judgmentFinalized");

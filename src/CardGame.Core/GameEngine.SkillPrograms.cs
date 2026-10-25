@@ -1132,6 +1132,7 @@ public sealed partial class GameEngine
                 throw new InvalidOperationException("An active program contains duplicate named choices.");
             foreach (var binding in frame.ChoiceBindings)
             {
+                if (IsMobileBuLianShiAnxuEqualityResult(frame, binding)) continue;
                 if (IsBoundarySidiChoiceResult(frame, binding)) continue;
                 if (IsBoundaryGuYongChoiceResult(frame, binding)) continue;
                 if (IsBoundarySunLuBanChoiceResult(frame, binding)) continue;

@@ -86,6 +86,19 @@ internal static class SkillProgramChecks
         AssertReject(overlappingJudgmentMoves,
             """{"schemaVersion":3,"skills":{"scenario:overlap-judgment-moves":{"name":"Overlapping outcome","description":"The shared Spade branch cannot move one entity twice."}}}""",
             "cards may be moved more than once");
+        var crossGuardTarget = """
+            {"schemaVersion":__SCHEMA__,"skills":[{"id":"scenario:cross-judgment-target","revision":1,
+            "triggers":[{"id":"judge","window":"turnStartBeforeNormalFlow","subject":"owner","optional":true,"effects":[
+            {"op":"startJudgment","target":"owner","judgmentReason":"fixture:guard","resultBind":"card","outcomeBind":"outcome","visibility":"public"},
+            {"op":"moveBoundCards","target":"owner","sourceBind":"card","destination":"discardPile"},
+            {"op":"revealTopCards","target":"owner","amount":2,"resultBind":"gift","visibility":"private","condition":{"kind":"judgmentOutcomeMatchesSuits","sourceBind":"outcome","suits":["spade","club"]}},
+            {"op":"selectTarget","target":"owner","targetKind":"anyLiving","condition":{"kind":"judgmentOutcomeMatchesSuits","sourceBind":"outcome","suits":["heart","diamond"]}},
+            {"op":"moveBoundCards","target":"owner","sourceBind":"gift","destination":"selectedTargetHand","condition":{"kind":"judgmentOutcomeMatchesSuits","sourceBind":"outcome","suits":["spade","club"]}}
+            ]}]}]}
+            """.Replace("__SCHEMA__", SkillProgramCatalog.RulesSchemaVersion.ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal);
+        AssertReject(crossGuardTarget,
+            """{"schemaVersion":3,"skills":{"scenario:cross-judgment-target":{"name":"Cross-guard target","description":"A black gift cannot use a target produced only by a red judgment."}}}""",
+            "conditional selectedTarget requires its matching judgment outcome branch");
     }
 
 

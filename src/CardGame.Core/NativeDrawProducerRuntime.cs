@@ -32,7 +32,8 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
             _ => throw new InvalidOperationException("Draw has an unsupported amount instruction.")
         };
         if (requested is null) return SkillProgramStepOutcome.Continue;
-        if (!queries.HasAttemptCapability && !queries.IsGameStartingDraw(frame) && !queries.IsGameStartingGainDraw(frame) && !queries.IsLiushiClearDraw(frame))
+        if (!queries.HasAttemptCapability && !queries.IsGameStartingDraw(frame) && !queries.IsGameStartingGainDraw(frame) && !queries.IsLiushiClearDraw(frame) &&
+            !MobileZhugeJinComposition.IsHongyuanDrawCursor(frame, queries.ResolvePlan(frame)))
         {
             if (selected) operations.DrawSelectedTargets(frame.Id, requested.Value, reason);
             else operations.DrawProgramCards(frame.Id, targetSeat, requested.Value,
@@ -50,6 +51,7 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
 
     internal static bool IsCommittedEmptyTargetDraw(ProgramSkillFrame frame, ProgramExecutionPlan plan, int amount) =>
         BoundaryGuYongComposition.IsCommittedEmptyRecipientDraw(frame, plan, amount) ||
+        MobileZhugeJinComposition.IsCommittedEmptyHongyuanDraw(frame, plan, amount) ||
         frame.SelectedTargetSeats.Count == 0 && frame.NativeDraw is null && amount > 0 &&
         frame.InstructionIndex >= 2 && frame.InstructionIndex <= plan.Instructions.Count &&
         plan.BindingId == (frame.TriggerId ?? frame.ActivationId) &&
@@ -164,7 +166,8 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
             throw new InvalidOperationException("A Draw instruction lost its exact paid cursor or result binding.");
         if (paid.ReturnKind == NativeDrawAttemptReturnKind.ProgramInstruction)
         {
-            if ((!queries.HasAttemptCapability && !queries.IsGameStartingDraw(frame) && !queries.IsGameStartingGainDraw(frame) && !queries.IsLiushiClearDraw(frame)) || paid.Operation is not null ||
+            if ((!queries.HasAttemptCapability && !queries.IsGameStartingDraw(frame) && !queries.IsGameStartingGainDraw(frame) && !queries.IsLiushiClearDraw(frame) &&
+                !MobileZhugeJinComposition.IsHongyuanDrawCursor(frame, plan)) || paid.Operation is not null ||
                 plan.Instructions[paid.InstructionIndex - 1].CompiledInstruction is not DrawProgramInstruction instruction ||
                 paid.ResultBind != (instruction.Target == SkillProgramEffectTarget.SelectedTargets ? null : instruction.ResultBind) ||
                 paid.Visibility != instruction.Visibility ||

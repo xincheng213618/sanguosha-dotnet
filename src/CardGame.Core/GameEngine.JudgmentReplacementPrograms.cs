@@ -22,6 +22,8 @@ public sealed partial class GameEngine
     {
         if (trigger.Effects is [{ Op: SkillProgramEffectOp.ReplaceJudgmentFromPublicRice }])
             return RiceJudgmentReplacementCards(owner, trigger);
+        if (IsDeckTopJudgmentReplacement(trigger))
+            return _cardZones.CardsAt(CardLocation.DrawPile).TakeLast(1).ToArray();
         if (trigger.Window != SkillProgramTriggerWindow.JudgmentReplacing ||
             trigger.Effects.Count == 0 ||
             trigger.Effects[0] is not { Op: SkillProgramEffectOp.ReplaceJudgment or SkillProgramEffectOp.DelegateJudgmentReplacement } replacement ||
@@ -87,6 +89,13 @@ public sealed partial class GameEngine
         var enabled = owner.IsAlive &&
             HasRuntimeSkillInstance(owner, program.Id, candidate.SkillInstanceId) &&
             MatchesProgramJudgmentReplacement(owner, trigger, pending.TargetSeat, pending.Reason);
+        if (IsDeckTopJudgmentReplacement(trigger))
+        {
+            if (enabled && HasDeckTopJudgmentReplacementMaterial())
+                BeginDeckTopJudgmentReplacementChoice(pending, candidate, program, trigger);
+            else AdvanceJudgmentCandidate(pending);
+            return;
+        }
         var replacementCards = enabled
             ? GetProgramJudgmentReplacementCards(
                 owner, trigger, pending.TargetSeat, pending.Reason)
@@ -180,6 +189,7 @@ public sealed partial class GameEngine
         var owner = _players[candidate.OwnerSeat];
         var oldJudgmentCard = GetJudgmentCard(pending) ??
             throw new InvalidOperationException("The configured judgment replacement lost its current card.");
+        if (TryResolveDeckTopJudgmentReplacement(selected, pending, candidate, program, trigger)) return;
         int? selectedCardId = selected.Parameters.GetValueOrDefault("action") switch
         {
             "program-judgment-replace" => int.Parse(
@@ -291,10 +301,11 @@ public sealed partial class GameEngine
         var oldFrom = CardLocation.Judgment(pending.TargetSeat);
         if (_cardZones.GetLocation(oldJudgmentCard.Id) != oldFrom)
             throw new InvalidOperationException("The current judgment card is no longer in its judgment zone.");
-        var replacementFrom = exactRiceLocation ?? FindOwnedCardLocation(owner, replacement);
+        var topInput = exactRiceLocation is null && IsDeckTopJudgmentReplacementInput(pending, owner, replacement);
+        var replacementFrom = exactRiceLocation ?? (topInput ? CardLocation.DrawPile : FindOwnedCardLocation(owner, replacement));
         if (exactRiceLocation is not null ? replacementFrom.Zone != CardZoneKind.PublicPersistentPile || replacementFrom.OwnerSeat != owner.Seat ||
                 _cardZones.GetLocation(replacement.Id) != replacementFrom || !_publicPersistentPiles.Values.Any(p => p.Location == replacementFrom && RiceProducer(p)) :
-            replacementFrom.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
+            !topInput && replacementFrom.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
             throw new InvalidOperationException("The configured replacement card is not in an owned input zone.");
         var requestedOldTo = oldDestination == SkillProgramOldJudgmentCardDestination.OwnerHand
             ? CardLocation.Hand(owner.Seat)
@@ -356,6 +367,7 @@ public sealed partial class GameEngine
     private void ResolvePendingAiProgramJudgmentReplacement()
     {
         if (ResolveAiDelegatedJudgmentChoice()) return;
+        if (TryResolveAiDeckTopJudgmentReplacement()) return;
         var pending = ActiveJudgment ??
             throw new InvalidOperationException("AI configured judgment replacement is missing.");
         var decision = _pendingDecision ??

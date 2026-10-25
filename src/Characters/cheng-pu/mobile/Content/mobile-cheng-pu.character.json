@@ -1,0 +1,11 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cheng-pu",
+  "skills": [],
+  "generals": [{ "registrationOrder": 73100, "pools": { "current": 73100 }, "definition": {
+    "id": "mobile:cheng-pu", "name": "程普·移动版", "portraitKey": "mobile-cheng-pu", "skillId": "classic:lihuo",
+    "additionalSkillIds": ["boundary:chunlao-mobile"], "factionId": "wu", "baseHp": 4, "gender": "Male",
+    "characterId": "character:cheng-pu", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

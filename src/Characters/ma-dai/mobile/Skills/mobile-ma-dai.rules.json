@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "mobile:ma-dai-qianxi", "revision": 1,
+    "triggers": [{ "id": "judge-nearby-slash-damage", "window": "beforeDamageApplied", "subject": "damageSource", "optional": true,
+      "condition": { "kind": "all", "children": [{ "kind": "directCardUseDamage" }, { "kind": "damageCardIsSlash" }] },
+      "effects": [
+        { "op": "startJudgment", "target": "owner", "judgmentReason": "skill.mobile.ma-dai-qianxi", "resultBind": "qianxi-card", "outcomeBind": "qianxi-outcome", "visibility": "public" },
+        { "op": "preventCurrentDamage", "target": "owner", "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "qianxi-outcome", "suits": ["spade", "club", "diamond"] } },
+        { "op": "reduceMobileMaDaiDamageTargetMaximumHp", "target": "owner", "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "qianxi-outcome", "suits": ["spade", "club", "diamond"] } },
+        { "op": "moveBoundCards", "target": "owner", "sourceBind": "qianxi-card", "destination": "discardPile", "awaitMovementTriggers": true }
+      ]
+    }]
+  }]
+}

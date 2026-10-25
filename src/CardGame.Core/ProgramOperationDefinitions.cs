@@ -668,7 +668,8 @@ internal sealed class RevealTopCardsProgramOperationDescriptor : ProgramOperatio
             numberExpression: expression,
             resultBind: r.RequiredIdentifier("resultBind"),
             visibility: r.RequiredEnum<SkillProgramCardSetVisibility>("visibility"));
-        RequireAlways(effect, r.Path);
+        if (effect.Condition.Kind != SkillProgramConditionKind.JudgmentOutcomeMatchesSuits)
+            RequireAlways(effect, r.Path);
         return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
@@ -794,7 +795,7 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
         if (effect.Condition.Kind != SkillProgramConditionKind.Always &&
             !(effect.Condition.Kind == SkillProgramConditionKind.BoundCardsMatchSuits && destination == SkillProgramCardDestination.OwnerHand) &&
             !(effect.Condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits &&
-                destination is SkillProgramCardDestination.DiscardPile or SkillProgramCardDestination.OwnerHand or SkillProgramCardDestination.OwnerPersistentZone) &&
+                destination is SkillProgramCardDestination.DiscardPile or SkillProgramCardDestination.OwnerHand or SkillProgramCardDestination.OwnerPersistentZone or SkillProgramCardDestination.SelectedTargetHand) &&
             !(effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs &&
               destination is SkillProgramCardDestination.DiscardPile or SkillProgramCardDestination.OwnerHand or
                 SkillProgramCardDestination.DrawPileTop) &&
@@ -808,6 +809,8 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
             ? [new RequireBoundParticipantGiftEntry(effect.SourceBind!), new ReadSelectedTarget(),
                 new RequireOwnedCardSet(effect.SourceBind!, SkillProgramEffectTarget.Owner, null, [CardZoneKind.Hand, CardZoneKind.Equipment]),
                 new MoveCardSet(effect.SourceBind!, effect.ExceptBind, SkillProgramCardDestination.SelectedTargetHand)] :
+        effect is { Destination: SkillProgramCardDestination.SelectedTargetHand, Condition.Kind: SkillProgramConditionKind.JudgmentOutcomeMatchesSuits }
+            ? [new ReadSelectedTarget(), new MoveCardSet(effect.SourceBind!, effect.ExceptBind, SkillProgramCardDestination.SelectedTargetHand)] :
         effect.Destination == SkillProgramCardDestination.PhaseOwnerHand
             ? [new RequireContext(ProgramContextCapability.PhaseOwner),
                 new MoveCardSet(effect.SourceBind!, effect.ExceptBind, effect.Destination.Value)]
@@ -937,6 +940,7 @@ internal sealed class SelectTargetProgramOperationDescriptor : ProgramOperationD
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: choice-guarded target selection requires a matching requiredTargetKind and no additional selection filters.");
         if (effect.Condition.Kind != SkillProgramConditionKind.Always &&
             effect.Condition.Kind != SkillProgramConditionKind.ChoiceIs &&
+            effect.Condition.Kind != SkillProgramConditionKind.JudgmentOutcomeMatchesSuits &&
             !(skipIfNoTarget && (effect.Condition.Kind == SkillProgramConditionKind.PindianWon ||
                 IsCardActionCategoryBranch(effect.Condition))))
             RequireAlways(effect, r.Path);

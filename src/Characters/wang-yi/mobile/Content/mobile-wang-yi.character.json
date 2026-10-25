@@ -1,0 +1,18 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:wang-yi",
+  "skills": [
+    { "registrationOrder": 73000, "programBundle": "mobile-wang-yi", "includeProgramPresentation": true, "definition": {
+      "id": "mobile:zhenlie", "name": "贞烈", "description": "当你的判定牌生效前，你可以亮出牌堆顶的一张牌，然后你打出此牌代替之。", "executionForms": "Trigger"
+    } },
+    { "registrationOrder": 73001, "programBundle": "mobile-wang-yi", "includeProgramPresentation": true, "definition": {
+      "id": "mobile:miji", "name": "秘计", "description": "准备阶段或结束阶段，若你已受伤，你可以进行一次判定，若结果为黑色，你观看牌堆顶的X张牌（X为你已损失的体力值），然后将这些牌交给一名角色。", "executionForms": "Trigger"
+    } }
+  ],
+  "generals": [{ "registrationOrder": 73002, "pools": { "current": 73002 }, "definition": {
+    "id": "mobile:wang-yi", "name": "王异·移动版", "portraitKey": "mobile-wang-yi", "skillId": "mobile:zhenlie",
+    "additionalSkillIds": ["mobile:miji"], "factionId": "wei", "baseHp": 3, "gender": "Female",
+    "characterId": "character:wang-yi", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

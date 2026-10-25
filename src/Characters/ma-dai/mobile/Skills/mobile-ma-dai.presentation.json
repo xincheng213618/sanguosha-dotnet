@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": { "mobile:ma-dai-qianxi": {
+    "name": "潜袭", "description": "对距离为1的目标造成杀伤害前可判定，非红桃则防止此伤害，然后目标减1点体力上限。",
+    "triggerChoices": { "judge-nearby-slash-damage": "潜袭·判定防伤减上限" }
+  } }
+}

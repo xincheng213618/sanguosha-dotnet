@@ -21911,6 +21911,210 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-cao-ang",
+      "characterName": "曹昂·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-83.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/12200.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cao-ang.jpg",
+          "sha256": "517e40a7f141e4e10c0f37c0d146c8eaf56a23557bdc4a7ecd6fb2025913b559",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-chen-lin",
+      "characterName": "陈琳·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-75.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/11300.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-chen-lin.jpg",
+          "sha256": "bdedf0c99c966976ded2efec8caeb8ccc0b6012139832bfb5a6c84c79852823f",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhuge-jin",
+      "characterName": "诸葛瑾·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-84.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/12300.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhuge-jin.jpg",
+          "sha256": "2baaca43e4c2fdb3741e7237577427f8d2ffba7fb0dcbe5c34741d19d3cc4869",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-bu-lian-shi",
+      "characterName": "步练师·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-117.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/51500.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-bu-lian-shi.jpg",
+          "sha256": "b930017bf147c64faff5d5a1d46e15a6fd266aae8557f62dde96a6774fc4a568",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhu-huan",
+      "characterName": "朱桓·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-181.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/32800.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhu-huan.jpg",
+          "sha256": "4d361cc22b73648e7e9a8b6b9b3a079adccd65da5327d69dd598eb45dbcecb94",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-han-dang",
+      "characterName": "韩当·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-119.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/51000.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-han-dang.jpg",
+          "sha256": "a1b9133f44dd8bf9552c30878ec014fec09edc8a54891698a83708065459c97e",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-cao-zhang",
+      "characterName": "曹彰·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-111.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/51300.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cao-zhang.jpg",
+          "sha256": "5fb60bb777442cdb991ddbdbbd6cb25900821d2c0e3ad9459ac0f6c67c8897c9",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-liao-hua",
+      "characterName": "廖化·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-115.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/51400.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-liao-hua.jpg",
+          "sha256": "078c1cd8e3fcfe0b1b78c8a7fc619bf518393947ec525e9c9261d8b8dce2bfd9",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-ma-dai",
+      "characterName": "马岱·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-138.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/18900.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-ma-dai.jpg",
+          "sha256": "4e6dda7c9a3166787775b1cb68bf2a6fbb8011da515b4cc8e0e0eaf47aeb2a8c",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-wang-yi",
+      "characterName": "王异·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-112.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/16300.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-wang-yi.jpg",
+          "sha256": "8c769e0ca47b8f69a6ff094c644a9c5815992e3453e82865767a09f9e44094e8",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-cheng-pu",
+      "characterName": "程普·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-118.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/16900.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cheng-pu.jpg",
+          "sha256": "261a18b08d67372843bd8d23fc9f6a05e2dc4ed4720642490383eb041f8c4972",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-xun-you",
+      "characterName": "荀攸·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-113.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/16400.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-xun-you.jpg",
+          "sha256": "88fa46c0257ab2c7b5449c828a65fcc42c1c073524068364d3d2b971f1599e02",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

@@ -443,7 +443,7 @@ public sealed partial class GameEngine
             if (!matches) continue;
             if (relation == SkillProgramCardActionOwnerRelation.ConversionSource && targets.Count == 0 && !trigger.AllowNoEventTarget) continue;
             var eventTargetsForBinding = window == SkillProgramTriggerWindow.CardUseTargetsFinalized &&
-                (HasFinalTargetSlashEffects(trigger.Effects) || IsMobileZhuRongTargetTrigger(binding.SkillId, trigger))
+                (HasFinalTargetSlashEffects(trigger.Effects) || IsMobileZhuRongTargetTrigger(binding.SkillId, trigger) || IsMobileCaoAngTargetTrigger(binding.SkillId, trigger))
                 ? targets.Where(seat => _players[seat].IsAlive).Order().ToArray()
                 : IsMouYuanShaoTargetTrigger(binding.SkillId, trigger)
                 ? targets.Where(seat => _players[seat].IsAlive).Order().ToArray()
@@ -469,12 +469,13 @@ public sealed partial class GameEngine
                     EventTargetRuleWounded = UsesTreatedWounded && eventTarget >= 0 ? IsRuleWounded(_players[eventTarget]) : null,
                     EventTargetHandCount = eventTarget >= 0 ? GetHand(_players[eventTarget]).Count : 0,
                     EventTargetHp = window == SkillProgramTriggerWindow.CardUseTargetsFinalized &&
-                        (HasFinalTargetSlashEffects(trigger.Effects) || IsMobileZhuRongTargetTrigger(binding.SkillId, trigger)) && eventTarget >= 0
+                        (HasFinalTargetSlashEffects(trigger.Effects) || IsMobileZhuRongTargetTrigger(binding.SkillId, trigger) || IsMobileCaoAngTargetTrigger(binding.SkillId, trigger)) && eventTarget >= 0
                         ? _players[eventTarget].Hp : capturedFacts.EventTargetHp,
                     OwnerEventTargetDistance = eventTarget >= 0
                         ? GetCombatDistance(owner.Seat, eventTarget)
                         : int.MaxValue,
-                    CardActionTargetIsOwner = bindingTargets.Contains(owner.Seat)
+                    CardActionTargetIsOwner = IsMobileCaoAngTargetTrigger(binding.SkillId, trigger)
+                        ? eventTarget == owner.Seat : bindingTargets.Contains(owner.Seat)
                 };
                 var context = CreateCardActionProgramContext(action, window, parentFrameId: 0,
                     owner.Seat, eventTarget, facts) with { OptionalChooserSeat = rewardChooser };

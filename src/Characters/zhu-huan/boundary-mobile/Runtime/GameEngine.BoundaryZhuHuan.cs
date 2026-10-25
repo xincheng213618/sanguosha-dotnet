@@ -3,7 +3,8 @@ namespace CardGame.Core;
 public sealed partial class GameEngine
 {
     private const string BoundaryPingkouAction="boundary-zhu-huan-pingkou",BoundaryPingkouGain="skill.boundary-zhu-huan.pingkou.equipment";
-    private bool TracksBoundaryZhuHuanPhaseSkips=>_contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBoundaryZhuHuanPingkou)==true;
+    private bool TracksBoundaryZhuHuanPhaseSkips => _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBoundaryZhuHuanPingkou) ||
+        _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileZhuHuanPingkou);
     private static CardConversionSource BoundaryZhuHuanSource(ProgramSkillFrame frame)=>new(frame.SkillId,GetProgramBindingId(frame),frame.OwnerSeat,frame.SkillInstanceId);
     [ProgramCapability] private sealed class BoundaryZhuHuanHost(GameEngine engine):IBoundaryZhuHuanHost
     {

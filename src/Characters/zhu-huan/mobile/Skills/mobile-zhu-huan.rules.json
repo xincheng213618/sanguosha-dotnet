@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "mobile:pingkou", "revision": 1,
+    "triggers": [{ "id": "actual-ended-skips", "window": "afterTurnEnded", "subject": "owner", "turnOwnerScope": "own", "optional": true,
+      "effects": [{ "op": "resolveMobileZhuHuanPingkou", "target": "owner" }] }]
+  }]
+}

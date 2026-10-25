@@ -1,0 +1,10 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:ma-dai",
+  "skills": [{ "registrationOrder": 72902, "programBundle": "mobile-ma-dai", "includeProgramPresentation": true,
+    "definition": { "id": "mobile:ma-dai-qianxi", "name": "潜袭", "description": "当你使用【杀】对距离为1的目标角色造成伤害时，你可以进行一次判定。若结果不为红桃，你防止此伤害，然后该角色减1点体力上限。", "executionForms": "Trigger" }
+  }],
+  "generals": [{ "registrationOrder": 72900, "pools": { "current": 72900 }, "definition": {
+    "id": "mobile:ma-dai", "name": "马岱·移动版", "portraitKey": "mobile-ma-dai", "skillId": "classic:mashu", "additionalSkillIds": ["mobile:ma-dai-qianxi"],
+    "factionId": "shu", "baseHp": 4, "gender": "Male", "characterId": "character:ma-dai", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

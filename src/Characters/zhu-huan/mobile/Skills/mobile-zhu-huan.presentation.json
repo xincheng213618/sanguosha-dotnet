@@ -1,0 +1,4 @@
+{
+  "schemaVersion": 3,
+  "skills": { "mobile:pingkou": { "name": "平寇", "description": "回合结束时，你可以对至多X名其他角色各造成1点伤害（X为你本回合实际跳过的阶段数）。" } }
+}

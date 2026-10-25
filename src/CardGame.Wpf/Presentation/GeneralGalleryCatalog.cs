@@ -517,6 +517,18 @@ public static class GeneralGalleryCatalog
         groups.Add("anniversary:lei-bo", "other");
         groups.Add("anniversary:liu-you", "other");
         groups.Add("mobile:he-qi", "other");
+        groups.Add("mobile:cao-ang", "sp");
+        groups.Add("mobile:chen-lin", "sp");
+        groups.Add("mobile:zhuge-jin", "sp");
+        groups.Add("mobile:bu-lian-shi", "fame-2");
+        groups.Add("mobile:zhu-huan", "fame-4");
+        groups.Add("mobile:han-dang", "fame-2");
+        groups.Add("mobile:cao-zhang", "fame-2");
+        groups.Add("mobile:liao-hua", "fame-2");
+        groups.Add("mobile:ma-dai", "fame-2");
+        groups.Add("mobile:wang-yi", "fame-2");
+        groups.Add("mobile:cheng-pu", "fame-2");
+        groups.Add("mobile:xun-you", "fame-2");
         groups.Add("mobile:li-dian", "sp");
         groups.Add("mobile:taishi-ci", "myth-fire");
         groups.Add("mobile:cao-chong", "fame-3");
