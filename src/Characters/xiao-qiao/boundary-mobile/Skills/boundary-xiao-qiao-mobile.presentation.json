@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:hongyan-mobile": {
+      "name": "红颜",
+      "description": "黑桃手牌和本人黑桃判定视为红桃；任意角色红桃判定生效前指定结果花色。",
+      "triggerLabels": {
+        "heart-before-result": "指定判定结果花色"
+      }
+    },
+    "boundary:tianxiang-mobile": {
+      "name": "天香",
+      "description": "弃置红桃手牌防止伤害，再令其他角色受1伤并摸至多5张牌，或失去1体力并获得弃牌。",
+      "triggerLabels": {
+        "prevent-with-heart-hand": "防止伤害并选择受益角色"
+      }
+    }
+  }
+}

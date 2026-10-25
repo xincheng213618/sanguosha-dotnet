@@ -1,0 +1,8 @@
+{ "schemaVersion": 62, "skills": [{ "id": "boundary:lieren-mobile", "revision": 1, "triggers": [
+  { "id": "contest-on-slash-target", "window": "cardUseTargetsFinalized", "ownerRelation": "actor", "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"], "optional": true,
+    "effects": [
+      { "op": "startCardActionPindian", "target": "owner", "opponentRef": { "kind": "eventTarget" }, "resultBind": "contest", "visibility": "public" },
+      { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "resultOpponent", "resultBind": "contest" }, "zones": ["hand", "equipment"], "count": 1, "destination": "ownerHand", "skipIfNoCards": true, "awaitMovementTriggers": true, "condition": { "kind": "pindianWon", "sourceBind": "contest" } },
+      { "op": "exchangeMobileLierenPindianCards", "target": "owner", "sourceBind": "contest", "condition": { "kind": "pindianNotWon", "sourceBind": "contest" } }
+    ] }
+] }] }

@@ -1,0 +1,1 @@
+{ "schemaVersion": 3, "skills": { "boundary:luanji-mobile": { "name": "乱击", "description": "两张手牌当【万箭齐发】，本回合不能重复使用发动乱击时已用过的花色。其他角色以【闪】响应后其摸一张牌；万箭齐发未造成伤害时，你摸等同于此牌目标数的牌。", "activationLabels": { "unused-suit-pair-as-arrow-barrage": "未用花色·乱击" }, "triggerLabels": { "actual-arrow-dodge-draw": "闪响应·乱击", "undamaged-arrow-draw": "万箭无伤害·乱击" } } } }

@@ -793,7 +793,8 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
         // cards), or a placement onto the draw pile top (Gongxin).
         if (effect.Condition.Kind != SkillProgramConditionKind.Always &&
             !(effect.Condition.Kind == SkillProgramConditionKind.BoundCardsMatchSuits && destination == SkillProgramCardDestination.OwnerHand) &&
-            !(effect.Condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits && destination == SkillProgramCardDestination.DiscardPile) &&
+            !(effect.Condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits &&
+                destination is SkillProgramCardDestination.DiscardPile or SkillProgramCardDestination.OwnerHand or SkillProgramCardDestination.OwnerPersistentZone) &&
             !(effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs &&
               destination is SkillProgramCardDestination.DiscardPile or SkillProgramCardDestination.OwnerHand or
                 SkillProgramCardDestination.DrawPileTop) &&

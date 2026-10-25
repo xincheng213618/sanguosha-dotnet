@@ -327,6 +327,12 @@ public enum SkillProgramEffectOp
     DrawMobileJiemingOwnerIfRecipientShort = 65201,
     ConsumeMobileQiangxiTarget = 65301,
     ClaimBoundaryYanLiangWenChouDuelResponses = 65710,
+    ResolveBoundarySunCeZhiba = 66300,
+    DrawMobileLuanjiResponder = 66002,
+    DrawMobileLuanjiNoDamage = 66003,
+    ExchangeMobileLierenPindianCards = 66201,
+    CaptureBoundaryZhangZhaoPhaseDiscards = 66600,
+    RewriteBoundaryXiaoQiaoJudgment = 66700,
     ResolveBoundaryCaoXiuQingxi = 51100,
     ResolveBoundaryQuanCongYaoming = 51200,
     SelectMobileShiKaijiTargets = 47400,
@@ -5971,7 +5977,8 @@ public sealed class SkillProgramCatalog
             (window != SkillProgramTriggerWindow.DiscardPhaseEnded || subject != SkillProgramTriggerSubject.Owner || !allowOwnDiscardPhaseEnded || turnOwnerScope != SkillProgramTurnOwnerScope.Own))
             Fail(path, "discard budget requires an actual own discard-phase end");
         if (effects.Any(e => e.Op == SkillProgramEffectOp.OfferRedDiscardRecoveryChoice) &&
-            (window != SkillProgramTriggerWindow.TurnEnding || subject != SkillProgramTriggerSubject.Owner ||
+            (window != SkillProgramTriggerWindow.TurnEnding && !(skillId == "boundary:zaiqi-mobile" &&
+                window == SkillProgramTriggerWindow.DiscardPhaseEnded && allowOwnDiscardPhaseEnded) || subject != SkillProgramTriggerSubject.Owner ||
              optional || turnOwnerScope != SkillProgramTurnOwnerScope.Own || effects.Count != 1))
             Fail(path, "red discard recovery requires one mandatory own turn-ending operation");
         if (effects.Any(e => e.Op == SkillProgramEffectOp.PreventCurrentDamageAndDrawMultiple) &&
@@ -6167,7 +6174,7 @@ public sealed class SkillProgramCatalog
         XinPiComposition.Trigger(path, parsedTrigger);
         HuaManComposition.Trigger(path, parsedTrigger);
         if (window == SkillProgramTriggerWindow.JudgmentBeforeResult &&
-            (parsedTrigger.Effects is not [{ Op: SkillProgramEffectOp.ChooseFinalJudgmentFiveByZiwei or SkillProgramEffectOp.ChooseHellDayuanJudgment }]))
+            (parsedTrigger.Effects is not [{ Op: SkillProgramEffectOp.ChooseFinalJudgmentFiveByZiwei or SkillProgramEffectOp.ChooseHellDayuanJudgment or SkillProgramEffectOp.RewriteBoundaryXiaoQiaoJudgment }]))
             Fail(path, "the before-result boundary requires the exact paid judgment override operation");
         if (window == SkillProgramTriggerWindow.JudgmentBeforeResult && minimumRank == 0 &&
             parsedTrigger.Effects is not [{ Op: SkillProgramEffectOp.ChooseHellDayuanJudgment }])

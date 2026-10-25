@@ -8,7 +8,8 @@ public sealed partial class GameEngine
         ProgramInstructionResolver.Default.Resolve(f, _contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
     private IReadOnlyList<Card> SuitBenefitCosts(int ownerSeat, string skillId, string instance, IReadOnlyList<Suit>? suits = null) =>
         GetHand(_players[ownerSeat]).Concat(GetEquipment(_players[ownerSeat]))
-            .Where(c => (suits is null || suits.Contains(EffectiveSuit(_players[ownerSeat], c))) &&
+            .Where(c => (skillId != "boundary:tianxiang-mobile" || _cardZones.GetLocation(c.Id) == CardLocation.Hand(ownerSeat)) &&
+                (suits is null || suits.Contains(EffectiveSuit(_players[ownerSeat], c))) &&
                 !c.IsGeneralWeapon && !IsActiveProgramSourceEquipmentCard(ownerSeat, skillId, instance, c) &&
                 !IsForeignEquipmentDiscardPrevented(ownerSeat, c, _cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard)).ToArray();
 

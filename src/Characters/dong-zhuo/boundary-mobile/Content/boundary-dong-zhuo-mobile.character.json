@@ -1,0 +1,42 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:dong-zhuo",
+  "skills": [
+    {
+      "registrationOrder": 65900,
+      "programBundle": "boundary-dong-zhuo-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:jiuchi-mobile",
+        "name": "酒池",
+        "description": "你可以将一张黑桃手牌当【酒】使用。你使用的受【酒】影响的【杀】造成伤害后，本回合“崩坏”失效。"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 65901,
+      "pools": {
+        "current": 65901
+      },
+      "definition": {
+        "id": "boundary:dong-zhuo-mobile",
+        "name": "界董卓·移动版",
+        "portraitKey": "boundary-dong-zhuo-mobile",
+        "skillId": "boundary:jiuchi-mobile",
+        "factionId": "qun",
+        "baseHp": 8,
+        "additionalSkillIds": [
+          "boundary:roulin-current",
+          "boundary:benghuai-current",
+          "classic:baonve"
+        ],
+        "gender": "Male",
+        "characterId": "character:dong-zhuo",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

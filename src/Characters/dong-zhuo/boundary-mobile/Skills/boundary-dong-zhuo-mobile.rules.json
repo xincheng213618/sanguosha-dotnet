@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "boundary:jiuchi-mobile",
+      "revision": 1,
+      "viewAs": [
+        {
+          "id": "spade-hand-as-alcohol",
+          "inputKinds": [],
+          "inputSuits": [
+            "spade"
+          ],
+          "outputKind": "alcohol",
+          "forPlay": true,
+          "forResponse": true
+        }
+      ],
+      "triggers": [
+        {
+          "id": "alcohol-slash-disables-own-decay",
+          "window": "afterDamageApplied",
+          "subject": "damageSource",
+          "optional": false,
+          "priority": 100,
+          "damageOccurrence": "perDamage",
+          "condition": {
+            "kind": "all",
+            "children": [
+              {
+                "kind": "damageSourceIsOwner"
+              },
+              {
+                "kind": "damageCardIsSlash"
+              }
+            ]
+          },
+          "effects": [
+            {
+              "op": "suppressOwnSkillAfterAlcoholSlashDamage",
+              "target": "owner",
+              "skillIds": [
+                "boundary:benghuai-current"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

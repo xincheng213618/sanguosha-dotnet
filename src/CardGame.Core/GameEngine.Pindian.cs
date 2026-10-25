@@ -193,6 +193,7 @@ public sealed partial class GameEngine
                         frame.ProgramResultVisibility) { ForeignTurnOrigin = foreignOrigin }).ToArray())
             });
             RecordPindianHandContestReturn(GetActiveProgramFrame(program.Id), frame);
+            CaptureMobileZhuRongPindianReturn(GetActiveProgramFrame(program.Id), frame);
             AdvanceRuntimeProgram(program.Id);
         }
         else throw new InvalidOperationException("Pindian lost its parent continuation.");

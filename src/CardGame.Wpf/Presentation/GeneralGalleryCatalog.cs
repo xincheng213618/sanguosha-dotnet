@@ -142,6 +142,16 @@ public static class GeneralGalleryCatalog
         groups.Add("boundary:pang-de-mobile", "boundary");
         groups.Add("boundary:xu-huang-mobile", "boundary");
         groups.Add("boundary:yan-liang-wen-chou-mobile", "boundary");
+        groups.Add("boundary:wolong-zhuge-liang-mobile", "boundary");
+        groups.Add("boundary:dong-zhuo-mobile", "boundary");
+        groups.Add("boundary:yuan-shao-mobile", "boundary");
+        groups.Add("boundary:meng-huo-mobile", "boundary");
+        groups.Add("boundary:zhu-rong-mobile", "boundary");
+        groups.Add("boundary:sun-ce-mobile", "boundary");
+        groups.Add("boundary:deng-ai-mobile", "boundary");
+        groups.Add("boundary:jiang-wei-mobile", "boundary");
+        groups.Add("boundary:zhang-zhao-zhang-hong-mobile", "boundary");
+        groups.Add("boundary:xiao-qiao-mobile", "boundary");
         groups.Add("boundary:bu-lian-shi-mobile", "boundary-fame");
         groups.Add("boundary:liu-biao-mobile", "boundary-fame");
         groups.Add("boundary:liao-hua-mobile", "boundary-fame");

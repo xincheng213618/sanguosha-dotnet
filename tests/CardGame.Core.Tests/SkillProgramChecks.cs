@@ -75,6 +75,17 @@ internal static class SkillProgramChecks
         Require(SkillProgramCatalog.Load(withoutGate, ownDiscardPresentation).Programs["scenario:own-discard"].GameplayHash !=
                 SkillProgramCatalog.Load(ownDiscardRules, ownDiscardPresentation).Programs["scenario:own-discard"].GameplayHash,
             "Enabling own discard completion must change the content fingerprint.");
+        var overlappingJudgmentMoves = """
+            {"schemaVersion":__SCHEMA__,"skills":[{"id":"scenario:overlap-judgment-moves","revision":1,
+            "triggers":[{"id":"judge","window":"turnStartBeforeNormalFlow","subject":"owner","optional":true,"effects":[
+            {"op":"startJudgment","target":"owner","judgmentReason":"fixture:overlap","resultBind":"card","outcomeBind":"outcome","visibility":"public"},
+            {"op":"moveBoundCards","target":"owner","sourceBind":"card","destination":"ownerHand","condition":{"kind":"judgmentOutcomeMatchesSuits","sourceBind":"outcome","suits":["heart","spade"]}},
+            {"op":"moveBoundCards","target":"owner","sourceBind":"card","destination":"ownerPersistentZone","destinationZone":"authority","condition":{"kind":"judgmentOutcomeMatchesSuits","sourceBind":"outcome","suits":["spade","club"]}}
+            ]}]}]}
+            """.Replace("__SCHEMA__", SkillProgramCatalog.RulesSchemaVersion.ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal);
+        AssertReject(overlappingJudgmentMoves,
+            """{"schemaVersion":3,"skills":{"scenario:overlap-judgment-moves":{"name":"Overlapping outcome","description":"The shared Spade branch cannot move one entity twice."}}}""",
+            "cards may be moved more than once");
     }
 
 

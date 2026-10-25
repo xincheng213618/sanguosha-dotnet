@@ -423,32 +423,40 @@ internal static class ProgramCompositionValidator
                                 Fail("excluded cards must be a subset of the same source root");
                             atoms.ExceptWith(except.Atoms);
                         }
-                        // Branches of one named choice are mutually exclusive at
-                        // play time, so they may partition the same cards; any
-                        // other overlap would move physical cards twice.
+                        // One named choice, or disjoint suits of one frozen
+                        // judgment outcome, can partition the same entities.
+                        // Prefix both key types so even arbitrary identifiers
+                        // cannot collide across choice and judgment guards.
                         var choiceBind = effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs
-                            ? effect.Condition.SourceBind : null;
-                        var choiceOption = choiceBind is null ? null : effect.Condition.OptionId;
+                            ? "choice:" + effect.Condition.SourceBind
+                            : effect.Condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits
+                                ? "judgment-outcome:" + effect.Condition.SourceBind : null;
+                        var choiceOptions = effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs
+                            ? new[] { effect.Condition.OptionId! }
+                            : effect.Condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits
+                                ? effect.Condition.Suits.Select(suit => suit.ToString()).Distinct(StringComparer.Ordinal).ToArray() : [];
                         if (source.Root.Consumed.Overlaps(atoms) || source.Root.PossiblyGifted.Overlaps(atoms))
                         {
-                            if (choiceBind is null || choiceOption is null ||
+                            if (choiceBind is null || choiceOptions.Length == 0 ||
                                 !source.Root.ChoiceConsumed.TryGetValue(choiceBind, out var choiceAtoms) ||
                                 !atoms.IsSubsetOf(choiceAtoms) ||
-                                source.Root.ChoiceOptionConsumed.TryGetValue(
-                                    $"{choiceBind}\u001f{choiceOption}", out var optionAtoms) &&
-                                optionAtoms.Overlaps(atoms))
+                                choiceOptions.Any(option => source.Root.ChoiceOptionConsumed.TryGetValue(
+                                    $"{choiceBind}\u001f{option}", out var optionAtoms) && optionAtoms.Overlaps(atoms)))
                                 Fail("cards may be moved more than once");
                         }
                         source.Root.Consumed.UnionWith(atoms);
-                        if (choiceBind is not null && choiceOption is not null)
+                        if (choiceBind is not null && choiceOptions.Length > 0)
                         {
                             if (!source.Root.ChoiceConsumed.TryGetValue(choiceBind, out var choiceAtoms))
                                 source.Root.ChoiceConsumed[choiceBind] = choiceAtoms = [];
                             choiceAtoms.UnionWith(atoms);
-                            var optionKey = $"{choiceBind}\u001f{choiceOption}";
-                            if (!source.Root.ChoiceOptionConsumed.TryGetValue(optionKey, out var optionAtoms))
-                                source.Root.ChoiceOptionConsumed[optionKey] = optionAtoms = [];
-                            optionAtoms.UnionWith(atoms);
+                            foreach (var option in choiceOptions)
+                            {
+                                var optionKey = $"{choiceBind}\u001f{option}";
+                                if (!source.Root.ChoiceOptionConsumed.TryGetValue(optionKey, out var optionAtoms))
+                                    source.Root.ChoiceOptionConsumed[optionKey] = optionAtoms = [];
+                                optionAtoms.UnionWith(atoms);
+                            }
                         }
                         break;
                     }

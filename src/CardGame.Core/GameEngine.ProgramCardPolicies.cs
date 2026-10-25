@@ -110,6 +110,7 @@ public sealed partial class GameEngine
     private Suit GetProgramEffectiveSuit(CharacterState owner, Card card, CardLocation? identityLocation = null)
     {
         if (ShenZfIdentitySuit(owner, card, identityLocation) is { } shenZfSuit) return shenZfSuit;
+        if (BoundaryXiaoQiaoEffectiveSuit(owner, card, identityLocation) is { } mobileSuit) return mobileSuit;
         if (GetSkillBindingShard(owner).GetCardPolicies(SkillProgramCardPolicyKind.RewriteSuit).Count == 0)
             return card.Suit;
         var suit = card.Suit;

@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "boundary:huoji-mobile",
+      "revision": 1,
+      "viewAs": [
+        {
+          "id": "red-he-as-fire-attack",
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "inputKinds": [],
+          "inputSuits": [
+            "heart",
+            "diamond"
+          ],
+          "outputKind": "fireAttack",
+          "forPlay": true,
+          "forResponse": false
+        }
+      ]
+    },
+    {
+      "id": "boundary:kanpo-mobile",
+      "revision": 1,
+      "viewAs": [
+        {
+          "id": "black-he-as-nullification",
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "inputKinds": [],
+          "inputSuits": [
+            "spade",
+            "club"
+          ],
+          "outputKind": "nullification",
+          "forPlay": false,
+          "forResponse": true
+        }
+      ]
+    }
+  ]
+}

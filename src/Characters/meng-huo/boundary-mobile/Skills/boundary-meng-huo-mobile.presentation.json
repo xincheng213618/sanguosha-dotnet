@@ -1,0 +1,1 @@
+{ "schemaVersion": 3, "skills": { "boundary:zaiqi-mobile": { "name": "再起", "description": "弃牌阶段结束时，你可以令至多X名角色各选择一项（X为本回合置入弃牌堆的红色牌数）：摸一张牌，或令你回复1点体力。", "triggerLabels": { "red-discard-phase-end": "弃牌阶段结束·再起" } } } }

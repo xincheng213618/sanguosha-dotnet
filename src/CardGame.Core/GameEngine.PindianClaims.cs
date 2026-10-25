@@ -4,6 +4,7 @@ public sealed partial class GameEngine
 {
     private bool BeginPindianClaims(PindianFrame frame)
     {
+        if (TryBeginBoundarySunCeZhibaClaim(frame)) return true;
         if (TryBeginBoundaryJianYongZongshi(frame)) return true;
         if (TryBeginDouyuPairWinDraws(frame)) return true;
         if (frame.Result is { } wuResult && TryBeginWuLuKangPostComparison(frame, wuResult, 0)) return true;

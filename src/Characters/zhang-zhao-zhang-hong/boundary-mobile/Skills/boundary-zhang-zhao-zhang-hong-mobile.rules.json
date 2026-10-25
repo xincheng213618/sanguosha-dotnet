@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "boundary:zhijian-mobile",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "equip-target",
+          "usesPerTurn": null,
+          "minCards": 0,
+          "maxCards": 0,
+          "sourceZones": [
+            "hand"
+          ],
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherLiving",
+          "condition": {
+            "kind": "always"
+          },
+          "effects": [
+            {
+              "op": "selectAndMoveOwnedCard",
+              "target": "owner",
+              "chooserRef": {
+                "kind": "owner"
+              },
+              "cardOwnerRef": {
+                "kind": "owner"
+              },
+              "zones": [
+                "hand"
+              ],
+              "count": 1,
+              "cardCategories": [
+                "equipment"
+              ],
+              "destination": "selectedTargetCorrespondingZone",
+              "targetRef": {
+                "kind": "selectedTarget"
+              },
+              "prohibitReplacingEquipment": true,
+              "awaitMovementTriggers": true,
+              "resultBind": "zhijian-placed"
+            },
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1
+            }
+          ]
+        }
+      ],
+      "triggers": [
+        {
+          "id": "draw-on-play-equipment",
+          "window": "cardUseTargetsFinalized",
+          "ownerRelation": "actor",
+          "cardCategories": [
+            "equipment"
+          ],
+          "optional": false,
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "boundary:guzheng-mobile",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "restore-discard-phase",
+          "window": "discardPhaseEnded",
+          "subject": "owner",
+          "turnOwnerScope": "otherLiving",
+          "optional": true,
+          "effects": [
+            {
+              "op": "captureBoundaryZhangZhaoPhaseDiscards",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

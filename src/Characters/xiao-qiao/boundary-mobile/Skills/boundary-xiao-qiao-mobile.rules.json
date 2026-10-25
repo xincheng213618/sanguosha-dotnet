@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:hongyan-mobile", "revision": 1, "triggers": [
+      { "id": "heart-before-result", "window": "judgmentBeforeResult", "subject": "any", "suits": ["heart"], "minimumRank": 1, "maximumRank": 13, "excludedReasons": [], "optional": false,
+        "effects": [{ "op": "rewriteBoundaryXiaoQiaoJudgment", "target": "owner" }] }
+    ] },
+    { "id": "boundary:tianxiang-mobile", "revision": 1, "triggers": [
+      { "id": "prevent-with-heart-hand", "window": "beforeDamageApplied", "subject": "damageTarget", "priority": -100, "optional": true,
+        "effects": [{ "op": "discardSuitPreventDamageAndBenefit", "target": "owner", "suits": ["heart"], "amount": 1, "maximumCards": 5 }] }
+    ] }
+  ]
+}

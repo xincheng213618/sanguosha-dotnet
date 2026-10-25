@@ -32,8 +32,8 @@ public sealed partial class GameEngine
     { ["program-action"] = "red-discard-recovery", ["frame-id"] = f.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["mode"] = mode };
     internal SkillProgramStepOutcome BeginRedDiscardRecovery(ProgramSkillFrame f)
     {
-        if (f.WindowContext?.Window != SkillProgramTriggerWindow.TurnEnding || f.OwnerSeat != _currentSeat)
-            throw new InvalidOperationException("Red discard recovery requires its actual own turn ending.");
+        if (!ValidMobileOrOlRedDiscardRecoveryWindow(f))
+            throw new InvalidOperationException("Red discard recovery requires its actual own rule boundary.");
         var budget = CurrentTurnRedDiscardCount;
         if (budget <= 0 || !_players[f.OwnerSeat].IsAlive) return SkillProgramStepOutcome.Continue;
         var draft = new ProgramRedDiscardRecoveryDraft(budget, []);
@@ -51,7 +51,7 @@ public sealed partial class GameEngine
             new(new($"red-discard-recovery.{f.Id}.{key}"), label, [], targets, RedDiscardRecoveryParameters(f, key)));
         if (d.Selected.Count < d.Budget)
         {
-            foreach (var other in _players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat && !d.Selected.Contains(p.Seat)))
+            foreach (var other in _players.Where(p => p.IsAlive && CanMobileOrOlRedDiscardRecoverySelect(f, p.Seat) && !d.Selected.Contains(p.Seat)))
                 Add($"seat:{other.Seat}", $"选择 {other.Name}", [other.Seat]);
         }
         if (d.Selected.Count > 0)
@@ -131,7 +131,7 @@ public sealed partial class GameEngine
             return;
         }
         if (!d.Committed && d.Selected.Count < d.Budget && int.TryParse(mode["seat:".Length..], out var seat) &&
-            _players[seat].IsAlive && seat != f.OwnerSeat && !d.Selected.Contains(seat))
+            CanMobileOrOlRedDiscardRecoverySelect(f, seat) && _players[seat].IsAlive && !d.Selected.Contains(seat))
         {
             var active = GetActiveProgramFrame(f.Id);
             var grown = active.RedDiscardRecoveryDraft! with { Selected = Array.AsReadOnly(active.RedDiscardRecoveryDraft!.Selected.Append(seat).ToArray()) };
@@ -179,9 +179,9 @@ public sealed partial class GameEngine
     {
         if (f.RedDiscardRecoveryDraft is not { } d) return;
         if (paused.Op != SkillProgramEffectOp.OfferRedDiscardRecoveryChoice ||
-            f.WindowContext?.Window != SkillProgramTriggerWindow.TurnEnding ||
+            !ValidMobileOrOlRedDiscardRecoveryWindow(f) ||
             d.Budget < 0 || d.Selected is null || d.Selected.Distinct().Count() != d.Selected.Count ||
-            d.Selected.Any(seat => !IsValidPlayerSeat(seat) || seat == f.OwnerSeat) ||
+            d.Selected.Any(seat => !CanMobileOrOlRedDiscardRecoverySelect(f, seat)) ||
             d.Selected.Count > d.Budget || d.Cursor < 0 || d.Cursor > d.Selected.Count ||
             (d.AskingSeat is { } asking && (!d.Committed || !IsValidPlayerSeat(asking) ||
                 !d.Selected.Contains(asking))) ||

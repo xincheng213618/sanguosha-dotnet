@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:jiang-wei",
+  "skills": [
+    { "registrationOrder": 66501, "programBundle": "boundary-jiang-wei-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:tiaoxin-mobile", "name": "挑衅", "description": "出牌阶段限一次，你可以选择一名其他角色，然后除非其对你使用一张【杀】，否则你弃置其一张牌。", "actionForms": "Active" } },
+    { "registrationOrder": 66502, "programBundle": "boundary-jiang-wei-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:zhiji-mobile", "name": "志继", "description": "觉醒技，准备阶段，若你没有手牌，你回复1点体力或摸两张牌，然后减1点体力上限，获得“观星”。", "tags": "Awakening", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 66500, "pools": { "current": 66500 }, "definition": {
+    "id": "boundary:jiang-wei-mobile", "name": "界姜维·移动版", "portraitKey": "boundary-jiang-wei-mobile", "skillId": "boundary:tiaoxin-mobile",
+    "additionalSkillIds": ["boundary:zhiji-mobile"], "factionId": "shu", "baseHp": 4, "gender": "Male", "characterId": "character:jiang-wei", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

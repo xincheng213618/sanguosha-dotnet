@@ -1,0 +1,9 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:zhu-rong",
+  "skills": [{ "registrationOrder": 66201, "programBundle": "boundary-zhu-rong-mobile", "includeProgramPresentation": true,
+    "definition": { "id": "boundary:lieren-mobile", "name": "烈刃", "description": "当你使用【杀】指定一名角色为目标后，你可以与其拼点。若你赢，你获得其一张牌；若你没赢，你与其交换双方拼点的牌。", "executionForms": "Trigger" } }],
+  "generals": [{ "registrationOrder": 66200, "pools": { "current": 66200 }, "definition": {
+    "id": "boundary:zhu-rong-mobile", "name": "界祝融·移动版", "portraitKey": "boundary-zhu-rong-mobile", "skillId": "boundary:juxiang-current", "additionalSkillIds": ["boundary:lieren-mobile"],
+    "factionId": "shu", "baseHp": 4, "gender": "Female", "characterId": "character:zhu-rong", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

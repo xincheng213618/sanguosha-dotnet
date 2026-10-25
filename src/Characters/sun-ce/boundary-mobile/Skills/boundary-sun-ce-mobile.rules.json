@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "boundary:jiang-mobile",
+      "revision": 1,
+      "modifiers": [],
+      "viewAs": [],
+      "activations": [],
+      "triggers": [
+        {
+          "id": "draw-on-using-duel",
+          "window": "cardUseBeforeTargetEffects",
+          "ownerRelation": "actor",
+          "cardKinds": [
+            "duel"
+          ],
+          "optional": true,
+          "priority": 0,
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "draw-on-using-red-slash",
+          "window": "cardUseBeforeTargetEffects",
+          "ownerRelation": "actor",
+          "cardKinds": [
+            "slash",
+            "fireSlash",
+            "thunderSlash",
+            "coldSlash"
+          ],
+          "optional": true,
+          "priority": 0,
+          "condition": {
+            "kind": "cardActionCardIsRed"
+          },
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "draw-on-targeted-by-duel",
+          "window": "cardUseBeforeTargetEffects",
+          "ownerRelation": "target",
+          "cardKinds": [
+            "duel"
+          ],
+          "optional": true,
+          "priority": 0,
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "draw-on-targeted-by-red-slash",
+          "window": "cardUseBeforeTargetEffects",
+          "ownerRelation": "target",
+          "cardKinds": [
+            "slash",
+            "fireSlash",
+            "thunderSlash",
+            "coldSlash"
+          ],
+          "optional": true,
+          "priority": 0,
+          "condition": {
+            "kind": "cardActionCardIsRed"
+          },
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1
+            }
+          ]
+        }
+      ],
+      "contributions": [],
+      "cardIdentities": [],
+      "states": []
+    },
+    {
+      "id": "boundary:hunzi-mobile",
+      "revision": 1,
+      "states": [
+        {
+          "id": "awakened",
+          "initialValue": false,
+          "visibility": "public",
+          "resetScope": "game",
+          "reacquirePolicy": "preserveUntilGameEnd"
+        }
+      ],
+      "triggers": [
+        {
+          "id": "awakening",
+          "window": "turnStartBeforeNormalFlow",
+          "subject": "owner",
+          "optional": false,
+          "priority": 30,
+          "usageScope": "game",
+          "usageLimit": 1,
+          "condition": {
+            "kind": "compare",
+            "left": {
+              "kind": "currentHp"
+            },
+            "operator": "lessThanOrEqual",
+            "right": {
+              "kind": "integerConstant",
+              "value": 2
+            }
+          },
+          "effects": [
+            {
+              "op": "changeMaximumHp",
+              "target": "owner",
+              "amount": -1
+            },
+            {
+              "op": "grantSkills",
+              "target": "owner",
+              "skillIds": [
+                "boundary:yingzi",
+                "classic:yinghun"
+              ]
+            },
+            {
+              "op": "setBooleanState",
+              "target": "owner",
+              "stateId": "awakened",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "boundary:zhiba-mobile",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "accept-wu-challenge",
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherLivingWithHand",
+          "usesPerTurn": null,
+          "effects": [
+            {
+              "op": "resolveBoundarySunCeZhiba",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

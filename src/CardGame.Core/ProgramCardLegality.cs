@@ -280,6 +280,7 @@ public sealed partial class GameEngine
 
     private bool IsProgramViewAsAllowed(CharacterState owner, CardKind kind, IReadOnlyList<int> cardIds,
         CardConversionSource source, bool forResponse, bool dyingUse = false, int? requestedUseTarget = null) =>
+        IsMobileYuanShaoViewAsAllowed(owner, cardIds, source) &&
         !CardLegality.IsViewAsForbidden(new(owner, kind, cardIds, source, forResponse, dyingUse, requestedUseTarget));
 
     private bool IsProgramHandPhysicalRestricted(int actorSeat, int cardId) =>

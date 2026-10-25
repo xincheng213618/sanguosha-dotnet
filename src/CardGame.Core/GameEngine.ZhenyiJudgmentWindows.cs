@@ -29,6 +29,7 @@ public sealed partial class GameEngine
 
     private bool IsExactZhenyiBeforeResultProgramChild(ProgramJudgmentTriggerWindowFrame window, ProgramSkillFrame child)
     {
+        if (IsExactBoundaryXiaoQiaoBeforeResultProgramChild(window, child)) return true;
         if (IsExactHellDayuanBeforeResultProgramChild(window, child)) return true;
         if (window.ZhenyiBeforeResult != true || !window.Activated ||
             window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count ||
@@ -49,11 +50,13 @@ public sealed partial class GameEngine
     {
         if (pending.ZhenyiBeforeResultCompleted == true ||
             !(_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseFinalJudgmentFiveByZiwei) ||
-              _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseHellDayuanJudgment))) return false;
+              _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseHellDayuanJudgment) ||
+              _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RewriteBoundaryXiaoQiaoJudgment))) return false;
         var candidates = _players.Where(p => p.IsAlive)
             .OrderBy(p => p.Seat)
             .SelectMany(owner => EnabledUniqueProgramTriggers(owner, SkillProgramTriggerWindow.JudgmentBeforeResult)
                 .Where(b => ProgramInstructionResolver.Default.Features(b.Trigger).HasOperation(SkillProgramEffectOp.ChooseHellDayuanJudgment) ||
+                    ProgramInstructionResolver.Default.Features(b.Trigger).HasOperation(SkillProgramEffectOp.RewriteBoundaryXiaoQiaoJudgment) ||
                     owner.Markers.GetValueOrDefault(PlayerMarkerKind.Ziwei) == 1 &&
                     ProgramInstructionResolver.Default.Features(b.Trigger).HasOperation(SkillProgramEffectOp.ChooseFinalJudgmentFiveByZiwei))
                 .OrderByDescending(b => b.Trigger.Priority).ThenBy(b => b.SkillId, StringComparer.Ordinal)

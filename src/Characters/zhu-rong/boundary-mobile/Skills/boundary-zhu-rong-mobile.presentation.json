@@ -1,0 +1,1 @@
+{ "schemaVersion": 3, "skills": { "boundary:lieren-mobile": { "name": "烈刃", "description": "当你使用【杀】指定一名角色为目标后，你可以与其拼点：赢，获得其一张牌；没赢，交换双方拼点的牌。", "triggerLabels": { "contest-on-slash-target": "指定目标·烈刃" } } } }

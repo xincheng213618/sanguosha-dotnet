@@ -1,0 +1,51 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhuge-liang",
+  "skills": [
+    {
+      "registrationOrder": 65800,
+      "programBundle": "boundary-wolong-zhuge-liang-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:huoji-mobile",
+        "name": "火计",
+        "description": "你可以将一张红色牌当【火攻】使用。"
+      }
+    },
+    {
+      "registrationOrder": 65801,
+      "programBundle": "boundary-wolong-zhuge-liang-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:kanpo-mobile",
+        "name": "看破",
+        "description": "你可以将一张黑色牌当【无懈可击】使用。"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 65802,
+      "pools": {
+        "current": 65802
+      },
+      "definition": {
+        "id": "boundary:wolong-zhuge-liang-mobile",
+        "name": "界卧龙诸葛亮·移动版",
+        "portraitKey": "boundary-wolong-zhuge-liang-mobile",
+        "skillId": "classic:bazhen",
+        "factionId": "shu",
+        "baseHp": 3,
+        "additionalSkillIds": [
+          "boundary:huoji-mobile",
+          "boundary:kanpo-mobile"
+        ],
+        "gender": "Male",
+        "characterId": "character:wolong-zhuge-liang",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

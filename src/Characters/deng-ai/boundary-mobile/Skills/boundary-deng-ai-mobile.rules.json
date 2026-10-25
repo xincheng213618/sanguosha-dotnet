@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "boundary:tuntian-mobile", "revision": 1,
+      "modifiers": [{ "id": "field-outgoing-distance", "query": "outgoingDistance", "operation": "add", "valueExpression": "negatedOwnedZoneCount", "valueZone": "authority", "priority": 0 }],
+      "triggers": [{ "id": "judge-after-off-turn-owned-loss", "window": "cardsMoved", "subject": "owner", "sourceZones": ["hand", "equipment"],
+        "movementOccurrence": "perOwnerBatch", "optional": true,
+        "condition": { "kind": "not", "children": [{ "kind": "ownerIsTurnPlayer" }] },
+        "effects": [
+          { "op": "startJudgment", "target": "owner", "judgmentReason": "skill.boundary.tuntian-mobile", "resultBind": "tuntian-card", "outcomeBind": "tuntian-outcome", "visibility": "public" },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "tuntian-card", "destination": "ownerHand", "awaitMovementTriggers": true,
+            "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "tuntian-outcome", "suits": ["heart"] } },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "tuntian-card", "destination": "ownerPersistentZone", "destinationZone": "authority", "awaitMovementTriggers": true,
+            "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "tuntian-outcome", "suits": ["spade", "club", "diamond"] } }
+        ] }] },
+    { "id": "boundary:zaoxian-mobile", "revision": 1,
+      "triggers": [{ "id": "awakening", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false, "usageScope": "game", "usageLimit": 1,
+        "condition": { "kind": "compare", "left": { "kind": "currentOwnedZoneCount", "zone": "authority" }, "operator": "greaterThanOrEqual", "right": { "kind": "integerConstant", "value": 3 } },
+        "effects": [{ "op": "changeMaximumHp", "target": "owner", "amount": -1 }, { "op": "grantSkills", "target": "owner", "skillIds": ["boundary:deng-ai-jixi-mobile"] }] }] },
+    { "id": "boundary:deng-ai-jixi-mobile", "revision": 1,
+      "viewAs": [{ "id": "field-as-native-snatch", "sourceZones": ["authority"], "inputKinds": [], "inputSuits": [], "outputKind": "snatch", "forPlay": true, "forResponse": false }] }
+  ]
+}

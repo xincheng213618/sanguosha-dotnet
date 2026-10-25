@@ -1,0 +1,14 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:xiao-qiao",
+  "skills": [
+    { "registrationOrder": 66700, "programBundle": "boundary-xiao-qiao-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:hongyan-mobile", "name": "红颜", "description": "锁定技，你使用、打出、弃置或交给其他角色的黑桃手牌均视为红桃；你的黑桃判定牌均视为红桃。当一名角色的红桃判定牌生效前，你将其判定结果改为你指定的一种花色。", "tags": "Locked", "executionForms": "Trigger" } },
+    { "registrationOrder": 66701, "programBundle": "boundary-xiao-qiao-mobile", "includeProgramPresentation": true,
+      "definition": { "id": "boundary:tianxiang-mobile", "name": "天香", "description": "当你受到伤害时，你可以弃置一张红桃手牌，防止此次伤害并选择一名其他角色，令其受到伤害来源造成的1点伤害后摸X张牌（X为其已损失的体力值，至多为5），或令其失去1点体力后获得你弃置的牌。", "executionForms": "Trigger" } }
+  ],
+  "generals": [{ "registrationOrder": 66702, "pools": { "current": 66700 }, "definition": {
+    "id": "boundary:xiao-qiao-mobile", "name": "界小乔·移动版", "portraitKey": "official-boundary-xiao-qiao-mobile", "skillId": "boundary:tianxiang-mobile", "additionalSkillIds": ["boundary:hongyan-mobile"], "factionId": "wu", "baseHp": 3, "gender": "Female", "characterId": "character:xiao-qiao", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

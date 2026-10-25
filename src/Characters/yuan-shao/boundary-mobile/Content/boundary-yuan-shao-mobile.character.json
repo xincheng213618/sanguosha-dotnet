@@ -1,0 +1,9 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:yuan-shao",
+  "skills": [{ "registrationOrder": 66001, "programBundle": "boundary-yuan-shao-mobile", "includeProgramPresentation": true,
+    "definition": { "id": "boundary:luanji-mobile", "name": "乱击", "description": "出牌阶段，你可以将两张手牌当【万箭齐发】使用（不能使用本回合发动此技能时已用过的花色）。其他角色打出【闪】响应你使用的【万箭齐发】结算结束后，其摸一张牌。当你使用【万箭齐发】结算结束后，若此牌没有造成过伤害，你摸等同于此牌目标数的牌。", "actionForms": "Active", "executionForms": "Trigger" } }],
+  "generals": [{ "registrationOrder": 66000, "pools": { "current": 66000 }, "definition": {
+    "id": "boundary:yuan-shao-mobile", "name": "界袁绍·移动版", "portraitKey": "boundary-yuan-shao-mobile", "skillId": "boundary:luanji-mobile", "additionalSkillIds": ["classic:xueyi"],
+    "factionId": "qun", "baseHp": 4, "gender": "Male", "characterId": "character:yuan-shao", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

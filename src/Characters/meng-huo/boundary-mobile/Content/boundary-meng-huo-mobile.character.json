@@ -1,0 +1,11 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:meng-huo",
+  "skills": [{ "registrationOrder": 66101, "programBundle": "boundary-meng-huo-mobile", "includeProgramPresentation": true,
+    "definition": { "id": "boundary:zaiqi-mobile", "name": "再起", "description": "弃牌阶段结束时，你可以令至多X名角色各选择一项（X为本回合置入弃牌堆的红色牌数）：1.摸一张牌；2.令你回复1点体力。", "executionForms": "Trigger" } }],
+  "generals": [{ "registrationOrder": 66100, "pools": { "current": 66100 }, "definition": {
+    "id": "boundary:meng-huo-mobile", "name": "界孟获·移动版", "portraitKey": "boundary-meng-huo-mobile", "skillId": "boundary:huoshou-current",
+    "additionalSkillIds": ["boundary:zaiqi-mobile"], "factionId": "shu", "baseHp": 4, "gender": "Male", "characterId": "character:meng-huo", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

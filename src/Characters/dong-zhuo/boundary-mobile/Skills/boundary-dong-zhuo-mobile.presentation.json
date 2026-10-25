@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:jiuchi-mobile": {
+      "name": "酒池",
+      "description": "你可以将一张黑桃手牌当【酒】使用。你使用的受【酒】影响的【杀】造成伤害后，本回合“崩坏”失效。"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:jiang-mobile": {
+      "name": "激昂",
+      "description": "当你使用决斗或红色杀指定目标后，或成为决斗或红色杀的目标后，你可以摸一张牌。"
+    },
+    "boundary:hunzi-mobile": {
+      "name": "魂姿",
+      "description": "觉醒技，准备阶段，若你的体力值小于3，你减1点体力上限，获得英姿和英魂。"
+    },
+    "boundary:zhiba-mobile": {
+      "name": "制霸",
+      "description": "主公技，其他吴势力角色的出牌阶段限一次，其可以与你拼点；若你已觉醒，你可以拒绝此拼点。若其没赢，你可以获得两张拼点牌。",
+      "activationLabels": {
+        "accept-wu-challenge": "吴势力角色向主公发起拼点"
+      }
+    }
+  }
+}

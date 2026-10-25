@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:huoji-mobile": {
+      "name": "火计",
+      "description": "你可以将一张红色牌当【火攻】使用。"
+    },
+    "boundary:kanpo-mobile": {
+      "name": "看破",
+      "description": "你可以将一张黑色牌当【无懈可击】使用。"
+    }
+  }
+}

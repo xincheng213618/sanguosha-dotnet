@@ -4,6 +4,7 @@ public sealed partial class GameEngine
 {
     private int[] FaZhengMobileAssistedTargets(ProgramSkillFrame frame, int actor)
     {
+        if (MobileJiangWeiAssistedTargets(frame, actor) is { } mobileTargets) return mobileTargets;
         if (frame.SkillId != "boundary:xuanhuo-mobile") return AssistedPhysicalSlashTargets(actor);
         if (frame.TriggerId != "replace-draw-with-request" || frame.ActivationId != frame.TriggerId || frame.InstructionIndex != 3 ||
             frame.WindowContext?.Window != SkillProgramTriggerWindow.DrawPhaseStarting || frame.SelectedTargetSeats is not [var selected] || selected != actor || actor == frame.OwnerSeat ||

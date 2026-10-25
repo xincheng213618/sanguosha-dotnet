@@ -25,7 +25,7 @@ internal sealed class OfferRedDiscardRecoveryChoiceDescriptor : ProgramOperation
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.ChooseOption, static (_, _) => { });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) =>
-        [new RequireTriggerWindow(SkillProgramTriggerWindow.TurnEnding), new RequireOwnTurnBoundary()];
+        [new RequireTriggerWindows([SkillProgramTriggerWindow.TurnEnding, SkillProgramTriggerWindow.DiscardPhaseEnded]), new RequireOwnTurnBoundary()];
 }
 public sealed class OfferRedDiscardRecoveryChoiceHandler : ISkillProgramEffectHandler
 {

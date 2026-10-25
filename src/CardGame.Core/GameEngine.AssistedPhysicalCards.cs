@@ -37,6 +37,7 @@ public sealed partial class GameEngine
 
     private SkillProgramStepOutcome RequestProgramSlashAgainstChosenTarget(ProgramSkillFrame frame, int actorSeat, string bind, bool actorChoosesTarget)
     {
+        if (TryBeginMobileJiangWeiTiaoxin(frame, actorSeat, bind, actorChoosesTarget, out var mobileOutcome)) return mobileOutcome;
         if (TryBeginFulueAssistedSlash(frame, actorSeat, bind, out var fulueOutcome)) return fulueOutcome;
         var active = GetActiveProgramFrame(frame.Id);
         if (active.AssistedSlashRequest is not null || active.SelectedTargetSeats.Count != 1 || active.SelectedTargetSeats[0] != actorSeat || actorSeat == active.OwnerSeat)
