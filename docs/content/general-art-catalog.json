@@ -21120,13 +21120,47 @@
       "skins": [
         {
           "id": "classic",
-          "name": "经典形象（BWIKI）",
+          "name": "经典形象（BWIKI，爆料版共用占位图）",
           "sourcePage": "https://wiki.biligame.com/msgs/%E5%8A%BF%E9%AB%98%E7%BF%94",
           "imageUrl": "https://patchwiki.biligame.com/images/msgs/c/ce/f36ktt3no886poa6fx0cctg5r1rh411.png",
           "sha256": "ba5cc5c2f3b81705c78251bf3c625ecd842a6cdcc9fb9d0ce5ab8fa76172408f",
           "pixelWidth": 452,
           "pixelHeight": 640,
           "localPath": "src/CardGame.Wpf/Assets/mobile-shi-gao-xiang.png"
+        }
+      ]
+    },
+    {
+      "key": "mobile-shi-huang-chong",
+      "characterName": "势黄崇",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象（BWIKI，爆料版共用占位图）",
+          "sourcePage": "https://wiki.biligame.com/msgs/%E5%8A%BF黄崇",
+          "imageUrl": "https://patchwiki.biligame.com/images/msgs/c/c1/f36ktt3no886poa6fx0cctg5r1rh411.png",
+          "sha256": "ba5cc5c2f3b81705c78251bf3c625ecd842a6cdcc9fb9d0ce5ab8fa76172408f",
+          "pixelWidth": 452,
+          "pixelHeight": 640,
+          "localPath": "src/CardGame.Wpf/Assets/mobile-shi-huang-chong.png"
+        }
+      ]
+    },
+    {
+      "key": "mobile-shi-huang-quan",
+      "characterName": "势黄权",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象（BWIKI，爆料版共用占位图）",
+          "sourcePage": "https://wiki.biligame.com/msgs/%E5%8A%BF黄权",
+          "imageUrl": "https://patchwiki.biligame.com/images/msgs/f/f0/f36ktt3no886poa6fx0cctg5r1rh411.png",
+          "sha256": "ba5cc5c2f3b81705c78251bf3c625ecd842a6cdcc9fb9d0ce5ab8fa76172408f",
+          "pixelWidth": 452,
+          "pixelHeight": 640,
+          "localPath": "src/CardGame.Wpf/Assets/mobile-shi-huang-quan.png"
         }
       ]
     },
