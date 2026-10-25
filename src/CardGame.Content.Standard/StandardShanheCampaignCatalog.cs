@@ -203,6 +203,7 @@ public static partial class StandardShanheCampaignCatalog
         var currentDuoduoYishan = RequiresCurrentDuoduoYishanRegistry(requirements);
         var currentYaoli = RequiresCurrentYaoliRegistry(requirements);
         var currentLegendaryTactics = RequiresCurrentLegendaryTacticsRegistry(requirements);
+        var buildTactics = RequiresBuildTacticsRegistry(requirements);
         var currentSlashTactics = RequiresCurrentSlashTacticsRegistry(requirements);
         var s5Chengxiong = RequiresChengxiongBossRegistry(requirements);
         var s5CaoxingHigh = RequiresCaoxingHighRegistry(requirements);
@@ -296,6 +297,7 @@ public static partial class StandardShanheCampaignCatalog
             (currentDuoduoYishan ? "/current-duoduo-yishan" : "") +
             (currentYaoli ? "/current-yaoli" : "") +
             (currentLegendaryTactics ? "/current-legendary-tactics" : "") +
+            (buildTactics ? "/current-build-tactics" : "") +
             (localTroops ? "/local-troops" : "") +
             (currentSlashTactics ? "/current-slash-tactics" : "") +
             (s5Chengxiong ? "/s5-chengxiong-14055" : "") +
@@ -339,6 +341,7 @@ public static partial class StandardShanheCampaignCatalog
             var packages = new List<IGameContentPackage> { new StandardShanheBossPackage() };
             if (localTroops) packages.Add(new StandardShanheLocalTroopPackage());
             if (currentLegendaryTactics) packages.Add(new StandardShanheLegendaryTacticsPackage());
+            if (buildTactics) packages.Add(new StandardShanheBuildTacticsPackage());
             if (s5Zhangliao || ids.Any(id => id == StandardShanheS5BossPackage.ZhangliaoBaseId ||
                 id == StandardShanheS5BossPackage.ZhangliaoLingdongId || id == StandardShanheS5BossPackage.ZhangliaoHuangkongId ||
                 id == StandardShanheS5BossPackage.DongZhuoLuoyangId || id == StandardShanheS5BossPackage.DongMinBaseId ||
@@ -520,7 +523,10 @@ public static partial class StandardShanheCampaignCatalog
                     // The one-copy expedition limit is an explicit local choice.
                     : skill.Id == "shanhe:duisha-2026" ? new(skill.Id, Repeatable: false) : null
             });
-            var ids = new[] { setup.PlayerGeneralId }.Concat(setup.AllyRoster.Select(m => m.GeneralId))
+            // The runtime pool also supplies native private general libraries.
+            // Campaign seats remain fixed by the opening recipe in BuildCampaignPlayers;
+            // a pool containing only occupied seats leaves Zuo Ci with no avatars.
+            var ids = GetPlayerGeneralIds().Append(setup.PlayerGeneralId).Concat(setup.AllyRoster.Select(m => m.GeneralId))
                 .Concat(setup.EnemyRoster.Select(m => m.GeneralId))
                 .Concat(setup.BossTransition is { } transition ? new[] { transition.GeneralId } : [])
                 .Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();

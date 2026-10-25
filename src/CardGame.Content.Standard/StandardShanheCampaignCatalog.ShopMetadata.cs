@@ -33,6 +33,8 @@ public static partial class StandardShanheCampaignCatalog
                 CurrentLeihuoRewardId, CurrentLianjiRewardId, CurrentErlianjiRewardId,
                 CurrentTiebushan4RewardId, CurrentJingjijiaRewardId, "codex-card-4059"])
             .Concat(CurrentEconomyTactics.Where(source => source.RewardId != CurrentInterest2RewardId).Select(source => source.RewardId))
+            .Concat([CurrentMuniuLiumaRewardId, CurrentSougua3RewardId, CurrentFenjinRewardId])
+            .Concat(CurrentBuildSkillDefaultUnlockedRewardIds)
             .Where(available.Contains).ToArray());
     }
 
@@ -70,6 +72,11 @@ public static partial class StandardShanheCampaignCatalog
                 [CurrentTiebushan4RewardId] = new(2074, 700, 4, "战法"),
                 [CurrentJingjijiaRewardId] = new(2116, 700, 4, "战法"),
                 [CurrentPianzhuanjiaRewardId] = new(2117, 700, 4, "战法"),
+                [CurrentCuixue2RewardId] = new(2049, 500, 3, "战法"),
+                [CurrentYuanzhu3RewardId] = new(2078, 700, 4, "战法"),
+                [CurrentMuniuLiumaRewardId] = new(2088, 500, 3, "战法"),
+                [CurrentSougua3RewardId] = new(2170, 500, 3, "战法"),
+                [CurrentFenjinRewardId] = new(2228, 200, 1, "战法"),
                 [CurrentYaoliRewardId] = new(2319, 200, 1, "战法"),
                 [CurrentYaoli2RewardId] = new(2320, 300, 2, "战法"),
                 [CurrentYaoli3RewardId] = new(2321, 500, 3, "战法"),
@@ -151,7 +158,8 @@ public static partial class StandardShanheCampaignCatalog
                 ["codex-card-4076"] = new(4076, 250, 3, "牌", CardKind.Peach, Suit.Club, 8),
                 ["codex-card-4092"] = new(4092, 150, 1, "牌", CardKind.FiveGrains, Suit.Club, 5),
                 ["codex-card-4107"] = new(4107, 200, 2, "牌", CardKind.Lightning, Suit.Heart, 1)
-            }.Concat(CurrentEconomyTactics.Select(source => new KeyValuePair<string, ShanheShopMetadata>(source.RewardId,
+            }.Concat(CurrentBuildSkillShopMetadata)
+                .Concat(CurrentEconomyTactics.Select(source => new KeyValuePair<string, ShanheShopMetadata>(source.RewardId,
                 new(source.SourceId, source.Price, source.Rarity, "战法"))))
                 .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal));
     }

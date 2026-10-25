@@ -60,8 +60,12 @@ public static partial class StandardShanheCampaignCatalog
     });
 
     /// <summary>Verified source-tree node ids and their acquirable runtime reward ids.</summary>
-    public static IReadOnlyDictionary<int, string> CodexRewardIdsByNodeId { get; } =
+    public static IReadOnlyDictionary<int, string> CodexRewardIdsByNodeId => CodexRewardIdsCache.Value;
+
+    // Partial-file initialization order must not decide which verified source rows bind.
+    private static readonly Lazy<IReadOnlyDictionary<int, string>> CodexRewardIdsCache = new(() =>
         new ReadOnlyDictionary<int, string>(CodexRewardBindings.Concat(Codex2026RewardBindings).Select(binding => new KeyValuePair<int, string>(binding.NodeId, binding.Reward.Id))
+            .Concat(CurrentBuildSkillCodexBindings)
             .Append(new(2, OpeningInheritanceRewardId))
             // Availability still requires this reward in the selected edition.
             .Append(new(42, CurrentJinnangJiRewardId))
@@ -71,6 +75,8 @@ public static partial class StandardShanheCampaignCatalog
             .Append(new(132, CurrentLeihuo2RewardId))
             .Append(new(141, CurrentPianzhuanjiaRewardId))
             .Append(new(147, CurrentTouxiRewardId))
+            .Append(new(78, CurrentCuixue2RewardId))
+            .Append(new(91, CurrentYuanzhu3RewardId))
             .Append(new(74, "chapter-skill-3020"))
             .Append(new(93, "chapter-skill-3017"))
             .Append(new(95, "chapter-skill-3070"))
@@ -78,7 +84,7 @@ public static partial class StandardShanheCampaignCatalog
             .Append(new(100, "chapter-skill-3091"))
             .Append(new(108, "chapter-skill-3038"))
             .Append(new(105, CurrentInterest2RewardId))
-            .Append(new(35, CurrentFarStrikeRewardId)).ToDictionary(pair => pair.Key, pair => pair.Value));
+            .Append(new(35, CurrentFarStrikeRewardId)).ToDictionary(pair => pair.Key, pair => pair.Value)));
 
     /// <summary>Adds the opt-in codex pool without altering the historical default campaign definition.</summary>
     public static ShanheCampaignDefinition CreateCodexDefinition(int difficulty, string editionId) =>
