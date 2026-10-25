@@ -40,6 +40,7 @@ public sealed partial class GameEngine
     {
         if (source is not null && ViewAsRule(source) is { } usageRule &&
             (usageRule.TieredRoundConversion is not null || usageRule.UnusedOutputNameThisGame ||
+             usageRule.UsesPerActualTurn is not null ||
              usageRule.ConversionStateId is not null && usageRule.UsesPerPhase is not null ||
              source is { SkillId: "guandu:battle-event", BindingId: "hold-line" })) ConsumeProgramViewAsUsage([source]);
         PrepareWuZhangFeiResponseRanks(provider, effectiveKind, [card], source);

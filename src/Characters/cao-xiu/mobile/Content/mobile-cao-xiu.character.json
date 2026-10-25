@@ -1,0 +1,16 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cao-xiu",
+  "skills": [],
+  "generals": [{
+    "registrationOrder": 77699,
+    "pools": { "current": 77699 },
+    "definition": {
+      "id": "mobile:cao-xiu", "name": "曹休·移动版", "portraitKey": "mobile-cao-xiu",
+      "skillId": "classic:qianju", "additionalSkillIds": ["classic:qingxi"],
+      "factionId": "wei", "baseHp": 4, "gender": "Male",
+      "characterId": "character:cao-xiu", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+    }
+  }]
+}

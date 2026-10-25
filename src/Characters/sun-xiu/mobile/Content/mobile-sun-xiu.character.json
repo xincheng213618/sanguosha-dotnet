@@ -1,0 +1,30 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:sun-xiu",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 78100,
+      "pools": {
+        "current": 78100
+      },
+      "definition": {
+        "id": "mobile:sun-xiu",
+        "name": "孙休·移动版",
+        "portraitKey": "mobile-sun-xiu",
+        "skillId": "classic:yanzhu",
+        "additionalSkillIds": [
+          "classic:xingxue",
+          "boundary:zhaofu-mobile"
+        ],
+        "factionId": "wu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:sun-xiu",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

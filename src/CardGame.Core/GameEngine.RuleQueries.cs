@@ -104,6 +104,7 @@ public sealed partial class GameEngine
                 $"equipment:{card.Id}:draw-count",
                 EquipmentRules.Get(card.Kind).DrawCountBonus)));
         var contributions = CollectNumericRuleContributions(player, SkillRuleQuery.DrawCount).ToList();
+        AddFiniteContribution(contributions, $"issued:{player.Seat}:mobile-duliang:draw", MobileLiYanNextDrawBonus(player));
         AddFiniteContribution(contributions, $"state:{player.Seat}:cao-xi:gangshu:draw", CaoXiGangshuBonus(player, SkillRuleQuery.DrawCount));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:shunshi:draw", DuFuRenPhaseBonus(player.Seat, SkillRuleQuery.DrawCount));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:kuangxiang:draw", -ChengGongYingDrawPenalty(player.Seat));

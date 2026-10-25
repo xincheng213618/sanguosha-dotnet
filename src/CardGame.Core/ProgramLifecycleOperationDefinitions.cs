@@ -657,5 +657,7 @@ internal sealed class SetChainedStateProgramOperationDescriptor : ProgramOperati
         return new(Op, r.RequiredEnum<SkillProgramEffectTarget>("target"), 0, r.Condition(),
             chained: r.RequiredBool("chained"));
     }
-    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => effect.Target == SkillProgramEffectTarget.SelectedTargets ? [new ReadTargetSet(1)] : WithSelectedTarget(effect);
+    // An explicitly produced empty set is a valid no-op. The resource graph
+    // still requires a target-set producer before this collection is read.
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => effect.Target == SkillProgramEffectTarget.SelectedTargets ? [new ReadTargetSet(0)] : WithSelectedTarget(effect);
 }

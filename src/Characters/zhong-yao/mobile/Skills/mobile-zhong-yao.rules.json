@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:huomo", "revision": 1,
+      "viewAs": [
+        { "id": "black-nonbasic-slash", "inputKinds": [], "inputCategories": ["trick", "equipment"], "inputSuits": ["spade", "club"], "sourceZones": ["hand", "equipment"], "outputKind": "slash", "forPlay": true, "forResponse": false, "extendedUse": true, "costDestination": "drawPileTop", "usesPerActualTurn": 1, "usageGroup": "huomo-slash", "useOnly": true },
+        { "id": "black-nonbasic-fire-slash", "inputKinds": [], "inputCategories": ["trick", "equipment"], "inputSuits": ["spade", "club"], "sourceZones": ["hand", "equipment"], "outputKind": "fireSlash", "forPlay": true, "forResponse": false, "extendedUse": true, "costDestination": "drawPileTop", "usesPerActualTurn": 1, "usageGroup": "huomo-slash", "useOnly": true },
+        { "id": "black-nonbasic-thunder-slash", "inputKinds": [], "inputCategories": ["trick", "equipment"], "inputSuits": ["spade", "club"], "sourceZones": ["hand", "equipment"], "outputKind": "thunderSlash", "forPlay": true, "forResponse": false, "extendedUse": true, "costDestination": "drawPileTop", "usesPerActualTurn": 1, "usageGroup": "huomo-slash", "useOnly": true },
+        { "id": "black-nonbasic-peach", "inputKinds": [], "inputCategories": ["trick", "equipment"], "inputSuits": ["spade", "club"], "sourceZones": ["hand", "equipment"], "outputKind": "peach", "forPlay": true, "forResponse": false, "extendedUse": true, "costDestination": "drawPileTop", "usesPerActualTurn": 1, "usageGroup": "huomo-peach", "useOnly": true },
+        { "id": "black-nonbasic-alcohol", "inputKinds": [], "inputCategories": ["trick", "equipment"], "inputSuits": ["spade", "club"], "sourceZones": ["hand", "equipment"], "outputKind": "alcohol", "forPlay": true, "forResponse": false, "extendedUse": true, "costDestination": "drawPileTop", "usesPerActualTurn": 1, "usageGroup": "huomo-alcohol", "useOnly": true },
+        { "id": "black-nonbasic-dodge", "inputKinds": [], "inputCategories": ["trick", "equipment"], "inputSuits": ["spade", "club"], "sourceZones": ["hand", "equipment"], "outputKind": "dodge", "forPlay": false, "forResponse": true, "extendedUse": true, "costDestination": "drawPileTop", "usesPerActualTurn": 1, "usageGroup": "huomo-dodge", "useOnly": true }
+      ]
+    },
+    {
+      "id": "mobile:zuoding", "revision": 1,
+      "triggers": [{
+        "id": "spade-target-with-undamaged-participant", "window": "cardUseTargetsFinalized", "ownerRelation": "observer", "optional": true,
+        "condition": { "kind": "all", "children": [
+          { "kind": "not", "children": [{ "kind": "cardActionActorIsOwner" }] },
+          { "kind": "cardActionActorIsCurrentTurn" }, { "kind": "cardActionPhaseIsPlay" },
+          { "kind": "cardActionSuitIs", "suits": ["spade"] }
+        ] },
+        "effects": [
+          { "op": "selectTarget", "target": "owner", "targetKind": "mobileZhongYaoZuodingTarget" },
+          { "op": "draw", "target": "selectedTarget", "amount": 1 }
+        ]
+      }]
+    }
+  ]
+}

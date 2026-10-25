@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:jiyu",
+      "revision": 1,
+      "minimumRulesVersion": 190,
+      "activations": [
+        {
+          "id": "hand-discard-restriction",
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "anyLivingWithHand",
+          "usesPerTurn": null,
+          "effects": [
+            {
+              "op": "selectOwnedCards",
+              "target": "selectedTarget",
+              "amount": 1,
+              "zones": [
+                "hand"
+              ],
+              "resultBind": "discard"
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "discard",
+              "destination": "discardPile",
+              "awaitMovementTriggers": true
+            },
+            {
+              "op": "grantTurnBoundSuitUseProhibition",
+              "target": "owner",
+              "sourceBind": "discard"
+            },
+            {
+              "op": "turnOver",
+              "target": "owner",
+              "condition": {
+                "kind": "boundCardsMatchSuits",
+                "sourceBind": "discard",
+                "suits": [
+                  "spade"
+                ]
+              }
+            },
+            {
+              "op": "loseHp",
+              "target": "selectedTarget",
+              "amount": 1,
+              "condition": {
+                "kind": "boundCardsMatchSuits",
+                "sourceBind": "discard",
+                "suits": [
+                  "spade"
+                ]
+              }
+            }
+          ],
+          "usesPerPhase": 1
+        }
+      ]
+    }
+  ]
+}

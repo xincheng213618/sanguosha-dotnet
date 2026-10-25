@@ -28,6 +28,10 @@
 
 `draw` 的 `numberExpression: "targetLostHp"` 读取实际摸牌目标在该指令开始时的当前体力上限减当前体力值，最少为零。计算对象是已解析的目标，不使用拥有者的冻结失血值或手牌数；与其他原生摸牌指令共用替代、子结算和恢复回执。目标体力未定义时沿现有数量操作的取消与清理边界处理。
 
+`setChainedState` 的 `selectedTargets` 可以读取已由 `selectTargets` 明确产生的零人集合；此时不改变任何角色状态。资源图仍拒绝没有集合生产者的读取，不能把默认空列表当作已经完成的选人。
+
+`viewAs.usesPerActualTurn` 除既有出牌路径外，支持单张实体、`extendedUse` / `useOnly`、牌堆顶费用的原生【闪】使用。实际响应付款与出牌付款共用限次账本；只是打出、代供和其他响应方向不因此获得使用许可。`usageGroup` 可让不同属性的【杀】共用牌名额度，实体同名牌的使用不消耗该转换额度。
+
 ## 提交、暂停与恢复
 
 命令接受前重新校验 Revision、Prompt、操作者、技能实例、材料和目标。玩家视图在提交前准备，并冻结所有嵌套集合；公开事件的集合由 `CommittedEventProjection` 冻结。玩家及 AI 使用 `CreateSnapshot(viewerSeat)`；`ResolutionStack` 是可信诊断。

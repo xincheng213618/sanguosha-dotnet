@@ -110,6 +110,13 @@ internal static class ProgramCompositionDefinitionChecks
         RejectEffects("unselected target", """
         [{"op":"turnOver","target":"selectedTarget"}]
         """, "selectedTarget");
+        Accept("explicit empty target set chain", """
+        [{"op":"selectTargets","target":"owner","targetKind":"anyLiving","minimumTargets":0,"maximumTargets":2,"targetAiOrder":"supportDraw"},
+         {"op":"setChainedState","target":"selectedTargets","chained":true}]
+        """);
+        RejectEffects("unselected target set chain", """
+        [{"op":"setChainedState","target":"selectedTargets","chained":true}]
+        """, "selected target set must be produced");
         RejectEffects("ordinary second target selection", """
         [{"op":"selectTarget","target":"owner","targetKind":"otherLiving"},
          {"op":"setChainedState","target":"selectedTarget","chained":true},

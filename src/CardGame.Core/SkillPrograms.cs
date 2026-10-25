@@ -141,6 +141,7 @@ public enum SkillProgramComparisonOperator
 }
 public enum SkillProgramTargetKind
 {
+    MobileZhongYaoZuodingTarget = 77700,
     MobileShiChenQunMaximumLoss = 47302,
     NianDeadAlly = 27930,
     OtherLivingHpAtLeastOwner = 27500,
@@ -351,6 +352,7 @@ public enum SkillProgramEffectOp
     PrepareMobileChenQunDingpin = 77200,
     CompleteMobileChenQunDingpin = 77201,
     CompleteMobileGuYongOnMixedHand = 77300,
+    IssueMobileLiYanNextDrawBonus = 77900,
     ResolveBoundaryCaoXiuQingxi = 51100,
     ResolveBoundaryQuanCongYaoming = 51200,
     SelectMobileShiKaijiTargets = 47400,
@@ -4428,8 +4430,11 @@ public sealed class SkillProgramCatalog
         var sameSuit = node.TryGetProperty("sameSuit", out _) && RequiredBool(node, "sameSuit", path);
         int? usesPerPhase = node.TryGetProperty("usesPerPhase", out _) ? PositiveInt(node, "usesPerPhase", path) : null;
         int? usesPerActualTurn = node.TryGetProperty("usesPerActualTurn", out _) ? PositiveInt(node, "usesPerActualTurn", path) : null;
-        if (usesPerActualTurn is not null && (!forPlay || forResponse && !rankTwoDamageUse || inputCount != 1 || variableInput || allHandSuit))
-            Fail(path + ".usesPerActualTurn", "actual-turn conversion usage requires one physical card for play only");
+        var actualTurnTopDeckDodgeUse = !forPlay && forResponse && useOnly && extended &&
+            output == CardKind.Dodge && costDestination == SkillProgramCardDestination.DrawPileTop;
+        if (usesPerActualTurn is not null && (inputCount != 1 || variableInput || allHandSuit ||
+            !(forPlay && (!forResponse || rankTwoDamageUse) || actualTurnTopDeckDodgeUse)))
+            Fail(path + ".usesPerActualTurn", "actual-turn conversion usage requires one physical card for play or a native top-deck Dodge use");
         if (usesPerActualTurn is not null && (usesPerPhase is not null || activationGroup is not null ||
             tieredRound is not null || roundOnceCardless is not null || roundDistinct is not null || drawFunded is not null || chainedStateCost.HasValue))
             Fail(path + ".usesPerActualTurn", "actual-turn conversion usage cannot combine with phase, activation or specialized payment policies");

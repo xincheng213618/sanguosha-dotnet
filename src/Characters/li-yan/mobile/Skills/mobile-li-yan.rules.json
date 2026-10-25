@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:duliang",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "take-hand-and-benefit",
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherLivingWithHand",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "selectAndMoveOwnedCard",
+              "target": "owner",
+              "chooserRef": {
+                "kind": "owner"
+              },
+              "cardOwnerRef": {
+                "kind": "selectedTarget"
+              },
+              "zones": [
+                "hand"
+              ],
+              "count": 1,
+              "destination": "ownerHand",
+              "awaitMovementTriggers": true
+            },
+            {
+              "op": "chooseOption",
+              "target": "owner",
+              "resultBind": "benefit",
+              "options": [
+                {
+                  "id": "view"
+                },
+                {
+                  "id": "next-draw"
+                }
+              ]
+            },
+            {
+              "op": "viewTopCardsAndObtainMatchingCards",
+              "target": "selectedTarget",
+              "amount": 2,
+              "cardCategories": [
+                "basic"
+              ],
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "benefit",
+                "optionId": "view"
+              }
+            },
+            {
+              "op": "issueMobileLiYanNextDrawBonus",
+              "target": "selectedTarget",
+              "amount": 1,
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "benefit",
+                "optionId": "next-draw"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

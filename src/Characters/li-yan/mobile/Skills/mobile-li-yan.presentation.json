@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:duliang": {
+      "name": "督粮",
+      "description": "出牌阶段限一次，你可以获得一名其他角色的一张手牌，然后选择一项：1.令其观看牌堆顶的两张牌，然后获得其中的基本牌；2.令其于下个摸牌阶段额外摸一张牌。",
+      "activationLabels": {
+        "take-hand-and-benefit": "督粮 · 获得其一张手牌并选择补偿"
+      },
+      "optionLabels": {
+        "view": "令其观看牌堆顶两张牌并获得基本牌",
+        "next-draw": "令其下个摸牌阶段额外摸一张牌"
+      }
+    }
+  }
+}
