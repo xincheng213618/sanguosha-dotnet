@@ -22574,6 +22574,227 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-yu-jin",
+      "characterName": "于禁",
+      "defaultSkinId": "16000",
+      "skins": [
+        {
+          "id": "16000",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-109.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/16000.jpg",
+          "sha256": "1361516eb9442668e985a5e7a635a640108321942bce1b26e8880708904854f5",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-yu-jin.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-cao-hong",
+      "characterName": "曹洪",
+      "defaultSkinId": "11400",
+      "skins": [
+        {
+          "id": "11400",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-76.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/11400.jpg",
+          "sha256": "a7d4688d0ff4b4672e7239750c24a89af4cf06c9a3f16e1eb5a5f6b857912733",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cao-hong.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-he-tai-hou",
+      "characterName": "何太后",
+      "defaultSkinId": "13100",
+      "skins": [
+        {
+          "id": "13100",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-92.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/13100.jpg",
+          "sha256": "dd4baf0bb5b68ee8cd9ebeef833f42ce1cbd73f0b19c750ca5bdbfdcb370cfaa",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-he-tai-hou.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-wen-pin",
+      "characterName": "文聘",
+      "defaultSkinId": "13600",
+      "skins": [
+        {
+          "id": "13600",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-97.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/13600.jpg",
+          "sha256": "d259531f613c99c6109c98c22e3ee8fd6cc2d79c4c7177a6e20716821cea2ae0",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-wen-pin.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhuge-dan",
+      "characterName": "诸葛诞",
+      "defaultSkinId": "12900",
+      "skins": [
+        {
+          "id": "12900",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-90.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/12900.jpg",
+          "sha256": "4416117eb3c28c06b62886dbaf41bde371378462d941eb7309de5026d94f6faa",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhuge-dan.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-cao-zhi",
+      "characterName": "曹植",
+      "defaultSkinId": "15100",
+      "skins": [
+        {
+          "id": "15100",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-101.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/15100.jpg",
+          "sha256": "b7f9c74018f3b0f1edb13b111adc889c9f4a7b49e59c3ba94ad4f9daee1f2825",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cao-zhi.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-ling-tong",
+      "characterName": "凌统",
+      "defaultSkinId": "15500",
+      "skins": [
+        {
+          "id": "15500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-105.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/15500.jpg",
+          "sha256": "357bf7fc4602348cb41c3bab4d0a6aebb191cbb26d1beb4335977373ec3e6a4a",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-ling-tong.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-wu-guo-tai",
+      "characterName": "吴国太",
+      "defaultSkinId": "15700",
+      "skins": [
+        {
+          "id": "15700",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-107.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/15700.jpg",
+          "sha256": "40e99e0a63a6be1e9cb390fd70e5d1573a4e40b969506ccc55797f617b3092fc",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-wu-guo-tai.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-cao-rui",
+      "characterName": "曹叡",
+      "defaultSkinId": "33200",
+      "skins": [
+        {
+          "id": "33200",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-185.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/33200.jpg",
+          "sha256": "20ea3f2488a22b49144a737091ff22cf5f894a7fc6c606e5bc39ef5ea9613295",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cao-rui.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-chen-qun",
+      "characterName": "陈群",
+      "defaultSkinId": "32300",
+      "skins": [
+        {
+          "id": "32300",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-176.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/32300.jpg",
+          "sha256": "6e71d0e2ba6deb48f4b319f897fe4eb9d466b7b1ab0e3b18052075a16d3c26d8",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-chen-qun.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-gu-yong",
+      "characterName": "顾雍",
+      "defaultSkinId": "32900",
+      "skins": [
+        {
+          "id": "32900",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-182.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/32900.jpg",
+          "sha256": "cb3cddc329dc1bc95f6822916fff6dcc311f0e7f141dae2f3a2da4fc20510bfe",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-gu-yong.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-bu-zhi",
+      "characterName": "步骘",
+      "defaultSkinId": "36300",
+      "skins": [
+        {
+          "id": "36300",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-205.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/36300.jpg",
+          "sha256": "d7fafde8f6a8f186848a6cc0c074cee588eff864c2afd7e189e275310a9208f2",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-bu-zhi.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-li-tong",
+      "characterName": "李通",
+      "defaultSkinId": "36400",
+      "skins": [
+        {
+          "id": "36400",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-206.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/36400.jpg",
+          "sha256": "d1b71b4320a24f300ba3023834488f2912ee03d7a4353f259ac2ecbd59caa9c9",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-li-tong.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,41 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:gu-yong",
+  "skills": [
+    {
+      "registrationOrder": 77300,
+      "programBundle": "mobile-gu-yong",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:bingyi",
+        "name": "秉壹",
+        "description": "结束阶段，你可以展示所有手牌，若颜色均相同，你选择至多X名角色（X为你的手牌数），然后这些角色各摸一张牌。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 77399,
+      "pools": {
+        "current": 77399
+      },
+      "definition": {
+        "id": "mobile:gu-yong",
+        "name": "顾雍·移动版",
+        "portraitKey": "mobile-gu-yong",
+        "skillId": "classic:shenxing",
+        "additionalSkillIds": [
+          "mobile:bingyi"
+        ],
+        "factionId": "wu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:gu-yong",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

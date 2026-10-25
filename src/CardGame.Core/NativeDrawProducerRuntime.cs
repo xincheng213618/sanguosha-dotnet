@@ -49,6 +49,14 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
             ? SkillProgramStepOutcome.AwaitChild : SkillProgramStepOutcome.Continue;
     }
 
+    internal static bool IsOptionalRecipientSelection(SkillProgramEffect? effect) => effect is
+        { Op: SkillProgramEffectOp.SelectTargets, Target: SkillProgramEffectTarget.Owner,
+          MinimumTargets: 0, TargetKind: SkillProgramTargetKind.AnyLivingChained, SourceBind: null, ReplaceSelection: true } ||
+        effect is { Op: SkillProgramEffectOp.SelectTargets, Target: SkillProgramEffectTarget.Owner,
+          MinimumTargets: 0, MaximumTargets: > 0 and <= 8, TargetKind: SkillProgramTargetKind.AnyLiving,
+          SourceBind: null, ReplaceSelection: null, NumberExpression: SkillProgramNumberExpression.CurrentHandCount,
+          TargetAiOrder: SkillProgramTargetAiOrder.SupportDraw, Condition.Kind: SkillProgramConditionKind.Always };
+
     internal static bool IsCommittedEmptyTargetDraw(ProgramSkillFrame frame, ProgramExecutionPlan plan, int amount) =>
         BoundaryGuYongComposition.IsCommittedEmptyRecipientDraw(frame, plan, amount) ||
         MobileZhugeJinComposition.IsCommittedEmptyHongyuanDraw(frame, plan, amount) ||
@@ -61,9 +69,7 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
         // The preceding selection was validated and committed by the ordinary
         // answer path on this same cursor. An unselected/default empty list is
         // not sufficient to turn an arbitrary multi-recipient draw into a no-op.
-        plan.Instructions[frame.InstructionIndex - 2] is
-            { Op: SkillProgramEffectOp.SelectTargets, Target: SkillProgramEffectTarget.Owner,
-                MinimumTargets: 0, TargetKind: SkillProgramTargetKind.AnyLivingChained, SourceBind: null, ReplaceSelection: true };
+        IsOptionalRecipientSelection(plan.Instructions[frame.InstructionIndex - 2]);
 
     public SkillProgramStepOutcome BeginOperationProgramDraw(ProgramSkillFrame frame,
         int recipientSeat, int requestedCount, CardMoveReason reason)

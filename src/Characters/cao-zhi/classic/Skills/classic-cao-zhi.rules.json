@@ -46,7 +46,14 @@
       "minimumRulesVersion": 189,
       "modifiers": [],
       "viewAs": [],
-      "activations": [],
+      "activations": [
+        {
+          "id": "virtual-alcohol", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0,
+          "targetKind": "anyLiving", "usesPerTurn": null,
+          "condition": { "kind": "not", "children": [{ "kind": "faceDown" }] },
+          "effects": [{ "op": "useVirtualAlcohol", "target": "owner" }]
+        }
+      ],
       "triggers": [
         {
           "id": "flip-for-virtual-alcohol",

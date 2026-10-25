@@ -15,7 +15,8 @@ public enum ProgramRuntimePhase
     AfterSkillLoss,
     BeforeJudgmentPhase,
     BeforeRecoveryApply,
-    BeforeDamageApply
+    BeforeDamageApply,
+    PaidInitialSelection
 }
 
 internal enum ProgramFrameInvariantPhase { BeforeSelectionState, AfterSelectionState }
@@ -120,14 +121,14 @@ internal sealed class ProgramRuntimeHookCatalog
             }
         }
         foreach (var pair in hooks)
-            if (pair.Value.Count == 0) throw new InvalidOperationException($"Runtime hook phase '{pair.Key}' has no registrations.");
+            if (pair.Value.Count == 0 && pair.Key != ProgramRuntimePhase.PaidInitialSelection) throw new InvalidOperationException($"Runtime hook phase '{pair.Key}' has no registrations.");
         foreach (var pair in invariants)
             if (pair.Value.Count == 0) throw new InvalidOperationException($"Frame invariant phase '{pair.Key}' has no registrations.");
         return new(hooks, invariants, recoveryParents, ProgramRuntimeProofCatalog.Discover(methodArray));
     }
 
     internal static bool IsPermission(ProgramRuntimePhase phase) =>
-        phase is ProgramRuntimePhase.AfterOwnerDeath or ProgramRuntimePhase.AfterSkillLoss;
+        phase is ProgramRuntimePhase.AfterOwnerDeath or ProgramRuntimePhase.AfterSkillLoss or ProgramRuntimePhase.PaidInitialSelection;
 
     internal void ValidateAdditional(IReadOnlyList<ModeRuntimeHookRegistration> additional)
     {

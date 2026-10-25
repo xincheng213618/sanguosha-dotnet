@@ -22,7 +22,8 @@
         "id": "classic:jiushi",
         "name": "酒诗",
         "description": "当你需要使用【酒】时，若你的武将牌正面朝上，你可以翻面，视为使用一张【酒】；当你受到伤害后，若你的武将牌背面朝上，你可以翻回正面。",
-        "executionForms": "Trigger"
+        "executionForms": "Trigger",
+        "actionForms": "Active"
       }
     }
   ],

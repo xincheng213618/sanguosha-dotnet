@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:jieyue",
+      "revision": 1,
+      "viewAs": [
+        {
+          "id": "red-hand-as-dodge",
+          "sourceZones": [
+            "hand"
+          ],
+          "inputKinds": [],
+          "inputSuits": [
+            "heart",
+            "diamond"
+          ],
+          "inputCount": 1,
+          "outputKind": "dodge",
+          "forPlay": false,
+          "forResponse": true,
+          "allowSameKind": true,
+          "useEffectiveInputSuit": true
+        },
+        {
+          "id": "black-hand-as-nullification",
+          "sourceZones": [
+            "hand"
+          ],
+          "inputKinds": [],
+          "inputSuits": [
+            "spade",
+            "club"
+          ],
+          "inputCount": 1,
+          "outputKind": "nullification",
+          "forPlay": false,
+          "forResponse": true,
+          "allowSameKind": true,
+          "useEffectiveInputSuit": true
+        }
+      ],
+      "triggers": [
+        {
+          "id": "ending-discard-and-other-choice",
+          "window": "turnEnding",
+          "subject": "owner",
+          "optional": true,
+          "effects": [
+            {
+              "op": "selectTarget",
+              "target": "owner",
+              "targetKind": "otherLiving"
+            },
+            {
+              "op": "selectAndMoveOwnedCard",
+              "target": "owner",
+              "chooserRef": {
+                "kind": "owner"
+              },
+              "cardOwnerRef": {
+                "kind": "owner"
+              },
+              "zones": [
+                "hand"
+              ],
+              "count": 1,
+              "destination": "discardPile",
+              "resultBind": "jieyue-cost",
+              "awaitMovementTriggers": true
+            },
+            {
+              "op": "resolveMobileYuJinJieyue",
+              "target": "owner",
+              "resultBind": "jieyue-answer"
+            },
+            {
+              "op": "selectAndMoveOwnedCard",
+              "target": "owner",
+              "chooserRef": {
+                "kind": "owner"
+              },
+              "cardOwnerRef": {
+                "kind": "selectedTarget"
+              },
+              "zones": [
+                "hand",
+                "equipment",
+                "judgment"
+              ],
+              "count": 1,
+              "destination": "discardPile",
+              "skipIfNoCards": true,
+              "awaitMovementTriggers": true,
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "jieyue-answer",
+                "optionId": "discard"
+              }
+            }
+          ]
+        },
+        {
+          "id": "preparation-retrieve-jieyue",
+          "window": "turnStartBeforeNormalFlow",
+          "subject": "owner",
+          "optional": false,
+          "effects": [
+            {
+              "op": "collectMobileYuJinJieyue",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

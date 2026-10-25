@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:zhendu": {
+      "name": "鸩毒",
+      "description": "其他角色的出牌阶段开始时，你可以弃置一张手牌。若如此做，该角色视为使用一张【酒】，然后你对其造成1点伤害。",
+      "triggerChoices": {
+        "other-play-start-wine": "弃置一张手牌，令其使用酒，然后对其造成1点伤害"
+      }
+    },
+    "mobile:qiluan": {
+      "name": "戚乱",
+      "description": "一名角色的回合结束时，你每于此回合内杀死过一名其他角色，你可以摸三张牌。",
+      "triggerChoices": {
+        "self-actual-turn-deaths": "摸本人本回合击杀角色数的三倍张牌",
+        "other-actual-turn-deaths": "摸本人本回合击杀角色数的三倍张牌"
+      }
+    }
+  }
+}

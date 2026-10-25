@@ -22,6 +22,9 @@ internal static class ProgramRuntimeHookChecks
         a.Trace.Clear();
         Require(a.Hooks.CanContinue(ProgramRuntimePhase.AfterOwnerDeath, frame) && !a.Hooks.CanContinue(ProgramRuntimePhase.AfterSkillLoss, frame) &&
             a.Trace.SequenceEqual(["death", "loss"]), "Owner-death permission cannot authorize a skill-loss continuation.");
+        Require(catalog.Hooks[ProgramRuntimePhase.PaidInitialSelection].Count == 0 &&
+            !b.Hooks.CanContinue(ProgramRuntimePhase.PaidInitialSelection, frame),
+            "The additive paid-selection proof is optional and an empty registry never authorizes a historical selection.");
         a.Trace.Clear(); a.ExpectedFrame = frame; a.ExpectedPlan = plan;
         a.Hooks.AssertFrame(ProgramFrameInvariantPhase.BeforeSelectionState, frame, plan);
         Require(a.Trace.SequenceEqual(["before", "plan"]), "Invariants receive the original frame and resolved plan in order.");

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:bingyi",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "ending-reveal-and-share",
+          "window": "turnEnding",
+          "subject": "owner",
+          "optional": true,
+          "priority": 0,
+          "condition": {
+            "kind": "compare",
+            "left": {
+              "kind": "currentHandCount"
+            },
+            "operator": "greaterThanOrEqual",
+            "right": {
+              "kind": "integerConstant",
+              "value": 1
+            }
+          },
+          "usageScope": "turn",
+          "usageLimit": 1,
+          "effects": [
+            {
+              "op": "selectOwnedCards",
+              "target": "owner",
+              "numberExpression": "allOwnedZoneCards",
+              "zones": [
+                "hand"
+              ],
+              "resultBind": "shown-hand"
+            },
+            {
+              "op": "revealBoundCards",
+              "target": "owner",
+              "sourceBind": "shown-hand"
+            },
+            {
+              "op": "completeMobileGuYongOnMixedHand",
+              "target": "owner",
+              "sourceBind": "shown-hand"
+            },
+            {
+              "op": "selectTargets",
+              "target": "owner",
+              "targetKind": "anyLiving",
+              "minimumTargets": 0,
+              "maximumTargets": 8,
+              "numberExpression": "currentHandCount",
+              "targetAiOrder": "supportDraw"
+            },
+            {
+              "op": "draw",
+              "target": "selectedTargets",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

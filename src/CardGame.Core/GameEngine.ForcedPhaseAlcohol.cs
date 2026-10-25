@@ -157,7 +157,9 @@ public sealed partial class GameEngine
             context.Facts != parent.AfterTurnEnded.Items[parent.AfterTurnEnded.ItemIndex].Facts ||
             ActualTurnDeathCounts(f.OwnerSeat) != (deaths, kills) || deaths <= 0 || kills < 0 || kills > deaths)
             throw new InvalidOperationException("Death benefit draw requires exact frozen deaths from its completed actual turn.");
-        return checked(deaths + 2 * kills);
+        var effect = ProgramInstructionResolver.Default.Resolve(f, _contentRegistry.GetSkill(f.SkillId).Program!)
+            .GetPausedInstruction(f.InstructionIndex).Effect;
+        return checked(effect.ActualTurnDeathOwnerKillsOnly == true ? 3 * kills : deaths + 2 * kills);
     }
     [ProgramCapability]
     private sealed class ForcedPhaseAlcoholCapability(GameEngine engine) : IForcedPhaseAlcoholHost

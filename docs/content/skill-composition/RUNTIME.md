@@ -26,6 +26,8 @@
 
 人物专属操作也必须具备描述符、解析校验、资源声明、执行与 AI/交互适配，并通过现有注册协议接入。完整操作集合以 `SkillProgramEffectOp` 及当前操作目录为准；本组说明聚焦可复用合同。
 
+`draw` 的 `numberExpression: "targetLostHp"` 读取实际摸牌目标在该指令开始时的当前体力上限减当前体力值，最少为零。计算对象是已解析的目标，不使用拥有者的冻结失血值或手牌数；与其他原生摸牌指令共用替代、子结算和恢复回执。目标体力未定义时沿现有数量操作的取消与清理边界处理。
+
 ## 提交、暂停与恢复
 
 命令接受前重新校验 Revision、Prompt、操作者、技能实例、材料和目标。玩家视图在提交前准备，并冻结所有嵌套集合；公开事件的集合由 `CommittedEventProjection` 冻结。玩家及 AI 使用 `CreateSnapshot(viewerSeat)`；`ResolutionStack` 是可信诊断。

@@ -1,0 +1,41 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:chen-qun",
+  "skills": [
+    {
+      "registrationOrder": 77200,
+      "programBundle": "mobile-chen-qun",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:dingpin",
+        "name": "定品",
+        "description": "出牌阶段，你可以弃置一张本回合未使用或弃置过类型的手牌并选择一名已受伤的角色，令其判定。若结果为黑色，该角色摸X张牌（X为其已损失的体力值），然后你本回合不能再对其发动定品；若为红色，你翻面。",
+        "actionForms": "Active"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 77299,
+      "pools": {
+        "current": 77299
+      },
+      "definition": {
+        "id": "mobile:chen-qun",
+        "name": "陈群·移动版",
+        "portraitKey": "mobile-chen-qun",
+        "skillId": "mobile:dingpin",
+        "additionalSkillIds": [
+          "boundary:faen-mobile"
+        ],
+        "factionId": "wei",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:chen-qun",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

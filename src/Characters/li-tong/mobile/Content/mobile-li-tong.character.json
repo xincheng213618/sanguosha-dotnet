@@ -1,0 +1,27 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:li-tong",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 77599,
+      "pools": {
+        "current": 77599
+      },
+      "definition": {
+        "id": "mobile:li-tong",
+        "name": "李通·移动版",
+        "portraitKey": "mobile-li-tong",
+        "skillId": "ol:tuifeng",
+        "additionalSkillIds": [],
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:li-tong",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

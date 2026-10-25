@@ -1,0 +1,27 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cao-hong",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 76400,
+      "pools": {
+        "current": 76400
+      },
+      "definition": {
+        "id": "mobile:cao-hong",
+        "name": "曹洪·移动版",
+        "portraitKey": "mobile-cao-hong",
+        "skillId": "ol:yuanhu",
+        "additionalSkillIds": [],
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:cao-hong",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

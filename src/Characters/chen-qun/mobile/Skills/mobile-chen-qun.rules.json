@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:dingpin",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "judge-unused-category",
+          "minCards": 1,
+          "maxCards": 1,
+          "sourceZones": [
+            "hand"
+          ],
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "anyWounded",
+          "usesPerTurn": null,
+          "effects": [
+            {
+              "op": "prepareMobileChenQunDingpin",
+              "target": "owner"
+            },
+            {
+              "op": "captureSelectedCards",
+              "target": "owner",
+              "resultBind": "dingpin-cost"
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "dingpin-cost",
+              "destination": "discardPile",
+              "awaitMovementTriggers": true
+            },
+            {
+              "op": "startJudgment",
+              "target": "selectedTarget",
+              "judgmentReason": "skill.mobile.dingpin",
+              "resultBind": "dingpin-card",
+              "outcomeBind": "dingpin-outcome",
+              "visibility": "public"
+            },
+            {
+              "op": "draw",
+              "target": "selectedTarget",
+              "numberExpression": "targetLostHp",
+              "condition": {
+                "kind": "judgmentOutcomeMatchesSuits",
+                "sourceBind": "dingpin-outcome",
+                "suits": [
+                  "spade",
+                  "club"
+                ]
+              }
+            },
+            {
+              "op": "completeMobileChenQunDingpin",
+              "target": "owner"
+            },
+            {
+              "op": "turnOver",
+              "target": "owner",
+              "condition": {
+                "kind": "judgmentOutcomeMatchesSuits",
+                "sourceBind": "dingpin-outcome",
+                "suits": [
+                  "heart",
+                  "diamond"
+                ]
+              }
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "dingpin-card",
+              "destination": "discardPile",
+              "awaitMovementTriggers": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

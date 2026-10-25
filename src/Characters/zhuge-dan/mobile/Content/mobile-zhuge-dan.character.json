@@ -1,0 +1,29 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhuge-dan",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 76700,
+      "pools": {
+        "current": 76700
+      },
+      "definition": {
+        "id": "mobile:zhuge-dan",
+        "name": "诸葛诞·移动版",
+        "portraitKey": "mobile-zhuge-dan",
+        "skillId": "classic:gongao",
+        "additionalSkillIds": [
+          "classic:juyi"
+        ],
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:zhuge-dan",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

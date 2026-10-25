@@ -342,6 +342,11 @@ public enum SkillProgramEffectOp
     ApplyMobileWuYiBenxi = 74110,
     PrepareMobileGuoHuaiJingce = 75000,
     GrantMobileFenxunDistance = 75600,
+    ResolveMobileYuJinJieyue = 76300,
+    CollectMobileYuJinJieyue = 76301,
+    PrepareMobileChenQunDingpin = 77200,
+    CompleteMobileChenQunDingpin = 77201,
+    CompleteMobileGuYongOnMixedHand = 77300,
     ResolveBoundaryCaoXiuQingxi = 51100,
     ResolveBoundaryQuanCongYaoming = 51200,
     SelectMobileShiKaijiTargets = 47400,
@@ -1903,7 +1908,8 @@ public enum SkillProgramNumberExpression
     FourMinusHandCount = 47000,
     HandCountMinusFour = 47001,
     AfterDamageAmount = 56100,
-    BoundaryWangYiMijiCount = 57400
+    BoundaryWangYiMijiCount = 57400,
+    TargetLostHp = 77200
 }
 public enum SkillProgramCardSetVisibility { Private, Public }
 public enum SkillProgramCardDestination

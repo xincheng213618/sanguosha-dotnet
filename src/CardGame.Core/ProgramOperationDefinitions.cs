@@ -94,6 +94,12 @@ internal sealed record CreateCoverageResult(string Name) : ProgramResourceOperat
 internal readonly record struct ProgramEffectContinuationContext(
     SkillProgramEffect Effect, ProgramSkillFrame Frame, ISkillProgramExecutionHost State, bool PaidReturnAccepted);
 
+internal interface IProgramChoiceResultProof
+{
+    bool MatchesChoiceResult(SkillProgramEffect effect, ProgramSkillFrame frame,
+        ProgramChoiceResultBinding binding, ISkillProgramEffectHost host);
+}
+
 /// <summary>Which program dependency kinds an operation relies on for a given engine fact emission.</summary>
 [Flags]
 internal enum ProgramDependencyKinds
@@ -465,7 +471,7 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
         r.AllowOnly("op", "target", "amount", "numberExpression", "sourceBind", "resultBind", "targetRef", "condition",
-            "replacementSuits", "minimumReplacementRank", "maximumReplacementRank");
+            "replacementSuits", "minimumReplacementRank", "maximumReplacementRank", "ownerKillsOnly");
         var target = r.RequiredEnum<SkillProgramEffectTarget>("target");
         if (target == SkillProgramEffectTarget.SelectedTargets &&
             (r.Has("numberExpression") || r.Has("sourceBind") || r.Has("resultBind")))
@@ -473,7 +479,7 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
         var expression = r.Has("numberExpression")
             ? r.RequiredEnum<SkillProgramNumberExpression>("numberExpression") : (SkillProgramNumberExpression?)null;
         if (expression is not null && (r.Has("amount") || expression is not
-                (SkillProgramNumberExpression.LivingFactionCount or SkillProgramNumberExpression.TargetMaxHpMinusHandCount or
+                (SkillProgramNumberExpression.LivingFactionCount or SkillProgramNumberExpression.TargetLostHp or SkillProgramNumberExpression.TargetMaxHpMinusHandCount or
                  SkillProgramNumberExpression.CategoryTargetTurnUsage or SkillProgramNumberExpression.OwnerLostHp or SkillProgramNumberExpression.BoundCardCount or
                  SkillProgramNumberExpression.CurrentAttackRange or SkillProgramNumberExpression.HandLimitMinusHandCount or SkillProgramNumberExpression.FourMinusHandCount or
                  SkillProgramNumberExpression.LostHpMinusHandCount or SkillProgramNumberExpression.SelectedTargetsHandGreaterThanLord or
@@ -503,7 +509,10 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
         var effect = new SkillProgramEffect(Op, target, amount, r.Condition(), numberExpression: expression,
             sourceBind: source, resultBind: bind, targetReference: targetRef,
             replacementSuits: replacementSuits, minimumReplacementRank: minimumReplacementRank,
-            maximumReplacementRank: maximumReplacementRank);
+            maximumReplacementRank: maximumReplacementRank)
+        { ActualTurnDeathOwnerKillsOnly = r.Has("ownerKillsOnly") ? r.RequiredBool("ownerKillsOnly") : null };
+        if (r.Has("ownerKillsOnly") && expression != SkillProgramNumberExpression.ActualTurnDeathBenefits)
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: ownerKillsOnly requires actualTurnDeathBenefits.");
         if (expression == SkillProgramNumberExpression.BoundaryWangYiMijiCount &&
             (target != SkillProgramEffectTarget.Owner || targetRef is not null || bind != "drawn" || replacementSuits.Count != 0))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: mobile Miji requires the owner's chosen draw count and the drawn binding.");

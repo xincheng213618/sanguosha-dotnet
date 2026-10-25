@@ -1,0 +1,52 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:he-tai-hou",
+  "skills": [
+    {
+      "registrationOrder": 76501,
+      "programBundle": "mobile-he-tai-hou",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:zhendu",
+        "name": "鸩毒",
+        "description": "其他角色的出牌阶段开始时，你可以弃置一张手牌。若如此做，该角色视为使用一张【酒】，然后你对其造成1点伤害。",
+        "executionForms": "Trigger"
+      }
+    },
+    {
+      "registrationOrder": 76502,
+      "programBundle": "mobile-he-tai-hou",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:qiluan",
+        "name": "戚乱",
+        "description": "一名角色的回合结束时，你每于此回合内杀死过一名其他角色，你可以摸三张牌。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 76500,
+      "pools": {
+        "current": 76500
+      },
+      "definition": {
+        "id": "mobile:he-tai-hou",
+        "name": "何太后·移动版",
+        "portraitKey": "mobile-he-tai-hou",
+        "skillId": "mobile:zhendu",
+        "additionalSkillIds": [
+          "mobile:qiluan"
+        ],
+        "factionId": "qun",
+        "baseHp": 3,
+        "gender": "Female",
+        "characterId": "character:he-tai-hou",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

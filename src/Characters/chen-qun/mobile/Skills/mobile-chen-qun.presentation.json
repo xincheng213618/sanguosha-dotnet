@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:dingpin": {
+      "name": "定品",
+      "description": "出牌阶段，你可以弃置一张本回合未使用或弃置过类型的手牌并选择一名已受伤的角色，令其判定。若结果为黑色，该角色摸X张牌（X为其已损失的体力值），然后你本回合不能再对其发动定品；若为红色，你翻面。",
+      "activationLabels": {
+        "judge-unused-category": "弃手牌定品"
+      }
+    }
+  }
+}

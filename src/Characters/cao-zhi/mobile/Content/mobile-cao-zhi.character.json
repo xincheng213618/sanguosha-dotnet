@@ -1,0 +1,29 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cao-zhi",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 76800,
+      "pools": {
+        "current": 76800
+      },
+      "definition": {
+        "id": "mobile:cao-zhi",
+        "name": "曹植·移动版",
+        "portraitKey": "mobile-cao-zhi",
+        "skillId": "classic:luoying",
+        "factionId": "wei",
+        "baseHp": 3,
+        "additionalSkillIds": [
+          "classic:jiushi"
+        ],
+        "gender": "Male",
+        "characterId": "character:cao-zhi",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

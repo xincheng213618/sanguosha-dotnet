@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:bingyi": {
+      "name": "秉壹",
+      "description": "结束阶段，你可以展示所有手牌，若颜色均相同，你选择至多X名角色（X为你的手牌数），然后这些角色各摸一张牌。"
+    }
+  }
+}

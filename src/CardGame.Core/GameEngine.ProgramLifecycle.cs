@@ -787,7 +787,7 @@ public sealed partial class GameEngine
         var target = _players[targetSeat];
         if ((numberExpression is SkillProgramNumberExpression.OwnerLostHp or SkillProgramNumberExpression.OwnerMaxHp or
                 SkillProgramNumberExpression.CurrentHp or SkillProgramNumberExpression.LiveOwnerLostHp or SkillProgramNumberExpression.BoundaryWangYiMijiCount) && !_players[frame.OwnerSeat].HasHpValue ||
-            (numberExpression is SkillProgramNumberExpression.LostHpMinusHandCount or SkillProgramNumberExpression.TargetMaxHpMinusHandCount) && !target.HasHpValue ||
+            (numberExpression is SkillProgramNumberExpression.TargetLostHp or SkillProgramNumberExpression.LostHpMinusHandCount or SkillProgramNumberExpression.TargetMaxHpMinusHandCount) && !target.HasHpValue ||
             numberExpression == SkillProgramNumberExpression.LivingPlayersMinHp && _players.Any(p => p.IsAlive && !p.HasHpValue) && !_players.Any(p => p.IsAlive && p.HasHpValue))
         { CancelProgramBindingAndCleanup(frame, "体力值未定义，无法计算此效果。"); return null; }
         return numberExpression switch
@@ -797,6 +797,7 @@ public sealed partial class GameEngine
             SkillProgramNumberExpression.CurrentHp => Math.Max(0, _players[frame.OwnerSeat].Hp),
             SkillProgramNumberExpression.LiveOwnerLostHp => Math.Max(0,
                 _players[frame.OwnerSeat].MaxHp - _players[frame.OwnerSeat].Hp),
+            SkillProgramNumberExpression.TargetLostHp => Math.Max(0, target.MaxHp - target.Hp),
             SkillProgramNumberExpression.CurrentHandEmptyTwoOtherwiseOne => GetHand(target).Count == 0 ? 2 : 1,
             SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne => (GetEquipment(target).Count + 1) / 2 + 1,
             SkillProgramNumberExpression.EquipmentHalfFloorPlusOne => GetEquipment(target).Count / 2 + 1,
@@ -4762,7 +4763,8 @@ public sealed partial class GameEngine
         if (effects.Any(e => e.NumberExpression == SkillProgramNumberExpression.ActualTurnDeathBenefits) &&
             windowContext is { Window: SkillProgramTriggerWindow.AfterTurnEnded,
                 Facts: { ActualTurnDeathCount: { } deaths, OwnerActualTurnKillCount: { } kills } })
-            publicContext = publicContext with { ActualTurnDeathBenefits = checked(deaths + 2 * kills) };
+            publicContext = publicContext with { ActualTurnDeathBenefits = checked(effects.Single(e =>
+                e.NumberExpression == SkillProgramNumberExpression.ActualTurnDeathBenefits).ActualTurnDeathOwnerKillsOnly == true ? 3 * kills : deaths + 2 * kills) };
         publishedTargets ??= PublishedFixedRecipientForAi(owner, effects, windowContext);
         publishedTargets ??= PublishedEndingPairActorForAi(owner, effects, windowContext);
         if (publishedTargets is null && effects.Any(effect => effect.Op == SkillProgramEffectOp.YuanziResolve) &&

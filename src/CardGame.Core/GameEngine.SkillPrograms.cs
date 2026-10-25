@@ -1132,6 +1132,7 @@ public sealed partial class GameEngine
                 throw new InvalidOperationException("An active program contains duplicate named choices.");
             foreach (var binding in frame.ChoiceBindings)
             {
+                if (HasDeclaredProgramChoiceProof(frame, plan, binding)) continue;
                 if (IsMobileBuLianShiAnxuEqualityResult(frame, binding)) continue;
                 if (IsBoundarySidiChoiceResult(frame, binding)) continue;
                 if (IsBoundaryGuYongChoiceResult(frame, binding)) continue;
@@ -1300,7 +1301,7 @@ public sealed partial class GameEngine
             if (activation is null ||
                 frame.SelectedCardIds.Count < activation.MinCards && !HasWuLuKangPindianSelection(frame, activation) ||
                 frame.SelectedCardIds.Count > activation.MaxCards ||
-                frame.WangYunPlan is not { CostPaid: true } && frame.FriendEventFlow is null && frame.MatchingRecast is null && frame.PhaseHandSeizure is null && frame.SourceCurseReceipt is null && frame.DiamondDelayed is null && frame.BlackGiftContest is null && frame.YangHong is null && !HasPaidWeifuInitialSelection(frame) && !HasPaidShuziInitialSelection(frame) && !HasPaidLiuYanInitialSelection(frame) && !HasPaidZixiPlacement(frame) && !HasPaidWeiwanSelection(frame) && !HasPaidLeZhouFeiXianshuSelection(frame) && !HasPaidMouXiahouShiSelection(frame) && !HasPaidBoundaryChenQunInitialSelection(frame) && frame.SelectedCardIds.Any(id => !CanSelectProgramActivationCard(plan,
+                frame.WangYunPlan is not { CostPaid: true } && frame.FriendEventFlow is null && frame.MatchingRecast is null && frame.PhaseHandSeizure is null && frame.SourceCurseReceipt is null && frame.DiamondDelayed is null && frame.BlackGiftContest is null && frame.YangHong is null && !HasPaidWeifuInitialSelection(frame) && !HasPaidShuziInitialSelection(frame) && !HasPaidLiuYanInitialSelection(frame) && !HasPaidZixiPlacement(frame) && !HasPaidWeiwanSelection(frame) && !HasPaidLeZhouFeiXianshuSelection(frame) && !HasPaidMouXiahouShiSelection(frame) && !HasPaidBoundaryChenQunInitialSelection(frame) && !RuntimeHooks.CanContinue(ProgramRuntimePhase.PaidInitialSelection, frame) && frame.SelectedCardIds.Any(id => !CanSelectProgramActivationCard(plan,
                     _cardZones.CardsAt(_cardZones.GetLocation(id)).Single(card => card.Id == id), frame.OwnerSeat, frame.SkillId)) ||
                 activation.CardCountExpression == SkillProgramCardCountExpression.NextPhaseActivationOrdinal && frame.SelectedCardIds.Count !=
                     _programPhaseUses.GetValueOrDefault((frame.OwnerSeat, frame.SkillId, activation.UsageGroup)) ||

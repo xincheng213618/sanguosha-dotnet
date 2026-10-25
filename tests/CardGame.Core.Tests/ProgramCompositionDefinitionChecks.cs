@@ -125,7 +125,7 @@ internal static class ProgramCompositionDefinitionChecks
         RejectEffects("empty draw without chained replacement contract", """
         [{"op":"selectTargets","target":"owner","targetKind":"anyLivingChained","minimumTargets":0,"maximumTargets":8,"targetAiOrder":"supportDraw"},
          {"op":"draw","target":"selectedTargets","amount":1}]
-        """, "immediately preceding committed chained replacement selection");
+        """, "immediately preceding committed optional recipient selection");
         RejectSelectedCardEffects("duplicate selected-card consumption", """
         [{"op":"discardSelected","target":"owner","amount":1},
          {"op":"discardSelected","target":"owner","amount":1}]

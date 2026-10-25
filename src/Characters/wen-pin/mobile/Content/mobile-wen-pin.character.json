@@ -1,0 +1,27 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:wen-pin",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 76600,
+      "pools": {
+        "current": 76600
+      },
+      "definition": {
+        "id": "mobile:wen-pin",
+        "name": "文聘·移动版",
+        "portraitKey": "mobile-wen-pin",
+        "skillId": "ol:zhenwei",
+        "additionalSkillIds": [],
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:wen-pin",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

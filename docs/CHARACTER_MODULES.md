@@ -62,6 +62,8 @@ descriptor 的 `FactRequirements` 按 `Triggered`、`Activated` 分别声明逻�
 
 `AwakeningConditionOverride` 是觉醒条件的许可查询：按顺序读取注册者，任一返回真时可免除该次觉醒的条件。它不替代技能实例、触发时机、存活、费用和次数检查，也不自动放行同技能内的觉醒后奖励。人物自定义的觉醒门槛与后续回执必须同样识别实际授予的许可，不能伪造原门槛的历史事实。
 
+专用操作产生通用选择结果时，描述符声明 `CreateChoiceResult` 的绑定与有限选项，并实现 `IProgramChoiceResultProof`。通用帧检查只接受原游标内唯一的已执行生产者、声明内选项和能力提供的实际付款/分支证明；选择者、原父帧、技能实例与内容指纹由所属能力核对。普通 `chooseOption` 保持原有检查，新的专用操作不向中央人物名单追加特判。
+
 私有选择与 AI 策略继续使用已有 `[ProgramAnswer]`、`[ProgramAiChoice]`，子帧返回继续使用 `[ProgramContinuation]`。新增能力应在自己的模块声明相应入口，不修改集中人物分派表。
 
 需要观察响应窗口中的实际「使用」时，人物模块可提供无状态、无参的 `IProgramCommittedUseContract`。注册表按技能身份发现唯一契约，技能 JSON 加载与内容注册均校验其完整触发绑定；未注册的格式继续受原校验约束。契约只校验声明，实际使用与单纯打出的区分仍由原生动作上下文和人物资格检查负责。
@@ -109,6 +111,8 @@ descriptor 的 `FactRequirements` 按 `Triggered`、`Activated` 分别声明逻�
 玩家视图使用 `[ProgramViewContributor(contribution, order)]` 注册原有位置的公开牌、私看牌、人物牌堆和处理区变换。不同渠道保留原顺序、去重位置及最终冻结边界；来源方法和私有性证明继续由所属人物维护。`InvariantProcessing`、`PublicProcessing` 和各类排除条件不可互换：盖牌、秘密交换牌及暂存手牌即使 `revealAll` 也不计公共处理区，同时拼点及武陆抗的诊断可见性仍由原渠道控制。
 
 子结算推进和续接权限在所属机制的方法旁使用 `[ProgramRuntimeHook(phase, order)]` 注册。推进方法无参数并返回 `bool`，按阶段内的显式顺序运行，首个返回 `true` 的方法结束本轮分派。`BeforeDeclaration`、`BeforeResponseHealth`、`AfterResponseHealth` 保留原调度位置，不能跨过声明、响应体力子帧或其他原生结算分支移动。
+
+`PaidInitialSelection` 是已支付初始选牌的资格证明挂点。卡牌费用实际提交后，新的动态类型筛选可能立即排除这张原费用牌；人物通过原帧、原内容指纹、冻结选牌及真实逻辑弃牌回执证明该历史选择，通用帧检查据此保留原费用。它不放宽新动作的选牌或提交验证，也不代替费用支付。新消费者在所属 Runtime 用 `ProgramRuntimeHook` 注册，不向中央人物条件链追加名单。
 
 `BeforeJudgmentPhase` 位于全部准备阶段子结算之后、原生跳判判断之前，用于消费已经签发的下次判定阶段义务。它在翻面跳过整个回合时不会经过，也不会为已跳过的判定阶段虚构阶段开始窗口；同步完成义务的钩子返回 `false`，由原生回合流程继续推进。
 

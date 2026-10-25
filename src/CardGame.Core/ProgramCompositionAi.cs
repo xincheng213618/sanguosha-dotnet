@@ -286,6 +286,9 @@ internal sealed partial class ProgramAiEstimateContext
             SkillProgramNumberExpression.LostHpMinusHandCount => Math.Max(0, _player.MaxHp - _player.Hp - _estimatedHandCount),
             SkillProgramNumberExpression.LivingFactionCount => _publicContext.LivingFactionCount,
             SkillProgramNumberExpression.LivingPlayersMinHp => _publicContext.LivingPlayersMinHp ?? _player.Hp,
+            SkillProgramNumberExpression.TargetLostHp => TargetsOwner(effect)
+                ? Math.Max(0, _player.MaxHp - _player.Hp)
+                : _publicContext.SelectedTarget is { } wounded ? Math.Max(0, wounded.MaxHp - wounded.Hp) : 1d,
             SkillProgramNumberExpression.TargetMaxHpMinusHandCount =>
                 TargetsOwner(effect)
                     ? Math.Max(0, _player.MaxHp - _estimatedHandCount)
