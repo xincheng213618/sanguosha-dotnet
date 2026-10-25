@@ -209,6 +209,8 @@ public static partial class StandardShanheCampaignCatalog
             .ToHashSet(StringComparer.Ordinal);
         var currentFuqi = extraSkills.Contains(StandardShanheFuqiPackage.SkillId);
         var currentWangong = extraSkills.Contains(StandardShanheWangongPackage.SkillId);
+        var currentLonghun = extraSkills.Contains(StandardShanheLonghunPackage.SkillId);
+        var currentYiji = extraSkills.Contains(StandardShanheYijiPackage.SkillId);
         var currentSlashTactics = RequiresCurrentSlashTacticsRegistry(requirements);
         var s5Chengxiong = RequiresChengxiongBossRegistry(requirements);
         var s5CaoxingHigh = RequiresCaoxingHighRegistry(requirements);
@@ -305,6 +307,8 @@ public static partial class StandardShanheCampaignCatalog
             (buildTactics ? "/current-build-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
+            (currentLonghun ? "/current-longhun-3023" : "") +
+            (currentYiji ? "/current-yiji-3081" : "") +
             (localTroops ? "/local-troops" : "") +
             (currentSlashTactics ? "/current-slash-tactics" : "") +
             (s5Chengxiong ? "/s5-chengxiong-14055" : "") +
@@ -351,6 +355,8 @@ public static partial class StandardShanheCampaignCatalog
             if (buildTactics) packages.Add(new StandardShanheBuildTacticsPackage());
             if (currentFuqi) packages.Add(new StandardShanheFuqiPackage());
             if (currentWangong) packages.Add(new StandardShanheWangongPackage());
+            if (currentLonghun) packages.Add(new StandardShanheLonghunPackage());
+            if (currentYiji) packages.Add(new StandardShanheYijiPackage());
             if (s5Zhangliao || ids.Any(id => id == StandardShanheS5BossPackage.ZhangliaoBaseId ||
                 id == StandardShanheS5BossPackage.ZhangliaoLingdongId || id == StandardShanheS5BossPackage.ZhangliaoHuangkongId ||
                 id == StandardShanheS5BossPackage.DongZhuoLuoyangId || id == StandardShanheS5BossPackage.DongMinBaseId ||

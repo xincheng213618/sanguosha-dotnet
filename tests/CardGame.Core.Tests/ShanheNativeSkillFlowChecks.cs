@@ -75,8 +75,8 @@ internal static class ShanheNativeSkillFlowChecks
         }
         Need(session.Snapshot.Gold == 4000 - paid && session.Snapshot.ExtraSkillIds.ToHashSet().SetEquals([luanji.SkillId!, yuce.SkillId!]) &&
             StandardShanheCampaignCatalog.CodexRewardIdsByNodeId[110] == luanji.Id &&
-            StandardShanheCampaignCatalog.GetDefaultCodexUnlockedRewardIds(current).Contains(yuce.Id),
-            "Both real source skills are purchasable with the category surcharge; Luanji has its actual S5 tree node and Yuce has explicit default stock.");
+            StandardShanheCampaignCatalog.CodexRewardIdsByNodeId[38] == yuce.Id,
+            "Both real source skills are purchasable with the category surcharge and bound to their actual S5 tree nodes.");
         Accept(session.Submit(new ChooseShanheNodeOptionCommand("$leave", null, session.Revision)));
         Accept(session.Submit(new MoveShanheNodeCommand("battle", session.Revision)));
         var s = Scene.Start(session.PendingBattleSetup!);
