@@ -1,0 +1,9 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:taishi-ci",
+  "skills": [{ "registrationOrder": 71101, "programBundle": "mobile-taishi-ci", "includeProgramPresentation": true,
+    "definition": { "id": "mobile:taishi-ci-tianyi", "name": "天义", "description": "出牌阶段限一次，你可以与一名其他角色拼点。若你赢，本阶段你使用【杀】的次数上限+1、无距离限制且目标数上限+1；若你没赢，本阶段你不能使用【杀】。", "actionForms": "Active" } }],
+  "generals": [{ "registrationOrder": 71100, "pools": { "current": 71100 }, "definition": {
+    "id": "mobile:taishi-ci", "name": "太史慈·移动版", "portraitKey": "mobile-taishi-ci", "skillId": "mobile:taishi-ci-tianyi", "factionId": "wu", "baseHp": 4, "gender": "Male",
+    "characterId": "character:taishi-ci", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

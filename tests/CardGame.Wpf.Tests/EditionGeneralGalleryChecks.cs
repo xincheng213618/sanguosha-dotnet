@@ -31,6 +31,7 @@ internal static class EditionGeneralGalleryChecks
                 "anniversary:yuan-yin", "anniversary:qiao-rui", "anniversary:hu-che-er",
                 "anniversary:zhang-heng", "anniversary:hao-meng", "anniversary:lei-bo",
                 "anniversary:liu-you", "mobile:he-qi", "boundary:liu-feng",
+                "mobile:li-dian", "mobile:taishi-ci", "mobile:cao-chong", "mobile:chen-gong", "mobile:liu-feng", "mobile:lu-su", "mobile:xiahou-shi", "mobile:sp-xu-shu", "mobile:jia-xu", "mobile:zhang-song",
                 "boundary:yi-ji-mobile", "boundary:cao-xiu-mobile", "boundary:quan-cong-mobile",
                 "boundary:man-chong-mobile", "boundary:wu-yi-mobile", "boundary:zhu-zhi-mobile",
                 "boundary:zhou-cang-mobile", "boundary:cao-zhen-mobile", "boundary:sun-xiu-mobile",

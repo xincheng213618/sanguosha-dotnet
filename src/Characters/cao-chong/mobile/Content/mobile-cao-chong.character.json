@@ -1,0 +1,16 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cao-chong",
+  "skills": [],
+  "generals": [{
+    "registrationOrder": 71200,
+    "pools": { "current": 71200 },
+    "definition": {
+      "id": "mobile:cao-chong", "name": "曹冲·移动版", "portraitKey": "mobile-cao-chong",
+      "skillId": "classic:chengxiang", "additionalSkillIds": ["classic:renxin"],
+      "factionId": "wei", "baseHp": 3, "gender": "Male",
+      "characterId": "character:cao-chong", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+    }
+  }]
+}

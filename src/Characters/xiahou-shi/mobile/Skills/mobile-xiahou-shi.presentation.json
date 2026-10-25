@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:yanyu": {
+      "name": "燕语",
+      "description": "出牌阶段，你可以重铸杀；出牌阶段结束时，若你于此阶段内重铸过至少两张杀，你可以令一名男性角色摸两张牌。",
+      "activationLabels": {
+        "recast-slash": "重铸实体杀"
+      },
+      "triggerLabels": {
+        "two-recasts-support-male": "令一名男性角色摸两张牌"
+      }
+    }
+  }
+}

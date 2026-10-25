@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "mobile:wangxi", "revision": 1,
+    "triggers": [
+      { "id": "taking-each-point", "window": "afterDamageApplied", "subject": "owner", "optional": true, "damageOccurrence": "perDamagePoint",
+        "condition": { "kind": "otherDamageParticipantAlive" }, "effects": [{ "op": "drawMobileLiDianWangxi", "target": "owner" }] },
+      { "id": "dealing-each-point", "window": "afterDamageApplied", "subject": "damageSource", "optional": true, "damageOccurrence": "perDamagePoint",
+        "condition": { "kind": "otherDamageParticipantAlive" }, "effects": [{ "op": "drawMobileLiDianWangxi", "target": "owner" }] }
+    ]
+  }]
+}

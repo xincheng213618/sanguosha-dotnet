@@ -333,6 +333,8 @@ public enum SkillProgramEffectOp
     ExchangeMobileLierenPindianCards = 66201,
     CaptureBoundaryZhangZhaoPhaseDiscards = 66600,
     RewriteBoundaryXiaoQiaoJudgment = 66700,
+    DrawMobileLiDianWangxi = 71000,
+    ResolveMobileSpXuShuJianyan = 71700,
     ResolveBoundaryCaoXiuQingxi = 51100,
     ResolveBoundaryQuanCongYaoming = 51200,
     SelectMobileShiKaijiTargets = 47400,

@@ -61,9 +61,9 @@ internal sealed class SelectOwnedCardsProgramOperationDescriptor : ProgramOperat
         if (r.Has("requireExactCount"))
         {
             if (!r.RequiredBool("requireExactCount") || variable || target != SkillProgramEffectTarget.Owner ||
-                targetRef is not null || expression != SkillProgramNumberExpression.OwnerLostHp ||
+                targetRef is not null || expression is not (SkillProgramNumberExpression.OwnerLostHp or SkillProgramNumberExpression.SelectedPairHandDifference) ||
                 effect.AllowDecline || zones.Any(zone => zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)))
-                throw new InvalidOperationException($"Invalid skill program at {r.Path}: requireExactCount requires an owner lost-HP hand/equipment selection without variable bounds or decline.");
+                throw new InvalidOperationException($"Invalid skill program at {r.Path}: requireExactCount requires an exact owner lost-HP or selected-pair-difference hand/equipment selection without variable bounds or decline.");
             RequireAlways(effect, r.Path);
         }
         if (r.Has("freezeSelectedCardSuits"))

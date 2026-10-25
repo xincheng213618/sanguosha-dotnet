@@ -24,10 +24,13 @@ internal static class OwnedExactCountContract
         if (exact.Length == 0) return;
         if (exact.Length != 1 || effects[0] != exact[0] ||
             exact[0] is not { Op: SkillProgramEffectOp.SelectOwnedCards,
-                Target: SkillProgramEffectTarget.Owner, NumberExpression: SkillProgramNumberExpression.OwnerLostHp,
+                Target: SkillProgramEffectTarget.Owner, NumberExpression: SkillProgramNumberExpression.OwnerLostHp or SkillProgramNumberExpression.SelectedPairHandDifference,
                 Condition.Kind: SkillProgramConditionKind.Always, TargetReference: null,
                 MinimumCards: 0, MaximumCards: 0, AllowDecline: false } ||
-            minCards != 0 || maxCards != 0 || minTargets != 0 || maxTargets != 0)
-            throw new InvalidOperationException($"Invalid skill program at {path}: exact owned-card count requires the first unconditional owner lost-HP selection of a zero-card, zero-target activation.");
+            minCards != 0 || maxCards != 0 ||
+            (exact[0].NumberExpression == SkillProgramNumberExpression.OwnerLostHp
+                ? minTargets != 0 || maxTargets != 0
+                : minTargets != 2 || maxTargets != 2 || targetKind != SkillProgramTargetKind.OtherLivingPair))
+            throw new InvalidOperationException($"Invalid skill program at {path}: exact owned-card count requires a first unconditional owner selection with zero cards and either lost-HP/zero targets or a selected-hand-difference/other living pair.");
     }
 }

@@ -1,0 +1,16 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:chen-gong",
+  "skills": [],
+  "generals": [{
+    "registrationOrder": 71300,
+    "pools": { "current": 71300 },
+    "definition": {
+      "id": "mobile:chen-gong", "name": "陈宫·移动版", "portraitKey": "mobile-chen-gong",
+      "skillId": "classic:mingce", "additionalSkillIds": ["classic:zhichi"],
+      "factionId": "qun", "baseHp": 3, "gender": "Male",
+      "characterId": "character:chen-gong", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+    }
+  }]
+}

@@ -1,0 +1,17 @@
+{ "schemaVersion": 62, "skills": [{ "id": "mobile:taishi-ci-tianyi", "revision": 1,
+  "states": [
+    { "id": "mobile-tianyi-won-phase", "initialValue": false, "visibility": "public", "resetScope": "playPhase", "reacquirePolicy": "preserveUntilGameEnd" },
+    { "id": "mobile-tianyi-failed-phase", "initialValue": false, "visibility": "public", "resetScope": "playPhase", "reacquirePolicy": "preserveUntilGameEnd" }
+  ],
+  "modifiers": [
+    { "id": "won-phase-slash-count", "query": "slashLimit", "operation": "add", "value": 1, "priority": 0, "condition": { "kind": "runtimeBooleanState", "stateId": "mobile-tianyi-won-phase" } },
+    { "id": "won-phase-slash-distance", "query": "slashDistanceLimit", "operation": "unlimited", "value": 0, "priority": 0, "condition": { "kind": "runtimeBooleanState", "stateId": "mobile-tianyi-won-phase" } },
+    { "id": "won-phase-slash-target", "query": "cardTargetCount", "operation": "add", "value": 1, "priority": 0, "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"], "condition": { "kind": "runtimeBooleanState", "stateId": "mobile-tianyi-won-phase" } }
+  ],
+  "activations": [{ "id": "contest", "minCards": 1, "maxCards": 1, "sourceZones": ["hand"], "minTargets": 1, "maxTargets": 1, "targetKind": "otherLivingWithHand", "usesPerTurn": null, "usesPerGame": null, "usesPerPhase": 1,
+    "effects": [
+      { "op": "pindian", "target": "selectedTarget", "amount": 1 },
+      { "op": "setBooleanState", "target": "owner", "stateId": "mobile-tianyi-won-phase", "value": true, "condition": { "kind": "pindianWon" } },
+      { "op": "setBooleanState", "target": "owner", "stateId": "mobile-tianyi-failed-phase", "value": true, "condition": { "kind": "pindianNotWon" } }
+    ] }]
+}] }

@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:yanyu",
+      "revision": 1,
+      "states": [
+        {
+          "id": "yanyu-two-recasts",
+          "initialValue": false,
+          "visibility": "public",
+          "resetScope": "playPhase",
+          "reacquirePolicy": "preserveUntilGameEnd"
+        }
+      ],
+      "activations": [
+        {
+          "id": "recast-slash",
+          "minCards": 1,
+          "maxCards": 1,
+          "sourceZones": [
+            "hand"
+          ],
+          "cardKinds": [
+            "slash",
+            "fireSlash",
+            "thunderSlash",
+            "coldSlash"
+          ],
+          "minTargets": 0,
+          "maxTargets": 0,
+          "targetKind": "anyLiving",
+          "usesPerTurn": null,
+          "effects": [
+            {
+              "op": "recastSelectedCards",
+              "target": "owner",
+              "stateId": "yanyu-two-recasts",
+              "threshold": 2
+            }
+          ]
+        }
+      ],
+      "triggers": [
+        {
+          "id": "two-recasts-support-male",
+          "window": "playEnding",
+          "subject": "owner",
+          "optional": true,
+          "condition": {
+            "kind": "booleanState",
+            "stateId": "yanyu-two-recasts",
+            "expectedValue": true
+          },
+          "effects": [
+            {
+              "op": "selectTarget",
+              "target": "owner",
+              "targetKind": "anyLivingMale"
+            },
+            {
+              "op": "draw",
+              "target": "selectedTarget",
+              "amount": 2
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

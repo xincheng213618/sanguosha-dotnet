@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:dimeng": {
+      "name": "缔盟",
+      "description": "出牌阶段限一次，你可以选择两名其他角色并弃置X张牌（X为两者手牌数之差），然后令这两名角色交换手牌。",
+      "activationLabels": {
+        "alliance-pact": "先支付差额，再交换手牌"
+      }
+    }
+  }
+}

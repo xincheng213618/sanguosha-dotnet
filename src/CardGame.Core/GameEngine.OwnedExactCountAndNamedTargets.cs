@@ -5,7 +5,7 @@ public sealed partial class GameEngine
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 20)]
     private bool CanStartExactOwnedCardCount(CharacterState owner, ProgramExecutionPlan plan)
     {
-        if (plan.Instructions.FirstOrDefault() is not { RequireExactCount: true } effect) return true;
+        if (plan.Instructions.FirstOrDefault() is not { RequireExactCount: true, NumberExpression: SkillProgramNumberExpression.OwnerLostHp } effect) return true;
         var required = Math.Max(0, owner.MaxHp - owner.Hp);
         var discards = plan.Instructions.Any(e => e.Op == SkillProgramEffectOp.MoveBoundCards &&
             e.SourceBind == effect.ResultBind && e.Destination == SkillProgramCardDestination.DiscardPile &&

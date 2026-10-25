@@ -21741,6 +21741,176 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-li-dian",
+      "characterName": "李典·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-170.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/31700.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-li-dian.jpg",
+          "sha256": "fe9636e42ed45ad904aae73f065d51ed32a4ee26e28a7d45ce201f672afe9f36",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-taishi-ci",
+      "characterName": "太史慈·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-38.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/3800.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-taishi-ci.jpg",
+          "sha256": "962c8605534c7e410aaad54d5423c3049325a11efa192c1fbb496d48b52d275e",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-cao-chong",
+      "characterName": "曹冲·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-123.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/17400.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cao-chong.jpg",
+          "sha256": "8016a36f8aa5946067c9d88eda47e80645a80b77658fc8a061f02856c20dbf78",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-chen-gong",
+      "characterName": "陈宫·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-103.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/15300.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-chen-gong.jpg",
+          "sha256": "ebf7c2b6c5bfc48008570ca786de7653742fcdecb7d0d1bf613e363e7e1e06f6",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-liu-feng",
+      "characterName": "刘封·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-128.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/17900.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-liu-feng.jpg",
+          "sha256": "2521426cc28d1dc9a88f8a8346fc770a1e6e91c8ae755a5b266b849b416a04c8",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-lu-su",
+      "characterName": "鲁肃·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-49.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/4900.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-lu-su.jpg",
+          "sha256": "d1f68e24e0ceaed0640edae1da70fd856e5b33a1c22f348aae29a221c722796c",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-xiahou-shi",
+      "characterName": "夏侯氏·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-189.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/33600.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-xiahou-shi.jpg",
+          "sha256": "bc9a0fc03dc3b64c3145d0a51c345d6e6c8ba8468fdec3cdb509ef8985ded88d",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-sp-xu-shu",
+      "characterName": "SP徐庶·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-157.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/30400.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-sp-xu-shu.jpg",
+          "sha256": "b5d8b36068ba2a1ce21d414ae729c0804da46ad77d5b7df0c15eaf2433ab8fd5",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-jia-xu",
+      "characterName": "贾诩·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-48.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/4800.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-jia-xu.jpg",
+          "sha256": "7e54c9013d68894ece29d0341f466e78dee4394cc32a2ad8bca8235f940b73aa",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhang-song",
+      "characterName": "张松·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-179.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/32600.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhang-song.jpg",
+          "sha256": "e49adbf4fe657c74ee015aa9e847f15fc722f87a24291f3c1da6d8c0bcceb364",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

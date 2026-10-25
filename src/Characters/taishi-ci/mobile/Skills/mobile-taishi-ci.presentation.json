@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:taishi-ci-tianyi": {
+      "name": "天义",
+      "description": "出牌阶段限一次，拼点赢则本阶段杀次数上限+1、无距离限制且目标数上限+1；没赢则本阶段不能使用杀。",
+      "activationLabels": {
+        "contest": "天义·拼点"
+      },
+      "booleanStates": {
+        "mobile-tianyi-won-phase": {
+          "trueText": "本阶段天义拼赢，杀次数和目标各加一且无距离限制",
+          "falseText": "本阶段未获得天义增益"
+        },
+        "mobile-tianyi-failed-phase": {
+          "trueText": "本阶段天义未赢，不能使用杀",
+          "falseText": "本阶段无天义禁杀"
+        }
+      }
+    }
+  }
+}

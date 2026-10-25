@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:qianxin",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "wounded-source-awakening",
+          "window": "afterDamageApplied",
+          "subject": "damageSource",
+          "optional": false,
+          "usageScope": "game",
+          "usageLimit": 1,
+          "damageOccurrence": "perDamage",
+          "condition": {
+            "kind": "compare",
+            "left": {
+              "kind": "currentHp"
+            },
+            "operator": "lessThan",
+            "right": {
+              "kind": "currentMaxHp"
+            }
+          },
+          "effects": [
+            {
+              "op": "changeMaximumHp",
+              "target": "owner",
+              "amount": -1
+            },
+            {
+              "op": "grantSkills",
+              "target": "owner",
+              "skillIds": [
+                "mobile:jianyan"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:jianyan",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "declare-and-give",
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 0,
+          "maxTargets": 0,
+          "targetKind": "anyLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "resolveMobileSpXuShuJianyan",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

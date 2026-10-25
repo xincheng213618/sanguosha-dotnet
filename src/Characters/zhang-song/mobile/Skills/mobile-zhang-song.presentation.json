@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:qiangzhi": {
+      "name": "强识",
+      "booleanStates": {
+        "shown-basic": {
+          "trueText": "本阶段已展示基本牌",
+          "falseText": "未展示基本牌"
+        },
+        "shown-trick": {
+          "trueText": "本阶段已展示锦囊牌",
+          "falseText": "未展示锦囊牌"
+        },
+        "shown-equipment": {
+          "trueText": "本阶段已展示装备牌",
+          "falseText": "未展示装备牌"
+        }
+      },
+      "description": "出牌阶段开始时，你可以选择一名其他角色并随机展示其一张手牌。本阶段，当你使用与该牌类别相同的牌时，你可以摸一张牌。"
+    }
+  }
+}

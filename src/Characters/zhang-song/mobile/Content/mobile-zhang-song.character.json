@@ -1,0 +1,41 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhang-song",
+  "skills": [
+    {
+      "registrationOrder": 72001,
+      "programBundle": "mobile-zhang-song",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:qiangzhi",
+        "name": "强识",
+        "description": "出牌阶段开始时，你可以选择一名其他角色并随机展示其一张手牌。本阶段，当你使用与该牌类别相同的牌时，你可以摸一张牌。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 72000,
+      "pools": {
+        "current": 72000
+      },
+      "definition": {
+        "id": "mobile:zhang-song",
+        "name": "张松·移动版",
+        "portraitKey": "mobile-zhang-song",
+        "skillId": "mobile:qiangzhi",
+        "additionalSkillIds": [
+          "classic:xiantu"
+        ],
+        "factionId": "shu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:zhang-song",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

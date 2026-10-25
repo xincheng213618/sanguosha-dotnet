@@ -1,0 +1,9 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:li-dian",
+  "skills": [{ "registrationOrder": 71001, "programBundle": "mobile-li-dian", "includeProgramPresentation": true,
+    "definition": { "id": "mobile:wangxi", "name": "忘隙", "description": "当你对其他角色造成1点伤害后，或受到其他角色造成的1点伤害后，你可以与该角色按座次先后各摸一张牌。", "executionForms": "Trigger" } }],
+  "generals": [{ "registrationOrder": 71000, "pools": { "current": 71000 }, "definition": {
+    "id": "mobile:li-dian", "name": "李典·移动版", "portraitKey": "mobile-li-dian", "skillId": "boundary:xunxun", "additionalSkillIds": ["mobile:wangxi"],
+    "factionId": "wei", "baseHp": 3, "gender": "Male", "characterId": "character:li-dian", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

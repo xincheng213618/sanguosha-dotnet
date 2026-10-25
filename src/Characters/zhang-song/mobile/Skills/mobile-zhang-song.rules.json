@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:qiangzhi",
+      "revision": 1,
+      "states": [
+        {
+          "id": "shown-basic",
+          "initialValue": false,
+          "visibility": "public",
+          "resetScope": "playPhase",
+          "reacquirePolicy": "preserveUntilGameEnd"
+        },
+        {
+          "id": "shown-trick",
+          "initialValue": false,
+          "visibility": "public",
+          "resetScope": "playPhase",
+          "reacquirePolicy": "preserveUntilGameEnd"
+        },
+        {
+          "id": "shown-equipment",
+          "initialValue": false,
+          "visibility": "public",
+          "resetScope": "playPhase",
+          "reacquirePolicy": "preserveUntilGameEnd"
+        }
+      ],
+      "modifiers": [],
+      "viewAs": [],
+      "activations": [],
+      "triggers": [
+        {
+          "id": "reveal-hand-card",
+          "window": "playPhaseStarting",
+          "subject": "owner",
+          "turnOwnerScope": "own",
+          "optional": true,
+          "priority": 0,
+          "effects": [
+            {
+              "op": "selectTarget",
+              "target": "owner",
+              "targetKind": "otherLivingWithHand"
+            },
+            {
+              "op": "revealTargetHandCard",
+              "target": "owner",
+              "chooserRef": {
+                "kind": "owner"
+              },
+              "cardOwnerRef": {
+                "kind": "selectedTarget"
+              },
+              "resultBind": "qiangzhi-shown",
+              "mode": "random"
+            },
+            {
+              "op": "setBooleanState",
+              "target": "owner",
+              "stateId": "shown-basic",
+              "value": true,
+              "condition": {
+                "kind": "boundCardsMatchCategories",
+                "sourceBind": "qiangzhi-shown",
+                "cardCategories": [
+                  "basic"
+                ]
+              }
+            },
+            {
+              "op": "setBooleanState",
+              "target": "owner",
+              "stateId": "shown-trick",
+              "value": true,
+              "condition": {
+                "kind": "boundCardsMatchCategories",
+                "sourceBind": "qiangzhi-shown",
+                "cardCategories": [
+                  "trick"
+                ]
+              }
+            },
+            {
+              "op": "setBooleanState",
+              "target": "owner",
+              "stateId": "shown-equipment",
+              "value": true,
+              "condition": {
+                "kind": "boundCardsMatchCategories",
+                "sourceBind": "qiangzhi-shown",
+                "cardCategories": [
+                  "equipment"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "draw-on-matching-category",
+          "window": "cardUseCommitted",
+          "ownerRelation": "actor",
+          "optional": true,
+          "condition": {
+            "kind": "all",
+            "children": [
+              {
+                "kind": "cardActionActorIsCurrentTurn"
+              },
+              {
+                "kind": "any",
+                "children": [
+                  {
+                    "kind": "all",
+                    "children": [
+                      {
+                        "kind": "booleanState",
+                        "stateId": "shown-basic",
+                        "expectedValue": true
+                      },
+                      {
+                        "kind": "cardActionCategoryIs",
+                        "categories": [
+                          "basic"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "all",
+                    "children": [
+                      {
+                        "kind": "booleanState",
+                        "stateId": "shown-trick",
+                        "expectedValue": true
+                      },
+                      {
+                        "kind": "cardActionCategoryIs",
+                        "categories": [
+                          "trick"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "all",
+                    "children": [
+                      {
+                        "kind": "booleanState",
+                        "stateId": "shown-equipment",
+                        "expectedValue": true
+                      },
+                      {
+                        "kind": "cardActionCategoryIs",
+                        "categories": [
+                          "equipment"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1
+            }
+          ]
+        }
+      ],
+      "contributions": [],
+      "cardIdentities": []
+    }
+  ]
+}

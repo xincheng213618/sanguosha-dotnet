@@ -1,0 +1,42 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:xiahou-shi",
+  "skills": [
+    {
+      "registrationOrder": 71600,
+      "programBundle": "mobile-xiahou-shi",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:yanyu",
+        "name": "燕语",
+        "description": "出牌阶段，你可以重铸杀；出牌阶段结束时，若你于此阶段内重铸过至少两张杀，你可以令一名男性角色摸两张牌。",
+        "actionForms": "Active",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 71601,
+      "pools": {
+        "current": 71601
+      },
+      "definition": {
+        "id": "mobile:xiahou-shi",
+        "name": "夏侯氏·移动版",
+        "portraitKey": "official-mobile-xiahou-shi",
+        "skillId": "classic:qiaoshi",
+        "additionalSkillIds": [
+          "mobile:yanyu"
+        ],
+        "factionId": "shu",
+        "baseHp": 3,
+        "gender": "Female",
+        "characterId": "character:xiahou-shi",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:lu-su",
+  "skills": [
+    {
+      "registrationOrder": 71500,
+      "programBundle": "mobile-lu-su",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:dimeng",
+        "name": "缔盟",
+        "description": "出牌阶段限一次，你可以选择两名其他角色并弃置X张牌（X为两者手牌数之差），然后令这两名角色交换手牌。",
+        "actionForms": "Active"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 71501,
+      "pools": {
+        "current": 71501
+      },
+      "definition": {
+        "id": "mobile:lu-su",
+        "name": "鲁肃·移动版",
+        "portraitKey": "official-mobile-lu-su",
+        "skillId": "classic:haoshi",
+        "additionalSkillIds": [
+          "mobile:dimeng"
+        ],
+        "factionId": "wu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:lu-su",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

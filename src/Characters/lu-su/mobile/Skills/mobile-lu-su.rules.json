@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:dimeng",
+      "revision": 1,
+      "modifiers": [],
+      "viewAs": [],
+      "activations": [
+        {
+          "id": "alliance-pact",
+          "minCards": 0,
+          "maxCards": 0,
+          "sourceZones": [
+            "hand"
+          ],
+          "minTargets": 2,
+          "maxTargets": 2,
+          "targetKind": "otherLivingPair",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "usesPerGame": null,
+          "condition": {
+            "kind": "always"
+          },
+          "effects": [
+            {
+              "op": "selectOwnedCards",
+              "target": "owner",
+              "zones": [
+                "hand",
+                "equipment"
+              ],
+              "numberExpression": "selectedPairHandDifference",
+              "requireExactCount": true,
+              "resultBind": "dimeng-cost"
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "dimeng-cost",
+              "destination": "discardPile",
+              "awaitMovementTriggers": true
+            },
+            {
+              "op": "exchangeSelectedTargetHands",
+              "target": "owner"
+            }
+          ]
+        }
+      ],
+      "triggers": [],
+      "contributions": [],
+      "cardIdentities": []
+    }
+  ]
+}

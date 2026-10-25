@@ -1,0 +1,53 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:xu-shu",
+  "skills": [
+    {
+      "registrationOrder": 71700,
+      "programBundle": "mobile-sp-xu-shu",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:qianxin",
+        "name": "潜心",
+        "description": "觉醒技，当你造成伤害后，若你已受伤，你减1点体力上限，然后获得荐言。",
+        "tags": "Awakening",
+        "executionForms": "Trigger"
+      }
+    },
+    {
+      "registrationOrder": 71701,
+      "programBundle": "mobile-sp-xu-shu",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:jianyan",
+        "name": "荐言",
+        "description": "出牌阶段限一次，你可以选择一种牌的类别或颜色，逐张亮出牌堆顶牌直到符合条件，令一名男性角色获得最后亮出的符合牌，然后将其余亮出的牌置入弃牌堆。",
+        "actionForms": "Active"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 71702,
+      "pools": {
+        "current": 71702
+      },
+      "definition": {
+        "id": "mobile:sp-xu-shu",
+        "name": "SP徐庶·移动版",
+        "portraitKey": "official-mobile-sp-xu-shu",
+        "skillId": "boundary:zhuhai-current",
+        "additionalSkillIds": [
+          "mobile:qianxin"
+        ],
+        "factionId": "shu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:xu-shu",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}
