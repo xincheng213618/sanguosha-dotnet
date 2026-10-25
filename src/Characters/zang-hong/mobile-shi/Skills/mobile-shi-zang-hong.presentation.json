@@ -1,0 +1,13 @@
+{
+ "schemaVersion": 3,
+ "skills": {
+  "mobile:shi-liezhi": {
+   "name": "烈志",
+   "description": "每回合限一次，你可以减少1点体力上限，然后你视为使用一张【桃】或者【酒】。"
+  },
+  "mobile:shi-juegu": {
+   "name": "据孤",
+   "description": "当你成为牌的目标后，若你未受伤，你可以摸两张牌，然后弃置X张牌（X为本回合此技能发动次数）。"
+  }
+ }
+}

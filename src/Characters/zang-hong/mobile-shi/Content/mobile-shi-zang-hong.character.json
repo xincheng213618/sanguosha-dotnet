@@ -1,0 +1,54 @@
+{
+ "formatVersion": 1,
+ "packageId": "standard-classic-generals",
+ "characterId": "character:zang-hong",
+ "skills": [
+  {
+   "registrationOrder": 51912,
+   "programBundle": "mobile-shi-zang-hong",
+   "includeProgramPresentation": true,
+   "definition": {
+    "id": "mobile:shi-liezhi",
+    "name": "烈志",
+    "description": "每回合限一次，你可以减少1点体力上限，然后你视为使用一张【桃】或者【酒】。",
+    "actionForms": "Active",
+    "executionForms": "Trigger"
+   }
+  },
+  {
+   "registrationOrder": 51913,
+   "programBundle": "mobile-shi-zang-hong",
+   "includeProgramPresentation": true,
+   "definition": {
+    "id": "mobile:shi-juegu",
+    "name": "据孤",
+    "description": "当你成为牌的目标后，若你未受伤，你可以摸两张牌，然后弃置X张牌（X为本回合此技能发动次数）。",
+    "actionForms": "Active",
+    "executionForms": "Trigger"
+   }
+  }
+ ],
+ "generals": [
+  {
+   "registrationOrder": 51915,
+   "pools": {
+    "current": 51915
+   },
+   "definition": {
+    "id": "mobile:shi-zang-hong",
+    "name": "势臧洪",
+    "portraitKey": "mobile-shi-zang-hong",
+    "skillId": "mobile:shi-liezhi",
+    "additionalSkillIds": [
+     "mobile:shi-juegu"
+    ],
+    "factionId": "qun",
+    "baseHp": 4,
+    "gender": "Male",
+    "characterId": "character:zang-hong",
+    "variantId": "mobile-shi",
+    "rulesetId": "sanguosha-mobile"
+   }
+  }
+ ]
+}

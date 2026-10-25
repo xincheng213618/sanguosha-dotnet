@@ -1,0 +1,62 @@
+{
+ "schemaVersion": 62,
+ "skills": [
+  {
+   "id": "mobile:shi-liezhi",
+   "revision": 1,
+   "activations": [
+    {
+     "id": "liezhi-virtual",
+     "minCards": 0,
+     "maxCards": 0,
+     "sourceZones": ["hand"],
+     "minTargets": 0,
+     "maxTargets": 0,
+     "targetKind": "anyLiving",
+     "usesPerTurn": 1,
+     "usesPerPhase": null,
+     "condition": {
+      "kind": "always"
+     },
+     "effects": [
+      {
+       "op": "resolveShiZhLiezhi",
+       "target": "owner"
+      }
+     ]
+    }
+   ],
+   "triggers": []
+  },
+  {
+   "id": "mobile:shi-juegu",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "juegu-targeted",
+     "window": "cardUseTargetsFinalized",
+     "ownerRelation": "target",
+     "optional": true,
+     "isSkillInvocation": false,
+     "condition": {
+      "kind": "compare",
+      "left": {
+       "kind": "currentHp"
+      },
+      "operator": "equal",
+      "right": {
+       "kind": "currentMaxHp"
+      }
+     },
+     "effects": [
+      {
+       "op": "resolveShiZhJuegu",
+       "target": "owner"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
