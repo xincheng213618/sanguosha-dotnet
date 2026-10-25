@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "boundary:qingnang-mobile",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "discard-and-heal",
+          "minCards": 1,
+          "maxCards": 1,
+          "sourceZones": ["hand"],
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "anyWounded",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            { "op": "discardSelected", "target": "owner", "amount": 1 },
+            { "op": "recover", "target": "selectedTarget", "amount": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:guan-yu",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 60400,
+      "pools": { "current": 60400 },
+      "definition": {
+        "id": "boundary:guan-yu-mobile",
+        "name": "界关羽·移动版",
+        "portraitKey": "boundary-guan-yu-mobile",
+        "skillId": "boundary:wusheng",
+        "additionalSkillIds": ["boundary:yijue"],
+        "factionId": "shu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:guan-yu",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

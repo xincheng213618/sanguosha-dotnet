@@ -7,6 +7,36 @@ internal static class BoundaryMaChaoChecks
 {
     private static ContentRegistry Classic => ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(true), new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage());
 
+    public static void MobileDeclinedSuitForbidsDodgeAndPaidSuitRestoresNativeResponseCold()
+    {
+        foreach (var pay in new[] { false, true })
+        {
+            var (game, registry) = Start(Suit.Heart, "mobile");
+            Slash(game, 1); Activate(game);
+            Reach(game, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "slash-suit-discard"));
+            var before = game.CreateSnapshot(1).Players[1].Hand.Select(c => c.Id).ToArray();
+            Replay(game, registry);
+            game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+            var payment = Prompt(game)!.Choices.First(c => pay ? c.Cards.Count == 1 &&
+                game.CreateSnapshot(1).Players[1].Hand.Single(h => h.Id == c.Cards[0]).Kind == CardKind.Slash : c.Cards.Count == 0);
+            Answer(game, c => c.Id == payment.Id); Settle(game);
+            var receipt = game.Events.Select(e => e.Payload).OfType<ProgramSlashSuitDiscardResolvedEvent>().Single();
+            var dodges = game.Events.Select(e => e.Payload).OfType<CardRespondedEvent>().Count(e => e.ResponderSeat == 1 && e.EffectiveCardKind == CardKind.Dodge);
+            Require(receipt.SkillId == "boundary:tieqi-mobile" && receipt.PaymentCompleted == pay &&
+                game.CreateSnapshot(1).Players[1].Hp == (pay ? 4 : 3) && dodges == (pay ? 1 : 0),
+                "Mobile Tieqi forbids the Dodge itself after declining; a genuine paid same-suit card restores the native Dodge response after cold recovery.");
+            if (pay)
+                Require(receipt.PaidCardId == payment.Cards.Single() && game.CardMovements.Count(m => m.CardId == receipt.PaidCardId &&
+                    m.From == CardLocation.Hand(1) && m.To == CardLocation.DiscardPile) == 1,
+                    "The original same-suit cost moves exactly once before the real Dodge.");
+            else
+                Require(game.CreateSnapshot(1).Players[1].Hand.Select(c => c.Id).SequenceEqual(before) &&
+                    !game.Events.Select(e => e.Payload).OfType<ResponseRequestedEvent>().Any(e => e.TargetSeat == 1 && e.RequiredCardKind == CardKind.Dodge),
+                    "A failed mobile suit payment never opens a Dodge request or consumes an ineffective Dodge.");
+            Replay(game, registry);
+        }
+    }
+
     public static void TieqiPaoxiaoTrueDodgeAndNextUseReplay()
     {
         var (declined, declinedRegistry) = Start(Suit.Heart, "paoxiao");
@@ -63,7 +93,7 @@ internal static class BoundaryMaChaoChecks
     {
         var action = game.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Slash && a.TargetSeats.SequenceEqual([target]));
         Accept(game, new PlayCardCommand(0, action.CardId!.Value, [target], game.Revision, Prompt(game)!.PromptId, action.PlayedCardKind));
-        Reach(game, p => p.SkillPrompt?.SkillId == "boundary:tieqi");
+        Reach(game, p => p.SkillPrompt?.SkillId is "boundary:tieqi" or "boundary:tieqi-mobile");
     }
     private static PendingDecision? Prompt(GameEngine game) => game.PendingDecision ?? Enumerable.Range(0, 4).Select(seat => game.CreateSnapshot(seat).PendingDecision).FirstOrDefault(p => p is not null && p.Choices.Count > 0);
     private static void Activate(GameEngine game) => Answer(game, c => c.Parameters.GetValueOrDefault("program-action") == "activate" || c.Parameters.GetValueOrDefault("action") == "program-judgment-trigger-activate");
@@ -100,7 +130,7 @@ internal static class BoundaryMaChaoChecks
         public PackageManifest Manifest { get; } = new("fixture-mc", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder builder)
         {
-            CharacterFixtureContent.Register(builder, "boundary:ma-chao");
+            CharacterFixtureContent.Register(builder, scenario == "mobile" ? "boundary:ma-chao-mobile" : "boundary:ma-chao");
             foreach (var id in new[] { "classic:mashu", "classic:qingguo" }) builder.AddSkill(Classic.GetSkill(id));
             if (scenario == "paoxiao") builder.AddSkill(Classic.GetSkill("boundary:paoxiao"));
             if (scenario == "replacement") builder.AddSkill(Classic.GetSkill("classic:guicai"));
@@ -136,7 +166,7 @@ internal static class BoundaryMaChaoChecks
                 builder.AddSkill(new("fixture:mc-enhance", "实际多目标", "实际多目标") { Program = enhance.Programs["fixture:mc-enhance"] });
             }
             builder.AddSkill(new("fixture:mc-marker", "固定", "固定") { SelectionWeights = new Dictionary<Role, double> { [Role.Lord] = -1000 } });
-            builder.AddGeneral(new("fixture:mc-owner", "测试马超", "supporter", scenario == "legacy" ? "classic:tieqi" : "boundary:tieqi", "shu", 4,
+            builder.AddGeneral(new("fixture:mc-owner", "测试马超", "supporter", scenario == "legacy" ? "classic:tieqi" : scenario == "mobile" ? "boundary:tieqi-mobile" : "boundary:tieqi", "shu", 4,
                 new[] { "classic:mashu", "fixture:mc-driver", "fixture:mc-marker" }.Concat(scenario == "paoxiao" ? ["boundary:paoxiao"] : Array.Empty<string>()).Concat(scenario == "replacement" ? ["classic:guicai", "fixture:mc-claim"] : Array.Empty<string>()).Concat(scenario == "multi" ? ["fixture:mc-enhance"] : scenario == "bazhen" ? ["classic:bazhen"] : Array.Empty<string>()).ToArray()));
             for (var seat = 1; seat < 4; seat++) builder.AddGeneral(new($"fixture:mc-{seat}", "目标" + seat, "supporter", "classic:qingguo", "wei", 4,
                 new[] { "fixture:mc-locked" }.Concat(scenario == "redirect" && seat == 1 ? ["classic:liuli"] :

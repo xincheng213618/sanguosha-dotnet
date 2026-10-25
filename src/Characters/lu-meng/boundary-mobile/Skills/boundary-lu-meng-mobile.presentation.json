@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:qinxue-mobile": {
+      "name": "勤学",
+      "description": "觉醒技，准备阶段，若你的手牌数比你的体力值多3或更多（若游戏人数不小于7则改为2），你减1点体力上限，然后获得“攻心”。"
+    }
+  }
+}

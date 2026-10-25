@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhao-yun",
+  "skills": [
+    {
+      "registrationOrder": 60501,
+      "programBundle": "boundary-zhao-yun-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:yajiao-mobile",
+        "name": "涯角",
+        "description": "当你于回合外使用或打出手牌时，你可以展示牌堆顶一张牌并将其交给任意一名角色。若这两张牌类别不同，你弃置一张牌。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 60500,
+      "pools": { "current": 60500 },
+      "definition": {
+        "id": "boundary:zhao-yun-mobile",
+        "name": "界赵云·移动版",
+        "portraitKey": "boundary-zhao-yun-mobile",
+        "skillId": "classic:longdan",
+        "additionalSkillIds": ["boundary:yajiao-mobile"],
+        "factionId": "shu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:zhao-yun",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

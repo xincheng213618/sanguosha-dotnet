@@ -322,6 +322,7 @@ public enum SkillProgramEffectOp
     SubstituteBoundaryXuChuDraw = 59900,
     StoreBoundaryXiahouDunQingjian = 60010,
     DistributeBoundaryXiahouDunQingjian = 60011,
+    GiveMobileYajiaoRevealedCard = 60501,
     ResolveBoundaryCaoXiuQingxi = 51100,
     ResolveBoundaryQuanCongYaoming = 51200,
     SelectMobileShiKaijiTargets = 47400,

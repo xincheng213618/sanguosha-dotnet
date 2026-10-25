@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "boundary:yajiao-mobile",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "reveal-on-hand-card-use",
+          "window": "cardUseCommitted",
+          "ownerRelation": "actor",
+          "optional": true,
+          "priority": 0,
+          "condition": {
+            "kind": "all",
+            "children": [
+              { "kind": "not", "children": [{ "kind": "ownerIsTurnPlayer" }] },
+              { "kind": "cardActionFromOwnerHand" }
+            ]
+          },
+          "effects": [
+            { "op": "revealTopCards", "target": "owner", "amount": 1, "resultBind": "revealed", "visibility": "public" },
+            { "op": "selectTarget", "target": "owner", "targetKind": "anyLiving" },
+            { "op": "giveMobileYajiaoRevealedCard", "target": "owner", "sourceBind": "revealed" },
+            {
+              "op": "selectAndMoveOwnedCard", "target": "owner",
+              "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "owner" },
+              "zones": ["hand", "equipment"], "count": 1, "destination": "discardPile",
+              "skipIfNoCards": true, "awaitMovementTriggers": true,
+              "condition": { "kind": "not", "children": [{ "kind": "boundCardCategoryMatchesCardAction", "sourceBind": "revealed" }] }
+            }
+          ]
+        },
+        {
+          "id": "reveal-on-hand-card-response",
+          "window": "cardResponseAccepted",
+          "ownerRelation": "actor",
+          "optional": true,
+          "priority": 0,
+          "condition": {
+            "kind": "all",
+            "children": [
+              { "kind": "not", "children": [{ "kind": "ownerIsTurnPlayer" }] },
+              { "kind": "cardActionFromOwnerHand" }
+            ]
+          },
+          "effects": [
+            { "op": "revealTopCards", "target": "owner", "amount": 1, "resultBind": "revealed", "visibility": "public" },
+            { "op": "selectTarget", "target": "owner", "targetKind": "anyLiving" },
+            { "op": "giveMobileYajiaoRevealedCard", "target": "owner", "sourceBind": "revealed" },
+            {
+              "op": "selectAndMoveOwnedCard", "target": "owner",
+              "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "owner" },
+              "zones": ["hand", "equipment"], "count": 1, "destination": "discardPile",
+              "skipIfNoCards": true, "awaitMovementTriggers": true,
+              "condition": { "kind": "not", "children": [{ "kind": "boundCardCategoryMatchesCardAction", "sourceBind": "revealed" }] }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

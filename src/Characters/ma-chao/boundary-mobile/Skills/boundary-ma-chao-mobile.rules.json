@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "boundary:tieqi-mobile",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "suppress-and-judge-final-target",
+          "window": "slashBeforeResponse",
+          "ownerRelation": "actor",
+          "cardKinds": [
+            "slash",
+            "fireSlash",
+            "thunderSlash"
+          ],
+          "optional": true,
+          "effects": [
+            {
+              "op": "suppressCurrentSlashTargetAndJudgeSuitDiscard",
+              "target": "owner",
+              "judgmentReason": "boundary:tieqi-mobile",
+              "resultBind": "tieqi-judgment"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

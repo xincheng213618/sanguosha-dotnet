@@ -117,7 +117,8 @@ public sealed partial class GameEngine
         Dictionary<string, string> Parameters() => new() { ["program-action"] = "slash-suit-discard", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) };
         return SlashSuitDiscardCards(draft).Select(card => new PromptChoice(new($"slash-suit-discard.{frame.Id}.pay.{card.Id}"),
             $"弃置【{card.DisplayName}】{GetSuitDisplayName(draft.FinalSuit)}{card.RankText}", [card.Id], [], Parameters()))
-            .Append(new(new($"slash-suit-discard.{frame.Id}.decline"), "不弃置，不能抵消此杀", [], [], Parameters())).ToArray();
+            .Append(new(new($"slash-suit-discard.{frame.Id}.decline"),
+                frame.SkillId == BoundaryMaChaoMobileTieqi ? "不弃置，不能使用【闪】响应此杀" : "不弃置，不能抵消此杀", [], [], Parameters())).ToArray();
     }
 
     private void PublishProgramSlashSuitDiscard(ProgramSkillFrame frame)
@@ -126,7 +127,7 @@ public sealed partial class GameEngine
         var choices = SlashSuitDiscardChoices(frame);
         var skill = _contentRegistry.GetSkill(frame.SkillId);
         _pendingDecision = new(DecisionKind.ProgramTrigger, draft.TargetSeat,
-            $"【{skill.Name}】：是否弃置一张{GetSuitDisplayName(draft.FinalSuit)}牌，使你能抵消此杀？",
+            $"【{skill.Name}】：是否弃置一张{GetSuitDisplayName(draft.FinalSuit)}牌，使你{(frame.SkillId == BoundaryMaChaoMobileTieqi ? "可以使用【闪】响应此杀" : "能抵消此杀")}？",
             choices.SelectMany(choice => choice.Cards).ToArray(), [], frame.OwnerSeat)
         { PromptId = CreatePromptId(), IsPrivate = true, Choices = choices, TargetSeat = draft.TargetSeat,
             SkillPrompt = new(frame.SkillId, skill.Name, skill.Name, skill.Description) };

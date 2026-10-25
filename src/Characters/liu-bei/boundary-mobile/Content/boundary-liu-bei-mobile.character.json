@@ -1,0 +1,43 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:liu-bei",
+  "skills": [
+    {
+      "registrationOrder": 60301,
+      "programBundle": "boundary-liu-bei-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:jijiang-mobile",
+        "name": "激将",
+        "description": "主公技，当你需要使用或打出【杀】时，你可以令其他蜀势力角色依次选择是否打出一张【杀】，视为由你使用或打出。",
+        "actionForms": "Active",
+        "tags": "Lord",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 60300,
+      "pools": {
+        "current": 60300
+      },
+      "definition": {
+        "id": "boundary:liu-bei-mobile",
+        "name": "界刘备·移动版",
+        "portraitKey": "boundary-liu-bei-mobile",
+        "skillId": "boundary:rende",
+        "additionalSkillIds": [
+          "boundary:jijiang-mobile"
+        ],
+        "factionId": "shu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:liu-bei",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

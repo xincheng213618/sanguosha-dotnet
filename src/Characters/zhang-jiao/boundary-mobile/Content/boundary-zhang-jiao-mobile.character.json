@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhang-jiao",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 61000,
+      "pools": { "current": 61000 },
+      "definition": {
+        "id": "boundary:zhang-jiao-mobile",
+        "name": "界张角·移动版",
+        "portraitKey": "boundary-zhang-jiao-mobile",
+        "skillId": "classic:leiji",
+        "additionalSkillIds": ["classic:guidao", "classic:huangtian"],
+        "factionId": "qun",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:zhang-jiao",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

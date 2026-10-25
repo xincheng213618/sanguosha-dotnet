@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:jijiang-mobile": {
+      "name": "激将",
+      "description": "主公技，当你需要使用或打出【杀】时，你可以令其他蜀势力角色依次选择是否打出一张【杀】，视为由你使用或打出。"
+    }
+  }
+}

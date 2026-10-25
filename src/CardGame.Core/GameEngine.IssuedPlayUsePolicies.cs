@@ -23,6 +23,7 @@ public sealed partial class GameEngine
     private bool IsIssuedCardUnrespondable(long frameId) =>
         IsBoundaryZhangFeiLiyongUnrespondable(frameId) ||
         IsBoundaryHuangZhongUnrespondable(frameId) ||
+        IsBoundaryMaChaoUnrespondable(frameId) ||
         IsBoundaryAnjianUnrespondable(frameId) ||
         IsMobileShiWanglieUnrespondable(frameId) ||
         IsMobileShiZhuangshiUnrespondable(frameId) ||

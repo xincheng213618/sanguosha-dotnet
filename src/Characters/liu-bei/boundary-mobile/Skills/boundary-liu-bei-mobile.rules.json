@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "boundary:jijiang-mobile",
+      "revision": 1,
+      "cardPolicies": [
+        {
+          "id": "allied-slash",
+          "kind": "factionResponseRequest",
+          "requiredCardKinds": [
+            "slash"
+          ],
+          "factionId": "shu",
+          "ownerRole": "lord"
+        }
+      ],
+      "activations": [
+        {
+          "id": "request-shu-slash",
+          "usesPerTurn": null,
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherLivingSlashable",
+          "condition": {
+            "kind": "classicIdentityMode"
+          },
+          "effects": [
+            {
+              "op": "requestFactionCard",
+              "target": "selectedTarget",
+              "providerFactionId": "shu",
+              "requiredKind": "slash"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

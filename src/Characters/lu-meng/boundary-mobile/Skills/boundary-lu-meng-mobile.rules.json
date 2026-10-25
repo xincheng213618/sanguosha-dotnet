@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "boundary:qinxue-mobile", "revision": 1,
+    "triggers": [{
+      "id": "preparation", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false,
+      "usageScope": "game", "usageLimit": 1, "namedUsageGroup": "awakening",
+      "condition": { "kind": "compare", "left": { "kind": "currentHandCountMinusHp" }, "operator": "greaterThanOrEqual", "right": { "kind": "integerConstant", "value": 2 } },
+      "effects": [
+        { "op": "changeMaximumHp", "target": "owner", "amount": -1 },
+        { "op": "grantSkills", "target": "owner", "skillIds": ["classic:gongxin"] }
+      ]
+    }]
+  }]
+}

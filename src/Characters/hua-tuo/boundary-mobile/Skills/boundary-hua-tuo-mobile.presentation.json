@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "boundary:qingnang-mobile": {
+      "name": "青囊",
+      "description": "出牌阶段限一次，你可以弃置一张手牌并令一名角色回复1点体力。若你弃置的牌为红色，则可以再次发动此技能，但不能选择本回合选择过的角色。"
+    }
+  }
+}

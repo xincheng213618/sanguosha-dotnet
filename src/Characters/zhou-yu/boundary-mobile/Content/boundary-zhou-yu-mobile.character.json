@@ -1,0 +1,17 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhou-yu",
+  "skills": [],
+  "generals": [{
+    "registrationOrder": 60800,
+    "pools": { "current": 60800 },
+    "definition": {
+      "id": "boundary:zhou-yu-mobile", "name": "界周瑜·移动版",
+      "portraitKey": "boundary-zhou-yu-mobile", "skillId": "boundary:yingzi",
+      "additionalSkillIds": ["boundary:fanjian"],
+      "factionId": "wu", "baseHp": 3, "gender": "Male",
+      "characterId": "character:zhou-yu", "variantId": "boundary-mobile", "rulesetId": "sanguosha-mobile"
+    }
+  }]
+}

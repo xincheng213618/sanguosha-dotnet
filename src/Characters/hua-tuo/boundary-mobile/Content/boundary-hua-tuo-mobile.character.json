@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:hua-tuo",
+  "skills": [
+    {
+      "registrationOrder": 60901,
+      "programBundle": "boundary-hua-tuo-mobile",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "boundary:qingnang-mobile",
+        "name": "青囊",
+        "description": "出牌阶段限一次，你可以弃置一张手牌并令一名角色回复1点体力。若你弃置的牌为红色，则可以再次发动此技能，但不能选择本回合选择过的角色。",
+        "actionForms": "Active"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 60900,
+      "pools": { "current": 60900 },
+      "definition": {
+        "id": "boundary:hua-tuo-mobile",
+        "name": "界华佗·移动版",
+        "portraitKey": "boundary-hua-tuo-mobile",
+        "skillId": "boundary:jijiu",
+        "additionalSkillIds": ["boundary:qingnang-mobile"],
+        "factionId": "qun",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:hua-tuo",
+        "variantId": "boundary-mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}
