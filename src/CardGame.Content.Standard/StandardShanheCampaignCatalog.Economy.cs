@@ -57,7 +57,9 @@ public static partial class StandardShanheCampaignCatalog
         new(2017, "tactic-economy-2017", "谋略过人", 2, 300,
             "选择【战法奖励】时，候选项从三个变为四个", new(TacticRewardChoiceCount: 4)),
         new(2018, "tactic-economy-2018", "慧黠", 1, 200,
-            "选择【卡牌奖励】时，候选项从三个变为四个", new(CardRewardChoiceCount: 4))
+            "选择【卡牌奖励】时，候选项从三个变为四个", new(CardRewardChoiceCount: 4)),
+        new(2016, "tactic-economy-2016", "思维敏捷", 2, 300,
+            "选择【技能奖励】时，候选项从三个变为四个", new(SkillRewardChoiceCount: 4))
     });
 
     private static ShanheCampaignDefinition WithCurrentEconomyTactics(ShanheCampaignDefinition definition)

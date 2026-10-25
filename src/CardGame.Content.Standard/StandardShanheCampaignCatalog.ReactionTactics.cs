@@ -103,6 +103,16 @@ public static partial class StandardShanheCampaignCatalog
             "仅首领战中，你随机获得3张初始手牌", BossBattleOnly: true),
         new ReactionTacticSource(2027, "未雨绸缪Ⅲ", StandardShanheBossOpeningTacticsPackage.WeiyuChoumou3SkillId, 500, 3, null,
             "仅首领战中，你随机获得4张初始手牌", BossBattleOnly: true),
+        new ReactionTacticSource(2079, "手到擒来", StandardShanheCycleTacticsPackage.ShoudaoQinlaiSkillId, 200, 1, null,
+            "每回合你使用第7张牌后,你摸1张牌"),
+        new ReactionTacticSource(2080, "手到擒来Ⅱ", StandardShanheCycleTacticsPackage.ShoudaoQinlai2SkillId, 300, 2, null,
+            "每回合你使用第5张牌后,你摸1张牌"),
+        new ReactionTacticSource(2081, "手到擒来Ⅲ", StandardShanheCycleTacticsPackage.ShoudaoQinlai3SkillId, 500, 3, 65,
+            "每回合你使用第6张牌后,你摸2张牌"),
+        new ReactionTacticSource(2227, "弱反馈", StandardShanheSustainOpeningTacticsPackage.RuoFankuiSkillId, 500, 3, null,
+            "你受到1点伤害后，摸一张牌"),
+        new ReactionTacticSource(2182, "粮草储备", StandardShanheSustainOpeningTacticsPackage.LiangcaoChubeiSkillId, 200, 1, 17,
+            "游戏开始时，你回复1点体力"),
     });
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentReactionTacticShopMetadata =>

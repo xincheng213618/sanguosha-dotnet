@@ -24,6 +24,7 @@ public sealed partial class ShanheCampaignSession
         {
             ShanheRewardCategory.Tactic => effect.TacticRewardChoiceCount,
             ShanheRewardCategory.Card => effect.CardRewardChoiceCount,
+            ShanheRewardCategory.Skill => effect.SkillRewardChoiceCount,
             _ => 0
         }).DefaultIfEmpty(0).Max());
 

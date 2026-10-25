@@ -14,8 +14,9 @@ public sealed partial class ShanheCampaignSession
             var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed,
                 node.Id + ":boss:" + group.Id, state.EncounterOrdinal));
             random.Shuffle(offers);
-            var choiceCount = group.RewardIds.All(id => RewardCategory(_rewards[id]) == ShanheRewardCategory.Tactic)
-                ? CategorizedRewardChoiceCount(state, ShanheRewardCategory.Tactic, group.ChoiceCount) : group.ChoiceCount;
+            var categories = group.RewardIds.Select(id => RewardCategory(_rewards[id])).Distinct().ToArray();
+            var choiceCount = categories.Length == 1
+                ? CategorizedRewardChoiceCount(state, categories[0], group.ChoiceCount) : group.ChoiceCount;
             return new BossRewardGroupState(group.Id, group.Name, ShanheCampaignContent.Freeze(offers.Take(choiceCount)));
         });
         return ClearPrimaryRewardState(state) with

@@ -12,12 +12,16 @@ internal static class ShanheRewardCategoryChecks
         [
             ([], ShanheRewardCategory.Tactic, 3),
             ([], ShanheRewardCategory.Card, 3),
+            ([], ShanheRewardCategory.Skill, 3),
             (["tactic-economy-2017"], ShanheRewardCategory.Tactic, 4),
             (["tactic-economy-2017"], ShanheRewardCategory.Card, 3),
             (["tactic-economy-2018"], ShanheRewardCategory.Tactic, 3),
             (["tactic-economy-2018"], ShanheRewardCategory.Card, 4),
-            (["tactic-economy-2017", "tactic-economy-2018"], ShanheRewardCategory.Skill, 2),
-            (["tactic-economy-2017", "tactic-economy-2018"], ShanheRewardCategory.Supply, 3)
+            (["tactic-economy-2017", "tactic-economy-2018"], ShanheRewardCategory.Skill, 3),
+            (["tactic-economy-2016"], ShanheRewardCategory.Skill, 4),
+            (["tactic-economy-2016"], ShanheRewardCategory.Tactic, 3),
+            (["tactic-economy-2016"], ShanheRewardCategory.Card, 3),
+            (["tactic-economy-2016", "tactic-economy-2017", "tactic-economy-2018"], ShanheRewardCategory.Supply, 3)
         ];
         foreach (var item in cases)
         {
@@ -43,7 +47,7 @@ internal static class ShanheRewardCategoryChecks
                 offer.RewardOffers.All(reward => reward.Id.StartsWith(prefix, StringComparison.Ordinal)) &&
                 ReferenceEquals(offer.RewardOffers, session.Snapshot.RewardOffers) &&
                 categories.RewardCategories.Count == 4 && categories.RewardOffers.Count == 0,
-                "The owned tactic increases only its own category's three choices to four; skills and supplies retain their own pools.");
+                "Each owned choice tactic increases only its own category's three choices to four; supplies retain their own pool.");
             before = Snapshot(session);
             var other = item.Category == ShanheRewardCategory.Tactic ? ShanheRewardCategory.Card : ShanheRewardCategory.Tactic;
             Require(!session.Submit(new ChooseShanheRewardCategoryCommand(other, session.Revision)).Accepted &&
@@ -129,15 +133,18 @@ internal static class ShanheRewardCategoryChecks
         ShanheRewardDefinition[] skills =
         [
             new("skill-guard", "守御", SkillId: "fixture:shanhe-guard"),
-            new("skill-raid", "突袭", SkillId: "fixture:shanhe-raid")
+            new("skill-raid", "突袭", SkillId: "fixture:shanhe-raid"),
+            new("skill-yingzi", "英姿", SkillId: "standard:yingzi"),
+            new("skill-wusheng", "武圣", SkillId: "standard:wusheng"),
+            new("skill-paoxiao", "咆哮", SkillId: "standard:paoxiao")
         ];
         var supplies = Enumerable.Range(1, 4).Select(index => new ShanheRewardDefinition("supply-" + index,
             "铜钱" + index, Gold: index)).ToArray();
         var rewards = tactics.Concat(cards).Concat(skills).Concat(supplies).ToArray();
-        var economy = StandardShanheCampaignCatalog.CurrentEconomyTactics.Where(source => source.SourceId is 2017 or 2018)
+        var economy = StandardShanheCampaignCatalog.CurrentEconomyTactics.Where(source => source.SourceId is 2016 or 2017 or 2018)
             .Select(source => new ShanheRewardDefinition(source.RewardId, source.Name)
             { CampaignEconomy = source.Effect, Rarity = source.Rarity }).ToArray();
-        Require(economy.Length == 2, "Both authored category-choice tactics must be registered in the current catalogue.");
+        Require(economy.Length == 3, "All three authored category-choice tactics must be registered in the current catalogue.");
         return new("fixture:reward-categories", "分类奖励", [ShanheCampaignChecks.Player], ["start"],
         [
             new("start", "渡口", ShanheNodeKind.Battle, ["next"],
