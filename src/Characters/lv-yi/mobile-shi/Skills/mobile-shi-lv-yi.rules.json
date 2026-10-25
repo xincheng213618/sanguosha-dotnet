@@ -1,0 +1,118 @@
+{
+ "schemaVersion": 62,
+ "skills": [
+  {
+   "id": "mobile:shi-huilv",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "huilv-play-start",
+     "window": "playPhaseStarting",
+     "subject": "owner",
+     "turnOwnerScope": "otherLiving",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiLyHuilv",
+       "target": "owner"
+      }
+     ]
+    },
+    {
+     "id": "huilv-play-end",
+     "window": "playEnding",
+     "subject": "owner",
+     "turnOwnerScope": "otherLiving",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiLyHuilvSettle",
+       "target": "owner"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mobile:shi-songyan",
+   "revision": 1,
+   "activations": [],
+   "viewAs": [
+    {
+     "id": "songyan-as-nullification",
+     "inputKinds": [],
+     "inputSuits": [],
+     "inputCount": 1,
+     "sourceZones": ["hand"],
+     "outputKind": "nullification",
+     "forPlay": false,
+     "forResponse": true
+    }
+   ],
+   "triggers": [
+    {
+     "id": "songyan-prep",
+     "window": "turnStartBeforeNormalFlow",
+     "subject": "owner",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiLySongyan",
+       "target": "owner"
+      }
+     ]
+    },
+    {
+     "id": "songyan-damage",
+     "window": "afterDamageApplied",
+     "subject": "owner",
+     "damageOccurrence": "perDamage",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      {
+       "op": "resolveShiLySongyan",
+       "target": "owner"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mobile:shi-shishi",
+   "revision": 1,
+   "activations": [],
+   "triggers": [],
+   "viewAs": [
+    {
+     "id": "shishi-inert-alias",
+     "inputKinds": [],
+     "inputSuits": [],
+     "inputCount": 1,
+     "sourceZones": ["hand"],
+     "outputKind": "slash",
+     "forPlay": true,
+     "forResponse": false,
+     "condition": {
+      "kind": "runtimeBooleanState",
+      "stateId": "shishi-inert",
+      "expectedValue": true
+     }
+    }
+   ],
+   "states": [
+    {
+     "id": "shishi-inert",
+     "initialValue": false,
+     "visibility": "public",
+     "resetScope": "turn",
+     "reacquirePolicy": "preserveUntilGameEnd"
+    }
+   ]
+  }
+ ]
+}
