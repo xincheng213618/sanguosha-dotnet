@@ -1,0 +1,55 @@
+{
+ "formatVersion": 1,
+ "packageId": "standard-classic-generals",
+ "characterId": "character:huang-quan",
+ "skills": [
+  {
+   "registrationOrder": 51930,
+   "programBundle": "mobile-shi-huang-quan",
+   "includeProgramPresentation": true,
+   "definition": {
+    "id": "mobile:shi-cuixian",
+    "name": "摧先",
+    "description": "①当你使用有对应实体牌的伤害类卡牌指定唯一目标后，你可以将你与其的各一张牌置于其武将牌上，称为“摧先”牌；然后若此牌造成过伤害，则你获得其X张“摧先”牌（X为其的“摧先”牌数的一半向上取整）。②武将牌上有“摧先”牌的角色回合开始时，你选择一项：【1】获得其“摧先”牌中的非伤害类卡牌；【2】令其获得“摧先”牌中的伤害类卡牌，然后你视为对其使用一张【决斗】。",
+    "actionForms": "Active",
+    "executionForms": "Trigger"
+   }
+  },
+  {
+   "registrationOrder": 51931,
+   "programBundle": "mobile-shi-huang-quan",
+   "includeProgramPresentation": true,
+   "definition": {
+    "id": "mobile:shi-gushi",
+    "name": "固势",
+    "description": "（锁定技）每局游戏每个区域限一次，当你失去一个区域内的最后一张牌后，你选择一项：【1】获得一张伤害牌，你使用此牌无次数限制；【2】用等量张牌替换一名角色武将牌上“摧先”牌中的伤害类卡牌。",
+    "actionForms": "Active",
+    "executionForms": "Trigger",
+    "tags": "Locked"
+   }
+  }
+ ],
+ "generals": [
+  {
+   "registrationOrder": 51932,
+   "pools": {
+    "current": 51932
+   },
+   "definition": {
+    "id": "mobile:shi-huang-quan",
+    "name": "势黄权",
+    "portraitKey": "mobile-shi-huang-quan",
+    "skillId": "mobile:shi-cuixian",
+    "additionalSkillIds": [
+     "mobile:shi-gushi"
+    ],
+    "factionId": "shu",
+    "baseHp": 4,
+    "gender": "Male",
+    "characterId": "character:huang-quan",
+    "variantId": "mobile-shi",
+    "rulesetId": "sanguosha-mobile"
+   }
+  }
+ ]
+}

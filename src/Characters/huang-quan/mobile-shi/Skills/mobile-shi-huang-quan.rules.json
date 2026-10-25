@@ -1,0 +1,95 @@
+{
+ "schemaVersion": 62,
+ "skills": [
+  {
+   "id": "mobile:shi-cuixian",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "cuixian-place",
+     "window": "cardUseTargetsFinalized",
+     "ownerRelation": "actor",
+     "optional": true,
+     "isSkillInvocation": false,
+     "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash", "duel", "fireAttack", "barbarianAssault", "arrowBarrage", "unexpectedAssault"],
+     "condition": {
+      "kind": "all",
+      "children": [
+       { "kind": "compare", "left": { "kind": "cardActionPhysicalCardCount" }, "operator": "greaterThanOrEqual", "right": { "kind": "integerConstant", "value": 1 } },
+       { "kind": "compare", "left": { "kind": "cardUseDesignatedTargetCount" }, "operator": "equal", "right": { "kind": "integerConstant", "value": 1 } }
+      ]
+     },
+     "effects": [
+      { "op": "resolveShiHqCuixian", "target": "owner" }
+     ]
+    },
+    {
+     "id": "cuixian-claim",
+     "window": "cardUseCompleted",
+     "ownerRelation": "actor",
+     "includeResponseUses": true,
+     "optional": true,
+     "isSkillInvocation": false,
+     "effects": [
+      { "op": "resolveShiHqCuixian", "target": "owner" }
+     ]
+    },
+    {
+     "id": "cuixian-turn",
+     "window": "turnStartBeforeNormalFlow",
+     "subject": "owner",
+     "turnOwnerScope": "anyLiving",
+     "optional": true,
+     "isSkillInvocation": false,
+     "effects": [
+      { "op": "resolveShiHqCuixian", "target": "owner" }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mobile:shi-gushi",
+   "revision": 1,
+   "activations": [],
+   "triggers": [
+    {
+     "id": "gushi-hand",
+     "window": "cardsMoved",
+     "subject": "owner",
+     "sourceZones": ["hand"],
+     "movementOccurrence": "perCard",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      { "op": "resolveShiHqGushi", "target": "owner" }
+     ]
+    },
+    {
+     "id": "gushi-equipment",
+     "window": "cardsMoved",
+     "subject": "owner",
+     "sourceZones": ["equipment"],
+     "movementOccurrence": "perCard",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      { "op": "resolveShiHqGushi", "target": "owner" }
+     ]
+    },
+    {
+     "id": "gushi-judgment",
+     "window": "cardsMoved",
+     "subject": "owner",
+     "sourceZones": ["judgment"],
+     "movementOccurrence": "perCard",
+     "optional": false,
+     "isSkillInvocation": false,
+     "effects": [
+      { "op": "resolveShiHqGushi", "target": "owner" }
+     ]
+    }
+   ]
+  }
+ ]
+}

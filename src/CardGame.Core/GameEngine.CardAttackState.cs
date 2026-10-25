@@ -38,7 +38,7 @@ public sealed partial class GameEngine
         long? ProgramFrameId, int? DelayedTurnSeat,
         bool RequestedSlashChild = false, bool DamageWasApplied = false, int FinalTargetSeat = 0, ProgramDamageTargetDuelOrigin? DamageTargetDuelReturn = null, ProgramDualColorDuelOrigin? DualColorDuelReturn = null,
         SharedSlashBenefitReturn? SharedSlashBenefit = null, bool SharedSlashCausedDamage = false,
-        ForeignTurnContestSlashReturn? ForeignTurnContestSlashReturn = null, PindianWinnerSlashReturn? PindianWinnerSlashReturn = null, ConditionalDiscardDuelOrigin? ConditionalDiscardDuelReturn = null, EndingHistoricalUseReturn? EndingHistoricalUseReturn = null, InspectedHandSlashReturn? InspectedHandSlashReturn = null, KuangfuSlashReturn? KuangfuSlashReturn = null, ForeignSelectedCardSlashReturn? ForeignSelectedCardSlashReturn = null, FriendRecastDuelOrigin? FriendRecastDuelReturn = null, CaoChunNativeSlash? CaoChunSlash = null, WangCanNativeReceipt? DenglouNative = null, QigongNativeReceipt? Qigong = null, ZhenyingDuelOrigin? ZhenyingDuel = null, HeJinMouzhuUseOrigin? HeJinMouzhu = null, WuAnGuoLiyongDuelOrigin? WuAnGuoLiyong = null);
+        ForeignTurnContestSlashReturn? ForeignTurnContestSlashReturn = null, PindianWinnerSlashReturn? PindianWinnerSlashReturn = null, ConditionalDiscardDuelOrigin? ConditionalDiscardDuelReturn = null, ShiQuanDuelOrigin? ShiQuanDuelReturn = null, EndingHistoricalUseReturn? EndingHistoricalUseReturn = null, InspectedHandSlashReturn? InspectedHandSlashReturn = null, KuangfuSlashReturn? KuangfuSlashReturn = null, ForeignSelectedCardSlashReturn? ForeignSelectedCardSlashReturn = null, FriendRecastDuelOrigin? FriendRecastDuelReturn = null, CaoChunNativeSlash? CaoChunSlash = null, WangCanNativeReceipt? DenglouNative = null, QigongNativeReceipt? Qigong = null, ZhenyingDuelOrigin? ZhenyingDuel = null, HeJinMouzhuUseOrigin? HeJinMouzhu = null, WuAnGuoLiyongDuelOrigin? WuAnGuoLiyong = null);
     private AttackCompletionReceipt CaptureAttackCompletion(CardAttackHandle attack) =>
         new(attack.ResolutionId, attack.IsDelayedJudgmentDamage,
             attack.ProgramSkillFrameId ?? attack.ProgramSkillCardUseFrameId ?? NextActualUseAdjustedSlashParent(attack) ?? HpLossMaterialSlashParent(attack),
@@ -52,6 +52,7 @@ public sealed partial class GameEngine
             LifecycleCardUse(attack.ResolutionId)?.ForeignTurnContestSlashReturn,
             LifecycleCardUse(attack.ResolutionId)?.PindianWinnerSlashReturn,
             LifecycleCardUse(attack.ResolutionId)?.ConditionalDiscardDuelOrigin,
+            LifecycleCardUse(attack.ResolutionId)?.ShiQuanDuelOrigin,
             LifecycleCardUse(attack.ResolutionId)?.EndingHistoricalUseReturn,
             LifecycleCardUse(attack.ResolutionId)?.InspectedHandSlashReturn,
             LifecycleCardUse(attack.ResolutionId)?.KuangfuSlashReturn,
