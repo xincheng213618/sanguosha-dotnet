@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:huimin",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "qualified-population-draft",
+          "window": "turnEnding",
+          "subject": "owner",
+          "optional": true,
+          "effects": [{ "op": "drawAndDraftLowHandPopulation", "target": "owner", "stateId": "eligible-start" }]
+        }
+      ]
+    }
+  ]
+}

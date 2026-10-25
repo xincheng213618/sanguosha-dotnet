@@ -1,0 +1,8 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:mi-zhu", "skills": [],
+  "generals": [{ "registrationOrder": 78699, "pools": { "current": 78699 }, "definition": {
+    "id": "mobile:mi-zhu", "name": "糜竺·移动版", "portraitKey": "mobile-mi-zhu",
+    "skillId": "ol:ziyuan", "additionalSkillIds": ["ol:jujia"], "factionId": "shu", "baseHp": 3, "gender": "Male",
+    "characterId": "character:mi-zhu", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

@@ -1,0 +1,42 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:qu-yi",
+  "skills": [
+    {
+      "registrationOrder": 79300,
+      "programBundle": "mobile-qu-yi",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:fuqi",
+        "name": "伏骑",
+        "description": "锁定技，当你使用【杀】或普通锦囊牌指定目标后，到你的距离为1的其他角色不能响应此牌。",
+        "tags": "Locked",
+        "executionForms": "State"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 79399,
+      "pools": {
+        "current": 79399
+      },
+      "definition": {
+        "id": "mobile:qu-yi",
+        "name": "麹义·移动版",
+        "portraitKey": "mobile-qu-yi",
+        "skillId": "mobile:fuqi",
+        "factionId": "qun",
+        "baseHp": 4,
+        "additionalSkillIds": [
+          "classic:jiaozi"
+        ],
+        "gender": "Male",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile",
+        "characterId": "character:qu-yi"
+      }
+    }
+  ]
+}

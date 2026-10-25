@@ -1,0 +1,8 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:wang-ji", "skills": [],
+  "generals": [{ "registrationOrder": 78599, "pools": { "current": 78599 }, "definition": {
+    "id": "mobile:wang-ji", "name": "王基·移动版", "portraitKey": "mobile-wang-ji",
+    "skillId": "classic:qizhi", "additionalSkillIds": ["classic:jinqu"], "factionId": "wei", "baseHp": 3, "gender": "Male",
+    "characterId": "character:wang-ji", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

@@ -8,13 +8,19 @@ public sealed partial class GameEngine
     private static bool DamageBudgetCard(CardActionContext a) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DamageTargetBudget.DamageBudgetCard(a);
     private CardConversionSource BudgetSource(ProgramSkillFrame f) => new(f.SkillId, GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    private static bool DamageBudgetParticipantMatches(SkillProgramTrigger trigger, int owner, ProgramSkillWindowContext context) => trigger.Subject switch
+    {
+        SkillProgramTriggerSubject.Any => context.SourceSeat == owner || context.TargetSeat == owner,
+        SkillProgramTriggerSubject.DamageSource => context.SourceSeat == owner,
+        _ => false
+    };
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 230)]
     private bool CanOfferDamageTargetBudget(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context)
     {
         if (t.Effects is not [var e]) return true;
         if (e.Op == SkillProgramEffectOp.GainDamageOccurrenceTargetBudget)
             return context is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, OccurrenceIndex: 0 } &&
-                (context.SourceSeat == c.OwnerSeat || context.TargetSeat == c.OwnerSeat);
+                DamageBudgetParticipantMatches(t, c.OwnerSeat, context);
         if (e.Op != SkillProgramEffectOp.AddDamageMarkerBudgetTargets) return true;
         return _players[c.OwnerSeat].Markers.GetValueOrDefault(e.Marker!.Value) > 0 &&
             TryGetDesignatedExtraTargetUse(c.OwnerSeat, context, out var use, out var window) && DamageBudgetCard(use.Action!) &&
@@ -28,13 +34,13 @@ public sealed partial class GameEngine
             var c = f.WindowContext ?? throw new InvalidOperationException("A damage budget lost its native occurrence.");
             var index = _resolutionStack.FindIndex(x => x.Id == f.Id);
             if (f.InstructionIndex != 1 || c.Window != SkillProgramTriggerWindow.AfterDamageApplied || c.OccurrenceIndex != 0 || c.Amount <= 0 ||
-                c.SourceSeat != f.OwnerSeat && c.TargetSeat != f.OwnerSeat || index < 1 ||
+                !DamageBudgetParticipantMatches(GetProgramTrigger(f), f.OwnerSeat, c) || index < 1 ||
                 _resolutionStack[index - 1] is not DamageTriggerWindowFrame w || w.Id != c.ParentFrameId || w.ParentFrameId != c.DamageFrameId || w.TriggerWindow != c.Window ||
                 w.TargetSeat != c.TargetSeat || (GetDamageTriggerAttack(w).IsSourceLess ? c.SourceSeat is not null : w.SourceSeat != c.SourceSeat) ||
                 w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()) ||
                 _resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == w.ParentFrameId) is not { } damage || damage.Amount != c.Amount || damage.TargetSeat != c.TargetSeat ||
                 CompleteProgramEventHistory().OfType<DamageTargetBudgetGainedEvent>().Any(x => x.DamageWindowFrameId == w.Id && x.Source == BudgetSource(f)))
-                throw new InvalidOperationException("A damage budget requires one exact applied damage OR-participant occurrence.");
+                throw new InvalidOperationException("A damage budget requires one exact applied damage occurrence matching its declared participant.");
             MutateParticipantMarker(f, f.OwnerSeat, e.Marker!.Value, 1);
             AdvanceEventRulesAndQueueFact(new DamageTargetBudgetGainedEvent(f.Id, w.Id, BudgetSource(f), e.Marker.Value,
                 c.SourceSeat, c.TargetSeat!.Value, c.Amount, _players[f.OwnerSeat].Markers.GetValueOrDefault(e.Marker.Value)));
@@ -138,9 +144,15 @@ public sealed partial class GameEngine
         var count = action.EffectiveDesignatedTargetSeats.Distinct().Count();
         var currentMarkers = _players[r.Source.OwnerSeat].Markers.GetValueOrDefault(r.Marker);
         // Selection entitlement is frozen when it is offered. The text's later
-        // "half the marks" observes the actual marks at the final designation,
+        // shortfall policy observes the actual marks at the final designation,
         // including intervening genuine damage or a nested actual card Use.
-        var removed = _players[r.Source.OwnerSeat].IsAlive && count < currentMarkers ? currentMarkers / 2 + currentMarkers % 2 : 0;
+        var policy = DamageBudgetSourceEffect(r)!.DamageTargetShortfallPolicy ?? DamageTargetBudgetShortfallPolicy.RemoveHalfRoundedUp;
+        var removed = _players[r.Source.OwnerSeat].IsAlive && count < currentMarkers ? policy switch
+        {
+            DamageTargetBudgetShortfallPolicy.RemoveAll => currentMarkers,
+            DamageTargetBudgetShortfallPolicy.RemoveHalfRoundedUp => currentMarkers / 2 + currentMarkers % 2,
+            _ => throw new InvalidOperationException("Unknown damage target budget shortfall policy.")
+        } : 0;
         // This is an issued designation effect. Losing the skill after choosing
         // does not reissue it or abandon its final-use debit.
         if (removed > 0)
@@ -180,6 +192,10 @@ public sealed partial class GameEngine
         }
         return p.Choices.Single(c => c.Parameters["branch"] == "done");
     }
+    private SkillProgramEffect? DamageBudgetSourceEffect(DamageTargetBudgetReceipt receipt) =>
+        _contentRegistry.GetSkill(receipt.Source.SkillId).Program is { } program && program.GameplayHash == receipt.GameplayHash &&
+        program.Triggers.SingleOrDefault(t => t.Id == receipt.Source.BindingId)?.Effects is [{ Op: SkillProgramEffectOp.AddDamageMarkerBudgetTargets } effect] &&
+        effect.Marker == receipt.Marker ? effect : null;
     private bool IsDamageBudgetResolvedFact(CardUseFrame use, DamageTargetBudgetResolvedEvent fact, IReadOnlyList<int> before, int? currentProofActor = null)
     {
         var r = fact.Receipt; var pairSize = use.CardKind == CardKind.BorrowedSword ? 2 : 1;
@@ -190,8 +206,7 @@ public sealed partial class GameEngine
             r.OriginalTargets.Any(s => !IsValidPlayerSeat(s)) || r.AddedTargets.Any(s => !IsValidPlayerSeat(s)) ||
             r.AddedTargets.Where((_, i) => i % pairSize == 0).Distinct().Count() != r.AddedTargets.Count / pairSize ||
             r.AddedTargets.Where((_, i) => i % pairSize == 0).Any(s => r.OriginalTargets.Where((_, i) => i % pairSize == 0).Contains(s)) ||
-            _contentRegistry.GetSkill(r.Source.SkillId).Program is not { } program || program.GameplayHash != r.GameplayHash ||
-            program.Triggers.SingleOrDefault(t => t.Id == r.Source.BindingId)?.Effects is not [{ Op: SkillProgramEffectOp.AddDamageMarkerBudgetTargets } e] || e.Marker != r.Marker)
+            DamageBudgetSourceEffect(r) is null)
             return false;
         var history = CompleteProgramEventHistory().ToArray();
         return history.OfType<DamageTargetBudgetResolvedEvent>().Count(x => x.ProgramFrameId == r.ProgramFrameId) == 1 &&

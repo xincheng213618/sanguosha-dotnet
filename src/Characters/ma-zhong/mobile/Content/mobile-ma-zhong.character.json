@@ -1,0 +1,11 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:ma-zhong",
+  "skills": [{ "registrationOrder": 78800, "programBundle": "mobile-ma-zhong", "includeProgramPresentation": true,
+    "definition": { "id": "mobile:fuman", "name": "抚蛮",
+      "description": "出牌阶段每名角色限一次，你可以将一张【杀】交给一名其他角色，然后其于其下个回合结束前使用此【杀】时，你摸一张牌。",
+      "executionForms": "Trigger", "actionForms": "Active" } }],
+  "generals": [{ "registrationOrder": 78899, "pools": { "current": 78899 }, "definition": {
+    "id": "mobile:ma-zhong", "name": "马忠·移动版", "portraitKey": "mobile-ma-zhong", "skillId": "mobile:fuman",
+    "factionId": "shu", "baseHp": 4, "gender": "Male", "characterId": "character:ma-zhong", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

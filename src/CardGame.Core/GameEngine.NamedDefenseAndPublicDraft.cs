@@ -201,7 +201,7 @@ public sealed partial class GameEngine
         if (draft.Stage == 2 && action == "public-draft-start")
         {
             var start = choice.Targets.Single();
-            if (!_players[start].IsAlive) throw new InvalidOperationException("The chosen starting character is no longer alive.");
+            if (!PublicHandDraftStartingSeats(frame).Contains(start)) throw new InvalidOperationException("The chosen starting character no longer meets this frozen draft's starting policy.");
             ClearPendingDecision(); ReplaceRuntimeTop(frame = frame with { PublicHandDraft = draft with
             { Stage = 3, RecipientSeats = draft.RecipientSeats.OrderBy(seat => RelativeTableOrder(start, seat)).ToArray() } });
             ContinuePublicHandDraft(frame); return;
@@ -224,9 +224,15 @@ public sealed partial class GameEngine
     private void ReturnPublicHandDraftReveal(ProgramSkillFrame frame)
     {
         if(frame.PublicHandDraft is not{Stage:2}) throw new InvalidOperationException("A public Hand draft lost its complete shown roster.");
-        PublishNamedDraftPrompt(frame, frame.OwnerSeat, "选择顺时针分配的起始角色。", _players.Where(player => player.IsAlive)
-            .Select(player => NamedDraftChoice(frame, "public-draft-start", player.Name, seat: player.Seat)).ToArray(), false);
+        var starts = PublicHandDraftStartingSeats(frame);
+        if (starts.Length == 0) { ReplaceRuntimeTop(frame with { PublicHandDraft = null }); AdvanceRuntimeProgram(frame.Id); return; }
+        PublishNamedDraftPrompt(frame, frame.OwnerSeat, "选择顺时针分配的起始角色。", starts
+            .Select(seat => NamedDraftChoice(frame, "public-draft-start", _players[seat].Name, seat: seat)).ToArray(), false);
     }
+    private int[] PublicHandDraftStartingSeats(ProgramSkillFrame frame) =>
+        GetPausedPrivateOfferEffect(frame)?.StateId == "eligible-start"
+            ? frame.PublicHandDraft!.RecipientSeats.Where(seat => _players[seat].IsAlive).ToArray()
+            : _players.Where(player => player.IsAlive).Select(player => player.Seat).ToArray();
     private IEnumerable<int> GetPublicHandDraftCardIds() => _resolutionStack.OfType<ProgramSkillFrame>()
         .Where(frame => frame.PublicHandDraft is { Stage: >= 2 }).SelectMany(frame => frame.PublicHandDraft!.CardIds
             .Where(id => _cardZones.GetLocation(id) == CardLocation.Hand(frame.OwnerSeat)));

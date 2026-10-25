@@ -1,0 +1,8 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:sima-lang", "skills": [],
+  "generals": [{ "registrationOrder": 78799, "pools": { "current": 78799 }, "definition": {
+    "id": "mobile:sima-lang", "name": "司马朗·移动版", "portraitKey": "mobile-sima-lang",
+    "skillId": "ol:junbing", "additionalSkillIds": ["ol:quji"], "factionId": "wei", "baseHp": 3, "gender": "Male",
+    "characterId": "character:sima-lang", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

@@ -1,0 +1,4 @@
+{
+  "schemaVersion": 3,
+  "skills": { "mobile:fuman": { "name": "抚蛮", "description": "出牌阶段每名角色限一次，你可以将一张【杀】交给一名其他角色，然后其于其下个回合结束前使用此【杀】时，你摸一张牌。" } }
+}

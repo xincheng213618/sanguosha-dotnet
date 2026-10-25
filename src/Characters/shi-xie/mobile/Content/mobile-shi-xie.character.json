@@ -1,0 +1,49 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:shi-xie",
+  "skills": [
+    {
+      "registrationOrder": 78901,
+      "programBundle": "mobile-shi-xie",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:biluan",
+        "name": "避乱",
+        "description": "摸牌阶段开始时，若有其他角色计算与你的距离为1，你可以放弃摸牌，令其他角色计算与你的距离+X（X为场上存活势力数）。",
+        "executionForms": "Trigger"
+      }
+    },
+    {
+      "registrationOrder": 78902,
+      "programBundle": "mobile-shi-xie",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:lixia",
+        "name": "礼下",
+        "description": "锁定技，其他角色的结束阶段，若你不在其攻击范围内，你选择一项：1.摸一张牌；2.令其摸一张牌。选择完成后，其他角色计算与你的距离-1。",
+        "tags": "Locked",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 78900,
+      "pools": { "current": 78900 },
+      "definition": {
+        "id": "mobile:shi-xie",
+        "name": "士燮·移动版",
+        "portraitKey": "mobile-shi-xie",
+        "skillId": "mobile:biluan",
+        "additionalSkillIds": ["mobile:lixia"],
+        "factionId": "qun",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:shi-xie",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

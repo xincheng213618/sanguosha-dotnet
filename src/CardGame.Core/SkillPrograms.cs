@@ -353,6 +353,12 @@ public enum SkillProgramEffectOp
     CompleteMobileChenQunDingpin = 77201,
     CompleteMobileGuYongOnMixedHand = 77300,
     IssueMobileLiYanNextDrawBonus = 77900,
+    PrepareMobileMaZhongFuman = 78800,
+    IncreaseMobileShiXieIncomingDistanceByLivingFactions = 78900,
+    DecreaseMobileShiXieIncomingDistance = 78901,
+    PrepareMobileDongBaiLianzhu = 79100,
+    ResolveMobileDongBaiLianzhuRelay = 79101,
+    RecoverMobileDongBaiLianzhu = 79102,
     ResolveBoundaryCaoXiuQingxi = 51100,
     ResolveBoundaryQuanCongYaoming = 51200,
     SelectMobileShiKaijiTargets = 47400,
@@ -3714,9 +3720,17 @@ public sealed class SkillProgramCatalog
     {
         RequireObject(node, path);
         CheckProperties(node, path, "id", "kind", "cardKinds", "requiredCardKinds", "value",
-            "inputSuit", "outputSuit", "condition", "factionId", "ownerRole", "discardCost", "providerDrawCount", "maximumRecoveryOrdinal");
+            "inputSuit", "outputSuit", "condition", "factionId", "ownerRole", "discardCost", "providerDrawCount", "maximumRecoveryOrdinal",
+            "useIncomingResponseDistance", "includeNonTargetResponders");
         var id = Identifier(node, "id", path);
         var kind = EnumValue<SkillProgramCardPolicyKind>(node, "kind", path);
+        bool? useIncomingResponseDistance = node.TryGetProperty("useIncomingResponseDistance", out _)
+            ? RequiredBool(node, "useIncomingResponseDistance", path) : null;
+        bool? includeNonTargetResponders = node.TryGetProperty("includeNonTargetResponders", out _)
+            ? RequiredBool(node, "includeNonTargetResponders", path) : null;
+        if ((useIncomingResponseDistance.HasValue || includeNonTargetResponders.HasValue) &&
+            kind != SkillProgramCardPolicyKind.ProhibitNearbyTargetResponse)
+            Fail(path, "response distance and non-target qualifiers require prohibitNearbyTargetResponse");
         int? maximumRecoveryOrdinal = node.TryGetProperty("maximumRecoveryOrdinal", out _)
             ? PositiveInt(node, "maximumRecoveryOrdinal", path) : null;
         if (maximumRecoveryOrdinal is not null && kind != SkillProgramCardPolicyKind.OwnRecoveryAmountBonus)
@@ -4007,7 +4021,8 @@ public sealed class SkillProgramCatalog
             Fail(path, "Own-turn faction recovery replacement rewards exactly one card and charges no payment.");
         var policy = new SkillProgramCardPolicy(id, kind, cardKinds, requiredKinds, value,
             inputSuit, outputSuit, OptionalCondition(node, path), factionId, ownerRole)
-        { DiscardCost = discardCost, ProviderDrawCount = providerDrawCount };
+        { DiscardCost = discardCost, ProviderDrawCount = providerDrawCount,
+          UseIncomingResponseDistance = useIncomingResponseDistance, IncludeNonTargetResponders = includeNonTargetResponders };
         GameEngine.ValidateComparedBlackSlashPolicy(path, policy);
         return policy;
     }

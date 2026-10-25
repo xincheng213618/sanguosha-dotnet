@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:fuqi",
+      "revision": 1,
+      "cardPolicies": [
+        {
+          "id": "nearby-others-cannot-respond",
+          "kind": "prohibitNearbyTargetResponse",
+          "value": 1,
+          "useIncomingResponseDistance": true,
+          "includeNonTargetResponders": true
+        }
+      ]
+    }
+  ]
+}

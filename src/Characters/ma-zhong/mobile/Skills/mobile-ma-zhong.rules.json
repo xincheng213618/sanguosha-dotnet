@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "mobile:fuman", "revision": 1,
+    "activations": [{
+      "id": "give-physical-slash", "minCards": 0, "maxCards": 0, "sourceZones": ["hand"],
+      "minTargets": 1, "maxTargets": 1, "targetKind": "otherLiving", "usesPerTurn": null,
+      "targetPhaseLedgerId": "give-physical-slash",
+      "effects": [
+        { "op": "consumeTargetPhaseLedger", "target": "owner", "usageId": "give-physical-slash" },
+        { "op": "selectOwnedCards", "target": "owner", "minimumCards": 1, "maximumCards": 1, "zones": ["hand"], "cardKinds": ["slash", "fireSlash", "thunderSlash"], "resultBind": "fuman-gift" },
+        { "op": "prepareMobileMaZhongFuman", "target": "owner" },
+        { "op": "moveBoundCards", "target": "owner", "sourceBind": "fuman-gift", "destination": "selectedTargetHand" }
+      ]
+    }],
+    "triggers": [{
+      "id": "gifted-slash-used", "window": "cardUseCommitted", "ownerRelation": "observer",
+      "cardKinds": ["slash", "fireSlash", "thunderSlash"], "optional": false, "isSkillInvocation": false,
+      "effects": [{ "op": "draw", "target": "owner", "amount": 1 }]
+    }]
+  }]
+}

@@ -1,0 +1,39 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:ta-dun",
+  "skills": [
+    {
+      "registrationOrder": 79000,
+      "programBundle": "mobile-ta-dun",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:luanzhan",
+        "name": "乱战",
+        "description": "锁定技，当你造成伤害后，你获得1枚“乱战”标记；你使用杀或黑色普通锦囊牌时，可以额外选择至多X名角色为目标；指定目标后，若此牌的目标角色数小于X，你移去所有“乱战”标记（X为“乱战”标记数）。",
+        "executionForms": "Trigger",
+        "tags": "Locked"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 79099,
+      "pools": {
+        "current": 79000
+      },
+      "definition": {
+        "id": "mobile:ta-dun",
+        "name": "蹋顿·移动版",
+        "portraitKey": "mobile-ta-dun",
+        "skillId": "mobile:luanzhan",
+        "factionId": "qun",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:ta-dun",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

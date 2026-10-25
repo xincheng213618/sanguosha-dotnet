@@ -1,0 +1,30 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:xi-zhi-cai",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 79499,
+      "pools": {
+        "current": 79499
+      },
+      "definition": {
+        "id": "mobile:xi-zhi-cai",
+        "name": "戏志才·移动版",
+        "portraitKey": "mobile-xi-zhi-cai",
+        "skillId": "classic:tiandu",
+        "factionId": "wei",
+        "baseHp": 3,
+        "additionalSkillIds": [
+          "ol:xianfu",
+          "ol:chouce"
+        ],
+        "gender": "Male",
+        "characterId": "character:xi-zhi-cai",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

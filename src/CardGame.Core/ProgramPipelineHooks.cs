@@ -37,7 +37,8 @@ internal enum ProgramPipelinePhase
     ResumeScheduledPhase,
     CancelScheduledPhase,
     ParticipantPrompt,
-    ParticipantHostState
+    ParticipantHostState,
+    CollectMovementCandidates
 }
 
 // Register next to the owning implementation with an explicit order; orders are
@@ -53,6 +54,8 @@ internal delegate IReadOnlyList<ProgramTriggerCandidate> ProgramTriggerCandidate
     CharacterState owner, SkillProgramTriggerWindow window, IReadOnlyList<ProgramTriggerCandidate> candidates);
 internal delegate void ProgramIssuedCardTriggerCollector(
     CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result);
+internal delegate void ProgramMovementCandidateCollector(
+    CardMovementBatchContext batch, List<ProgramTriggerCandidate> result);
 internal delegate void ProgramVirtualDuelLegacyCapture(ProgramSkillFrame frame, int sourceSeat, int targetSeat);
 internal delegate bool ProgramCompletedBindingReturn(ProgramSkillFrame frame, bool completed);
 internal delegate void ProgramPlayPhaseDecisionPreparation(CharacterState actor);
@@ -92,6 +95,8 @@ internal sealed class ProgramPipelineHookCatalog
             [ProgramPipelinePhase.CollectIssuedCardTrigger] = (typeof(ProgramIssuedCardTriggerCollector),
                 [typeof(CardActionContext), typeof(SkillProgramTriggerWindow), typeof(List<ProgramCardTriggerCandidate>)],
                 typeof(void)),
+            [ProgramPipelinePhase.CollectMovementCandidates] = (typeof(ProgramMovementCandidateCollector),
+                [typeof(CardMovementBatchContext), typeof(List<ProgramTriggerCandidate>)], typeof(void)),
             [ProgramPipelinePhase.CaptureVirtualDuelLegacy] = (typeof(ProgramVirtualDuelLegacyCapture),
                 [typeof(ProgramSkillFrame), typeof(int), typeof(int)], typeof(void)),
             [ProgramPipelinePhase.ReturnCompletedProgramBinding] = (typeof(ProgramCompletedBindingReturn),
@@ -207,6 +212,7 @@ internal sealed class ProgramPipelineHooks
 {
     private readonly ProgramTriggerCandidateIncluder[] _includeTriggerCandidate;
     private readonly ProgramIssuedCardTriggerCollector[] _collectIssuedCardTrigger;
+    private readonly ProgramMovementCandidateCollector[] _collectMovementCandidates;
     private readonly ProgramVirtualDuelLegacyCapture[] _captureVirtualDuelLegacy;
     private readonly ProgramCompletedBindingReturn[] _returnCompletedProgramBinding;
     private readonly ProgramPlayPhaseDecisionPreparation[] _preparePlayPhaseDecision;
@@ -243,6 +249,7 @@ internal sealed class ProgramPipelineHooks
             .ToArray();
         _includeTriggerCandidate = Bind<ProgramTriggerCandidateIncluder>(ProgramPipelinePhase.IncludeTriggerCandidate);
         _collectIssuedCardTrigger = Bind<ProgramIssuedCardTriggerCollector>(ProgramPipelinePhase.CollectIssuedCardTrigger);
+        _collectMovementCandidates = Bind<ProgramMovementCandidateCollector>(ProgramPipelinePhase.CollectMovementCandidates);
         _captureVirtualDuelLegacy = Bind<ProgramVirtualDuelLegacyCapture>(ProgramPipelinePhase.CaptureVirtualDuelLegacy);
         _returnCompletedProgramBinding = Bind<ProgramCompletedBindingReturn>(ProgramPipelinePhase.ReturnCompletedProgramBinding);
         _preparePlayPhaseDecision = Bind<ProgramPlayPhaseDecisionPreparation>(ProgramPipelinePhase.PreparePlayPhaseDecision);
@@ -284,6 +291,11 @@ internal sealed class ProgramPipelineHooks
         CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result)
     {
         foreach (var collect in _collectIssuedCardTrigger) collect(action, window, result);
+    }
+
+    internal void CollectMovementCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> result)
+    {
+        foreach (var collect in _collectMovementCandidates) collect(batch, result);
     }
 
     internal void CaptureVirtualDuelLegacy(ProgramSkillFrame frame, int sourceSeat, int targetSeat)

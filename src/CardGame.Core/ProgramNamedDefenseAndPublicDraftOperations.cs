@@ -42,10 +42,13 @@ internal sealed class DrawAndDraftLowHandPopulationProgramDescriptor : ProgramOp
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, _) => { });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "condition");
+        r.AllowOnly("op", "target", "stateId", "condition");
         if (r.RequiredEnum<SkillProgramEffectTarget>("target") != SkillProgramEffectTarget.Owner)
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: a hand draft belongs to its owner.");
-        var effect = new SkillProgramEffect(Op, SkillProgramEffectTarget.Owner, 0, r.Condition());
+        var policy = r.OptionalIdentifier("stateId");
+        if (policy is not (null or "eligible-start"))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: a hand draft start policy must be eligible-start or omitted.");
+        var effect = new SkillProgramEffect(Op, SkillProgramEffectTarget.Owner, 0, r.Condition(), stateId: policy);
         RequireAlways(effect, r.Path); return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>

@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:lianzhu",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "reveal-and-give",
+          "minCards": 1,
+          "maxCards": 1,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "prepareMobileDongBaiLianzhu",
+              "target": "owner"
+            },
+            {
+              "op": "captureSelectedCards",
+              "target": "owner",
+              "resultBind": "lianzhu-card"
+            },
+            {
+              "op": "revealBoundCards",
+              "target": "owner",
+              "sourceBind": "lianzhu-card"
+            },
+            {
+              "op": "prepareMobileDongBaiLianzhu",
+              "target": "owner",
+              "sourceBind": "lianzhu-card"
+            }
+          ]
+        }
+      ],
+      "triggers": [
+        {
+          "id": "gained-relay",
+          "window": "cardsGained",
+          "subject": "owner",
+          "movementOccurrence": "perThirdPartyHandGain",
+          "destinationZones": [
+            "hand"
+          ],
+          "optional": false,
+          "isSkillInvocation": false,
+          "effects": [
+            {
+              "op": "resolveMobileDongBaiLianzhuRelay",
+              "target": "owner"
+            }
+          ]
+        },
+        {
+          "id": "damage-recover",
+          "window": "afterDamageApplied",
+          "subject": "damageSource",
+          "damageOccurrence": "perDamage",
+          "optional": true,
+          "effects": [
+            {
+              "op": "recoverMobileDongBaiLianzhu",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:xiahui",
+      "revision": 1,
+      "cardPolicies": [
+        {
+          "id": "black-and-lianzhu-entities",
+          "kind": "xiaHuiBlackHandAndGainedEntityRestrictions"
+        }
+      ]
+    }
+  ]
+}

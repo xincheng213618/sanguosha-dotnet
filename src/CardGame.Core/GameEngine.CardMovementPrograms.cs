@@ -425,6 +425,7 @@ public sealed partial class GameEngine
         AppendShenZfMovementCandidates(batch, candidates);
         AppendAnniversarySunQuanMingMovementCandidates(batch, candidates);
         AppendAnniversaryLiuYongMovementCandidates(batch, candidates);
+        _programPipelineHooks.CollectMovementCandidates(batch, candidates);
         return candidates
             .OrderBy(candidate => RelativeTableOrder(_currentSeat, candidate.OwnerSeat))
             .ThenByDescending(candidate => candidate.Priority)

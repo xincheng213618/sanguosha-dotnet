@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cao-jie",
+  "skills": [
+    {
+      "registrationOrder": 79601,
+      "programBundle": "mobile-cao-jie",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:huimin",
+        "name": "惠民",
+        "description": "结束阶段，你可以摸X张牌（X为手牌数小于其体力值的角色数），展示等量张手牌并选择这些角色中的一名角色，这些角色从该角色开始依次获得其中一张。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 79600,
+      "pools": { "current": 79600 },
+      "definition": {
+        "id": "mobile:cao-jie",
+        "name": "曹节·移动版",
+        "portraitKey": "mobile-cao-jie",
+        "skillId": "classic:shouxi",
+        "additionalSkillIds": ["mobile:huimin"],
+        "factionId": "qun",
+        "baseHp": 3,
+        "gender": "Female",
+        "characterId": "character:cao-jie",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

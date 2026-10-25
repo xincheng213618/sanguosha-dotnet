@@ -2,6 +2,13 @@ using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 
+public enum DamageTargetBudgetShortfallPolicy { RemoveHalfRoundedUp, RemoveAll }
+public sealed partial class SkillProgramEffect
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public DamageTargetBudgetShortfallPolicy? DamageTargetShortfallPolicy { get; internal init; }
+}
+
 public sealed record DamageTargetBudgetReceipt
 {
     private IReadOnlyList<int> _before = [], _added = [];
@@ -41,8 +48,14 @@ internal abstract class DamageTargetBudgetDescriptor : ProgramOperationDescripto
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.ChooseOption, static (_, c) => c.PublicControlValue(4));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "marker", "condition");
-        var e = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(), marker: r.RequiredEnum<PlayerMarkerKind>("marker"));
+        if (Op == SkillProgramEffectOp.AddDamageMarkerBudgetTargets)
+            r.AllowOnly("op", "target", "marker", "condition", "shortfallPolicy");
+        else r.AllowOnly("op", "target", "marker", "condition");
+        var e = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(), marker: r.RequiredEnum<PlayerMarkerKind>("marker"))
+        {
+            DamageTargetShortfallPolicy = r.Has("shortfallPolicy")
+                ? r.RequiredEnum<DamageTargetBudgetShortfallPolicy>("shortfallPolicy") : null
+        };
         RequireAlways(e, r.Path); return e;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) =>
@@ -68,8 +81,8 @@ internal static class DamageTargetBudgetContract
             t.UsageScope is not null || t.MarkerCost is not null || t.NamedUsageGroup is not null || t.ChoiceGroup is not null ||
             t.IncludeResponseUses || t.CardKinds.Count != 0 || t.CardCategories.Count != 0 ||
             (e.Op == SkillProgramEffectOp.GainDamageOccurrenceTargetBudget
-                ? t.Window != SkillProgramTriggerWindow.AfterDamageApplied || t.Subject != SkillProgramTriggerSubject.Any || t.DamageOccurrence != SkillProgramDamageOccurrence.PerDamage
+                ? t.Window != SkillProgramTriggerWindow.AfterDamageApplied || t.Subject is not (SkillProgramTriggerSubject.Any or SkillProgramTriggerSubject.DamageSource) || t.DamageOccurrence != SkillProgramDamageOccurrence.PerDamage
                 : t.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || t.OwnerRelation != SkillProgramCardActionOwnerRelation.Actor))
-            throw new InvalidOperationException($"{path}: damage budget requires one mandatory exact per-damage OR-participant or actual actor designation binding.");
+            throw new InvalidOperationException($"{path}: damage budget requires one mandatory exact per-damage declared participant or actual actor designation binding.");
     }
 }

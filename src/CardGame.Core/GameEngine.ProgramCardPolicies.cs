@@ -58,14 +58,16 @@ public sealed partial class GameEngine
         if (ShiSsGanjueCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats)) return true;
         if (ShiLyShishiCannotRespond(sourceSeat, responderSeat)) return true;
         if ((!IsSlashCard(incomingKind) && !IsOrdinaryTrick(incomingKind)) ||
-            sourceSeat == responderSeat || !targetSeats.Contains(responderSeat) ||
+            sourceSeat == responderSeat ||
             !_players[sourceSeat].IsAlive || !_players[responderSeat].IsAlive)
             return false;
 
-        var distance = GetCombatDistance(sourceSeat, responderSeat);
         return CardPolicies(_players[sourceSeat],
                 SkillProgramCardPolicyKind.ProhibitNearbyTargetResponse, incomingKind)
-            .Any(item => distance <= item.Policy.Value);
+            .Any(item => (item.Policy.IncludeNonTargetResponders == true || targetSeats.Contains(responderSeat)) &&
+                (item.Policy.UseIncomingResponseDistance == true
+                    ? GetCombatDistance(responderSeat, sourceSeat)
+                    : GetCombatDistance(sourceSeat, responderSeat)) <= item.Policy.Value);
     }
 
     private bool IsSuitSlashResponseProhibited(CardAttackHandle attack)

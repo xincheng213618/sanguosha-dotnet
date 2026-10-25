@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:biluan",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "skip-normal-draw-for-distance",
+          "window": "drawPhaseStarting",
+          "subject": "owner",
+          "turnOwnerScope": "own",
+          "optional": true,
+          "drawPhaseMode": "replacement",
+          "effects": [{ "op": "increaseMobileShiXieIncomingDistanceByLivingFactions", "target": "owner" }]
+        }
+      ]
+    },
+    {
+      "id": "mobile:lixia",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "one-other-ending-benefit",
+          "window": "turnEnding",
+          "subject": "owner",
+          "turnOwnerScope": "otherLiving",
+          "optional": false,
+          "effects": [
+            {
+              "op": "chooseOption",
+              "target": "owner",
+              "resultBind": "lixia-benefit",
+              "options": [{ "id": "self" }, { "id": "current" }]
+            },
+            { "op": "decreaseMobileShiXieIncomingDistance", "target": "owner" }
+          ]
+        }
+      ]
+    }
+  ]
+}
