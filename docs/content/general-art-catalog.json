@@ -20927,6 +20927,23 @@
       ]
     },
     {
+      "key": "mobile-shi-lv-yi",
+      "characterName": "势吕壹",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典头像（BWIKI，爆料版暂无立绘）",
+          "sourcePage": "https://wiki.biligame.com/msgs/%E5%8A%BF%E5%90%95%E5%A3%B9",
+          "imageUrl": "https://patchwiki.biligame.com/images/msgs/e/e4/irswi4ywz6nor0vke3nfp2n8sk4le46.png",
+          "sha256": "da1111c419fb2ef73e567778d004b7940b7d0a9adecf8b7083927d53da5a7ec4",
+          "pixelWidth": 88,
+          "pixelHeight": 88,
+          "localPath": "src/CardGame.Wpf/Assets/mobile-shi-lv-yi.png"
+        }
+      ]
+    },
+    {
       "key": "mobile-shi-deng-ai",
       "characterName": "势邓艾",
       "defaultSkinId": "86100",
