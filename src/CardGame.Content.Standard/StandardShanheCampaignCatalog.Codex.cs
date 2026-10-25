@@ -66,6 +66,7 @@ public static partial class StandardShanheCampaignCatalog
     private static readonly Lazy<IReadOnlyDictionary<int, string>> CodexRewardIdsCache = new(() =>
         new ReadOnlyDictionary<int, string>(CodexRewardBindings.Concat(Codex2026RewardBindings).Select(binding => new KeyValuePair<int, string>(binding.NodeId, binding.Reward.Id))
             .Concat(CurrentBuildSkillCodexBindings)
+            .Concat(CurrentReactionTacticCodexBindings)
             .Append(new(2, OpeningInheritanceRewardId))
             // Availability still requires this reward in the selected edition.
             .Append(new(42, CurrentJinnangJiRewardId))
@@ -97,7 +98,9 @@ public static partial class StandardShanheCampaignCatalog
         var additionalRewards = bindings.Select(binding => binding.Reward).Concat(new[]
         {
             CodexBasicCard(4004), CodexBasicCard(4008), CodexBasicCard(4076), CodexBasicCard(4092), CodexBasicCard(4107)
-        }).Concat(editionId == Returning2026EditionId ? new[] { CodexBasicCard(4059) } : []).ToArray();
+        }).Concat(editionId == Returning2026EditionId
+            ? new[] { CodexBasicCard(4059) }.Concat(CurrentShopCardSources.Select(source =>
+                CodexBasicCard(source.SourceId) with { Name = source.Name })) : []).ToArray();
         var allRewards = original.Rewards.Concat(additionalRewards).ToArray();
         var rewardIds = additionalRewards.Select(reward => reward.Id).ToArray();
         return WithOpeningInheritance(WithChapterRewards(original with
@@ -160,6 +163,7 @@ public static partial class StandardShanheCampaignCatalog
         new Dictionary<CardKind, string>
         {
             [CardKind.CrimsonSoulZither] = "crimson-soul-zither",
+            [CardKind.PurpleGoldCrown] = "purple-gold-crown",
             [CardKind.LionBelt] = "lion-belt",
             [CardKind.DelusionCrown] = "delusion-crown",
             [CardKind.GhostDragonCrescentBlade] = "ghost-dragon-crescent-blade",
@@ -186,6 +190,7 @@ public static partial class StandardShanheCampaignCatalog
                 builder.AddCard(new("shanhe-codex:equipment-" + id, card.DisplayName, card.CategoryName, card.Description, kind));
             }
             builder.AddSkill(EmbeddedSkillProgramCatalog.Definition("hulao-equipment", "hulao:lion-belt"));
+            builder.AddSkill(EmbeddedSkillProgramCatalog.Definition("hulao-equipment", "hulao:purple-gold-crown"));
             builder.AddSkill(EmbeddedSkillProgramCatalog.Definition("shenwu-equipment", "shenwu:delusion-crown") with { Tags = SkillTag.Locked });
         }
     }

@@ -57,6 +57,55 @@ internal static class ShanheBuildTacticChecks
             "The real discard leaves one card, own ending draws three, enemy endings pay nothing, and the next four-card draw occurs with Fenjin disabled at exactly two HP.");
     }
 
+    public static void PurchasedTiersEnterNativeOpeningArmorAndPhysique()
+    {
+        var current = StandardShanheCampaignCatalog.CreateDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
+        var ids = new[] { "tactic-build-2056", "tactic-build-2073", "tactic-build-2070" };
+        var rewards = ids.Select(id => current.Rewards.Single(reward => reward.Id == id)).ToArray();
+        const string buyer = "classic:cao-cao";
+        var definition = new ShanheCampaignDefinition("fixture:armor-stock", "真实购买与开局", [buyer], ["shop"],
+            [new("shop", "集市", ShanheNodeKind.Shop, ["battle"], Choices: rewards.Select(reward =>
+                new ShanheNodeChoiceDefinition("buy-" + reward.Id, reward.Name,
+                    StandardShanheCampaignCatalog.ShopMetadataByRewardId[reward.Id].Price,
+                    RewardId: reward.Id, LeavesNode: false)).ToArray()),
+             new("battle", "步卒", ShanheNodeKind.Battle, [],
+                [new("guard", "步卒", [new(StandardShanheLocalTroopPackage.FootmanId) { StartingHand = [] }])])],
+            rewards, StartingGold: 3000);
+        var session = ShanheCampaignSession.Create(definition, new(83, buyer) { UseCodexRewardPool = true },
+            StandardShanheCampaignCatalog.CreateBattleRegistry);
+        Pay(new MoveShanheNodeCommand("shop", session.Revision));
+        foreach (var (id, price) in ids.Zip(new[] { 700, 600, 700 }))
+        {
+            var item = session.Snapshot.ShopItems.Single(item => item.Reward?.Id == id);
+            Need(item.GoldCost == price && !item.RequiresSkillReplacement,
+                "Three real tactic tiers retain source prices plus the paid tactic-category surcharge without occupying extra skill slots.");
+            Pay(new ChooseShanheNodeOptionCommand(item.ChoiceId, null, session.Revision));
+        }
+        Need(session.Snapshot.Gold == 1000 && session.Snapshot.TacticIds.ToHashSet().SetEquals(ids) &&
+            session.Snapshot.ExtraSkillIds.Count == 0 && StandardShanheCampaignCatalog.CodexRewardIdsByNodeId[102] == ids[0] &&
+            !StandardShanheCampaignCatalog.GetDefaultCodexUnlockedRewardIds(current).Contains(ids[0]) &&
+            StandardShanheCampaignCatalog.GetDefaultCodexUnlockedRewardIds(current).Contains(ids[1]),
+            "The fixed 102 reward requires its real research binding; a random-node source tier is explicit default inventory, not a fabricated fixed node.");
+        Pay(new ChooseShanheNodeOptionCommand("$leave", null, session.Revision));
+        Pay(new MoveShanheNodeCommand("battle", session.Revision));
+        var game = StandardShanheCampaignCatalog.CreateBattle(session.PendingBattleSetup!);
+        Submit(new StartGameCommand());
+        for (var step = 0; step < 100 && game.PendingDecision is not { Kind: DecisionKind.PlayCard, PlayerSeat: 0 }; step++)
+            Submit(new AdvanceOneStepCommand(game.Revision));
+        var owner = game.CreateSnapshot(0).Players[0];
+        Need(game.PendingDecision is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } && owner.MaxHp == 7 && owner.Hp == 7 && owner.Armor == 6 &&
+            game.Events.Select(item => item.Payload).OfType<ArmorGrantedEvent>().Where(fact => fact.PlayerSeat == 0)
+                .Select(fact => fact.Amount).Order().SequenceEqual([2, 4]) &&
+            game.Events.Select(item => item.Payload).OfType<RecoveryAppliedEvent>().Count(fact => fact.TargetSeat == 0 && fact.Amount == 3) == 1,
+            "The actual purchased opening tier grants four armor, the first real round grants two more, and physique increases maximum HP before its separate real three-point recovery.");
+        return;
+
+        void Pay(ShanheCampaignCommand command)
+        { var result = session.Submit(command); Need(result.Accepted, result.Error ?? "Actual stock purchase was rejected."); }
+        void Submit(GameCommand command)
+        { var result = game.Submit(command); Need(result.Accepted, result.Error?.Message ?? "Actual opening command was rejected."); }
+    }
+
     private static void Need(bool value, string message)
     { if (!value) throw new InvalidOperationException(message); }
 

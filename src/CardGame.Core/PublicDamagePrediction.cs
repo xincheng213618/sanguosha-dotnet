@@ -15,18 +15,21 @@ public sealed record PublicDamagePrediction(int HpBefore, int ArmorBefore, int D
     public bool IsLethal => HpAfter <= 0 || MaxHpAfter <= 0;
 
     public static PublicDamagePrediction Calculate(int hp, int armor, int amount,
-        PublicDamagePaymentKind paymentKind = PublicDamagePaymentKind.Damage, int? maxHp = null)
+        PublicDamagePaymentKind paymentKind = PublicDamagePaymentKind.Damage, int? maxHp = null,
+        bool bypassArmor = false, int armorDamageMultiplier = 1)
     {
-        if (armor < 0 || amount < 0 || maxHp is < 0 || !Enum.IsDefined(paymentKind))
+        if (armor < 0 || amount < 0 || maxHp is < 0 || armorDamageMultiplier is < 1 or > 2 || !Enum.IsDefined(paymentKind))
             throw new ArgumentOutOfRangeException(nameof(amount), "Armor, amount and maximum HP must be nonnegative and use a known payment kind.");
         var maximum = maxHp ?? Math.Max(0, hp);
-        var absorbed = paymentKind == PublicDamagePaymentKind.Damage ? Math.Min(armor, amount) : 0;
+        var absorbed = paymentKind == PublicDamagePaymentKind.Damage && !bypassArmor
+            ? Math.Min(armor, checked(amount * armorDamageMultiplier)) : 0;
+        var shielded = (int)((absorbed + (long)armorDamageMultiplier - 1) / armorDamageMultiplier);
         var afterMaximum = paymentKind == PublicDamagePaymentKind.MaximumHpLoss ? Math.Max(0, maximum - amount) : maximum;
         var loss = paymentKind switch
         {
             PublicDamagePaymentKind.MaximumHpLoss => (int)Math.Max(0L, (long)hp - afterMaximum),
             PublicDamagePaymentKind.ClampedHpLoss => Math.Min(Math.Max(0, hp), amount),
-            _ => amount - absorbed
+            _ => amount - shielded
         };
         // Damage and HP loss preserve the full rescue debt. The explicit legacy
         // clamped payment remains distinct; maximum HP only clamps downwards.

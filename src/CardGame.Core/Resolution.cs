@@ -477,7 +477,7 @@ public sealed partial record ProgramSkillFrame(
 }
 
 /// <summary>One cardless program damage instruction, owned solely by its program frame.</summary>
-public sealed record AttackAttemptState(
+public sealed partial record AttackAttemptState(
     int SourceSeat,
     int TargetSeat,
     int DamageAmount,
@@ -526,7 +526,7 @@ public sealed record FactionRecoveryDebtReturn(long DyingFrameId, long DyingPare
     int DyingVictimSeat, DyingContinuationKind DyingContinuation, bool Survived,
     long? ParentAttackOwnerFrameId, long? ParentDamageWindowFrameId);
 
-public sealed record CardAttackState
+public sealed partial record CardAttackState
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool ColdDamageReplacementAttempted { get; init; }

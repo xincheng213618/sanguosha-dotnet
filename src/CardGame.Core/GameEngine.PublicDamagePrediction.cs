@@ -117,7 +117,9 @@ public sealed partial class GameEngine
             {
                 if (modifier.CapsToAmount) continue;
                 var eligible = modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource
-                    ? MatchesPerOccurrenceSourceDamageModifier(modifier, !source.HpUndefined, source.Hp,
+                    ? modifier.Condition == SkillProgramDamageModifierCondition.DirectSkillDamage
+                        ? issuedAttack is { } skillAttack && IsDirectSkillDamage(skillAttack)
+                        : MatchesPerOccurrenceSourceDamageModifier(modifier, !source.HpUndefined, source.Hp,
                         Math.Max(0, source.HandCount - paidHandCards),
                         modifier.Condition == SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan &&
                         sourceSeat != targetSeat ? GetCombatDistance(sourceSeat, targetSeat) : 0, _roundNumber)
@@ -150,6 +152,8 @@ public sealed partial class GameEngine
                 ClassicJiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards));
         if (!finalized && issuedAttack is null && cardUse && !sourceLess && !chain)
             additional = checked(additional + WangongPublicProposedBonus(view, sourceSeat, kind));
+        if (!finalized && (issuedAttack is not null || cardUse))
+            additional = checked(additional + WoxinPublicBonus(view, sourceSeat, sourceLess, chain, issuedAttack));
         cardLayer = Math.Max(0, cardLayer);
         if (!sourceLess && (HasVisiblePolicy(sourceState, sourceVisible, SkillProgramCardPolicyKind.DamageBecomesHpLoss) ||
             sourceSeat != targetSeat && (HasVisiblePolicy(sourceState, sourceVisible, SkillProgramCardPolicyKind.OtherParticipantDamageBecomesHpLoss) ||
@@ -167,7 +171,12 @@ public sealed partial class GameEngine
             full = Math.Min(1, full);
         if (!finalized && FindPassiveProgramDamageCap(targetState, sourceLess ? null : sourceSeat, targetVisible) is { } damageCap)
             full = Math.Min(damageCap.Cap, full);
-        return PublicDamagePrediction.Calculate(target.Hp, target.Armor, full, maxHp: target.MaxHp);
+        var bypass = sourceSeat != targetSeat && HasNativeDamageArmorPolicy(sourceSeat, sourceLess,
+            SkillProgramCardPolicyKind.BypassOtherParticipantArmor, sourceVisible);
+        var armorMultiplier = HasNativeDamageArmorPolicy(sourceSeat, sourceLess,
+            SkillProgramCardPolicyKind.DoubleArmorDamage, sourceVisible) ? 2 : 1;
+        return PublicDamagePrediction.Calculate(target.Hp, target.Armor, full, maxHp: target.MaxHp,
+            bypassArmor: bypass, armorDamageMultiplier: armorMultiplier);
     }
 
     private static HashSet<string> VisiblePredictionSkillIds(PlayerSnapshot player) =>

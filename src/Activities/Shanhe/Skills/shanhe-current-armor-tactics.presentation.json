@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:current-tiebushan-2071": { "name": "铁布衫", "description": "普通战法。每场战斗开局，你获得1点护甲。" },
+    "shanhe:current-tiebushan-2072": { "name": "铁布衫Ⅱ", "description": "稀有战法。每场战斗开局，你获得2点护甲。" },
+    "shanhe:current-tiebushan-2073": { "name": "铁布衫Ⅲ", "description": "史诗战法。每场战斗开局，你获得4点护甲。" },
+    "shanhe:current-hujia-2069": { "name": "护甲Ⅰ", "description": "稀有战法。每轮开始时，你获得1点护甲。" },
+    "shanhe:current-hujia-2070": { "name": "护甲Ⅱ", "description": "史诗战法。每轮开始时，你获得2点护甲。" },
+    "shanhe:current-tipo-2054": { "name": "体魄Ⅰ", "description": "稀有战法。每场战斗开局，你增加1点体力上限并回复等量体力。" },
+    "shanhe:current-tipo-2055": { "name": "体魄Ⅱ", "description": "史诗战法。每场战斗开局，你增加2点体力上限并回复等量体力。" },
+    "shanhe:current-tipo-2056": { "name": "体魄Ⅲ", "description": "传说战法。每场战斗开局，你增加3点体力上限并回复等量体力。" }
+  }
+}

@@ -15836,10 +15836,12 @@ public sealed partial class GameEngine
                 : _players[attack.SourceSeat].IsAlive && (item.seat == attack.SourceSeat || item.seat == attack.TargetSeat) &&
                   (item.modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource
                 ? item.seat == attack.SourceSeat && !attack.IsSourceLess &&
-                  MatchesPerOccurrenceSourceDamageModifier(item.modifier, _players[attack.SourceSeat].HasHpValue,
+                  (item.modifier.Condition == SkillProgramDamageModifierCondition.DirectSkillDamage
+                  ? IsDirectSkillDamage(attack)
+                  : MatchesPerOccurrenceSourceDamageModifier(item.modifier, _players[attack.SourceSeat].HasHpValue,
                       _players[attack.SourceSeat].Hp, GetHand(_players[attack.SourceSeat]).Count,
                       item.modifier.Condition == SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan &&
-                      attack.SourceSeat != attack.TargetSeat ? GetCombatDistance(attack.SourceSeat, attack.TargetSeat) : 0, _roundNumber)
+                      attack.SourceSeat != attack.TargetSeat ? GetCombatDistance(attack.SourceSeat, attack.TargetSeat) : 0, _roundNumber))
                 : item.modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageParticipant
                 ? item.modifier.Condition switch
                   {

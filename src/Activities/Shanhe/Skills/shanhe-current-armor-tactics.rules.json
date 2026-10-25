@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:current-tiebushan-2071", "revision": 1,
+      "triggers": [{ "id": "native-opening-one-armor", "window": "gameStarting", "subject": "owner", "optional": false,
+        "effects": [{ "op": "grantArmor", "target": "owner", "amount": 1 }] }]
+    },
+    {
+      "id": "shanhe:current-tiebushan-2072", "revision": 1,
+      "triggers": [{ "id": "native-opening-two-armor", "window": "gameStarting", "subject": "owner", "optional": false,
+        "effects": [{ "op": "grantArmor", "target": "owner", "amount": 2 }] }]
+    },
+    {
+      "id": "shanhe:current-tiebushan-2073", "revision": 1,
+      "triggers": [{ "id": "native-opening-four-armor", "window": "gameStarting", "subject": "owner", "optional": false,
+        "effects": [{ "op": "grantArmor", "target": "owner", "amount": 4 }] }]
+    },
+    {
+      "id": "shanhe:current-hujia-2069", "revision": 1,
+      "triggers": [{ "id": "native-round-one-armor", "window": "roundStarting", "subject": "owner", "optional": false,
+        "effects": [{ "op": "grantArmor", "target": "owner", "amount": 1 }] }]
+    },
+    {
+      "id": "shanhe:current-hujia-2070", "revision": 1,
+      "triggers": [{ "id": "native-round-two-armor", "window": "roundStarting", "subject": "owner", "optional": false,
+        "effects": [{ "op": "grantArmor", "target": "owner", "amount": 2 }] }]
+    },
+    {
+      "id": "shanhe:current-tipo-2054", "revision": 1,
+      "triggers": [{ "id": "native-opening-maximum-and-recovery", "window": "gameStarting", "subject": "owner", "optional": false,
+        "effects": [
+          { "op": "changeMaximumHp", "target": "owner", "amount": 1 },
+          { "op": "recover", "target": "owner", "amount": 1 }
+        ] }]
+    },
+    {
+      "id": "shanhe:current-tipo-2055", "revision": 1,
+      "triggers": [{ "id": "native-opening-maximum-and-recovery", "window": "gameStarting", "subject": "owner", "optional": false,
+        "effects": [
+          { "op": "changeMaximumHp", "target": "owner", "amount": 2 },
+          { "op": "recover", "target": "owner", "amount": 2 }
+        ] }]
+    },
+    {
+      "id": "shanhe:current-tipo-2056", "revision": 1,
+      "triggers": [{ "id": "native-opening-maximum-and-recovery", "window": "gameStarting", "subject": "owner", "optional": false,
+        "effects": [
+          { "op": "changeMaximumHp", "target": "owner", "amount": 3 },
+          { "op": "recover", "target": "owner", "amount": 3 }
+        ] }]
+    }
+  ]
+}

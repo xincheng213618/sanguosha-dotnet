@@ -58,6 +58,8 @@ public enum SkillProgramTriggerConditionKind
     DamageSourceFactionIs = 26,
     FaceDown = 27,
     CardActionMatchesPreviousPlayCard = 28,
+    DamageTargetIsPublicTeamEnemy = 29,
+    DamageFromOwnerTrickUse = 30,
     CardActionCardIsBlack = 800,
     DamageSourceGenderIs = 801,
     DamageNatureIs = 804,
@@ -112,6 +114,7 @@ public enum SkillProgramTriggerValueKind
     LivingPlayersMinHp = 25,
     TurnOwnerDiscardPhaseHandDiscardCount = 26,
     DamageInstancesTakenThisTurn = 27,
+    AppliedDamageAmount = 28,
     EventTargetDamageInstancesTakenThisTurn = 4100,
     CardActionPhysicalCardCount = 400,
     MarkerParity = 450,
@@ -232,7 +235,8 @@ public enum SkillProgramDamageModifierCondition
     OwnerRoundSlashUseOrdinalWithinLimit = 1037,
     OwnerActualTurnElementalSlashUseOrdinalWithinLimit = 1038,
     SourceRoundIsOdd = 1039,
-    SourceRoundIsEven = 1040
+    SourceRoundIsEven = 1040,
+    DirectSkillDamage = 1041
 }
 public sealed record SkillProgramDamageModifier(
     string Id, IReadOnlyList<CardKind> CardKinds, int Amount,
@@ -2276,6 +2280,12 @@ public sealed record SkillProgramTriggerFacts(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? EventTargetDamageInstancesTakenThisTurn { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? AppliedDamageAmount { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? DamageTargetIsPublicTeamEnemy { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? DamageFromOwnerTrickUse { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? CurrentTurnUsedCardCategoryCount { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? ActualTurnActorUseOrdinal { get; init; }
@@ -2406,6 +2416,8 @@ public sealed record SkillProgramTriggerValue(SkillProgramTriggerValueKind Kind,
         SkillProgramTriggerValueKind.ActualTurnDeathCount => facts.ActualTurnDeathCount ??
             throw new InvalidOperationException("Actual turn deaths require frozen death facts."),
         SkillProgramTriggerValueKind.IntegerConstant => Value,
+        SkillProgramTriggerValueKind.AppliedDamageAmount => facts.AppliedDamageAmount ??
+            throw new InvalidOperationException("Applied damage facts were not captured."),
         SkillProgramTriggerValueKind.CurrentActualPlayPhysicalSlashLossCount => facts.CurrentActualPlayPhysicalSlashLossCount ??
             throw new InvalidOperationException("Actual Play physical Slash loss facts were not captured."),
         SkillProgramTriggerValueKind.TurnOwnerDamageDealtThisTurn => facts.TurnOwnerDamageDealtThisTurn ??
@@ -2551,6 +2563,8 @@ public sealed class SkillProgramTriggerCondition
         SkillProgramTriggerConditionKind.DirectCardUseDamage => facts.DirectCardUseDamage == true,
         SkillProgramTriggerConditionKind.DamageCardIsRed => facts.DamageCardIsRed == true,
         SkillProgramTriggerConditionKind.DamageTargetIsOther => facts.DamageTargetIsOther == true,
+        SkillProgramTriggerConditionKind.DamageTargetIsPublicTeamEnemy => facts.DamageTargetIsPublicTeamEnemy == true,
+        SkillProgramTriggerConditionKind.DamageFromOwnerTrickUse => facts.DamageFromOwnerTrickUse == true,
         SkillProgramTriggerConditionKind.CardActionCategoryIs =>
             facts.CardActionCategory is { } category && CardCategories.Contains(category),
         SkillProgramTriggerConditionKind.CardActionTargetIsOwner => facts.CardActionTargetIsOwner == true,
@@ -3727,6 +3741,17 @@ public sealed class SkillProgramCatalog
             ? EnumValue<Suit>(node, "inputSuit", path) : null;
         Suit? outputSuit = node.TryGetProperty("outputSuit", out _)
             ? EnumValue<Suit>(node, "outputSuit", path) : null;
+        if (kind is SkillProgramCardPolicyKind.BypassOtherParticipantArmor or SkillProgramCardPolicyKind.DoubleArmorDamage or
+            SkillProgramCardPolicyKind.ReserveNextDamageAfterOffTurnHit)
+        {
+            var condition = OptionalCondition(node, path);
+            if (cardKinds.Count != 0 || requiredKinds.Count != 0 || value != 0 ||
+                inputSuit is not null || outputSuit is not null || ownerRole is not null || factionId is not null ||
+                condition.Kind != SkillProgramConditionKind.Always || node.TryGetProperty("discardCost", out _) ||
+                node.TryGetProperty("providerDrawCount", out _) || maximumRecoveryOrdinal is not null)
+                Fail(path, "Damage policies require an unconditional marker without card, suit, role, amount or payment qualifiers.");
+            return new(id, kind, cardKinds, requiredKinds, value, inputSuit, outputSuit, condition);
+        }
         if (kind == SkillProgramCardPolicyKind.ShanheFenchaiJudgment)
         {
             if (node.EnumerateObject().Any(property => property.Name is not ("id" or "kind")))
@@ -4009,6 +4034,7 @@ public sealed class SkillProgramCatalog
                     or SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan
                     or SkillProgramDamageModifierCondition.SourceRoundIsOdd
                     or SkillProgramDamageModifierCondition.SourceRoundIsEven
+                    or SkillProgramDamageModifierCondition.DirectSkillDamage
                     or SkillProgramDamageModifierCondition.BothParticipantsPublicEnemiesOfOwner)))
             Fail(path + ".cardKinds", "must contain distinct effective card kinds");
         var sourceRound = condition is SkillProgramDamageModifierCondition.SourceRoundIsOdd or
@@ -4074,7 +4100,8 @@ public sealed class SkillProgramCatalog
         else if (condition is SkillProgramDamageModifierCondition.SourceHandBelowHp or
                  SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan or
                  SkillProgramDamageModifierCondition.SourceRoundIsOdd or
-                 SkillProgramDamageModifierCondition.SourceRoundIsEven)
+                 SkillProgramDamageModifierCondition.SourceRoundIsEven or
+                 SkillProgramDamageModifierCondition.DirectSkillDamage)
         {
             if (scope != SkillProgramDamageModifierSourceScope.DamageSource || kinds.Count != 0)
                 Fail(path, "source damage conditions require damageSource and every damage kind");
@@ -5544,6 +5571,9 @@ public sealed class SkillProgramCatalog
                 item.Kind is SkillProgramTriggerValueKind.DamageInstancesTakenThisTurn or SkillProgramTriggerValueKind.EventTargetDamageInstancesTakenThisTurn) &&
             window != SkillProgramTriggerWindow.AfterDamageApplied)
             Fail(path + ".condition", "damage-instance count requires afterDamageApplied");
+        if (EnumerateTriggerValues(condition).Any(item => item.Kind == SkillProgramTriggerValueKind.AppliedDamageAmount) &&
+            window != SkillProgramTriggerWindow.AfterDamageApplied)
+            Fail(path + ".condition", "appliedDamageAmount requires an afterDamageApplied trigger");
         if (EnumerateTriggerConditions(condition).Any(item => item.Kind is
                 SkillProgramTriggerConditionKind.CardActionActorIsCurrentTurn or
                 SkillProgramTriggerConditionKind.CardActionPhaseIsPlay) &&
@@ -5609,6 +5639,14 @@ public sealed class SkillProgramCatalog
                 item.Kind == SkillProgramTriggerConditionKind.DamageTargetIsOther) &&
             window != SkillProgramTriggerWindow.AfterDamageApplied)
             Fail(path + ".condition", "damageTargetIsOther requires an afterDamageApplied trigger");
+        if (EnumerateTriggerConditions(condition).Any(item =>
+                item.Kind == SkillProgramTriggerConditionKind.DamageTargetIsPublicTeamEnemy) &&
+            window != SkillProgramTriggerWindow.AfterDamageApplied)
+            Fail(path + ".condition", "damageTargetIsPublicTeamEnemy requires an afterDamageApplied trigger");
+        if (EnumerateTriggerConditions(condition).Any(item =>
+                item.Kind == SkillProgramTriggerConditionKind.DamageFromOwnerTrickUse) &&
+            window != SkillProgramTriggerWindow.AfterDamageApplied)
+            Fail(path + ".condition", "damageFromOwnerTrickUse requires an afterDamageApplied trigger");
         if (EnumerateTriggerConditions(condition).Any(item =>
                 item.Kind is SkillProgramTriggerConditionKind.DamageSourceIsOwner or
                     SkillProgramTriggerConditionKind.DamageSourceFactionIs) &&
