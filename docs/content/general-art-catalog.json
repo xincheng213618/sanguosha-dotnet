@@ -21080,6 +21080,23 @@
       ]
     },
     {
+      "key": "mobile-shi-yang-hong",
+      "characterName": "势杨弘",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象（BWIKI，画师 铁杵文化）",
+          "sourcePage": "https://wiki.biligame.com/msgs/%E5%8A%BF%E6%9D%A8%E5%BC%98",
+          "imageUrl": "https://patchwiki.biligame.com/images/msgs/e/e3/mdqr6b4xcwmkfdvh5ejozk9jqxqzmyw.jpg",
+          "sha256": "de2b2e259208f32b541657341dadf22c3b14c705384564ef98c2110efad144ad",
+          "pixelWidth": 848,
+          "pixelHeight": 1200,
+          "localPath": "src/CardGame.Wpf/Assets/mobile-shi-yang-hong.jpg"
+        }
+      ]
+    },
+    {
       "key": "mobile-shi-deng-ai",
       "characterName": "势邓艾",
       "defaultSkinId": "86100",
