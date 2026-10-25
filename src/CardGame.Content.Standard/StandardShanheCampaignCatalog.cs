@@ -204,6 +204,11 @@ public static partial class StandardShanheCampaignCatalog
         var currentYaoli = RequiresCurrentYaoliRegistry(requirements);
         var currentLegendaryTactics = RequiresCurrentLegendaryTacticsRegistry(requirements);
         var buildTactics = RequiresBuildTacticsRegistry(requirements);
+        var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
+            .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
+            .ToHashSet(StringComparer.Ordinal);
+        var currentFuqi = extraSkills.Contains(StandardShanheFuqiPackage.SkillId);
+        var currentWangong = extraSkills.Contains(StandardShanheWangongPackage.SkillId);
         var currentSlashTactics = RequiresCurrentSlashTacticsRegistry(requirements);
         var s5Chengxiong = RequiresChengxiongBossRegistry(requirements);
         var s5CaoxingHigh = RequiresCaoxingHighRegistry(requirements);
@@ -298,6 +303,8 @@ public static partial class StandardShanheCampaignCatalog
             (currentYaoli ? "/current-yaoli" : "") +
             (currentLegendaryTactics ? "/current-legendary-tactics" : "") +
             (buildTactics ? "/current-build-tactics" : "") +
+            (currentFuqi ? "/current-fuqi-3100" : "") +
+            (currentWangong ? "/current-wangong-3263" : "") +
             (localTroops ? "/local-troops" : "") +
             (currentSlashTactics ? "/current-slash-tactics" : "") +
             (s5Chengxiong ? "/s5-chengxiong-14055" : "") +
@@ -342,6 +349,8 @@ public static partial class StandardShanheCampaignCatalog
             if (localTroops) packages.Add(new StandardShanheLocalTroopPackage());
             if (currentLegendaryTactics) packages.Add(new StandardShanheLegendaryTacticsPackage());
             if (buildTactics) packages.Add(new StandardShanheBuildTacticsPackage());
+            if (currentFuqi) packages.Add(new StandardShanheFuqiPackage());
+            if (currentWangong) packages.Add(new StandardShanheWangongPackage());
             if (s5Zhangliao || ids.Any(id => id == StandardShanheS5BossPackage.ZhangliaoBaseId ||
                 id == StandardShanheS5BossPackage.ZhangliaoLingdongId || id == StandardShanheS5BossPackage.ZhangliaoHuangkongId ||
                 id == StandardShanheS5BossPackage.DongZhuoLuoyangId || id == StandardShanheS5BossPackage.DongMinBaseId ||

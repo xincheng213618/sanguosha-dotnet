@@ -148,6 +148,8 @@ public sealed partial class GameEngine
         if (!finalized)
             additional = checked(additional + ShanheS5JiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards) +
                 ClassicJiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards));
+        if (!finalized && issuedAttack is null && cardUse && !sourceLess && !chain)
+            additional = checked(additional + WangongPublicProposedBonus(view, sourceSeat, kind));
         cardLayer = Math.Max(0, cardLayer);
         if (!sourceLess && (HasVisiblePolicy(sourceState, sourceVisible, SkillProgramCardPolicyKind.DamageBecomesHpLoss) ||
             sourceSeat != targetSeat && (HasVisiblePolicy(sourceState, sourceVisible, SkillProgramCardPolicyKind.OtherParticipantDamageBecomesHpLoss) ||

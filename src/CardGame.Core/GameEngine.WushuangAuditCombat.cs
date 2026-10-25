@@ -3,6 +3,7 @@ namespace CardGame.Core;
 public sealed partial class GameEngine
 {
     private const string WushuangJieying = "wushuang:skill-3230", WushuangWangong = "wushuang:skill-3263";
+    private const string ShanheWangong = "shanhe:wangong-3263";
     private const string WushuangCampClaimReason = "skill-program.wushuang.jieying.ended-hand";
 
     [ProgramCapability]
@@ -115,19 +116,33 @@ public sealed partial class GameEngine
         return facts.LastOrDefault(f => f.ActorSeat == actor);
     }
 
+    private bool IsWangongModeSkill(string skillId) =>
+        IsWushuangMode && skillId == WushuangWangong ||
+        _options.ShanheBattle is not null && skillId == ShanheWangong;
+
     private bool HasWushuangWangongPrivilege(CharacterState actor, long? existingUseId = null)
     {
-        if (!IsWushuangMode) return false;
         var current = existingUseId is { } id ? LifecycleCardUse(id) : null;
         if (current?.WushuangWangong is { } receipt) return receipt.Source.OwnerSeat == actor.Seat && ValidWushuangWangongUse(current);
-        return HasProgramSkill(actor, WushuangWangong) &&
+        return (IsWangongModeSkill(WushuangWangong) && HasProgramSkill(actor, WushuangWangong) ||
+                IsWangongModeSkill(ShanheWangong) && HasProgramSkill(actor, ShanheWangong)) &&
             PreviousWushuangActualUse(actor.Seat, current)?.CardCategoryMask == 1 << (int)SkillProgramCardCategory.Basic;
+    }
+
+    private int WangongPublicProposedBonus(GameSnapshot view, int sourceSeat, CardKind? kind)
+    {
+        if (kind is not { } card || !IsSlashCard(card) || !IsValidPlayerSeat(sourceSeat)) return 0;
+        var source = view.Players.Single(player => player.Seat == sourceSeat);
+        var visible = VisiblePredictionSkillIds(source);
+        return source.IsAlive && (visible.Contains(WushuangWangong) && IsWangongModeSkill(WushuangWangong) ||
+            visible.Contains(ShanheWangong) && IsWangongModeSkill(ShanheWangong)) &&
+            HasWushuangWangongPrivilege(_players[sourceSeat]) ? 1 : 0;
     }
 
     private SkillProgramStepOutcome CaptureWushuangWangong(ProgramSkillFrame supplied)
     {
         var frame = GetActiveProgramFrame(supplied.Id);
-        if (!IsWushuangMode || frame.SkillId != WushuangWangong || frame.WindowContext is not
+        if (!IsWangongModeSkill(frame.SkillId) || frame.WindowContext is not
             { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } context } || context.ActorSeat != frame.OwnerSeat ||
             LifecycleCardUse(context.ParentCardUseFrameId) is not { Action: { } action, WushuangWangong: null } use ||
             action.ActionId != context.CardActionId || action.ActorSeat != frame.OwnerSeat || !IsSlashCard(use.CardKind))
@@ -142,9 +157,9 @@ public sealed partial class GameEngine
     }
 
     private bool ValidWushuangWangongUse(CardUseFrame use) => use.WushuangWangong is { } receipt &&
-        receipt.Source.SkillId == WushuangWangong && receipt.Source.OwnerSeat == use.SourceSeat && receipt.UseFrameId == use.Id &&
+        IsWangongModeSkill(receipt.Source.SkillId) && receipt.Source.OwnerSeat == use.SourceSeat && receipt.UseFrameId == use.Id &&
         use.Action is { } action && action.ActionId == receipt.ActionId && action.ActorSeat == use.SourceSeat && IsSlashCard(use.CardKind) &&
-        _contentRegistry.GetSkill(WushuangWangong).Program?.GameplayHash == receipt.GameplayHash &&
+        _contentRegistry.GetSkill(receipt.Source.SkillId).Program?.GameplayHash == receipt.GameplayHash &&
         ProgramEventHistory<WushuangWangongUseCapturedEvent>().Count(e => e.Receipt == receipt) == 1 &&
         ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.ActorSeat == use.SourceSeat &&
             e.OriginFrameId == receipt.PreviousOriginFrameId && e.CardActionId == receipt.PreviousActionId &&
@@ -164,7 +179,7 @@ public sealed partial class GameEngine
         IsSlashCard(query.Kind) && HasWushuangWangongPrivilege(query.Actor, query.ExistingUseFrameId);
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 63201)]
-    private int WushuangWangongDamage(IDamageAttempt attack) => IsWushuangMode && !attack.IsSourceLess && !attack.IsChainPropagation &&
+    private int WushuangWangongDamage(IDamageAttempt attack) => !attack.IsSourceLess && !attack.IsChainPropagation &&
         attack.EffectiveCardKind is { } kind && IsSlashCard(kind) && LifecycleCardUse(attack.ResolutionId) is { } use &&
         use.SourceSeat == attack.SourceSeat && ValidWushuangWangongUse(use) ? 1 : 0;
 }

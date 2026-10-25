@@ -3882,6 +3882,11 @@ public sealed class SkillProgramCatalog
                     CardKind.IronChain or CardKind.BorrowedSword)))
                 Fail(path, "nearby response prohibition requires Slash or ordinary trick kinds and distance 1..20");
         }
+        else if (kind == SkillProgramCardPolicyKind.ProhibitOthersResponse)
+        {
+            if (requiredKinds.Count != 0 || value is not (0 or 1))
+                Fail(path, "other-response prohibition requires value 0 (all others) or 1 (distance one) and no response kinds");
+        }
         else if (kind is not (SkillProgramCardPolicyKind.PindianRankBySuit or SkillProgramCardPolicyKind.PindianRankBonus) && (requiredKinds.Count != 0 || value != 0))
             Fail(path, "requiredCardKinds and value require a minimum response count policy");
         if (kind is SkillProgramCardPolicyKind.SlashMustTargetOverHpHandOwner or SkillProgramCardPolicyKind.ProhibitOthersResponse or SkillProgramCardPolicyKind.XiaHuiBlackHandAndGainedEntityRestrictions or SkillProgramCardPolicyKind.StopUsingAfterTrickOrHpCount or SkillProgramCardPolicyKind.RoundGainedOtherSourceUse or SkillProgramCardPolicyKind.DistanceOneToNotHigherHp or SkillProgramCardPolicyKind.SlashExtraTargetsByLostHp or SkillProgramCardPolicyKind.ClaimedEntitiesFaceDownUse or SkillProgramCardPolicyKind.SuppressOthersNonLockedDuringDying or SkillProgramCardPolicyKind.ProhibitBlackTrickTarget or SkillProgramCardPolicyKind.PreventForeignEquipmentDiscard or SkillProgramCardPolicyKind.OfferSkipDiscard or SkillProgramCardPolicyKind.DrawFromBottom or
@@ -3905,7 +3910,7 @@ public sealed class SkillProgramCatalog
                      SkillProgramCardPolicyKind.ForeignPublicPileSlash or SkillProgramCardPolicyKind.PindianClaim or SkillProgramCardPolicyKind.IgnoreTurnObtainedHandCardsForDiscard or SkillProgramCardPolicyKind.PreventForeignEquipmentDiscard))
             Fail(path + ".cardKinds", "this policy requires effective card kinds");
         if (kind is SkillProgramCardPolicyKind.SlashMustTargetOverHpHandOwner or SkillProgramCardPolicyKind.OtherParticipantDamageBecomesHpLoss or SkillProgramCardPolicyKind.StopUsingAfterTrickOrHpCount or SkillProgramCardPolicyKind.ProhibitOthersResponse &&
-            (cardKinds.Count != 0 || requiredKinds.Count != 0 || value != 0 || inputSuit is not null || outputSuit is not null ||
+            (cardKinds.Count != 0 || requiredKinds.Count != 0 || (value != 0 && kind != SkillProgramCardPolicyKind.ProhibitOthersResponse) || inputSuit is not null || outputSuit is not null ||
              ownerRole is not null || factionId is not null || OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
             Fail(path, "This policy requires an unconditional unqualified definition.");
         if (kind == SkillProgramCardPolicyKind.CannotNullifyOwnOrdinaryTrick &&

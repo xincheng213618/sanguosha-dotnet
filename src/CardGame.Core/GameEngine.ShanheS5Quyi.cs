@@ -5,7 +5,8 @@ public sealed partial class GameEngine
     private bool IsShanheS5FuqiResponseProhibited(int sourceSeat, int responderSeat) =>
         sourceSeat != responderSeat && IsValidPlayerSeat(sourceSeat) && IsValidPlayerSeat(responderSeat) &&
         _players[sourceSeat].IsAlive && _players[responderSeat].IsAlive &&
-        HasCardPolicy(_players[sourceSeat], SkillProgramCardPolicyKind.ProhibitOthersResponse);
+        CardPolicies(_players[sourceSeat], SkillProgramCardPolicyKind.ProhibitOthersResponse)
+            .Any(item => item.Policy.Value == 0 || GetCombatDistance(sourceSeat, responderSeat) == 1);
 
     private bool ShanheS5FuqiNullificationBanned(int responderSeat)
     {
