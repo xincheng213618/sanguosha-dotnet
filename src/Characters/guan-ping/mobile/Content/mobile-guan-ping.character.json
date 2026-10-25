@@ -1,0 +1,8 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:guan-ping",
+  "skills": [],
+  "generals": [{ "registrationOrder": 73300, "pools": { "current": 73300 }, "definition": {
+    "id": "mobile:guan-ping", "name": "关平·移动版", "portraitKey": "mobile-guan-ping", "skillId": "classic:longyin",
+    "factionId": "shu", "baseHp": 4, "gender": "Male", "characterId": "character:guan-ping", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

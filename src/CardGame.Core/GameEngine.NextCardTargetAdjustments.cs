@@ -54,7 +54,9 @@ public sealed partial class GameEngine
             _nextCardTargetAdjustmentOwners.Clear();
             _redAdditionalTargetGrants.Clear();
         }
-        else if (payload is CardUseDeclaredEvent used)
+        else if (payload is CardUseDeclaredEvent used &&
+            (!_nextCardTargetAdjustmentOwners.TryGetValue(used.SourceSeat, out var source) || source.SkillId != "classic:qiaoshui" ||
+             GetProgramCardCategory(used.CardKind) == SkillProgramCardCategory.Basic || IsOrdinaryTrick(used.CardKind)))
             _nextCardTargetAdjustmentOwners.Remove(used.SourceSeat);
     }
 
@@ -87,8 +89,8 @@ public sealed partial class GameEngine
                         Add([.. action.TargetSeats, owner.Seat, victim.Seat]);
                 continue;
             }
-            // Placement cards retain their legal target
-            // contract; their actual use still consumes the next-card grant.
+            // Placement cards retain their legal target contract. Classic
+            // Qiaoshui waits for the next basic or ordinary trick to consume it.
             if (EquipmentRules.IsEquipment(kind) || kind is
                 CardKind.Indulgence or CardKind.SupplyShortage or CardKind.Lightning or CardKind.BorrowedSword) continue;
             var possible = action.Kind is LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage or

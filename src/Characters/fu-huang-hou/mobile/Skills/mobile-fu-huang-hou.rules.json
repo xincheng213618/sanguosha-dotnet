@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 62, "skills": [{ "id": "mobile:zhuikong", "revision": 1,
+    "triggers": [{ "id": "wounded-foreign-actual-turn", "window": "otherActualTurnStarted", "subject": "owner", "optional": true,
+      "effects": [
+        { "op": "selectTarget", "target": "owner", "targetKind": "eventSource" },
+        { "op": "startPindian", "target": "owner", "opponentRef": { "kind": "selectedTarget" }, "resultBind": "zhuikong-result", "visibility": "public" },
+        { "op": "grantTurnCardTargetRestriction", "target": "selectedTarget", "targetRestriction": "selfOnly", "condition": { "kind": "pindianWon", "sourceBind": "zhuikong-result" } },
+        { "op": "grantDirectedTurnCardPolicy", "target": "owner", "actorRef": { "kind": "selectedTarget" }, "targetRef": { "kind": "owner" }, "effects": ["ignoreDistance"],
+          "condition": { "kind": "pindianNotWon", "sourceBind": "zhuikong-result" } }
+      ] }]
+  }]
+}

@@ -1,0 +1,38 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:ling-cao",
+  "skills": [
+    {
+      "registrationOrder": 74501,
+      "programBundle": "mobile-ling-cao",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:dujin",
+        "name": "独进",
+        "description": "摸牌阶段，你可以多摸X+1张牌（X为你装备区里牌数的一半，向下取整）。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 74500,
+      "pools": {
+        "current": 74500
+      },
+      "definition": {
+        "id": "mobile:ling-cao",
+        "name": "凌操·移动版",
+        "portraitKey": "mobile-ling-cao",
+        "skillId": "mobile:dujin",
+        "factionId": "wu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:ling-cao",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

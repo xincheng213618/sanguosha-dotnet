@@ -279,6 +279,7 @@ internal sealed partial class ProgramAiEstimateContext
             SkillProgramNumberExpression.OwnerMaxHp => Math.Max(0, _player.MaxHp),
             SkillProgramNumberExpression.CurrentHandEmptyTwoOtherwiseOne => _estimatedHandCount == 0 ? 2 : 1,
             SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne => (_publicContext.EquipmentCardCount + 1) / 2 + 1,
+            SkillProgramNumberExpression.EquipmentHalfFloorPlusOne => _publicContext.EquipmentCardCount / 2 + 1,
             SkillProgramNumberExpression.CurrentTurnUsedCardCategoryCount => _publicContext.CurrentTurnUsedCardCategoryCount ?? 0,
             SkillProgramNumberExpression.ActualTurnDeathBenefits => _publicContext.ActualTurnDeathBenefits ?? 0,
             SkillProgramNumberExpression.OwnerLostHp or SkillProgramNumberExpression.BoundaryWangYiMijiCount => Math.Max(0, _player.MaxHp - _player.Hp),

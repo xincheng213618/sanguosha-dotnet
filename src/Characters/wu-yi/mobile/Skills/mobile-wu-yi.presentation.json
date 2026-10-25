@@ -1,0 +1,3 @@
+{
+  "schemaVersion": 3, "skills": { "mobile:benxi": { "name": "奔袭", "description": "回合内每使用一张牌，本回合距离-1；计算与所有其他角色的距离均为1时，无视其他角色防具，且杀可再指定一个合法目标。" } }
+}

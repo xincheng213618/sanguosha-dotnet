@@ -57,8 +57,9 @@ public sealed partial class GameEngine
         if (!trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.OfferSameTypeDifferentNameOrExtraTarget)) return true;
         return _players[candidate.OwnerSeat].IsAlive && _players[candidate.OwnerSeat].Hp > 0 &&
             FreezeSameTypeAidUse(candidate.OwnerSeat, context) is { } identity &&
+            MatchesClassicQiuyuanAidContext(candidate.SkillId, candidate.OwnerSeat, context, identity) &&
             !IsCardEffectIneffective(identity.CardUseFrameId, candidate.OwnerSeat) &&
-            SameTypeAidRecipients(identity, candidate.SkillId == "boundary:qiuyuan-mobile").Length > 0;
+            SameTypeAidRecipients(identity, candidate.SkillId).Length > 0;
     }
     private bool CanAddSameTypeAidTarget(SameTypeAidIdentity identity, int seat, bool ignoreSlashDistance = false)
     {
@@ -113,9 +114,11 @@ public sealed partial class GameEngine
         return paused.Op is SkillProgramEffectOp.UseVirtualCard or SkillProgramEffectOp.OfferUnlimitedVirtualSlash &&
             paused.OutputKind == CardKind.Slash && paused.TargetRestriction == SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget;
     }
-    private int[] SameTypeAidRecipients(SameTypeAidIdentity identity, bool ignoreSlashDistance = false) => _players.Where(p => p.IsAlive &&
+    private int[] SameTypeAidRecipients(SameTypeAidIdentity identity, string skillId) => _players.Where(p => p.IsAlive &&
         p.Seat != identity.OriginalOwnerTarget && p.Seat != identity.ActorSeat &&
-        (CanAddSameTypeAidTarget(identity, p.Seat, ignoreSlashDistance) || GetHand(p).Count + GetEquipment(p).Count > 0))
+        (!IsClassicQiuyuanAid(skillId) || !LifecycleCardUse(identity.CardUseFrameId)!.TargetSeats.Contains(p.Seat)) &&
+        (CanAddSameTypeAidTarget(identity, p.Seat, SameTypeAidIgnoresSlashDistance(skillId)) ||
+            GetHand(p).Count + (IsClassicQiuyuanAid(skillId) ? 0 : GetEquipment(p).Count) > 0))
         .Select(p => p.Seat).Order().ToArray();
     private bool SameTypeAidUnpaidSourceValid(ProgramSkillFrame f) =>
         f.SameTypeAid is { } r && _winner == Winner.None && _players[f.OwnerSeat].IsAlive &&
@@ -126,7 +129,7 @@ public sealed partial class GameEngine
     {
         var f = GetActiveProgramFrame(frame.Id);
         if (f.SameTypeAid is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context ||
-            FreezeSameTypeAidUse(f.OwnerSeat, context) is not { } use)
+            FreezeSameTypeAidUse(f.OwnerSeat, context) is not { } use || !MatchesClassicQiuyuanAidContext(f.SkillId, f.OwnerSeat, context, use))
             throw new InvalidOperationException("Aid requires one exact original target/use opportunity.");
         ReplaceRuntimeTop(f = f with { SameTypeAid = new(f.InstructionIndex, SameTypeAidSource(f), f.GameplayHash,
             use, SameTypeAidStage.ChoosingRecipient) });
@@ -138,19 +141,19 @@ public sealed partial class GameEngine
     {
         var r = f.SameTypeAid!;
         if (r.Stage == SameTypeAidStage.ChoosingRecipient)
-            return Array.AsReadOnly(SameTypeAidRecipients(r.Use, f.SkillId == "boundary:qiuyuan-mobile").Select(seat => new PromptChoice(new($"same-type-aid.{f.Id}.recipient-{seat}"),
+            return Array.AsReadOnly(SameTypeAidRecipients(r.Use, f.SkillId).Select(seat => new PromptChoice(new($"same-type-aid.{f.Id}.recipient-{seat}"),
                 $"请 {_players[seat].Name} 给牌或成为额外目标", [], [seat], SameTypeAidParameters(f, "recipient"))).ToArray());
         if (r.Stage != SameTypeAidStage.ChoosingAnswer || r.RecipientSeat is not { } recipient) return [];
         var choices = new List<PromptChoice>();
-        foreach (var raw in BuildOwnedCardPaymentChoices(f.Id, recipient, recipient, [CardZoneKind.Hand, CardZoneKind.Equipment],
-            OwnedCardMoveIntent.Transfer, canSelect: (_, card) => !card.IsGeneralWeapon && IsSameTypeAidCard(card.Kind, r.Use.EffectiveKind),
+        foreach (var raw in BuildOwnedCardPaymentChoices(f.Id, recipient, recipient, SameTypeAidPaymentZones(f.SkillId),
+            OwnedCardMoveIntent.Transfer, canSelect: (_, card) => !card.IsGeneralWeapon && IsSameTypeAidPaymentKind(f.SkillId, card.Kind, r.Use.EffectiveKind),
             destination: SkillProgramCardDestination.OwnerHand, destinationSeat: f.OwnerSeat))
         {
             var parameters = new Dictionary<string, string>(raw.Parameters);
             foreach (var pair in SameTypeAidParameters(f, "give")) parameters[pair.Key] = pair.Value;
             choices.Add(raw with { Parameters = parameters });
         }
-        if (CanAddSameTypeAidTarget(r.Use, recipient, f.SkillId == "boundary:qiuyuan-mobile"))
+        if (CanAddSameTypeAidTarget(r.Use, recipient, SameTypeAidIgnoresSlashDistance(f.SkillId)))
             choices.Add(new(new($"same-type-aid.{f.Id}.become-target"), "成为此牌的额外目标", [], [recipient], SameTypeAidParameters(f, "target")));
         // Candidate seats use only public HE counts. A private hand without a
         // matching card must not leak its eligibility to the original chooser.
@@ -166,6 +169,7 @@ public sealed partial class GameEngine
         var skill = _contentRegistry.GetSkill(f.SkillId);
         _pendingDecision = new(DecisionKind.ProgramTrigger, chooser,
             r.Stage == SameTypeAidStage.ChoosingRecipient ? "选择一名其他角色求援。" :
+                IsClassicQiuyuanAid(f.SkillId) ? "交给原目标一张手牌【闪】，或成为此【杀】的额外目标。" :
                 f.SkillId == "boundary:qiuyuan-mobile" ? "交给原目标一张【杀】以外的基本牌，或成为此【杀】的额外目标。" :
                 "交给原目标同类型不同牌名的一张牌，或成为原牌额外目标。",
             choices.SelectMany(c => c.Cards).Distinct().ToArray(), choices.SelectMany(c => c.Targets).Distinct().ToArray(), f.OwnerSeat)
@@ -187,7 +191,7 @@ public sealed partial class GameEngine
         var option = selected.Parameters.GetValueOrDefault("aid-option");
         if (r.Stage == SameTypeAidStage.ChoosingRecipient)
         {
-            if (option != "recipient" || selected.Targets is not [var recipient] || !SameTypeAidRecipients(r.Use, f.SkillId == "boundary:qiuyuan-mobile").Contains(recipient))
+            if (option != "recipient" || selected.Targets is not [var recipient] || !SameTypeAidRecipients(r.Use, f.SkillId).Contains(recipient))
                 throw new InvalidOperationException("Aid requires one publicly eligible recipient.");
             ReplaceRuntimeTop(f = f with { SameTypeAid = r with { RecipientSeat = recipient, Stage = SameTypeAidStage.ChoosingAnswer } });
             AdvanceEventRulesAndQueueFact(new SameTypeAidOfferedEvent(f.Id, r.Source, f.GameplayHash, r.Use, recipient));
@@ -198,17 +202,17 @@ public sealed partial class GameEngine
         if (option == "unavailable") { ReplaceRuntimeTop(f = f with { SameTypeAid = r with { Stage = SameTypeAidStage.Complete } }); FinishProgramSkill(f, false); return; }
         if (option == "target")
         {
-            if (!CanAddSameTypeAidTarget(r.Use, donor, f.SkillId == "boundary:qiuyuan-mobile")) throw new InvalidOperationException("Aid cannot add an illegal or duplicate target.");
+            if (!CanAddSameTypeAidTarget(r.Use, donor, SameTypeAidIgnoresSlashDistance(f.SkillId))) throw new InvalidOperationException("Aid cannot add an illegal or duplicate target.");
             AddSameTypeAidTarget(f, donor); ReplaceRuntimeTop(f = GetActiveProgramFrame(f.Id) with
             { SameTypeAid = r with { AddedTarget = true, Stage = SameTypeAidStage.Complete } });
             FinishProgramSkill(f, true); return;
         }
         if (option != "give" || selected.Cards is not [var id] ||
             _cardZones.GetLocation(id) is not { OwnerSeat: { } sourceOwner } from || sourceOwner != donor ||
-            from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
+            !SameTypeAidPaymentZones(f.SkillId).Contains(from.Zone))
             throw new InvalidOperationException("Aid requires one real recipient-owned HE entity.");
         var card = _cardZones.CardsAt(from).Single(c => c.Id == id);
-        if (card.IsGeneralWeapon || !IsSameTypeAidCard(card.Kind, r.Use.EffectiveKind))
+        if (card.IsGeneralWeapon || !IsSameTypeAidPaymentKind(f.SkillId, card.Kind, r.Use.EffectiveKind))
             throw new InvalidOperationException("Aid payment changed its exact type or card name.");
         ReplaceRuntimeTop(f = f with { SameTypeAid = r with { Stage = SameTypeAidStage.GiftChildren },
             PendingMovementContinuation = new(donor, 0, null) });

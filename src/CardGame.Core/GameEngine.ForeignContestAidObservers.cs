@@ -7,7 +7,8 @@ public sealed partial class GameEngine
         if (f.SameTypeAid is not { } r || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1 ||
             r.Source != SameTypeAidSource(f) || r.GameplayHash != f.GameplayHash ||
             r.Use.OriginalOwnerTarget != f.OwnerSeat || !MatchesSameTypeAidUse(r.Use) ||
-            f.WindowContext is not { } context || FreezeSameTypeAidUse(f.OwnerSeat, context) != r.Use) return false;
+            f.WindowContext is not { } context || FreezeSameTypeAidUse(f.OwnerSeat, context) != r.Use ||
+            !MatchesClassicQiuyuanAidContext(f.SkillId, f.OwnerSeat, context, r.Use)) return false;
         var parent = _resolutionStack.SingleOrDefault(p => p.Id == context.ParentFrameId);
         if (parent is ProgramCardTriggerWindowFrame card)
             return card.ParentFrameId == r.Use.CardUseFrameId && card.CandidateIndex >= 0 && card.CandidateIndex < card.Candidates.Count &&
@@ -20,9 +21,9 @@ public sealed partial class GameEngine
     private bool IsValidSameTypeAidPayment(ProgramSkillFrame f)
     {
         if (f.SameTypeAid is not { RecipientSeat: { } donor, Payment: { } paid } r ||
-            paid.From.OwnerSeat != donor || paid.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) ||
+            paid.From.OwnerSeat != donor || !SameTypeAidPaymentZones(f.SkillId).Contains(paid.From.Zone) ||
             !paid.Delivered || paid.CardId <= 0 || paid.MovementSequence <= 0 || paid.SequenceAfter < paid.MovementSequence ||
-            !IsSameTypeAidCard(paid.PrintedKind, r.Use.EffectiveKind) ||
+            !IsSameTypeAidPaymentKind(f.SkillId, paid.PrintedKind, r.Use.EffectiveKind) ||
             _cardMovements.Count(m => m.Sequence == paid.MovementSequence && m.CardId == paid.CardId && m.CardKind == paid.PrintedKind &&
                 m.From == paid.From && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == SameTypeAidGiftReason) != 1 ||
             CompleteProgramEventHistory().OfType<SameTypeAidGiftPaidEvent>().Count(e => e.ProgramFrameId == f.Id &&

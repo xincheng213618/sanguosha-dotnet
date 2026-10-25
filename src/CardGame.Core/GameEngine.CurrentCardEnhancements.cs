@@ -106,8 +106,11 @@ public sealed partial class GameEngine
             return CurrentCardExtraTargets(frame).Select(target => new PromptChoice(new ChoiceId($"enhancement.{frame.Id}.target.{target}"),
                 $"额外指定 {_players[target].Name}", [], [target], Parameters("target"))).ToArray();
         var result = new List<PromptChoice>();
+        var mobileBenxi = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!)
+            .GetPausedInstruction(frame.InstructionIndex).Effect.Op == SkillProgramEffectOp.ApplyMobileWuYiBenxi;
         foreach (var option in new[] { CurrentCardEnhancement.ExtraTarget, CurrentCardEnhancement.IgnoreArmor, CurrentCardEnhancement.Uncancelable, CurrentCardEnhancement.DrawAfterDamage }.Except(draft.Selected))
         {
+            if (mobileBenxi && option != CurrentCardEnhancement.ExtraTarget) continue;
             if (option == CurrentCardEnhancement.ExtraTarget && CurrentCardExtraTargets(frame).Length == 0) continue;
             var label = option switch { CurrentCardEnhancement.ExtraTarget => "目标数+1", CurrentCardEnhancement.IgnoreArmor => "无视防具", CurrentCardEnhancement.Uncancelable => "不能被抵消", _ => "造成伤害后摸一张牌" };
             result.Add(new(new ChoiceId($"enhancement.{frame.Id}.{option}"), label, [], [], Parameters(option.ToString())));
@@ -132,7 +135,7 @@ public sealed partial class GameEngine
         selected = CardEnhancementChoices(frame).SingleOrDefault(choice => choice.Id == selected.Id) ?? throw new InvalidOperationException("Enhancement option became illegal.");
         var draft = frame.CardEnhancementDraft!;
         var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.ApplyCurrentCardEnhancements || _pendingDecision?.PlayerSeat != frame.OwnerSeat)
+        if (effect.Op is not (SkillProgramEffectOp.ApplyCurrentCardEnhancements or SkillProgramEffectOp.ApplyMobileWuYiBenxi) || _pendingDecision?.PlayerSeat != frame.OwnerSeat)
             throw new InvalidOperationException("Enhancement lost its frozen instruction or chooser.");
         var option = selected.Parameters["enhancement-option"];
         ClearPendingDecision();
@@ -171,7 +174,7 @@ public sealed partial class GameEngine
         if (frame.CardEnhancementDraft is not { } draft) return;
         var use = EnhancementCardUse(frame);
         var flags = draft.Selected.Aggregate(CurrentCardEnhancement.None, (value, item) => value | item);
-        if (paused.Op != SkillProgramEffectOp.ApplyCurrentCardEnhancements || use.Id != draft.CardUseFrameId ||
+        if (paused.Op is not (SkillProgramEffectOp.ApplyCurrentCardEnhancements or SkillProgramEffectOp.ApplyMobileWuYiBenxi) || use.Id != draft.CardUseFrameId ||
             draft.Selected.Count >= paused.Amount || draft.Selected.Distinct().Count() != draft.Selected.Count ||
             draft.Selected.Any(flag => flag is not (CurrentCardEnhancement.ExtraTarget or CurrentCardEnhancement.IgnoreArmor or CurrentCardEnhancement.Uncancelable or CurrentCardEnhancement.DrawAfterDamage)) ||
             (use.Enhancements & flags) != flags || flags != CurrentCardEnhancement.None && use.EnhancementOwnerSeat != frame.OwnerSeat ||

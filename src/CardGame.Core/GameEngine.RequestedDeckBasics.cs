@@ -128,7 +128,7 @@ public sealed partial class GameEngine
         var source=RequireConversionSource(choice);var context=RequestedDeckBasicContext(original)??throw new InvalidOperationException("The basic need no longer has its original producer.");
         var actor=_players[original.PlayerSeat];var policy=RequestedDeckBasicSources(actor,RequestedDeckBasicKind(original,context.Intent)).SingleOrDefault(s=>s.Source==source).Policy;
         if(policy is null || !original.Choices.Any(c=>c.Id==choice.Id && AssistedChoicesEqual([c],[choice])))throw new InvalidOperationException("The optional top view source lost current qualification.");
-        var count=GetHand(actor).Count==0?policy.Value*2:policy.Value;
+        var count=IsMobileZhugeKeAocai(source.SkillId)?policy.Value:GetHand(actor).Count==0?policy.Value*2:policy.Value;
         // This is the same bounded refresh used by actual draws. Never fill a short nonempty pile by moving looked-at cards.
         EnsureDrawPile();
         var ids=_cardZones.CardsAt(CardLocation.DrawPile).Reverse().Take(count).Select(c=>c.Id).ToArray();

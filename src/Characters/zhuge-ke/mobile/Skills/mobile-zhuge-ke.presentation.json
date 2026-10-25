@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:aocai": { "name": "傲才", "description": "回合外有真实基本牌需求时，可私看牌堆顶两张，并使用或打出其中需要的基本牌；空手仍为两张。" },
+    "mobile:duwu": { "name": "黩武", "description": "弃置目标体力值数量的牌，造成1点伤害；因此进入濒死则于该次濒死结算后自己失去1点体力，本回合黩武失效。", "activationLabels": { "target-hp-cost": "黩武·弃牌伤害" } }
+  }
+}

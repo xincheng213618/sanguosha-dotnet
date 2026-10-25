@@ -3,11 +3,7 @@
   "skills": {
     "classic:qiuyuan": {
       "name": "求援",
-      "description": "当你成为其他角色使用【杀】的目标时，你可以选择另一名其他角色，除非其交给你一张【闪】，否则其也成为此【杀】的目标。",
-      "optionLabels": {
-        "give-dodge": "交给你一张【闪】",
-        "become-target": "不弃牌，成为此【杀】的目标"
-      }
+      "description": "当你成为其他角色使用【杀】的目标时，你可以选择另一名其他角色，除非其交给你一张【闪】，否则其也成为此【杀】的目标。"
     },
     "classic:zhuikong": {
       "name": "惴恐",

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 62, "skills": [{ "id": "mobile:sidi", "revision": 1,
+    "triggers": [
+      { "id": "store-after-actual-dodge", "window": "cardResponseAccepted", "ownerRelation": "observer", "cardKinds": ["dodge"], "optional": true,
+        "effects": [
+          { "op": "revealTopCards", "target": "owner", "amount": 1, "resultBind": "new-qian", "visibility": "public" },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "new-qian", "destination": "ownerPersistentZone", "destinationZone": "authority" }
+        ] },
+      { "id": "reduce-foreign-play", "window": "playPhaseStarting", "subject": "owner", "turnOwnerScope": "otherLiving", "optional": true,
+        "condition": { "kind": "compare", "left": { "kind": "currentOwnedZoneCount", "zone": "authority" }, "operator": "greaterThan", "right": { "kind": "integerConstant", "value": 0 } },
+        "effects": [
+          { "op": "selectSourceCard", "target": "owner", "cardSource": "owner", "zones": ["authority"], "resultBind": "spent-qian" },
+          { "op": "consumeMobileCaoZhenSidi", "target": "owner", "sourceBind": "spent-qian" }
+        ] }
+    ]
+  }]
+}

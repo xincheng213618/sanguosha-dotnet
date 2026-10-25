@@ -22132,6 +22132,227 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-guan-ping",
+      "characterName": "关平·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-126.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/17700.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-guan-ping.jpg",
+          "sha256": "4a93ea1a4a13df5b2fe194ec07e0a39e31c008e896bb334ec250e628fd578999",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-yu-fan",
+      "characterName": "虞翻·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-130.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/53400.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-yu-fan.jpg",
+          "sha256": "dc391663e5f280ff1c55d911dd5405b8732e2dd6b3deae2a4ff1aabcbc6d1d6e",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-liu-biao",
+      "characterName": "刘表·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-121.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/51600.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-liu-biao.jpg",
+          "sha256": "0e2bee83a1fb98ece105786787985d35c27f2bfa182fd052a5ccacb5481cfeaa",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-man-chong",
+      "characterName": "满宠·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-125.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/53200.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-man-chong.jpg",
+          "sha256": "5657ced81c85b56d1231aba1fe77ea3dd1c5dac95f83fdccda1eba45fcd23d71",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-jian-yong",
+      "characterName": "简雍·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-127.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/53300.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-jian-yong.jpg",
+          "sha256": "ef4a7f940b49396ef4a27dae9c0cb3dcb309eac229b775faea44e5f4512ba082",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-pan-zhang-ma-zhong",
+      "characterName": "潘璋马忠·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-129.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/54200.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-pan-zhang-ma-zhong.jpg",
+          "sha256": "2849235090259c3f332e36836a240eacf5ad99754cc7435ecfefdd98a6d13a66",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-fu-huang-hou",
+      "characterName": "伏皇后·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-132.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/18300.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-fu-huang-hou.jpg",
+          "sha256": "8193356ac19b130d58ff7e44a1cdb7a626ff1999fe2739ca71fa3e0b646f41e2",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-cao-zhen",
+      "characterName": "曹真·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-174.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/32100.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cao-zhen.jpg",
+          "sha256": "69b2e617a3ac7c7484e84f558517947e584469441139487c0993d04be37d1740",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-wu-yi",
+      "characterName": "吴懿·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-177.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/32400.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-wu-yi.jpg",
+          "sha256": "80bd89489bc3f19fceca4c4470792db7d6579af7f53bf77358cad15ed0053576",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhu-ran",
+      "characterName": "朱然·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-131.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/53700.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhu-ran.jpg",
+          "sha256": "f55ac7acbb0a118f22d4f6ec617ab0b51e11acbe0a45231ac8a96ea27552855a",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-sun-lu-ban",
+      "characterName": "孙鲁班·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-180.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/32700.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-sun-lu-ban.jpg",
+          "sha256": "e184ba6fd38470ae4afef57af7c87cf7af6311d5b056d6dcdcbecc2256230e92",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhuge-ke",
+      "characterName": "诸葛恪·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-80.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/11800.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhuge-ke.jpg",
+          "sha256": "20f9b459a0713d7f044320d9b40b5e76ac1d44c6ff6e4ef953bc17dfb61b7c2f",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-ling-cao",
+      "characterName": "凌操·移动版",
+      "defaultSkinId": "classic",
+      "skins": [
+        {
+          "id": "classic",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-59.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/7100.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-ling-cao.jpg",
+          "sha256": "60b1764d42e3664011774a213d48a5c61006b6042df58ab3fa1aaed27e86232f",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

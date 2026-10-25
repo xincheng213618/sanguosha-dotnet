@@ -799,6 +799,7 @@ public sealed partial class GameEngine
                 _players[frame.OwnerSeat].MaxHp - _players[frame.OwnerSeat].Hp),
             SkillProgramNumberExpression.CurrentHandEmptyTwoOtherwiseOne => GetHand(target).Count == 0 ? 2 : 1,
             SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne => (GetEquipment(target).Count + 1) / 2 + 1,
+            SkillProgramNumberExpression.EquipmentHalfFloorPlusOne => GetEquipment(target).Count / 2 + 1,
             SkillProgramNumberExpression.CurrentTurnUsedCardCategoryCount => CurrentTurnCategoryDrawCount(frame, targetSeat),
             SkillProgramNumberExpression.ActualTurnDeathBenefits => ActualTurnDeathDrawCount(frame, targetSeat),
             SkillProgramNumberExpression.CategoryTargetTurnUsage => GetProgramCategoryTargetTurnUsage(frame),

@@ -1,0 +1,3 @@
+{
+  "schemaVersion": 3, "skills": { "mobile:zhuikong": { "name": "惴恐", "description": "其他实际回合开始时受伤可拼点；赢则该角色本回合只能对自己使用牌，没赢则该角色至你的最终距离为1。", "triggerChoices": { "wounded-foreign-actual-turn": "与当前回合角色拼点。" } } }
+}

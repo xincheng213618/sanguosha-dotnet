@@ -1,0 +1,16 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:jian-yong",
+  "skills": [],
+  "generals": [{
+    "registrationOrder": 73700,
+    "pools": { "current": 73700 },
+    "definition": {
+      "id": "mobile:jian-yong", "name": "简雍·移动版", "portraitKey": "official-mobile-jian-yong",
+      "skillId": "classic:qiaoshui", "additionalSkillIds": ["classic:zongshi-pindian"],
+      "factionId": "shu", "baseHp": 3, "gender": "Male",
+      "characterId": "character:jian-yong", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+    }
+  }]
+}

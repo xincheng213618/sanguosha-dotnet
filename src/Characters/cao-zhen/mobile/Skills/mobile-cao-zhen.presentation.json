@@ -1,0 +1,3 @@
+{
+  "schemaVersion": 3, "skills": { "mobile:sidi": { "name": "司敌", "description": "本人使用闪或本人回合他人使用闪后，可将顶牌存为钤；其他角色出牌阶段开始，可移去一钤令该阶段杀次数上限-1。", "authorityName": "钤", "triggerChoices": { "store-after-actual-dodge": "将牌堆顶的一张牌存为钤。", "reduce-foreign-play": "移去一张钤，减少本出牌阶段杀次数。" } } }
+}

@@ -22,6 +22,41 @@ internal static class ZeroMaterialTargetAdjustmentChecks
         SourceChanges();
     }
 
+    public static void ClassicQiaoshuiWaitsForBasicOrOrdinaryTrickCold()
+    {
+        const string classic = "classic:qiaoshui";
+        var (game, registry) = Create(classic: true);
+        Reach(game, p => p.SkillPrompt?.SkillId == classic && Has(p, "program-action", "activate"));
+        Answer(game, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
+        Reach(game, p => Has(p, "program-action", "select-target")); Answer(game, c => c.Targets.SequenceEqual([1]));
+        Reach(game, p => Has(p, "action", "pindian-source-card"));
+        var paid = V(game, 0).Hand[0].Id;
+        Answer(game, c => c.Parameters.GetValueOrDefault("action") == "pindian-source-card" && c.Cards.SequenceEqual([paid])); Play(game);
+        Require(F<PindianResultDeterminedEvent>(game).Single().Result.SourceWon,
+            "The original classic grant comes from a genuine winning phase-start Pindian.");
+        for (var i = 0; i < 80 && new[] { CardKind.Crossbow, CardKind.Indulgence, CardKind.DrawTwo }.Any(k => V(game, 0).Hand.All(c => c.Kind != k)); i++)
+        { Use(game, "draw-one"); Play(game); }
+        foreach (var kind in new[] { CardKind.Crossbow, CardKind.Indulgence })
+        {
+            var card = V(game, 0).Hand.First(c => c.Kind == kind).Id;
+            var action = game.GetHumanLegalActions().First(a => a.CardId == card && a.ProgramSkillId != classic &&
+                (kind != CardKind.Indulgence || a.TargetSeats.SequenceEqual([1])));
+            Accept(game, new PlayCardCommand(0, card, action.TargetSeats, game.Revision, P(game)!.PromptId, action.PlayedCardKind, action.TargetCardId)
+                { ConversionSource = action.ConversionSource }); Play(game); game = Cold(game, registry);
+            Require(game.GetHumanLegalActions().Any(a => a.ProgramSkillId == classic && a.ProgramActivationId == "next-card-target-adjustment"),
+                "A real equipment or delayed-trick use and cold replay preserve the unspent classic basic/ordinary-trick allowance.");
+        }
+        var draw = V(game, 0).Hand.First(c => c.Kind == CardKind.DrawTwo).Id;
+        var adjusted = game.GetHumanLegalActions().Single(a => a.CardId == draw && a.ProgramSkillId == classic && a.TargetSeats.SequenceEqual([0, 1]));
+        var hands = new[] { V(game, 0).HandCount, V(game, 1).HandCount };
+        Accept(game, new PlayCardCommand(0, draw, adjusted.TargetSeats, game.Revision, P(game)!.PromptId, adjusted.PlayedCardKind, adjusted.TargetCardId));
+        Reach(game, p => p.SkillPrompt?.SkillId == Observer); game = Cold(game, registry); Play(game);
+        Require(V(game, 0).HandCount == hands[0] + 1 && V(game, 1).HandCount == hands[1] + 2 &&
+            game.GetHumanLegalActions().All(a => a.ProgramSkillId != classic) &&
+            game.CardMovements.Count(m => m.CardId == draw && m.Reason == CardMoveReasons.Use && m.To == CardLocation.Processing) == 1,
+            "The next actual ordinary trick consumes that same allowance once, draws for both real targets and never repays its entity after cold.");
+    }
+
     private static void Run(string source, CardKind kind)
     {
         var (game, registry) = Create(); Play(game);
@@ -129,13 +164,14 @@ internal static class ZeroMaterialTargetAdjustmentChecks
         Require(F<PindianResultDeterminedEvent>(game).Single().Result.SourceWon && F<NextActualUseTargetAdjustmentGrantedEvent>(game).Length == 1,
             "The adjustment comes from a real accepted winning Pindian with actual hand payment.");
     }
-    private static (GameEngine, ContentRegistry) Create(bool borrowed = false)
+    private static (GameEngine, ContentRegistry) Create(bool borrowed = false, bool classic = false)
     {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(borrowed));
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(borrowed, classic));
         var game = GameEngine.CreateStandard(new GameOptions { Seed = 31, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord, ModeId = Mode,
             UseInteractiveSetup = true, UseInteractiveDiscard = true, AdvanceAfterHumanCommands = false, MaxTurns = 4 }, registry);
         Accept(game, new StartGameCommand()); Reach(game, p => p.Kind == DecisionKind.SelectGeneral && p.PlayerSeat == 0);
         Accept(game, new SelectGeneralCommand(0, "fixture:zero-target-owner", game.Revision, P(game)!.PromptId));
+        if (classic) return (game, registry);
         Reach(game, p => p.SkillPrompt?.SkillId == Red && Has(p, "program-action", "activate"));
         Answer(game, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
         Reach(game, p => Has(p, "option-id", "targets")); Answer(game, c => c.Parameters.GetValueOrDefault("option-id") == "targets");
@@ -166,13 +202,13 @@ internal static class ZeroMaterialTargetAdjustmentChecks
     private static void Reject(GameEngine game) { var before = State(game); var p = P(game)!; Require(!game.Submit(new AnswerPromptCommand(0, p.PromptId, new("unpublished"), game.Revision)).Accepted && before == State(game), "Invalid continuation input does not mutate or pay the actual zero-material use again."); }
     private static void Require(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 
-    private sealed class Fixture(bool borrowed) : IGameContentPackage
+    private sealed class Fixture(bool borrowed, bool classic = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture:zero-material-targets", "1.0.0", "Real commands combining registered shared zero-material and target-adjustment capabilities.");
         public void Register(IContentRegistryBuilder builder)
         {
             foreach (var (resource, ids) in new (string, string[])[] {
-                ("boundary-jian-yong", [Adjustment]), ("classic-qin-mi", ["classic:tianbian"]), ("classic-wu-xian", [Red]),
+                ("boundary-jian-yong", [Adjustment]), ("classic-jian-yong", ["classic:qiaoshui"]), ("classic-qin-mi", ["classic:tianbian"]), ("classic-wu-xian", [Red]),
                 ("ordinary-yang-yan", [Chain]), ("ordinary-wang-xiang", [Draw]), ("boundary-guo-huang-hou", [Tiered, Upgrade]) })
             {
                 using var rules = new StreamReader(typeof(StandardContentPackage).Assembly.GetManifestResourceStream($"CardGame.Content.Standard.SkillPrograms.{resource}.rules.json")!);
@@ -191,6 +227,7 @@ internal static class ZeroMaterialTargetAdjustmentChecks
             """)!;
             root["schemaVersion"] = SkillProgramCatalog.RulesSchemaVersion;
             var activations = root["skills"]![0]!["activations"]!.AsArray();
+            if (classic) activations.Add(JsonNode.Parse("""{"id":"draw-one","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"draw","target":"owner","amount":1}]}"""));
             activations.Add(JsonNode.Parse("""{"id":"legacy","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"grantNextCardTargetAdjustment","target":"owner"}]}"""));
             if (borrowed)
             {
@@ -215,10 +252,11 @@ internal static class ZeroMaterialTargetAdjustmentChecks
             builder.AddSkill(new("fixture:zero-target-noop", "来源替换", "无运行能力"));
             builder.AddSkill(new("fixture:zero-target-selection", "固定其他候选", "只用公开选择权重") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(r => r, _ => 100d) });
             builder.AddGeneral(new("fixture:zero-target-owner", "共享零材料目标机制", "supporter", Driver, "shu", 7,
-                borrowed ? [Adjustment, "classic:tianbian", Red, Observer, PairObserver] : [Adjustment, "classic:tianbian", Red, Observer]));
+                classic ? ["classic:qiaoshui", "classic:tianbian", Observer] : borrowed ? [Adjustment, "classic:tianbian", Red, Observer, PairObserver] : [Adjustment, "classic:tianbian", Red, Observer]));
             for (var i = 1; i < 4; i++) builder.AddGeneral(new($"fixture:zero-target-peer-{i}", "固定原生目标", "supporter", "fixture:zero-target-selection", "qun", 8));
             builder.AddDeck(new("fixture:zero-target-deck", "固定真实实体", 4, 2, []) { PhysicalCards = Enumerable.Range(0, 80).Select(_ => new ContentDeckPhysicalCard("standard:slash", Suit.Heart, 7))
-                .Concat(borrowed ? Enumerable.Range(0, 20).Select(_ => new ContentDeckPhysicalCard("standard:crossbow", Suit.Spade, 7)) : []).ToArray() });
+                .Concat(classic ? new[] { "standard:crossbow", "standard:indulgence", "standard:draw_two" }.SelectMany(id => Enumerable.Range(0, 20).Select(_ => new ContentDeckPhysicalCard(id, Suit.Heart, 7))) :
+                    borrowed ? Enumerable.Range(0, 20).Select(_ => new ContentDeckPhysicalCard("standard:crossbow", Suit.Spade, 7)) : []).ToArray() });
             builder.AddMode(new(Mode, "共享机制固定4人", 4, 4, new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Renegade)] = 3 },
                 "fixture:zero-target-deck", GeneralCandidateCount: 4, GeneralPoolIds: ["fixture:zero-target-owner", "fixture:zero-target-peer-1", "fixture:zero-target-peer-2", "fixture:zero-target-peer-3"]));
         }

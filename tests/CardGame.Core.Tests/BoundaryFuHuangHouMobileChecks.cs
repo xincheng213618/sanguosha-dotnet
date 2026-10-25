@@ -5,6 +5,54 @@ namespace CardGame.Core.Tests;
 
 internal static class BoundaryFuHuangHouMobileChecks
 {
+    public static void ClassicQiuyuanUsesEachActualMultiTargetAndDodgeOnlyDistantAidCold()
+    {
+        const string classic = "classic:qiuyuan";
+        var (registry, game) = CreateScene(classicAid: true);
+        Need(new[] { 0, 2 }.All(seat => Player(game, seat).Skills?.Any(skill => skill.ContentId == classic) == true),
+            "Both original target seats are the real generals holding classic Qiuyuan before this multi-target Slash is issued.");
+        var actor = new[] { 1, 3 }.First(seat => Player(game, seat).Hand.Any(c => c.Kind == CardKind.Slash) &&
+            Player(game, seat == 1 ? 3 : 1).Hand.Any(c => c.Kind == CardKind.Dodge) && Player(game, seat == 1 ? 3 : 1).Hand.Any(c => c.Kind == CardKind.Peach));
+        var donor = actor == 1 ? 3 : 1;
+        Reach(game, p => p is { Kind: DecisionKind.PlayCard } && p.PlayerSeat == actor);
+        Accept(game, new UseProgramSkillCommand(actor, "fixture:boundary-fuhuanghou-quiet", "two-original-targets", [], [], game.Revision, Decision(game)!.PromptId));
+        Reach(game, p => p is { Kind: DecisionKind.PlayCard } && p.PlayerSeat == actor);
+        var slash = Player(game, actor).Hand.First(c => c.Kind == CardKind.Slash).Id;
+        Need(!game.Submit(new PlayCardCommand(actor, slash, [donor], game.Revision, Decision(game)!.PromptId)).Accepted,
+            "The aid recipient is outside the actual user's normal Slash distance even though the native use allows two original targets.");
+        var action = game.GetLegalActions(actor).Single(a => a.CardId == slash && a.Kind == LegalActionKind.Slash &&
+            a.TargetSeats.Count == 2 && a.TargetSeats.Order().SequenceEqual([0, 2]));
+        Accept(game, new PlayCardCommand(actor, slash, action.TargetSeats, game.Revision, Decision(game)!.PromptId, action.PlayedCardKind, action.TargetCardId)
+            { ConversionSource = action.ConversionSource });
+        Reach(game, p => Optional(p, classic)); var first = Decision(game)!.PlayerSeat; Activate(game);
+        Reach(game, p => p?.Choices.Any(c => c.Parameters.GetValueOrDefault("aid-option") == "recipient") == true);
+        Answer(game, c => c.Targets.SequenceEqual([donor]));
+        Reach(game, p => p?.PlayerSeat == donor && p.Choices.Any(c => c.Parameters.GetValueOrDefault("aid-option") == "give"));
+        var dodge = Player(game, donor).Hand.First(c => c.Kind == CardKind.Dodge).Id;
+        var peach = Player(game, donor).Hand.First(c => c.Kind == CardKind.Peach).Id;
+        Need(Decision(game)!.Choices.Any(c => c.Cards.SequenceEqual([dodge])) && Decision(game)!.Choices.All(c => !c.Cards.Contains(peach)),
+            "Classic Qiuyuan accepts only an actual hand Dodge; the same donor's Peach is not the boundary variant's eligible payment.");
+        Answer(game, c => c.Cards.SequenceEqual([dodge])); Reach(game, p => p?.SkillPrompt?.SkillId == Watch);
+        var root = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == classic);
+        var use = root.SameTypeAid!.Use.CardUseFrameId;
+        Need(root.OwnerSeat == first && root.WindowContext!.TargetSeat == first && root.SameTypeAid is { Stage: SameTypeAidStage.GiftChildren, Payment.Delivered: true } &&
+            Player(game, first).Hand.Any(c => c.Id == dodge), "The real finalized target owns its paid Dodge and exact native gain child.");
+        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry); Continue(game);
+        Reach(game, p => Optional(p, classic)); var second = Decision(game)!.PlayerSeat;
+        Need(first != second && new[] { first, second }.Order().SequenceEqual([0, 2]),
+            "Each of the two actual finalized targets gets one independent offer, including the nonprimary target.");
+        Activate(game); Reach(game, p => p?.Choices.Any(c => c.Parameters.GetValueOrDefault("aid-option") == "recipient") == true);
+        Answer(game, c => c.Targets.SequenceEqual([donor]));
+        Reach(game, p => p?.PlayerSeat == donor && p.Choices.Any(c => c.Parameters.GetValueOrDefault("aid-option") == "target"));
+        Answer(game, c => c.Parameters.GetValueOrDefault("aid-option") == "target");
+        Reach(game, p => p is { Kind: DecisionKind.PlayCard } && p.PlayerSeat == actor);
+        Need(Events<SameTypeAidOfferedEvent>(game).Where(e => e.Source.SkillId == classic && e.Use.CardUseFrameId == use).Select(e => e.Source.OwnerSeat).Order().SequenceEqual([0, 2]) &&
+            Events<SameTypeAidTargetAddedEvent>(game).Single(e => e.Source.SkillId == classic).RecipientSeat == donor &&
+            new[] { 0, 2, donor }.All(target => Events<DamageAppliedEvent>(game).Any(e => e.SourceSeat == actor && e.TargetSeat == target && e.Amount == 1)) &&
+            game.CardMovements.Count(m => m.CardId == slash && m.From == CardLocation.Hand(actor) && m.To == CardLocation.Processing) == 1 &&
+            game.CardMovements.Count(m => m.CardId == dodge && m.From == CardLocation.Hand(donor) && m.To == CardLocation.Hand(first) && m.Reason.Value == GiftReason) == 1,
+            "Cold returns the actual Dodge once; refusal adds the distant character to the same multi-target Slash, and all three targets resolve without repaying the Slash.");
+    }
     public static void HealthyHpThresholdAndOneContestPerRoundIssueExactForeignTurnRestriction()
     {
         var (_, game) = CreateScene(); Need(Player(game, 0).Hp == Player(game, 0).MaxHp && Player(game, 1).Hp == Player(game, 0).Hp,

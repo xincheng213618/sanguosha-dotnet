@@ -99,6 +99,8 @@ internal static class ForeignTurnContestAidComposition
         if (window == SkillProgramTriggerWindow.OtherActualTurnStarted ||
             effects.Any(e => e.Op == SkillProgramEffectOp.ResolveForeignTurnPindian))
         {
+            if (window == SkillProgramTriggerWindow.OtherActualTurnStarted && subject == SkillProgramTriggerSubject.Owner && optional &&
+                MobileFuHuangHouComposition.IsWoundedForeignTurnPipeline(effects)) return;
             if (window == SkillProgramTriggerWindow.OtherActualTurnStarted && subject == SkillProgramTriggerSubject.Owner &&
                 !optional && effects is [{ Op: SkillProgramEffectOp.ResolveShenTaishiCiPowei or SkillProgramEffectOp.ResolveHappyTaishiCiChongwei, Target: SkillProgramEffectTarget.Owner,
                     Condition.Kind: SkillProgramConditionKind.Always }]) return;

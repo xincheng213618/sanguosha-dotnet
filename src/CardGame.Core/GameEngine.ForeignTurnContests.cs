@@ -4,6 +4,7 @@ public sealed partial class GameEngine
 {
     private const string ForeignTurnContestClaimReason = "program.foreign-turn-contest.claim";
     private bool HasForeignTurnContests =>
+        _contentRegistry.ProgramDependencies.HasTriggerWindow(SkillProgramTriggerWindow.OtherActualTurnStarted) ||
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveForeignTurnPindian) ||
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShenTaishiCiPowei) ||
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveHappyTaishiCiChongwei) ||
@@ -120,6 +121,7 @@ public sealed partial class GameEngine
     {
         if (!IsForeignActualTurnPindian(program)) return null;
         var plan = ProgramInstructionResolver.Default.Resolve(program, _contentRegistry.GetSkill(program.SkillId).Program!);
+        if (!plan.Instructions.Any(effect => effect.Op == SkillProgramEffectOp.ResolveForeignTurnPindian)) return null;
         if (plan.Instructions.Count != 3 || program.InstructionIndex != 2 ||
             plan.Instructions[1].Op != SkillProgramEffectOp.StartPindian ||
             plan.Instructions[1].ResultBind != pindian.ProgramResultBind ||

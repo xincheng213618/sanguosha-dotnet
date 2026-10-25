@@ -1,0 +1,10 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:fu-huang-hou",
+  "skills": [{ "registrationOrder": 73900, "programBundle": "mobile-fu-huang-hou", "includeProgramPresentation": true,
+    "definition": { "id": "mobile:zhuikong", "name": "惴恐", "description": "其他角色的回合开始时，若你已受伤，你可以与其拼点：若你赢，其本回合不能对除其以外的角色使用牌；若你没赢，其本回合计算与你的距离视为1。", "executionForms": "Trigger" } }],
+  "generals": [{ "registrationOrder": 73901, "pools": { "current": 73901 }, "definition": {
+    "id": "mobile:fu-huang-hou", "name": "伏皇后·移动版", "portraitKey": "mobile-fu-huang-hou", "skillId": "mobile:zhuikong",
+    "additionalSkillIds": ["classic:qiuyuan"], "factionId": "qun", "baseHp": 3, "gender": "Female",
+    "characterId": "character:fu-huang-hou", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

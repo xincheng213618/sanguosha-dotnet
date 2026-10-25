@@ -14,7 +14,8 @@
           "minTargets": 1,
           "maxTargets": 1,
           "targetKind": "otherLiving",
-          "usesPerTurn": 1,
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
           "condition": { "kind": "always" },
           "effects": [
             {

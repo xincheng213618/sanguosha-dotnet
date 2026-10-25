@@ -16,73 +16,27 @@
           "cardKinds": [
             "slash",
             "fireSlash",
-            "thunderSlash"
+            "thunderSlash",
+            "coldSlash"
           ],
           "optional": true,
           "priority": 0,
           "effects": [
             {
-              "op": "selectTarget",
-              "target": "owner",
-              "targetKind": "otherLegalCurrentCardTarget"
-            },
+              "op": "offerSameTypeDifferentNameOrExtraTarget",
+              "target": "owner"
+            }
+          ]
+        },
+        {
+          "id": "legacy-virtual-slash-aid",
+          "window": "otherActualUseTargeted",
+          "subject": "owner",
+          "optional": true,
+          "effects": [
             {
-              "op": "chooseOption",
-              "target": "selectedTarget",
-              "resultBind": "qiuyuan-answer",
-              "options": [
-                {
-                  "id": "give-dodge",
-                  "condition": {
-                    "kind": "hasOwnedCardCategory",
-                    "zones": [
-                      "hand"
-                    ],
-                    "cardKinds": [
-                      "dodge"
-                    ]
-                  }
-                },
-                {
-                  "id": "become-target",
-                  "condition": {
-                    "kind": "always"
-                  }
-                }
-              ]
-            },
-            {
-              "op": "selectAndMoveOwnedCard",
-              "target": "owner",
-              "chooserRef": {
-                "kind": "selectedTarget"
-              },
-              "cardOwnerRef": {
-                "kind": "selectedTarget"
-              },
-              "zones": [
-                "hand"
-              ],
-              "cardKinds": [
-                "dodge"
-              ],
-              "count": 1,
-              "destination": "ownerHand",
-              "awaitMovementTriggers": true,
-              "condition": {
-                "kind": "choiceIs",
-                "sourceBind": "qiuyuan-answer",
-                "optionId": "give-dodge"
-              }
-            },
-            {
-              "op": "addCurrentCardUseTarget",
-              "target": "selectedTarget",
-              "condition": {
-                "kind": "choiceIs",
-                "sourceBind": "qiuyuan-answer",
-                "optionId": "become-target"
-              }
+              "op": "offerSameTypeDifferentNameOrExtraTarget",
+              "target": "owner"
             }
           ]
         }

@@ -1,0 +1,9 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:cao-zhen",
+  "skills": [{ "registrationOrder": 74000, "programBundle": "mobile-cao-zhen", "includeProgramPresentation": true,
+    "definition": { "id": "mobile:sidi", "name": "司敌", "description": "当你使用闪时，或当其他角色于你的回合内使用闪时，你可以将牌堆顶的一张牌置于你的武将牌上，称为钤；其他角色的出牌阶段开始时，你可以移去一张钤，令其本阶段使用杀的次数上限-1。", "executionForms": "Trigger" } }],
+  "generals": [{ "registrationOrder": 74001, "pools": { "current": 74001 }, "definition": {
+    "id": "mobile:cao-zhen", "name": "曹真·移动版", "portraitKey": "mobile-cao-zhen", "skillId": "mobile:sidi",
+    "factionId": "wei", "baseHp": 4, "gender": "Male", "characterId": "character:cao-zhen", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

@@ -1,0 +1,29 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:sun-lu-ban",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 74300,
+      "pools": {
+        "current": 74300
+      },
+      "definition": {
+        "id": "mobile:sun-lu-ban",
+        "name": "孙鲁班·移动版",
+        "portraitKey": "mobile-sun-lu-ban",
+        "skillId": "classic:zenhui",
+        "additionalSkillIds": [
+          "classic:jiaojin"
+        ],
+        "factionId": "wu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:sun-lu-ban",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

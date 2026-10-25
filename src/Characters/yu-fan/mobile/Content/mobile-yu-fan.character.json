@@ -1,0 +1,8 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:yu-fan",
+  "skills": [],
+  "generals": [{ "registrationOrder": 73400, "pools": { "current": 73400 }, "definition": {
+    "id": "mobile:yu-fan", "name": "虞翻·移动版", "portraitKey": "mobile-yu-fan", "skillId": "classic:zongxuan", "additionalSkillIds": ["classic:zhiyan"],
+    "factionId": "wu", "baseHp": 3, "gender": "Male", "characterId": "character:yu-fan", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } }]
+}

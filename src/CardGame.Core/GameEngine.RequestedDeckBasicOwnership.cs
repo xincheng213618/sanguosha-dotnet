@@ -31,6 +31,7 @@ public sealed partial class GameEngine
     {
         if(owner.RequestedDeckBasicMaterial is not { } r || r.OwnerFrameId!=owner.Id || r.ViewFrameId<=r.RequestFrameId ||
             r.ActorSeat<0 || r.ActorSeat>=_players.Count || r.Cursor<0 || r.ViewedCount<0 || r.ViewedCount>4 ||
+            IsMobileZhugeKeAocai(r.Source.SkillId) && r.ViewedCount>2 ||
             r.Source.OwnerSeat!=r.ActorSeat || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) ||
             _contentRegistry.Skills.GetValueOrDefault(r.Source.SkillId)?.Program is not { } program || program.GameplayHash!=r.GameplayHash ||
             program.CardPolicies.SingleOrDefault(p=>p.Id==r.Source.BindingId) is not {Kind:SkillProgramCardPolicyKind.PrivateTopBasicRequest,Value:2} ||

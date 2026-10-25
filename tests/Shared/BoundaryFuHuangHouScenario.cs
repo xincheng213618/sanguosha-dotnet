@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
@@ -10,9 +11,9 @@ internal static class BoundaryFuHuangHouScenario
         Mode = "identity:classic-boundary-fuhuanghou-fixture", Deck = "fixture:boundary-fuhuanghou-deck";
 
     // Four externally controlled seats use the public identity setup/commands, never a multiplayer Shanhe exception.
-    internal static (ContentRegistry Registry, GameEngine Game) CreateScene(bool weakPeers = false)
+    internal static (ContentRegistry Registry, GameEngine Game) CreateScene(bool weakPeers = false, bool classicAid = false)
     {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(weakPeers));
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(weakPeers, classicAid));
         var game = GameEngine.CreateStandard(new GameOptions {
             Seed = 31, PlayerCount = 4, HumanSeat = 0, HumanSeats = [0, 1, 2, 3], HumanRole = Role.Lord, ModeId = Mode,
             UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 9
@@ -23,7 +24,9 @@ internal static class BoundaryFuHuangHouScenario
             var prompt = Decision(game);
             if (prompt is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 }) return (registry, game);
             if (prompt is { Kind: DecisionKind.SelectGeneral }) {
-                var id = prompt.PlayerSeat == 0 ? Owner : prompt.ValidContentIds.First(id => id != Owner);
+                var id = prompt.PlayerSeat == 0 ? Owner : classicAid
+                    ? "fixture:boundary-fuhuanghou-peer-" + prompt.PlayerSeat
+                    : prompt.ValidContentIds.First(id => id != Owner);
                 Accept(game, new SelectGeneralCommand(prompt.PlayerSeat, id, game.Revision, prompt.PromptId));
             }
             else if (prompt is not null) throw new InvalidOperationException("Unexpected Fu Huang Hou setup decision: " + prompt.Kind);
@@ -68,12 +71,13 @@ internal static class BoundaryFuHuangHouScenario
         Answer(game, choice => choice.Cards.SequenceEqual([peer]));
     }
 
-    private sealed class Fixture(bool weakPeers) : IGameContentPackage
+    private sealed class Fixture(bool weakPeers, bool classicAid) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-boundary-fuhuanghou", new(1, 0));
         public void Register(IContentRegistryBuilder builder)
         {
             CharacterFixtureContent.Register(builder, Hero);
+            if (classicAid) CharacterFixtureContent.Register(builder, "classic:fu-huanghou");
             var rules = $$$$"""
                 {"schemaVersion":{{{{SkillProgramCatalog.RulesSchemaVersion}}}},"skills":[
                   {"id":"{{{{Quiet}}}}","revision":1,"modifiers":[{"id":"keep-real-inputs","query":"handLimit","operation":"add","value":20,"priority":0}]},
@@ -82,11 +86,18 @@ internal static class BoundaryFuHuangHouScenario
                 """;
             var labels = new Dictionary<string, object> { [Quiet] = new { name = "保留原生手牌", description = "实际回合与真实拼点输入" },
                 [Watch] = new { name = "原生得牌子窗", description = "取得原拼点牌或求援实际赠与后暂停", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } };
-            var programs = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
+            var nodes = JsonNode.Parse(rules)!;
+            if (classicAid) nodes["skills"]![0]!["activations"] = JsonNode.Parse("""
+                [{"id":"two-original-targets","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
+                  "effects":[{"op":"grantTurnRuleModifier","target":"owner","ruleQuery":"cardTargetCount","ruleOperation":"add","amount":1,"cardKinds":["slash","fireSlash","thunderSlash","coldSlash"]}]}]
+                """);
+            var programs = SkillProgramCatalog.Load(nodes.ToJsonString(), JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, program) in programs.Programs) builder.AddSkill(new(id, programs.Presentations[id].Name, programs.Presentations[id].Description) { Program = program, ProgramPresentation = programs.Presentations[id] });
-            builder.AddGeneral(new(Owner, "移动版技能真实来源", "supporter", Zhuikong, "qun", 3, [Qiuyuan, Quiet, Watch], GeneralGender.Female));
+            builder.AddGeneral(new(Owner, "移动版技能真实来源", "supporter", classicAid ? "classic:qiuyuan" : Zhuikong, "qun", 3,
+                classicAid ? [Quiet, Watch] : [Qiuyuan, Quiet, Watch], GeneralGender.Female));
             var ids = new List<string> { Owner };
-            for (var index = 1; index < 4; index++) { var id = "fixture:boundary-fuhuanghou-peer-" + index; ids.Add(id); builder.AddGeneral(new(id, "可控制的其他角色", "supporter", Quiet, "wei", weakPeers ? 2 : 4)); }
+            for (var index = 1; index < 4; index++) { var id = "fixture:boundary-fuhuanghou-peer-" + index; ids.Add(id); builder.AddGeneral(new(id, "可控制的其他角色", "supporter", Quiet, "wei", weakPeers ? 2 : 4,
+                classicAid && index == 2 ? ["classic:qiuyuan", Watch] : [])); }
             builder.AddDeck(new(Deck, "固定真实杀闪桃锦囊", 8, 0, []) { PhysicalCards = Enumerable.Range(0, 128).Select(index => (index % 4) switch {
                 0 => new ContentDeckPhysicalCard("standard:slash", Suit.Spade, 7), 1 => new ContentDeckPhysicalCard("standard:dodge", Suit.Heart, 13),
                 2 => new ContentDeckPhysicalCard("standard:peach", Suit.Diamond, 7), _ => new ContentDeckPhysicalCard("standard:dismantlement", Suit.Club, 2)
