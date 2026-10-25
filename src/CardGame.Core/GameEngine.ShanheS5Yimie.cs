@@ -183,6 +183,7 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("Yimie cost lost its original skill frame.");
     }
 
-    private sealed partial class ProgramSkillHost : IShanheS5YimieHost
+    [ProgramCapability]
+    private sealed class ShanheS5YimieProgramCapability(GameEngine engine) : IShanheS5YimieHost
     { public SkillProgramStepOutcome ResolveShanheS5Yimie(ProgramSkillFrame f, string stage) => engine.ResolveShanheS5Yimie(f, stage); }
 }

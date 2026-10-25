@@ -4,7 +4,8 @@ public sealed partial class GameEngine
 {
     private const string ShanheZhanhunDaoSkill = "shanhe:zhanhun-dao";
 
-    private sealed partial class ProgramSkillHost : IShanheZhanhunDaoProgramHost
+    [ProgramCapability]
+    private sealed class ShanheZhanhunDaoProgramCapability(GameEngine engine) : IShanheZhanhunDaoProgramHost
     {
         public SkillProgramStepOutcome ResolveShanheZhanhunDao(ProgramSkillFrame frame) => engine.ResolveShanheZhanhunDao(frame);
     }

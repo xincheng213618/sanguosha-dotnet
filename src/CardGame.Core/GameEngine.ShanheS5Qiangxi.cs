@@ -69,7 +69,8 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("S5 Qiangxi lost its exact owner, paid source, round count or target.");
     }
 
-    private sealed partial class ProgramSkillHost : IShanheS5QiangxiHost
+    [ProgramCapability]
+    private sealed class ShanheS5QiangxiProgramCapability(GameEngine engine) : IShanheS5QiangxiHost
     {
         public SkillProgramStepOutcome ResolveShanheS5Qiangxi(ProgramSkillFrame frame, string stage) => engine.ResolveShanheS5Qiangxi(frame, stage);
     }

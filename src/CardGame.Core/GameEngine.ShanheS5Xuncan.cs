@@ -249,6 +249,7 @@ public sealed partial class GameEngine
             f.JudgmentOutcomeBindings?.Any(o => o.Reason == "shanhe.s5.leijie" && IsValidProgramJudgmentOutcome(f, o)) == true) ||
         ProgramEventHistory<ShanheS5JudgmentEffectEvent>().Any(e => e.FrameId == f.Id);
 
-    private sealed partial class ProgramSkillHost : IShanheS5XuncanHost
+    [ProgramCapability]
+    private sealed class ShanheS5XuncanProgramCapability(GameEngine engine) : IShanheS5XuncanHost
     { public SkillProgramStepOutcome ResolveShanheS5Xuncan(ProgramSkillFrame f, SkillProgramEffect e) => engine.ResolveShanheS5Xuncan(f, e); }
 }

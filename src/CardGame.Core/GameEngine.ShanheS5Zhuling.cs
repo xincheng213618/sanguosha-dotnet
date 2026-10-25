@@ -5,7 +5,8 @@ public sealed partial class GameEngine
     private const string ShanheS5JixianX = "shanhe-s5-jixian-x";
     private static readonly CardMoveReason ShanheS5JixianDrawReason = new("shanhe.s5.jixian.draw");
 
-    private sealed partial class ProgramSkillHost : IShanheS5JixianProgramHost
+    [ProgramCapability]
+    private sealed class ShanheS5JixianProgramCapability(GameEngine engine) : IShanheS5JixianProgramHost
     {
         public SkillProgramStepOutcome ResolveShanheS5Jixian(ProgramSkillFrame frame, string stage) => engine.ResolveShanheS5Jixian(frame, stage);
     }

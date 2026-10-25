@@ -60,7 +60,8 @@ public sealed partial class GameEngine
         AssertShanheS5HujiaReward(f); return true;
     }
 
-    private sealed partial class ProgramSkillHost : IShanheS5HujiaHost, IShanheS5JianxiongHost
+    [ProgramCapability]
+    private sealed class ShanheS5HujiaProgramCapability(GameEngine engine) : IShanheS5HujiaHost, IShanheS5JianxiongHost
     {
         public void BindShanheS5HujiaReward(ProgramSkillFrame frame) => engine.BindShanheS5HujiaReward(frame);
         public void ClaimShanheS5JianxiongCards(ProgramSkillFrame frame) => engine.ClaimShanheS5JianxiongCards(frame);

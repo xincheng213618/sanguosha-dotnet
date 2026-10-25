@@ -65,7 +65,8 @@ public sealed partial class GameEngine
         }
     }
 
-    private sealed partial class ProgramSkillHost : IAnqiFeirenHost
+    [ProgramCapability]
+    private sealed class AnqiFeirenProgramCapability(GameEngine engine) : IAnqiFeirenHost
     {
         public SkillProgramStepOutcome ResolveAnqiFeiren(ProgramSkillFrame frame) => engine.ResolveAnqiFeiren(frame);
     }

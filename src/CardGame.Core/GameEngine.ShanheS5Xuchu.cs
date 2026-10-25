@@ -4,7 +4,8 @@ public sealed partial class GameEngine
 {
     private const string ShanheS5LuoyiNumberPrefix = "shanhe-s5-luoyi-x:";
 
-    private sealed partial class ProgramSkillHost : IShanheS5LuoyiProgramHost
+    [ProgramCapability]
+    private sealed class ShanheS5LuoyiProgramCapability(GameEngine engine) : IShanheS5LuoyiProgramHost
     {
         public void ResolveShanheS5Luoyi(ProgramSkillFrame frame, SkillProgramEffect effect) =>
             engine.ResolveShanheS5Luoyi(frame, effect);
