@@ -52,7 +52,7 @@ internal static class ShanheEncounterChecks
             Need(GameCheckpointJson.Serialize(recovered.CreateCheckpoint()) == saved &&
                 SnapshotJson.Serialize(recovered.CreateSnapshot(0)) == SnapshotJson.Serialize(game.CreateSnapshot(0)),
                 "The native game restores its content hash, command prefix and player view.");
-            var plain = setup with { EnemyRoster = [new("classic:cao-cao")] };
+            var plain = setup with { EnemyRoster = [new("classic:cao-cao")], BossTransition = null };
             var ordinary = StandardShanheCampaignCatalog.CreateBattleRegistry(plain);
             var ordinaryHash = ordinary.ContentHash;
             foreach (var enemy in encounter.Enemies)

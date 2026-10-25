@@ -70,6 +70,7 @@ public sealed partial class GameEngine
         public void CancelResolutionTree(Func<ModeCancelledResolution, IGameEvent> cancellationFact)
         {
             ArgumentNullException.ThrowIfNull(cancellationFact);
+            engine.CaptureShanheBossCancelledMaterials();
             // Retiring an actual-turn subtree has no ordinary child return.
             // Already paid physical cards stay paid until native processing cleanup.
             while (engine._resolutionStack.LastOrDefault() is { } top)

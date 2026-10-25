@@ -63,6 +63,7 @@ public static partial class ShanheCampaignContent
                     encounter.Enemies.Count + (encounter.Allies?.Count ?? 0) + 1 <= 8, "An encounter requires one to seven enemies and at most eight total seats.");
                 Require(encounter.VictoryGold is >= 0 and <= 100_000 && encounter.HealAfterVictory is >= 0 and <= 1000, "Invalid encounter rewards.");
                 foreach (var npc in encounter.Enemies!.Concat(encounter.Allies ?? [])) ValidateCombatant(npc);
+                ValidateBossTransition(encounter.BossTransition, encounter.Enemies);
             }
             UniqueIds((node.Choices ?? []).Select(c => c?.Id ?? ""), "node choice");
             foreach (var choice in node.Choices ?? [])
@@ -113,6 +114,14 @@ public static partial class ShanheCampaignContent
         Bonuses = value.Bonuses ?? new(), StartingCards = Freeze(value.StartingCards ?? []), StartingEquipment = Freeze(value.StartingEquipment ?? [])
     };
     internal static bool IsBattle(ShanheNodeKind kind) => kind is ShanheNodeKind.Battle or ShanheNodeKind.EliteBattle or ShanheNodeKind.BossBattle;
+    internal static void ValidateBossTransition(ShanheBossTransition? transition, IReadOnlyList<ShanheCombatantDefinition> enemies)
+    {
+        if (transition is null) return;
+        Require(transition.EnemyIndex >= 0 && transition.EnemyIndex < enemies.Count, "A boss transition requires an existing enemy seat.");
+        RequireText(transition.GeneralId, "second-form general");
+        Require(transition.MaxHp is >= 1 and <= 1000 && transition.Hp >= 1 && transition.Hp <= transition.MaxHp &&
+            transition.DrawCards is >= 0 and <= 40, "Invalid boss second-form health, general or draw count.");
+    }
     internal static void Require(bool condition, string message)
     {
         if (!condition) throw new ArgumentException(message);

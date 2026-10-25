@@ -107,6 +107,7 @@ public sealed partial class ShanheCampaignSession
             PlayerRank = options.PlayerRank,
             RebirthAvailable = options.PlayerRank == 5,
             StartingResourcesExpireOnUse = Definition.StartingResourcesExpireOnUse,
+            BossTransition = firstEncounter.BossTransition,
             // This registry-only probe validates every reward, including skill
             // programs imported only by recipes that reference them. No engine
             // is created and no unearned skill is granted to a battle player.
@@ -269,7 +270,8 @@ public sealed partial class ShanheCampaignSession
             DefaultGodFactionId = Definition.DefaultGodFactionId,
             PlayerRank = _options.PlayerRank,
             RebirthAvailable = rebirthAvailable,
-            StartingResourcesExpireOnUse = Definition.StartingResourcesExpireOnUse
+            StartingResourcesExpireOnUse = Definition.StartingResourcesExpireOnUse,
+            BossTransition = encounter.BossTransition
         });
         return state with { Phase = ShanheCampaignPhase.Battle, EncounterOrdinal = ordinal, EncounterId = encounter.Id, BattleSetup = setup };
     }

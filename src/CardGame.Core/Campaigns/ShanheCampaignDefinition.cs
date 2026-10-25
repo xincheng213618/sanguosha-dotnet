@@ -12,6 +12,9 @@ public sealed record ShanheTacticBonuses(int MaxHp = 0, int InitialHand = 0, int
 
 public sealed record ShanheStartingCard(CardKind Kind, Suit Suit = Suit.Spade, int Rank = 1);
 
+/// <summary>A reserved second form replaces the indexed enemy in the same battle.</summary>
+public sealed record ShanheBossTransition(int EnemyIndex, string GeneralId, int MaxHp, int Hp, int DrawCards = 0);
+
 public sealed record ShanheCombatantDefinition(
     string GeneralId, int MaxHpBonus = 0, int? Hp = null, int InitialHandBonus = 0,
     int DrawBonus = 0, int SlashBonus = 0, IReadOnlyList<string>? ExtraSkillIds = null)
@@ -68,6 +71,9 @@ public sealed record ShanheBattleSetup(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool StartingResourcesExpireOnUse { get; init; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ShanheBossTransition? BossTransition { get; init; }
+
     public int BattleSeed => DeriveSeed(RunSeed, NodeId, EncounterOrdinal);
 
     public static bool ValueEquals(ShanheBattleSetup? left, ShanheBattleSetup? right) =>
@@ -91,6 +97,7 @@ public sealed record ShanheBattleSetup(
             throw new ArgumentException("A campaign roster cannot contain null combatants.", nameof(setup));
         if (setup.StartingCards.Any(value => value is null) || setup.StartingEquipment.Any(value => value is null))
             throw new ArgumentException("A campaign opening cannot contain null physical cards.", nameof(setup));
+        ShanheCampaignContent.ValidateBossTransition(setup.BossTransition, setup.EnemyRoster);
         return setup with
         {
             ExtraSkillIds = ShanheCampaignContent.Freeze(setup.ExtraSkillIds),
@@ -112,7 +119,11 @@ public sealed record ShanheBattleSetup(
 
 public sealed record ShanheEncounterDefinition(
     string Id, string Name, IReadOnlyList<ShanheCombatantDefinition> Enemies,
-    IReadOnlyList<ShanheCombatantDefinition>? Allies = null, int VictoryGold = 0, int HealAfterVictory = 0);
+    IReadOnlyList<ShanheCombatantDefinition>? Allies = null, int VictoryGold = 0, int HealAfterVictory = 0)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ShanheBossTransition? BossTransition { get; init; }
+}
 
 public sealed record ShanheRewardDefinition(
     string Id, string Name, int Gold = 0, int Heal = 0, ShanheTacticBonuses? Bonuses = null,

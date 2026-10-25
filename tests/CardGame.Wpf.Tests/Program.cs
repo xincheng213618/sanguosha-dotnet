@@ -210,6 +210,7 @@ internal static class Program
             Check("Shanhe campaign UI: full roster search pages and selection", () => ShanheCampaignUiChecks.FullRosterSearchPagesAndSelection(output));
             Check("Shanhe campaign UI: preparation locks and encounter preview", () => ShanheCampaignUiChecks.PreparationLocksAndEncounterPreview(output));
             Check("Shanhe campaign UI: public fixed NPC cards read-only preview", () => ShanheCampaignUiChecks.PublishedFixedNpcCardsAreReadOnlyInEncounterPreview(output));
+            Check("Shanhe campaign UI: eight-seat boss stages and final settlement preview", () => ShanheCampaignUiChecks.EightSeatBossStagesAndFinalSettlementPreview(output));
             Check("Shanhe campaign UI: published boss portraits render on actual seats", () => ShanheBossPortraitChecks.PublishedS5BossAliasesDecodeAndRenderOnRealSeats(output));
             Check("Shanhe campaign UI: inheritance before map and cold restore", () => ShanheCampaignUiChecks.InheritanceOffersBeforeFirstMapAndSurvivesColdRestore(output));
             Check("Shanhe campaign UI: shop purchase states and codex navigation", () => ShanheModulesUiChecks.ShopPurchaseAndCodexNavigation(output));

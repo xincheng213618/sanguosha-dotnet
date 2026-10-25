@@ -308,7 +308,7 @@
           <TextBlock Text="{Binding ShanheEncounterEnemyDetail}" Style="{StaticResource Caption}" TextAlignment="Center"/>
          </ScrollViewer>
         </Grid>
-        <TextBlock Grid.Row="1" Text="击败敌人，领取奖励后继续征程。" Foreground="#A68E66" VerticalAlignment="Center" FontSize="12"/>
+        <TextBlock Grid.Row="1" Text="击败本场全部敌军，按章节结算奖励。" Foreground="#A68E66" VerticalAlignment="Center" FontSize="12"/>
         <Button x:Name="ShanheChallengeButton" Grid.Row="1" Grid.Column="2" Content="挑 战" Command="{Binding ChallengeShanheEncounterCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Center" VerticalAlignment="Center" MinWidth="170" AutomationProperties.Name="确认挑战当前遭遇"/>
        </Grid>
        <Button x:Name="ShanheEncounterCloseButton" Content="×" FontSize="25" Style="{StaticResource QuietCampaignButton}" Padding="6,0" Margin="0,9,9,0" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{Binding CloseShanheEncounterPreviewCommand}" AutomationProperties.Name="返回章节地图"/>
