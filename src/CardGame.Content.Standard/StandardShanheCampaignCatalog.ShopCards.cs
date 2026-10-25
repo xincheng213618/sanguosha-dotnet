@@ -4,7 +4,8 @@ namespace CardGame.Content.Standard;
 
 public static partial class StandardShanheCampaignCatalog
 {
-    private sealed record ShopCardSource(int SourceId, string Name, CardKind Kind, Suit Suit, int Rank, int Price, int Rarity)
+    private sealed record ShopCardSource(int SourceId, string Name, CardKind Kind, Suit Suit, int Rank, int Price, int Rarity,
+        int? CodexNodeId = null)
     {
         public string RewardId => "codex-card-" + SourceId.ToString(System.Globalization.CultureInfo.InvariantCulture);
         public ShanheShopMetadata Metadata => new(SourceId, Price, Rarity,
@@ -15,7 +16,7 @@ public static partial class StandardShanheCampaignCatalog
     // This catalogue's suit codes are 1=Heart, 2=Diamond, 3=Spade, 4=Club,
     // as corroborated by the existing verified 4004/4008/4010/4015 faces.
     // They are independent of the enemy equipment table's local suit convention.
-    // These rows have no fixed S5 research node; their initial availability is local stock.
+    // Rows without a fixed S5 research node use explicit local default stock.
     private static IReadOnlyList<ShopCardSource> CurrentShopCardSources => Array.AsReadOnly(new[]
     {
         new ShopCardSource(4001, "诸葛连弩", CardKind.Crossbow, Suit.Diamond, 1, 600, 4),
@@ -31,7 +32,12 @@ public static partial class StandardShanheCampaignCatalog
         new ShopCardSource(4023, "的卢", CardKind.Dilu, Suit.Club, 5, 600, 4),
         new ShopCardSource(4024, "爪黄飞电", CardKind.Zhaohuangfeidian, Suit.Heart, 13, 600, 4),
         new ShopCardSource(4025, "骅骝", CardKind.Hualiu, Suit.Diamond, 13, 600, 4),
+        new ShopCardSource(4026, "无双方天戟", CardKind.WushuangHalberd, Suit.Diamond, 12, 600, 4),
         new ShopCardSource(4027, "束发紫金冠", CardKind.PurpleGoldCrown, Suit.Diamond, 1, 400, 3),
+        new ShopCardSource(4028, "红锦百花袍", CardKind.RedCottonRobe, Suit.Club, 1, 600, 4),
+        new ShopCardSource(4037, "修罗炼狱戟", CardKind.ShuraInfernoHalberd, Suit.Diamond, 12, 600, 4, 111),
+        new ShopCardSource(4045, "七宝刀", CardKind.QiBaoDao, Suit.Spade, 6, 400, 3),
+        new ShopCardSource(4046, "百辟刀", CardKind.BaiBiDao, Suit.Spade, 2, 600, 4),
         new ShopCardSource(4148, "雷震", CardKind.Leizhen, Suit.Club, 1, 400, 3),
         new ShopCardSource(4149, "暗器飞刃", CardKind.AnqiFeiren, Suit.Heart, 5, 200, 2),
         new ShopCardSource(4151, "斩魂刀", CardKind.ZhanhunDao, Suit.Spade, 2, 100, 1),
@@ -59,4 +65,8 @@ public static partial class StandardShanheCampaignCatalog
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentShopCardMetadata =>
         CurrentShopCardSources.Select(source => new KeyValuePair<string, ShanheShopMetadata>(source.RewardId, source.Metadata));
+
+    private static IEnumerable<KeyValuePair<int, string>> CurrentShopCardCodexBindings =>
+        CurrentShopCardSources.Where(source => source.CodexNodeId.HasValue)
+            .Select(source => new KeyValuePair<int, string>(source.CodexNodeId!.Value, source.RewardId));
 }

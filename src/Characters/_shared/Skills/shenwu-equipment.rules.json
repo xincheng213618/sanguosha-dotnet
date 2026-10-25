@@ -3,10 +3,10 @@
   "skills": [
     {
       "id": "shenwu:shura-inferno-halberd", "revision": 1,
-      "modifiers": [{ "id": "all-in-range-slash-targets", "query": "cardTargetCount", "operation": "add",
-        "value": 5, "cardKinds": ["slash", "fireSlash", "thunderSlash"], "priority": 0, "condition": { "kind": "always" } }],
+      "modifiers": [{ "id": "all-in-range-slash-targets", "query": "cardTargetCount", "operation": "set",
+        "valueExpression": "otherLivingPlayerCount", "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"], "priority": 0, "condition": { "kind": "always" } }],
       "triggers": [{ "id": "recover-damaged-target", "window": "afterDamageApplied", "subject": "damageSource",
-        "damageOccurrence": "perDamage", "damageCardKinds": ["slash", "fireSlash", "thunderSlash"],
+        "damageOccurrence": "perDamage", "damageCardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"],
         "optional": false, "priority": 0,
         "effects": [{ "op": "recover", "target": "owner", "targetRef": { "kind": "eventTarget" }, "amount": 1 }]
       }]

@@ -24,7 +24,7 @@ public enum SkillRuleQuery
 }
 public enum SkillRuleOperation { Add, Set, Unlimited }
 public enum SkillRuleRecipientScope { Owner = 0, OtherPublicTeamAllies = 1 }
-public enum SkillRuleValueExpression { LivingFactionCount, OwnedZoneCount, OwnerLostHp = 2, NegatedOwnedZoneCount = 3, NegatedOwnerLostHp = 900, OwnerMarkerCount = 2600, CurrentTurnUsedHandSuitCount = 4600, PublicLivingFactionCount = 5200, OwnerMaxHp = 5600, NegatedLivingFemaleCount = 21400, NegatedCurrentRoundActualUseCount = 27260, PublicTeamEnemyCount = 27600, OtherPublicTeamAllyCount = 27602, CurrentTurnDrawPhaseDrawCountHalfFloor = 27900 }
+public enum SkillRuleValueExpression { LivingFactionCount, OwnedZoneCount, OwnerLostHp = 2, NegatedOwnedZoneCount = 3, NegatedOwnerLostHp = 900, OwnerMarkerCount = 2600, CurrentTurnUsedHandSuitCount = 4600, PublicLivingFactionCount = 5200, OwnerMaxHp = 5600, NegatedLivingFemaleCount = 21400, NegatedCurrentRoundActualUseCount = 27260, PublicTeamEnemyCount = 27600, OtherPublicTeamAllyCount = 27602, CurrentTurnDrawPhaseDrawCountHalfFloor = 27900, OtherLivingPlayerCount = 27910 }
 public enum SkillRuleQueryDependency { MarkerState }
 public enum SkillProgramConditionKind { Always, OwnTurn, NotOwnTurn, Wounded, HpAtLeast, HandCountAtLeast, CardUseIsRed, SelectedTargetIsOther, SelectedTargetHandGreaterThanOwner, PindianWon, PindianNotWon, BooleanState, All, Any, Not, FaceDown, Chained, ChoiceIs, BoundCardsSameColor, BoundCardsMatchCategories, BoundCardsMatchKinds = 20, HasClaimableDamageCards = 21, AttackRangeCoverageDecreased = 22, HasOwnedCardCategory = 23, BoundCardCountAtLeast = 24, ActivationCardCountAtLeast = 25, ClassicIdentityMode = 26, BoundCardSuitMatchesChoice = 27, BoundCardsMatchSuits = 28, BoundCardCategoryMatchesCardAction = 29, EventTargetGenderIs = 30, EventSourceGenderIs = 31, EventSourceExists = 32, SelectedTargetWounded = 820, SelectedTargetHpGreaterThanOwner = 47200, RuntimeBooleanState = 450, PublicCounterAtLeast = 451, PublicCounterOdd = 452, HandCountGreaterThanHp = 1020, PositiveHandLimit = 1021, HasUsableHandCard = 1022, RequestedSlashDamagedOwner = 1023, PreviousPlayCardIsBasic = 1024, NoWeapon = 11300, NoArmor = 22501, NoMounts = 22502, NoTreasure = 22503, JudgmentOutcomeMatchesSuits = 14400 }
 public enum SkillProgramTriggerConditionKind
@@ -2699,6 +2699,9 @@ public sealed class SkillProgramModifier
         SkillRuleValueExpression.OtherPublicTeamAllyCount => context.OtherPublicTeamAllyCount is >= 0
             ? checked(context.OtherPublicTeamAllyCount.Value * (ValueMultiplier ?? 1))
             : throw new InvalidOperationException("Other living public allies were not captured."),
+        SkillRuleValueExpression.OtherLivingPlayerCount => context.OtherLivingPlayerCount is >= 0
+            ? context.OtherLivingPlayerCount.Value
+            : throw new InvalidOperationException("Other living participants were not captured."),
         SkillRuleValueExpression.CurrentTurnUsedHandSuitCount => context.CurrentTurnUsedHandSuitCount ??
             throw new InvalidOperationException("Actual turn hand-suit facts were not captured."),
         SkillRuleValueExpression.CurrentTurnDrawPhaseDrawCountHalfFloor => context.CurrentTurnDrawPhaseDrawCount is >= 0
@@ -4158,6 +4161,10 @@ public sealed class SkillProgramCatalog
         SkillRuleValueExpression? valueExpression = hasValueExpression
             ? EnumValue<SkillRuleValueExpression>(node, "valueExpression", path)
             : null;
+        if (valueExpression == SkillRuleValueExpression.OtherLivingPlayerCount &&
+            (query != SkillRuleQuery.CardTargetCount || operation != SkillRuleOperation.Set ||
+             recipientScope != SkillRuleRecipientScope.Owner))
+            Fail(path, "other living participants require an owner card-target-count Set modifier");
         var valueMultiplier = node.TryGetProperty("valueMultiplier", out _) ? PositiveInt(node, "valueMultiplier", path) : (int?)null;
         if (valueMultiplier is not null &&
             (valueExpression != SkillRuleValueExpression.OtherPublicTeamAllyCount || valueMultiplier > 20))
@@ -4218,7 +4225,7 @@ public sealed class SkillProgramCatalog
             (operation != SkillRuleOperation.Add || query != SkillRuleQuery.OutgoingDistance))
             Fail(path + ".valueExpression",
                 "negatedOwnedZoneCount is currently supported only by additive outgoingDistance modifiers");
-        if (valueExpression is not null && valueExpression is not (SkillRuleValueExpression.NegatedOwnedZoneCount or SkillRuleValueExpression.NegatedOwnerLostHp or SkillRuleValueExpression.NegatedLivingFemaleCount or SkillRuleValueExpression.NegatedCurrentRoundActualUseCount) &&
+        if (valueExpression is not null && valueExpression is not (SkillRuleValueExpression.NegatedOwnedZoneCount or SkillRuleValueExpression.NegatedOwnerLostHp or SkillRuleValueExpression.NegatedLivingFemaleCount or SkillRuleValueExpression.NegatedCurrentRoundActualUseCount or SkillRuleValueExpression.OtherLivingPlayerCount) &&
             (operation != SkillRuleOperation.Add || query != SkillRuleQuery.HandLimit &&
                 !(query == SkillRuleQuery.CardTargetCount && valueExpression == SkillRuleValueExpression.OwnerLostHp) &&
                 !(query is (SkillRuleQuery.IncomingDistance or SkillRuleQuery.OutgoingDistance) && valueExpression == SkillRuleValueExpression.OwnerMarkerCount) &&
@@ -4250,8 +4257,11 @@ public sealed class SkillProgramCatalog
         {
             var lostHpSlashTargets = valueExpression == SkillRuleValueExpression.OwnerLostHp && value == 0 &&
                 cardKinds.Count > 0 && cardKinds.All(kind => kind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash);
-            if (operation != SkillRuleOperation.Add || !lostHpSlashTargets && (value <= 0 || valueExpression is not null))
-                Fail(path, "cardTargetCount requires a positive fixed modifier or an additive ownerLostHp Slash modifier");
+            var allOtherSlashTargets = valueExpression == SkillRuleValueExpression.OtherLivingPlayerCount &&
+                operation == SkillRuleOperation.Set && cardKinds.Count == 4 && ProgramCardKindMatch.IsFullSlashFamily(cardKinds);
+            if (!allOtherSlashTargets && (operation != SkillRuleOperation.Add ||
+                    !lostHpSlashTargets && (value <= 0 || valueExpression is not null)))
+                Fail(path, "cardTargetCount requires a positive fixed addition, additive ownerLostHp Slash modifier or otherLivingPlayerCount Set for the full Slash family");
             if (cardKinds.Count == 0)
                 Fail(path + ".cardKinds", "cardTargetCount requires at least one effective card kind");
         }
@@ -5473,7 +5483,7 @@ public sealed class SkillProgramCatalog
                         CardCatalog.Get(kind).CategoryName == "锦囊牌")
                     : window is SkillProgramTriggerWindow.CardUseCommitted or SkillProgramTriggerWindow.CardEffectBeforeApply or SkillProgramTriggerWindow.CardUseBeforeTargetEffects or SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.SlashTargetRedirecting or SkillProgramTriggerWindow.SlashBeforeResponse or SkillProgramTriggerWindow.SlashFullyDodged
                     ? cardKinds.All(kind => kind is CardKind.Slash or CardKind.FireSlash or
-                        CardKind.ThunderSlash or CardKind.Lightning)
+                        CardKind.ThunderSlash or CardKind.ColdSlash or CardKind.Lightning)
                     : cardKinds.All(kind => kind is CardKind.Slash or CardKind.FireSlash or
                         CardKind.ThunderSlash or CardKind.Dodge or CardKind.Nullification);
                 if (!supported)

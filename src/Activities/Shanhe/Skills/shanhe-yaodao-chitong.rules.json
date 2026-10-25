@@ -4,7 +4,7 @@
     "id": "shanhe:yaodao-chitong", "revision": 1,
     "triggers": [{
       "id": "judge-and-randomly-redirect", "window": "slashTargetRedirecting", "ownerRelation": "actor",
-      "cardKinds": ["slash", "fireSlash", "thunderSlash"], "optional": false, "isSkillInvocation": false,
+      "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"], "optional": false, "isSkillInvocation": false,
       "priority": -1000,
       "effects": [
         { "op": "beginYaodaoChitong", "target": "owner" },

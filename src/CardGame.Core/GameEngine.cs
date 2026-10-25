@@ -6695,7 +6695,9 @@ public sealed partial class GameEngine
         IReadOnlyList<CardConversionSource>? additionalConversionSources = null)
     {
         var targetSeats = targets.Select(target => target.Seat).ToArray();
-        var stillLegal = targetSeats.Length >= 2 && (targetSeats.Length <= 5 || (HasHpLossSlashTargets(source) || HasNativeExtraSlashTargets(source, slash, playedCardKind) || playedCardKind == CardKind.FireSlash && HasMouZyFireTargets(source) && targetSeats.Length <= 1 + MouZyTargetLimit(source)) && targetSeats.Length < _players.Count(p => p.IsAlive)) &&
+        // The same current legal-action projection owns the target limit for
+        // equipment and program modifiers, including every other living seat.
+        var stillLegal = targetSeats.Length >= 2 && targetSeats.Length < _players.Count(p => p.IsAlive) &&
             BuildLegalActions(source, selectedPhysicalCardId: slash.Id).Any(action =>
                 action.Kind == LegalActionKind.Slash &&
                 action.CardId == slash.Id &&

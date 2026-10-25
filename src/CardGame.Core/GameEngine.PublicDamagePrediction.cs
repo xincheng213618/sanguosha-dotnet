@@ -107,6 +107,10 @@ public sealed partial class GameEngine
             player.IsAlive && CardPolicies(player, policy).Any(binding => visible.Contains(binding.Source.SkillId));
         var cardLayer = amount;
         var additional = 0;
+        if (!finalized)
+            additional = checked(additional + QiBaoDaoDamageBonus(cardUse && kind is { } slash && IsSlashCard(slash),
+                sourceLess, chain, HasWeaponAbility(sourceState, CardKind.QiBaoDao),
+                !target.HpUndefined, target.Hp, target.MaxHp));
         if (!finalized && !sourceLess && source.IsAlive)
         {
             if (cardUse && !chain && kind is { } card)

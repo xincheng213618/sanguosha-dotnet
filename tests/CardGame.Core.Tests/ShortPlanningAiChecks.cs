@@ -76,8 +76,8 @@ internal static class ShortPlanningAiChecks
         Need(Brain(AiDecisionPolicy.TacticalPlanningVersion).ChoosePlay(robe.View, [robeFire, End], 1).Action == End,
             "Red Cotton Robe instead checks final fire damage nature, including an ordinary Slash converted to fire damage.");
         var cold = Scene(LegalActionKind.Dismantlement, CardKind.ColdSlash, CardKind.RedCottonRobe);
-        Need(Brain(AiDecisionPolicy.TacticalPlanningVersion).ChoosePlay(cold.View, [cold.Slash, End], 1).Action == cold.Slash,
-            "The registered robe prevents fire and thunder damage only; do not invent immunity against a legal cold Slash.");
+        Need(Brain(AiDecisionPolicy.TacticalPlanningVersion).ChoosePlay(cold.View, [cold.Slash, End], 1).Action == End,
+            "The registered robe prevents Cold damage too, so retain the blocked Cold Slash and end play.");
 
         var shield = Scene(LegalActionKind.Dismantlement, CardKind.Slash, CardKind.RenwangShield);
         var redMaterial = PublicCard(103, CardKind.Slash) with { Suit = Suit.Heart };
