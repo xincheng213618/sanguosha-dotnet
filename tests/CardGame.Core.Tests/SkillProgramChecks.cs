@@ -55,6 +55,20 @@ internal static class SkillProgramChecks
         AssertReject(RulesA, PresentationA.Replace("scenario:composed", "scenario:missing", StringComparison.Ordinal),
             "unknown skill");
         AssertReject("{", PresentationA, "rules");
+        foreach (var policy in new[] { "bypassOtherParticipantArmor", "doubleArmorDamage", "reserveNextDamageAfterOffTurnHit" })
+        {
+            var qualified = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                schemaVersion = SkillProgramCatalog.RulesSchemaVersion,
+                skills = new[] { new { id = "scenario:damage-policy", revision = 1,
+                    cardPolicies = new[] { new { id = "qualified", kind = policy, value = 1 } } } }
+            });
+            AssertReject(qualified, System.Text.Json.JsonSerializer.Serialize(new
+            {
+                schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                skills = new Dictionary<string, object> { ["scenario:damage-policy"] = new { name = "Policy", description = "Unqualified damage policy." } }
+            }), "unconditional marker");
+        }
         foreach (var condition in new[]
         {
             """{"kind":"damageTargetIsPublicTeamEnemy"}""",

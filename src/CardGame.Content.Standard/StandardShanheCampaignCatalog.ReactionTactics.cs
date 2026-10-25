@@ -5,6 +5,9 @@ namespace CardGame.Content.Standard;
 
 public static partial class StandardShanheCampaignCatalog
 {
+    public const string CurrentJiyiSkillId = "shanhe:current-jiyi-2171";
+    public const string CurrentJiyi2SkillId = "shanhe:current-jiyi-2172";
+    public const string CurrentJiyi3SkillId = "shanhe:current-jiyi-2173";
     public const string CurrentCuixueSkillId = "shanhe:current-cuixue-2048";
     public const string CurrentXialuXiangfengSkillId = "shanhe:current-xialu-xiangfeng-2028";
     public const string CurrentZhongjijiSkillId = "shanhe:current-zhongjiji-2130";
@@ -60,6 +63,18 @@ public static partial class StandardShanheCampaignCatalog
             "当你击杀其他角色后，你回复1点体力值"),
         new ReactionTacticSource(2169, "搜刮Ⅱ", CurrentSougua2SkillId, 300, 2, null,
             "当你击杀其他角色后，你回复2点体力值"),
+        new ReactionTacticSource(2171, "技艺Ⅰ", CurrentJiyiSkillId, 500, 3, 69,
+            "当你的技能直接造成伤害时，此伤害+1"),
+        new ReactionTacticSource(2172, "技艺Ⅱ", CurrentJiyi2SkillId, 700, 4, 123,
+            "当你的技能直接造成伤害时，此伤害+2"),
+        new ReactionTacticSource(2173, "技艺Ⅲ", CurrentJiyi3SkillId, 700, 4, null,
+            "当你的技能直接造成伤害时，此伤害+3"),
+        new ReactionTacticSource(2177, "隔山打牛", StandardShanheArmorBreakTacticsPackage.GeshanDaniuSkillId, 700, 4, 126,
+            "你对其他人造成伤害时，无视其护甲"),
+        new ReactionTacticSource(2193, "剔甲术", StandardShanheArmorBreakTacticsPackage.TijiaShuSkillId, 500, 3, null,
+            "对护甲造成双倍伤害"),
+        new ReactionTacticSource(2127, "卧薪尝胆", StandardShanheWoxinPackage.SkillId, 500, 3, null,
+            "回合外每受到1次伤害，你的下次造成伤害+1"),
     });
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentReactionTacticShopMetadata =>

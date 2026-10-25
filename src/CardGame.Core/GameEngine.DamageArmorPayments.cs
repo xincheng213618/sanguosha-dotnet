@@ -23,14 +23,14 @@ public sealed partial class GameEngine
     private DamageArmorPaymentReceipt? PrepareDamageArmorPayment(long frameId, IDamageAttempt attack)
     {
         var target = _players[attack.TargetSeat];
-        if (target.Armor == 0 || WushuangArmorBypass(attack)) return null;
+        if (target.Armor == 0 || BypassesNativeDamageArmor(attack)) return null;
         if (target.Armor < 0 || _resolutionStack.LastOrDefault() is not DamageFrame damage ||
             damage.Id != frameId || damage.ParentFrameId != attack.ResolutionId ||
             damage.SourceSeat != attack.SourceSeat || damage.TargetSeat != attack.TargetSeat ||
             damage.Amount != attack.DamageAmount || damage.Amount < 0 || !attack.DamageAmountFinalized || damage.ArmorPayment is not null ||
             !IsExactArmorDamageRequest(damage, attack, requireUnpaid: true))
             throw new InvalidOperationException("Armor payment requires the exact unpaid native damage segment.");
-        var multiplier = WushuangArmorDamageMultiplier(attack);
+        var multiplier = NativeDamageArmorMultiplier(attack);
         var absorbed = Math.Min(target.Armor, checked(damage.Amount * multiplier));
         var hpLoss = damage.Amount - (absorbed + multiplier - 1) / multiplier;
         var unclamped = checked(target.Hp - hpLoss);

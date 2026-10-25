@@ -360,6 +360,9 @@ public static partial class StandardShanheCampaignCatalog
                 packages.Add(new StandardShanheArmorTacticsPackage());
                 packages.Add(new StandardShanheDamageDrawTacticsPackage());
                 packages.Add(new StandardShanheSustainTacticsPackage());
+                packages.Add(new StandardShanheDirectSkillDamagePackage());
+                packages.Add(new StandardShanheArmorBreakTacticsPackage());
+                packages.Add(new StandardShanheWoxinPackage());
             }
             if (currentFuqi) packages.Add(new StandardShanheFuqiPackage());
             if (currentWangong) packages.Add(new StandardShanheWangongPackage());

@@ -235,7 +235,8 @@ public enum SkillProgramDamageModifierCondition
     OwnerRoundSlashUseOrdinalWithinLimit = 1037,
     OwnerActualTurnElementalSlashUseOrdinalWithinLimit = 1038,
     SourceRoundIsOdd = 1039,
-    SourceRoundIsEven = 1040
+    SourceRoundIsEven = 1040,
+    DirectSkillDamage = 1041
 }
 public sealed record SkillProgramDamageModifier(
     string Id, IReadOnlyList<CardKind> CardKinds, int Amount,
@@ -3734,6 +3735,17 @@ public sealed class SkillProgramCatalog
             ? EnumValue<Suit>(node, "inputSuit", path) : null;
         Suit? outputSuit = node.TryGetProperty("outputSuit", out _)
             ? EnumValue<Suit>(node, "outputSuit", path) : null;
+        if (kind is SkillProgramCardPolicyKind.BypassOtherParticipantArmor or SkillProgramCardPolicyKind.DoubleArmorDamage or
+            SkillProgramCardPolicyKind.ReserveNextDamageAfterOffTurnHit)
+        {
+            var condition = OptionalCondition(node, path);
+            if (cardKinds.Count != 0 || requiredKinds.Count != 0 || value != 0 ||
+                inputSuit is not null || outputSuit is not null || ownerRole is not null || factionId is not null ||
+                condition.Kind != SkillProgramConditionKind.Always || node.TryGetProperty("discardCost", out _) ||
+                node.TryGetProperty("providerDrawCount", out _) || maximumRecoveryOrdinal is not null)
+                Fail(path, "Damage policies require an unconditional marker without card, suit, role, amount or payment qualifiers.");
+            return new(id, kind, cardKinds, requiredKinds, value, inputSuit, outputSuit, condition);
+        }
         if (kind == SkillProgramCardPolicyKind.ShanheFenchaiJudgment)
         {
             if (node.EnumerateObject().Any(property => property.Name is not ("id" or "kind")))
@@ -4016,6 +4028,7 @@ public sealed class SkillProgramCatalog
                     or SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan
                     or SkillProgramDamageModifierCondition.SourceRoundIsOdd
                     or SkillProgramDamageModifierCondition.SourceRoundIsEven
+                    or SkillProgramDamageModifierCondition.DirectSkillDamage
                     or SkillProgramDamageModifierCondition.BothParticipantsPublicEnemiesOfOwner)))
             Fail(path + ".cardKinds", "must contain distinct effective card kinds");
         var sourceRound = condition is SkillProgramDamageModifierCondition.SourceRoundIsOdd or
@@ -4081,7 +4094,8 @@ public sealed class SkillProgramCatalog
         else if (condition is SkillProgramDamageModifierCondition.SourceHandBelowHp or
                  SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan or
                  SkillProgramDamageModifierCondition.SourceRoundIsOdd or
-                 SkillProgramDamageModifierCondition.SourceRoundIsEven)
+                 SkillProgramDamageModifierCondition.SourceRoundIsEven or
+                 SkillProgramDamageModifierCondition.DirectSkillDamage)
         {
             if (scope != SkillProgramDamageModifierSourceScope.DamageSource || kinds.Count != 0)
                 Fail(path, "source damage conditions require damageSource and every damage kind");
