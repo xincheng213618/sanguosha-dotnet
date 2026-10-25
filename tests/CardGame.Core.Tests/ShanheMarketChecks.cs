@@ -41,7 +41,7 @@ internal static class ShanheMarketChecks
         BuyCategory(session, "t", 300);
         Accept(session, new ChooseShanheNodeOptionCommand("buy-medicine", null, session.Revision));
         Require(Items(session, "e").All(item => item.GoldCost == 200) && Items(session, "c").All(item => item.GoldCost == 250) &&
-            Items(session, "s").All(item => item.GoldCost == 80), "Equipment and cards accumulate independently while skill prices stay fixed.");
+            Items(session, "s").All(item => item.GoldCost == 180), "Equipment, cards and skills accumulate independent category surcharges.");
         foreach (var item in session.Snapshot.ShopItems.Where(item => !item.IsPurchased))
             Require(session.Snapshot.NodeChoices.Single(choice => choice.Id == item.ChoiceId).GoldCost == item.GoldCost,
                 "Node commands and product views must agree on the exact current debit.");

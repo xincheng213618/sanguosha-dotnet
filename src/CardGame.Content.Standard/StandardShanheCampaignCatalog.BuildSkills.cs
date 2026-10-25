@@ -6,7 +6,7 @@ namespace CardGame.Content.Standard;
 public static partial class StandardShanheCampaignCatalog
 {
     // Source rows are matched by their complete rule, not just their names.
-    // All runtime skills below already belong to the normal showcase registry.
+    // Reuse ordinary definitions where exact; distinct S5 rules have conditional packages.
     private sealed record CurrentBuildSkillSource(
         int SourceId, string Name, string SkillId, int Price, int Rarity, int? CodexNodeId, string Description)
     {
@@ -20,6 +20,16 @@ public static partial class StandardShanheCampaignCatalog
     // Codex equipment construction can request shop metadata during that process.
     private static IReadOnlyList<CurrentBuildSkillSource> CurrentBuildSkills => Array.AsReadOnly(new[]
     {
+        new CurrentBuildSkillSource(3023, "龙魂", StandardShanheLonghunPackage.SkillId, 1000, 4, 107,
+            "你可以将至多两张花色相同的牌按以下规则使用或打出：\n•红桃当【桃】;•方片当火【杀】;\n•梅花当【闪】;•黑桃当【无懈可击】。\n若你以此法转化使用了两张：\n•红色牌，此牌回复值或伤害值+1;\n•黑色牌，你弃置当前回合角色一张牌。"),
+        new CurrentBuildSkillSource(3081, "遗计", StandardShanheYijiPackage.SkillId, 600, 3, null,
+            "当你受到1点伤害后，你可以观看牌堆顶的两张牌，然后将这些牌交给任意角色。"),
+        new CurrentBuildSkillSource(3049, "青囊", "classic:qingnang", 100, 1, null,
+            "出牌阶段限一次，你可以弃置一张手牌令一名角色回复1点体力。"),
+        new CurrentBuildSkillSource(3052, "刚烈", "classic:ganglie", 300, 2, 43,
+            "当你受到伤害后，你可以判定，若结果不为红桃，伤害来源选择弃置两张手牌或受到1点伤害。"),
+        new CurrentBuildSkillSource(3271, "英姿", "boundary:yingzi", 300, 2, null,
+            "锁定技，摸牌阶段，你多摸一张牌。你的手牌上限为你的体力上限。"),
         new CurrentBuildSkillSource(3028, "裸衣", "classic:luoyi", 1000, 4, null,
             "摸牌阶段，你可以少摸一张牌，然后你本回合使用【杀】或【决斗】造成的伤害+1。"),
         new CurrentBuildSkillSource(3037, "武神", "ol:wushen", 1000, 4, null,
@@ -52,7 +62,7 @@ public static partial class StandardShanheCampaignCatalog
             "你可以将一张黑色手牌当【闪】使用或打出。"),
         new CurrentBuildSkillSource(3053, "矢北", "classic:shibei", 100, 1, null,
             "锁定技，当你每回合首次受到伤害后，你回复1点体力，然后当你本回合再受到伤害后，你失去1点体力。"),
-        new CurrentBuildSkillSource(3089, "御策", "classic:yuce", 300, 2, null,
+        new CurrentBuildSkillSource(3089, "御策", "classic:yuce", 300, 2, 38,
             "当你受到伤害后，你可以展示一张手牌令伤害来源选择一项：\n1.弃置一张与你展示牌类型不同的手牌；2.你回复1点体力。"),
         new CurrentBuildSkillSource(3164, "绝境", "ol:juejing", 300, 2, null,
             "锁定技，你的手牌上限+2。当你进入或脱离濒死状态时，你摸一张牌。")
