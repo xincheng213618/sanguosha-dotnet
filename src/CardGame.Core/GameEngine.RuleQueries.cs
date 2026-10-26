@@ -106,6 +106,7 @@ public sealed partial class GameEngine
         var contributions = CollectNumericRuleContributions(player, SkillRuleQuery.DrawCount).ToList();
         AddFiniteContribution(contributions, $"campaign:{player.Seat}:market:draw", ShanheMarketRuleBonus(player.Seat, SkillRuleQuery.DrawCount));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:mobile-duliang:draw", MobileLiYanNextDrawBonus(player));
+        AddFiniteContribution(contributions, $"issued:{player.Seat}:shanhe-luanxin:draw", ShanheLuanxinNextDrawBonus(player));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:alternating-next-draw", AlternatingNextDrawPhaseBonus(player));
         AddFiniteContribution(contributions, $"state:{player.Seat}:cao-xi:gangshu:draw", CaoXiGangshuBonus(player, SkillRuleQuery.DrawCount));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:shunshi:draw", DuFuRenPhaseBonus(player.Seat, SkillRuleQuery.DrawCount));
@@ -228,7 +229,8 @@ public sealed partial class GameEngine
             contributions)));
         ordinary = ApplyBoundaryZhuZhiHandLimit(player, ordinary);
         ordinary = ApplyBoundaryLiuShanHandLimit(player, ordinary);
-        return suppressHanSongYinbi ? ordinary : ApplyAnniversaryHanSongHandLimit(player, ordinary);
+        ordinary = suppressHanSongYinbi ? ordinary : ApplyAnniversaryHanSongHandLimit(player, ordinary);
+        return ApplyMinimumHandLimitPolicy(player, ordinary);
     }
 
     private RuleQueryEvaluation EvaluateCardTargetCount(CharacterState player, CardKind effectiveCardKind)

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:companion-guangao", "revision": 1,
+    "triggers": [{
+      "id": "legal-slash-extra-target", "window": "cardUseTargetsFinalized", "ownerRelation": "observer", "optional": false,
+      "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"],
+      "effects": [{"op": "resolveShanheGuangao", "target": "owner"}]
+    }]
+  }]
+}

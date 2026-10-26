@@ -9,7 +9,7 @@ public static partial class StandardShanheCampaignCatalog
 
     private static ShanheCampaignDefinition WithOpeningInheritance(ShanheCampaignDefinition definition)
     {
-        var registry = PlayerRosterRegistry;
+        var registry = OpeningInheritanceRegistry.Value;
         var pool = definition.Rewards.Where(reward => reward.SkillId is { } skill &&
                 ShopMetadataByRewardId.TryGetValue(reward.Id, out var metadata) && metadata.Rarity == 2 && metadata.Kind == "技能" &&
                 registry.Skills.TryGetValue(skill, out var implementation) && implementation.ImplementationStatus == SkillImplementationStatus.Complete)
@@ -24,4 +24,7 @@ public static partial class StandardShanheCampaignCatalog
             }).ToArray()
         };
     }
+
+    private static readonly Lazy<ContentRegistry> OpeningInheritanceRegistry = new(() =>
+        ComposedSkillContentRegistry.CreateShowcase(additionalPackages: [new StandardShanheXiashengPackage()]));
 }

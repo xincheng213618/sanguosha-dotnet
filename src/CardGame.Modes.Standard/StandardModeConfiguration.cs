@@ -132,7 +132,18 @@ public static class StandardModeConfigurationRules
             return;
         }
         GodFactionSelectionRules.ValidateDefault(setup.DefaultGodFactionId);
+        if (setup.TerrainSkillId is { } terrain && (!registry.Skills.TryGetValue(terrain, out var terrainSkill) ||
+            terrainSkill.ImplementationStatus != SkillImplementationStatus.Complete || terrainSkill.Program is null))
+            throw new ArgumentException("The Shanhe terrain requires complete registered content.");
         _ = ShanheGeneralRanks.GetBonuses(setup.PlayerRank ?? 1);
+        if (setup.SharedAllyRank != 0 && setup.SharedAllyRank != Math.Max(3, setup.PlayerRank ?? 1))
+            throw new ArgumentException("Shared ally rank must match the expedition rank.");
+        if (setup.ExtraSkillIds.Contains(ShanheTeamTactics.AllyRebirthSkillId, StringComparer.Ordinal) ||
+            setup.TacticSkillIds.Contains(ShanheTeamTactics.AllyRebirthSkillId, StringComparer.Ordinal) ||
+            setup.EnemyRoster.Any(member => (member.ExtraSkillIds ?? []).Contains(ShanheTeamTactics.AllyRebirthSkillId, StringComparer.Ordinal)) ||
+            setup.SharedAllyRank != 5 && setup.AllyRoster.Any(member =>
+                (member.ExtraSkillIds ?? []).Contains(ShanheTeamTactics.AllyRebirthSkillId, StringComparer.Ordinal)))
+            throw new ArgumentException("Ally rebirth requires an explicitly shared fifth-rank ally recipe.");
         if (setup.RebirthAvailable && setup.PlayerRank != 5 ||
             setup.RebirthAvailable != setup.ExtraSkillIds.Contains(ShanheGeneralRanks.RebirthSkillId, StringComparer.Ordinal) ||
             setup.TacticSkillIds.Contains(ShanheGeneralRanks.RebirthSkillId, StringComparer.Ordinal))
@@ -163,7 +174,8 @@ public static class StandardModeConfigurationRules
             if (!tacticIdentities.Add(acquisition.IdentityId) && !acquisition.Repeatable)
                 throw new ArgumentException("A unique campaign tactic cannot be acquired more than once.");
         }
-        foreach (var member in setup.EnemyRoster.Concat(setup.AllyRoster)) ValidateMember(member);
+        foreach (var member in setup.EnemyRoster) ValidateMember(member);
+        foreach (var member in setup.AllyRoster) ValidateMember(member, isAlly: true);
         if (setup.BossTransition is { } transition &&
             (transition.EnemyIndex < 0 || transition.EnemyIndex >= setup.EnemyRoster.Count ||
              !registry.Generals.ContainsKey(transition.GeneralId) || !registry.IsGeneralPlayable(transition.GeneralId) ||
@@ -171,6 +183,11 @@ public static class StandardModeConfigurationRules
              transition.MaxHp is < 1 or > 1000 || transition.Hp < 1 || transition.Hp > transition.MaxHp ||
              transition.DrawCards is < 0 or > 40))
             throw new ArgumentException("The Shanhe second form must be a reserved playable general with bounded health and draw count.");
+        if (setup.BossTransition is { Combatant: { } stage } sourceTransition)
+        {
+            if (stage.GeneralId != sourceTransition.GeneralId) throw new ArgumentException("The source second-form numeric recipe has a different general.");
+            ValidateMember(stage);
+        }
         foreach (var card in setup.StartingCards.Concat(setup.StartingEquipment))
         {
             if (!Enum.IsDefined(card.Kind) || !Enum.IsDefined(card.Suit) || card.Suit == Suit.None ||
@@ -182,13 +199,15 @@ public static class StandardModeConfigurationRules
             setup.StartingEquipment.Select(c => EquipmentCatalog.Get(c.Kind).Slot).Distinct().Count() != setup.StartingEquipment.Count)
             throw new ArgumentException("Shanhe starting equipment needs one registered card per equipment slot.");
 
-        void ValidateMember(ShanheCombatantDefinition member, bool isPlayer = false)
+        void ValidateMember(ShanheCombatantDefinition member, bool isPlayer = false, bool isAlly = false)
         {
             if (!registry.Generals.TryGetValue(member.GeneralId, out var general) ||
                 !registry.IsGeneralPlayable(member.GeneralId) || mode.GeneralPoolIds?.Contains(member.GeneralId) != true ||
                 member.MaxHpBonus is < 0 or > 40 || member.Hp is <= 0 || member.Hp > general.BaseHp + member.MaxHpBonus ||
                 member.InitialHandBonus is < 0 or > 20 || member.DrawBonus is < 0 or > 10 || member.SlashBonus is < 0 or > 10 ||
-                (member.ExtraSkillIds?.Count ?? 0) > 8 + (isPlayer && setup.RebirthAvailable ? 1 : 0) ||
+                member.InitialArmor is < 0 or > 1000 || member.ArmorRecoveryPerRound is < 0 or > 1000 ||
+                member.ArmorRecoveryCap is < 0 or > 1000 || member.ExtraDamage is < 0 or > 1000 ||
+                (member.ExtraSkillIds?.Count ?? 0) > 8 + (isPlayer && setup.RebirthAvailable || isAlly && setup.SharedAllyRank == 5 ? 1 : 0) ||
                 !isPlayer && (member.ExtraSkillIds ?? []).Contains(ShanheGeneralRanks.RebirthSkillId, StringComparer.Ordinal) ||
                 (member.ExtraSkillIds ?? []).Distinct(StringComparer.Ordinal).Count() != (member.ExtraSkillIds?.Count ?? 0) ||
                 (member.ExtraSkillIds ?? []).Any(id => !registry.Skills.TryGetValue(id, out var skill) ||

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:chanrang-edict-1510", "revision": 1,
+    "triggers": [{
+      "id": "first-foreign-turn-gain", "window": "cardsMoved", "subject": "owner", "optional": false,
+      "movementOccurrence": "perBatch", "sourceZones": ["hand"],
+      "effects": [{"op": "resolveShanheChanrangEdict", "target": "owner"}]
+    }]
+  }]
+}

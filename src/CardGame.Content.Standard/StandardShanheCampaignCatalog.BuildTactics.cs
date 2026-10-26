@@ -14,9 +14,17 @@ public static partial class StandardShanheCampaignCatalog
     public const string CurrentSougua3RewardId = "tactic-sougua-current-2170";
     public const string CurrentFenjinSkillId = "shanhe:current-fenjin-2228";
     public const string CurrentFenjinRewardId = "tactic-fenjin-current-2228";
+    public const string CurrentTigerWineSkillId = "shanhe:tiger-wine-2108";
+    public const string CurrentTigerWineRewardId = "tactic-tiger-wine-2108";
+    public const string CurrentTigerWine2SkillId = "shanhe:tiger-wine-2109";
+    public const string CurrentTigerWine2RewardId = "tactic-tiger-wine-2109";
 
     private static IReadOnlyList<ShanheRewardDefinition> BuildTacticRewards { get; } = Array.AsReadOnly(new[]
     {
+        new ShanheRewardDefinition(CurrentTigerWineRewardId, "战法·虎骨酒")
+        { TacticSkillId = CurrentTigerWineSkillId, Rarity = 2, Description = "每个实际回合，你可额外使用1次普通酒。不免除材料或其他用牌条件；救命酒不消耗普通酒次数。" },
+        new ShanheRewardDefinition(CurrentTigerWine2RewardId, "战法·虎骨酒Ⅱ")
+        { TacticSkillId = CurrentTigerWine2SkillId, Rarity = 4, Description = "每个实际回合，你可额外使用2次普通酒。不免除材料或其他用牌条件；救命酒不消耗普通酒次数。" },
         new ShanheRewardDefinition(CurrentCuixue2RewardId, "战法·淬血Ⅱ")
         { TacticSkillId = CurrentCuixue2SkillId, Description = "史诗战法：每轮杀首次造成伤害后摸2张牌，后续杀伤和同次伤害的额外点数不重复奖励。不占额外技能槽，本次征程限获得一份。" },
         new ShanheRewardDefinition(CurrentYuanzhu3RewardId, "战法·援助Ⅲ")
@@ -52,11 +60,13 @@ public static partial class StandardShanheCampaignCatalog
         CurrentCuixue2RewardId or CurrentMuniuLiumaRewardId or CurrentSougua3RewardId => 500,
         CurrentYuanzhu3RewardId => 700,
         CurrentFenjinRewardId => 200,
+        CurrentTigerWineRewardId => 300,
+        CurrentTigerWine2RewardId => 700,
         _ => throw new ArgumentOutOfRangeException(nameof(rewardId), rewardId, "Unknown verified build tactic.")
     };
 
     private static bool RequiresBuildTacticsRegistry(ShanheBattleSetup setup) =>
         setup.TacticSkillIds.Concat(setup.ExtraSkillIds)
             .Concat(setup.AllyRoster.Concat(setup.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
-            .Any(id => id is CurrentCuixue2SkillId or CurrentYuanzhu3SkillId or CurrentMuniuLiumaSkillId or CurrentSougua3SkillId or CurrentFenjinSkillId);
+            .Any(id => id is CurrentCuixue2SkillId or CurrentYuanzhu3SkillId or CurrentMuniuLiumaSkillId or CurrentSougua3SkillId or CurrentFenjinSkillId or CurrentTigerWineSkillId or CurrentTigerWine2SkillId);
 }

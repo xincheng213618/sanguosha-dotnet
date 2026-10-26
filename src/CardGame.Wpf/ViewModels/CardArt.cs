@@ -9,7 +9,7 @@ public static class CardArt
 {
     public static bool NeedsRuntimeNameOverlay(CardKind? kind) =>
         kind is CardKind.GeneralWeapon or CardKind.ScarletBloodSword or CardKind.Xuanjian or CardKind.ColdSlash or
-            CardKind.AnqiFeiren or CardKind.YaodaoChitong or CardKind.Leizhen or CardKind.MantianGuohai;
+            CardKind.AnqiFeiren or CardKind.YaodaoChitong or CardKind.Leizhen or CardKind.MantianGuohai or CardKind.ShanRangZhaoShu;
 
     public static ImageSource? Get(CardKind? kind)
     {
@@ -20,6 +20,7 @@ public static class CardArt
             CardKind.ShanheXingtianAxe => CardKind.XingtianAxe,
             CardKind.Xuanjian or CardKind.AnqiFeiren or CardKind.YaodaoChitong or CardKind.Leizhen => CardKind.GeneralWeapon,
             CardKind.ColdSlash => CardKind.Slash,
+            CardKind.ShanRangZhaoShu => CardKind.JadeSeal, // Generic treasure fallback, not the original edict artwork.
             _ => key
         };
         return Load($"{artworkKind}.png");
@@ -42,6 +43,7 @@ public static class CardArt
         {
             CardKind.ShanheXingtianAxe => CardKind.XingtianAxe,
             CardKind.Xuanjian or CardKind.Leizhen => CardKind.GeneralWeapon,
+            CardKind.ShanRangZhaoShu => CardKind.JadeSeal,
             _ => kind
         };
         return Load($"equip-{artworkKind}.png");

@@ -35,6 +35,8 @@ public sealed partial class MainViewModel
             SelectAllHandCommand = SelectAllZhihengHandCommand,
             Choices = DockSkillChoices,
             ChoiceCommand = DockSkillChoiceCommand,
+            EnhancementOptions = CardEnhancementOptions,
+            EnhancementCommand = ToggleCardEnhancementCommand,
             CatalogChoices = ExpandedSelectionChoices,
             CatalogCommand = CardNameSelectionCommand,
             CatalogTitle = CardNameSelectionTitle

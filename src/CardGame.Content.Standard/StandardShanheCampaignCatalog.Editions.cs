@@ -45,13 +45,17 @@ public static partial class StandardShanheCampaignCatalog
     {
         new ShanheCampaignEdition(LocalEditionId, "诸侯伐董 · 2024主题本地版",
             "采用已核实的2024战法和技能版本；剧情、地图、敌军及难度数值为本地编排。"),
+        new ShanheCampaignEdition(Source2026EditionId, "诸侯伐董 · 2026配置复现（25档）",
+            "按公开配置的25档、地区连边和场地推进。敌军成长复现客户端预览；体力上限、行军日数等未公开细节使用本地规则。四项非计分章节任务可累计，两个战绩分任务等待可靠计分依据。") { DefaultGodFactionId = "qun" },
         new ShanheCampaignEdition(Returning2026EditionId, "诸侯伐董 · 2026专属形态",
-            "加入2026羁绊、队·初，以及可重复获得的精于谋略II、队·牌、队·甲。虎牢可遇风篁助战的神鬼无前吕布，或文远之威张辽；本地第2档张辽增加灵动判定防伤，第3档再加入惶恐的摸牌与弃牌数量翻倍；洛阳加入酒池、肉林、崩坏与逐点暴虐的独立董卓形态，以及当前全站配置的董旻技能形态：本地第1档仅盾弓，第2档起增加篡朝，接受发动后转换阴阳并令此次用牌的牌效果整体无效。董旻的原版关卡和阶段归属未核实，独立投放与其他遭遇分布、联动顺序及成长均为本地编排。另可遇到仅动态无双与专版利驭的霸戟雄英吕布：整区获牌后，按实际获得数量使用原生决斗；此形态原版属于崤函道，本地独立放入洛阳，另加入与闭月仙伶貂蝉同行的双敌候选：离间使用不能被无懈的真实决斗，专版闭月空手补至手牌上限，否则获得流离直到下一本人回合。另有凤仪情仇三敌阵容：覆銮凶影董卓以10/15体力登场，黑色手牌可作酒且不限次数，酒杀造成伤害后永久失去崩坏并获得已损失体力值加一张的再起；肉林使所有其他角色的双向杀均需两闪，盗书可猜花色取牌。三敌使用原始基础体力与技能，地图位置和孙坚同行为本地编排。神武将出征默认按群势力参与战斗，技能改势力仍按实际结果结算。另加入普通战法队友·杀，使其他队友每个出牌阶段可用杀次数+1。当前公开S5的远击技按最终距离大于1增加伤害，不限于杀；山河册节点35可研习，本地每次征程限取一份。") { DefaultGodFactionId = "qun" }
+            "加入2026羁绊、队·初，以及可重复获得的精于谋略II、队·牌、队·甲。虎牢可遇风篁助战的神鬼无前吕布，或文远之威张辽；本地第2档张辽增加灵动判定防伤，第3档再加入惶恐的摸牌与弃牌数量翻倍；洛阳加入酒池、肉林、崩坏与逐点暴虐的独立董卓形态，以及当前全站配置的董旻技能形态：本地第1档仅盾弓，第2档起增加篡朝，接受发动后转换阴阳并令此次用牌的牌效果整体无效。来源配置的董氏阶段可在25档配置复现入口体验；本入口的独立投放、遭遇分布、联动顺序及成长为本地编排。另可遇到仅动态无双与专版利驭的霸戟雄英吕布：整区获牌后，按实际获得数量使用原生决斗；此形态原版属于崤函道，本地独立放入洛阳，另加入与闭月仙伶貂蝉同行的双敌候选：离间使用不能被无懈的真实决斗，专版闭月空手补至手牌上限，否则获得流离直到下一本人回合。另有凤仪情仇三敌阵容：覆銮凶影董卓以10/15体力登场，黑色手牌可作酒且不限次数，酒杀造成伤害后永久失去崩坏并获得已损失体力值加一张的再起；肉林使所有其他角色的双向杀均需两闪，盗书可猜花色取牌。三敌使用原始基础体力与技能，地图位置和孙坚同行为本地编排。神武将出征默认按群势力参与战斗，技能改势力仍按实际结果结算。另加入普通战法队友·杀，使其他队友每个出牌阶段可用杀次数+1。当前公开S5的远击技按最终距离大于1增加伤害，不限于杀；山河册节点35可研习，本地每次征程限取一份。") { DefaultGodFactionId = "qun" }
     });
 
-    public static ShanheCampaignDefinition CreateDefinition(int difficulty, string editionId) =>
-        WithStartingResourcesContract(WithChapterRewards(CreateCurrentBaseDefinition(difficulty, editionId)),
-            categorizeNormalRewards: editionId == Returning2026EditionId);
+    public static ShanheCampaignDefinition CreateDefinition(int difficulty, string editionId) => editionId == Source2026EditionId
+        ? CreateSourceDefinition(difficulty, includeCodex: false) :
+        WithMuluEncounter(WithGuideTerrain(WithThirdChapterEliteEncounters(WithStoryEventPools(WithRandomOpeningBattles(WithStartingResourcesContract(
+            WithTeamGrowth(WithChapterRewards(CreateCurrentBaseDefinition(difficulty, editionId)), editionId),
+            categorizeNormalRewards: editionId == Returning2026EditionId), difficulty), editionId), editionId), difficulty, editionId), difficulty, editionId);
 
     private static ShanheCampaignDefinition CreateCurrentBaseDefinition(int difficulty, string editionId) => editionId switch
     {
@@ -94,11 +98,28 @@ public static partial class StandardShanheCampaignCatalog
         definition = WithSavedRoster(definition);
         if (string.Equals(ShanheCampaignContent.GetContentHash(definition), checkpoint.CampaignHash, StringComparison.Ordinal))
             return definition;
+        // Inheritance was an additive codex reward. An earlier journal may
+        // predate that row while retaining every other authored definition.
+        // Reconstruct its complete old shape and require the exact saved hash;
+        // never rewrite the checkpoint or weaken the content fingerprint gate.
+        if (checkpoint.Options.UseCodexRewardPool &&
+            !checkpoint.Options.EquippedTacticIds.Contains(OpeningInheritanceRewardId, StringComparer.Ordinal) &&
+            definition.Rewards.Any(reward => reward.Id == OpeningInheritanceRewardId))
+        {
+            var beforeInheritance = ShanheCampaignContent.FreezeAndValidate(definition with
+            {
+                Rewards = definition.Rewards.Where(reward => reward.Id != OpeningInheritanceRewardId).ToArray()
+            });
+            if (string.Equals(ShanheCampaignContent.GetContentHash(beforeInheritance), checkpoint.CampaignHash, StringComparison.Ordinal))
+                return beforeInheritance;
+        }
         throw new ArgumentException("Campaign checkpoint content fingerprint does not match the current definition.", nameof(checkpoint));
     }
 
     public static string EditionIdForCampaign(string campaignId, int difficulty)
     {
+        if (difficulty is >= 1 and <= 25 && campaignId == "shanhe:zhuhou-source-2026-" +
+            difficulty.ToString(System.Globalization.CultureInfo.InvariantCulture)) return Source2026EditionId;
         if (difficulty is < 1 or > 3) throw new ArgumentOutOfRangeException(nameof(difficulty));
         var suffix = difficulty.ToString(System.Globalization.CultureInfo.InvariantCulture);
         return campaignId == "shanhe:zhuhou-local-" + suffix ? LocalEditionId
@@ -199,6 +220,10 @@ public static partial class StandardShanheCampaignCatalog
         {
             Id = "shanhe:zhuhou-2026-" + difficulty.ToString(System.Globalization.CultureInfo.InvariantCulture),
             DefaultGodFactionId = Editions.Single(edition => edition.Id == Returning2026EditionId).DefaultGodFactionId,
+            // The old local scenario granted preparation stats before ranks
+            // existed. Current expeditions use the normal base plus the chosen
+            // rank; explicit tactics and later rewards still add normally.
+            StartingBonuses = new(),
             Name = "山河图 · 诸侯伐董（2026专属形态·本地编排）",
             Nodes = nodes,
             Rewards = original.Rewards.Concat(teamRewards).ToArray(),

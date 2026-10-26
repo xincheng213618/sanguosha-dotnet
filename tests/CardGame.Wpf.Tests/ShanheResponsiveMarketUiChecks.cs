@@ -18,11 +18,10 @@ using CardGame.Wpf.ViewModels;
 
 internal static class ShanheResponsiveMarketUiChecks
 {
-    public static void CampaignFillsEmbeddedAndIndependentClientAreas(string output)
+    public static void CampaignFillsMainWindowClientArea(string output)
     {
         using var vm = Create();
         var owner = new MainWindow(vm);
-        ShanheCampaignWindow? detached = null;
         try
         {
             owner.ApplyTemplate();
@@ -30,38 +29,38 @@ internal static class ShanheResponsiveMarketUiChecks
             var root = (FrameworkElement)owner.Content;
             var overlay = (Border)owner.FindName("ShanheOverlay");
             var panel = (ShanheCampaignPanel)owner.FindName("ShanhePanel");
-            foreach (var size in new[] { new Size(1440, 900), new Size(1600, 1000) })
+            foreach (var size in new[] { new Size(1120, 780), new Size(1440, 900), new Size(1600, 1000) })
             {
                 Layout(root, size);
                 Fills(panel, overlay);
                 Fills((Grid)panel.FindName("CampaignSurface"), panel);
+                var close = (Button)panel.FindName("ShanheCloseButton");
+                var bounds = Bounds(close, root);
+                Program.Assert(bounds.Left >= 0 && bounds.Right <= size.Width + 1 && bounds.Bottom <= size.Height + 1,
+                    "The main window retains its return action inside the client area at every supported size.");
             }
             Program.Render(root, 1440, 900, Path.Combine(output, "shanhe-campaign-client-fill-1440x900.png"));
-
-            detached = new ShanheCampaignWindow(vm);
-            detached.ApplyTemplate();
-            var independent = (FrameworkElement)detached.Content;
-            foreach (var size in new[] { new Size(960, 640), new Size(960, 900), new Size(1440, 900) })
-            {
-                Layout(independent, size);
-                Fills(detached.CampaignPanel, independent);
-                Fills((Grid)detached.CampaignPanel.FindName("CampaignSurface"), detached.CampaignPanel);
-                var close = (Button)detached.CampaignPanel.FindName("ShanheCloseButton");
-                var bounds = Bounds(close, independent);
-                Program.Assert(bounds.Left >= 0 && bounds.Right <= size.Width + 1 && bounds.Bottom <= size.Height + 1,
-                    "The compact independent client retains its visible return action inside the client area.");
-            }
-            Program.Render(independent, 960, 900, Path.Combine(output, "shanhe-campaign-client-fill-960x900.png"));
+            Layout(root, new(1120, 780));
+            Program.Render(root, 1120, 780, Path.Combine(output, "shanhe-campaign-client-fill-1120x780.png"));
+            var revision = Program.Engine(vm).Revision;
+            Program.Assert(ReferenceEquals(FocusSurface(owner, vm), overlay) &&
+                KeyboardNavigation.GetTabNavigation(overlay) == KeyboardNavigationMode.Cycle &&
+                TableShortcutChecks.Input(owner, Key.Enter, ModifierKeys.Control) &&
+                !TableShortcutChecks.Input(owner, Key.Enter) && Program.Engine(vm).Revision == revision,
+                "The main-window map owns modal keyboard input and leaves the covered ordinary table unchanged.");
+            Click((Button)panel.FindName("ShanheCloseButton"));
+            Layout(root, new(1120, 780));
+            Program.Assert(!vm.IsShanheOpen && Program.Engine(vm).Revision == revision && owner.OwnedWindows.Count == 0,
+                "Returning from the campaign uses the same main window and preserves the covered table.");
         }
-        finally { detached?.Close(); owner.Close(); }
+        finally { owner.Close(); }
     }
 
-    public static void FloatingMarketPagesToFifthGoodsAndReturnsToItsOriginalSurface(string output)
+    public static void FloatingMarketPagesAndReturnsToMainWindowMapOrTable(string output)
     {
         using var vm = Create();
         Attach(vm, NewShop());
         var owner = new MainWindow(vm);
-        ShanheCampaignWindow? detached = null;
         try
         {
             ShowControlledHost(owner, new(1440, 900));
@@ -92,7 +91,7 @@ internal static class ShanheResponsiveMarketUiChecks
                     OverlayVisibility = marketOverlay.Visibility.ToString(), shop.ActualWidth, shop.ActualHeight,
                     Gold = gold, ExpectedGold = vm.ShanheMarketGoldText, Equipment = equipment, ExpectedEquipment = vm.ShanheMarketEquipmentText,
                     FocusSurfaceMatches = focusMatches, FocusSurface = FocusSurface(owner, vm).Name,
-                    owner.IsShanheWindowDetached, WindowServiceMatches = ReferenceEquals(Window.GetWindow(marketOverlay), owner),
+                    WindowServiceMatches = ReferenceEquals(Window.GetWindow(marketOverlay), owner),
                     WindowVisualAncestorMatches = ReferenceEquals(VisualWindowAncestor(marketOverlay), owner), DiagnosticImage = diagnostic
                 }));
             Program.Render(root, 1440, 900, Path.Combine(output, "shanhe-market-floating-1440x900.png"));
@@ -118,21 +117,17 @@ internal static class ShanheResponsiveMarketUiChecks
                 "The active campaign table's permanent market entry and Escape return to that same table surface without opening the map or submitting a battle command.");
 
             vm.OpenShanheCommand.Execute(null);
-            detached = new ShanheCampaignWindow(vm);
-            ShowControlledHost(detached, new(960, 900));
-            var independent = (FrameworkElement)detached.Content;
-            var independentMarket = (ShanheMarketOverlay)detached.FindName("MarketPanelHost");
-            var independentShop = (ShanheShopPanel)independentMarket.FindName("MarketHost");
+            Layout(root, new(1120, 780));
             vm.OpenShanheMarketCommand.Execute(null);
-            Layout(independent, new(960, 900));
-            CheckFiveCardsAndPage(independentShop, independent, new(960, 900));
-            Program.Render(independent, 960, 900, Path.Combine(output, "shanhe-market-floating-960x900-fifth.png"));
-            independentMarket.HandleEscape(); Layout(independent, new(960, 900));
-            Program.Assert(!vm.IsShanheMarketOpen && vm.IsShanheOpen &&
-                ((TabControl)detached.CampaignPanel.FindName("ShanheJourneyTabs")).SelectedIndex == 0,
-                "The independent window uses the same market close route and keeps its campaign map available.");
+            Layout(root, new(1120, 780));
+            CheckFiveCardsAndPage(shop, root, new(1120, 780));
+            Program.Render(root, 1120, 780, Path.Combine(output, "shanhe-market-floating-1120x780-fifth.png"));
+            Program.Assert(TableShortcutChecks.Input(owner, Key.Escape) && !vm.IsShanheMarketOpen && vm.IsShanheOpen &&
+                tabs.SelectedIndex == mapIndex && ReferenceEquals(FocusSurface(owner, vm), owner.FindName("ShanheOverlay")) &&
+                Program.Engine(vm).Revision == revision,
+                "At the minimum main-window size, Escape returns from the actual merchant to the same map without changing its live campaign battle.");
         }
-        finally { detached?.Close(); owner.Close(); }
+        finally { owner.Close(); }
     }
 
     private static void CheckFiveCardsAndPage(ShanheShopPanel shop, FrameworkElement root, Size size)

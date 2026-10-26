@@ -12,6 +12,17 @@ public sealed partial class MainViewModel
     private bool _shanheGeneralRosterReady;
 
     public ObservableRangeCollection<ShanheGeneralOption> ShanheGeneralPage { get; } = [];
+    public ShanheCodexLoadoutOption? SelectedShanheSetupLoadout
+    {
+        get => ShanheCodexLoadoutPlans.FirstOrDefault(plan => plan.IsSelected);
+        set
+        {
+            if (value is null) return;
+            if (SelectShanheCodexLoadoutCommand.CanExecute(value))
+                SelectShanheCodexLoadoutCommand.Execute(value);
+            RaisePropertyChanged(nameof(SelectedShanheSetupLoadout));
+        }
+    }
     public string ShanheGeneralSearch
     {
         get => _shanheGeneralSearch;

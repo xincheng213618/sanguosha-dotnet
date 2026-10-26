@@ -33,7 +33,7 @@ public static partial class StandardShanheCampaignCatalog
                 CurrentLeihuoRewardId, CurrentLianjiRewardId, CurrentErlianjiRewardId,
                 CurrentTiebushan4RewardId, CurrentJingjijiaRewardId, "codex-card-4059"])
             .Concat(CurrentEconomyTactics.Where(source => source.RewardId != CurrentInterest2RewardId).Select(source => source.RewardId))
-            .Concat([CurrentMuniuLiumaRewardId, CurrentSougua3RewardId, CurrentFenjinRewardId])
+            .Concat([CurrentMuniuLiumaRewardId, CurrentSougua3RewardId, CurrentFenjinRewardId, CurrentTigerWineRewardId, CurrentTigerWine2RewardId])
             .Concat(CurrentBuildSkillDefaultUnlockedRewardIds)
             .Concat(StandardShanheOriginalSkills.DefaultStockRewardIds)
             .Concat(CurrentReactionTacticDefaultUnlockedRewardIds)
@@ -80,6 +80,8 @@ public static partial class StandardShanheCampaignCatalog
                 [CurrentMuniuLiumaRewardId] = new(2088, 500, 3, "战法"),
                 [CurrentSougua3RewardId] = new(2170, 500, 3, "战法"),
                 [CurrentFenjinRewardId] = new(2228, 200, 1, "战法"),
+                [CurrentTigerWineRewardId] = new(2108, 300, 2, "战法"),
+                [CurrentTigerWine2RewardId] = new(2109, 700, 4, "战法"),
                 [CurrentYaoliRewardId] = new(2319, 200, 1, "战法"),
                 [CurrentYaoli2RewardId] = new(2320, 300, 2, "战法"),
                 [CurrentYaoli3RewardId] = new(2321, 500, 3, "战法"),
@@ -129,6 +131,9 @@ public static partial class StandardShanheCampaignCatalog
                 ["tactic-xiaoming"] = new(2300, 500, 3, "战法"),
                 ["tactic-duichu-2026"] = new(2202, 200, 1, "战法"),
                 ["tactic-duisha-2026"] = new(2329, 200, 1, "战法"),
+                ["tactic-duipai-2026"] = new(2201, 200, 1, "战法"),
+                ["tactic-duijia-2026"] = new(2200, 300, 2, "战法"),
+                [ShanheTeamTactics.HealthRewardId] = new(2199, 500, 3, "战法"),
                 [CurrentFarStrikeRewardId] = new(2129, 200, 1, "战法"),
                 ["tactic-jiban-2026"] = new(2204, 300, 2, "战法"),
                 ["original-qiangxi"] = new(3011, 600, 3, "技能"),

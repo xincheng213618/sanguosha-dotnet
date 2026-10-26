@@ -917,10 +917,23 @@
                     </ItemsControl>
                 </WrapPanel>
                 <Border x:Name="ActionBar" Grid.Row="1" Background="Transparent" Padding="8,5,8,0">
-                    <Border.Style><Style TargetType="Border"><Setter Property="Height" Value="90" /><Style.Triggers><DataTrigger Binding="{Binding IsWushuangShopOpen}" Value="True"><Setter Property="Opacity" Value="0" /></DataTrigger><DataTrigger Binding="{Binding SelectionArea.HasCatalogChoices}" Value="True"><Setter Property="Height" Value="250" /></DataTrigger></Style.Triggers></Style></Border.Style>
+                    <Border.Style><Style TargetType="Border"><Setter Property="Height" Value="90" /><Style.Triggers><DataTrigger Binding="{Binding IsWushuangShopOpen}" Value="True"><Setter Property="Opacity" Value="0" /></DataTrigger><DataTrigger Binding="{Binding SelectionArea.HasCatalogChoices}" Value="True"><Setter Property="Height" Value="250" /></DataTrigger><DataTrigger Binding="{Binding SelectionArea.HasEnhancementOptions}" Value="True"><Setter Property="Height" Value="146" /></DataTrigger></Style.Triggers></Style></Border.Style>
                     <Grid>
                         <!-- Supplemental actions float above this fixed dock instead of resizing the battlefield. -->
-                        <Grid.RowDefinitions><RowDefinition><RowDefinition.Style><Style TargetType="RowDefinition"><Setter Property="Height" Value="0" /><Style.Triggers><DataTrigger Binding="{Binding SelectionArea.HasCatalogChoices}" Value="True"><Setter Property="Height" Value="160" /></DataTrigger></Style.Triggers></Style></RowDefinition.Style></RowDefinition><RowDefinition Height="23" /><RowDefinition Height="48" /><RowDefinition Height="14" /></Grid.RowDefinitions>
+                        <Grid.RowDefinitions><RowDefinition><RowDefinition.Style><Style TargetType="RowDefinition"><Setter Property="Height" Value="0" /><Style.Triggers><DataTrigger Binding="{Binding SelectionArea.HasCatalogChoices}" Value="True"><Setter Property="Height" Value="160" /></DataTrigger><DataTrigger Binding="{Binding SelectionArea.HasEnhancementOptions}" Value="True"><Setter Property="Height" Value="56" /></DataTrigger></Style.Triggers></Style></RowDefinition.Style></RowDefinition><RowDefinition Height="23" /><RowDefinition Height="48" /><RowDefinition Height="14" /></Grid.RowDefinitions>
+                        <Viewbox Grid.Row="0" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Center" Visibility="{Binding SelectionArea.HasEnhancementOptions, Converter={StaticResource BoolToVisibility}}">
+                            <ItemsControl x:Name="CardEnhancementOptions" ItemsSource="{Binding SelectionArea.EnhancementOptions}" AutomationProperties.Name="奔袭效果选择">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate><DataTemplate>
+                                    <Border BorderThickness="2" CornerRadius="4" Margin="4,0" Padding="2">
+                                        <Border.Style><Style TargetType="Border"><Setter Property="BorderBrush" Value="Transparent" /><Style.Triggers><DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter Property="BorderBrush" Value="#FFE2A0" /><Setter Property="Background" Value="#766039" /></DataTrigger></Style.Triggers></Style></Border.Style>
+                                        <Button Command="{Binding DataContext.SelectionArea.EnhancementCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Style="{StaticResource TableSecondaryButton}" Padding="14,5" ToolTip="{Binding Description}" AutomationProperties.Name="{Binding Description}">
+                                            <StackPanel Orientation="Horizontal"><TextBlock Text="✓ " Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibility}}" /><TextBlock Text="{Binding Description}" /></StackPanel>
+                                        </Button>
+                                    </Border>
+                                </DataTemplate></ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Viewbox>
                         <Border Grid.Row="0" x:Name="CardNameSelectionArea" Background="#EC211E19" BorderBrush="#8B7750" BorderThickness="1" CornerRadius="4" Padding="6,3" Visibility="{Binding SelectionArea.HasCatalogChoices, Converter={StaticResource BoolToVisibility}}" KeyboardNavigation.TabNavigation="Cycle">
                             <Grid>
                                 <Grid.RowDefinitions><RowDefinition Height="20" /><RowDefinition Height="*" /></Grid.RowDefinitions>
@@ -1881,8 +1894,7 @@
         <Border x:Name="ShanheOverlay" Background="#F00B1519" Panel.ZIndex="300" Visibility="{Binding IsShanheOpen, Converter={StaticResource BoolToVisibility}}" KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle" FocusManager.IsFocusScope="True" IsVisibleChanged="TableOverlay_IsVisibleChanged">
             <controls:ShanheCampaignPanel x:Name="ShanhePanel" />
         </Border>
-        <Border x:Name="ShanheMarketOverlay" Panel.ZIndex="320" KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle" FocusManager.IsFocusScope="True" IsVisibleChanged="TableOverlay_IsVisibleChanged">
-            <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding IsShanheMarketOpen}" Value="True"/><Condition Binding="{Binding IsShanheWindowDetached, ElementName=MainWindowRoot}" Value="False"/></MultiDataTrigger.Conditions><Setter Property="Visibility" Value="Visible"/></MultiDataTrigger></Style.Triggers></Style></Border.Style>
+        <Border x:Name="ShanheMarketOverlay" Panel.ZIndex="320" Visibility="{Binding IsShanheMarketOpen, Converter={StaticResource BoolToVisibility}}" KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle" FocusManager.IsFocusScope="True" IsVisibleChanged="TableOverlay_IsVisibleChanged">
             <controls:ShanheMarketOverlay x:Name="ShanheMarketHost" />
         </Border>
         <Border x:Name="WushuangShopOverlay" Background="#9A120D08" Panel.ZIndex="310" Visibility="{Binding IsWushuangShopOpen, Converter={StaticResource BoolToVisibility}}" KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle" FocusManager.IsFocusScope="True" IsVisibleChanged="TableOverlay_IsVisibleChanged">

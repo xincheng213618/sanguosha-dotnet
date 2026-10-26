@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:confident-xiaorui": {
+      "name": "骁锐",
+      "description": "当友方角色于其回合内使用【杀】造成伤害后，其使用【杀】的限制次数+1。"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CardGame.Core.Campaigns;
 
 namespace CardGame.Wpf.Persistence;
 
@@ -14,6 +15,8 @@ public sealed record ShanheCodexProfile
     public string[] ClaimedRewards { get; init; } = [];
     public ShanheRunRecord[] RunRecords { get; init; } = [];
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ShanheGuideTaskProgressState? GuideTaskProgress { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ShanheCodexLoadoutPlan[]? LoadoutPlans { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? SelectedLoadoutPlanId { get; init; }
@@ -24,7 +27,11 @@ public sealed record ShanheCodexLoadoutPlan(string Id, string Name, string?[] Eq
 /// <summary>One settled expedition, independent of the next replaceable campaign save.</summary>
 public sealed record ShanheRunRecord(string ExpeditionKey, string CampaignId, string CampaignName,
     string PlayerGeneralId, string PlayerGeneralName, int Difficulty, bool Won, int BooksEarned,
-    int CompletedNodes, int Battles, DateTimeOffset CompletedAtUtc, string EndingText);
+    int CompletedNodes, int Battles, DateTimeOffset CompletedAtUtc, string EndingText)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? SourceDifficultyId { get; init; }
+}
 
 public interface IShanheCodexStore
 {
@@ -97,5 +104,6 @@ public sealed class FileShanheCodexStore : IShanheCodexStore
             throw new InvalidDataException("山河册进度无效，原文件已保留。");
         ShanheCodexLoadouts.ValidatePlans(profile);
         ShanheCodexSettlement.ValidateRecords(profile);
+        ShanheGuideTaskSettlement.ValidateProfile(profile);
     }
 }

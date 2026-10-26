@@ -27,6 +27,7 @@ internal static class ShanheCampaignUiChecks
         try
         {
             using var vm = Create(ordinary, campaign);
+            vm.SelectedShanheScenario = vm.ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.LocalEditionId);
             vm.SaveGameCommand.Execute(null);
             var ordinarySave = GameCheckpointJson.Serialize(ordinary.Read(GameSaveSlot.Manual).Checkpoint);
             var ordinarySaveStatus = vm.SaveStatus;
@@ -37,7 +38,7 @@ internal static class ShanheCampaignUiChecks
             {
                 vm.OpenShanheCommand.Execute(null);
                 Layout(root);
-                var panel = Program.Find<ShanheCampaignPanel>(root).Single();
+                var panel = (ShanheCampaignPanel)window.FindName("ShanhePanel");
                 Program.Assert(vm.IsShanheOpen && vm.ShanheEditionNotice.Contains("本地起步版") &&
                     vm.ShanheContextDescription.Contains("诸侯") && vm.ShanheGenerals.Count > 1 &&
                     vm.ShanheDifficulties.Count == 3,
@@ -118,6 +119,7 @@ internal static class ShanheCampaignUiChecks
         var ordinary = new MemorySaveStore();
         var campaign = new SwitchingShanheSaveStore();
         using var vm = Create(ordinary, campaign);
+        vm.SelectedShanheScenario = vm.ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.LocalEditionId);
         vm.SaveGameCommand.Execute(null);
         var ordinarySave = GameCheckpointJson.Serialize(ordinary.Read(GameSaveSlot.Manual).Checkpoint);
         vm.OpenShanheCommand.Execute(null);
@@ -216,7 +218,7 @@ internal static class ShanheCampaignUiChecks
                 "The actual battle dock must bind the independent campaign manual-save confirmation while the map is closed.");
             cold.OpenShanheCommand.Execute(null);
             Layout(root);
-            var panel = Program.Find<ShanheCampaignPanel>(root).Single();
+            var panel = (ShanheCampaignPanel)window.FindName("ShanhePanel");
             ((TabControl)panel.FindName("ShanheJourneyTabs")).SelectedIndex = 1;
             cold.ShanheCodexShowCollection = true;
             Program.Render(root, 1440, 880, Path.Combine(output, "shanhe-campaign-build.png"));
@@ -248,7 +250,7 @@ internal static class ShanheCampaignUiChecks
         {
             vm.OpenShanheCommand.Execute(null);
             Layout(root);
-            var panel = Program.Find<ShanheCampaignPanel>(root).Single();
+            var panel = (ShanheCampaignPanel)window.FindName("ShanhePanel");
             ClickNavigation((Button)panel.FindName("ShanhePrepareButton"), root);
             var selector = (ComboBox)panel.FindName("ShanheScenarioSelector");
             selector.SelectedItem = vm.ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.Returning2026EditionId);
@@ -275,11 +277,9 @@ internal static class ShanheCampaignUiChecks
                 Program.Find<TextBlock>(root).Any(text => text.Text == vm.SelectedShanheGeneralMeta),
                 "Switching back republishes the actual selected god general's default faction before expedition creation.");
             Click((Button)panel.FindName("ShanheStartButton"), root);
-            var opening = vm.ShanheMapRows.SelectMany(row => row.Nodes).Single(node => node.IsAvailable);
-            vm.SelectShanheNodeCommand.Execute(opening);
-            vm.ChooseShanheOptionCommand.Execute(vm.ShanheChoices.First(choice => choice.IsEnabled));
-            var bossNode = vm.ShanheMapRows.SelectMany(row => row.Nodes).Single(node => node.IsAvailable);
-            Program.Assert(bossNode.Id == "hulao", "The verified seed must enter the real first-chapter exclusive boss route.");
+            var bossNode = vm.ShanheMapRows.SelectMany(row => row.Nodes).Single(node => node.IsAvailable && node.Id == "hulao-start");
+            Program.Assert(vm.ShanheMapRows.SelectMany(row => row.Nodes).Count(node => node.IsAvailable) == 2,
+                "The current edition opens two actual first-chapter battles instead of a forced preparation event.");
             vm.SelectShanheNodeCommand.Execute(bossNode);
             var game = Program.Engine(vm);
             var setup = game.CreateCheckpoint().Options.ShanheBattle!;
@@ -291,8 +291,7 @@ internal static class ShanheCampaignUiChecks
             var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup);
             var expectedGeneral = registry.Generals[bossId];
             var expectedSkills = expectedGeneral.SkillIds.Concat(setup.EnemyRoster[0].ExtraSkillIds ?? []).ToHashSet(StringComparer.Ordinal);
-            var knownForm = bossId.StartsWith("shanhe:", StringComparison.Ordinal) &&
-                boss.Skills!.Select(skill => skill.Id).ToHashSet(StringComparer.Ordinal).SetEquals(expectedSkills);
+            var knownForm = boss.Skills!.Select(skill => skill.Id).ToHashSet(StringComparer.Ordinal).SetEquals(expectedSkills);
             if (bossId == StandardShanheBossPackage.ShenguiLvbuId)
                 knownForm &= game.CreateSnapshot(0).Players.Single(player => player.GeneralId == StandardShanheBossPackage.FenghuangId)
                     .Skills!.Select(skill => skill.Id).ToHashSet().SetEquals(["ol:fudao", "ol:xiuhao"]);
@@ -342,7 +341,7 @@ internal static class ShanheCampaignUiChecks
         VerifyFengyiPreviewAndFiveSeatTable(output);
     }
 
-    public static void LauncherSelectionMapAndDetachedWindow(string output)
+    public static void LauncherSelectionMapAndMainWindowNavigation(string output)
     {
         var store = new SwitchingShanheSaveStore();
         using var vm = Create(new MemorySaveStore(), store);
@@ -353,7 +352,7 @@ internal static class ShanheCampaignUiChecks
             vm.OpenShanheCommand.Execute(null);
             var root = (FrameworkElement)owner.Content;
             Layout(root);
-            var panel = Program.Find<ShanheCampaignPanel>(root).Single();
+            var panel = (ShanheCampaignPanel)owner.FindName("ShanhePanel");
             vm.SelectedShanheScenario = vm.ShanheScenarios.Single(s => s.Id == StandardShanheCampaignCatalog.Returning2026EditionId);
             Layout(root);
             CheckPreparationLayout(panel);
@@ -372,6 +371,13 @@ internal static class ShanheCampaignUiChecks
                 !string.IsNullOrWhiteSpace(vm.SelectedShanheGeneralDescription) &&
                 !string.IsNullOrWhiteSpace(vm.SelectedShanheSkillText),
                 "The visible portrait roster must update the actual selected general and its skill preview.");
+            var scenario = (ComboBox)panel.FindName("ShanheScenarioSelector");
+            scenario.IsDropDownOpen = true;
+            Layout(root);
+            Program.Assert(!TableShortcutChecks.Input(owner, Key.Escape) && scenario.IsDropDownOpen &&
+                setup.Visibility == Visibility.Visible && vm.IsShanheOpen,
+                "An expanded selector owns Escape before the main window can dismiss its preparation surface.");
+            scenario.IsDropDownOpen = false;
             Program.Assert(TableShortcutChecks.Input(owner, Key.Escape) && vm.IsShanheOpen &&
                 setup.Visibility == Visibility.Collapsed && !store.Exists,
                 "Escape must close only preparation and must not begin or save an expedition.");
@@ -393,56 +399,49 @@ internal static class ShanheCampaignUiChecks
             Program.Assert(rules.Visibility == Visibility.Visible && TableShortcutChecks.Input(owner, Key.Escape) &&
                 rules.Visibility == Visibility.Collapsed && vm.IsShanheOpen,
                 "Rules must be a dismissible inner surface without closing the expedition.");
-            owner.OpenShanheWindow();
-            owner.OpenShanheWindow();
-            var detached = owner.OwnedWindows.OfType<ShanheCampaignWindow>().Single();
-            Program.Assert(ReferenceEquals(detached.DataContext, vm) && panel.Visibility == Visibility.Collapsed &&
-                !detached.CampaignPanel.ShowDetachButton,
-                "Opening again must activate one owned campaign window with the shared model and one visible panel.");
-            var detachedRoot = (FrameworkElement)detached.Content;
-            detached.Width = 960; detached.Height = 680;
-            detached.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
-            detached.UpdateLayout();
-            CheckPreparationLayout(detached.CampaignPanel);
-            Program.Render(detached, (int)detached.ActualWidth, (int)detached.ActualHeight,
+            owner.Width = owner.MinWidth; owner.Height = owner.MinHeight;
+            owner.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+            owner.UpdateLayout();
+            CheckPreparationLayout(panel);
+            Program.Render(owner, (int)owner.ActualWidth, (int)owner.ActualHeight,
                 Path.Combine(output, "shanhe-launcher-compact.png"));
-            ClickNavigation((Button)detached.CampaignPanel.FindName("ShanhePrepareButton"), detachedRoot);
-            Click((Button)detached.CampaignPanel.FindName("ShanheStartButton"), detachedRoot);
+            ClickNavigation((Button)panel.FindName("ShanhePrepareButton"), root);
+            Click((Button)panel.FindName("ShanheStartButton"), root);
             Program.Assert(store.Exists && vm.HasShanheSession && vm.ShanheMapNodes.Count > 1 &&
                 vm.ShanheMapLinks.Count > 0 && vm.ShanheMapNodes.Any(node => node.IsAvailable),
-                "Preparation in the detached window must create a real saved campaign and actionable linked map.");
-            detached.Width = 960; detached.Height = 680;
-            detached.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
-            detached.UpdateLayout();
-            var compactBounds = detached.CampaignPanel.TransformToAncestor(detached)
-                .TransformBounds(new Rect(detached.CampaignPanel.RenderSize));
+                "Preparation in the main window must create a real saved campaign and actionable linked map.");
+            owner.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+            owner.UpdateLayout();
+            var compactBounds = panel.TransformToAncestor(root).TransformBounds(new Rect(panel.RenderSize));
             Program.Assert(compactBounds.Left >= 0 && compactBounds.Top >= 0 &&
-                compactBounds.Right <= detached.ActualWidth && compactBounds.Bottom <= detached.ActualHeight,
-                "The minimum-size window must keep the complete campaign surface inside its client bounds.");
-            Program.Render(detached, (int)detached.ActualWidth, (int)detached.ActualHeight,
-                Path.Combine(output, "shanhe-window-compact.png"));
-            detached.Width = 1440; detached.Height = 920;
-            detached.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
-            detached.UpdateLayout();
-            Program.Render(detached, (int)detached.ActualWidth, (int)detached.ActualHeight,
-                Path.Combine(output, "shanhe-window.png"));
+                compactBounds.Right <= root.ActualWidth + 1 && compactBounds.Bottom <= root.ActualHeight + 1,
+                "The minimum main window keeps the complete campaign surface inside its client bounds.");
+            var hud = Program.Find<ShanhePlayerHud>(panel).Single();
+            var hudBounds = hud.TransformToAncestor(panel).TransformBounds(new Rect(hud.RenderSize));
+            Program.Assert(hud.IsVisible && hudBounds.Right <= panel.ActualWidth + 1 &&
+                hudBounds.Bottom <= panel.ActualHeight + 1 && hudBounds.Top >= 0,
+                "The map's real player and build display stays visible within the compact campaign client.");
+            Program.Render(owner, (int)owner.ActualWidth, (int)owner.ActualHeight,
+                Path.Combine(output, "shanhe-main-window-compact.png"));
+            owner.Width = 1440; owner.Height = 920;
+            owner.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+            owner.UpdateLayout();
+            Program.Render(owner, (int)owner.ActualWidth, (int)owner.ActualHeight,
+                Path.Combine(output, "shanhe-main-window.png"));
             store.FailWrites = true;
-            detached.Close();
-            Program.Assert(detached.IsVisible && vm.IsShanheOpen && vm.ShanheStatusText.Contains("未保存"),
-                "A failed independent save must keep the campaign window and its retry status visible.");
             vm.CloseShanheCommand.Execute(null);
-            Program.Assert(vm.IsShanheOpen, "The embedded close command must also preserve a campaign whose save failed.");
+            Program.Assert(vm.IsShanheOpen && vm.ShanheStatusText.Contains("未保存"),
+                "A failed campaign save keeps the main window's map and retry status available.");
             store.FailWrites = false;
             Program.Assert(TableShortcutChecks.Input(owner, Key.F5) && vm.ShanheStatusText.Contains("已保存"),
                 "F5 on the campaign surface must retry the independent map save, including outside a battle.");
-            detached.Close();
+            vm.CloseShanheCommand.Execute(null);
             Layout(root);
-            Program.Assert(!vm.IsShanheOpen && panel.Visibility == Visibility.Visible && store.Exists &&
-                owner.OwnedWindows.OfType<ShanheCampaignWindow>().Count() == 0,
-                "Closing the detached window must preserve the save, restore the embedded host and leave no owned window.");
+            Program.Assert(!vm.IsShanheOpen && store.Exists,
+                "Returning from the main window's campaign map preserves its independent save.");
             vm.OpenShanheCommand.Execute(null);
             Program.Assert(vm.IsShanheOpen && vm.ContinueShanheCommand.CanExecute(null),
-                "Closing a campaign window must keep its shared view model alive for the next entry.");
+                "Returning from the campaign map keeps the same main-window model alive for the next entry.");
         }
         finally { store.FailWrites = false; owner.Close(); }
 
@@ -455,7 +454,7 @@ internal static class ShanheCampaignUiChecks
             var actionsBounds = actions.TransformToAncestor(target).TransformBounds(new Rect(actions.RenderSize));
             Program.Assert(copy.ViewportHeight > 0 && overview.ActualHeight <= copy.ViewportHeight &&
                 copyBounds.Bottom <= actionsBounds.Top && actions.IsVisible,
-                "The entire overview stays visible above the real preparation actions, including the minimum detached window.");
+                "The entire overview stays visible above the real preparation actions, including the minimum main window.");
         }
     }
 
@@ -469,7 +468,7 @@ internal static class ShanheCampaignUiChecks
         {
             vm.OpenShanheCommand.Execute(null);
             Layout(root);
-            var panel = Program.Find<ShanheCampaignPanel>(root).Single();
+            var panel = (ShanheCampaignPanel)window.FindName("ShanhePanel");
             ClickNavigation((Button)panel.FindName("ShanhePrepareButton"), root);
             var roster = (ListBox)panel.FindName("ShanheGeneralSelector");
             var search = (TextBox)panel.FindName("ShanheGeneralSearchBox");
@@ -528,12 +527,13 @@ internal static class ShanheCampaignUiChecks
         {
             vm.OpenShanheCommand.Execute(null);
             Layout(root);
-            var panel = Program.Find<ShanheCampaignPanel>(root).Single();
+            var panel = (ShanheCampaignPanel)window.FindName("ShanhePanel");
             Program.Assert(vm.IsShanhePreparation && vm.CanPrepareShanheExpedition,
                 "A fresh preparation surface must permit choosing a general and editing a loadout.");
             ClickNavigation((Button)panel.FindName("ShanhePrepareButton"), root);
             var rankSelector = (ComboBox)panel.FindName("ShanheRankSelector");
             rankSelector.SetCurrentValue(Selector.SelectedItemProperty, vm.ShanheRanks.Single(option => option.Value == 5));
+            vm.SelectedShanheGeneral = vm.ShanheGenerals.Single(general => general.Id == "classic:qu-yi");
             Layout(root);
             Program.Assert(vm.ShanheRanks.Count == 5 && vm.SelectedShanheRank.Value == 5 &&
                 ((Border)panel.FindName("ShanheSetupOverlay")).Visibility == Visibility.Visible &&
@@ -544,6 +544,8 @@ internal static class ShanheCampaignUiChecks
             vm.StartShanheCommand.Execute(null);
             Layout(root);
             var saved = ShanheCampaignJsonText(store);
+            Program.Assert(vm.ShanheVitalText.Contains("麹义") && vm.ShanheVitalText.Contains("6/6"),
+                "The actual fifth-rank Qu Yi map uses four printed HP plus two rank HP, with no hidden old preparation bonus.");
             Program.Assert(vm.IsShanheRunInProgress && !vm.IsShanhePreparation &&
                 !vm.CanPrepareShanheExpedition && !vm.StartShanheCommand.CanExecute(null) &&
                 !vm.EquipCodexTacticCommand.CanExecute(null) && !vm.UnlockCodexNodeCommand.CanExecute(null) &&
@@ -559,6 +561,7 @@ internal static class ShanheCampaignUiChecks
                 cold.SelectedShanheRank = cold.ShanheRanks[1];
                 cold.ContinueShanheCommand.Execute(null);
                 Program.Assert(cold.SelectedShanheRank.Value == 5 && cold.ShanheRankStatusText.Contains("重生可用") &&
+                    cold.ShanheVitalText.Contains("6/6") &&
                     ShanheCampaignJsonText(store) == saved,
                     "Continuing restores the saved fifth rank instead of the current preparation preference and leaves its journal untouched.");
             }
@@ -568,11 +571,10 @@ internal static class ShanheCampaignUiChecks
             Program.Assert(((Border)panel.FindName("ShanheSetupOverlay")).Visibility == Visibility.Collapsed &&
                 ShanheCampaignJsonText(store) == saved,
                 "A routed click against the hidden preparation entry must not reopen setup during a run.");
-            var opening = vm.ShanheMapRows.SelectMany(row => row.Nodes).Single(node => node.IsAvailable);
-            vm.SelectShanheNodeCommand.Execute(opening);
-            vm.ChooseShanheOptionCommand.Execute(vm.ShanheChoices.First(choice => choice.IsEnabled));
-            Layout(root);
-            var battleNode = vm.ShanheMapRows.SelectMany(row => row.Nodes).Single(node => node.IsAvailable);
+            var availableBattles = vm.ShanheMapRows.SelectMany(row => row.Nodes).Where(node => node.IsAvailable).ToArray();
+            Program.Assert(availableBattles.Length == 2 && vm.ShanheChoices.Count == 0 && !vm.IsShanheRewardOpen,
+                "Without inheritance the actual opening exposes two battle locations with no forced event or initial skill choice.");
+            var battleNode = availableBattles[0];
             var game = Program.Engine(vm);
             var journal = ShanheCampaignJsonText(store);
             Program.Assert(vm.ShanheMapNodes.Count < vm.ShanheMapRows.Sum(row => row.Nodes.Count) &&
@@ -586,11 +588,13 @@ internal static class ShanheCampaignUiChecks
             Program.Render(root, 1440, 880, Path.Combine(output, "shanhe-encounter-preview.png"));
             Program.Assert(panel.HandleEscape() && !vm.IsShanheEncounterPreviewOpen &&
                 ShanheCampaignJsonText(store) == journal, "Escape must dismiss only the uncommitted encounter preview.");
-            battleNode = vm.ShanheMapRows.SelectMany(row => row.Nodes).Single(node => node.IsAvailable);
+            battleNode = vm.ShanheMapRows.SelectMany(row => row.Nodes).First(node => node.IsAvailable);
             Click(Bound(panel, vm.PreviewShanheNodeCommand, battleNode), root);
             Click(Program.Find<Button>(panel).Single(button => ReferenceEquals(button.Command, vm.ChallengeShanheEncounterCommand)), root);
             Program.Assert(!vm.IsShanheEncounterPreviewOpen && vm.IsShanheBattleActive && vm.IsShanheBattleSession &&
-                store.Read().Battle?.Options.ShanheBattle is { PlayerRank: 5, RebirthAvailable: true } &&
+                store.Read().Battle?.Options.ShanheBattle is { PlayerGeneralId: "classic:qu-yi", PlayerRank: 5, RebirthAvailable: true,
+                    Hp: 6, MaxHpBonus: 2, InitialHandBonus: 2, DrawBonus: 1, SlashBonus: 1 } &&
+                Program.Engine(vm).CreateSnapshot(0).Players[0] is { Hp: 6, MaxHp: 6 } &&
                 Program.Engine(vm).CreateSnapshot(0).Players[0].Skills!.Count(skill => skill.ContentId == ShanheGeneralRanks.RebirthSkillId) == 1 &&
                 !ReferenceEquals(Program.Engine(vm), game),
                 "Confirming the actual challenge button must enter and save the real native battle exactly once.");
@@ -613,62 +617,64 @@ internal static class ShanheCampaignUiChecks
             fixedEnemies.All(enemy => enemy.StartingHand is null),
             "The actual published Guangcheng candidates retain random opening hands and expose their three additional fixed weapons.");
         foreach (var kind in new[] { CardKind.Leizhen, CardKind.ShanheXingtianAxe })
-            Program.Assert(CardArt.Get(kind) is not null && CardArt.GetEquipment(kind) is not null && CardArt.NeedsRuntimeNameOverlay(kind),
-                "Both new fixed weapons have readable card faces, equipment icons and runtime name overlays.");
-        // Retain the entire published graph and both original departures.
-        // Expose the route choice instead of randomly selecting one entrance;
-        // the real southern preparation commands still unlock Guangcheng.
-        var session = ShanheCampaignSession.Create(published with { RandomStartingNode = false },
-            new(89, "classic:guan-yu"), StandardShanheCampaignCatalog.CreateBattleRegistry);
-        var store = new PreviewTrackingShanheStore();
-        using var model = Create(new MemorySaveStore(), store);
-        model.SelectedShanheScenario = model.ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.Returning2026EditionId);
-        typeof(MainViewModel).GetField("_shanheSession", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(model, session);
-        var window = new MainWindow(model); window.ApplyTemplate();
-        var root = (FrameworkElement)window.Content;
-        try
+            Program.Assert(CardArt.Get(kind) is not null && CardArt.GetEquipment(kind) is not null &&
+                CardArt.NeedsRuntimeNameOverlay(kind) == (kind == CardKind.Leizhen),
+                "Fixed weapons have readable card faces and equipment icons; only a generic artwork template needs a runtime name overlay.");
+        // A preview now reveals only this run's concrete encounter. Exercise
+        // each authentic fixed-card recipe separately, without seed searches or
+        // combining otherwise independent candidate rosters into a fake battle.
+        foreach (var fixedEnemy in fixedEnemies)
         {
-            model.OpenShanheCommand.Execute(null); Layout(root);
-            var panel = Program.Find<ShanheCampaignPanel>(root).Single();
-            var departure = model.ShanheMapRows.SelectMany(row => row.Nodes).Single(candidate => candidate.Id == "guangcheng-start");
-            Click(Bound(panel, model.PreviewShanheNodeCommand, departure), root);
-            Click(Bound(panel, model.ChooseShanheOptionCommand, model.ShanheChoices.Single(choice => choice.Id == "supplies")), root);
-            var node = model.ShanheMapRows.SelectMany(row => row.Nodes).Single(candidate => candidate.Id == guangcheng.Id);
-            Program.Assert(node.IsAvailable && session.Snapshot.Phase == ShanheCampaignPhase.Map &&
-                session.Snapshot.CompletedNodeIds.Contains(departure.Id) && session.CreateCheckpoint().Commands.Count == 2 && store.Exists,
-                "The actual southern departure and preparation choice must complete before its published Guangcheng encounter is available for preview.");
-            var ordinary = Program.Engine(model);
-            var ordinaryCheckpoint = GameCheckpointJson.Serialize(ordinary.CreateCheckpoint());
-            var journal = ShanheCampaignJson.Serialize(session.CreateCheckpoint());
-            var snapshot = JsonSerializer.Serialize(session.Snapshot);
-            var writes = store.WriteCount;
-            var revision = session.Revision;
-            Click(Bound(panel, model.PreviewShanheNodeCommand, node), root);
-            var scroll = (ScrollViewer)panel.FindName("ShanheEncounterEnemyDetailScroll");
-            Program.Assert(model.IsShanheEncounterPreviewOpen && scroll.Content is TextBlock detail &&
-                detail.Text == model.ShanheEncounterEnemyDetail && detail.Visibility == Visibility.Visible && detail.ActualHeight > 0 &&
-                detail.Text.Contains("李傕", StringComparison.Ordinal) && detail.Text.Contains("郭汜", StringComparison.Ordinal) &&
-                detail.Text.Contains("张绣", StringComparison.Ordinal) &&
-                detail.Text.Contains("额外起手牌（随机起手之外）", StringComparison.Ordinal) &&
-                new[] { CardKind.ScarletBloodSword, CardKind.ZhanhunDao, CardKind.Leizhen }.All(kind =>
-                    detail.Text.Contains("【" + CardCatalog.Get(kind).DisplayName + "】", StringComparison.Ordinal) &&
-                    detail.Text.Contains(CardCatalog.Get(kind).Description, StringComparison.Ordinal)),
-                "The real preview control shows Scarlet Blood Sword and Soul Cleaver with their complete CardCatalog rules as additional hand cards, alongside the published Li Jue and Guo Si.");
-            Program.Assert(session.PendingBattleSetup is null && session.Revision == revision && session.Snapshot.EncounterOrdinal == 0 &&
-                ShanheCampaignJson.Serialize(session.CreateCheckpoint()) == journal && JsonSerializer.Serialize(session.Snapshot) == snapshot &&
-                ReferenceEquals(Program.Engine(model), ordinary) && GameCheckpointJson.Serialize(ordinary.CreateCheckpoint()) == ordinaryCheckpoint &&
-                !model.IsShanheBattleSession && store.WriteCount == writes && store.Exists,
-                "The public fixed-card preview does not roll an encounter, deal or reveal random opening cards, create a battle, change either journal or write a save.");
-            scroll.ScrollToBottom(); Layout(root);
-            Program.Assert(scroll.VerticalOffset > 0 && Math.Abs(scroll.VerticalOffset - scroll.ScrollableHeight) < 1,
-                "The actual scroll surface reaches the complete extra-card rules at the end of the published candidate roster.");
-            Program.Render(root, 1440, 880, Path.Combine(output, "shanhe-public-fixed-card-preview.png"));
-            Click((Button)panel.FindName("ShanheEncounterCloseButton"), root);
-            Program.Assert(!model.IsShanheEncounterPreviewOpen && session.PendingBattleSetup is null &&
-                ShanheCampaignJson.Serialize(session.CreateCheckpoint()) == journal && store.WriteCount == writes && store.Exists,
-                "Closing the actual fixed-card preview preserves the unissued encounter and read-only save boundary.");
+            var encounter = guangcheng.Encounters!.Single(item => item.Enemies.Contains(fixedEnemy));
+            var isolatedNode = guangcheng with { NextNodeIds = [], Encounters = [encounter] };
+            var session = ShanheCampaignSession.Create(published with { StartingNodeIds = [guangcheng.Id], Nodes = [isolatedNode] },
+                new(89, "classic:guan-yu"), StandardShanheCampaignCatalog.CreateBattleRegistry);
+            var store = new PreviewTrackingShanheStore();
+            using var model = Create(new MemorySaveStore(), store);
+            model.SelectedShanheScenario = model.ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.Returning2026EditionId);
+            typeof(MainViewModel).GetField("_shanheSession", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(model, session);
+            var window = new MainWindow(model); window.ApplyTemplate();
+            var root = (FrameworkElement)window.Content;
+            try
+            {
+                model.OpenShanheCommand.Execute(null); Layout(root);
+                var panel = (ShanheCampaignPanel)window.FindName("ShanhePanel");
+                var node = model.ShanheMapRows.SelectMany(row => row.Nodes).Single(candidate => candidate.Id == guangcheng.Id);
+                Program.Assert(node.IsAvailable && session.Snapshot.Phase == ShanheCampaignPhase.Map &&
+                    session.CreateCheckpoint().Commands.Count == 0 && !store.Exists,
+                    "The original fixed-card recipe is available for a read-only preview before any map command or save write.");
+                var ordinary = Program.Engine(model);
+                var ordinaryCheckpoint = GameCheckpointJson.Serialize(ordinary.CreateCheckpoint());
+                var journal = ShanheCampaignJson.Serialize(session.CreateCheckpoint());
+                var snapshot = JsonSerializer.Serialize(session.Snapshot);
+                var writes = store.WriteCount;
+                var revision = session.Revision;
+                Click(Bound(panel, model.PreviewShanheNodeCommand, node), root);
+                var scroll = (ScrollViewer)panel.FindName("ShanheEncounterEnemyDetailScroll");
+                Program.Assert(model.IsShanheEncounterPreviewOpen && scroll.Content is TextBlock detail &&
+                    detail.Text == model.ShanheEncounterEnemyDetail && detail.Visibility == Visibility.Visible && detail.ActualHeight > 0 &&
+                    detail.Text.Contains(model.ShanheEncounterEnemyPortraitName, StringComparison.Ordinal) &&
+                    detail.Text.Contains("额外起手牌（随机起手之外）", StringComparison.Ordinal) &&
+                    fixedEnemy.StartingCards!.Select(card => card.Kind).All(kind =>
+                        detail.Text.Contains("【" + CardCatalog.Get(kind).DisplayName + "】", StringComparison.Ordinal) &&
+                        detail.Text.Contains(CardCatalog.Get(kind).Description, StringComparison.Ordinal)),
+                    "The concrete preview control retains its original enemy's complete fixed-card rules as additional hand cards.");
+                Program.Assert(session.PendingBattleSetup is null && session.Revision == revision && session.Snapshot.EncounterOrdinal == 0 &&
+                    ShanheCampaignJson.Serialize(session.CreateCheckpoint()) == journal && JsonSerializer.Serialize(session.Snapshot) == snapshot &&
+                    ReferenceEquals(Program.Engine(model), ordinary) && GameCheckpointJson.Serialize(ordinary.CreateCheckpoint()) == ordinaryCheckpoint &&
+                    !model.IsShanheBattleSession && store.WriteCount == writes && !store.Exists,
+                    "The public fixed-card preview does not roll an encounter, deal or reveal random opening cards, create a battle, change either journal or write a save.");
+                scroll.ScrollToBottom(); Layout(root);
+                Program.Assert(Math.Abs(scroll.VerticalOffset - scroll.ScrollableHeight) < 1,
+                    "The actual scroll surface reaches the complete extra-card rules at the end of the published candidate roster.");
+                Program.Render(root, 1440, 880, Path.Combine(output, "shanhe-public-fixed-card-preview-" + fixedEnemy.GeneralId.Split(':')[^1] + ".png"));
+                Click((Button)panel.FindName("ShanheEncounterCloseButton"), root);
+                Program.Assert(!model.IsShanheEncounterPreviewOpen && session.PendingBattleSetup is null &&
+                    ShanheCampaignJson.Serialize(session.CreateCheckpoint()) == journal && store.WriteCount == writes && !store.Exists,
+                    "Closing the actual fixed-card preview preserves the unissued encounter and read-only save boundary.");
+            }
+            finally { window.Content = null; window.DataContext = null; window.Close(); }
         }
-        finally { window.Content = null; window.DataContext = null; window.Close(); }
     }
 
     public static void EightSeatBossStagesAndFinalSettlementPreview(string output)
@@ -688,7 +694,7 @@ internal static class ShanheCampaignUiChecks
         {
             var root = (FrameworkElement)window.Content;
             model.OpenShanheCommand.Execute(null); Layout(root);
-            var panel = Program.Find<ShanheCampaignPanel>(root).Single();
+            var panel = (ShanheCampaignPanel)window.FindName("ShanhePanel");
             var node = model.ShanheMapRows.SelectMany(row => row.Nodes).Single(item => item.Id == final.Id);
             var ordinary = Program.Engine(model);
             var ordinaryJournal = GameCheckpointJson.Serialize(ordinary.CreateCheckpoint());
@@ -775,11 +781,11 @@ internal static class ShanheCampaignUiChecks
             Click((Button)panel.FindName("ShanheConfirmRewardButton"), panel);
             var saved = store.Read().Campaign;
             var expectedSkill = StandardShanheCampaignCatalog.CreateCodexDefinition(1,
-                StandardShanheCampaignCatalog.LocalEditionId).Rewards.Single(reward => reward.Id == selected.Id).SkillId;
+                StandardShanheCampaignCatalog.Returning2026EditionId).Rewards.Single(reward => reward.Id == selected.Id).SkillId;
             Program.Assert(!vm.IsShanheRewardOpen && vm.ShanheExtraSkillCards.Single().Id == expectedSkill &&
                 saved.Commands.Count == 1 && saved.Commands[0] is CardGame.Core.Campaigns.ChooseShanheOpeningSkillCommand &&
-                vm.ShanheMapRows.SelectMany(row => row.Nodes).Count(node => node.IsAvailable) == 1,
-                "Confirming inheritance must grant exactly the chosen skill then unlock the untouched first map node.");
+                vm.ShanheMapRows.SelectMany(row => row.Nodes).Count(node => node.IsAvailable) == 2,
+                "Confirming inheritance must grant exactly the chosen skill then unlock both untouched first-chapter battle locations.");
             var committed = ShanheCampaignJsonText(store);
             vm.SelectShanheRewardCardCommand.Execute(selected);
             vm.ConfirmShanheRewardCommand.Execute(null);
@@ -810,9 +816,9 @@ internal static class ShanheCampaignUiChecks
         var full = StandardShanheCampaignCatalog.CreateDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
         var luoyang = full.Nodes.Single(node => node.Id == "luoyang");
         var encounter = luoyang.Encounters!.Single(candidate => candidate.Id == "luoyang:fengyi-s5");
-        // Preserve the published Luoyang node and every real candidate, while making
-        // it the fixture's first route; no earlier battle or victory is fabricated.
-        var definition = full with { StartingNodeIds = [luoyang.Id], Nodes = [luoyang] };
+        // Exercise the authored wounded boss directly. Previews now show the one
+        // seeded encounter, so unrelated alternative rosters must not be merged.
+        var definition = full with { StartingNodeIds = [luoyang.Id], Nodes = [luoyang with { Encounters = [encounter] }] };
         var session = ShanheCampaignSession.Create(definition, new(83, "classic:guan-yu"), StandardShanheCampaignCatalog.CreateBattleRegistry);
         var store = new PreviewTrackingShanheStore();
         using (var model = Create(new MemorySaveStore(), store))
@@ -824,7 +830,7 @@ internal static class ShanheCampaignUiChecks
             try
             {
                 model.OpenShanheCommand.Execute(null); Layout(root);
-                var panel = Program.Find<ShanheCampaignPanel>(root).Single();
+                var panel = (ShanheCampaignPanel)window.FindName("ShanhePanel");
                 var node = model.ShanheMapRows.SelectMany(row => row.Nodes).Single(candidate => candidate.Id == luoyang.Id);
                 var ordinary = Program.Engine(model); var ordinaryCheckpoint = GameCheckpointJson.Serialize(ordinary.CreateCheckpoint());
                 var journal = ShanheCampaignJson.Serialize(session.CreateCheckpoint()); var state = JsonSerializer.Serialize(session.Snapshot);
@@ -835,14 +841,15 @@ internal static class ShanheCampaignUiChecks
                     !model.ShanheEncounterEnemyDetail.Contains("董卓·覆銮凶影  体力 15/15", StringComparison.Ordinal) &&
                     Program.Find<TextBlock>(panel).Any(text => text.Text.Contains(expected, StringComparison.Ordinal)),
                     "The real Luoyang preview binding uses General.InitialHp for the new partial-health boss instead of silently displaying full 15/15.");
-                var portraitCaption = Program.Find<TextBlock>(panel).Single(text =>
-                    BindingOperations.GetBinding(text, TextBlock.TextProperty)?.Path?.Path == nameof(MainViewModel.ShanheEncounterEnemyPortraitName));
+                var displayedBoss = model.ShanheEncounterEnemyCards.Single(card => card.Name == "董卓·覆銮凶影");
+                var portraitCaption = Program.Find<TextBlock>((ItemsControl)panel.FindName("ShanheEncounterEnemyCards")).Single(text =>
+                    ReferenceEquals(text.DataContext, displayedBoss) && text.Text == displayedBoss.Name);
                 Program.Assert(portraitCaption.Text == model.ShanheEncounterEnemyPortraitName &&
-                    portraitCaption.Text == "董卓·洛阳技能形态" &&
-                    portraitCaption.ToolTip is string names && names == model.ShanheEncounterEnemyName && names.Contains("覆銮凶影") &&
+                    portraitCaption.Text == "董卓·覆銮凶影" && displayedBoss.Stats.Contains("体力 10/15") &&
+                    model.ShanheEncounterEnemyCards.Count == encounter.Enemies.Count &&
                     portraitCaption.Parent is Border { Parent: Border portraitHost } captionHost &&
                     captionHost.ActualHeight > 0 && captionHost.ActualHeight < portraitHost.ActualHeight,
-                    "The real portrait caption names its pictured form, fits inside the portrait and retains the complete candidate list in its tooltip and scrollable details.");
+                    "Each actual enemy has its own named portrait and stats, including the wounded boss, with its caption inside the portrait.");
                 Program.Assert(session.PendingBattleSetup is null && session.Revision == 0 && session.Snapshot.EncounterOrdinal == 0 &&
                     ShanheCampaignJson.Serialize(session.CreateCheckpoint()) == journal && JsonSerializer.Serialize(session.Snapshot) == state &&
                     ReferenceEquals(Program.Engine(model), ordinary) && GameCheckpointJson.Serialize(ordinary.CreateCheckpoint()) == ordinaryCheckpoint &&
@@ -851,7 +858,7 @@ internal static class ShanheCampaignUiChecks
                 var scroll = (ScrollViewer)panel.FindName("ShanheEncounterEnemyDetailScroll");
                 Program.Assert(scroll is { ScrollableHeight: > 0, Content: TextBlock detail } &&
                     detail.Text.Contains(expected, StringComparison.Ordinal) && detail.ActualHeight > scroll.ViewportHeight,
-                    "The genuine multi-candidate Luoyang details remain in a scrollable native text surface instead of clipping the final 10/15 source form.");
+                    "The complete selected Luoyang roster remains in a scrollable native text surface without clipping the wounded boss's 10/15 statistics.");
                 scroll.ScrollToBottom(); Layout(root);
                 Program.Assert(scroll.VerticalOffset > 0 && Math.Abs(scroll.VerticalOffset - scroll.ScrollableHeight) < 1,
                     "The actual encounter detail control can reach the bottom of the complete source roster.");

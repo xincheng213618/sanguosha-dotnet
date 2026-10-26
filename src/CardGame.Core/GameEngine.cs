@@ -250,7 +250,7 @@ public sealed partial class GameEngine
             for (var index = _resolutionStack.Count - 1; index >= 0; index--)
                 if (_resolutionStack[index] is DyingFrame frame &&
                     !(IsOriginalDyingSuspendedByDyingSuits(frame) || IsOriginalDyingSuspendedByRecipientCategoryMark(frame) || IsOriginalDyingSuspendedByAnniversaryYangBiao(frame)) &&
-                    !IsOriginalDyingSuspendedByOwnedDeathBenefit(frame) &&
+                    !IsOriginalDyingSuspendedByOwnedDeathBenefit(frame) && !IsOriginalDyingSuspendedByOwnerDeathDamage(frame) &&
                     !IsOriginalDyingSuspendedByHappyGuardElai(frame) &&
                     !IsOriginalDyingSuspendedByDeathGrowth(frame) && !IsOriginalDyingSuspendedByHeJinYanhuo(frame) &&
                     !IsOriginalDyingSuspendedByHellKing(frame) && !IsOriginalDyingSuspendedByWenhePoison(frame) &&
@@ -7287,15 +7287,18 @@ public sealed partial class GameEngine
         var nearbyResponseProhibited = IsNearbyTargetResponseProhibited(
             attack.CardUserSeat, target.Seat, playedCardKind, [target.Seat]);
         var suitResponseProhibited = IsSuitSlashResponseProhibited(attack);
+        var convertedColorlessProhibited = HasConvertedSlashSameColorResponseRestriction(attack) &&
+            ConvertedSlashSameColorResponseColor(attack) is null;
         var ghostBladeProhibited =
             HasWeaponAbility(_players[attack.CardUserSeat], CardKind.GhostDragonCrescentBlade) &&
             attack.PhysicalCards.Count > 0 && attack.PhysicalCards.All(card =>
                 IsRedSuit(EffectiveSuit(_players[attack.CardUserSeat], card)));
-        if (attack.ProhibitsDodge || WushuangDrunkenSlashUnrespondable(attack) || nearbyResponseProhibited || suitResponseProhibited || ghostBladeProhibited)
+        if (attack.ProhibitsDodge || WushuangDrunkenSlashUnrespondable(attack) || nearbyResponseProhibited || suitResponseProhibited || ghostBladeProhibited || convertedColorlessProhibited)
         {
             var prohibitingSkills = attack.ResponseProhibitingSkillNames
                 .Concat(nearbyResponseProhibited ? ["伏骑"] : [])
                 .Concat(suitResponseProhibited ? ["武神"] : [])
+                .Concat(convertedColorlessProhibited ? ["父魂"] : [])
                 .Concat(ghostBladeProhibited ? ["鬼龙斩月刀"] : [])
                 .Distinct(StringComparer.Ordinal)
                 .Select(name => $"【{name}】");
@@ -18712,7 +18715,8 @@ public sealed partial class GameEngine
                     !nestedResponseUseOnDying && !nestedDyingEntry && !HasLeCaiYongFeibaiRescueContinuation(dyingContinuation.FrameId) && !HasWuZglRescueContinuation(dyingContinuation.FrameId) && !HasLeCaoZhiWenlanRescueContinuation(dyingContinuation.FrameId) &&
                     !IsExactOtherDyingRecoveryRide(dyingContinuation.FrameId) &&
                     !IsExactDyingOwnedCardRide(dyingContinuation.FrameId) &&
-                    !(dyingFrameIndex >= 0 && IsRoundPricedPileAlcoholRide(dyingFrameIndex, (DyingFrame)_resolutionStack[dyingFrameIndex])))
+                    !(dyingFrameIndex >= 0 && (IsRoundPricedPileAlcoholRide(dyingFrameIndex, (DyingFrame)_resolutionStack[dyingFrameIndex]) ||
+                        IsOlSpZhujiuDyingRide(dyingFrameIndex, (DyingFrame)_resolutionStack[dyingFrameIndex]))))
                 {
                     var top = coreTop;
                     var topShape = top is ProgramSkillFrame diagnosticProgram

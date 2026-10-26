@@ -9,9 +9,10 @@ internal sealed class ShanheBossStageFeature : IGameModeFeature,
 {
     private readonly ShanheBattleSetup _setup;
     private readonly IModeEncounterHost _host;
-    internal ShanheBossStageFeature(ShanheBattleSetup setup, IModeEncounterHost host)
+    private readonly IStandardBattleHost _battleHost;
+    internal ShanheBossStageFeature(ShanheBattleSetup setup, IModeEncounterHost host, IStandardBattleHost battleHost)
     {
-        _setup = setup; _host = host;
+        _setup = setup; _host = host; _battleHost = battleHost;
         RuleObservers = Array.AsReadOnly<ModeRuleObserverRegistration>(
         [ModeRuleObserverRegistration.ForEvent<IGameEvent>(ProgramRulePhase.AfterEvent, 27600, ObserveLethalDamage)]);
     }
@@ -51,7 +52,7 @@ internal sealed class ShanheBossStageFeature : IGameModeFeature,
             throw new InvalidOperationException("A Shanhe boss transition lost its lethal first-form owner.");
         var transition = _setup.BossTransition!;
         _host.ReplaceCombatant(new(BossSeat, boss.GeneralId, transition.GeneralId, PreserveCurrentState: true,
-            MaximumHpOverride: transition.MaxHp, HpOverride: transition.Hp));
+            MaximumHpOverride: transition.MaxHp, HpOverride: transition.Hp, ArmorOverride: transition.Combatant?.InitialArmor));
         // Commit the once-only marker before any cleanup can publish another rule event.
         _host.PublishFact(new ShanheBossStageStartedEvent(BossSeat, boss.GeneralId, transition.GeneralId,
             facts.TurnNumber, transition.MaxHp, transition.Hp));
@@ -62,6 +63,8 @@ internal sealed class ShanheBossStageFeature : IGameModeFeature,
         _host.FinishInterruptedTurn(facts.CurrentSeat, facts.TurnNumber, "shanhe-boss-stage",
             new ShanheBossTurnInterruptedEvent(facts.TurnNumber, facts.CurrentSeat, BossSeat));
         if (transition.DrawCards != 0) _host.DrawInitialCards(BossSeat, transition.DrawCards);
+        foreach (var card in transition.StartingEquipment ?? [])
+            _battleHost.PlaceStartingCard(card, BossSeat, equipment: true);
         _host.BeginNaturalTurnAt(BossSeat);
         _host.Log("ShanheBossTransformed", $"首领进入第二阶段【{_host.General(transition.GeneralId).Name}】，当前回合中断，由首领开始新的自然回合。", BossSeat);
         _host.PublishState();

@@ -71,7 +71,7 @@ public sealed partial class MainViewModel
         {
             if (ActiveShanheBossRewardGroup is null) _shanheBossRewardGroupId = null;
             foreach (var group in summary.Groups)
-                ShanheBossRewardGroups.Add(new(group.Id, group.Name, group.SelectedReward?.Name ?? (group.IsExhausted ? "暂无可领取奖励" : $"{group.Offers.Count} 选 一"),
+                ShanheBossRewardGroups.Add(new(group.Id, group.Name, group.IsSkipped ? $"已换取 {group.SkipGold} 铜币" : group.SelectedReward?.Name ?? (group.IsExhausted ? "暂无可领取奖励" : $"{group.Offers.Count} 选 一"),
                     group.IsResolved, group.Id == _shanheBossRewardGroupId, state.Revision));
             if (ActiveShanheBossRewardGroup is { } active)
                 foreach (var reward in active.Offers)

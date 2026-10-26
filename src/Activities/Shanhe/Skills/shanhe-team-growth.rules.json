@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {"id": "shanhe:team-health-2199", "revision": 1,
+      "triggers": [{"id": "opening-other-team-health", "window": "gameStarting", "subject": "owner", "optional": false, "priority": 100,
+        "effects": [
+          {"op": "selectAllPublicTeamTargets", "target": "owner", "targetKind": "otherPublicTeamAllies", "allowEmpty": false},
+          {"op": "grantShanheTeamOpeningMaximumHp", "target": "owner"},
+          {"op": "recover", "target": "selectedTargets", "amount": 3}
+        ]}]},
+    {"id": "shanhe:ally-rank-five-rebirth", "revision": 1,
+      "triggers": [{"id": "ally-campaign-rebirth", "window": "selfDyingResponse", "subject": "owner", "optional": true,
+        "usageScope": "game", "usageLimit": 1,
+        "effects": [
+          {"op": "recoverTo", "target": "owner", "numberExpression": "integerConstant", "minimumValue": 5, "clampToMaxHp": true},
+          {"op": "draw", "target": "owner", "amount": 5}
+        ]}]}
+  ]
+}

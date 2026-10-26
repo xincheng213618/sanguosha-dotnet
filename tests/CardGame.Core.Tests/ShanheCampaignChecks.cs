@@ -249,7 +249,7 @@ internal static partial class ShanheCampaignChecks
             new("end", "决战", ShanheNodeKind.BossBattle, [], [new("last", "守军", [new(Enemy)], VictoryGold: 11)],
                 ["guard", "raid", "opening"]) { RewardSkipGold = 100 }
         ], [new("guard", "守御", SkillId: Guard), new("raid", "突袭", SkillId: Raid),
-            new("opening", "行囊", Bonuses: new(InitialHand: 1))], StartingGold: 8, ExtraSkillSlots: 0);
+            new("opening", "行囊", StartingCards: [new(CardKind.Slash)])], StartingGold: 8, ExtraSkillSlots: 0);
         var session = Create(definition);
         var before = Snapshot(session);
         Require(!session.Snapshot.CanSkipReward && session.Snapshot.RewardSkipGold == 0 &&

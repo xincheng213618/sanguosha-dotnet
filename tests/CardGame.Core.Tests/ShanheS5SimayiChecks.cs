@@ -14,6 +14,49 @@ internal static class ShanheS5SimayiChecks
         Driver = "fixture:s5-sima-driver", Discard = "fixture:s5-sima-discard", Hold = "fixture:s5-sima-hold",
         Deck = "fixture:s5-sima-deck";
 
+    public static void MediumChapterBossUsesObservedPanelAndFourRenSkill()
+    {
+        foreach (var difficulty in new[] { 1, 2, 3 })
+        {
+            var definition = StandardShanheCampaignCatalog.CreateDefinition(difficulty, StandardShanheCampaignCatalog.Returning2026EditionId);
+            var node = definition.Nodes.Single(n => n.Id == "luoyang");
+            var encounter = node.Encounters!.Single(e => e.Id == "luoyang:simayi-s5");
+            var enemy = encounter.Enemies.Single();
+            if (node.ChapterNumber != 3 || enemy.GeneralId != Hero ||
+                enemy.MaxHpBonus != (difficulty == 2 ? 6 : 0) || enemy.Hp != (difficulty == 2 ? 10 : (int?)null) ||
+                enemy.DrawBonus != (difficulty == 2 ? 4 : 0) || enemy.SlashBonus != 0 || enemy.InitialHandBonus != 0)
+                throw new InvalidOperationException("Only the observed medium third-chapter Sima Yi recipe uses 10/10, draw 6 and Slash 1; the other source panels stay at 4/4 and draw 2.");
+            if (difficulty != 2) continue;
+
+            var route = new ShanheCampaignDefinition("fixture:medium-simayi", "中等司马隐谋", ["classic:guan-yu"], ["boss"],
+                [new("boss", node.Name, ShanheNodeKind.BossBattle, [], [encounter])], []);
+            var session = ShanheCampaignSession.Create(route, new(83, "classic:guan-yu"), StandardShanheCampaignCatalog.CreateBattleRegistry);
+            if (!session.Submit(new MoveShanheNodeCommand("boss", session.Revision)).Accepted)
+                throw new InvalidOperationException("The actual campaign must prepare the medium boss recipe.");
+            var setup = session.PendingBattleSetup!;
+            var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup);
+            var game = StandardShanheCampaignCatalog.CreateBattle(setup);
+            var boss = game.CreateSnapshot(0).Players[1];
+            if (boss is not { Hp: 10, MaxHp: 10, HandCount: 4 } || registry.Generals[Hero].BaseHp != 4 ||
+                !new[] { Renjie, Baiyin, Jilue, Lianpo }.All(id => boss.Skills!.Any(skill => skill.ContentId == id)))
+                throw new InvalidOperationException("The native boss starts full at 10/10 with all four S5 skills and the original random opening hand.");
+            if (!game.Submit(new StartGameCommand()).Accepted)
+                throw new InvalidOperationException("The native medium Sima Yi battle must start.");
+            for (var step = 0; step < 80 && !game.Events.Any(e => e.Payload is CardsDrawnEvent { PlayerSeat: 1, Count: 6 }); step++)
+            {
+                var pending = game.CreateSnapshot(0).PendingDecision;
+                var result = pending is { PlayerSeat: 0, Kind: DecisionKind.PlayCard }
+                    ? game.Submit(new EndPlayPhaseCommand(0, game.Revision, pending.PromptId))
+                    : pending is { PlayerSeat: 0, Kind: DecisionKind.DiscardCards }
+                    ? game.Submit(new DiscardCardsCommand(0, pending.ValidCardIds.Take(pending.RequiredCardCount).ToArray(), pending.PromptId, game.Revision))
+                    : game.Submit(new AdvanceOneStepCommand(game.Revision));
+                if (!result.Accepted) throw new InvalidOperationException(result.Error?.Message ?? "The native boss draw was rejected.");
+            }
+            if (!game.Events.Any(e => e.Payload is CardsDrawnEvent { PlayerSeat: 1, Count: 6 }))
+                throw new InvalidOperationException("The actual enemy normal draw phase must draw six cards.");
+        }
+    }
+
     public static void FourRenPerActualPointAndPhaseDiscardPayOriginalJilueColdWithoutAwakeningCost()
     {
         var s = Scene.Start(); s.Play();

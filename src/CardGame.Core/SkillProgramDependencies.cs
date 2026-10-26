@@ -103,6 +103,7 @@ internal sealed class SkillProgramDependencies
         _windows = triggers.Select(trigger => trigger.Window).ToFrozenSet();
         _cardPolicyKinds = programs.SelectMany(program => program.CardPolicies).Select(policy => policy.Kind).ToFrozenSet();
         UsesActualPlayPhaseUseLedger = HasCardPolicy(SkillProgramCardPolicyKind.FirstActualPlayUseDistanceUnlimited) ||
+            HasCardPolicy(SkillProgramCardPolicyKind.MaximumOwnPlayCardUses) ||
             HasCardPolicy(SkillProgramCardPolicyKind.StopUsingAfterTrickOrHpCount) ||
             _triggerOperationSkillIds.Keys.Concat(_activationOperations).Any(op =>
                 ProgramOperationCatalog.Default.Resolve(op) is IActualPlayPhaseUseLedgerOperation);

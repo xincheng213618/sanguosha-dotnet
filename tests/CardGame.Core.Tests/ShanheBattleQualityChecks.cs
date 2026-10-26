@@ -8,6 +8,41 @@ internal static class ShanheBattleQualityChecks
     private const string Forced = "fixture:battle-quality-100";
     private const string Guard = "fixture:shanhe-guard", Raid = "fixture:shanhe-raid";
 
+    public static void AuthoredBaseQualitiesStayHomogeneousAndPromotionsRetainTheFullPool()
+    {
+        var original = Definition();
+        var definition = original with
+        {
+            Nodes = original.Nodes.Select(node => node.Id == "start" ? node with
+                { PrimaryTacticRarity = 1, PrimarySkillRarity = 2, RewardSkipGold = 100 } : node).ToArray(),
+            Rewards = original.Rewards.Select(reward => reward.SkillId is not null && reward.Rarity == 3
+                ? reward with { Rarity = 2 } : reward).ToArray()
+        };
+        var common = Create(definition, 71, []);
+        Complete(common);
+        Accept(common, new ChooseShanheRewardCategoryCommand(ShanheRewardCategory.Tactic, common.Revision));
+        Need(common.Snapshot.RewardOffers.Count == 3 && common.Snapshot.RewardOffers.All(reward => reward.Rarity == 1) &&
+            !common.Snapshot.CanSkipReward,
+            "An authored ordinary tactic draft contains only common tactics before any promotion and remains mandatory.");
+        var rare = Create(definition, 71, []);
+        Complete(rare);
+        Accept(rare, new ChooseShanheRewardCategoryCommand(ShanheRewardCategory.Skill, rare.Revision));
+        Need(rare.Snapshot.RewardOffers.Count == 2 && rare.Snapshot.RewardOffers.All(reward => reward.Rarity == 2) &&
+            rare.Snapshot.RewardSkipGold == 100,
+            "An authored rare skill node excludes common skills from the same catalogue and quotes exactly the rare-skill compensation.");
+        var promoted = Create(definition, 71, [Forced]);
+        Complete(promoted);
+        Accept(promoted, new ChooseShanheRewardCategoryCommand(ShanheRewardCategory.Tactic, promoted.Revision));
+        Need(promoted.Snapshot.RewardOffers.Count == 3 && promoted.Snapshot.RewardOffers.All(reward => reward.Rarity > 1) &&
+            promoted.Definition.Nodes.Single(node => node.Id == "start").RewardIds!.Contains("t6"),
+            "Filtering the base draft does not remove the full authored higher-quality pool used by a real owned promotion tactic.");
+        var checkpoint = promoted.CreateCheckpoint();
+        var cold = ShanheCampaignSession.Restore(ShanheCampaignJson.Deserialize(ShanheCampaignJson.Serialize(checkpoint)), definition,
+            ShanheCampaignChecks.Registry);
+        Need(JsonSerializer.Serialize(cold.Snapshot) == JsonSerializer.Serialize(promoted.Snapshot),
+            "A cold journal preserves the selected base quality and finalized promoted offer without rerolling.");
+    }
+
     public static void RealOrdinaryWinsPromoteFrozenCategoryAndMixedOffersWithoutWideningResearch()
     {
         var baseline = Create(Definition(), 71, []);

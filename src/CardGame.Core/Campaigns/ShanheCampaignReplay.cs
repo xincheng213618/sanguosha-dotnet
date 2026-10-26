@@ -17,6 +17,10 @@ public sealed record ShanheCampaignOptions(int Seed, string PlayerGeneralId)
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? PlayerRank { get; init; }
 
+    /// <summary>Only an authored source-difficulty recipe may bind this identity; local tiers leave it null.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? SourceDifficultyId { get; init; }
+
     /// <summary>Opts new expeditions into the verified codex skill and equipment reward pool.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool UseCodexRewardPool { get; init; }
@@ -60,7 +64,11 @@ public sealed record ChooseShanheRewardCategoryCommand(ShanheRewardCategory Cate
 public sealed record ChooseShanheOpeningSkillCommand(string RewardId, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record ChooseShanheBossRewardCommand(string GroupId, string RewardId, string? ReplaceSkillId, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record ConfirmShanheBossRewardCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
-public sealed record SkipShanheRewardCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
+public sealed record SkipShanheRewardCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? GroupId { get; init; }
+}
 public sealed record RefreshShanheShopCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record BuyShanheMarketItemCommand(string ChoiceId, string? ReplaceSkillId, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record ChooseShanheNodeOptionCommand(string ChoiceId, string? ReplaceSkillId, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
@@ -95,8 +103,23 @@ public sealed record ShanheCampaignSnapshot(
     ShanheBattleSetup? PendingBattleSetup, string StoryText, string EndingText)
 {
     public string PlayerGeneralId { get; init; } = "";
+    public string PlayerCharacterId { get; init; } = "";
+    private readonly IReadOnlyList<ShanheGuideBattleCompletion> _completedBattles = Array.Empty<ShanheGuideBattleCompletion>();
+    public IReadOnlyList<ShanheGuideBattleCompletion> CompletedBattles
+    {
+        get => _completedBattles;
+        init => _completedBattles = ShanheCampaignContent.Freeze(value);
+    }
+    public string? CurrentStoryEventName { get; init; }
+    public IReadOnlyList<ShanheCombatantDefinition> RecruitedCompanions { get; init; } = Array.Empty<ShanheCombatantDefinition>();
     public int PlayerRank { get; init; } = 1;
     public bool RebirthUsed { get; init; }
+    private readonly IReadOnlyList<ShanheCombatantDefinition> _startingCompanions = Array.Empty<ShanheCombatantDefinition>();
+    public IReadOnlyList<ShanheCombatantDefinition> StartingCompanions
+    {
+        get => _startingCompanions;
+        init => _startingCompanions = ShanheCampaignContent.Freeze(value.Select(ShanheCampaignContent.FreezeCombatant));
+    }
     public IReadOnlyList<ShanheStartingCard> StartingCards { get; init; } = Array.Empty<ShanheStartingCard>();
     public IReadOnlyList<ShanheStartingCard> StartingEquipment { get; init; } = Array.Empty<ShanheStartingCard>();
     public int EncounterOrdinal { get; init; }

@@ -40,7 +40,7 @@ public sealed partial class GameEngine
                 SecondaryGeneral = seat.SecondaryGeneralId is null ? null : ResolveSetupGeneral(seat.SecondaryGeneralId),
                 SecondaryGeneralSelected = seat.SecondaryGeneralSelected,
                 SecondaryGeneralRevealed = seat.SecondaryGeneralRevealed,
-                MaxHp = seat.MaxHp, Hp = seat.Hp, IsAlive = seat.IsAlive,
+                MaxHp = seat.MaxHp, Hp = seat.Hp, IsAlive = seat.IsAlive, Armor = seat.InitialArmor,
                 GeneralDraftCandidates = seat.GeneralDraftCandidateIds is null ? null :
                     Array.AsReadOnly(seat.GeneralDraftCandidateIds.Select(ResolveSetupGeneral).ToArray())
             };

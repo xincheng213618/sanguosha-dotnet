@@ -1,0 +1,4 @@
+{"schemaVersion":62,"skills":[{"id":"shanhe:xiasheng-3362","revision":1,"triggers":[
+ {"id":"red-hand-black-use","window":"cardUseCommitted","ownerRelation":"actor","includeResponseUses":true,"optional":false,"effects":[{"op":"resolveShanheXiasheng","target":"owner","stage":"draw"}]},
+ {"id":"black-hand-red-target","window":"cardUseTargetsFinalized","ownerRelation":"actor","optional":false,"effects":[{"op":"resolveShanheXiasheng","target":"owner","stage":"target"}]}
+]}]}

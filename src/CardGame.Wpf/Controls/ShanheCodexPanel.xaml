@@ -61,7 +61,6 @@
     </ItemsControl>
     <StackPanel Canvas.Left="120" Canvas.Top="477" Width="220"><TextBlock Text="{Binding ShanheCodexLoadoutCount}" Foreground="#614628" TextAlignment="Center" FontSize="12"/><TextBlock Text="装备方案随时保存 · 下次出征生效" Foreground="#8C6B42" TextAlignment="Center" FontSize="10" Margin="0,6,0,0"/></StackPanel>
     <TextBlock Canvas.Left="381" Canvas.Top="23" Text="战 法 研 习" FontFamily="KaiTi" FontSize="22" Foreground="#594029"/>
-    <TextBlock Canvas.Left="525" Canvas.Top="31" Text="2026 诸侯伐董 · 滚轮横向翻阅" FontSize="10" Foreground="#80633D"/>
     <StackPanel Canvas.Left="806" Canvas.Top="22" Orientation="Horizontal"><TextBlock Text="山河册" Foreground="#705334" FontSize="12" VerticalAlignment="Center"/><Border Background="#402B1E" BorderBrush="#B2935C" BorderThickness="1" Padding="15,4" Margin="10,0,0,0"><TextBlock Text="{Binding ShanheBookBalance, StringFormat={}{0} 册}" Foreground="#F0D499" FontSize="17"/></Border></StackPanel>
     <CheckBox x:Name="CollectionToggle" Canvas.Left="946" Canvas.Top="32" Content="本次行装" IsChecked="{Binding ShanheCodexShowCollection}" Foreground="#705334" FontSize="10"/>
     <Grid Canvas.Left="374" Canvas.Top="82" Width="32" Height="355">
@@ -83,7 +82,7 @@
        <ItemsControl.ItemContainerStyle><Style TargetType="ContentPresenter"><Setter Property="Canvas.Left" Value="{Binding X}"/></Style></ItemsControl.ItemContainerStyle>
        <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}" Foreground="#917A52" FontFamily="KaiTi" FontSize="13"/></DataTemplate></ItemsControl.ItemTemplate>
       </ItemsControl>
-      <ItemsControl ItemsSource="{Binding ShanheCodexNodes}">
+      <ItemsControl x:Name="CodexTreeNodes">
        <ItemsControl.ItemsPanel><ItemsPanelTemplate><Canvas/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
        <ItemsControl.ItemContainerStyle><Style TargetType="ContentPresenter"><Setter Property="Canvas.Left" Value="{Binding X}"/><Setter Property="Canvas.Top" Value="{Binding Y}"/></Style></ItemsControl.ItemContainerStyle>
        <ItemsControl.ItemTemplate><DataTemplate>
@@ -128,6 +127,45 @@
     <Border Canvas.Left="370" Canvas.Top="58" Width="660" Height="395" Background="#F3E8D6B5" BorderBrush="#A78A56" BorderThickness="1" Padding="18" Visibility="{Binding ShanheCodexShowCollection, Converter={StaticResource VisibleWhen}}">
      <DockPanel><StackPanel DockPanel.Dock="Top"><TextBlock Text="本次征程 · 行装" FontFamily="KaiTi" FontSize="24" Foreground="#513D27"/><TextBlock Text="{Binding ShanheBuildSummary}" TextWrapping="Wrap" Foreground="#80633D" FontSize="11" Margin="0,8,0,10"/></StackPanel><ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsControl ItemsSource="{Binding ShanheCodexCards}"><ItemsControl.ItemTemplate><DataTemplate><Border BorderBrush="#B29A6B" BorderThickness="0,0,0,1" Padding="0,8"><Border.ToolTip><ToolTip MaxWidth="460"><ScrollViewer MaxHeight="480" VerticalScrollBarVisibility="Auto"><TextBlock Text="{Binding RuleTooltip}" TextWrapping="Wrap" LineHeight="22"/></ScrollViewer></ToolTip></Border.ToolTip><StackPanel><TextBlock Text="{Binding Name}" Foreground="#63432D" FontFamily="KaiTi" FontSize="18"/><TextBlock Text="{Binding Summary}" Foreground="#6B5B43" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0"/></StackPanel></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl></ScrollViewer></DockPanel>
     </Border>
+    <Expander x:Name="CodexGuideTasksExpander" Canvas.Left="370" Canvas.Top="24" Width="660" Header="{Binding ShanheGuideTaskHeader}" IsExpanded="False" Foreground="#705334" FontSize="11" AutomationProperties.Name="诸侯伐董章节任务">
+     <Expander.Template><ControlTemplate TargetType="Expander"><StackPanel>
+      <ToggleButton x:Name="GuideTaskToggle" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" Content="{TemplateBinding Header}" HorizontalAlignment="Left" Width="230" Height="26" Margin="175,0,0,8" Background="#493324" Foreground="#F2DEAE" BorderBrush="#A98A51" BorderThickness="1" Cursor="Hand" AutomationProperties.Name="展开或收起章节任务">
+       <ToggleButton.Template><ControlTemplate TargetType="ToggleButton">
+        <Border x:Name="TaskHeaderEdge" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="6,3"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+        <ControlTemplate.Triggers>
+         <Trigger Property="IsChecked" Value="True"><Setter TargetName="TaskHeaderEdge" Property="Background" Value="#745332"/><Setter TargetName="TaskHeaderEdge" Property="BorderBrush" Value="#E6C477"/></Trigger>
+         <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="TaskHeaderEdge" Property="Background" Value="#77512E"/><Setter TargetName="TaskHeaderEdge" Property="BorderBrush" Value="#FFDC84"/></Trigger>
+         <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="TaskHeaderEdge" Property="BorderBrush" Value="#FFE8A2"/><Setter TargetName="TaskHeaderEdge" Property="BorderThickness" Value="2"/></Trigger>
+        </ControlTemplate.Triggers>
+       </ControlTemplate></ToggleButton.Template>
+      </ToggleButton>
+      <ContentPresenter x:Name="GuideTaskContent" Visibility="Collapsed"/>
+     </StackPanel><ControlTemplate.Triggers><Trigger Property="IsExpanded" Value="True"><Setter TargetName="GuideTaskContent" Property="Visibility" Value="Visible"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Expander.Template>
+     <Border Height="395" Background="#FFF0E2C5" BorderBrush="#A78A56" BorderThickness="1" Padding="15,11">
+      <DockPanel>
+       <StackPanel DockPanel.Dock="Top" Margin="0,0,0,7">
+        <TextBlock Text="诸侯伐董 · 章节任务" FontFamily="KaiTi" FontSize="21" Foreground="#513D27"/>
+        <TextBlock Text="{Binding ShanheGuideTaskNotice}" TextWrapping="Wrap" FontSize="11" Foreground="#815E38" Margin="0,4,0,0"/>
+       </StackPanel>
+       <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+        <ItemsControl x:Name="CodexGuideTaskChapters" ItemsSource="{Binding ShanheGuideTaskChapters}"><ItemsControl.ItemTemplate><DataTemplate>
+         <StackPanel Margin="0,0,0,8">
+          <TextBlock Text="{Binding Title}" Foreground="#64472C" FontWeight="Bold" FontSize="12" Margin="0,2,0,3"/>
+          <ItemsControl ItemsSource="{Binding Tasks}"><ItemsControl.ItemTemplate><DataTemplate>
+           <Border BorderBrush="#C5AA7B" BorderThickness="0,0,0,1" Padding="3,5,3,6" ToolTip="{Binding VerificationNote}">
+            <StackPanel>
+             <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="{Binding Name}" FontFamily="KaiTi" FontSize="16" Foreground="#513D27"/><TextBlock Grid.Column="1" Text="{Binding RewardLabel}" Foreground="#80603A" FontSize="11" VerticalAlignment="Center"/></Grid>
+             <TextBlock Text="{Binding Condition}" Foreground="#594C38" FontSize="11" TextWrapping="Wrap" Margin="0,2,0,0"/>
+             <TextBlock Text="{Binding Availability}" Foreground="#94653A" FontSize="10" TextWrapping="Wrap" Margin="0,3,0,0"/>
+            </StackPanel>
+           </Border>
+          </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+         </StackPanel>
+        </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+       </ScrollViewer>
+      </DockPanel>
+     </Border>
+    </Expander>
    </Canvas>
    <Border x:Name="CodexPickerOverlay" Background="#B8000000" Visibility="{Binding IsShanheCodexPickerOpen, Converter={StaticResource VisibleWhen}}" KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle" FocusManager.IsFocusScope="True">
     <Border Margin="62,40,25,37" BorderBrush="#AE9B76" BorderThickness="2" Background="#292823" Padding="21,13">

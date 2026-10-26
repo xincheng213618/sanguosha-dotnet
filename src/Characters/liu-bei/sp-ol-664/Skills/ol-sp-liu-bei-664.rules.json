@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "ol:xudai-3576", "revision": 1, "triggers": [
+      { "id": "grant-after-response", "window": "cardResponseCompleted", "ownerRelation": "actor", "optional": true,
+        "usageScope": "game", "usageLimit": 1, "namedUsageGroup": "xudai", "effects": [
+          { "op": "selectTarget", "target": "owner", "targetKind": "otherLiving" },
+          { "op": "grantOlSpLiuBeiXudai", "target": "owner" }] },
+      { "id": "grant-after-damage", "window": "afterDamageApplied", "subject": "owner", "damageOccurrence": "perDamage", "optional": true,
+        "usageScope": "game", "usageLimit": 1, "namedUsageGroup": "xudai", "effects": [
+          { "op": "selectTarget", "target": "owner", "targetKind": "otherLiving" },
+          { "op": "grantOlSpLiuBeiXudai", "target": "owner" }] }] },
+    { "id": "ol:zhujiu-3577", "revision": 1, "activations": [
+      { "id": "brew", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving", "usesPerTurn": null,
+        "effects": [{ "op": "useOlSpLiuBeiZhujiu", "target": "owner" }] }],
+      "triggers": [{ "id": "dying-brew", "window": "selfDyingResponse", "subject": "owner", "optional": true,
+        "effects": [{ "op": "useOlSpLiuBeiZhujiu", "target": "owner" }] }] },
+    { "id": "ol:jinglei-3578", "revision": 1, "triggers": [
+      { "id": "after-alcohol", "window": "cardUseCompleted", "ownerRelation": "observer", "cardKinds": ["alcohol"], "optional": true,
+        "usageScope": "turn", "usageLimit": 1, "effects": [
+          { "op": "resolveOlSpLiuBeiJinglei", "target": "owner", "stage": "pay" }, { "op": "resolveOlSpLiuBeiJinglei", "target": "owner", "stage": "adjust" }] }] }
+  ]
+}

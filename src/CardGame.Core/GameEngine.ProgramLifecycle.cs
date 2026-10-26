@@ -1043,6 +1043,9 @@ public sealed partial class GameEngine
                 SkillProgramTargetKind.AnyLivingWithHand => GetHand(target).Count > 0,
                 SkillProgramTargetKind.OtherLivingWithHand =>
                     target.Seat != ownerSeat && GetHand(target).Count > 0,
+                SkillProgramTargetKind.OtherLivingWithMoreHandCards => target.Seat != ownerSeat && GetHand(target).Count > GetHand(_players[ownerSeat]).Count,
+                SkillProgramTargetKind.OtherLivingWithFewerHandCardsAndOwnedCards => target.Seat != ownerSeat &&
+                    GetHand(target).Count < GetHand(_players[ownerSeat]).Count && GetHand(target).Count + GetEquipment(target).Count > 0,
                 SkillProgramTargetKind.OtherLivingWithFewerHandCards =>
                     target.Seat != ownerSeat && GetHand(target).Count > 0 &&
                     GetHand(target).Count < GetHand(_players[ownerSeat]).Count,

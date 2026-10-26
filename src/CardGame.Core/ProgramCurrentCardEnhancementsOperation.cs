@@ -2,7 +2,8 @@ namespace CardGame.Core;
 
 [Flags]
 public enum CurrentCardEnhancement { None = 0, ExtraTarget = 1, IgnoreArmor = 2, Uncancelable = 4, DrawAfterDamage = 8 }
-public sealed record ProgramCardEnhancementDraft(long CardUseFrameId, IReadOnlyList<CurrentCardEnhancement> Selected, bool ChoosingExtraTarget = false);
+public sealed record ProgramCardEnhancementDraft(long CardUseFrameId, IReadOnlyList<CurrentCardEnhancement> Selected, bool ChoosingExtraTarget = false,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)] bool FinishAfterExtraTarget = false);
 public sealed record CurrentCardEnhancedEvent(long CardUseFrameId, long CardActionId, int OwnerSeat, CurrentCardEnhancement Enhancement, int? ExtraTargetSeat = null) : IGameEvent;
 internal interface ICurrentCardEnhancementProgramHost
 {

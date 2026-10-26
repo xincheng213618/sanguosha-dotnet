@@ -116,6 +116,24 @@ public sealed partial class GameEngine
             result.Add(new(new ChoiceId($"enhancement.{frame.Id}.{option}"), label, [], [], Parameters(option.ToString())));
         }
         result.Add(new(new ChoiceId($"enhancement.{frame.Id}.finish"), "不再选择", [], [], Parameters("finish")));
+        if (!mobileBenxi)
+        {
+            var remaining = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!)
+                .GetPausedInstruction(frame.InstructionIndex).Effect.Amount - draft.Selected.Count;
+            var options = result.Where(choice => choice.Parameters["enhancement-option"] != "finish").ToArray();
+            for (var mask = 1; mask < (1 << options.Length); mask++)
+            {
+                var selected = options.Where((_, index) => (mask & (1 << index)) != 0).ToArray();
+                if (selected.Length > remaining) continue;
+                var flags = selected.Aggregate(CurrentCardEnhancement.None, (value, choice) =>
+                    value | Enum.Parse<CurrentCardEnhancement>(choice.Parameters["enhancement-option"]));
+                var parameters = Parameters("confirm");
+                parameters["enhancement-selection"] = ((int)flags).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                parameters["maximum-options"] = remaining.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                result.Add(new(new ChoiceId($"enhancement.{frame.Id}.confirm.{(int)flags}"),
+                    "确定：" + string.Join("、", selected.Select(choice => choice.Description)), [], [], parameters));
+            }
+        }
         return result;
     }
 
@@ -140,22 +158,44 @@ public sealed partial class GameEngine
         var option = selected.Parameters["enhancement-option"];
         ClearPendingDecision();
         if (option == "finish") { FinishProgramCardEnhancements(frame); return; }
+        if (option == "confirm")
+        {
+            var flags = (CurrentCardEnhancement)int.Parse(selected.Parameters["enhancement-selection"], System.Globalization.CultureInfo.InvariantCulture);
+            foreach (var selectedEnhancement in new[] { CurrentCardEnhancement.IgnoreArmor, CurrentCardEnhancement.Uncancelable, CurrentCardEnhancement.DrawAfterDamage })
+                if ((flags & selectedEnhancement) != 0) frame = ApplyCardEnhancement(frame, selectedEnhancement, []);
+            if ((flags & CurrentCardEnhancement.ExtraTarget) != 0)
+            {
+                ReplaceRuntimeTop(frame = frame with { CardEnhancementDraft = frame.CardEnhancementDraft! with
+                    { ChoosingExtraTarget = true, FinishAfterExtraTarget = true } });
+                PublishCardEnhancementPrompt(frame);
+            }
+            else FinishProgramCardEnhancements(frame);
+            return;
+        }
         if (option == nameof(CurrentCardEnhancement.ExtraTarget))
         { ReplaceRuntimeTop(frame = frame with { CardEnhancementDraft = draft with { ChoosingExtraTarget = true } }); PublishCardEnhancementPrompt(frame); return; }
         var enhancement = option == "target" ? CurrentCardEnhancement.ExtraTarget : Enum.Parse<CurrentCardEnhancement>(option);
-        var use = EnhancementCardUse(frame); var targets = option == "target" ? use.TargetSeats.Concat(selected.Targets).ToArray() : use.TargetSeats;
+        frame = ApplyCardEnhancement(frame, enhancement, option == "target" ? selected.Targets : []);
+        if (frame.CardEnhancementDraft!.Selected.Count >= effect.Amount || frame.CardEnhancementDraft.FinishAfterExtraTarget)
+        { FinishProgramCardEnhancements(frame); return; }
+        PublishCardEnhancementPrompt(frame);
+    }
+
+    private ProgramSkillFrame ApplyCardEnhancement(ProgramSkillFrame frame, CurrentCardEnhancement enhancement, IReadOnlyList<int> extraTargets)
+    {
+        var draft = frame.CardEnhancementDraft!;
+        var use = EnhancementCardUse(frame); var targets = use.TargetSeats.Concat(extraTargets).ToArray();
         var action = use.Action!;
         var updatedAction = CloneRoleAction(action, action.ActorSeat, targets);
         var index = _resolutionStack.FindIndex(item => item.Id == use.Id);
         ReplaceRuntimeFrame(_resolutionStack[index].Id, use with { TargetSeats = targets, Action = updatedAction, Enhancements = use.Enhancements | enhancement,
-            TargetsAdjusted = use.TargetsAdjusted || option == "target" && use.CardKind == CardKind.BorrowedSword,
+            TargetsAdjusted = use.TargetsAdjusted || extraTargets.Count > 0 && use.CardKind == CardKind.BorrowedSword,
             EnhancementOwnerSeat = frame.OwnerSeat,
             IgnoresArmor = use.IgnoresArmor || enhancement == CurrentCardEnhancement.IgnoreArmor });
-        if (option == "target") SyncIssuedTieredRoundZeroTrickTargetWindows(use.Id, action);
-        AdvanceEventRulesAndQueueFact(new CurrentCardEnhancedEvent(use.Id, action.ActionId, frame.OwnerSeat, enhancement, option == "target" ? selected.Targets[0] : null));
+        if (extraTargets.Count > 0) SyncIssuedTieredRoundZeroTrickTargetWindows(use.Id, action);
+        AdvanceEventRulesAndQueueFact(new CurrentCardEnhancedEvent(use.Id, action.ActionId, frame.OwnerSeat, enhancement, extraTargets.Count > 0 ? extraTargets[0] : null));
         ReplaceRuntimeTop(frame = frame with { CardEnhancementDraft = draft with { Selected = draft.Selected.Append(enhancement).ToArray(), ChoosingExtraTarget = false } });
-        if (frame.CardEnhancementDraft.Selected.Count >= effect.Amount) { FinishProgramCardEnhancements(frame); return; }
-        PublishCardEnhancementPrompt(frame);
+        return frame;
     }
 
     private void FinishProgramCardEnhancements(ProgramSkillFrame frame)
@@ -178,7 +218,8 @@ public sealed partial class GameEngine
             draft.Selected.Count >= paused.Amount || draft.Selected.Distinct().Count() != draft.Selected.Count ||
             draft.Selected.Any(flag => flag is not (CurrentCardEnhancement.ExtraTarget or CurrentCardEnhancement.IgnoreArmor or CurrentCardEnhancement.Uncancelable or CurrentCardEnhancement.DrawAfterDamage)) ||
             (use.Enhancements & flags) != flags || flags != CurrentCardEnhancement.None && use.EnhancementOwnerSeat != frame.OwnerSeat ||
-            draft.ChoosingExtraTarget && draft.Selected.Contains(CurrentCardEnhancement.ExtraTarget))
+            draft.ChoosingExtraTarget && draft.Selected.Contains(CurrentCardEnhancement.ExtraTarget) ||
+            draft.FinishAfterExtraTarget && !draft.ChoosingExtraTarget)
             throw new InvalidOperationException("A current-card enhancement lost its paid action, unique option set or selection bounds.");
         if (ReferenceEquals(frame, _resolutionStack.LastOrDefault()) &&
             (_pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != frame.OwnerSeat ||

@@ -4,6 +4,8 @@ public static partial class BuiltInEquipmentContent
 {
     public static EquipmentContentPackage Shanhe { get; } = new("equipment:shanhe",
     [
+        new EquipmentDefinition(CardKind.ShanRangZhaoShu, "禅让诏书", EquipmentSlot.Treasure,
+            "每回合每名角色限一次，当其他角色于其回合外首次获得牌时，你可以交给其一张牌或令其交给你一张牌。"),
         new EquipmentDefinition(
                 CardKind.ZhanhunDao,
                 "斩魂刀",
@@ -32,6 +34,7 @@ public static partial class BuiltInEquipmentContent
                 WeaponAttackRange: 2)
     ],
     [
+        new(CardKind.ShanRangZhaoShu, "shanhe:chanrang-edict-1510", "equipment:shanhe-chanrang"),
         new(CardKind.ZhanhunDao, "shanhe:zhanhun-dao", "equipment:shanhe-zhanhun"),
         new(CardKind.AnqiFeiren, "shanhe:anqi-feiren", "equipment:shanhe-anqi"),
         new(CardKind.YaodaoChitong, "shanhe:yaodao-chitong", "equipment:shanhe-yaodao"),

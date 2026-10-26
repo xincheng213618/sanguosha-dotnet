@@ -38,6 +38,7 @@ public static partial class StandardShanheCampaignCatalog
         new ShopCardSource(4037, "修罗炼狱戟", CardKind.ShuraInfernoHalberd, Suit.Diamond, 12, 600, 4, 111),
         new ShopCardSource(4045, "七宝刀", CardKind.QiBaoDao, Suit.Spade, 6, 400, 3),
         new ShopCardSource(4046, "百辟刀", CardKind.BaiBiDao, Suit.Spade, 2, 600, 4),
+        new ShopCardSource(4056, "禅让诏书", CardKind.ShanRangZhaoShu, Suit.Spade, 13, 400, 3, 82),
         new ShopCardSource(4148, "雷震", CardKind.Leizhen, Suit.Club, 1, 400, 3),
         new ShopCardSource(4149, "暗器飞刃", CardKind.AnqiFeiren, Suit.Heart, 5, 200, 2),
         new ShopCardSource(4151, "斩魂刀", CardKind.ZhanhunDao, Suit.Spade, 2, 100, 1),

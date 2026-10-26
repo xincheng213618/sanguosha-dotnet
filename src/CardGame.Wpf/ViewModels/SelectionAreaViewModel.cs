@@ -23,6 +23,9 @@ public sealed record SelectionAreaViewModel
     public IReadOnlyList<PromptChoice> Choices { get; init; } = [];
     public ICommand ChoiceCommand { get; init; } = null!;
     public bool HasChoices => Choices.Count > 0;
+    public IReadOnlyList<CardEnhancementOptionViewModel> EnhancementOptions { get; init; } = [];
+    public ICommand EnhancementCommand { get; init; } = null!;
+    public bool HasEnhancementOptions => EnhancementOptions.Count > 0;
     public IReadOnlyList<PromptChoice> CatalogChoices { get; init; } = [];
     public ICommand CatalogCommand { get; init; } = null!;
     public string CatalogTitle { get; init; } = string.Empty;

@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:team-health-2199": {"name": "队·体", "description": "你的所有队友体力+3。每场开战时，其他公开同队角色增加3点体力上限并回复3点体力，先于先辅选择结算。"},
+    "shanhe:ally-rank-five-rebirth": {"name": "队友·五阶重生", "description": "本次征程此队友限一次，濒死时可以回复至5点体力并摸五张牌。体力回复不超过上限；不消耗玩家的五阶重生。"}
+  }
+}

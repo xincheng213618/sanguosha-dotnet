@@ -1,4 +1,5 @@
 using CardGame.Core;
+using CardGame.Core.Campaigns;
 using CardGame.Content.Standard;
 using static BoundaryLiDianChecks;
 
@@ -45,6 +46,48 @@ internal static class BoundaryGuanXingZhangBaoChecks
         Replay(g,r);Settle(g);
     }
 
+    public static void MixedColorConvertedSlashCannotBeDodged()
+    {
+        var (g,r)=StartResponseScene();
+        var hand=OwnHand(g);
+        var red=hand.First(card=>CardColor(card)==Color.Red);
+        var black=hand.First(card=>CardColor(card)==Color.Black);
+        var targetDodges=g.CreateSnapshot(3,true).Players[3].Hand.Where(card=>card.Kind==CardKind.Dodge).ToArray();
+        Require(targetDodges.Length>0,"The target has a Dodge that would answer an unrestricted Slash.");
+        var hpBefore=g.CreateSnapshot(3).Players[3].Hp;
+        Accept(g,new UseProgramSkillCommand(0,Skill,"two-hand-cards-as-slash",[red.Id,black.Id],[3],g.Revision,P(g)!.PromptId));
+        Settle(g);
+        Require(g.CreateSnapshot(3).Players[3].Hp==hpBefore-1,
+            "A red/black pair creates a colorless Slash: no Dodge has a matching color.");
+        Require(SpentCards(g,3,targetDodges).Count==0,"The target cannot spend a red or black Dodge on the colorless Slash.");
+        Require(g.CreateSnapshot(0).Players[0].Skills!.Any(s=>s.ContentId==Wusheng)&&
+            g.CreateSnapshot(0).Players[0].Skills!.Any(s=>s.ContentId==Paoxiao),
+            "The unanswerable Slash deals damage and grants both turn skills.");
+        Replay(g,r);
+    }
+
+    public static void OtherConversionsAndPhysicalSlashesUseCorrectResponseColors()
+    {
+        foreach(var converted in new[]{false,true})
+        {
+            var (g,r)=StartResponseScene(wusheng:true,blackDodgeOnly:true);
+            var material=OwnHand(g).Single(card=>converted?card.Kind==CardKind.Peach:
+                card.Kind==CardKind.Slash&&card.Suit==Suit.Club&&card.Rank==5);
+            var action=g.GetHumanLegalActions().Single(a=>a.Kind==LegalActionKind.Slash&&a.CardId==material.Id&&
+                a.TargetSeats.SequenceEqual([3])&&(a.ConversionSource?.SkillId==Wusheng)==converted);
+            var dodges=g.CreateSnapshot(3,true).Players[3].Hand.Where(card=>card.Kind==CardKind.Dodge).ToArray();
+            var hp=g.CreateSnapshot(3).Players[3].Hp;
+            Accept(g,new PlayCardCommand(0,material.Id,[3],g.Revision,P(g)!.PromptId,action.PlayedCardKind)
+                {ConversionSource=action.ConversionSource});
+            Settle(g);
+            Require(g.CreateSnapshot(3).Players[3].Hp==hp-(converted?1:0),
+                "Fuhun restricts a red Wusheng Slash, while a physical Slash retains its ordinary Dodge response.");
+            Require(SpentCards(g,3,dodges).Count==(converted?0:1),
+                "A black hand Dodge answers the physical Slash but cannot answer the red Wusheng conversion.");
+            Replay(g,r);
+        }
+    }
+
     private enum Color { Red, Black }
 
     private static Color CardColor(CardSnapshot card)=>card.Suit is Suit.Heart or Suit.Diamond?Color.Red:Color.Black;
@@ -61,6 +104,22 @@ internal static class BoundaryGuanXingZhangBaoChecks
     private static void Accept(GameEngine g,GameCommand command){var result=g.Submit(command);Require(result.Accepted,result.Error?.Message??"Command rejected.");}
 
     private const string DriverSkill="fixture:gxb-driver";
+
+    private static (GameEngine,ContentRegistry) StartResponseScene(bool wusheng=false,bool blackDodgeOnly=false)
+    {
+        var r=ContentRegistry.Build(new StandardContentPackage(),new StandardActiveSkillExpansionPackage(true),
+            new StandardRescueSkillExpansionPackage(),new StandardClassicGeneralPackage(),new Fixture(false));
+        var setup=new ShanheBattleSetup(31,1,"boundary-fuhun-response","fixture:gxb",4,4,0,0,0,wusheng?[Wusheng]:[],
+            [new(CardKind.Peach,Suit.Heart,4),new(CardKind.Slash,Suit.Club,5)],[],
+            [new("fixture:gxb-1",Hp:5){StartingHand=[]},
+             new("fixture:gxb-2",Hp:5){StartingHand=blackDodgeOnly?[new(CardKind.Dodge,Suit.Spade,2)]:
+                [new(CardKind.Dodge,Suit.Diamond,2),new(CardKind.Dodge,Suit.Spade,2)]}],
+            [new("fixture:gxb-3",Hp:5){StartingHand=[]}],new string('c',64));
+        var g=GameEngine.CreateStandard(new GameOptions{Seed=setup.BattleSeed,PlayerCount=4,HumanSeat=0,HumanRole=null,
+            HumanTeamId=ShanheBattleSetup.PlayerTeamId,ModeId=ShanheBattleSetup.BattleModeId,ShanheBattle=setup,
+            AdvanceAfterHumanCommands=false,UseInteractiveSetup=false,UseInteractiveDiscard=false,MaxTurns=4},r);
+        Accept(g,new StartGameCommand());Settle(g);return(g,r);
+    }
 
     private static (GameEngine,ContentRegistry) Start(bool inheritance=false)
     {
@@ -101,6 +160,9 @@ internal static class BoundaryGuanXingZhangBaoChecks
             b.AddMode(new("identity:gxb","固定",4,4,new Dictionary<string,int>{{nameof(Role.Lord),1},{nameof(Role.Loyalist),1},{nameof(Role.Rebel),2}},
                 "fixture:gxb-deck",GeneralCandidateCount:4,
                 GeneralPoolIds:["fixture:gxb","fixture:gxb-1","fixture:gxb-2","fixture:gxb-3"]));
+            b.AddMode(new(ShanheBattleSetup.BattleModeId,"父魂固定响应",4,4,new Dictionary<string,int>(),"fixture:gxb-deck",
+                GeneralPoolIds:["fixture:gxb","fixture:gxb-1","fixture:gxb-2","fixture:gxb-3"],ModeKind:ContentModeKind.Team,
+                TeamCounts:new Dictionary<string,int>{[ShanheBattleSetup.PlayerTeamId]=2,[ShanheBattleSetup.EnemyTeamId]=2}));
         }
     }
 

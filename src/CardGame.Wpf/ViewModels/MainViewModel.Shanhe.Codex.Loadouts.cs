@@ -118,6 +118,7 @@ public sealed partial class MainViewModel
             ShanheCodexLoadoutName = ShanheCodexSelectedLoadoutName;
         }
         RaisePropertyChanged(nameof(ShanheCodexSelectedLoadoutName));
+        RaisePropertyChanged(nameof(SelectedShanheSetupLoadout));
         foreach (var command in new[] { OpenShanheCodexLoadoutManagerCommand, NewShanheCodexLoadoutCommand,
             CopyShanheCodexLoadoutCommand, RenameShanheCodexLoadoutCommand, DeleteShanheCodexLoadoutCommand }.OfType<RelayCommand>())
             command.NotifyCanExecuteChanged();

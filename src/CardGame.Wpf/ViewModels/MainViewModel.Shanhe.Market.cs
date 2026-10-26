@@ -5,7 +5,7 @@ namespace CardGame.Wpf.ViewModels;
 
 public sealed partial class MainViewModel
 {
-    public IReadOnlyList<string> ShanheMarketCategories { get; } = new[] { "战法", "装备", "卡牌", "技能", "补给" };
+    public IReadOnlyList<string> ShanheMarketCategories { get; } = new[] { "战法", "装备", "卡牌", "技能" };
     private string _selectedShanheMarketCategory = "战法";
     public string SelectedShanheMarketCategory
     {
@@ -27,7 +27,6 @@ public sealed partial class MainViewModel
         "装备" => IsShanheBattleActive ? "购买即加入手牌" : ShanheStartingResourcesExpireOnUse
             ? "每战开局获得装备牌" : "每战开局装备",
         "卡牌" => IsShanheBattleActive ? "购买即加入手牌" : "每战开局获得随身牌",
-        "补给" => "补充军资与体力",
         _ => "战法持续本次征程，不占技能槽"
     };
     public string ShanheMarketSurchargeNotice

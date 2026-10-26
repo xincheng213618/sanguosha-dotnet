@@ -69,6 +69,9 @@ public static partial class StandardShanheCampaignCatalog
             .Concat(CurrentReactionTacticCodexBindings)
             .Concat(CurrentShopCardCodexBindings)
             .Append(new(2, OpeningInheritanceRewardId))
+            .Append(new(1, OpeningCompanionRewardId))
+            .Append(new(75, EliteOpeningCompanionRewardId))
+            .Append(new(89, ShanheTeamTactics.HealthRewardId))
             // Availability still requires this reward in the selected edition.
             .Append(new(42, CurrentJinnangJiRewardId))
             .Append(new(118, CurrentDuoduoYishan3RewardId))
@@ -89,9 +92,11 @@ public static partial class StandardShanheCampaignCatalog
             .Append(new(35, CurrentFarStrikeRewardId)).ToDictionary(pair => pair.Key, pair => pair.Value)));
 
     /// <summary>Adds the opt-in codex pool without altering the historical default campaign definition.</summary>
-    public static ShanheCampaignDefinition CreateCodexDefinition(int difficulty, string editionId) =>
-        WithStartingResourcesContract(WithCodexRewards(CreateCurrentBaseDefinition(difficulty, editionId), editionId),
-            categorizeNormalRewards: editionId == Returning2026EditionId);
+    public static ShanheCampaignDefinition CreateCodexDefinition(int difficulty, string editionId) => editionId == Source2026EditionId
+        ? CreateSourceCodexDefinition(difficulty) :
+        WithMuluEncounter(WithGuideTerrain(WithThirdChapterEliteEncounters(WithStoryEventPools(WithRandomOpeningBattles(WithStartingResourcesContract(
+            WithTeamGrowth(WithCodexRewards(CreateCurrentBaseDefinition(difficulty, editionId), editionId), editionId),
+            categorizeNormalRewards: editionId == Returning2026EditionId), difficulty), editionId), editionId), difficulty, editionId), difficulty, editionId);
 
     private static ShanheCampaignDefinition WithCodexRewards(ShanheCampaignDefinition original, string editionId)
     {
@@ -105,7 +110,7 @@ public static partial class StandardShanheCampaignCatalog
                 CodexBasicCard(source.SourceId) with { Name = source.Name })) : []).ToArray();
         var allRewards = original.Rewards.Concat(additionalRewards).ToArray();
         var rewardIds = additionalRewards.Select(reward => reward.Id).ToArray();
-        return WithOpeningInheritance(WithChapterRewards(original with
+        return WithOpeningCompanions(WithOpeningInheritance(WithChapterRewards(original with
         {
             Rewards = allRewards,
             Nodes = original.Nodes.Select(node => node with
@@ -115,7 +120,7 @@ public static partial class StandardShanheCampaignCatalog
                 Choices = node.Kind == ShanheNodeKind.Shop
                     ? CodexShopChoices(node, allRewards) : node.Choices
             }).ToArray()
-        }));
+        })), editionId);
     }
 
     private static CodexRewardBinding CodexSkill(int nodeId, string name, string skillId, string description) =>

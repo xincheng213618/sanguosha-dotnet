@@ -14,9 +14,13 @@ public sealed partial class MainViewModel
     private bool _shanheCodexReadFailed;
     private string? _selectedCodexId;
     private int _selectedCodexSlot;
+    private ShanheCampaignDefinition? _codexDefinition;
+    private (int Difficulty, string Edition) _codexDefinitionKey;
+    private ShanheCampaignDefinition? _presentedCodexDefinition;
+    private ShanheCodexProfile? _presentedCodexProfile;
     private string _shanheCodexMessage = "选中节点查看效果；选中左侧槽位安排初始战法。";
-    public ObservableCollection<ShanheCodexNode> ShanheCodexNodes { get; } = [];
-    public ObservableCollection<ShanheCodexLink> ShanheCodexLinks { get; } = [];
+    public ObservableRangeCollection<ShanheCodexNode> ShanheCodexNodes { get; } = [];
+    public ObservableRangeCollection<ShanheCodexLink> ShanheCodexLinks { get; } = [];
     public IReadOnlyList<ShanheCodexColumn> ShanheCodexColumns { get; } = Enumerable.Range(1, 80).Select(i => new ShanheCodexColumn(i)).ToArray();
     public ObservableCollection<ShanheCodexSlot> ShanheCodexSlots { get; } = [];
     public ShanheCodexNode? SelectedCodexNode => ShanheCodexNodes.FirstOrDefault(node => node.Id == _selectedCodexId);
@@ -85,7 +89,7 @@ public sealed partial class MainViewModel
         var path = ShanheCodexTree.RequiredPath(node.TreeId, _shanheCodexProfile.UnlockedRewardIds);
         var researched = _shanheCodexProfile.UnlockedRewardIds.Concat(path.Select(entry => ShanheCodexTree.Key(entry.Id)))
             .Distinct(StringComparer.Ordinal).ToArray();
-        var definition = StandardShanheCampaignCatalog.CreateCodexDefinition(SelectedShanheDifficulty.Value, SelectedShanheScenario.Id);
+        var definition = GetShanheCodexDefinition();
         var runtime = ShanheCodexTree.ResolveUnlockedRewardIds(researched, definition.Rewards.Select(reward => reward.Id));
         SaveCodexProfile(_shanheCodexProfile with
         {
@@ -97,7 +101,7 @@ public sealed partial class MainViewModel
     {
         if (!EquipCodexTacticCommand.CanExecute(null) || SelectedCodexNode is not { } node) return;
         var slots = _shanheCodexProfile.EquippedTacticIds.ToArray(); slots[_selectedCodexSlot] = node.RuntimeRewardId;
-        var definition = StandardShanheCampaignCatalog.CreateCodexDefinition(SelectedShanheDifficulty.Value, SelectedShanheScenario.Id);
+        var definition = GetShanheCodexDefinition();
         var runtime = ShanheCodexTree.ResolveUnlockedRewardIds(_shanheCodexProfile.UnlockedRewardIds, definition.Rewards.Select(reward => reward.Id));
         if (SaveCodexProfile(ShanheCodexLoadouts.UpdateActiveSlots(_shanheCodexProfile with
         {
@@ -121,6 +125,7 @@ public sealed partial class MainViewModel
         return new(seed, generalId)
         {
             ExpeditionId = Guid.NewGuid().ToString("N"),
+            SourceDifficultyId = definition.SourceDifficultyId,
             UseCodexRewardPool = true,
             UnlockedRewardIds = ShanheCodexTree.ResolveUnlockedRewardIds(
                 _shanheCodexProfile.UnlockedRewardIds.Concat(StandardShanheCampaignCatalog.GetDefaultCodexUnlockedRewardIds(definition)).ToArray(), known),
@@ -128,57 +133,83 @@ public sealed partial class MainViewModel
         };
     }
 
+    private ShanheCampaignDefinition GetShanheCodexDefinition()
+    {
+        var key = (Difficulty: SelectedShanheDifficulty.Value, Edition: SelectedShanheScenario.Id);
+        if (_codexDefinition is null || _codexDefinitionKey != key)
+        {
+            _codexDefinition = StandardShanheCampaignCatalog.CreateCodexDefinition(key.Difficulty, key.Edition);
+            _codexDefinitionKey = key;
+        }
+        return _codexDefinition;
+    }
+
     private void RefreshShanheCodex()
     {
         if (_selectedShanheDifficulty is null || _shanheCodexStore is null) return;
+        RaisePropertyChanged(nameof(ShanheGuideTaskChapters));
         if (!CanPrepareShanheExpedition)
         {
             IsShanheCodexPickerOpen = false;
             IsShanheCodexLoadoutManagerOpen = false;
         }
         // This is the next expedition's loadout; a resumed expedition keeps its frozen options.
-        var definition = StandardShanheCampaignCatalog.CreateCodexDefinition(SelectedShanheDifficulty.Value, SelectedShanheScenario.Id);
+        var definition = GetShanheCodexDefinition();
         var rewardIds = definition.Rewards.Select(reward => reward.Id).ToHashSet(StringComparer.Ordinal);
-        ShanheCodexNodes.Clear();
-        ShanheCodexLinks.Clear();
-        foreach (var entry in ShanheCodexTree.Entries)
+        if (!ReferenceEquals(_presentedCodexDefinition, definition) || !ReferenceEquals(_presentedCodexProfile, _shanheCodexProfile))
         {
-            var key = ShanheCodexTree.Key(entry.Id);
-            var runtimeId = ShanheCodexTree.RuntimeRewardId(entry.Id);
-            var path = ShanheCodexTree.RequiredPath(entry.Id, _shanheCodexProfile.UnlockedRewardIds);
-            var node = new ShanheCodexNode(key, entry.Name, entry.Description, entry.RewardType,
-                entry.Lane - 1, entry.Layer - 1, entry.Rarity switch { 2 => "稀有", 3 => "史诗", 4 => "传说", _ => "普通" },
-                entry.Cost, _shanheCodexProfile.UnlockedRewardIds.Contains(key),
-                runtimeId is not null && _shanheCodexProfile.EquippedTacticIds.Contains(runtimeId), key == _selectedCodexId,
-                entry.RewardType == "装备" ? ShanheArt.Get(entry.RewardId) ?? (ShanheCodexTree.EquipmentKind(entry.Id) is { } kind ? CardArt.Get(kind) : null) : null)
+            if (!ShanheCodexTree.Entries.Any(entry => ShanheCodexTree.Key(entry.Id) == _selectedCodexId))
+                _selectedCodexId = ShanheCodexTree.Key(ShanheCodexTree.Entries[0].Id);
+            var nodes = ShanheCodexTree.Entries.Select(entry =>
             {
-                TacticImage = entry.RewardType is "战法" or "随机战法" ? ShanheArt.Get(entry.RewardId) : null,
-                TreeId = entry.Id, RuntimeRewardId = runtimeId, IsAvailable = runtimeId is not null && rewardIds.Contains(runtimeId),
-                PathCost = path.Sum(item => item.Cost),
-                PathDescription = path.Count == 0 ? "此路线已研习" : "前置路线：" + string.Join(" → ", path.Select(item => item.Name))
-            };
-            ShanheCodexNodes.Add(node);
-        }
-        foreach (var entry in ShanheCodexTree.Entries)
-        {
-            var to = ShanheCodexNodes.Single(node => node.TreeId == entry.Id);
-            foreach (var parentId in entry.Parents.Concat(entry.Conditions).Distinct())
+                var key = ShanheCodexTree.Key(entry.Id);
+                var runtimeId = ShanheCodexTree.RuntimeRewardId(entry.Id);
+                var path = ShanheCodexTree.RequiredPath(entry.Id, _shanheCodexProfile.UnlockedRewardIds);
+                return new ShanheCodexNode(key, entry.Name, entry.Description, entry.RewardType,
+                    entry.Lane - 1, entry.Layer - 1, entry.Rarity switch { 2 => "稀有", 3 => "史诗", 4 => "传说", _ => "普通" },
+                    entry.Cost, _shanheCodexProfile.UnlockedRewardIds.Contains(key),
+                    runtimeId is not null && _shanheCodexProfile.EquippedTacticIds.Contains(runtimeId), key == _selectedCodexId,
+                    entry.RewardType == "装备" ? ShanheArt.Get(entry.RewardId) ?? (ShanheCodexTree.EquipmentKind(entry.Id) is { } kind ? CardArt.Get(kind) : null) : null)
+                {
+                    TacticImage = entry.RewardType is "战法" or "随机战法" ? ShanheArt.Get(entry.RewardId) : null,
+                    TreeId = entry.Id, RuntimeRewardId = runtimeId, IsAvailable = runtimeId is not null && rewardIds.Contains(runtimeId),
+                    PathCost = path.Sum(item => item.Cost),
+                    PathDescription = path.Count == 0 ? "此路线已研习" : "前置路线：" + string.Join(" → ", path.Select(item => item.Name))
+                };
+            }).ToArray();
+            var byId = nodes.ToDictionary(node => node.TreeId);
+            var links = new List<ShanheCodexLink>();
+            foreach (var entry in ShanheCodexTree.Entries)
             {
-                var from = ShanheCodexNodes.Single(node => node.TreeId == parentId);
-                var x1 = from.X + 49; var y1 = from.Y + 31; var x2 = to.X + 49; var y2 = to.Y + 31;
-                var mid = x1 + (x2 - x1) * .5;
-                var data = FormattableString.Invariant($"M{x1},{y1} H{mid} V{y2} H{x2}");
-                ShanheCodexLinks.Add(new(data, from.IsUnlocked && to.IsUnlocked ? "#A37C37" : "#7B6B4E"));
+                var to = byId[entry.Id];
+                foreach (var parentId in entry.Parents.Concat(entry.Conditions).Distinct())
+                {
+                    var from = byId[parentId];
+                    var x1 = from.X + 49; var y1 = from.Y + 31; var x2 = to.X + 49; var y2 = to.Y + 31;
+                    var mid = x1 + (x2 - x1) * .5;
+                    var data = FormattableString.Invariant($"M{x1},{y1} H{mid} V{y2} H{x2}");
+                    links.Add(new(data, from.IsUnlocked && to.IsUnlocked ? "#A37C37" : "#7B6B4E"));
+                }
             }
+            ShanheCodexNodes.ReplaceAll(nodes);
+            ShanheCodexLinks.ReplaceAll(links);
+            _presentedCodexDefinition = definition;
+            _presentedCodexProfile = _shanheCodexProfile;
         }
-        if (SelectedCodexNode is null && ShanheCodexNodes.FirstOrDefault() is { } first)
-        { _selectedCodexId = first.Id; var index = ShanheCodexNodes.IndexOf(first); ShanheCodexNodes[index] = first with { IsSelected = true }; }
-        ShanheCodexSlots.Clear();
+        // Selecting a node or reopening the book does not rebuild research paths, art, or links.
+        for (var index = 0; index < ShanheCodexNodes.Count; index++)
+        {
+            var node = ShanheCodexNodes[index];
+            var selected = node.Id == _selectedCodexId;
+            if (node.IsSelected != selected) ShanheCodexNodes[index] = node with { IsSelected = selected };
+        }
         for (var i = 0; i < 6; i++)
         {
             var id = _shanheCodexProfile.EquippedTacticIds[i];
             var node = ShanheCodexNodes.FirstOrDefault(node => node.RuntimeRewardId == id && id is not null);
-            ShanheCodexSlots.Add(new(i, id, node?.Name ?? (id is null ? "未装备" : "其他篇章"), node?.Accent ?? (i switch { 2 or 3 => "#7B609B", 4 => "#BC702F", 5 => "#A33C2D", _ => "#9D8154" }), i == _selectedCodexSlot) { TacticImage = node?.TacticImage });
+            var slot = new ShanheCodexSlot(i, id, node?.Name ?? (id is null ? "未装备" : "其他篇章"), node?.Accent ?? (i switch { 2 or 3 => "#7B609B", 4 => "#BC702F", 5 => "#A33C2D", _ => "#9D8154" }), i == _selectedCodexSlot) { TacticImage = node?.TacticImage };
+            if (i >= ShanheCodexSlots.Count) ShanheCodexSlots.Add(slot);
+            else if (ShanheCodexSlots[i] != slot) ShanheCodexSlots[i] = slot;
         }
         foreach (var property in new[] { nameof(SelectedCodexNode), nameof(ShanheBookBalance), nameof(ShanheCodexLoadoutCount), nameof(ShanheCodexEquipLabel) }) RaisePropertyChanged(property);
         foreach (var command in new[] { UnlockCodexNodeCommand, EquipCodexTacticCommand, RemoveCodexTacticCommand }.OfType<RelayCommand>()) command.NotifyCanExecuteChanged();

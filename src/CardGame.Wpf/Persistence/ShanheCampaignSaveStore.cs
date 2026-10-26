@@ -99,8 +99,8 @@ public sealed class FileShanheCampaignSaveStore : IShanheCampaignSaveStore
 
     private static void Validate(ShanheCampaignSaveFile save)
     {
-        if (save.FormatVersion != ShanheCampaignSaveFile.CurrentFormatVersion || save.Campaign is null ||
-            save.Difficulty is < 1 or > 3)
+        if (save.FormatVersion != ShanheCampaignSaveFile.CurrentFormatVersion || save.Campaign?.Options is null ||
+            !ShanheCampaignDifficultyContract.IsSupported(save.Campaign.CampaignId, save.Difficulty, save.Campaign.Options.SourceDifficultyId))
             throw new InvalidDataException("山河图存档格式或难度不受支持。");
         if (save.Campaign.Commands is null || save.Campaign.Commands.Count > 100_000)
             throw new InvalidDataException("山河图征程命令记录不完整或过长。");

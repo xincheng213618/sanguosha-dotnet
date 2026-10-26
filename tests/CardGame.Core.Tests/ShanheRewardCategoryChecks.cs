@@ -30,7 +30,7 @@ internal static class ShanheRewardCategoryChecks
             var categories = session.Snapshot;
             Require(categories.Phase == ShanheCampaignPhase.Reward && categories.RewardOffers.Count == 0 &&
                 categories.RewardCategories.SequenceEqual(Enum.GetValues<ShanheRewardCategory>()) &&
-                categories.CanSkipReward && categories.RewardSkipGold == 100 && categories.AvailableNodes.Count == 0,
+                !categories.CanSkipReward && categories.RewardSkipGold == 0 && categories.AvailableNodes.Count == 0,
                 "A real victory publishes nonempty categories before any candidate rewards are revealed.");
             var before = Snapshot(session);
             Require(!session.Submit(new ChooseShanheRewardCommand("tactic-0", null, session.Revision)).Accepted &&
@@ -89,15 +89,27 @@ internal static class ShanheRewardCategoryChecks
                     id.StartsWith("card-", StringComparison.Ordinal)).ToArray()
             } : node).ToArray()
         };
-        foreach (var openCategory in new[] { false, true })
+        foreach (var category in new[] { ShanheRewardCategory.Tactic, ShanheRewardCategory.Card })
         {
             var session = Create(definition, ["tactic-economy-2017"]);
             CompleteFirstVictory(session);
             var before = Snapshot(session);
             Require(!session.Submit(new ChooseShanheRewardCategoryCommand(ShanheRewardCategory.Supply, session.Revision)).Accepted &&
+                !session.Submit(new SkipShanheRewardCommand(session.Revision)).Accepted && !session.Snapshot.CanSkipReward &&
                 Snapshot(session) == before,
-                "A known but empty category is not selectable.");
-            if (openCategory) Accept(session, new ChooseShanheRewardCategoryCommand(ShanheRewardCategory.Tactic, session.Revision));
+                "An empty category and a decline before choosing a reward category cannot mint compensation.");
+            Accept(session, new ChooseShanheRewardCategoryCommand(category, session.Revision));
+            if (category == ShanheRewardCategory.Tactic)
+            {
+                before = Snapshot(session);
+                Require(!session.Snapshot.CanSkipReward && session.Snapshot.RewardSkipGold == 0 &&
+                    !session.Submit(new SkipShanheRewardCommand(session.Revision)).Accepted && Snapshot(session) == before,
+                    "The engine rejects a forged tactic decline, rather than merely hiding its button.");
+                Accept(session, new ChooseShanheRewardCommand(session.Snapshot.RewardOffers[0].Id, null, session.Revision));
+                Require(session.Snapshot.Bonuses != new ShanheTacticBonuses() && session.Snapshot.Phase == ShanheCampaignPhase.Map,
+                    "A tactic offer is resolved by claiming a real tactic.");
+                continue;
+            }
             var gold = session.Snapshot.Gold;
             Accept(session, new SkipShanheRewardCommand(session.Revision));
             Require(session.Snapshot.Phase == ShanheCampaignPhase.Map && session.Snapshot.Gold == gold + 100 &&
@@ -106,7 +118,7 @@ internal static class ShanheRewardCategoryChecks
                 session.Snapshot.StartingCards.Count == 0 && session.Snapshot.StartingEquipment.Count == 0 &&
                 session.Snapshot.CompletedNodeIds.SequenceEqual(["start"]) &&
                 session.AcceptedCommands.OfType<SkipShanheRewardCommand>().Count() == 1,
-                "Skipping before or after category selection pays the node's compensation exactly once and grants no candidate reward.");
+                "Declining the confirmed card category pays its configured compensation exactly once and grants no candidate reward.");
             before = Snapshot(session);
             Require(!session.Submit(new SkipShanheRewardCommand(session.Revision)).Accepted &&
                 !session.Submit(new ChooseShanheRewardCategoryCommand(ShanheRewardCategory.Card, session.Revision)).Accepted &&
@@ -116,6 +128,45 @@ internal static class ShanheRewardCategoryChecks
                 session.Snapshot.RewardCategories.Count == 0 && session.Snapshot.RewardOffers.Count == 0 &&
                 !session.Snapshot.CanSkipReward && session.Snapshot.Gold == gold + 100,
                 "The actual next battle starts without carrying the prior category, candidates or skip allowance.");
+        }
+    }
+
+    public static void SkillRarityControlsDeclinePriceAndCardsKeepAuthoredPriceCold()
+    {
+        foreach (var rarity in new[] { 1, 2 })
+        {
+            var source = FixtureDefinition();
+            var definition = source with
+            {
+                Nodes = source.Nodes.Select(node => node.Id == "start" ? node with
+                { CategorizedRewards = false, RewardIds = ["skill-guard"] } : node).ToArray(),
+                Rewards = source.Rewards.Select(reward => reward.Id == "skill-guard" ? reward with { Rarity = rarity } : reward).ToArray()
+            };
+            var session = Create(definition, []);
+            CompleteFirstVictory(session);
+            var gold = session.Snapshot.Gold;
+            var compensation = rarity == 1 ? 50 : 100;
+            Require(session.Snapshot.CanSkipReward && session.Snapshot.RewardSkipGold == compensation,
+                "Actual common and rare skill offers publish their respective fifty- and hundred-coin decline prices.");
+            Accept(session, new SkipShanheRewardCommand(session.Revision));
+            Require(session.Snapshot.Gold == gold + compensation && session.Snapshot.ExtraSkillIds.Count == 0,
+                "The command pays exactly the skill offer's rarity price without granting the skill.");
+            var cold = ShanheCampaignSession.Restore(ShanheCampaignJson.Deserialize(ShanheCampaignJson.Serialize(session.CreateCheckpoint())),
+                definition, ShanheCampaignChecks.Registry);
+            Require(Snapshot(cold) == Snapshot(session), "Cold journal replay preserves the rarity-specific compensation.");
+        }
+        foreach (var card in new[] { "card-slash-1", "card-crossbow" })
+        {
+            var source = FixtureDefinition();
+            var definition = source with { Nodes = source.Nodes.Select(node => node.Id == "start" ? node with
+                { CategorizedRewards = false, RewardIds = [card], RewardSkipGold = 75 } : node).ToArray() };
+            var session = Create(definition, []);
+            CompleteFirstVictory(session);
+            var gold = session.Snapshot.Gold;
+            Require(session.Snapshot.RewardSkipGold == 75, "Hand cards and equipment retain their authored decline amount.");
+            Accept(session, new SkipShanheRewardCommand(session.Revision));
+            Require(session.Snapshot.Gold == gold + 75 && session.Snapshot.StartingCards.Count == 0 && session.Snapshot.StartingEquipment.Count == 0,
+                "Declining cards and equipment pays once and grants no physical resource.");
         }
     }
 

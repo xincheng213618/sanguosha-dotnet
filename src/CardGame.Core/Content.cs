@@ -304,6 +304,10 @@ public static class CardCatalog
                 AiPlayValue: 26,
                 AiResponseValue: 0,
                 HandKeepValue: 38),
+            [CardKind.ShanRangZhaoShu] = new(
+                CardKind.ShanRangZhaoShu, "禅让诏书", "装备牌",
+                "装备至宝物槽。每回合每名角色限一次，当其他角色于其回合外首次获得牌时，你可以交给其一张牌或令其交给你一张牌。",
+                AiPlayValue: 34, AiResponseValue: 0, HandKeepValue: 40),
             [CardKind.QinggangSword] = new(
                 CardKind.QinggangSword,
                 "青釭剑",

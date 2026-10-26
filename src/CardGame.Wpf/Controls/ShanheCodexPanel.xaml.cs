@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -8,6 +9,7 @@ namespace CardGame.Wpf.Controls;
 public partial class ShanheCodexPanel : UserControl
 {
     private MainViewModel? _observedModel;
+    private readonly ObservableRangeCollection<ShanheCodexNode> _visibleNodes = [];
 
     public void FocusPicker()
     {
@@ -33,6 +35,8 @@ public partial class ShanheCodexPanel : UserControl
     public ShanheCodexPanel()
     {
         InitializeComponent();
+        CodexTreeNodes.ItemsSource = _visibleNodes;
+        CodexTreeScroll.ScrollChanged += (_, _) => RefreshVisibleNodes();
         DataContextChanged += (_, _) => ObserveModel();
         Loaded += (_, _) =>
         {
@@ -53,18 +57,41 @@ public partial class ShanheCodexPanel : UserControl
 
     private void ObserveModel()
     {
-        if (ReferenceEquals(_observedModel, DataContext)) return;
+        if (_observedModel is not null && ReferenceEquals(_observedModel, DataContext)) return;
         StopObservingModel();
         _observedModel = DataContext as MainViewModel;
-        if (_observedModel is null) return;
+        if (_observedModel is null) { _visibleNodes.Clear(); return; }
         _observedModel.PropertyChanged += ModelPropertyChanged;
+        _observedModel.ShanheCodexNodes.CollectionChanged += CodexNodesChanged;
+        RefreshVisibleNodes();
         if (_observedModel.IsShanheCodexLoadoutManagerOpen) QueueManagerFocus();
     }
 
     private void StopObservingModel()
     {
-        if (_observedModel is not null) _observedModel.PropertyChanged -= ModelPropertyChanged;
+        if (_observedModel is not null)
+        {
+            _observedModel.PropertyChanged -= ModelPropertyChanged;
+            _observedModel.ShanheCodexNodes.CollectionChanged -= CodexNodesChanged;
+        }
         _observedModel = null;
+    }
+
+    private void CodexNodesChanged(object? sender, NotifyCollectionChangedEventArgs e) => RefreshVisibleNodes();
+
+    private void RefreshVisibleNodes()
+    {
+        if (_observedModel is null) return;
+        // Keep absolute canvas coordinates and the full scroll extent, realizing only
+        // the viewport plus one column on each side for smooth horizontal scrolling.
+        var left = CodexTreeScroll.HorizontalOffset - 124;
+        var right = CodexTreeScroll.HorizontalOffset + Math.Max(615, CodexTreeScroll.ViewportWidth) + 124;
+        var visible = _observedModel.ShanheCodexNodes.Where(node => node.X + 98 >= left && node.X <= right).ToArray();
+        if (!_visibleNodes.Select(node => node.Id).SequenceEqual(visible.Select(node => node.Id)))
+            _visibleNodes.ReplaceAll(visible);
+        else
+            for (var index = 0; index < visible.Length; index++)
+                if (_visibleNodes[index] != visible[index]) _visibleNodes[index] = visible[index];
     }
 
     private void ModelPropertyChanged(object? sender, PropertyChangedEventArgs e)

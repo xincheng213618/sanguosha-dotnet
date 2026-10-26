@@ -29,7 +29,7 @@ public sealed partial class ShanheCampaignSession
     private int EconomyBattleBalance(RunState state, int battleGold)
     {
         var incomeBonus = OwnedEconomy(state).Sum(e => e.BattleGoldPercent);
-        var income = checked(battleGold + (int)((long)battleGold * incomeBonus / 100));
+        var income = Math.Max(0, checked(battleGold + (int)((long)battleGold * incomeBonus / 100)));
         var principal = checked(state.Gold + income);
         var interest = OwnedEconomy(state).Sum(e => e.PostBattleInterestPercent);
         return checked(principal + (int)((long)principal * interest / 100));

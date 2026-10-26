@@ -608,6 +608,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         SyncCardDistribution();
         SyncSkillTargetSelection();
         SyncOwnedCardSelection();
+        SyncCardEnhancementSelection();
         RefreshDecisionContext();
 
         var previousGeneralChoices = GeneralChoices.ToArray();

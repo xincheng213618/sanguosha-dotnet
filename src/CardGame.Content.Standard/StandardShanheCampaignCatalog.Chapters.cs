@@ -15,18 +15,28 @@ public static partial class StandardShanheCampaignCatalog
             { Description = "每场战斗开局额外获得一张闪；本地开场牌编排。" }
     });
 
+    // Dedicated chapter rewards reuse the verified physical faces while keeping
+    // the original four-tier shop catalogue and its existing ids unchanged.
+    private static IEnumerable<ShanheRewardDefinition> ChapterEpicCards => CurrentShopCardSources
+        .Where(source => source.Rarity == 3 && !EquipmentCatalog.IsEquipment(source.Kind))
+        .Select(source => CodexBasicCard(source.SourceId) with
+        {
+            Id = "chapter-epic-card-" + source.SourceId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            Rarity = 3
+        });
+
     private static ShanheCampaignDefinition WithChapterRewards(ShanheCampaignDefinition definition)
     {
         var currentSeason = definition.Id.StartsWith("shanhe:zhuhou-2026-", StringComparison.Ordinal);
-        var additions = currentSeason ? ChapterLegendarySkillRewards : ChapterLocalCards;
+        var additions = currentSeason ? ChapterLegendarySkillRewards.Concat(ChapterEpicCards) : ChapterLocalCards;
         var rewards = definition.Rewards.Concat(additions.Where(addition => definition.Rewards.All(reward => reward.Id != addition.Id))).ToArray();
-        var tactics = rewards.Where(IsChapterTactic).Where(reward => !currentSeason || IsLegendaryChapterReward(reward, "战法"))
-            .Select(reward => reward.Id).ToArray();
-        var skills = rewards.Where(reward => reward.SkillId is not null && IsLegendaryChapterReward(reward, "技能"))
+        var tactics = rewards.Where(IsChapterTactic).Where(reward => !currentSeason || IsEpicChapterReward(reward, "战法"))
             .Select(reward => reward.Id).ToArray();
         // Prefer the verified physical card faces when the codex catalogue is present; ordinary local editions
         // use their existing Peach/Duel recipes plus explicitly labelled local Slash/Dodge opening cards.
-        var cards = rewards.Where(reward => reward.Id.StartsWith("codex-card-", StringComparison.Ordinal) && reward.StartingCards?.Count > 0).ToArray();
+        var cards = currentSeason ? rewards.Where(reward => reward.Id.StartsWith("chapter-epic-card-", StringComparison.Ordinal) &&
+                reward.Rarity == 3 && reward.StartingCards?.Count > 0).ToArray()
+            : rewards.Where(reward => reward.Id.StartsWith("codex-card-", StringComparison.Ordinal) && reward.StartingCards?.Count > 0).ToArray();
         if (cards.Length < 3) cards = rewards.Where(reward => reward.StartingCards?.Count > 0).ToArray();
         var depths = new Dictionary<string, int>(StringComparer.Ordinal);
         var pending = new Queue<(string Id, int Depth)>();
@@ -57,8 +67,8 @@ public static partial class StandardShanheCampaignCatalog
                     AddSkillSlotsOnVictory = chapterBoss && chapter == 3 ? 0 : node.AddSkillSlotsOnVictory,
                     BossRewards = chapterBoss && chapter < 3 ? currentSeason
                         ? new(500, 1, [
-                            new("tactics", "传说战法", tactics, Math.Min(3, tactics.Length)),
-                            new("skills", "传说技能", skills, Math.Min(3, skills.Length))])
+                            new("tactics", "史诗战法", tactics, Math.Min(3, tactics.Length)),
+                            new("cards", "史诗手牌", cards.Select(reward => reward.Id).ToArray(), Math.Min(3, cards.Length))])
                         : new(500, 1, [new("tactics", "战法三选一", tactics),
                             new("cards", "卡牌三选一", cards.Select(reward => reward.Id).ToArray())])
                         : null
@@ -67,8 +77,8 @@ public static partial class StandardShanheCampaignCatalog
         });
     }
 
-    private static bool IsLegendaryChapterReward(ShanheRewardDefinition reward, string kind) =>
-        ShopMetadataByRewardId.TryGetValue(reward.Id, out var metadata) && metadata.Rarity == 4 && metadata.Kind == kind;
+    private static bool IsEpicChapterReward(ShanheRewardDefinition reward, string kind) =>
+        ShopMetadataByRewardId.TryGetValue(reward.Id, out var metadata) && metadata.Rarity == 3 && metadata.Kind == kind;
 
     private static bool IsChapterTactic(ShanheRewardDefinition reward) => reward.TacticSkillId is not null || reward.CampaignEconomy is { StartingGold: 0 } ||
         reward.Bonuses is { } bonus && (bonus.MaxHp != 0 || bonus.InitialHand != 0 || bonus.Draw != 0 || bonus.Slash != 0);

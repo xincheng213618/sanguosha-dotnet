@@ -15,10 +15,11 @@ public sealed partial class MainViewModel
         get => _shanheCodexShowCollection;
         set { if (SetProperty(ref _shanheCodexShowCollection, value)) RefreshShanheModules(); }
     }
+    public bool IsShanheShopNodeActive => _shanheSession is { Snapshot.Phase: ShanheCampaignPhase.NodeChoice } session &&
+        session.Definition.Nodes.Any(node => node.Id == session.Snapshot.CurrentNodeId && node.Kind == ShanheNodeKind.Shop);
     public bool IsShanheShopActive => _shanheSession?.HasPersistentMarket == true
         ? IsShanheRunInProgress && CurrentShanheMarketState?.ShopItems.Count > 0
-        : _shanheSession?.Snapshot is { Phase: ShanheCampaignPhase.NodeChoice } state &&
-        _shanheSession.Definition.Nodes.Any(node => node.Id == state.CurrentNodeId && node.Kind == ShanheNodeKind.Shop);
+        : IsShanheShopNodeActive;
     public IEnumerable<ShanheCampaignChoice> ShanheShopActions => IsShanheShopActive ? ShanheChoices.Where(choice => _shanheSession!.Snapshot.NodeChoices.Any(option => option.Id == choice.Id && option.RewardId is null)) : [];
     public int ShanheShopItemCount => ShanheShopItems.Count;
     public int ShanheCodexCount => ShanheCodexCards.Count;
@@ -87,7 +88,7 @@ public sealed partial class MainViewModel
                 ShanheCodexCards.Add(new(reward.Id, reward.Name, reward.Description, RewardRule(reward),
                     reward.TacticSkillId is null ? "基础整备 · 成长效果见上方" :
                     state?.TacticIds.Contains(reward.Id) == true ? "战法 · 本次征程已获得" : "战法图鉴 · 尚未获得"));
-        foreach (var property in new[] { nameof(IsShanheShopActive), nameof(ShanheShopActions), nameof(ShanheShopItemCount), nameof(ShanheCodexCount), nameof(ShanheShopNotice), nameof(ShanheCodexNotice), nameof(ShanheBuildSummary) }) RaisePropertyChanged(property);
+        foreach (var property in new[] { nameof(IsShanheShopActive), nameof(IsShanheShopNodeActive), nameof(ShanheShopActions), nameof(ShanheShopItemCount), nameof(ShanheCodexCount), nameof(ShanheShopNotice), nameof(ShanheCodexNotice), nameof(ShanheBuildSummary) }) RaisePropertyChanged(property);
     }
     private static ShanheShopItem DecorateShanheProduct(ShanheShopItem item, ShanheRewardDefinition? reward)
     {
@@ -105,7 +106,7 @@ public sealed partial class MainViewModel
             Accent = rarity switch { 2 => "#81619A", 3 => "#BF853C", 4 => "#A94531", _ => "#987653" }
         };
     }
-    private static bool IsShanheTactic(ShanheRewardDefinition reward) => reward.CampaignEconomy is not null || reward.OpeningSkillRewardIds is not null || reward.TacticSkillId is not null || reward.Bonuses is { } bonuses && (bonuses.MaxHp != 0 || bonuses.InitialHand != 0 || bonuses.Draw != 0 || bonuses.Slash != 0);
+    private static bool IsShanheTactic(ShanheRewardDefinition reward) => reward.CampaignEconomy is not null || reward.OpeningSkillRewardIds is not null || reward.OpeningCompanionPool is not null || reward.TacticSkillId is not null || reward.Bonuses is { } bonuses && (bonuses.MaxHp != 0 || bonuses.InitialHand != 0 || bonuses.Draw != 0 || bonuses.Slash != 0);
     private static string RewardCategory(ShanheRewardDefinition reward) => IsShanheTactic(reward) ? "战法" : reward.SkillId is not null ? "额外技能" : reward.StartingEquipment?.Count > 0 ? "随身装备" : reward.StartingCards?.Count > 0 ? "随身牌" : "补给";
     private string RewardRule(ShanheRewardDefinition reward) => reward.TacticSkillId is { } id && CurrentPresentationRegistry.Skills.TryGetValue(id, out var skill) ? skill.Description :
         reward.SkillId is { } extra && CurrentPresentationRegistry.Skills.TryGetValue(extra, out var learned) ? learned.Description : string.Empty;

@@ -141,6 +141,8 @@ public enum SkillProgramComparisonOperator
 }
 public enum SkillProgramTargetKind
 {
+    OtherLivingWithMoreHandCards = 78200,
+    OtherLivingWithFewerHandCardsAndOwnedCards = 78201,
     MobileZhongYaoZuodingTarget = 77700,
     MobileShiChenQunMaximumLoss = 47302,
     NianDeadAlly = 27930,
@@ -267,6 +269,7 @@ public enum SkillProgramRandomTransferRevealPolicy { RecipientAfterGain = 0 }
 
 public enum SkillProgramEffectOp
 {
+    QueueShanheLuanxinNextDraw = 81600,
     ApplyShanheMarketPurchase = 62030,
     ResolveBoundaryManChongJunxing = 53000,
     PrepareBoundaryWuYiBenxi = 53100,
@@ -1112,6 +1115,16 @@ public enum SkillProgramEffectOp
     PutOwnOrPreviousFirstDiscardOnTop = 5300, LoseHpIfRevealedNonEquipmentDiffers = 5301,
     StoreAdjacentDiscardedSlash = 5400, PayCompletedUseDiscardOrLoseHp = 5401,
     UseRoundPricedPileDyingAlcohol = 5402, OfferCurrentSlashFireAndExtraTarget = 5403,
+    ResolveShanheChanrangEdict = 5434,
+    AbolishPublicTeamEnemyEquipmentSlots = 5404,
+    ResolveShanheGuangao = 5405,
+    ResolveShanheYingxiangMovement = 5406, ResolveShanheYingxiangUse = 5407,
+    ResolveShanheXiasheng = 5408,
+    ResolveShanheBuwu = 5409,
+    UseOlSpLiuBeiZhujiu = 5431, GrantOlSpLiuBeiXudai = 5432, ResolveOlSpLiuBeiJinglei = 5433,
+    RecoverShanheShuanghun = 5412, RestoreShanheShuanghunUse = 5413,
+    GrantShanheTeamOpeningMaximumHp = 5414,
+    ReviveShanheMuluFollowers = 5420, FreezeShanheElephantRoundDamage = 5421,
     CollectPublicPile = 780,
     GrantNextCardTargetAdjustment = 782,
     GrantNextActualUseTargetAdjustment = 4700,
@@ -1824,6 +1837,8 @@ public enum SkillProgramEffectOp
     DrawNianRenxingRecovery = 27905,
     DrawNianBaonuReplacement = 27906,
     ReviveNianAlly = 27930,
+    GrantShanheXiaoruiSlashQuota = 27980,
+    PlaceRandomEmptySlotDeckEquipment = 28080,
     SelectRedJudgmentFireTarget = 27503,
     ResolveMobileJiKangQingxian = 80900,
     ResolveMobileJiKangJuexiang = 80901,
@@ -3796,6 +3811,22 @@ public sealed class SkillProgramCatalog
             ? EnumValue<Suit>(node, "inputSuit", path) : null;
         Suit? outputSuit = node.TryGetProperty("outputSuit", out _)
             ? EnumValue<Suit>(node, "outputSuit", path) : null;
+        if (kind == SkillProgramCardPolicyKind.AdditionalOrdinaryAlcoholUses)
+        {
+            var condition = OptionalCondition(node, path);
+            if (node.EnumerateObject().Any(property => property.Name is not ("id" or "kind" or "value" or "condition")) ||
+                value is < 1 or > 10 || condition.Kind != SkillProgramConditionKind.Always)
+                Fail(path, "Additional ordinary Alcohol uses require only an unconditional value 1..10.");
+            return new(id, kind, cardKinds, requiredKinds, value, inputSuit, outputSuit, condition);
+        }
+        if (kind is SkillProgramCardPolicyKind.MinimumHandLimit or SkillProgramCardPolicyKind.MaximumOwnPlayCardUses)
+        {
+            var condition = OptionalCondition(node, path);
+            if (node.EnumerateObject().Any(property => property.Name is not ("id" or "kind" or "value" or "condition")) ||
+                value is < 1 or > 1000 || condition.Kind != SkillProgramConditionKind.Always)
+                Fail(path, "A hand-limit floor or own-Play use cap requires only an unconditional value 1..1000.");
+            return new(id, kind, cardKinds, requiredKinds, value, inputSuit, outputSuit, condition);
+        }
         if (kind is SkillProgramCardPolicyKind.BypassOtherParticipantArmor or SkillProgramCardPolicyKind.DoubleArmorDamage or
             SkillProgramCardPolicyKind.ReserveNextDamageAfterOffTurnHit or SkillProgramCardPolicyKind.OtherWuTreatedWoundedForCanshi)
         {
