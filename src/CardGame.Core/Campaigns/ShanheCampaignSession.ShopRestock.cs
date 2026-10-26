@@ -37,6 +37,7 @@ public sealed partial class ShanheCampaignSession
         var reward = _rewards[authored.RewardId!];
         stock[position] = new($"$restock:{state.ShopRefreshCount}:{ordinal}:{reward.Id}", reward.Name,
             authored.GoldCost, authored.HpCost, reward.Id, LeavesNode: false) { Description = reward.Description };
+        stock[position] = PromoteShopItem(state, node, stock, position, ordinal);
         return state with { ShopStock = ShanheCampaignContent.Freeze(stock), ShopRestockCount = ordinal };
     }
 

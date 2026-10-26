@@ -630,6 +630,9 @@ public sealed partial class ShanheCampaignSession
                     authored.HpCost, reward.Id, LeavesNode: false) { Description = reward.Description });
             }
         }
+        // Finish the ordinary selection first so an unmodified category keeps its baseline RNG stream.
+        for (var position = 0; position < stock.Count; position++)
+            stock[position] = PromoteShopItem(state, node, stock, position);
         return ShanheCampaignContent.Freeze(stock);
     }
 
