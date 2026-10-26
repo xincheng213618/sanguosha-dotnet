@@ -925,6 +925,7 @@ public enum SkillProgramEffectOp
     GrantLeastHandMarkerOrDraw = 3800,
     ViewAndTakeSelectedTargetHand = 3300, RequestHandBySuitsOrLoseHp = 3301,
     RecastBoundCards = 62020,
+    ReflectAppliedDamage = 62021,
     RecastBoundCard = 3100,
     PayHpToGrantOneUseDamageShield = 3000,
     DrawThenDiscardHandToMaximumHp = 2900,
@@ -6132,6 +6133,10 @@ public sealed class SkillProgramCatalog
         if (effects.Any(effect => effect.AllBottomStateId is not null) &&
             (window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || subject != SkillProgramTriggerSubject.Owner))
             Fail(path, "all-bottom completion state requires an owner preparation trigger");
+        if (effects.Any(effect => effect.Op == SkillProgramEffectOp.ReflectAppliedDamage) &&
+            (window != SkillProgramTriggerWindow.AfterDamageApplied || subject != SkillProgramTriggerSubject.Owner ||
+             damageOccurrence != SkillProgramDamageOccurrence.PerDamage))
+            Fail(path + ".effects", "applied-damage reflection requires an owner afterDamageApplied perDamage trigger");
         if (requireDamageSource is not null &&
             (window != SkillProgramTriggerWindow.AfterDamageApplied || subject != SkillProgramTriggerSubject.Owner))
             Fail(path + ".requireDamageSource", "requires an afterDamageApplied owner trigger");

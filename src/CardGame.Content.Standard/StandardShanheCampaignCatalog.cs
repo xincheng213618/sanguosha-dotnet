@@ -472,6 +472,7 @@ public static partial class StandardShanheCampaignCatalog
                 packages.Add(new StandardShanheFuyiTacticsPackage());
                 packages.Add(new StandardShanheBowenTacticsPackage());
                 packages.Add(new StandardShanheRecastTacticsPackage());
+                packages.Add(new StandardShanheAppliedDamageReflectionPackage());
             }
             return ComposedSkillContentRegistry.CreateShowcase(additionalPackages: packages);
         })).Value;
