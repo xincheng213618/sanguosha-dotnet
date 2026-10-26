@@ -72,6 +72,7 @@ internal static class Program
                 !argument.StartsWith("--", StringComparison.Ordinal)) ??
                 Path.Combine(Path.GetTempPath(), "card-ui-check");
             Directory.CreateDirectory(output);
+            Check("local assets: external artwork deployment decoding and recovery", () => LocalAssetChecks.DeploymentDecodingAndRecovery(output));
             Check("LAN room UI: seats readiness private prompts and stable selection", () => LanRoomUiChecks.SeatsPrivacyAndSelection(output));
             Check("Mode rooms UI: selected modes seats AI readiness and quick start", () => LanRoomUiChecks.SelectedModesEnterRooms(output));
             Check("active effect badges restore actual duration and clear consumed facts", () => ActiveEffectUiChecks.LiveEffectsRestoreAndExpire(output));
@@ -302,8 +303,10 @@ internal static class Program
             Check("conversion skill rail selects published materials including chains and delayed cards", () => ConversionSkillSelectionChecks.SingleCardRules(output));
             Check("conversion skill rail chooses output before materials and retires old mode buttons", () => ConversionSkillSelectionChecks.MultipleOutputs(output));
             Check("conversion response rail: material driven exact hand equipment payment", () => ResponseConversionSelectionChecks.ResponsesRequireSkillAndExactMaterials(output));
+            Check("Zhangba response UI: native Slash Longdan and weapon pair drafts", () => ResponseConversionSelectionChecks.ZhangbaUsesWeaponSlotAndExactPair(output));
             Check("conversion skill rail: material driven one and two card Longhun", () => ResponseConversionSelectionChecks.PlayGroupsSingleAndMultipleCardConversions(output));
             Check("conversion skill rail: material determines Boundary Longdan output", () => ConversionSkillSelectionChecks.MaterialsDetermineOutput(output));
+            Check("Zhuque Fan UI: confirm Slash before choosing normal or fire with Longdan", () => ConversionSkillSelectionChecks.ZhuqueFanAfterSlashConfirmation(output));
             Check("composed skills share the generic WPF draft and submit their stable program identity", SkillProgramUiChecks.ActiveSelectionAndSubmission);
             Check("Program paid choices preserve actor control and opaque slots", () => ProgramPaidChoiceUiChecks.SharedChoiceSurfaces(output));
             Check("Fuchao UI: incremental discard exposes pick undo and finish cold", () => KongShuUiChecks.FuchaoIncrementalDiscardKeepsPickUndoAndFinishVisible(output));

@@ -16,7 +16,8 @@ public sealed partial class GameEngine
     public HumanActionView GetHumanActionView()
     {
         var actions = GetHumanLegalActions();
-        return new HumanActionView(Revision, actions, BuildHumanHandGuidance(actions), HumanWushuangJinzhiMaterials());
+        return new HumanActionView(Revision, actions, BuildHumanHandGuidance(actions), HumanWushuangJinzhiMaterials(),
+            _options.HumanSeat >= 0 && HasZhuqueFan(_players[_options.HumanSeat]));
     }
 
     /// <summary>

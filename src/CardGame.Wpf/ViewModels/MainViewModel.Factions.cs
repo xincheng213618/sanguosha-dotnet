@@ -15,7 +15,7 @@ internal static class FactionArtwork
         "群" => Path("qun"), "晋" => Path("jin"), "神" => Path("shen"), _ => null
     };
 
-    private static string Path(string id) => $"pack://application:,,,/CardGame.Wpf;component/Assets/gallery-faction-{id}.png";
+    private static string Path(string id) => $"pack://siteoforigin:,,,/Assets/gallery-faction-{id}.png";
 }
 
 public sealed partial class MainViewModel

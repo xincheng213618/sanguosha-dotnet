@@ -13,6 +13,82 @@ using CardGame.Wpf.ViewModels;
 
 internal static class ConversionSkillSelectionChecks
 {
+    public static void ZhuqueFanAfterSlashConfirmation(string output)
+    {
+        foreach (var scenario in new[]
+        {
+            new Scenario("standard:none", null, "standard:slash", CardKind.Slash, Fan: true),
+            new Scenario("standard:longdan", null, "standard:dodge", CardKind.Slash, Fan: true),
+            new Scenario("sp:longdan", "sp:zhao-yun", "standard:dodge", CardKind.Slash, Fan: true),
+            new Scenario("boundary:longdan", "boundary:zhao-yun", "standard:dodge", CardKind.Slash, Fan: true)
+        })
+        foreach (var invoke in new[] { false, true })
+        {
+            var (model, registry) = Create(scenario);
+            using (model)
+            using (var host = new NativeResponseStatusChecks.NativeHost(model))
+            {
+                var game = Program.Engine(model);
+                var original = game.CreateCheckpoint();
+                var revision = game.Revision;
+                var count = game.AcceptedCommands.Count;
+                var action = game.GetHumanLegalActions().FirstOrDefault(candidate => candidate.Kind == LegalActionKind.Slash &&
+                    candidate.PlayedCardKind == (scenario.Skill == "standard:none" ? null : CardKind.Slash) &&
+                    candidate.TargetSeats.Count == 1 && candidate.ConversionSource?.SkillId ==
+                        (scenario.Skill == "standard:none" ? null : scenario.Skill)) ??
+                    throw new InvalidOperationException($"Missing {scenario.Skill} Slash in {game.PendingDecision?.Kind}; " +
+                    string.Join("; ", game.GetHumanLegalActions().Where(candidate => candidate.Kind == LegalActionKind.Slash)
+                        .Select(candidate => $"{candidate.CardId}/{candidate.PlayedCardKind}/{candidate.ConversionSource?.SkillId}").Distinct()));
+                void SelectSlash()
+                {
+                    if (scenario.Skill != "standard:none")
+                    {
+                        model.ActivateHumanSkillCommand.Execute(model.HumanSkillCards.Single(skill => skill.ContentId == scenario.Skill));
+                        Program.Assert(!model.HasCardNameSelection && model.EquipmentPlayChoices.Count == 0,
+                            "The Fan must not add a Fire Slash output declaration to Longdan.");
+                    }
+                    model.SelectCardCommand.Execute(model.Hand.Single(card => card.Id == action.CardId));
+                    model.SelectTargetCommand.Execute(model.Seats.Single(seat => seat.Seat == action.TargetSeats[0]));
+                    Program.Assert(model.CanConfirmSelected && !model.HasAlternateSlash && !model.PlayButtonText.Contains("火杀"),
+                        "Draft the ordinary Slash and its target before asking about the weapon.");
+                    model.ConfirmSelectedCommand.Execute(null);
+                }
+                SelectSlash();
+                var retired = model.SelectionArea;
+                Program.Assert(retired.HasChoices && retired.Choices.Count == 2 && !retired.ShowPrimaryButtons &&
+                    retired.Hint.Contains("朱雀羽扇") && !model.CanConfirmSelected && !model.EndTurnCommand.CanExecute(null) &&
+                    game.Revision == revision && game.AcceptedCommands.Count == count,
+                    "Confirming Slash must open an unpaid two-button weapon choice without committing a command.");
+                // Esc cancels this draft; old buttons must not answer its replacement.
+                model.ClearSelectionCommand.Execute(null);
+                SelectSlash();
+                retired.ChoiceCommand.Execute(retired.Choices[invoke ? 0 : 1]);
+                Program.Assert(game.Revision == revision && model.SelectionArea.HasChoices,
+                    "A weapon choice from a cancelled draft must not submit another Slash.");
+                var current = model.SelectionArea;
+                Layout(host.Root);
+                if (scenario.Skill == "boundary:longdan" && invoke)
+                    Program.Render(host.Root, 1120, 740, Path.Combine(output, "zhuque-fan-after-longdan.png"));
+                var expectedAction = invoke ? game.GetHumanLegalActions().Single(candidate => candidate.Kind == LegalActionKind.Slash &&
+                    candidate.CardId == action.CardId && candidate.PlayedCardKind == CardKind.FireSlash &&
+                    candidate.ConversionSource == action.ConversionSource &&
+                    (candidate.AdditionalConversionSources ?? []).SequenceEqual(action.AdditionalConversionSources ?? []) &&
+                    candidate.TargetSeats.SequenceEqual(action.TargetSeats)) : action;
+                var expected = new PlayCardCommand(0, action.CardId!.Value, action.TargetSeats, revision, game.PendingDecision!.PromptId,
+                    expectedAction.PlayedCardKind) { ConversionSource = expectedAction.ConversionSource,
+                    AdditionalConversionSources = expectedAction.AdditionalConversionSources };
+                var reference = GameReplay.Restore(original, registry);
+                Accept(reference, expected);
+                Click(Button(host.Root, current.ChoiceCommand, current.Choices[invoke ? 0 : 1]));
+                Program.Assert(game.Revision == revision + 1 && game.AcceptedCommands.Count == count + 1 &&
+                    CommandJson.Serialize([game.AcceptedCommands.Last()]) == CommandJson.Serialize([expected]) &&
+                    game.CardMovements.SequenceEqual(reference.CardMovements) && !model.HasSelection &&
+                    Enumerable.Range(0, 4).All(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat)) == SnapshotJson.Serialize(reference.CreateSnapshot(seat))),
+                    "The weapon answer must submit exactly one native normal/fire command with the original Longdan source, material and target.");
+            }
+        }
+    }
+
     public static void MaterialsDetermineOutput(string output)
     {
         foreach (var kind in new[] { CardKind.Slash, CardKind.Alcohol })
@@ -289,12 +365,21 @@ internal static class ConversionSkillSelectionChecks
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(scenario));
         var game = GameEngine.CreateStandard(new GameOptions { Seed = 31, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord,
-            ModeId = Fixture.Mode, UseInteractiveSetup = true, AdvanceAfterHumanCommands = false, MaxTurns = 4 }, registry);
+            ModeId = scenario.Fan ? Fixture.FanMode : Fixture.Mode, UseInteractiveSetup = true, AdvanceAfterHumanCommands = false, MaxTurns = 4 }, registry);
         Accept(game, new StartGameCommand());
         Accept(game, new SelectGeneralCommand(0, Fixture.Owner, game.Revision, game.PendingDecision!.PromptId));
         for (var step = 0; step < 40 && game.PendingDecision?.Kind != DecisionKind.PlayCard; step++)
             Accept(game, new AdvanceOneStepCommand(game.Revision));
         Program.Assert(game.PendingDecision?.Kind == DecisionKind.PlayCard, "The native fixture must reach human play.");
+        if (scenario.Fan)
+        {
+            var fan = game.CreateSnapshot(0).Players[0].Hand.First(card => card.Kind == CardKind.ZhuqueFan);
+            Accept(game, new PlayCardCommand(0, fan.Id, [], game.Revision, game.PendingDecision!.PromptId));
+            for (var step = 0; step < 40 && game.PendingDecision?.Kind != DecisionKind.PlayCard; step++)
+                Accept(game, new AdvanceOneStepCommand(game.Revision));
+            Program.Assert(game.PendingDecision?.Kind == DecisionKind.PlayCard && game.GetHumanActionView().CanInvokeZhuqueFan,
+                "The Fan UI fixture must equip its actual weapon and resume human play.");
+        }
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         var model = new MainViewModel(false, 31, true, store, contentRegistry: registry)
@@ -304,15 +389,18 @@ internal static class ConversionSkillSelectionChecks
         return (model, registry);
     }
 
-    private sealed record Scenario(string Skill, string? General, string Material, CardKind Output, bool Chained = false);
+    private sealed record Scenario(string Skill, string? General, string Material, CardKind Output, bool Chained = false, bool Fan = false);
     private sealed class Fixture(Scenario scenario) : IGameContentPackage
     {
         internal const string Mode = "identity:conversion-skill-ui";
+        internal const string FanMode = "identity:classic-conversion-skill-ui";
         internal const string Owner = "fixture:conversion-skill-owner";
         public PackageManifest Manifest { get; } = new("fixture-conversion-skill-ui", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder builder)
         {
             if (scenario.General is { } general) CharacterFixtureContent.Register(builder, general);
+            if (scenario.Fan) builder.AddCard(new("fixture:zhuque-fan", "朱雀羽扇", "装备牌",
+                CardCatalog.Get(CardKind.ZhuqueFan).Description, CardKind.ZhuqueFan));
             builder.AddGeneral(new(Owner, "转换技能", "supporter", scenario.Skill, "qun", 6,
                 AdditionalSkillIds: scenario.Chained ? ["standard:wusheng"] : []));
             var peers = Enumerable.Range(1, 3).Select(seat => $"fixture:conversion-skill-peer-{seat}").ToArray();
@@ -320,10 +408,11 @@ internal static class ConversionSkillSelectionChecks
             builder.AddDeck(new("fixture:conversion-skill-deck", "转换材料", 8, 0, [])
             {
                 PhysicalCards = Enumerable.Range(0, 80).Select(index => new ContentDeckPhysicalCard(
+                    scenario.Fan && index % 4 == 0 ? "fixture:zhuque-fan" :
                     scenario.Skill == "boundary:longdan" && index % 2 == 0 ? "standard:peach" : scenario.Material,
                     (Suit)(index % 4), index % 13 + 1)).ToArray()
             });
-            builder.AddMode(new(Mode, "转换选牌", 4, 4, new Dictionary<string, int>
+            builder.AddMode(new(scenario.Fan ? FanMode : Mode, "转换选牌", 4, 4, new Dictionary<string, int>
                 { [nameof(Role.Lord)] = 1, [nameof(Role.Loyalist)] = 1, [nameof(Role.Rebel)] = 2 },
                 "fixture:conversion-skill-deck", GeneralCandidateCount: 4, GeneralPoolIds: [Owner, .. peers]));
         }

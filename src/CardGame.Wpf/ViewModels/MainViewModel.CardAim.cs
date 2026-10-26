@@ -88,7 +88,7 @@ public sealed partial class MainViewModel
 
     internal bool IsCardAimContext(CardViewModel card)
     {
-        if (_disposed || _snapshot is null || !CanEndTurn || HasGameOver ||
+        if (_disposed || _snapshot is null || !CanEndTurn || HasGameOver || IsZhuqueFanSelectionPending ||
             IsDiscardSelectionPending || IsHandResponsePending || IsSkillTargetSelectionPending ||
             _isSelectingActiveSkillCards || IsActiveSkillSelectionPending || _selectedTieredRoundZeroAction is not null ||
             _snapshot.Revision != _game.Revision ||

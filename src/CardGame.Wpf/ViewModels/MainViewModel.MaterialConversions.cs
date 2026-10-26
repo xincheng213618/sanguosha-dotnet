@@ -133,9 +133,8 @@ public sealed partial class MainViewModel
         {
             var action = MaterialPlayNativeActions(mode).SingleOrDefault(candidate => candidate.TargetSeats.SequenceEqual(targets));
             if (action is null) return;
-            command = new PlayCardCommand(_snapshot.HumanSeat, cards[0], action.TargetSeats, _snapshot.Revision, prompt.PromptId,
-                action.PlayedCardKind, action.TargetCardId) { ConversionSource = action.ConversionSource,
-                AdditionalConversionSources = action.AdditionalConversionSources };
+            SubmitSelectedPlayAction(cards[0], action, prompt.PromptId, "转化未执行");
+            return;
         }
         ExecuteSafely(() =>
         {

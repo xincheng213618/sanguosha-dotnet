@@ -13,19 +13,13 @@
     <Compile Include="..\Characters\**\Wpf\**\*.cs">
       <Link>Characters\$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)\..\Characters', '%(FullPath)'))</Link>
     </Compile>
-    <Resource Include="Assets\*.png;Assets\*.jpg" />
     <EmbeddedResource Include="Assets\Data\shanhe-codex-2026.json" LogicalName="CardGame.ShanheCodex2026.json" />
-    <Resource Include="Assets\Generals\*.png;Assets\Generals\*.jpg" />
-    <Resource Include="Assets\Table\*.png;Assets\Table\*.jpg" />
-    <Resource Include="Assets\Wushuang\*.png" />
+    <!-- Binary assets have an independent lifecycle from the application assembly. -->
+    <Content Include="Assets\**\*.png;Assets\**\*.jpg;Assets\**\*.mp3;Assets\**\*.wav"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <EmbeddedResource Include="..\..\docs\content\table-art-catalog.json" LogicalName="CardGame.TableArtCatalog.json" />
-    <Content Include="Assets\Cards\*.png" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="Assets\Shanhe\*.png" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <EmbeddedResource Include="..\..\docs\content\card-art-catalog.json" LogicalName="CardGame.CardArtCatalog.json" />
-    <Content Include="Assets\Skins\**\*.png" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <EmbeddedResource Include="..\..\docs\content\general-art-catalog.json" LogicalName="CardGame.GeneralArtCatalog.json" />
-    <Content Include="Assets\Audio\*.wav" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="Assets\Audio\Official\**\*.mp3;Assets\Audio\Official\**\*.wav" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <EmbeddedResource Include="..\..\docs\content\game-audio-catalog.json" LogicalName="CardGame.GameAudioCatalog.json" />
     <ProjectReference Include="..\CardGame.Core\CardGame.Core.csproj" />
     <ProjectReference Include="..\CardGame.Lan\CardGame.Lan.csproj" />

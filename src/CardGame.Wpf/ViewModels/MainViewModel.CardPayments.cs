@@ -119,10 +119,12 @@ public sealed partial class MainViewModel
             if (counts.Length == 0) return "当前没有可交出的合法牌。";
             var required = string.Join(" / ", counts);
             return SelectedCardPaymentChoice is { } choice
-                ? $"{choice.Description} · 点击「确定」确认；Esc 取消选牌。"
+                ? $"{choice.Description} · 点击「{HandResponseButtonText}」确认；Esc 取消选牌。"
                 : CardPaymentChoices.Count(choice => _paymentCardIds.SetEquals(choice.Cards)) > 1
                     ? "所选牌有多种支付效果，请先选择中央的具体方式，再点击「确定」。"
-                : $"选择 {required} 张合法手牌或装备（已选 {_paymentCardIds.Count} 张）· 选齐后点击「确定」；Esc 取消选牌。";
+                : _responseConversionSelection?.EquipmentKind is not null
+                ? $"丈八蛇矛 · 选择两张合法手牌（已选 {_paymentCardIds.Count}/2）· 选齐后点击「{HandResponseButtonText}」；Esc 取消选牌。"
+                : $"选择 {required} 张合法手牌或装备（已选 {_paymentCardIds.Count} 张）· 选齐后点击「{HandResponseButtonText}」；Esc 取消选牌。";
         }
     }
 
@@ -130,9 +132,12 @@ public sealed partial class MainViewModel
     public ICommand SelectPaymentEquipmentCommand => _selectPaymentEquipmentCommand ??=
         new RelayCommand<EquipmentSlotViewModel>(slot =>
         {
-            if (HumanEquipmentSlots.Any(current => ReferenceEquals(current, slot)) && IsCardPaymentMaterial(slot.Card?.Id))
-                TogglePaymentCard(slot.Card!.Id);
-        }, slot => HumanEquipmentSlots.Any(current => ReferenceEquals(current, slot)) && IsCardPaymentMaterial(slot.Card?.Id));
+            if (!HumanEquipmentSlots.Any(current => ReferenceEquals(current, slot))) return;
+            if (IsSelectedResponseEquipment(slot.Card)) ClearSelection();
+            else if (IsCardPaymentMaterial(slot.Card?.Id)) TogglePaymentCard(slot.Card!.Id);
+            else if (CanActivateResponseEquipment(slot.Card)) SelectResponseEquipment(slot.Card!);
+        }, slot => HumanEquipmentSlots.Any(current => ReferenceEquals(current, slot)) &&
+            (IsCardPaymentMaterial(slot.Card?.Id) || CanActivateResponseEquipment(slot.Card)));
 
     private void RefreshEquipmentMaterialSelection()
     {

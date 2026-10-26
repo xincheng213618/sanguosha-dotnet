@@ -32,7 +32,7 @@
  </UserControl.Resources>
  <Viewbox Stretch="Uniform">
   <Grid Width="1050" Height="535" ClipToBounds="True">
-   <Image Source="/CardGame.Wpf;component/Assets/shanhe-codex-book.png" Stretch="Fill" IsHitTestVisible="False"/>
+   <Image Source="pack://siteoforigin:,,,/Assets/shanhe-codex-book.png" Stretch="Fill" IsHitTestVisible="False"/>
    <Canvas x:Name="CodexBookContent"><Canvas.Style><Style TargetType="Canvas"><Style.Triggers><DataTrigger Binding="{Binding IsShanheCodexLoadoutManagerOpen}" Value="True"><Setter Property="IsEnabled" Value="False"/></DataTrigger></Style.Triggers></Style></Canvas.Style>
     <StackPanel Canvas.Left="27" Canvas.Top="139" Width="55">
      <TextBlock Text="山&#x0a;河&#x0a;册" FontFamily="KaiTi" FontSize="49" LineHeight="75" TextAlignment="Center" Foreground="#EAC777"><TextBlock.Effect><DropShadowEffect Color="#160900" BlurRadius="3" ShadowDepth="2" Opacity="0.8"/></TextBlock.Effect></TextBlock>

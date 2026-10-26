@@ -133,7 +133,7 @@ internal static class WushuangUiChecks
             var tacticRail = (ScrollViewer)window.FindName("HumanWushuangTactics");
             var dock = (FrameworkElement)window.FindName("HandDock");
             var badge = vm.HumanPlayer!.WushuangTactics.Single();
-            Program.Assert(badge.Id == initialTactic.TacticId && badge.Icon is not null && badge.Frame.IsFrozen &&
+            Program.Assert(badge.Id == initialTactic.TacticId && badge.Icon is not null && badge.Frame is { IsFrozen: true } &&
                 vm.HumanSkillCards.All(skill => skill.ContentId != WushuangTactics.ById[badge.Id].SkillId) &&
                 game.CreateSnapshot(0).Players[0].Skills!.Any(skill => skill.ContentId == WushuangTactics.ById[badge.Id].SkillId) &&
                 vm.WushuangSkillSlots.All(slot => slot.SkillId is null),

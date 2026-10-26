@@ -91,7 +91,7 @@
         </LinearGradientBrush>
     </UserControl.Resources>
     <Grid ClipToBounds="True">
-        <Grid.Background><ImageBrush ImageSource="/CardGame.Wpf;component/Assets/lobby-river-city.png" Stretch="UniformToFill" /></Grid.Background>
+        <Grid.Background><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/lobby-river-city.png" Stretch="UniformToFill" /></Grid.Background>
         <Border Background="#16EDC899" IsHitTestVisible="False" />
         <Border IsHitTestVisible="False"><Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0,1"><GradientStop Color="#00221914" Offset="0.45" /><GradientStop Color="#90221914" Offset="1" /></LinearGradientBrush></Border.Background></Border>
         <Grid>
@@ -134,7 +134,7 @@
                             <Border Grid.ColumnSpan="2" IsHitTestVisible="False"><Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,0"><GradientStop Color="#B8F1DFC0" Offset="0" /><GradientStop Color="#8DEAD4B0" Offset="0.6" /><GradientStop Color="#15EAD4B0" Offset="1" /></LinearGradientBrush></Border.Background></Border>
                             <Border Width="3" Margin="14,22,0,22" HorizontalAlignment="Left" Background="#A08B5E32" IsHitTestVisible="False" />
                             <Border Grid.Column="1" Margin="0,-20,14,-70" Opacity="0.68">
-                                <Border.Background><ImageBrush ImageSource="/CardGame.Wpf;component/Assets/general-da-qiao.png" Stretch="UniformToFill" AlignmentY="Top" /></Border.Background>
+                                <Border.Background><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/general-da-qiao.png" Stretch="UniformToFill" AlignmentY="Top" /></Border.Background>
                                 <Border.OpacityMask><LinearGradientBrush StartPoint="0,0" EndPoint="1,0"><GradientStop Color="#00FFFFFF" Offset="0" /><GradientStop Color="White" Offset="0.4" /><GradientStop Color="#00FFFFFF" Offset="1" /></LinearGradientBrush></Border.OpacityMask>
                             </Border>
                             <StackPanel VerticalAlignment="Center" Margin="32,0,0,0">
@@ -150,7 +150,7 @@
                         <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="20" /><RowDefinition Height="*" /></Grid.RowDefinitions>
                         <Button x:Name="ClassicBattleButton" Grid.Column="0" Grid.Row="0" Style="{StaticResource ModeCard}" Command="{Binding OpenLobbyCategoryCommand}" CommandParameter="identity" AutomationProperties.Name="经典场，选择身份对局" TabIndex="1">
                             <Grid ClipToBounds="True">
-                                <Grid.Background><ImageBrush ImageSource="/CardGame.Wpf;component/Assets/general-sun-shangxiang.png" Viewbox="0,0,1,0.60" Stretch="UniformToFill" AlignmentY="Top" /></Grid.Background>
+                                <Grid.Background><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/general-sun-shangxiang.png" Viewbox="0,0,1,0.60" Stretch="UniformToFill" AlignmentY="Top" /></Grid.Background>
                                 <Border Background="{StaticResource CardShade}" />
                                 <Border BorderBrush="#6FBB995F" BorderThickness="1" Margin="4" />
                                 <StackPanel VerticalAlignment="Center" Margin="12"><TextBlock Text="经典场" Style="{StaticResource CardTitle}" /><TextBlock Text="身份博弈 · 五人 / 八人" Style="{StaticResource CardCaption}" /></StackPanel>
@@ -160,7 +160,7 @@
                         </Button>
                         <Button x:Name="TeamBattleButton" Grid.Column="0" Grid.Row="2" Style="{StaticResource ModeCard}" Command="{Binding OpenLobbyCategoryCommand}" CommandParameter="team" AutomationProperties.Name="演武场，选择二对二阵营对局" TabIndex="2">
                             <Grid ClipToBounds="True">
-                                <Grid.Background><ImageBrush ImageSource="/CardGame.Wpf;component/Assets/general-taishi-ci.png" Viewbox="0,0,1,0.6" Stretch="UniformToFill" AlignmentY="Top" /></Grid.Background>
+                                <Grid.Background><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/general-taishi-ci.png" Viewbox="0,0,1,0.6" Stretch="UniformToFill" AlignmentY="Top" /></Grid.Background>
                                 <Border Background="{StaticResource CardShade}" /><Border BorderBrush="#6FBB995F" BorderThickness="1" Margin="4" />
                                 <StackPanel VerticalAlignment="Center" Margin="12"><TextBlock Text="演武场" Style="{StaticResource CardTitle}" /><TextBlock Text="2v2 阵营 · 并肩作战" Style="{StaticResource CardCaption}" /></StackPanel>
                                 <TextBlock Text="协 作" FontSize="10" Foreground="#D5BB84" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="22,16,0,0" />
@@ -169,7 +169,7 @@
                         </Button>
                         <Button x:Name="EnterBattleButton" Grid.Column="2" Grid.RowSpan="3" Style="{StaticResource ModeCard}" Command="{Binding OpenLobbyCategoryCommand}" CommandParameter="all" BorderBrush="#E4BC6B" AutomationProperties.Name="进入战场，选择模式与开局设置" TabIndex="0">
                             <Grid ClipToBounds="True">
-                                <Grid.Background><ImageBrush ImageSource="/CardGame.Wpf;component/Assets/lobby-featured-general.png" Stretch="UniformToFill" AlignmentY="Top" /></Grid.Background>
+                                <Grid.Background><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/lobby-featured-general.png" Stretch="UniformToFill" AlignmentY="Top" /></Grid.Background>
                                 <Border><Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0,1"><GradientStop Color="#001B1010" Offset="0.3" /><GradientStop Color="#631B1010" Offset="0.6" /><GradientStop Color="#FA1B1010" Offset="1" /></LinearGradientBrush></Border.Background></Border>
                                 <Border BorderBrush="#9CDDAB62" BorderThickness="1" Margin="5" />
                                 <Border HorizontalAlignment="Left" VerticalAlignment="Top" Background="#CC64271E" BorderBrush="#C6A367" BorderThickness="0,0,1,1" Padding="12,7"><TextBlock Text="群 雄 逐 鹿" Foreground="#FFE2AA" FontSize="12" /></Border>
@@ -182,7 +182,7 @@
                         </Button>
                         <Button x:Name="NationalBattleButton" Grid.Column="4" Grid.Row="0" Style="{StaticResource ModeCard}" Command="{Binding OpenLobbyCategoryCommand}" CommandParameter="national" AutomationProperties.Name="国战场，选择双将试验模式" TabIndex="3">
                             <Grid ClipToBounds="True">
-                                <Grid.Background><ImageBrush ImageSource="/CardGame.Wpf;component/Assets/general-yuan-shao.png" Viewbox="0,0,1,0.6" Stretch="UniformToFill" AlignmentY="Top" /></Grid.Background>
+                                <Grid.Background><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/general-yuan-shao.png" Viewbox="0,0,1,0.6" Stretch="UniformToFill" AlignmentY="Top" /></Grid.Background>
                                 <Border Background="{StaticResource CardShade}" /><Border BorderBrush="#6FBB995F" BorderThickness="1" Margin="4" />
                                 <StackPanel VerticalAlignment="Center" Margin="12"><TextBlock Text="国战场" Style="{StaticResource CardTitle}" /><TextBlock Text="双将暗置 · 魏蜀争锋" Style="{StaticResource CardCaption}" /></StackPanel>
                                 <TextBlock Text="试 验 模 式" FontSize="10" Foreground="#D5BB84" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="22,16,0,0" />
@@ -191,7 +191,7 @@
                         </Button>
                         <Button x:Name="StartTutorialButton" Grid.Column="4" Grid.Row="2" Style="{StaticResource ModeCard}" Command="{Binding StartTutorialCommand}" AutomationProperties.Name="新手演练，学习四步基础操作" TabIndex="4">
                             <Grid ClipToBounds="True">
-                                <Grid.Background><ImageBrush ImageSource="/CardGame.Wpf;component/Assets/general-lu-xun.png" Viewbox="0,0,1,0.6" Stretch="UniformToFill" AlignmentY="Top" /></Grid.Background>
+                                <Grid.Background><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/general-lu-xun.png" Viewbox="0,0,1,0.6" Stretch="UniformToFill" AlignmentY="Top" /></Grid.Background>
                                 <Border Background="{StaticResource CardShade}" /><Border BorderBrush="#6FBB995F" BorderThickness="1" Margin="4" />
                                 <StackPanel VerticalAlignment="Center" Margin="12"><TextBlock x:Name="LobbyTutorialTitle" Text="新手演练" Style="{StaticResource CardTitle}" FontSize="28" /><TextBlock Text="四步入门 · 从容上阵" Style="{StaticResource CardCaption}" /></StackPanel>
                                 <TextBlock Text="初 入 三 国" FontSize="10" Foreground="#D5BB84" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="22,16,0,0" />

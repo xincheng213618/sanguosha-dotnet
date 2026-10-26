@@ -125,7 +125,7 @@
   </Style>
  </UserControl.Resources>
  <Grid Width="1200" Height="750" Background="#211A14">
-  <Image Source="/CardGame.Wpf;component/Assets/shanhe-desk.png" Stretch="Fill" IsHitTestVisible="False"/>
+  <Image Source="pack://siteoforigin:,,,/Assets/shanhe-desk.png" Stretch="Fill" IsHitTestVisible="False"/>
   <Border BorderBrush="#AA8050" BorderThickness="1" Margin="6" IsHitTestVisible="False"/>
   <Grid x:Name="CampaignContent" Margin="22,14,22,16">
    <Grid.Style><Style TargetType="Grid"><Setter Property="IsEnabled" Value="True"/><Style.Triggers><DataTrigger Binding="{Binding Visibility, ElementName=ShanheSetupOverlay}" Value="Visible"><Setter Property="IsEnabled" Value="False"/></DataTrigger><DataTrigger Binding="{Binding Visibility, ElementName=ShanheRulesOverlay}" Value="Visible"><Setter Property="IsEnabled" Value="False"/></DataTrigger><DataTrigger Binding="{Binding IsShanheEncounterPreviewOpen}" Value="True"><Setter Property="IsEnabled" Value="False"/></DataTrigger><DataTrigger Binding="{Binding IsShanheRewardOpen}" Value="True"><Setter Property="IsEnabled" Value="False"/></DataTrigger><DataTrigger Binding="{Binding IsShanheBossRewardOpen}" Value="True"><Setter Property="IsEnabled" Value="False"/></DataTrigger><DataTrigger Binding="{Binding IsShanheSkillReplacementOpen}" Value="True"><Setter Property="IsEnabled" Value="False"/></DataTrigger></Style.Triggers></Style></Grid.Style>
@@ -152,7 +152,7 @@
        <StackPanel><TextBlock Text="{Binding ShanheChapterTitle}" FontFamily="KaiTi" FontSize="23" Foreground="#4B3625"/><TextBlock Text="{Binding ShanheChapterObjectiveText}" FontSize="12" LineHeight="19" Foreground="#715C40" TextWrapping="Wrap" Margin="0,6,0,0" MaxWidth="600" HorizontalAlignment="Left" MaxHeight="43" TextTrimming="CharacterEllipsis"/></StackPanel>
       </Border>
       <Grid x:Name="ShanhePreparationPage" Visibility="{Binding IsShanhePreparation, Converter={StaticResource BoolToVisibility}}">
-       <Image Source="/CardGame.Wpf;component/Assets/shanhe-map.png" Stretch="UniformToFill" IsHitTestVisible="False"/>
+       <Image Source="pack://siteoforigin:,,,/Assets/shanhe-map.png" Stretch="UniformToFill" IsHitTestVisible="False"/>
        <Border Background="#B8EFDFBC" BorderBrush="#9F7C4F" BorderThickness="1" Margin="18,17"/>
        <Grid Margin="53,43,43,38"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="235"/></Grid.ColumnDefinitions>
         <Grid Margin="0,0,28,0"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
@@ -371,7 +371,7 @@
      <Border Width="930" Height="535" BorderBrush="#A09B89" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
       <Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0.8,1"><GradientStop Color="#494B47"/><GradientStop Color="#292B29" Offset="0.48"/><GradientStop Color="#343632" Offset="1"/></LinearGradientBrush></Border.Background>
       <Grid>
-       <Image Source="/CardGame.Wpf;component/Assets/shanhe-desk.png" Stretch="Fill" Opacity="0.06" IsHitTestVisible="False"/>
+       <Image Source="pack://siteoforigin:,,,/Assets/shanhe-desk.png" Stretch="Fill" Opacity="0.06" IsHitTestVisible="False"/>
        <Border BorderBrush="#59726F60" BorderThickness="1" Margin="6" IsHitTestVisible="False"/>
        <Grid Margin="32,23,32,22"><Grid.RowDefinitions><RowDefinition Height="51"/><RowDefinition Height="79"/><RowDefinition Height="39"/><RowDefinition Height="*"/><RowDefinition Height="72"/></Grid.RowDefinitions>
         <TextBlock Text="替 换 技 能" Foreground="#E5DDC4" FontFamily="KaiTi" FontSize="32" TextAlignment="Center" VerticalAlignment="Center"/>

@@ -47,8 +47,8 @@ public sealed partial class MainViewModel
     public bool IsWushuangShopInteractive => _game?.CreateWushuangSnapshot(0)?.CanShop == true;
     public int WushuangShopWindowSeconds => IsWushuangOpening ? 15 : 20;
     public string WushuangCloseText => IsWushuangShopInteractive ? "结束" : "返回";
-    public System.Windows.Media.ImageSource WushuangShopTitleImage => WushuangArt.Get(IsWushuangOpening ? "rg1v1_ttl1.png" : "rg1v1_ttl0.png");
-    public System.Windows.Media.ImageSource WushuangLockImage => WushuangArt.Get(_game?.CreateWushuangSnapshot(0)?.IsLocked == true ? "roguelike1v1_shop_lock.png" : "roguelike1v1_shop_unlock.png");
+    public System.Windows.Media.ImageSource? WushuangShopTitleImage => WushuangArt.Get(IsWushuangOpening ? "rg1v1_ttl1.png" : "rg1v1_ttl0.png");
+    public System.Windows.Media.ImageSource? WushuangLockImage => WushuangArt.Get(_game?.CreateWushuangSnapshot(0)?.IsLocked == true ? "roguelike1v1_shop_lock.png" : "roguelike1v1_shop_unlock.png");
     public string WushuangLockText => _game?.CreateWushuangSnapshot(0)?.IsLocked == true ? "已锁定，下次保留本页" : "锁定本页";
     public string WushuangPromptText => !IsWushuangShopInteractive ? "暂时无法购买商品" : IsWushuangOpening ? "请选择一个初始奖励" : "请选择购买商品";
     public string WushuangTacticsText => _game?.CreateWushuangSnapshot(0) is { } state ? string.Join("　", state.TacticIds.Select(id => WushuangTactics.ById[id].Name)) : string.Empty;
@@ -267,14 +267,14 @@ public sealed record WushuangShopOfferViewModel(string Id, string Name, string D
     public bool IsSkill => SkillId is not null;
     public string PriceText => IsOpening ? "选择" : Cost == 0 ? "免费" : Cost.ToString();
     public string PriceForeground => IsAffordable || IsOpening ? "#F7E8A8" : "#F04436";
-    public System.Windows.Media.ImageSource PurchaseButtonImage => WushuangArt.Get(Cost == 0 && !IsOpening ? "rg1v1_btn_green0.png" : "rg1v1_btn_red0.png");
+    public System.Windows.Media.ImageSource? PurchaseButtonImage => WushuangArt.Get(Cost == 0 && !IsOpening ? "rg1v1_btn_green0.png" : "rg1v1_btn_red0.png");
     public string TypeText => IsTactic ? "战法" : IsSkill ? "技能" : IsEquipment ? "装备" : "卡牌";
     public string DetailText => IsEquipment ? "立即装备\n离开装备区后销毁" : IsCard ? "获得卡牌" : Description;
     public string DisplayName => Name.Replace("传习 · ", "", StringComparison.Ordinal);
-    public System.Windows.Media.ImageSource FrameImage => WushuangArt.Get($"rogue_award_quality_bg_{Math.Clamp(Quality, 1, 4)}.png");
-    public System.Windows.Media.ImageSource NameImage => WushuangArt.Get($"rogue_award_name_bg_{Math.Clamp(Quality, 1, 4)}.png");
-    public System.Windows.Media.ImageSource IconFrameImage => WushuangArt.Get($"rogue_zhanfa_bg_{Math.Clamp(Quality, 1, 4)}.png");
-    public System.Windows.Media.ImageSource TypeImage => WushuangArt.Get($"rogue_award_type_icon_{(IsTactic ? 2 : IsSkill ? 3 : 4)}.png");
+    public System.Windows.Media.ImageSource? FrameImage => WushuangArt.Get($"rogue_award_quality_bg_{Math.Clamp(Quality, 1, 4)}.png");
+    public System.Windows.Media.ImageSource? NameImage => WushuangArt.Get($"rogue_award_name_bg_{Math.Clamp(Quality, 1, 4)}.png");
+    public System.Windows.Media.ImageSource? IconFrameImage => WushuangArt.Get($"rogue_zhanfa_bg_{Math.Clamp(Quality, 1, 4)}.png");
+    public System.Windows.Media.ImageSource? TypeImage => WushuangArt.Get($"rogue_award_type_icon_{(IsTactic ? 2 : IsSkill ? 3 : 4)}.png");
     public System.Windows.Media.ImageSource? Artwork => IsCard ? CardArt.Get(CardKind) : TacticId is { } id ? ShanheArt.Get(id) : null;
 }
 public sealed record WushuangSkillSlotViewModel(string? SkillId, string Name, string Description);
