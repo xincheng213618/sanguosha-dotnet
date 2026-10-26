@@ -19,6 +19,7 @@ public sealed partial class GameEngine
             instance.Program.DamageModifiers.Any(modifier =>
                 modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource &&
                 modifier.Condition is SkillProgramDamageModifierCondition.SourceHandBelowHp or
+                    SkillProgramDamageModifierCondition.SourceHpAtMost or
                     SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan or
                     SkillProgramDamageModifierCondition.SourceRoundIsOdd or
                     SkillProgramDamageModifierCondition.SourceRoundIsEven));

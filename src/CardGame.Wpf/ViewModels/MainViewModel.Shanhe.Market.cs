@@ -47,7 +47,8 @@ public sealed partial class MainViewModel
     public string ShanheMarketRefreshText => _shanheSession?.Snapshot.ShopFreeRefreshRemaining > 0 ? "免费刷新" :
         _shanheSession?.Snapshot.ShopRefreshCost is int cost && cost > 0 ? $"刷新 · {cost} 铜币" : "刷新";
     public string ShanheMarketFreeRefreshRemaining => $"免费刷新：{_shanheSession?.Snapshot.ShopFreeRefreshRemaining ?? 0} 次";
-    public string ShanheMarketPaidRefreshRemaining => $"付费刷新：{_shanheSession?.Snapshot.ShopPaidRefreshRemaining ?? 0} 次";
+    public string ShanheMarketPaidRefreshRemaining => _shanheSession?.Snapshot.ShopPaidRefreshUnlimited == true
+        ? "付费刷新：无限" : $"付费刷新：{_shanheSession?.Snapshot.ShopPaidRefreshRemaining ?? 0} 次";
     public string ShanheMarketRefreshRemaining => IsShanheShopActive
         ? $"{ShanheMarketFreeRefreshRemaining} · {ShanheMarketPaidRefreshRemaining}" : "到达集市后可刷新货品";
     private RelayCommand? _refreshShanheMarketCommand;
@@ -55,7 +56,8 @@ public sealed partial class MainViewModel
     {
         if (_shanheSession is not { } session || !RefreshShanheMarketCommand.CanExecute(null)) return;
         ApplyShanheCommand(new RefreshShanheShopCommand(session.Revision));
-    }, () => IsShanheShopActive && _shanheSession!.Snapshot.ShopRefreshRemaining > 0 &&
+    }, () => IsShanheShopActive &&
+        (_shanheSession!.Snapshot.ShopPaidRefreshUnlimited || _shanheSession.Snapshot.ShopRefreshRemaining > 0) &&
         _shanheSession.Snapshot.Gold >= _shanheSession.Snapshot.ShopRefreshCost && !IsTutorialActive);
     private void RefreshShanheMarketPresentation()
     {

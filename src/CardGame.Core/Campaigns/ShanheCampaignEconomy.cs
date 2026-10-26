@@ -10,7 +10,7 @@ public sealed record ShanheCampaignEconomy(
     int ExtraEliteRareTactics = 0, int ExtraBossEpicSkills = 0, int SkillRewardChoiceCount = 0,
     int FreeShopRefreshes = 0, bool RestockOnPurchase = false,
     int ShopTacticPromotionPercent = 0, int ShopSkillPromotionPercent = 0, int ShopMaterialPromotionPercent = 0,
-    int BattlePrimaryPromotionPercent = 0);
+    int BattlePrimaryPromotionPercent = 0, bool UnlimitedPaidShopRefreshes = false);
 
 public static partial class ShanheCampaignContent
 {

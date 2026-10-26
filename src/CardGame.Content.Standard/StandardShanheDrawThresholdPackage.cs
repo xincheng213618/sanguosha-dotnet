@@ -7,6 +7,7 @@ namespace CardGame.Content.Standard;
 public sealed class StandardShanheDrawThresholdPackage : IGameContentPackage
 {
     public const string ShenlongBaiweiSkillId = "shanhe:current-shenlong-baiwei-2104";
+    public const string ShenlongBaiwei2SkillId = "shanhe:current-shenlong-baiwei-2143";
 
     public static readonly Version CurrentVersion = new(1, 0, 0);
     public PackageManifest Manifest { get; } = new("shanhe-current-draw-threshold", CurrentVersion,
@@ -18,14 +19,19 @@ public sealed class StandardShanheDrawThresholdPackage : IGameContentPackage
           {"id":"{{{ShenlongBaiweiSkillId}}}","revision":1,"triggers":[
             {"id":"ninth-actual-drawn-card","window":"cardsGained","subject":"owner",
              "destinationZones":["hand"],"movementOccurrence":"perBatch","optional":false,
-             "effects":[{"op":"damageRandomEnemyAtDrawThreshold","target":"owner","threshold":9,"amount":1}]}]}
+             "effects":[{"op":"damageRandomEnemyAtDrawThreshold","target":"owner","threshold":9,"amount":1}]}]},
+          {"id":"{{{ShenlongBaiwei2SkillId}}}","revision":1,"triggers":[
+            {"id":"sixth-actual-drawn-card","window":"cardsGained","subject":"owner",
+             "destinationZones":["hand"],"movementOccurrence":"perBatch","optional":false,
+             "effects":[{"op":"damageRandomEnemyAtDrawThreshold","target":"owner","threshold":6,"amount":1}]}]}
         ]}
         """, JsonSerializer.Serialize(new
         {
             schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
             skills = new Dictionary<string, object>
             {
-                [ShenlongBaiweiSkillId] = new { name = "神龙摆尾", description = "你每摸9张牌，对随机敌方造成1点伤害" }
+                [ShenlongBaiweiSkillId] = new { name = "神龙摆尾", description = "你每摸9张牌，对随机敌方造成1点伤害" },
+                [ShenlongBaiwei2SkillId] = new { name = "神龙摆尾Ⅱ", description = "你每摸6张牌，对随机敌方造成1点伤害" }
             }
         })));
 

@@ -9,7 +9,7 @@ public sealed partial class ShanheCampaignSession
         var stock = state.ShopStock.ToList();
         var position = stock.FindIndex(choice => choice.Id == choiceId);
         if (position < 0 || stock[position] is not { RewardId: { } boughtId, LeavesNode: false } bought ||
-            bought.GoldCost == 9999) return state;
+            !HasShopStockPrice(bought)) return state;
 
         var node = _nodes[state.CurrentNodeId!];
         var category = ShopCategory(_rewards[boughtId]);
@@ -17,7 +17,7 @@ public sealed partial class ShanheCampaignSession
                 !state.PurchasedChoiceIds.Contains(choice.Id, StringComparer.Ordinal) && choice.RewardId is not null)
             .Select(choice => RewardAcquisitionIdentity(_rewards[choice.RewardId!])).ToHashSet(StringComparer.Ordinal);
         var candidates = (node.Choices ?? []).Where(choice => choice is { RewardId: not null, LeavesNode: false } &&
-                choice.GoldCost != 9999 && ShopCategory(_rewards[choice.RewardId!]) == category)
+                HasShopStockPrice(choice) && ShopCategory(_rewards[choice.RewardId!]) == category)
             // The shared reward-cap preview bypasses research for earned boss loot;
             // shop candidates must first retain their ordinary unlock and ownership gate.
             .Where(choice => CanReceiveReward(state, _rewards[choice.RewardId!]) &&

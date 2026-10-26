@@ -212,6 +212,7 @@ public sealed partial class GameEngine
     private Func<int, int, int>? CreatePublicSourceOccurrenceDamageBonus(int viewerSeat)
     {
         if (!_contentRegistry.ProgramDependencies.HasSourceDistanceDamageModifiers &&
+            !_contentRegistry.ProgramDependencies.HasSourceHpDamageModifiers &&
             !_contentRegistry.ProgramDependencies.HasSourceRoundDamageModifiers) return null;
         // One detached viewer projection is shared by all candidate estimates.
         // No skill IDs or predicates are added to a player-facing snapshot.
@@ -226,12 +227,15 @@ public sealed partial class GameEngine
                 .SelectMany(instance => instance.Program.DamageModifiers)
                 .Where(modifier => modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource &&
                     modifier.Condition is SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan or
+                        SkillProgramDamageModifierCondition.SourceHpAtMost or
                         SkillProgramDamageModifierCondition.SourceRoundIsOdd or SkillProgramDamageModifierCondition.SourceRoundIsEven)
                 .ToArray();
             var distance = sourceSeat != targetSeat && modifiers.Any(modifier =>
                 modifier.Condition == SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan)
                 ? GetCombatDistance(sourceSeat, targetSeat) : 0;
-            return modifiers.Where(modifier => MatchesPerOccurrenceSourceDamageModifier(modifier, false, 0, 0, distance, _roundNumber))
+            var source = view.Players[sourceSeat];
+            return modifiers.Where(modifier => MatchesPerOccurrenceSourceDamageModifier(modifier,
+                    !source.HpUndefined, source.Hp, 0, distance, _roundNumber))
                 .Sum(modifier => modifier.Amount);
         };
     }

@@ -17,7 +17,7 @@ public sealed partial class ShanheCampaignSession
         IReadOnlyList<ShanheNodeChoiceDefinition> stock, int position, int restockOrdinal = 0)
     {
         var baseline = stock[position];
-        if (baseline.RewardId is not { } id || baseline.LeavesNode || baseline.GoldCost == 9999) return baseline;
+        if (baseline.RewardId is not { } id || baseline.LeavesNode || !HasShopStockPrice(baseline)) return baseline;
         var original = _rewards[id];
         if (original.Rarity is < 1 or >= 4) return baseline;
         var category = ShopCategory(original);
@@ -33,7 +33,7 @@ public sealed partial class ShanheCampaignSession
             .Select(choice => RewardAcquisitionIdentity(_rewards[choice.RewardId!])).ToHashSet(StringComparer.Ordinal);
         var originalIdentity = RewardAcquisitionIdentity(original);
         var candidates = (node.Choices ?? []).Where(choice => choice is { RewardId: not null, LeavesNode: false } &&
-                choice.GoldCost != 9999 && _rewards[choice.RewardId!] is var reward &&
+                HasShopStockPrice(choice) && _rewards[choice.RewardId!] is var reward &&
                 ShopCategory(reward) == category && reward.Rarity > original.Rarity &&
                 RewardAcquisitionIdentity(reward) != originalIdentity &&
                 !occupied.Contains(RewardAcquisitionIdentity(reward)) &&

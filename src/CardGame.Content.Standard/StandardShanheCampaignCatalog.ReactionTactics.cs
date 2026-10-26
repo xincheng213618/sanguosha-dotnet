@@ -161,6 +161,12 @@ public static partial class StandardShanheCampaignCatalog
             "回合外受到伤害一次大于等于3点时，对伤害来源造成等量同属性伤害。", RewardIdOverride: "tactic-pofu-chenzhou-current-2131"),
         new ReactionTacticSource(2104, "神龙摆尾", StandardShanheDrawThresholdPackage.ShenlongBaiweiSkillId, 300, 2, 34,
             "你每摸9张牌，对随机敌方造成1点伤害", RewardIdOverride: "tactic-shenlong-baiwei-current-2104"),
+        new ReactionTacticSource(2143, "神龙摆尾Ⅱ", StandardShanheDrawThresholdPackage.ShenlongBaiwei2SkillId, 500, 3, 77,
+            "你每摸6张牌，对随机敌方造成1点伤害", RewardIdOverride: "tactic-shenlong-baiwei-current-2143"),
+        new ReactionTacticSource(2162, "狂暴", StandardShanheLowHpDamagePackage.KuangbaoSkillId, 300, 2, 45,
+            "体力值小于等于2时，你造成的伤害+1", RewardIdOverride: "tactic-kuangbao-current-2162"),
+        new ReactionTacticSource(2163, "狂暴Ⅱ", StandardShanheLowHpDamagePackage.Kuangbao2SkillId, 500, 3, null,
+            "体力值小于等于3时，你造成的伤害+1", RewardIdOverride: "tactic-kuangbao-current-2163"),
     });
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentReactionTacticShopMetadata =>

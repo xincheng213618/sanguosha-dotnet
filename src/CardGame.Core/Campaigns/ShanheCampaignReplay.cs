@@ -110,11 +110,13 @@ public sealed record ShanheCampaignSnapshot(
         get => _openingSkillOffers;
         init => _openingSkillOffers = ShanheCampaignContent.Freeze(value);
     }
-    /// <summary>Total free and paid refreshes left at the active random shop.</summary>
+    /// <summary>Finite free and paid refreshes left; check ShopPaidRefreshUnlimited for an uncapped paid allowance.</summary>
     public int ShopRefreshRemaining { get; init; }
     /// <summary>Additional free refreshes left, independent from the ordinary or membership paid allowance.</summary>
     public int ShopFreeRefreshRemaining { get; init; }
     public int ShopPaidRefreshRemaining { get; init; }
+    /// <summary>Paid refreshes have no shop quota; every use still requires the published copper cost.</summary>
+    public bool ShopPaidRefreshUnlimited { get; init; }
     public int ShopRefreshCost { get; init; }
     /// <summary>A held tactic replaces purchased products in this active random shop.</summary>
     public bool ShopRestockOnPurchase { get; init; }

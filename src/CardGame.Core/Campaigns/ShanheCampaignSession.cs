@@ -381,7 +381,8 @@ public sealed partial class ShanheCampaignSession
         Require(_options.UseCodexRewardPool && _state.Phase == ShanheCampaignPhase.NodeChoice &&
             _state.CurrentNodeId is { } id && _nodes[id].Kind == ShanheNodeKind.Shop, "There is no refreshable shop.");
         var free = ShopFreeRefreshRemaining(_state) > 0;
-        Require(free || ShopPaidRefreshRemaining(_state) > 0, "This shop has no refreshes remaining.");
+        Require(free || HasUnlimitedPaidShopRefreshes(_state) || ShopPaidRefreshRemaining(_state) > 0,
+            "This shop has no refreshes remaining.");
         var cost = free ? 0 : 100;
         Require(_state.Gold >= cost, "Refreshing this shop costs 100 copper coins.");
         var next = _state with
@@ -516,6 +517,7 @@ public sealed partial class ShanheCampaignSession
             ShopItems = CreateShopItems(state, revision),
             ShopFreeRefreshRemaining = freeRefreshes,
             ShopPaidRefreshRemaining = paidRefreshes,
+            ShopPaidRefreshUnlimited = randomShop && HasUnlimitedPaidShopRefreshes(state),
             ShopRefreshRemaining = checked(freeRefreshes + paidRefreshes),
             ShopRefreshCost = randomShop && freeRefreshes == 0 ? 100 : 0,
             ShopRestockOnPurchase = randomShop && RestocksShopOnPurchase(state),
@@ -589,6 +591,11 @@ public sealed partial class ShanheCampaignSession
     private IReadOnlyList<ShanheNodeChoiceDefinition> NodeStock(RunState state, ShanheNodeDefinition node) =>
         _options.UseCodexRewardPool && node.Kind == ShanheNodeKind.Shop ? state.ShopStock : node.Choices ?? [];
 
+    // Unsupported catalogue placeholders use 9999. Executable economy tactics may
+    // also have that exact authored price, so price alone cannot exclude them.
+    private bool HasShopStockPrice(ShanheNodeChoiceDefinition choice) => choice.GoldCost != 9999 ||
+        choice.RewardId is { } id && _rewards[id].CampaignEconomy is not null;
+
     private enum ShopRewardCategory { Supply, Tactic, Skill, Equipment, Card }
     private static ShopRewardCategory ShopCategory(ShanheRewardDefinition reward) =>
         reward.TacticSkillId is not null || reward.OpeningSkillRewardIds is not null || reward.CampaignEconomy is not null || reward.Bonuses is { } bonus &&
@@ -619,7 +626,7 @@ public sealed partial class ShanheCampaignSession
         var previous = state.ShopStock.Select(choice => choice.RewardId).OfType<string>().ToHashSet(StringComparer.Ordinal);
         foreach (var category in new[] { ShopRewardCategory.Tactic, ShopRewardCategory.Skill, ShopRewardCategory.Equipment, ShopRewardCategory.Card })
         {
-            var pricedRewardIds = (node.Choices ?? []).Where(choice => choice.RewardId is not null && choice.GoldCost != 9999)
+            var pricedRewardIds = (node.Choices ?? []).Where(choice => choice.RewardId is not null && HasShopStockPrice(choice))
                 .Select(choice => choice.RewardId!).ToHashSet(StringComparer.Ordinal);
             var candidates = Definition.Rewards.Where(reward => pricedRewardIds.Contains(reward.Id) &&
                     ShopCategory(reward) == category && CanReceiveReward(state, reward))
@@ -629,7 +636,7 @@ public sealed partial class ShanheCampaignSession
             if (state.ShopRefreshCount > 0) candidates = candidates.OrderBy(reward => previous.Contains(reward.Id)).ToList();
             foreach (var reward in candidates.Take(checked(3 + random.Next(2) + ExtraShopStock(state))))
             {
-                var authored = node.Choices!.First(choice => choice.RewardId == reward.Id && choice.GoldCost != 9999);
+                var authored = node.Choices!.First(choice => choice.RewardId == reward.Id && HasShopStockPrice(choice));
                 stock.Add(new($"$shop:{state.ShopRefreshCount}:{reward.Id}", reward.Name, authored.GoldCost,
                     authored.HpCost, reward.Id, LeavesNode: false) { Description = reward.Description });
             }
