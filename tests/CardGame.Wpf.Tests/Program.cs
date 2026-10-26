@@ -77,6 +77,7 @@ internal static class Program
             Check("Mode rooms UI: selected modes seats AI readiness and quick start", () => LanRoomUiChecks.SelectedModesEnterRooms(output));
             Check("active effect badges restore actual duration and clear consumed facts", () => ActiveEffectUiChecks.LiveEffectsRestoreAndExpire(output));
             Check("Equipment slots UI: abolished slots remain visible and restore", () => EquipmentSlotUiChecks.AbolishedSlotsRemainVisibleAndRestore(output));
+            Check("Shanhe Xingtian artwork: existing face and equipment icon", () => ShanheXingtianArtworkChecks.ExistingAxeAssetsDecodeAndRenderInEquipmentSlot(output));
             Check("table shortcuts execute once per key press and preserve modal drafts", TableShortcutChecks.SinglePressActions);
             Check("table modal focus follows startup and current visible panels", () => ModalFocusChecks.StartupAndModalTransitions(output));
             Check("table overlays cover elevated badges and restore pointer input", () => TableOverlayNavigationChecks.ModalsCoverElevatedBadges(output));

@@ -651,6 +651,8 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe S5 Zhangxiu: native areas paid children and repeated abolished judgment cold", ShanheS5ZhangxiuChecks.XiongluanRealAreaCostsRecoveryChildrenAndAlreadyAbolishedJudgmentCold),
     ("Shanhe S5 Zhangxiu: Leizhen native materials next Slash prediction and unequipped benefit cold", ShanheS5ZhangxiuChecks.LeizhenNativeHandMaterialsThirdSlashNonstackAndUnequippedBenefitCold),
     ("Shanhe S5 Xingtian: native weapon cost all response bans armor and expiry cold", ShanheXingtianChecks.FixedHandRealEquipWeaponCostAndAllResponsesSealOtherSourceArmorUntilActualTurnEndCold),
+    ("Shanhe S5 Xingtian: sealed target no repeated offer other target and next turn cold", ShanheXingtianChecks.RetainedAxeDoesNotReofferSealedTargetButOtherTargetsAndNextTurnRemainLegalCold),
+    ("Shanhe S5 Xingtian forward: sealed target no repeated offer other target and next turn", ShanheXingtianChecks.RetainedAxeDoesNotReofferSealedTargetButOtherTargetsAndNextTurnRemainLegalForward),
     ("Shanhe S5 Xingtian: original special axe retains hand-only and directed armor contract", ShanheXingtianChecks.ExistingSpecialAxeStillOnlyBlocksHandAndHolderArmorBypass),
     ("Shanhe NPC opening: random four plus fixed equipment native cold", ShanheNpcStartingCardChecks.RandomFourPlusFixedEquipmentOrdinaryLifecycleAndRecipeCold),
     ("Shanhe S5 Li Jue: every actual prepare positive random damage and paid child cold", ShanheS5LiJueChecks.EveryActualPreparePositiveRandomDamageAndPaidChildCold),

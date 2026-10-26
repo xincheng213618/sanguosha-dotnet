@@ -16,6 +16,7 @@ public sealed partial class GameEngine
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 59300, SkillProgramEffectOp.ApplyShanheXingtianSeal)]
     private bool CanOfferShanheXingtian(ProgramTriggerLegalityContext gate) => gate.SkillId != ShanheXingtianSkill ||
+        gate.WindowContext is { TargetSeat: { } target } && !HasShanheXingtianSeal(target) &&
         GetEquipment(_players[gate.OwnerSeat]).Any(c => c.Kind == CardKind.ShanheXingtianAxe &&
             IsActiveProgramSourceEquipmentCard(gate.OwnerSeat, gate.SkillId, gate.Candidate.SkillInstanceId, c)) &&
         _cardZones.CardsAt(CardLocation.Hand(gate.OwnerSeat)).Count + GetEquipment(_players[gate.OwnerSeat]).Count >= 2;

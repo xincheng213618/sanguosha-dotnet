@@ -12,6 +12,72 @@ internal static class ShanheXingtianChecks
         Equip = "fixture:shanhe-axe-equip", EquipmentDodge = "fixture:shanhe-axe-equipment-dodge",
         React = "fixture:shanhe-axe-other-source", Watch = "fixture:shanhe-axe-paid-watch", Deck = "fixture:shanhe-axe-deck";
 
+    public static void RetainedAxeDoesNotReofferSealedTargetButOtherTargetsAndNextTurnRemainLegalCold()
+        => VerifyRetainedAxeTargetAndTurnEligibility(restoreAtBoundaries: true);
+
+    public static void RetainedAxeDoesNotReofferSealedTargetButOtherTargetsAndNextTurnRemainLegalForward()
+        => VerifyRetainedAxeTargetAndTurnEligibility(restoreAtBoundaries: false);
+
+    private static void VerifyRetainedAxeTargetAndTurnEligibility(bool restoreAtBoundaries)
+    {
+        var s = Scene.Start(extra:
+        [new(CardKind.ThunderSlash, Suit.Spade, 6), new(CardKind.Slash, Suit.Club, 10),
+         new(CardKind.Peach, Suit.Heart, 5), new(CardKind.Peach, Suit.Heart, 6),
+         new(CardKind.Peach, Suit.Heart, 7), new(CardKind.Peach, Suit.Heart, 8)]);
+        s.Play();
+        s.Card(CardKind.ShanheXingtianAxe, []); s.Play();
+        var weapon = s.V(0).Equipment.Single(card => card.Kind == CardKind.ShanheXingtianAxe).Id;
+        s.Card(CardKind.IronChain, [1]); s.Offer(Axe);
+        if (restoreAtBoundaries) s.Cold();
+        s.Activate();
+        s.Pay(s.V(0).Hand.Where(card => card.Kind == CardKind.Peach).Take(2).Select(card => card.Id).ToArray());
+        s.Play();
+        if (restoreAtBoundaries) s.Cold();
+        var turn = s.G.State.TurnNumber;
+        var firstInvoices = s.E<NativeLogicalDiscardInvocationRecordedEvent>().Count(IsAxePayment);
+        var firstSeals = s.E<CardTargetRestrictionGrantedEvent>().Where(IsAxeSeal).ToArray();
+        s.Need(firstInvoices == 1 && firstSeals.Length == 2 && firstSeals.All(e => e.Restriction.TargetSeat == 1) &&
+            s.V(0).Equipment.Any(card => card.Id == weapon) && s.Forbidden(1, CardKind.Dodge, CardActionType.Response),
+            "One actual two-hand-card payment applies both seals while the same original axe remains equipped.");
+
+        foreach (var kind in new[] { CardKind.Slash, CardKind.ThunderSlash, CardKind.Slash })
+        {
+            var hp = s.V(1).Hp;
+            s.Card(kind, [1]); s.PlayWithoutAxeOffer();
+            s.Need(s.G.State.TurnNumber == turn && s.V(1).Hp == hp - 1 &&
+                s.E<NativeLogicalDiscardInvocationRecordedEvent>().Count(IsAxePayment) == firstInvoices &&
+                s.E<CardTargetRestrictionGrantedEvent>().Count(IsAxeSeal) == firstSeals.Length,
+                "Later actual normal and elemental Slashes against the already sealed target resolve without another axe offer, payment or duplicate grant.");
+            if (restoreAtBoundaries) s.Cold();
+        }
+
+        s.Card(CardKind.Slash, [3]); s.Offer(Axe); s.Activate();
+        s.Pay(s.V(0).Hand.Where(card => card.Kind == CardKind.Peach).Take(2).Select(card => card.Id).ToArray(), targetSeat: 3);
+        s.Play();
+        if (restoreAtBoundaries) s.Cold();
+        s.Need(s.G.State.TurnNumber == turn && s.E<NativeLogicalDiscardInvocationRecordedEvent>().Count(IsAxePayment) == 2 &&
+            s.E<CardTargetRestrictionGrantedEvent>().Count(e => IsAxeSeal(e) && e.Restriction.TargetSeat == 3) == 2 &&
+            s.Forbidden(1, CardKind.Dodge, CardActionType.Response) && s.Forbidden(3, CardKind.Dodge, CardActionType.Response),
+            "A different actual target can still receive its own paid seal in the same turn; there is no invented global once-per-turn quota.");
+
+        s.End(); s.Play();
+        s.Need(s.G.State.TurnNumber > turn && !s.Forbidden(1, CardKind.Dodge, CardActionType.Response) &&
+            !s.Forbidden(3, CardKind.Dodge, CardActionType.Response), "Both target seals expire at their real original-turn boundary.");
+        s.Card(CardKind.Slash, [1]); s.Offer(Axe);
+        if (restoreAtBoundaries) s.Cold();
+        s.Activate();
+        s.Pay(s.V(0).Hand.Where(card => card.Kind == CardKind.Peach).Take(2).Select(card => card.Id).ToArray());
+        s.Play();
+        if (restoreAtBoundaries) s.Cold();
+        s.Need(s.E<NativeLogicalDiscardInvocationRecordedEvent>().Count(IsAxePayment) == 3 &&
+            s.E<CardTargetRestrictionGrantedEvent>().Count(e => IsAxeSeal(e) && e.Restriction.TargetSeat == 1) == 4,
+            "After expiry the original target may be paid and sealed again in a later real turn.");
+
+        static bool IsAxePayment(NativeLogicalDiscardInvocationRecordedEvent e) => e.ActualCount == 2 &&
+            e.Reason.Value == $"skill-program.{Axe}.MoveBoundCards";
+        static bool IsAxeSeal(CardTargetRestrictionGrantedEvent e) => e.Restriction.Source.SkillId == Axe;
+    }
+
     public static void FixedHandRealEquipWeaponCostAndAllResponsesSealOtherSourceArmorUntilActualTurnEndCold()
     {
         var s = Scene.Start(); s.Play();
@@ -137,6 +203,17 @@ internal static class ShanheXingtianChecks
         public void Continue() => Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
         public void End() => Accept(new EndPlayPhaseCommand(0, G.Revision, P!.PromptId));
         public void Play() => Reach(() => P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
+        public void PlayWithoutAxeOffer()
+        {
+            for (var step = 0; step < 160; step++)
+            {
+                if (P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard }) return;
+                Need(P?.SkillPrompt?.SkillId != Axe, "An already sealed target must not publish another S5 axe prompt.");
+                Need(P?.PlayerSeat != 0, "The sealed-target use must resolve without unexpected player input.");
+                Accept(new AdvanceOneStepCommand(G.Revision));
+            }
+            Need(false, "The actual sealed-target card use did not reach its completed play boundary.");
+        }
         public void DodgePrompt() => Reach(() => P is { PlayerSeat: 1, Kind: DecisionKind.RespondDodge });
         public void Offer(string id) => Reach(() => P?.SkillPrompt?.SkillId == id && P.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
         public void Card(CardKind kind, int[] targets)
@@ -145,15 +222,15 @@ internal static class ShanheXingtianChecks
             var a = G.GetHumanLegalActions().First(a => a.CardId is { } id && ids.Contains(id) && a.ConversionSource is null && a.TargetSeats.SequenceEqual(targets) && a.Kind != LegalActionKind.Recast);
             Accept(new PlayCardCommand(0, a.CardId!.Value, a.TargetSeats, G.Revision, P!.PromptId, a.PlayedCardKind, a.TargetCardId));
         }
-        public void Pay(IReadOnlyList<int> ids)
+        public void Pay(IReadOnlyList<int> ids, int targetSeat = 1)
         {
             foreach (var id in ids)
             {
                 Reach(() => P?.Choices.Any(c => c.Cards.SequenceEqual([id]) ||
-                    c.Parameters.GetValueOrDefault("program-action") == "select-target" && c.Targets.SequenceEqual([1])) == true);
+                    c.Parameters.GetValueOrDefault("program-action") == "select-target" && c.Targets.SequenceEqual([targetSeat])) == true);
                 if (P!.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "select-target"))
                 {
-                    Answer(c => c.Parameters.GetValueOrDefault("program-action") == "select-target" && c.Targets.SequenceEqual([1]));
+                    Answer(c => c.Parameters.GetValueOrDefault("program-action") == "select-target" && c.Targets.SequenceEqual([targetSeat]));
                     Reach(() => P?.Choices.Any(c => c.Cards.SequenceEqual([id])) == true);
                 }
                 Answer(c => c.Cards.SequenceEqual([id]));
@@ -190,13 +267,13 @@ internal static class ShanheXingtianChecks
         { if (!ok) throw new InvalidOperationException(why + JsonSerializer.Serialize(new { G.State.TurnNumber, G.State.CurrentSeat, P,
             Players = Enumerable.Range(0, 4).Select(V), Frames = G.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())),
             Last = G.Events.TakeLast(10).Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())) })); }
-        public static Scene Start(bool old = false)
+        public static Scene Start(bool old = false, IReadOnlyList<ShanheStartingCard>? extra = null)
         {
             var registry = ComposedSkillContentRegistry.CreateShowcase(additionalPackages: [new StandardShanheXingtianPackage(), new Fixture()]);
             var setup = new ShanheBattleSetup(31, 1, "fixture-shanhe-axe", Actor, 8, 0, 0, 0, 3, [],
                 [new(old ? CardKind.XingtianAxe : CardKind.ShanheXingtianAxe, Suit.Spade, 2), new(CardKind.IronChain, Suit.Club, 12),
                  new(CardKind.Slash, Suit.Heart, 7), new(CardKind.Slash, Suit.Club, 8), new(CardKind.Slash, Suit.Heart, 9),
-                 new(CardKind.Peach, Suit.Heart, 2), new(CardKind.Peach, Suit.Heart, 3), new(CardKind.Peach, Suit.Heart, 4)], [],
+                 new(CardKind.Peach, Suit.Heart, 2), new(CardKind.Peach, Suit.Heart, 3), new(CardKind.Peach, Suit.Heart, 4), .. (extra ?? [])], [],
                 [new(Target) { StartingHand = [new(CardKind.Dodge, Suit.Heart, 2)] }, new(Reactor) { StartingHand = [] },
                  new(Peer) { StartingHand = [] }], [], new string('c', 64));
             var g = GameEngine.CreateStandard(new GameOptions

@@ -604,6 +604,7 @@
     {
       "kind": "XingtianAxe",
       "file": "XingtianAxe.png",
+      "runtimeKinds": ["XingtianAxe", "ShanheXingtianAxe"],
       "sourceKind": "officialCardFace",
       "source": {
         "pageUrl": "https://www.sanguosha.com/news/20221206_3507_5113",
@@ -1916,6 +1917,7 @@
       "key": "equipment:XingtianAxe",
       "frame": "Equip_XingTianPoJunFu_S.png",
       "file": "equip-XingtianAxe.png",
+      "runtimeKinds": ["XingtianAxe", "ShanheXingtianAxe"],
       "rectangle": [
         3470,
         352,
