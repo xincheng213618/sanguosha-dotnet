@@ -1,0 +1,29 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:liu-bei",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 85599,
+      "pools": {
+        "current": 85599
+      },
+      "definition": {
+        "id": "mobile:liu-bei",
+        "name": "刘备·移动版",
+        "portraitKey": "mobile-liu-bei",
+        "skillId": "classic:rende",
+        "additionalSkillIds": [
+          "boundary:jijiang-mobile"
+        ],
+        "factionId": "shu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:liu-bei",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

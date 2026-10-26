@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:jieyin",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "discard-two-heal-pair",
+          "minCards": 2,
+          "maxCards": 2,
+          "sourceZones": [
+            "hand"
+          ],
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherWoundedMale",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "discardSelected",
+              "target": "owner",
+              "amount": 2
+            },
+            {
+              "op": "recover",
+              "target": "owner",
+              "amount": 1
+            },
+            {
+              "op": "recover",
+              "target": "selectedTarget",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

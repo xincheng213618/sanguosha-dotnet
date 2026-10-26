@@ -29,6 +29,7 @@ internal interface IProgramPaidCardFacts : IProgramSelectionQuery
     bool IsSatisfiedOwnHandReward(ProgramSkillFrame frame, SkillProgramEffect effect);
     bool ForeignDiscardPrevented(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent);
     bool SelfDiscardForbidden(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent);
+    bool AllowsOwnedCardPayment(ProgramSkillFrame frame, CardLocation source, Card card);
     bool IsActiveSourceEquipment(int owner, string skillId, string instanceId, Card card);
     bool IsZixiJudgment(int cardId);
     bool CanTransferZixiJudgment(Card card, int destinationSeat);
@@ -123,6 +124,8 @@ public sealed partial class GameEngine
             engine.IsForeignEquipmentDiscardPrevented(chooser, card, source, intent);
         public bool SelfDiscardForbidden(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent) =>
             engine.IsSelfHandCategoryDiscardForbidden(chooser, card, source, intent);
+        public bool AllowsOwnedCardPayment(ProgramSkillFrame frame, CardLocation source, Card card) =>
+            engine.AllowsPostCostSlashRedirectPayment(frame, source, card);
         public bool IsActiveSourceEquipment(int owner, string skillId, string instanceId, Card card) =>
             engine.IsActiveProgramSourceEquipmentCard(owner, skillId, instanceId, card);
         public bool IsZixiJudgment(int cardId) => engine.IsZixiQinJudgmentCard(cardId);

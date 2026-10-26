@@ -24087,6 +24087,108 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-da-qiao",
+      "characterName": "大乔",
+      "defaultSkinId": "1300",
+      "skins": [
+        {
+          "id": "1300",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-13.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/1300.jpg",
+          "sha256": "2bfb5bd78d6aea0f62ab2575a05f414b6fe5212ece55910ce9793175d31f5f34",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-da-qiao.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-sun-shangxiang",
+      "characterName": "孙尚香",
+      "defaultSkinId": "2500",
+      "skins": [
+        {
+          "id": "2500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-25.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/2500.jpg",
+          "sha256": "a89abee18863990d89f1b99d19595a62808e60fed32a8a4399b25db2c91d3444",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-sun-shangxiang.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-diao-chan",
+      "characterName": "貂蝉",
+      "defaultSkinId": "2400",
+      "skins": [
+        {
+          "id": "2400",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-24.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/2400.jpg",
+          "sha256": "bb11762e0fdcb7aaa9e9f75e73f34e0471d26396daba5061d4608716099c375a",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-diao-chan.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-xiahou-dun",
+      "characterName": "夏侯惇",
+      "defaultSkinId": "1700",
+      "skins": [
+        {
+          "id": "1700",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-17.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/1700.jpg",
+          "sha256": "544f924281b0da405534480a31be0932eea44ddcae9f73bd0935b513f6f4eb6b",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-xiahou-dun.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhuge-liang",
+      "characterName": "诸葛亮",
+      "defaultSkinId": "400",
+      "skins": [
+        {
+          "id": "400",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-4.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/400.jpg",
+          "sha256": "9290a6721de0655e5e54977f84e96469f95d1c3e29e73ab3df44b188fd7ea485",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhuge-liang.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-liu-bei",
+      "characterName": "刘备",
+      "defaultSkinId": "100101",
+      "skins": [
+        {
+          "id": "100101",
+          "name": "经典形象*刘备",
+          "sourcePage": "https://x.sanguosha.com/hero/1.html",
+          "imageUrl": "https://web.sanguosha.com/10/pc/res/assets/runtime/general/big/static/100101.png",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-liu-bei.png",
+          "sha256": "36f69370df66b197265b8903272704a2a176f28d03897e5f7576068b6a089dc0",
+          "pixelWidth": 574,
+          "pixelHeight": 761
+        }
+      ]
     }
   ]
 }

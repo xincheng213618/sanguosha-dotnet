@@ -1,0 +1,9 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:da-qiao",
+  "skills": [{ "registrationOrder": 85100, "programBundle": "mobile-da-qiao", "includeProgramPresentation": true,
+    "definition": { "id": "mobile:liuli", "name": "流离", "description": "当你成为其他角色使用【杀】的目标时，你可以弃置一张牌，将此【杀】转移给你攻击范围内的另一名其他角色。", "executionForms": "Trigger" } }],
+  "generals": [{ "registrationOrder": 85199, "pools": { "current": 85199 }, "definition": {
+    "id": "mobile:da-qiao", "name": "大乔·移动版", "portraitKey": "mobile-da-qiao", "skillId": "classic:guose",
+    "additionalSkillIds": ["mobile:liuli"], "factionId": "wu", "baseHp": 3, "gender": "Female",
+    "characterId": "character:da-qiao", "variantId": "mobile", "rulesetId": "sanguosha-mobile" } }]
+}

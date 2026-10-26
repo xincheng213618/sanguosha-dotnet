@@ -2990,6 +2990,8 @@ public sealed partial class SkillProgramEffect
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? AvailableAtSourceOnly { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? SlashRedirectPostCostRange { get; internal init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? OwnerBind { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? ChooserBind { get; internal init; }

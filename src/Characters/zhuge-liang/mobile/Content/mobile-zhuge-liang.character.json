@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhuge-liang",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 85699,
+      "pools": { "current": 85699 },
+      "definition": {
+        "id": "mobile:zhuge-liang",
+        "name": "诸葛亮·移动版",
+        "portraitKey": "mobile-zhuge-liang",
+        "skillId": "classic:guanxing",
+        "additionalSkillIds": ["classic:kongcheng"],
+        "factionId": "shu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:zhuge-liang",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

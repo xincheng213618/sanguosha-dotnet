@@ -1666,6 +1666,8 @@ var tests = new (string Name, Action Body)[]
     ("response use completion Dodge dying rescue exact parent", ResponseUseCompletionChecks.DodgeCompletionDyingRescueRetainsExactParent),
     ("response use completion excludes group response and wrong loader window", ResponseUseCompletionChecks.GroupDodgeStaysResponseOnlyAndLoaderRejectsWrongWindow),
     ("Fame 2017 Xu Shi foreign equipment AI replay", Fame2017XuShiChecks.ForeignEquipmentGiftAndAiReplay),
+    ("Mobile Da Qiao: equipment cost target pairs native paid cold", MobileDaQiaoChecks.EquipmentCostTargetPairsAndNativePaidCold),
+    ("Mobile Da Qiao: original Slash distance exemption does not expand owner range", MobileDaQiaoChecks.OriginalSlashDistanceExemptionDoesNotExpandOwnerRange),
     ("Mobile Lu Meng: before-entry discard choice cold decline and classic default", MobileLuMengChecks.BeforeEntrySkipDiscardedSlashChoiceColdAndDecline),
     ("Mobile Lu Meng: used extra Play Slash and played Duel Slash disable skip", MobileLuMengChecks.UsedSlashInExtraPlayAndPlayedDuelSlashDisableSkip),
     ("Mobile Xu Chu: foreign Duel damage-source bonus expires at actual turn end", MobileXuChuChecks.ForeignDuelDamageSourceBonusExpiresAtActualTurnEnd),

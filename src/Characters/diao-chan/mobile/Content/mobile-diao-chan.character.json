@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:diao-chan",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 85399,
+      "pools": { "current": 85399 },
+      "definition": {
+        "id": "mobile:diao-chan",
+        "name": "貂蝉·移动版",
+        "portraitKey": "mobile-diao-chan",
+        "skillId": "boundary:lijian-mobile",
+        "additionalSkillIds": ["classic:biyue"],
+        "factionId": "qun",
+        "baseHp": 3,
+        "gender": "Female",
+        "characterId": "character:diao-chan",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

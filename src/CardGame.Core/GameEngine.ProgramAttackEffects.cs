@@ -2,8 +2,26 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
-    private bool IsProgramSlashRedirectTarget(CardAttackHandle attack, int redirectorSeat, int targetSeat)
+    private bool IsProgramSlashRedirectBaseTarget(CardAttackHandle attack, int redirectorSeat, int targetSeat)
     {
+        if (attack.TargetSeat != redirectorSeat ||
+            !_players[redirectorSeat].IsAlive || !_players[targetSeat].IsAlive ||
+            targetSeat == redirectorSeat || targetSeat == attack.SourceSeat)
+            return false;
+        var kind = attack.EffectiveCardKind ?? CardKind.Slash;
+        return (ActiveFangtianHalberd is null ||
+                !_resolutionStack.OfType<CardUseFrame>()
+                    .Single(frame => frame.Id == attack.ResolutionId).TargetSeats.Contains(targetSeat)) &&
+               !IsDirectedCardTargetProhibited(attack.SourceSeat, targetSeat, kind, attack.ResolutionId) &&
+               !IsSlashProhibited(_players[targetSeat]);
+    }
+
+    private bool IsProgramSlashRedirectTarget(CardAttackHandle attack, int redirectorSeat, int targetSeat,
+        bool paymentCompleted = false)
+    {
+        if (PostCostSlashRedirectFrame(attack, redirectorSeat) is { } frame)
+            return paymentCompleted ? IsPostCostSlashRedirectTarget(attack, redirectorSeat, targetSeat, null) :
+                HasPostCostSlashRedirectPayment(frame, attack, targetSeat);
         if (attack.TargetSeat != redirectorSeat ||
             !_players[redirectorSeat].IsAlive || !_players[targetSeat].IsAlive ||
             targetSeat == redirectorSeat || targetSeat == attack.SourceSeat)
@@ -64,9 +82,15 @@ public sealed partial class GameEngine
         var attack = ProgramCardAttack ?? throw new InvalidOperationException(
             "Attack redirection requires the active Slash.");
         if (frame.WindowContext?.Window != SkillProgramTriggerWindow.SlashTargetRedirecting ||
-            !SameAttackOwner(ActiveCardAttack, attack) || frame.OwnerSeat != attack.TargetSeat ||
-            !IsProgramSlashRedirectTarget(attack, frame.OwnerSeat, targetSeat))
+            !SameAttackOwner(ActiveCardAttack, attack) || frame.OwnerSeat != attack.TargetSeat)
             throw new InvalidOperationException("Attack redirection lost its frozen legal target.");
+        if (!IsProgramSlashRedirectTarget(attack, frame.OwnerSeat, targetSeat, paymentCompleted: true))
+        {
+            if (PostCostSlashRedirectFrame(attack, frame.OwnerSeat)?.Id != frame.Id)
+                throw new InvalidOperationException("Attack redirection lost its frozen legal target.");
+            CancelProgramBindingAndCleanup(frame, "已付弃牌的原流离目标不再合法，取消转移并返回原杀。");
+            return;
+        }
         var previousSeat = attack.TargetSeat;
         attack.SetDamageParticipants(attack.SourceSeat, targetSeat);
         attack.SetIgnoresArmor(

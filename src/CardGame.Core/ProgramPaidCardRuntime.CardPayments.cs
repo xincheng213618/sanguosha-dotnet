@@ -132,6 +132,7 @@ internal sealed partial class ProgramPaidCardRuntime
             {
                 if (_facts.ForeignDiscardPrevented(chooserSeat, cards[slot],
                         new CardLocation(zone, cardOwnerSeat), intent)) continue;
+                if (!_facts.AllowsOwnedCardPayment(frame, new CardLocation(zone, cardOwnerSeat), cards[slot])) continue;
                 if (cardCategories is { Count: > 0 } && !MatchesProgramCardCategory(cards[slot].Kind, cardCategories))
                     continue;
                 if (cardKinds is { Count: > 0 } && !ProgramCardKindMatch.Contains(cardKinds, cards[slot].Kind))
@@ -203,6 +204,12 @@ internal sealed partial class ProgramPaidCardRuntime
             return;
         }
         var card = cards[slot];
+        if (!_facts.AllowsOwnedCardPayment(frame, new CardLocation(zone, ownerSeat), card))
+        {
+            _prompts.Clear();
+            _operations.Cancel(frame, "所选弃牌已不能维持原流离目标的实际攻击范围，技能结算取消。");
+            return;
+        }
         if (effect.Destination == SkillProgramCardDestination.DiscardPile &&
             _facts.ForeignDiscardPrevented(chooserSeat, card, new CardLocation(zone, ownerSeat), OwnedCardMoveIntent.Discard))
         {
