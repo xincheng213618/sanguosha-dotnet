@@ -131,14 +131,8 @@ public sealed partial class GameEngine
             var grant = CommitProgramExplicitSkillSource(program, new(id, skill, id, "campaign:shanhe"), revoked);
             newInstances.Add(grant.SkillInstanceId);
         }
-        var definition = _options.ShanheBattle!.MarketSetup!.Definition;
-        var boss = _options.ShanheBattle.MarketSetup.BossBattle;
-        var desired = _shanheMarket!.Snapshot.TacticIds.Select(id => definition.Rewards.Single(r => r.Id == id))
-            .SelectMany(r => new[] { !r.BossBattleOnly || boss ? r.TacticSkillId : null,
-                r.CampaignEconomy is { BattleSkillId: { } battleSkill, GoldAbove: { } threshold } &&
-                _options.ShanheBattle.MarketSetup.State.Gold > threshold ? battleSkill : null }.OfType<string>())
-            .Concat(_shanheMarket.GetSchoolProgress().Where(progress => progress.IsComplete)
-                .Select(progress => ShanheSchoolEffects.SkillId(progress.School)).OfType<string>())
+        var setup = _options.ShanheBattle!.MarketSetup!;
+        var desired = _shanheMarket!.GetBattleTacticSkills(setup.State.Gold, setup.BossBattle)
             .GroupBy(id => id, StringComparer.Ordinal).ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
         var existing = owner.SkillGrants.Grants.Where(g => g.SourceId == "campaign:shanhe-tactic")
             .GroupBy(g => g.SkillId).ToDictionary(g => g.Key, g => g.OrderBy(x => x.GrantId, StringComparer.Ordinal).ToArray(), StringComparer.Ordinal);

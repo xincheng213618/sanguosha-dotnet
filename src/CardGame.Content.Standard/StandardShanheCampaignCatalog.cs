@@ -223,6 +223,8 @@ public static partial class StandardShanheCampaignCatalog
         var miaoshouTactic = RequiresCurrentMiaoshouRegistry(requirements);
         var lateRoundTactics = RequiresCurrentLateRoundTacticsRegistry(requirements);
         var teamHealthTactic = RequiresCurrentTeamHealthRegistry(requirements);
+        var wineTactics = RequiresCurrentWineTacticsRegistry(requirements);
+        var zuiquanTactic = RequiresCurrentZuiquanRegistry(requirements);
         var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
@@ -338,6 +340,8 @@ public static partial class StandardShanheCampaignCatalog
             (miaoshouTactic ? "/current-miaoshou" : "") +
             (lateRoundTactics ? "/current-late-round-tactics" : "") +
             (teamHealthTactic ? "/current-team-health" : "") +
+            (wineTactics ? "/current-wine-tactics" : "") +
+            (zuiquanTactic ? "/current-zuiquan-2001" : "") +
             (wealthTactics ? "/current-wealth-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
@@ -409,6 +413,8 @@ public static partial class StandardShanheCampaignCatalog
             if (miaoshouTactic) packages.Add(new StandardShanheMiaoshouPackage());
             if (lateRoundTactics) packages.Add(new StandardShanheLateRoundTacticsPackage());
             if (teamHealthTactic) packages.Add(new StandardShanheTeamHealthPackage());
+            if (wineTactics) packages.Add(new StandardShanheWineTacticsPackage());
+            if (zuiquanTactic) packages.Add(new StandardShanheZuiquanPackage());
             if (reactionTactics)
             {
                 packages.Add(new StandardShanheArmorTacticsPackage());

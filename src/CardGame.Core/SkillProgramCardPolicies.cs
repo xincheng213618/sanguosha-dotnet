@@ -34,6 +34,7 @@ public enum SkillProgramCardPolicyKind
     SlashMustTargetOverHpHandOwner = 5744,
     IgnoreUseDistanceBeforeDealingDamage = 3800,
     UnlimitedAlcoholUse = 3900,
+    AdditionalAlcoholUses = 3901,
     SuppressOthersNonLockedDuringDying = 4000, ExclusiveTurnPeachUse = 4001, ProhibitBlackTrickTarget = 4002,
     PindianOpponentRandomHand = 3100,
     PindianMaximumSlashClaim = 3101,

@@ -3995,6 +3995,11 @@ public sealed class SkillProgramCatalog
             if (requiredKinds.Count != 0 || value is not (0 or 1))
                 Fail(path, "other-response prohibition requires value 0 (all others) or 1 (distance one) and no response kinds");
         }
+        else if (kind == SkillProgramCardPolicyKind.AdditionalAlcoholUses)
+        {
+            if (requiredKinds.Count != 0 || value is < 1 or > 20)
+                Fail(path, "Additional Alcohol uses require a bounded positive quota and no response kinds.");
+        }
         else if (kind is not (SkillProgramCardPolicyKind.PindianRankBySuit or SkillProgramCardPolicyKind.PindianRankBonus) && (requiredKinds.Count != 0 || value != 0))
             Fail(path, "requiredCardKinds and value require a minimum response count policy");
         if (kind is SkillProgramCardPolicyKind.SlashMustTargetOverHpHandOwner or SkillProgramCardPolicyKind.ProhibitOthersResponse or SkillProgramCardPolicyKind.XiaHuiBlackHandAndGainedEntityRestrictions or SkillProgramCardPolicyKind.StopUsingAfterTrickOrHpCount or SkillProgramCardPolicyKind.RoundGainedOtherSourceUse or SkillProgramCardPolicyKind.DistanceOneToNotHigherHp or SkillProgramCardPolicyKind.SlashExtraTargetsByLostHp or SkillProgramCardPolicyKind.ClaimedEntitiesFaceDownUse or SkillProgramCardPolicyKind.SuppressOthersNonLockedDuringDying or SkillProgramCardPolicyKind.ProhibitBlackTrickTarget or SkillProgramCardPolicyKind.PreventForeignEquipmentDiscard or SkillProgramCardPolicyKind.OfferSkipDiscard or SkillProgramCardPolicyKind.DrawFromBottom or
@@ -4055,6 +4060,11 @@ public sealed class SkillProgramCatalog
             (!cardKinds.SequenceEqual([CardKind.Alcohol]) || requiredKinds.Count != 0 || value != 0 ||
              inputSuit is not null || outputSuit is not null))
             Fail(path, "Unlimited Alcohol requires only Alcohol effective kind and no response, suit or numeric value.");
+        if (kind == SkillProgramCardPolicyKind.AdditionalAlcoholUses &&
+            (!cardKinds.SequenceEqual([CardKind.Alcohol]) || requiredKinds.Count != 0 || value is < 1 or > 20 ||
+             inputSuit is not null || outputSuit is not null || factionId is not null || ownerRole is not null ||
+             OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
+            Fail(path, "Additional Alcohol uses require exactly Alcohol, a bounded positive quota and no other qualifiers.");
         if (kind is SkillProgramCardPolicyKind.AlcoholKingIdentityRank or SkillProgramCardPolicyKind.ForeignTurnAlcoholUseProhibition &&
             (!cardKinds.SequenceEqual([CardKind.Alcohol]) || requiredKinds.Count != 0 || value != 0 || inputSuit is not null || outputSuit is not null ||
              factionId is not null || ownerRole is not null || OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))

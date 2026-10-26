@@ -37,6 +37,8 @@ public static partial class StandardShanheCampaignCatalog
             .Concat(CurrentBuildSkillDefaultUnlockedRewardIds)
             .Concat(CurrentMiaoshouDefaultUnlockedRewardIds)
             .Concat(CurrentLateRoundTacticDefaultUnlockedRewardIds)
+            .Concat(CurrentWineTacticDefaultUnlockedRewardIds)
+            .Concat(CurrentZuiquanDefaultUnlockedRewardIds)
             .Append("tactic-duijia-2026")
             .Concat(StandardShanheOriginalSkills.DefaultStockRewardIds)
             .Concat(CurrentReactionTacticDefaultUnlockedRewardIds)
@@ -171,6 +173,8 @@ public static partial class StandardShanheCampaignCatalog
                 .Concat(CurrentMiaoshouShopMetadata)
                 .Concat(CurrentLateRoundTacticShopMetadata)
                 .Concat(CurrentTeamHealthShopMetadata)
+                .Concat(CurrentWineTacticShopMetadata)
+                .Concat(CurrentZuiquanShopMetadata)
                 .Concat(CurrentReactionTacticShopMetadata)
                 .Concat(CurrentShopCardMetadata)
                 .Concat(CurrentEconomyTactics.Select(source => new KeyValuePair<string, ShanheShopMetadata>(source.RewardId,

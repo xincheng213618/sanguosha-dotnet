@@ -287,7 +287,7 @@ public sealed partial class ShanheCampaignSession
             rebirthAvailable ? ShanheCampaignContent.Freeze(state.ExtraSkillIds.Append(ShanheGeneralRanks.RebirthSkillId)) : state.ExtraSkillIds,
             state.StartingCards, state.StartingEquipment, encounter.Enemies, encounter.Allies ?? [], ContentHash)
         {
-            TacticSkillIds = BattleTacticSkills(state, node.Kind),
+            TacticSkillIds = BattleTacticSkills(state, state.Gold, node.Kind == ShanheNodeKind.BossBattle),
             ActiveSchoolIds = ShanheCampaignContent.Freeze(SchoolProgress(state).Where(p => p.IsComplete).Select(p => p.School.Id)),
             DefaultGodFactionId = Definition.DefaultGodFactionId,
             PlayerRank = _options.PlayerRank,

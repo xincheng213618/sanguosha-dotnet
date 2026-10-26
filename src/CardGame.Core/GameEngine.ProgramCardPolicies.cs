@@ -29,6 +29,7 @@ public sealed partial class GameEngine
 
     private bool HasCardPolicy(CharacterState owner, SkillProgramCardPolicyKind kind,
         CardKind? effectiveKind = null) =>
+        kind == SkillProgramCardPolicyKind.UnlimitedAlcoholUse && HasAdditionalAlcoholUse(owner) ||
         (kind is SkillProgramCardPolicyKind.IgnoreUseDistance or SkillProgramCardPolicyKind.UnlimitedAlcoholUse) && HasAnniversaryHanSongUniqueHand(owner) ||
         (kind is SkillProgramCardPolicyKind.IgnoreUseDistance or SkillProgramCardPolicyKind.UnlimitedAlcoholUse) && HasMouZhaJiangPreUsePrivilege(owner) ||
         kind == SkillProgramCardPolicyKind.UnlimitedAlcoholUse && HasBeifenPreUsePrivilege(owner) ||

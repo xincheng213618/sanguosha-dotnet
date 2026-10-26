@@ -9,7 +9,7 @@ public static partial class StandardShanheCampaignCatalog
     public static IReadOnlyDictionary<int, ShanheTacticSchoolMembership> CurrentTacticSchoolMembershipBySourceId => SchoolMetadata.Members;
 
     private static ShanheCampaignDefinition WithRemainingSchoolComponents(ShanheCampaignDefinition definition) =>
-        WithCurrentTeamHealthTactic(WithCurrentLateRoundTactics(definition));
+        WithCurrentZuiquanTactic(WithCurrentWineTactics(WithCurrentTeamHealthTactic(WithCurrentLateRoundTactics(definition))));
 
     private static ShanheCampaignDefinition WithCurrentSchools(ShanheCampaignDefinition definition)
     {
