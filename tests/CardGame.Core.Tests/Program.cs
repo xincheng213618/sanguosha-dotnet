@@ -392,6 +392,7 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe capped refill skills: bought Jieming per-point allied five-card cap", ShanheCappedRefillSkillChecks.PurchasedJiemingOffersEachDamagePointAndCapsAlliedRefillAtFive),
     ("Shanhe Fencheng skill stock: bought three skills native NPC discard and fire", ShanheFenchengSkillStockChecks.BoughtThreeSkillsEscalateShopPricesAndFenchengUsesNativeNpcDiscardAndFire),
     ("Shanhe Niepan skill stock: bought self-dying rescue resumes lethal parent", ShanheNiepanSkillStockChecks.PurchasedNiepanClearsRealOwnedCardsAndResumesLethalDamageParentAlive),
+    ("Shanhe Beige skill source: bought equipment cost Club judgment source discard", ShanheBeigeSkillChecks.PurchasedBeigePaysOnlyEquipmentBeforeClubJudgmentAndSourceNpcDiscardsTwo),
     ("Shanhe retaliation skill stock: bought Tuifeng per-point Feng and actual Slash quota", ShanheRetaliationSkillStockChecks.PurchasedTuifengStoresEachDamagePointAndCashOutAddsRealSlashUses),
     ("Shanhe retaliation skill stock: bought ordinary Chengxiang per-damage subset", ShanheRetaliationSkillStockChecks.PurchasedChengxiangRevealsOncePerDamageAndMovesLegalSubset),
     ("Shanhe shop refresh: free quota stacks before independent paid allowance", ShanheShopRefreshChecks.FreeRefreshesStackBeforeMembershipPaidAllowanceAndNeedNoCopper),

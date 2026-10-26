@@ -213,6 +213,7 @@ public static partial class StandardShanheCampaignCatalog
         var currentLonghun = extraSkills.Contains(StandardShanheLonghunPackage.SkillId);
         var currentYiji = extraSkills.Contains(StandardShanheYijiPackage.SkillId);
         var currentCappedRefill = extraSkills.Contains(StandardShanheCappedRefillSkillsPackage.SkillId);
+        var currentBeige = extraSkills.Contains(StandardShanheBeigeSkillsPackage.SkillId);
         var wealthTactics = extraSkills.Contains(StandardShanheWealthPackage.WealthHandLimitSkillId) ||
             extraSkills.Contains(StandardShanheWealthPackage.WealthInitialHandSkillId) ||
             extraSkills.Contains(StandardShanheWealthPackage.WealthDrawSkillId) ||
@@ -318,6 +319,7 @@ public static partial class StandardShanheCampaignCatalog
             (currentLonghun ? "/current-longhun-3023" : "") +
             (currentYiji ? "/current-yiji-3081" : "") +
             (currentCappedRefill ? "/current-jieming-3083" : "") +
+            (currentBeige ? "/current-beige-3140" : "") +
             (localTroops ? "/local-troops" : "") +
             (currentSlashTactics ? "/current-slash-tactics" : "") +
             (s5Chengxiong ? "/s5-chengxiong-14055" : "") +
@@ -376,6 +378,7 @@ public static partial class StandardShanheCampaignCatalog
             if (currentLonghun) packages.Add(new StandardShanheLonghunPackage());
             if (currentYiji) packages.Add(new StandardShanheYijiPackage());
             if (currentCappedRefill) packages.Add(new StandardShanheCappedRefillSkillsPackage());
+            if (currentBeige) packages.Add(new StandardShanheBeigeSkillsPackage());
             if (s5Zhangliao || ids.Any(id => id == StandardShanheS5BossPackage.ZhangliaoBaseId ||
                 id == StandardShanheS5BossPackage.ZhangliaoLingdongId || id == StandardShanheS5BossPackage.ZhangliaoHuangkongId ||
                 id == StandardShanheS5BossPackage.DongZhuoLuoyangId || id == StandardShanheS5BossPackage.DongMinBaseId ||
