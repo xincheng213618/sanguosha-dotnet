@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:luanji": {
+      "name": "乱击",
+      "description": "出牌阶段，你可以将两张花色相同的手牌当【万箭齐发】使用。"
+    }
+  }
+}

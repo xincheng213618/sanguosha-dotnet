@@ -81,6 +81,10 @@ public static class GeneralGalleryCatalog
     private static IReadOnlyDictionary<string, string> BuildGeneralGroups()
     {
         var groups = new Dictionary<string, string>(StringComparer.Ordinal);
+        groups.Add("mobile:cao-pi", "myth-forest");
+        groups.Add("mobile:yuan-shao", "myth-fire");
+        groups.Add("mobile:meng-huo", "myth-forest");
+        groups.Add("mobile:zhu-rong", "myth-forest");
         groups.Add("mobile:sun-jian", "myth-forest");
         groups.Add("mobile:guo-jia", "standard");
         groups.Add("mobile:zhou-yu", "standard");

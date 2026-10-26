@@ -392,7 +392,8 @@ public sealed partial class GameEngine
                 owner.Seat,
                 instance.SkillInstanceId);
             foreach (var cards in EnumerateCardCombinations(candidates, inputCount))
-                if ((!rule.SameSuit || cards.Select(card => card.Suit).Distinct().Count() == 1) &&
+                if ((!rule.SameSuit || cards.Select(card => rule.UseEffectiveInputSuit == true
+                        ? EffectiveSuit(owner, card) : card.Suit).Distinct().Count() == 1) &&
                     MatchesRoundDistinctBasicMaterials(owner, rule, cards))
                     selections.Add(new(cards, source, rule.RoundDistinctBasicUse is null ? outputKind : rule.OutputKind));
         }

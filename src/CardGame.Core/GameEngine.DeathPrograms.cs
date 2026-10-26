@@ -548,6 +548,61 @@ public sealed partial class GameEngine
     private int GetMarkerSourceCount(CharacterState player, PlayerMarkerKind marker, int skillOwnerSeat) =>
         player.MarkerSourceCounts.GetValueOrDefault((marker, skillOwnerSeat));
 
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 86200,
+        SkillProgramEffectOp.ClaimDeathCleanupCards)]
+    private bool HasInitialFilteredDeathClaimResources(ProgramTriggerLegalityContext eligibility)
+    {
+        // An explicit initial source filter is also its resource prerequisite.
+        // Legacy unfiltered claims and later conditional branches keep their admission.
+        if (eligibility.Plan.Instructions.FirstOrDefault() is not
+            { Op: SkillProgramEffectOp.ClaimDeathCleanupCards, Condition.Kind: SkillProgramConditionKind.Always } effect ||
+            effect.Zones.Count == 0) return true;
+        return FilteredDeathClaimParent(eligibility.OwnerSeat, eligibility.Context) is { } death &&
+            QueryProgramDeathCleanupCards(death, effect.Zones).Length > 0;
+    }
+
+    private DeathFrame? FilteredDeathClaimParent(int ownerSeat, ProgramSkillWindowContext context)
+    {
+        if (context.Window != SkillProgramTriggerWindow.CharacterDied || context.OwnerSeat != ownerSeat ||
+            _resolutionStack.OfType<ProgramKillTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId) is not { } window ||
+            window.BeforeDeathCleanup || context.TargetSeat != window.VictimSeat || context.SourceSeat != window.KillerSeat)
+            return null;
+        var windowIndex = _resolutionStack.FindLastIndex(f => f.Id == window.Id);
+        var deathIndex = _resolutionStack.FindLastIndex(f => f.Id == window.DeathFrameId);
+        return deathIndex >= 0 && deathIndex < windowIndex && _resolutionStack[deathIndex] is DeathFrame death &&
+            death.VictimSeat == window.VictimSeat && death.KillerSeat == window.KillerSeat &&
+            death.VictimSeat != ownerSeat ? death : null;
+    }
+
+    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 86200)]
+    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 86200)]
+    private bool IsCommittedFilteredDeathClaimMovement(ProgramSkillFrame frame, SkillProgramEffect? effect,
+        ProgramMovementContinuation pending)
+    {
+        if (effect is not { Op: SkillProgramEffectOp.ClaimDeathCleanupCards } || effect.Zones.Count == 0 ||
+            pending != frame.PendingMovementContinuation || pending.SubjectSeat != frame.OwnerSeat ||
+            pending.BeforeCount != 0 || pending.CoverageResultBind is not null || frame.WindowContext is not { } context ||
+            FilteredDeathClaimParent(frame.OwnerSeat, context) is not { } death)
+            return false;
+        var rootIndex = _resolutionStack.FindIndex(f => f.Id == frame.Id);
+        if (rootIndex < 0 || rootIndex + 1 >= _resolutionStack.Count ||
+            _resolutionStack[rootIndex + 1] is not CardsMovedTriggerWindowFrame moved || !ProgramMovementReturnMatches(frame, moved))
+            return false;
+        var window = _resolutionStack.OfType<ProgramKillTriggerWindowFrame>().Single(w => w.Id == context.ParentFrameId);
+        if (window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count ||
+            window.Candidates[window.CandidateIndex] is not { } candidate || candidate.OwnerSeat != frame.OwnerSeat ||
+            candidate.SkillId != frame.SkillId || candidate.SkillInstanceId != frame.SkillInstanceId ||
+            candidate.GameplayHash != frame.GameplayHash || candidate.BindingId != GetProgramBindingId(frame))
+            return false;
+        var reason = new CardMoveReason($"skill-program.{frame.SkillId}.{GetProgramBindingId(frame)}.claim-death-cleanup");
+        return moved.Batch.Movements.All(m => _cardMovements.Contains(m) && m.From == CardLocation.DiscardPile &&
+            m.To == CardLocation.Hand(frame.OwnerSeat) && m.Reason == reason && death.CleanedUpCardIds.Contains(m.CardId) &&
+            _cardMovements.LastOrDefault(prior => prior.CardId == m.CardId && prior.Sequence < m.Sequence) is { } cleanup &&
+            cleanup.From.OwnerSeat == death.VictimSeat && effect.Zones.Contains(cleanup.From.Zone) && cleanup.To == CardLocation.DiscardPile &&
+            (cleanup.From.Zone == CardZoneKind.Equipment ? cleanup.Reason == CardMoveReasons.DeathEquipmentDiscard :
+                cleanup.From.Zone is CardZoneKind.Hand or CardZoneKind.Judgment && cleanup.Reason == CardMoveReasons.DeathDiscard));
+    }
+
     internal void ClaimProgramDeathCleanupCards(ProgramSkillFrame frame)
     {
         var active = GetActiveProgramFrame(frame.Id);

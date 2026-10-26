@@ -1072,9 +1072,19 @@ public sealed record LegalAction
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public TargetHandCardPreselection? TargetHandPreselection { get; init; }
 
-    /// <summary>Selected activation cards must all share one printed suit.</summary>
+    /// <summary>Selected activation cards must all share one suit, using any issued overrides.</summary>
     public bool SelectedCardsSameSuit { get; init; }
     public bool SelectedCardsDistinctSuits { get; init; }
+
+    private readonly IReadOnlyDictionary<int, Suit>? _selectableCardSuitOverrides;
+    /// <summary>Owner-visible effective suits for an opted-in same-suit cost; never authoritative command input.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyDictionary<int, Suit>? SelectableCardSuitOverrides
+    {
+        get => _selectableCardSuitOverrides;
+        init => _selectableCardSuitOverrides = value is null ? null :
+            new System.Collections.ObjectModel.ReadOnlyDictionary<int, Suit>(value.ToDictionary(pair => pair.Key, pair => pair.Value));
+    }
 
     /// <summary>
     /// At least two selected activation cards must have one printed name (all Slash variants

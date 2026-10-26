@@ -35,6 +35,8 @@ public sealed class ClaimDeathCleanupCardsSkillProgramEffectHandler : ISkillProg
         ISkillProgramEffectHost host)
     {
         host.ClaimDeathCleanupCards(frame);
-        return SkillProgramStepOutcome.Continue;
+        return effect.Zones.Count > 0
+            ? host.GetCapability<IBoundCardMovementContinuationHost>().AwaitBoundCardMovements(frame.Id, frame.OwnerSeat)
+            : SkillProgramStepOutcome.Continue;
     }
 }

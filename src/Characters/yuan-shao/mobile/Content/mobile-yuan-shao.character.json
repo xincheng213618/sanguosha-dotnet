@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:yuan-shao",
+  "skills": [
+    {
+      "registrationOrder": 86300,
+      "programBundle": "mobile-yuan-shao",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:luanji",
+        "name": "乱击",
+        "description": "出牌阶段，你可以将两张花色相同的手牌当【万箭齐发】使用。",
+        "actionForms": "Active"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 86399,
+      "pools": { "current": 86399 },
+      "definition": {
+        "id": "mobile:yuan-shao",
+        "name": "袁绍·移动版",
+        "portraitKey": "mobile-yuan-shao",
+        "skillId": "mobile:luanji",
+        "additionalSkillIds": ["classic:xueyi"],
+        "factionId": "qun",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:yuan-shao",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

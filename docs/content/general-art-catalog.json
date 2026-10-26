@@ -24274,6 +24274,74 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-cao-pi",
+      "characterName": "曹丕",
+      "defaultSkinId": "4300",
+      "skins": [
+        {
+          "id": "4300",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-43.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/4300.jpg",
+          "sha256": "87d15c3ac89f63156548579087a8aa2454d09bb5d0db0f00cd477f2ca4f1e1ea",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cao-pi.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-yuan-shao",
+      "characterName": "袁绍",
+      "defaultSkinId": "4100",
+      "skins": [
+        {
+          "id": "4100",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-41.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/4100.jpg",
+          "sha256": "9e96743a0c27ca8ed9b4e2087c20c28a2f6b4317f19ee436d766529ca7a46fc3",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-yuan-shao.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-meng-huo",
+      "characterName": "孟获",
+      "defaultSkinId": "4700",
+      "skins": [
+        {
+          "id": "4700",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-47.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/4700.jpg",
+          "sha256": "c1854f1bf67e26c5a1115160383da64b3a681c152ea1fcb97a5988d7a5f758de",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-meng-huo.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhu-rong",
+      "characterName": "祝融",
+      "defaultSkinId": "4600",
+      "skins": [
+        {
+          "id": "4600",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-46.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/4600.jpg",
+          "sha256": "f31002528bc67b82b5f5c4b5b180528e21eaa0f45d820721ce697fef2f0952a8",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhu-rong.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

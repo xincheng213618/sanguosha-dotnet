@@ -23,6 +23,7 @@
     <Compile Include="..\Shared\MouSimaYiGiveScenario.cs" Link="MouSimaYiGiveScenario.cs" />
     <Compile Include="..\Shared\BaguaResponseScenario.cs" Link="BaguaResponseScenario.cs" />
     <Compile Include="..\Shared\CharacterFixtureContent.cs" Link="CharacterFixtureContent.cs" />
+    <Compile Include="..\CardGame.Core.Tests\MobileYuanShaoChecks.cs" Link="MobileYuanShaoChecks.cs" />
     <Compile Include="..\CardGame.Core.Tests\ShenMaChaoChecks.cs" Link="ShenMaChaoScenario.cs" />
     <Compile Include="..\CardGame.Core.Tests\ShenDengAiChecks.cs" Link="ShenDengAiScenario.cs" />
     <Compile Include="..\CardGame.Core.Tests\Fame2017PublicPileChecks.cs" Link="Fame2017PublicPileScenario.cs" />

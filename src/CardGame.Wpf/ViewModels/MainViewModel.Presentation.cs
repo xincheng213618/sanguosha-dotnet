@@ -485,9 +485,12 @@ public sealed partial class MainViewModel
                 .Concat(player.AuthorityCards ?? []).Concat(player.ChunlaoCards ?? []))
             .Where(card => materialIds.Contains(card.Id)).ToArray();
         if (selectedCards.Length != materialIds.Count) return false;
-        var distinct = action.SelectedCardsSameSuit || action.SelectedCardsDistinctSuits
+        var sameSuitCount = action.SelectedCardsSameSuit
+            ? selectedCards.Select(card => action.SelectableCardSuitOverrides?.GetValueOrDefault(card.Id, card.Suit) ?? card.Suit)
+                .Distinct().Count() : 0;
+        var distinct = action.SelectedCardsDistinctSuits
             ? selectedCards.Select(card => card.Suit).Distinct().Count() : 0;
-        return (!action.SelectedCardsSameSuit || distinct == 1) &&
+        return (!action.SelectedCardsSameSuit || sameSuitCount == 1) &&
                (!action.SelectedCardsDistinctSuits || distinct == selectedCards.Length) &&
                (!action.SelectedCardsSameNameOrAllEquipment || selectedCards.Length >= 2 &&
                    (selectedCards.All(card => EquipmentCatalog.IsEquipment(card.Kind)) ||

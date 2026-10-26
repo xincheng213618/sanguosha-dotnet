@@ -382,7 +382,7 @@ public sealed partial class SimpleAiBrain
         if (action.SelectedCardsSameSuit)
         {
             return selectableCards
-                .GroupBy(card => card.Suit)
+                .GroupBy(card => action.SelectableCardSuitOverrides?.GetValueOrDefault(card.Id, card.Suit) ?? card.Suit)
                 .Where(group => group.Count() >= action.MinCardCount)
                 .Select(group => group
                     .OrderBy(KeepValue)

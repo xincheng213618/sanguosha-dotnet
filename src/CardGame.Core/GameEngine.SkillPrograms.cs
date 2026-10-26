@@ -195,10 +195,11 @@ public sealed partial class GameEngine
                 if (!ProgramSelections.Apply(ProgramSelectionStage.AfterTargets, selection, candidates)) continue;
                 var cards = candidates.Cards;
                 var targets = candidates.Targets;
+                var effectiveSameSuit = ProgramSelectionUsesEffectiveSameSuit(program, plan);
                 if (cards.Length < requiredCards || targets.Length < activation.MinTargets ||
                     activation.SelectedCardsDistinctSuits && cards.Select(id => _cardZones.CardsAt(_cardZones.GetLocation(id)).Single(card => card.Id == id).Suit).Distinct().Count() < activation.MinCards ||
                     activation.SelectedCardsSameSuit && !cards
-                        .Select(id => _cardZones.CardsAt(_cardZones.GetLocation(id)).Single(card => card.Id == id).Suit)
+                        .Select(id => ProgramSameSuitInputSuit(owner, id, effectiveSameSuit))
                         .GroupBy(suit => suit).Any(group => group.Count() >= activation.MinCards)) continue;
                 if (!ProgramSelections.Apply(ProgramSelectionStage.Availability, selection, candidates)) continue;
                 if (features.FirstInstruction is
@@ -228,6 +229,8 @@ public sealed partial class GameEngine
                     ProgramActivationId = activation.Id,
                     SelectedCardsSameSuit = activation.SelectedCardsSameSuit,
                     SelectedCardsDistinctSuits = activation.SelectedCardsDistinctSuits,
+                    SelectableCardSuitOverrides = effectiveSameSuit ? candidates.Cards.ToDictionary(
+                        id => id, id => ProgramSameSuitInputSuit(owner, id, useEffectiveSuit: true)) : null,
                     SelectedCardsSameNameOrAllEquipment = candidates.SelectedCardsSameNameOrAllEquipment,
                     ProgramAiHint = CreateProgramAiHint(program, activation, context, owner.IsFaceDown),
                     SelectableCardIds = Array.AsReadOnly(candidates.Cards),
@@ -338,16 +341,17 @@ public sealed partial class GameEngine
         if (targets.Count < action.MinTargetCount || targets.Count > action.MaxTargetCount ||
             targets.Distinct().Count() != targets.Count || targets.Any(seat => !action.SelectableTargetSeats.Contains(seat)))
             return new CommandError(CommandErrorCode.InvalidTarget, "The program's target selection is invalid.");
-        if (action.SelectedCardsSameSuit && cards.Select(id =>
-                _cardZones.CardsAt(_cardZones.GetLocation(id)).Single(card => card.Id == id).Suit)
-                .Distinct().Skip(1).Any())
-            return new CommandError(CommandErrorCode.InvalidCard,
-                "The selected physical cards must share one printed suit.");
         var program = action.ProgramSkillOwnerSeat is null && action.ProgramSkillId is { } skillId
             ? _contentRegistry.GetSkill(skillId).Program : null;
         var plan = program is null ? null : ProgramInstructionResolver.Default.Find(program,
             ProgramInstructionSourceKind.Activation, action.ProgramActivationId);
         var activation = plan?.Activation;
+        var effectiveSameSuit = program is not null && plan is not null && ProgramSelectionUsesEffectiveSameSuit(program, plan);
+        if (action.SelectedCardsSameSuit && cards.Select(id =>
+                ProgramSameSuitInputSuit(_players[_currentSeat], id, effectiveSameSuit)).Distinct().Skip(1).Any())
+            return new CommandError(CommandErrorCode.InvalidCard, effectiveSameSuit
+                ? "The selected physical cards must share one effective suit."
+                : "The selected physical cards must share one printed suit.");
         ProgramSelectionContext? validationContext = program is not null && plan is not null
             ? new(_currentSeat, program, plan) : null;
         if (validationContext is { } beforeSuitContext &&
@@ -386,6 +390,17 @@ public sealed partial class GameEngine
                 return new CommandError(CommandErrorCode.InvalidTarget, "The program's target prerequisites are no longer satisfied.");
         }
         return null;
+    }
+
+    private static bool ProgramSelectionUsesEffectiveSameSuit(SkillProgram program, ProgramExecutionPlan plan) =>
+        plan.Activation is { SelectedCardsSameSuit: true } &&
+        plan.Features.Single(SkillProgramEffectOp.UseSelectedCardsAs) is { SourceBind: { } binding } &&
+        program.ViewAs.FirstOrDefault(rule => rule.Id == binding) is { SameSuit: true, UseEffectiveInputSuit: true };
+
+    private Suit ProgramSameSuitInputSuit(CharacterState owner, int cardId, bool useEffectiveSuit)
+    {
+        var card = _cardZones.CardsAt(_cardZones.GetLocation(cardId)).Single(item => item.Id == cardId);
+        return useEffectiveSuit ? EffectiveSuit(owner, card) : card.Suit;
     }
 
     private CommandResult SubmitUseProgramSkill(UseProgramSkillCommand command)

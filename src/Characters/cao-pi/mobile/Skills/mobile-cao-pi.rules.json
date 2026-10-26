@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:xingshang",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "claim-died-cards",
+          "window": "characterDied",
+          "subject": "owner",
+          "optional": true,
+          "condition": { "kind": "deathVictimHasCards" },
+          "effects": [
+            { "op": "claimDeathCleanupCards", "target": "owner", "zones": [ "hand", "equipment" ] }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:xingshang": {
+      "name": "行殇",
+      "description": "当其他角色死亡时，你可以获得其所有牌。"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cao-pi",
+  "skills": [
+    {
+      "registrationOrder": 86200,
+      "programBundle": "mobile-cao-pi",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:xingshang", "name": "行殇",
+        "description": "当其他角色死亡时，你可以获得其所有牌。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 86299,
+      "pools": { "current": 86299 },
+      "definition": {
+        "id": "mobile:cao-pi", "name": "曹丕·移动版", "portraitKey": "mobile-cao-pi",
+        "skillId": "mobile:xingshang", "additionalSkillIds": [ "classic:fangzhu", "boundary:songwei-mobile" ],
+        "factionId": "wei", "baseHp": 3, "gender": "Male",
+        "characterId": "character:cao-pi", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

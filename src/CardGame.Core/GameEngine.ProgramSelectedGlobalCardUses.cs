@@ -11,7 +11,8 @@ public sealed partial class GameEngine
             !HasExactNextActualUseProgramSelection(active, ProgramInstructionResolver.Default.Resolve(active, _contentRegistry.GetSkill(active.SkillId).Program!)) ||
             selection.OutputKind != CardKind.ArrowBarrage ||
             selection.Cards.Count != 2 ||
-            ViewAsRule(selection.Source) is { SameSuit: true } && selection.Cards[0].Suit != selection.Cards[1].Suit ||
+            ViewAsRule(selection.Source) is { SameSuit: true } rule && selection.Cards.Select(card =>
+                rule.UseEffectiveInputSuit == true ? EffectiveSuit(owner, card) : card.Suit).Distinct().Count() != 1 ||
             !CanUseGlobalCard(owner, CardKind.ArrowBarrage) ||
             !selection.Cards.All(card => GetHand(owner).Any(held => held.Id == card.Id)))
             throw new InvalidOperationException(
