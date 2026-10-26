@@ -159,6 +159,8 @@ public static partial class StandardShanheCampaignCatalog
             "回合外失去最后一张手牌后，摸两张牌", RewardIdOverride: "tactic-jishiyu-current-2128"),
         new ReactionTacticSource(2131, "破釜沉舟", StandardShanheAppliedDamageReflectionPackage.PofuChenzhouSkillId, 300, 2, null,
             "回合外受到伤害一次大于等于3点时，对伤害来源造成等量同属性伤害。", RewardIdOverride: "tactic-pofu-chenzhou-current-2131"),
+        new ReactionTacticSource(2104, "神龙摆尾", StandardShanheDrawThresholdPackage.ShenlongBaiweiSkillId, 300, 2, 34,
+            "你每摸9张牌，对随机敌方造成1点伤害", RewardIdOverride: "tactic-shenlong-baiwei-current-2104"),
     });
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentReactionTacticShopMetadata =>

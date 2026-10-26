@@ -16,6 +16,9 @@ public sealed partial class GameEngine
         private readonly IReadOnlyList<NativeDrawOrdinalEntitlement>? _ordinalEntitlements;
         public IReadOnlyList<NativeDrawOrdinalEntitlement>? OrdinalEntitlements
         { get => _ordinalEntitlements; init => _ordinalEntitlements = value is null ? null : Array.AsReadOnly(value.ToArray()); }
+        private readonly IReadOnlyList<NativeDrawThresholdEntitlement>? _thresholdEntitlements;
+        public IReadOnlyList<NativeDrawThresholdEntitlement>? ThresholdEntitlements
+        { get => _thresholdEntitlements; init => _thresholdEntitlements = value is null ? null : Array.AsReadOnly(value.ToArray()); }
     }
     private bool TracksNativeDrawInvocations =>
         _contentRegistry.ProgramDependencies.RequiresFact(ProgramTrackedFact.NativeDrawInvocation) ||
@@ -59,7 +62,8 @@ public sealed partial class GameEngine
             AdvanceEventRulesAndQueueFact(new GameStartingDrawChildRequestedEvent(draft.Id, child));
         return draft with { GameStartingOrigin = starting, GameStartingMovementOrigin = movementOrigin,
             ZhanjiEntitlements = CaptureZhanjiDrawEntitlements(draft.Id, owner, draft.Before),
-            OrdinalEntitlements = CaptureNativeDrawOrdinalEntitlements(draft.Id, owner, draft.Before) };
+            OrdinalEntitlements = CaptureNativeDrawOrdinalEntitlements(draft.Id, owner, draft.Before),
+            ThresholdEntitlements = CaptureNativeDrawThresholdEntitlements(draft.Id, owner, draft.Before) };
     }
     private void CompleteNativeDrawInvocation(NativeDrawInvocationDraft? draft, IReadOnlyList<int> actualIds)
     {
@@ -83,13 +87,15 @@ public sealed partial class GameEngine
             DirectProducer = draft.Producer, Reason = draft.Reason, SequenceBefore = draft.Before, SequenceAfter = after,
             LastBatchId = _pendingCardsMovedBatches[index].Id, Materials = materials, ZhanjiEntitlements = draft.ZhanjiEntitlements,
             GameStartingOrigin = draft.GameStartingOrigin, GameStartingMovementOrigin = draft.GameStartingMovementOrigin,
-            ActualTurnDrawOrdinal = FreezeNativeDrawOrdinal(draft), OrdinalEntitlements = draft.OrdinalEntitlements };
+            ActualTurnDrawOrdinal = FreezeNativeDrawOrdinal(draft), OrdinalEntitlements = draft.OrdinalEntitlements,
+            ThresholdProgress = FreezeNativeDrawThresholdProgress(draft, materials.Length) };
         _pendingCardsMovedBatches[index] = _pendingCardsMovedBatches[index] with { NativeDrawInvocation = proof };
         AdvanceEventRulesAndQueueFact(new NativeDrawInvocationRecordedEvent(proof.InvocationId, proof.OwnerSeat,
             proof.RequestedCount, proof.ActualCount, proof.ActualTurnNumber, proof.ActualTurnOwnerSeat, proof.PhaseActorSeat,
             proof.Phase, proof.ParentFrameId, proof.DirectProducer, proof.Reason, proof.SequenceBefore, proof.SequenceAfter,
             proof.LastBatchId) { GameStartingOrigin = proof.GameStartingOrigin, GameStartingMovementOrigin = proof.GameStartingMovementOrigin,
                 ActualTurnDrawOrdinal = proof.ActualTurnDrawOrdinal });
+        CompleteNativeDrawThresholdProgress(proof);
         CompleteSanwenNativeDrawQualification(proof);
         CompleteTangTangNativeDrawQualification(proof);
         CompleteLingkongNativeDrawQualification(proof);
@@ -120,7 +126,7 @@ public sealed partial class GameEngine
         var actual = _cardMovements.Where(m => m.Sequence > p.SequenceBefore && m.Sequence <= p.SequenceAfter &&
             m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(p.OwnerSeat) && m.Reason == p.Reason)
             .OrderBy(m => m.Sequence).Select(m => new NativeDrawMaterial(m.CardId, m.CardKind, m.Sequence));
-        return p.Materials.SequenceEqual(actual) && ValidZhanjiDrawEntitlements(p) && ValidNativeDrawOrdinalProof(p);
+        return p.Materials.SequenceEqual(actual) && ValidZhanjiDrawEntitlements(p) && ValidNativeDrawOrdinalProof(p) && ValidNativeDrawThresholdProof(p);
     }
     private int[] MatchingOutsideDrawIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate)
     {
