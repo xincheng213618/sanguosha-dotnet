@@ -208,6 +208,11 @@ public sealed partial class GameEngine
         }
         else if (pending.Kind == DecisionKind.Nullification && ActiveNullificationWindow is { } counter)
         {
+            if (ShanheTrickNullificationBanned(actor.Seat))
+            {
+                ClearPendingDecision(); _status = EngineStatus.Running;
+                ContinueNullificationWindow(counter); return;
+            }
             var cards = GetNullificationCards(actor);
             _pendingDecision = pending with { PromptId = CreatePromptId(), ValidCardIds = Array.AsReadOnly(cards.Select(c => c.Id).ToArray()),
                 Choices = CreateNullificationChoices(counter, actor, cards) };

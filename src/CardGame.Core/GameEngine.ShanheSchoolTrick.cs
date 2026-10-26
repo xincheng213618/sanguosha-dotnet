@@ -102,8 +102,8 @@ public sealed partial class GameEngine
         {
             var round = use.ShanheSchoolTrick!; var native = round.Native;
             if (use.Action is not { Type: CardActionType.Use } action || action.ActionId != round.ActionId ||
-                !IsShanheSchoolDamageTrick(use.CardKind) || native.Trick is null || native.Simple is not null ||
-                native.Source.SkillId != ShanheSchoolEffects.TrickRepeatSkillId || native.Source.OwnerSeat != use.SourceSeat ||
+                !IsShanheNativeTrickRepeatSource(use.CardKind, native.Source.SkillId) || native.Trick is null || native.Simple is not null ||
+                native.Source.OwnerSeat != use.SourceSeat ||
                 native.ActionId != action.ActionId || native.ProgramFrameId != round.ProgramFrameId ||
                 native.AutomaticGameplayHash != round.GameplayHash || native.WholeGroupRepeated != round.Started ||
                 round.Active && !round.Started ||

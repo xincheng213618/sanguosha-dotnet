@@ -945,6 +945,7 @@ public enum SkillProgramEffectOp
     RepeatCurrentDamageTrick = 62024,
     ApplyShanheSchoolTeamRank = 62025,
     ApplyShanheAlliedHealthBonus = 62026,
+    RepeatCurrentSnatch = 62027,
     RecastBoundCard = 3100,
     PayHpToGrantOneUseDamageShield = 3000,
     DrawThenDiscardHandToMaximumHp = 2900,
@@ -4091,6 +4092,14 @@ public sealed class SkillProgramCatalog
              inputSuit is not null || outputSuit is not null || factionId is not null || ownerRole is not null ||
              OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
             Fail(path, "The first Slash of each round requires the full Slash family, a bounded target bonus and no other qualifiers.");
+        if (kind is SkillProgramCardPolicyKind.ProhibitEnemyDamageTrickResponse or SkillProgramCardPolicyKind.ProhibitTargetOrdinaryTrickResponse &&
+            (cardKinds.Count == 0 || cardKinds.Any(card =>
+                !RuntimeSkills.RuntimeRules_Core_CommonRules.IsOrdinaryTrick(card) || card == CardKind.Nullification ||
+                kind == SkillProgramCardPolicyKind.ProhibitEnemyDamageTrickResponse &&
+                    !RuntimeSkills.RuntimeRules_Core_MouLuMeng.IsDamageCardKind(card) && card != CardKind.UnexpectedAssault) ||
+             requiredKinds.Count != 0 || value != 0 || inputSuit is not null || outputSuit is not null ||
+             factionId is not null || ownerRole is not null || OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
+            Fail(path, "Trick response prohibitions require the matching ordinary trick kinds and no other qualifiers.");
         if (kind is SkillProgramCardPolicyKind.AlcoholKingIdentityRank or SkillProgramCardPolicyKind.ForeignTurnAlcoholUseProhibition &&
             (!cardKinds.SequenceEqual([CardKind.Alcohol]) || requiredKinds.Count != 0 || value != 0 || inputSuit is not null || outputSuit is not null ||
              factionId is not null || ownerRole is not null || OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))

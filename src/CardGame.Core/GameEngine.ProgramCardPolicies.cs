@@ -47,6 +47,7 @@ public sealed partial class GameEngine
     private bool IsNearbyTargetResponseProhibited(int sourceSeat, int responderSeat,
         CardKind incomingKind, IReadOnlyList<int> targetSeats)
     {
+        if (IsShanheTrickResponseProhibited(sourceSeat, responderSeat, incomingKind, targetSeats)) return true;
         if (IsShanheS5FuqiResponseProhibited(sourceSeat, responderSeat)) return true;
         if (AnniversaryXiahouHuiCannotRespond(sourceSeat, responderSeat)) return true;
         if (ShenZfCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats)) return true;

@@ -19,6 +19,9 @@ public static partial class StandardShanheCampaignCatalog
         definition = WithCurrentHeartBladeTactic(definition);
         definition = WithCurrentDualBladeTactics(definition);
         definition = WithCurrentHandLimitStockTactics(definition);
+        definition = WithCurrentDoubleStealTactic(definition);
+        definition = WithCurrentDoubleResponseTactics(definition);
+        definition = WithCurrentTrickResponseTactics(definition);
         return WithCurrentGuandaoTactic(definition);
     }
 

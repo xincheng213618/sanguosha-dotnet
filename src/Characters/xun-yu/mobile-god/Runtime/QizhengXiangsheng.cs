@@ -69,7 +69,8 @@ public sealed partial class GameEngine
         }
         else if (r.Stage == QizhengStage.Response)
         {
-            if (!IsWenjiResponseForbidden(use.Id, responder.Seat))
+            if (!IsWenjiResponseForbidden(use.Id, responder.Seat) &&
+                !IsShanheTrickResponseProhibited(use.SourceSeat, responder.Seat, CardKind.QizhengXiangsheng, use.TargetSeats))
             foreach (var required in new[] { CardKind.Slash, CardKind.Dodge })
             {
                 foreach (var card in GetResponseCards(responder, required).Where(card => CanUseCardAsResponse(responder, card, required)))

@@ -231,6 +231,9 @@ public static partial class StandardShanheCampaignCatalog
         var heartBladeTactic = RequiresCurrentHeartBladeRegistry(requirements);
         var dualBladeTactics = RequiresCurrentDualBladeRegistry(requirements);
         var handLimitStock = RequiresCurrentHandLimitStockRegistry(requirements);
+        var doubleStealTactic = RequiresCurrentDoubleStealRegistry(requirements);
+        var doubleResponseTactics = RequiresCurrentDoubleResponseRegistry(requirements);
+        var trickResponseTactics = RequiresCurrentTrickResponseRegistry(requirements);
         var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
@@ -354,6 +357,9 @@ public static partial class StandardShanheCampaignCatalog
             (heartBladeTactic ? "/current-heart-blade-2045" : "") +
             (dualBladeTactics ? "/current-dual-blade" : "") +
             (handLimitStock ? "/current-hand-limit-stock" : "") +
+            (doubleStealTactic ? "/current-double-steal-2337" : "") +
+            (doubleResponseTactics ? "/current-double-response" : "") +
+            (trickResponseTactics ? "/current-trick-response" : "") +
             (wealthTactics ? "/current-wealth-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
@@ -433,6 +439,9 @@ public static partial class StandardShanheCampaignCatalog
             if (heartBladeTactic) packages.Add(new StandardShanheHeartBladePackage());
             if (dualBladeTactics) packages.Add(new StandardShanheDualBladePackage());
             if (handLimitStock) packages.Add(new StandardShanheHandLimitStockPackage());
+            if (doubleStealTactic) packages.Add(new StandardShanheDoubleStealPackage());
+            if (doubleResponseTactics) packages.Add(new StandardShanheDoubleResponsePackage());
+            if (trickResponseTactics) packages.Add(new StandardShanheTrickResponsePackage());
             if (reactionTactics)
             {
                 packages.Add(new StandardShanheArmorTacticsPackage());

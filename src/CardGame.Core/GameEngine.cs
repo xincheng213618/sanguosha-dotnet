@@ -4076,7 +4076,7 @@ public sealed partial class GameEngine
         {
             var responder = _players[pending.CandidateSeats[pending.CandidateIndex]];
             if (IsWenjiNullificationResponseForbidden(pending, responder.Seat) || WushuangFuqiNullificationBanned(responder.Seat) ||
-                ShanheS5FuqiNullificationBanned(responder.Seat))
+                ShanheS5FuqiNullificationBanned(responder.Seat) || ShanheTrickNullificationBanned(responder.Seat))
             {
                 pending = ReplaceNullificationWindowFrame(pending with { CandidateIndex = pending.CandidateIndex + 1, Step = ResolutionFrameStep.AwaitingResponse });
                 continue;
@@ -6121,6 +6121,7 @@ public sealed partial class GameEngine
             ignoresArmor: HasDirectedCardArmorBypass(group.ResolutionId, target.Seat));
         group.CurrentAttack = attack;
         ActiveCardAttack = attack;
+        FreezeRequiredGroupDodgeResponses(group, attack);
         if (HasHellRemenImmunity(target, group.Card.Kind))
         { SetCardUseStep(group.ResolutionId, ResolutionFrameStep.ResolvingEffect); CompleteAttack(attack); return; }
         if (UsesFormalTengjia && !attack.IgnoresArmor && HasTengjia(target) &&
@@ -6192,10 +6193,13 @@ public sealed partial class GameEngine
         var decisionKind = requiredCardKind == CardKind.Dodge
             ? DecisionKind.RespondDodge
             : DecisionKind.RespondSlash;
+        var responseQuestion = requiredCardKind == CardKind.Dodge && attack.RequiredDodgeResponses > 1
+            ? $"请打出第{attack.SuccessfulDodgeResponses + 1}/{attack.RequiredDodgeResponses}张【{requiredName}】。"
+            : $"是否打出【{requiredName}】？";
         _pendingDecision = new PendingDecision(
             decisionKind,
             target.Seat,
-            $"{_players[group.SourceSeat].Name} 使用了【{incomingName}】，是否打出【{requiredName}】？",
+            $"{_players[group.SourceSeat].Name} 使用了【{incomingName}】，{responseQuestion}",
             responseCards.Select(card => card.Id)
                 .Concat(zhangbaPairs.SelectMany(pair => pair.Select(card => card.Id)))
                 .Concat(programMultiCardResponses.SelectMany(item => item.Cards.Select(card => card.Id)))
@@ -7911,7 +7915,8 @@ public sealed partial class GameEngine
                 return;
             }
             FinishSingleCardResponse(responseCard, responseConversion);
-            CompleteAttack(attack);
+            if (requiredCardKind == CardKind.Dodge) CompleteSuccessfulDodgeResponse(attack);
+            else CompleteAttack(attack);
             return;
         }
 
@@ -8353,6 +8358,7 @@ public sealed partial class GameEngine
 
     private void FinishSuccessfulDodgeResponse(CardAttackHandle attack)
     {
+        if (TryFinishRequiredGroupDodge(attack)) return;
         var completed = attack.RegisterDodgeResponse();
         if (attack.RequiredDodgeResponses > 1)
         {
@@ -11819,6 +11825,9 @@ public sealed partial class GameEngine
                     return;
                 }
             case ProgramCardContinuation.GroupResponse:
+                if (action.EffectiveKind == CardKind.Dodge) CompleteSuccessfulDodgeResponse(attack);
+                else CompleteAttack(attack);
+                return;
             case ProgramCardContinuation.FactionSlashGroupResponse:
                 CompleteAttack(attack);
                 return;

@@ -38,6 +38,8 @@ public enum SkillProgramCardPolicyKind
     AdditionalDrawTwoCards = 3902,
     HandLimitCardKindExemption = 3903,
     RoundFirstSlashAdditionalTargets = 3904,
+    ProhibitEnemyDamageTrickResponse = 3905,
+    ProhibitTargetOrdinaryTrickResponse = 3906,
     SuppressOthersNonLockedDuringDying = 4000, ExclusiveTurnPeachUse = 4001, ProhibitBlackTrickTarget = 4002,
     PindianOpponentRandomHand = 3100,
     PindianMaximumSlashClaim = 3101,
