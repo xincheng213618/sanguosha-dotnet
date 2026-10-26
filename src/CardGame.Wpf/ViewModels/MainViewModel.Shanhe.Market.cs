@@ -32,9 +32,18 @@ public sealed partial class MainViewModel
         "补给" => "补充军资与体力，继续征程。",
         _ => "购买战法加入本次征程，不占六个初始战法位。"
     };
-    public string ShanheMarketSurchargeNotice => IsShanheShopActive && _shanheSession!.CreateCheckpoint().Options.UseCodexRewardPool &&
-        SelectedShanheMarketCategory is "战法" or "装备" or "卡牌" or "技能"
-        ? $"每购买一次{SelectedShanheMarketCategory}，本店同类商品额外消耗铜币 +100" : "货品及价格以当前商店为准";
+    public string ShanheMarketSurchargeNotice
+    {
+        get
+        {
+            var priceNotice = IsShanheShopActive && _shanheSession!.CreateCheckpoint().Options.UseCodexRewardPool &&
+                SelectedShanheMarketCategory is "战法" or "装备" or "卡牌" or "技能"
+                ? $"每购买一次{SelectedShanheMarketCategory}，本店同类商品额外消耗铜币 +100" : "货品及价格以当前商店为准";
+            return _shanheSession?.Snapshot.ShopRestockOnPurchase == true
+                ? priceNotice + "\n购买后原位补入同类商品；无货可补时保留已购灰位，不消耗刷新次数。"
+                : priceNotice;
+        }
+    }
     public string ShanheMarketRefreshText => _shanheSession?.Snapshot.ShopFreeRefreshRemaining > 0 ? "免费刷新" :
         _shanheSession?.Snapshot.ShopRefreshCost is int cost && cost > 0 ? $"刷新 · {cost} 铜币" : "刷新";
     public string ShanheMarketFreeRefreshRemaining => $"免费刷新：{_shanheSession?.Snapshot.ShopFreeRefreshRemaining ?? 0} 次";

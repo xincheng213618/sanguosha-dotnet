@@ -8,7 +8,7 @@ public sealed record ShanheCampaignEconomy(
     int? GoldAbove = null, string? BattleSkillId = null,
     int TacticRewardChoiceCount = 0, int CardRewardChoiceCount = 0,
     int ExtraEliteRareTactics = 0, int ExtraBossEpicSkills = 0, int SkillRewardChoiceCount = 0,
-    int FreeShopRefreshes = 0);
+    int FreeShopRefreshes = 0, bool RestockOnPurchase = false);
 
 public static partial class ShanheCampaignContent
 {

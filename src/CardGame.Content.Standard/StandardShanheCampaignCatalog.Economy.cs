@@ -63,7 +63,9 @@ public static partial class StandardShanheCampaignCatalog
         new(2291, "tactic-economy-2291", "刷新Ⅰ", 2, 300,
             "商店免费刷新次数+2", new(FreeShopRefreshes: 2)),
         new(2292, "tactic-economy-2292", "刷新Ⅱ", 3, 500,
-            "商店免费刷新次数+4", new(FreeShopRefreshes: 4))
+            "商店免费刷新次数+4", new(FreeShopRefreshes: 4)),
+        new(2252, "tactic-economy-2252", "补货", 2, 300,
+            "集市中购买后立即刷新同位置商品", new(RestockOnPurchase: true))
     });
 
     private static ShanheCampaignDefinition WithCurrentEconomyTactics(ShanheCampaignDefinition definition)

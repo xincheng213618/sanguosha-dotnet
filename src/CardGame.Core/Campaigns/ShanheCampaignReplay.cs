@@ -116,6 +116,8 @@ public sealed record ShanheCampaignSnapshot(
     public int ShopFreeRefreshRemaining { get; init; }
     public int ShopPaidRefreshRemaining { get; init; }
     public int ShopRefreshCost { get; init; }
+    /// <summary>A held tactic replaces purchased products in this active random shop.</summary>
+    public bool ShopRestockOnPurchase { get; init; }
     /// <summary>Exact compensation for the currently published reward offer; zero outside it.</summary>
     public int RewardSkipGold { get; init; }
     public bool CanSkipReward => Phase == ShanheCampaignPhase.Reward && RewardSkipGold > 0;

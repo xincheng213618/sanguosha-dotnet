@@ -235,6 +235,7 @@ internal static class Program
             Check("Shanhe campaign UI: shop purchase states and codex navigation", () => ShanheModulesUiChecks.ShopPurchaseAndCodexNavigation(output));
             Check("Shanhe codex UI: unlock equip persist and market", () => ShanheCodexUiChecks.UnlockEquipPersistAndMarket(output));
             Check("Shanhe market UI: free refresh clicks paid allowance and zero wallet", () => ShanheCodexUiChecks.FreeRefreshClicksKeepPaidAllowancePricesAndZeroWalletState(output));
+            Check("Shanhe market UI: restock purchase same slot prices and refresh allowances", () => ShanheCodexUiChecks.RestockPurchaseClicksReplaceOneSlotAndKeepPricesAndRefreshAllowances(output));
             Check("Shanhe codex UI: failed profile write preserves progress", ShanheCodexUiChecks.FailedProfileWritePreservesProgress);
             Check("Shanhe loadout plans: legacy JSON and detached operations", ShanheCodexLoadoutPersistenceChecks.LegacyJsonAndLoadoutOperationsStayDetached);
             Check("Shanhe loadout plans: invalid metadata and operations rejected", ShanheCodexLoadoutPersistenceChecks.DamagedLoadoutsAndInvalidOperationsAreRejected);

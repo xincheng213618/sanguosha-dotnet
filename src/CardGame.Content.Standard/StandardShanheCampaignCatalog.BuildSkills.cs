@@ -24,6 +24,8 @@ public static partial class StandardShanheCampaignCatalog
             "你可以将至多两张花色相同的牌按以下规则使用或打出：\n•红桃当【桃】;•方片当火【杀】;\n•梅花当【闪】;•黑桃当【无懈可击】。\n若你以此法转化使用了两张：\n•红色牌，此牌回复值或伤害值+1;\n•黑色牌，你弃置当前回合角色一张牌。"),
         new CurrentBuildSkillSource(3081, "遗计", StandardShanheYijiPackage.SkillId, 600, 3, null,
             "当你受到1点伤害后，你可以观看牌堆顶的两张牌，然后将这些牌交给任意角色。"),
+        new CurrentBuildSkillSource(3083, "节命", StandardShanheCappedRefillSkillsPackage.SkillId, 600, 3, 92,
+            "当你受到1点伤害后，你可以令一名角色将手牌摸至X张（X为其体力上限且至多为5）。"),
         new CurrentBuildSkillSource(3049, "青囊", "classic:qingnang", 100, 1, null,
             "出牌阶段限一次，你可以弃置一张手牌令一名角色回复1点体力。"),
         new CurrentBuildSkillSource(3052, "刚烈", "classic:ganglie", 300, 2, 43,
@@ -105,7 +107,19 @@ public static partial class StandardShanheCampaignCatalog
         new CurrentBuildSkillSource(3066, "琴音", "classic:qinyin", 100, 1, null,
             "弃牌阶段结束时，若你本阶段弃置过至少两张手牌，你可以选择令所有角色：\n1.各回复1点体力；2.各失去1点体力。"),
         new CurrentBuildSkillSource(3068, "绝策", "classic:juece", 100, 1, 25,
-            "结束阶段，你可以对一名没有手牌的其他角色造成1点伤害。")
+            "结束阶段，你可以对一名没有手牌的其他角色造成1点伤害。"),
+        new CurrentBuildSkillSource(3158, "推锋", "ol:tuifeng", 600, 3, null,
+            "当你受到1点伤害后，你可以将一张牌置于你的武将牌上，称为“锋”。准备阶段，你移去所有“锋”，摸两倍数量的牌，你本回合使用【杀】的限制次数+X（X为你本回合移去“锋”的数量）。"),
+        new CurrentBuildSkillSource(3086, "称象", "classic:chengxiang", 600, 3, 76,
+            "当你受到伤害后，你可以亮出牌堆顶四张牌，获得其中任意张点数和小于等于13的牌。"),
+        new CurrentBuildSkillSource(3201, "樵拾", "classic:qiaoshi", 100, 1, null,
+            "其他角色的结束阶段，若你与其手牌数相等，你可以与其各摸一张牌。"),
+        new CurrentBuildSkillSource(3144, "甚贤", "ol:shenxian", 100, 1, null,
+            "每回合限一次，当其他角色在你的回合外因弃置而失去基本牌后，你可以摸一张牌。"),
+        new CurrentBuildSkillSource(3208, "瑰藻", "classic:guizao", 100, 1, null,
+            "若你于弃牌阶段弃置过至少两张牌且这些牌花色均不相同，你可以回复1点体力或摸一张牌。"),
+        new CurrentBuildSkillSource(3171, "励战", "ol:lizhan", 100, 1, null,
+            "结束阶段，你可以令任意名已受伤角色摸一张牌。")
     });
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentBuildSkillShopMetadata =>

@@ -12,6 +12,7 @@ public sealed partial class ShanheCampaignSession
     private int ShopPaidRefreshRemaining(RunState state) => Math.Max(0,
         ShopRefreshLimit(state) - state.ShopPaidRefreshCount);
     private int ExtraShopStock(RunState state) => OwnedEconomy(state).Sum(e => e.ExtraStockPerCategory);
+    private bool RestocksShopOnPurchase(RunState state) => OwnedEconomy(state).Any(effect => effect.RestockOnPurchase);
 
     private int EconomyPurchasePrice(RunState state, int amount, int categoryPurchases)
     {
