@@ -926,6 +926,7 @@ public enum SkillProgramEffectOp
     ViewAndTakeSelectedTargetHand = 3300, RequestHandBySuitsOrLoseHp = 3301,
     RecastBoundCards = 62020,
     ReflectAppliedDamage = 62021,
+    DamageRandomEnemyAtDrawThreshold = 62022,
     RecastBoundCard = 3100,
     PayHpToGrantOneUseDamageShield = 3000,
     DrawThenDiscardHandToMaximumHp = 2900,
@@ -6185,6 +6186,13 @@ public sealed class SkillProgramCatalog
              !parsedTrigger.DestinationZones.SequenceEqual([CardZoneKind.Hand]) ||
              parsedTrigger.MovementOccurrence != SkillProgramMovementOccurrence.PerBatch || parsedTrigger.EvaluateConditionAtResolution))
             Fail(path + ".condition", "nativeDrawActualTurnOrdinalIs requires a frozen owner perBatch cardsGained hand boundary");
+        if (parsedTrigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.DamageRandomEnemyAtDrawThreshold) &&
+            (parsedTrigger.Window != SkillProgramTriggerWindow.CardsGained || parsedTrigger.Subject != SkillProgramTriggerSubject.Owner ||
+             !parsedTrigger.DestinationZones.SequenceEqual([CardZoneKind.Hand]) ||
+             parsedTrigger.MovementOccurrence != SkillProgramMovementOccurrence.PerBatch || parsedTrigger.EvaluateConditionAtResolution ||
+             parsedTrigger.Optional || parsedTrigger.UsageScope is not null || parsedTrigger.UsageLimit is not null ||
+             parsedTrigger.Effects.Count != 1 || parsedTrigger.Condition.Kind != SkillProgramTriggerConditionKind.Always))
+            Fail(path, "draw-threshold damage requires one mandatory unconditional owner perBatch cardsGained hand instruction");
         if (parsedTrigger.Effects.Any(e => e.Op == SkillProgramEffectOp.KanggeGainDraw) &&
             (parsedTrigger.Window != SkillProgramTriggerWindow.CardsGained ||
              parsedTrigger.Subject != SkillProgramTriggerSubject.Owner ||

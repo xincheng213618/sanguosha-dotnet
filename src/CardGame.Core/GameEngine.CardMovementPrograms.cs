@@ -373,6 +373,8 @@ public sealed partial class GameEngine
                     ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.StartJudgment)) continue;
                 var occurrences = trigger.MovementOccurrence == SkillProgramMovementOccurrence.PerBatch
                     ? new[] { count.Location.Zone == CardZoneKind.PrivatePersistentPile || trigger.Effects is [{ Op: SkillProgramEffectOp.RecoverAfterLastPublicRice }] ? indexes[0] : 0 } : indexes;
+                if (UsesNativeDrawThreshold(trigger))
+                    occurrences = Enumerable.Range(0, MatchingNativeDrawThresholdProgress(batch, candidate)?.Crossings ?? 0).ToArray();
                 candidates.AddRange(occurrences.Select(index => candidate with { OccurrenceIndex = index }));
             }
         }
@@ -550,6 +552,7 @@ public sealed partial class GameEngine
         SkillProgramTrigger trigger, CardLocation location)
     {
         var features = ProgramInstructionResolver.Default.Features(trigger);
+        if (UsesNativeDrawThreshold(trigger)) return MatchingNativeDrawThresholdIndexes(batch, candidate);
         var ordinalIndexes = UsesNativeDrawOrdinal(trigger) ? MatchingNativeDrawOrdinalIndexes(batch, candidate) : null;
         if (ordinalIndexes is { Length: not 1 }) return [];
         if (features.HasOperation(SkillProgramEffectOp.GainFaluTokensAfterActualDiscard))
