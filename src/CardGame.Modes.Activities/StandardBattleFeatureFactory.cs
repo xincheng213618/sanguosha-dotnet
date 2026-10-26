@@ -17,7 +17,8 @@ public sealed class StandardBattleFeatureFactory : IGameModeFeatureFactory
         {
             features.Add(new ShanheBattleFeature(campaign, context.GetHost<IStandardBattleHost>()));
             if (campaign.BossTransition is not null)
-                features.Add(new ShanheBossStageFeature(campaign, context.GetHost<IModeEncounterHost>()));
+                features.Add(new ShanheBossStageFeature(campaign, context.GetHost<IModeEncounterHost>(),
+                    context.GetHost<IStandardBattleHost>()));
         }
         if (mode.ShenwuActivity is not null)
             features.Add(new ShenwuBattleFeature(options, mode.ShenwuActivity, context.ContentRegistry,

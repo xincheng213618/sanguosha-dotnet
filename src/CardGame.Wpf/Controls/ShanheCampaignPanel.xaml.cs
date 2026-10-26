@@ -112,12 +112,6 @@ public partial class ShanheCampaignPanel : UserControl
             ShanheSetupOverlay.Visibility = Visibility.Collapsed;
     }
 
-    public bool ShowDetachButton
-    {
-        get => DetachWindowButton.Visibility == Visibility.Visible;
-        set => DetachWindowButton.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
-    }
-
     public void FocusCampaign()
     {
         if (ShanheSettlementHost.Visibility == Visibility.Visible) { ShanheSettlementHost.FocusSettlement(); return; }
@@ -135,7 +129,7 @@ public partial class ShanheCampaignPanel : UserControl
 
     public bool HandleEscape()
     {
-        if (ShanheCampaignWindow.HasOpenDropDown(this)) return true;
+        if (ModalFocus.HasOpenDropDown(this)) return true;
         if (ShanheCodexHost.HandleEscape()) return true;
         if (DataContext is MainViewModel { IsShanheSettlementOpen: true } settlement)
         { settlement.CloseShanheSettlementCommand.Execute(null); FocusCampaign(); return true; }
@@ -164,9 +158,6 @@ public partial class ShanheCampaignPanel : UserControl
         if (ShanheJourneyTabs.SelectedIndex != 0) { ShanheJourneyTabs.SelectedIndex = 0; return true; }
         return false;
     }
-
-    private void OpenDetachedWindow(object sender, RoutedEventArgs e) =>
-        (Window.GetWindow(this) as MainWindow)?.OpenShanheWindow();
 
     private void PrepareExpedition(object sender, RoutedEventArgs e)
     {
@@ -248,6 +239,6 @@ public partial class ShanheCampaignPanel : UserControl
     private void Campaign_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape && Keyboard.Modifiers == ModifierKeys.None &&
-            !ShanheCampaignWindow.HasOpenDropDown(this)) e.Handled = HandleEscape();
+            !ModalFocus.HasOpenDropDown(this)) e.Handled = HandleEscape();
     }
 }

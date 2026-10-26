@@ -162,6 +162,8 @@ public sealed partial class ShanheCampaignSession
         var probe = Definition.Nodes.First(node => ShanheCampaignContent.IsBattle(node.Kind));
         return ShanheCampaignContent.FreezeAndValidate(Definition with
         {
+            // This detached recipe only executes purchases. The owning expedition/battle keeps the source identity and growth contract.
+            SourceDifficultyId = null, SourceEnemyGrowth = null, SourceEnemyGrowthHash = null, SourceGrowthPolicy = null,
             Id = Definition.Id + ":market:" + state.MarketChapterNumber,
             Name = Definition.Name + " · 常驻集市", StartingNodeIds = [shop.Id], RandomStartingNode = false,
             StartingGold = 0, ExtraSkillSlots = 0, StartingBonuses = new(),
@@ -176,7 +178,7 @@ public sealed partial class ShanheCampaignSession
     {
         var definition = CreateMarketDefinition(state);
         return ShanheBattleMarketSetup.Freeze(new(definition,
-            _options with { PersistentMarket = false, EquippedTacticIds = [] },
+            _options with { PersistentMarket = false, EquippedTacticIds = [], SourceDifficultyId = null },
             ExportMarketTransfer(state, ShanheCampaignContent.GetContentHash(definition)))
             { BossBattle = state.CurrentNodeId is { } id && _nodes[id].Kind == ShanheNodeKind.BossBattle });
     }
@@ -212,7 +214,8 @@ public sealed partial class ShanheCampaignSession
             transfer.ExtraSkillIds.All(skill => Definition.Rewards.Any(reward => reward.SkillId == skill) || state.ExtraSkillIds.Contains(skill)) &&
             transfer.TacticIds.Count <= MaximumCommands && transfer.TacticIds.All(id => id is not null &&
                 _rewards.TryGetValue(id, out var reward) &&
-                (reward.TacticSkillId is not null || reward.OpeningSkillRewardIds is not null || reward.CampaignEconomy is not null)) &&
+                (reward.TacticSkillId is not null || reward.OpeningSkillRewardIds is not null || reward.OpeningCompanionPool is not null ||
+                    reward.CampaignEconomy is not null)) &&
             transfer.StartingCards.Count <= 24 && transfer.StartingEquipment.Count <= 8 && transfer.ShopStock.Count <= 512 &&
             transfer.PurchasedChoiceIds.Count <= MaximumCommands &&
             transfer.PurchasedChoiceIds.All(id => !string.IsNullOrWhiteSpace(id)) &&
@@ -228,7 +231,7 @@ public sealed partial class ShanheCampaignSession
                 authored.RewardId == choice.RewardId && authored.GoldCost == choice.GoldCost && authored.HpCost == choice.HpCost)) &&
             transfer.StartingEquipment.Select(card => EquipmentCatalog.Get(card.Kind).Slot).Distinct().Count() == transfer.StartingEquipment.Count,
             "Invalid market shelf or transaction counters.");
-        return state with
+        var imported = state with
         {
             MarketNodeId = transfer.MarketNodeId, MarketChapterNumber = transfer.ChapterNumber,
             Hp = transfer.Hp, Gold = transfer.Gold, ExtraSkillSlots = transfer.ExtraSkillSlots, Bonuses = transfer.Bonuses,
@@ -240,5 +243,6 @@ public sealed partial class ShanheCampaignSession
             ShopTacticPurchases = transfer.ShopTacticPurchases, ShopEquipmentPurchases = transfer.ShopEquipmentPurchases,
             ShopCardPurchases = transfer.ShopCardPurchases, ShopSkillPurchases = transfer.ShopSkillPurchases
         };
+        return imported;
     }
 }

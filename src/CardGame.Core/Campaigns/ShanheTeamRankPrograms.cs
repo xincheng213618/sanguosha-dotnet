@@ -11,10 +11,11 @@ public static class ShanheTeamRankPrograms
         setup.ActiveSchoolIds.Contains(6) && setup.TacticSkillIds.Contains(ShanheSchoolEffects.TeamRankSkillId, StringComparer.Ordinal)
             ? ShanheGeneralRanks.GetBonuses(EffectiveRank(setup)) : new();
 
-    // Both uses consume one expedition allowance. A teammate cannot refresh the
-    // player's spent privilege merely by entering the next encounter.
-    public static bool IsExpeditionRebirthUsage(ShanheBattleSetup setup, SkillUsageConsumedEvent usage) =>
+    public static bool IsPlayerExpeditionRebirthUsage(SkillUsageConsumedEvent usage) =>
         usage.Scope == SkillUsageScope.Game && usage.Count > 0 &&
-        (usage.SkillId == ShanheGeneralRanks.RebirthSkillId && usage.SkillOwnerSeat == 0 ||
-         usage.SkillId == SharedRebirthSkillId && usage.SkillOwnerSeat > 0 && usage.SkillOwnerSeat <= setup.AllyRoster.Count);
+        usage.SkillId == ShanheGeneralRanks.RebirthSkillId && usage.SkillOwnerSeat == 0;
+
+    public static bool IsAllyExpeditionRebirthUsage(ShanheBattleSetup setup, SkillUsageConsumedEvent usage) =>
+        usage.Scope == SkillUsageScope.Game && usage.Count > 0 && usage.SkillId == SharedRebirthSkillId &&
+        usage.SkillOwnerSeat > 0 && usage.SkillOwnerSeat <= setup.AllyRoster.Count;
 }

@@ -3,7 +3,7 @@ namespace CardGame.Core;
 /// <summary>Generic post-movement program host. It contains no skill ids.</summary>
 public sealed partial class GameEngine
 {
-    private CardMovementTiming? CaptureMovementTiming() => !(HasOl2016SimaRenjie || HasLeZhouFeiLingkongCapability || HasZhaoZhongCapability || HasMouFaZhengCapability || _contentRegistry.ProgramDependencies.UsesGainPhaseQualification || TracksRedOwnedLoss || HasActualHandGainCapability || HasAnniversaryHuCheErRules || HasAnniversaryQiaoRuiCapability ||
+    private CardMovementTiming? CaptureMovementTiming() => !(HasOl2016SimaRenjie || HasLeZhouFeiLingkongCapability || HasZhaoZhongCapability || HasMouFaZhengCapability || _contentRegistry.ProgramDependencies.UsesGainPhaseQualification || TracksRedOwnedLoss || HasActualHandGainCapability || HasShanheChanrangCapability || HasAnniversaryHuCheErRules || HasAnniversaryQiaoRuiCapability ||
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GiveAfterBatchGain) ||
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.BindOwnTurnEnemyHandGain) ||
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GainHappyHuaTuoMedicine) ||
@@ -135,6 +135,7 @@ public sealed partial class GameEngine
         CaptureAnniversaryMaMiaoGainBatch(completed);
         CaptureSlashUsePaymentBatch(completed);
         CaptureForeignTurnActualHandGains(completed);
+        CaptureShanheChanrangFirstGains(completed);
         CaptureQimeiMovementQualification(completed);
         if (CaptureSanwenGainQualifications(completed) is { } sanwen) completed = completed with { SanwenGains = sanwen };
         completed = CaptureBianFuRenMovementBatch(completed);
@@ -627,6 +628,12 @@ public sealed partial class GameEngine
         CardsMovedTriggerWindowFrame frame,
         ProgramTriggerCandidate candidate)
     {
+        if (IsShanheChanrangCandidate(candidate))
+            return CreateShanheChanrangContext(frame, candidate);
+        if (IsShanheYingxiangMovement(candidate))
+            return CreateShanheYingxiangContext(frame, candidate);
+        if (IsChilianLiangyinMovement(candidate))
+            return CreateChilianLiangyinContext(frame, candidate);
         if (IsBoundaryYiJiGiveCandidate(candidate))
             return CreateBoundaryYiJiGiveContext(frame, candidate);
         if (IsBoundaryZhouFeiMovement(candidate))

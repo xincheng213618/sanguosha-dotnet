@@ -17,17 +17,19 @@ public sealed partial class GameEngine
         return query switch { SkillRuleQuery.DrawCount => bonus.Draw, SkillRuleQuery.SlashLimit => bonus.Slash, _ => 0 };
     }
 
-    private bool ShanheExpeditionRebirthSpent => _options.ShanheBattle is { } setup &&
-        ProgramEventHistory<SkillUsageConsumedEvent>().Any(e => ShanheTeamRankPrograms.IsExpeditionRebirthUsage(setup, e));
+    private bool ShanheAllyExpeditionRebirthAvailable(int seat) =>
+        _options.ShanheBattle is { PlayerRank: 5 } setup &&
+        !setup.AllyRankRebirthUsedSeats.Contains(seat) &&
+        !ProgramEventHistory<SkillUsageConsumedEvent>().Any(e =>
+            e.SkillOwnerSeat == seat && ShanheTeamRankPrograms.IsAllyExpeditionRebirthUsage(setup, e));
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 62025)]
     private bool AllowsShanheSharedRebirth(ProgramTriggerLegalityContext gate)
     {
         if (gate.SkillId == ShanheTeamRankPrograms.SharedRebirthSkillId)
             return IsActualShanheAlly(gate.OwnerSeat) && HasShanheSchoolEffect(0, 6) &&
-                _options.ShanheBattle is { RebirthAvailable: true, PlayerRank: 5 } && !ShanheExpeditionRebirthSpent;
-        return gate.SkillId != ShanheGeneralRanks.RebirthSkillId ||
-            _options.ShanheBattle is null || !ShanheExpeditionRebirthSpent;
+                ShanheAllyExpeditionRebirthAvailable(gate.OwnerSeat);
+        return true;
     }
 
     private bool HasShanheTeamHealthTactic => _modeDefinition.Id == ShanheBattleSetup.BattleModeId &&
@@ -160,7 +162,7 @@ public sealed partial class GameEngine
             switch (state.Stage)
             {
                 case ShanheTeamRankStage.Grant:
-                    if (state.Rank == 5 && _options.ShanheBattle!.RebirthAvailable && !ShanheExpeditionRebirthSpent)
+                    if (state.Rank == 5 && ShanheAllyExpeditionRebirthAvailable(seat))
                         CommitProgramParticipantSkillGrants(f, seat, [ShanheTeamRankPrograms.SharedRebirthSkillId],
                             $"campaign:shanhe-team-rank:{seat}", null, null);
                     ReplaceRuntimeTop(GetActiveProgramFrame(id) with { ShanheTeamRank = state with { Stage = ShanheTeamRankStage.Health } });

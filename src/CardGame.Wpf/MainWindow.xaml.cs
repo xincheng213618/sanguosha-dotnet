@@ -43,7 +43,6 @@ public partial class MainWindow : Window
         PreviewMouseDown += TableMouseDown;
         InitializeCardAim();
         InitializeGeneralPreviewScroll();
-        InitializeShanheWindowHost(viewModel);
     }
 
     private void GameArea_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateTableScale(e.NewSize);
@@ -198,7 +197,6 @@ public partial class MainWindow : Window
 
     private void Window_Closed(object? sender, EventArgs e)
     {
-        DisposeShanheWindowHost();
         ObserveCardAimModel(null);
         _overlayFocusRequest++;
         _targetCardFocus = null;
@@ -415,7 +413,6 @@ public partial class MainWindow : Window
 
     private void FocusCurrentSurface(MainViewModel viewModel, IInputElement? previous)
     {
-        if ((viewModel.IsShanheOpen || viewModel.IsShanheMarketOpen) && FocusDetachedShanheWindow()) return;
         var surface = CurrentFocusSurface(viewModel);
         if (!surface.IsVisible || !surface.IsEnabled) return;
         if (previous is UIElement { IsVisible: true, IsEnabled: true, Focusable: true } target &&
@@ -426,7 +423,7 @@ public partial class MainWindow : Window
         }
         if (ReferenceEquals(surface, ShanheMarketOverlay)) ShanheMarketHost.FocusMarket();
         else if (ReferenceEquals(surface, WushuangShopOverlay)) surface.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
-        else if (ReferenceEquals(surface, ShanheOverlay)) surface.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+        else if (ReferenceEquals(surface, ShanheOverlay)) ShanhePanel.FocusCampaign();
         else if (ReferenceEquals(surface, SettingsOverlay)) SettingsSoundToggle.Focus();
         else if (ReferenceEquals(surface, HistoryOverlay)) HistoryPanel.FocusHistory();
         else if (ReferenceEquals(surface, GeneralGalleryOverlay)) GeneralGallery.FocusCurrentView();
@@ -552,7 +549,7 @@ public partial class MainWindow : Window
         var surface = CurrentFocusSurface(viewModel);
         // Escape belongs to an expanded selector before its containing panel.
         // Repeats have already been consumed, so holding it cannot close both.
-        if (key == Key.Escape && modifiers == ModifierKeys.None && ShanheCampaignWindow.HasOpenDropDown(surface))
+        if (key == Key.Escape && modifiers == ModifierKeys.None && ModalFocus.HasOpenDropDown(surface))
             return false;
         if (ReferenceEquals(surface, ShanheMarketOverlay))
         {

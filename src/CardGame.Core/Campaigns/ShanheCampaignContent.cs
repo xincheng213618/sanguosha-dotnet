@@ -11,6 +11,8 @@ public static partial class ShanheCampaignContent
         ArgumentNullException.ThrowIfNull(definition);
         RequireText(definition.Id, "campaign id");
         RequireText(definition.Name, "campaign name");
+        Require(definition.SourceDifficultyId is null or >= 1 and <= 25, "Unknown source difficulty identity.");
+        ShanheSourceDifficultyRuntime.ValidateContract(definition);
         GodFactionSelectionRules.ValidateDefault(definition.DefaultGodFactionId);
         Require(definition.Nodes is { Count: > 0 and <= 256 } && definition.Rewards is { Count: <= 512 }, "A campaign requires a bounded node and reward catalogue.");
         Require(definition.PlayerGeneralIds is { Count: > 0 and <= 2048 } && definition.StartingNodeIds is { Count: > 0 }, "A campaign requires player generals and entry nodes.");
@@ -28,6 +30,7 @@ public static partial class ShanheCampaignContent
         foreach (var reward in definition.Rewards)
         {
             ValidateOpeningSkillReward(definition, reward);
+            ValidateOpeningCompanionReward(definition, reward);
             ValidateEconomy(reward);
             RequireText(reward.Name, "reward name");
             Require(reward.Rarity is >= 0 and <= 4, "Reward rarity must be between zero and four.");
@@ -57,17 +60,33 @@ public static partial class ShanheCampaignContent
             UniqueIds(node.RewardIds ?? [], "node reward");
             Require((node.RewardIds ?? []).All(rewardIds.Contains), "A node references an unknown reward.");
             var battle = IsBattle(node.Kind);
+            Require(node.PrimaryTacticRarity is >= 0 and <= 4 && node.PrimarySkillRarity is >= 0 and <= 4 &&
+                (battle || node.PrimaryTacticRarity == 0 && node.PrimarySkillRarity == 0),
+                "Only battle nodes may set a bounded primary reward quality.");
+            Require(!node.IsStoryBattle || battle, "A story battle must use a battle node kind.");
             Require(battle || !node.CategorizedRewards, "Only battle nodes may offer categorized rewards.");
             Require(node.RewardSkipGold is >= 0 and <= 100_000 && (battle || node.RewardSkipGold == 0),
                 "Only battle nodes can grant bounded reward-skip compensation.");
             Require(battle ? node.Encounters is { Count: > 0 and <= 64 } && (node.Choices?.Count ?? 0) == 0 :
-                (node.Encounters?.Count ?? 0) == 0 && node.Choices is { Count: > 0 } &&
-                node.Choices.Count <= (node.Kind == ShanheNodeKind.Shop ? 512 : 64) && (node.RewardIds?.Count ?? 0) == 0,
+                (node.Encounters?.Count ?? 0) == 0 && ((node.Choices is { Count: > 0 } &&
+                node.Choices.Count <= (node.Kind == ShanheNodeKind.Shop ? 512 : 64)) || node.StoryEvents is { Count: > 0 }) && (node.RewardIds?.Count ?? 0) == 0,
                 "Battle nodes need encounters; other nodes need explicit choices.");
+            ValidateStoryEvents(node);
+            foreach (var story in node.StoryEvents ?? [])
+                foreach (var id in story.SkillRewardIds ?? [])
+                    Require(definition.Rewards.Any(reward => reward.Id == id && reward.SkillId is not null && reward.Rarity >= 2),
+                        "A story skill pool requires known rare-or-better skill rewards.");
             UniqueIds((node.Encounters ?? []).Select(e => e?.Id ?? ""), "encounter");
             foreach (var encounter in node.Encounters ?? [])
             {
                 RequireText(encounter.Name, "encounter name");
+                Require(encounter.SourceBattleId is null or > 0 && encounter.SourceCityId is null or > 0,
+                    "Source encounter identities must be positive when supplied.");
+                Require(encounter.SourceVisibleEnemyCount is null or >= 1 and <= 7 &&
+                    (encounter.SourceVisibleEnemyCount is null || encounter.Enemies is { } sourceEnemies && encounter.SourceVisibleEnemyCount <= sourceEnemies.Count),
+                    "A source multiplier roster cannot exceed the encounter roster.");
+                if (encounter.TerrainSkillId is not null) ValidateTerrainSkill(encounter.TerrainSkillId);
+                Require(encounter.StoryText is null || encounter.StoryText.Length <= 16_384, "Encounter narrative is too long.");
                 Require(encounter.Enemies is { Count: > 0 and <= 7 } && (encounter.Allies?.Count ?? 0) <= 6 &&
                     encounter.Enemies.Count + (encounter.Allies?.Count ?? 0) + 1 <= 8, "An encounter requires one to seven enemies and at most eight total seats.");
                 Require(encounter.VictoryGold is >= 0 and <= 100_000 && encounter.HealAfterVictory is >= 0 and <= 1000, "Invalid encounter rewards.");
@@ -75,12 +94,22 @@ public static partial class ShanheCampaignContent
                 ValidateBossTransition(encounter.BossTransition, encounter.Enemies);
             }
             UniqueIds((node.Choices ?? []).Select(c => c?.Id ?? ""), "node choice");
-            foreach (var choice in node.Choices ?? [])
+            foreach (var choice in (node.Choices ?? []).Concat((node.StoryEvents ?? []).SelectMany(story => story.Choices)))
             {
                 RequireText(choice.Name, "choice name");
                 Require(choice.Id != "$leave" && choice.GoldCost is >= 0 and <= 100_000 && choice.HpCost is >= 0 and <= 1000, "Invalid choice cost or reserved choice id.");
                 Require(choice.RewardId is null || rewardIds.Contains(choice.RewardId), "A choice references an unknown reward.");
                 Require(node.Kind == ShanheNodeKind.Shop || choice.LeavesNode, "Only shops may remain open after a choice.");
+                if (choice.BattleNodeId is { } battleId)
+                    Require(node.Kind == ShanheNodeKind.Event && choice.RewardId is null && choice.Companion is null &&
+                        definition.Nodes.Any(target => target.Id == battleId && target.IsStoryBattle),
+                        "A battle choice must reference a dedicated story battle and grant no immediate reward.");
+                if (choice.Companion is { } companion)
+                {
+                    Require(node.Kind == ShanheNodeKind.Event && choice.RewardId is null,
+                        "Recruitment is an event choice, separate from build rewards.");
+                    ValidateCombatant(companion);
+                }
             }
         }
         ValidateRoutes(definition);
@@ -92,12 +121,15 @@ public static partial class ShanheCampaignContent
             Nodes = Freeze(definition.Nodes.Select(node => node with
             {
                 NextNodeIds = Freeze(node.NextNodeIds), RewardIds = Freeze(node.RewardIds ?? []),
-                Choices = Freeze(node.Choices ?? []),
+                Choices = Freeze((node.Choices ?? []).Select(FreezeStoryChoice)),
+                StoryEvents = node.StoryEvents is null ? null : Freeze(node.StoryEvents.Select(story => story with
+                { Choices = Freeze(story.Choices.Select(FreezeStoryChoice)), SkillRewardIds = story.SkillRewardIds is null ? null : Freeze(story.SkillRewardIds) })),
                 BossRewards = FreezeBossRewards(node.BossRewards),
                 Encounters = Freeze((node.Encounters ?? []).Select(encounter => encounter with
                 {
                     Enemies = Freeze(encounter.Enemies.Select(FreezeCombatant)),
-                    Allies = Freeze((encounter.Allies ?? []).Select(FreezeCombatant))
+                    Allies = Freeze((encounter.Allies ?? []).Select(FreezeCombatant)),
+                    BossTransition = FreezeBossTransition(encounter.BossTransition)
                 }))
             }))
         };
@@ -123,6 +155,8 @@ public static partial class ShanheCampaignContent
         Bonuses = value.Bonuses ?? new(), StartingCards = Freeze(value.StartingCards ?? []), StartingEquipment = Freeze(value.StartingEquipment ?? [])
     };
     internal static bool IsBattle(ShanheNodeKind kind) => kind is ShanheNodeKind.Battle or ShanheNodeKind.EliteBattle or ShanheNodeKind.BossBattle;
+    internal static ShanheBossTransition? FreezeBossTransition(ShanheBossTransition? transition) => transition is null ? null : transition with
+    { Combatant = transition.Combatant is null ? null : FreezeCombatant(transition.Combatant) };
     internal static void ValidateBossTransition(ShanheBossTransition? transition, IReadOnlyList<ShanheCombatantDefinition> enemies)
     {
         if (transition is null) return;
@@ -130,6 +164,12 @@ public static partial class ShanheCampaignContent
         RequireText(transition.GeneralId, "second-form general");
         Require(transition.MaxHp is >= 1 and <= 1000 && transition.Hp >= 1 && transition.Hp <= transition.MaxHp &&
             transition.DrawCards is >= 0 and <= 40, "Invalid boss second-form health, general or draw count.");
+        if (transition.Combatant is { } combatant)
+        {
+            Require(combatant.GeneralId == transition.GeneralId, "A boss stage numeric recipe requires the same general.");
+            ValidateCombatant(combatant);
+        }
+        ValidateCards(transition.StartingEquipment, equipmentOnly: true);
     }
     internal static void Require(bool condition, string message)
     {
@@ -155,6 +195,13 @@ public static partial class ShanheCampaignContent
         Require(npc.MaxHpBonus is >= 0 and <= 40 && (npc.Hp is null or > 0 and <= 60) &&
             npc.InitialHandBonus is >= 0 and <= 20 && npc.DrawBonus is >= 0 and <= 10 && npc.SlashBonus is >= 0 and <= 10,
             "Invalid combatant health or bonuses.");
+        Require(npc.InitialArmor is >= 0 and <= 1000 && npc.ArmorRecoveryPerRound is >= 0 and <= 1000 &&
+            npc.ArmorRecoveryCap is >= 0 and <= 1000 && npc.ExtraDamage is >= 0 and <= 1000,
+            "Invalid combatant armor, recovery cap or damage increment.");
+        if (npc.SourceDifficultyAttributes is { } sourceAttributes)
+            Require(sourceAttributes.Count <= 5 && sourceAttributes.All(row => row is not null && row.Attributes is not null && row.DifficultyGroupId is >= 1 and <= 5) &&
+                sourceAttributes.Select(row => row.DifficultyGroupId).Distinct().Count() == sourceAttributes.Count,
+                "Source General attributes require distinct normal difficulty groups.");
         Require((npc.ExtraSkillIds?.Count ?? 0) <= 8, "Too many combatant skills.");
         UniqueIds(npc.ExtraSkillIds ?? [], "combatant skill");
         UniqueIds(npc.QualifiedPrintedLordSkillIds ?? [], "qualified printed Lord skill");
@@ -185,7 +232,9 @@ public static partial class ShanheCampaignContent
         {
             if (visited.Contains(id)) return;
             Require(visiting.Add(id), "Campaign routes must not contain cycles.");
-            foreach (var next in nodes[id].NextNodeIds) Visit(next);
+            foreach (var next in nodes[id].NextNodeIds.Concat((nodes[id].Choices ?? [])
+                .Concat((nodes[id].StoryEvents ?? []).SelectMany(story => story.Choices))
+                .Select(choice => choice.BattleNodeId).OfType<string>())) Visit(next);
             visiting.Remove(id);
             visited.Add(id);
         }

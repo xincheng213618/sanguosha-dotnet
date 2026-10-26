@@ -11,13 +11,24 @@ public sealed partial class ShanheCampaignSession
     }
 
     private static ShanheRewardCategory RewardCategory(ShanheRewardDefinition reward) =>
-        !string.IsNullOrWhiteSpace(reward.TacticSkillId) || reward.OpeningSkillRewardIds is not null ||
+        !string.IsNullOrWhiteSpace(reward.TacticSkillId) || reward.OpeningSkillRewardIds is not null || reward.OpeningCompanionPool is not null ||
         reward.CampaignEconomy is not null || reward.Bonuses is { } bonuses &&
             (bonuses.MaxHp != 0 || bonuses.InitialHand != 0 || bonuses.Draw != 0 || bonuses.Slash != 0)
             ? ShanheRewardCategory.Tactic :
         reward.SkillId is not null ? ShanheRewardCategory.Skill :
         reward.StartingCards?.Count > 0 || reward.StartingEquipment?.Count > 0 ? ShanheRewardCategory.Card :
         ShanheRewardCategory.Supply;
+
+    private static bool IsPrimaryRewardRarity(ShanheNodeDefinition node, ShanheRewardDefinition reward)
+    {
+        var rarity = RewardCategory(reward) switch
+        {
+            ShanheRewardCategory.Tactic => node.PrimaryTacticRarity,
+            ShanheRewardCategory.Skill => node.PrimarySkillRarity,
+            _ => 0
+        };
+        return rarity == 0 || reward.Rarity == rarity;
+    }
 
     private int CategorizedRewardChoiceCount(RunState state, ShanheRewardCategory category, int baseCount) =>
         Math.Max(baseCount, OwnedEconomy(state).Select(effect => category switch
@@ -63,6 +74,26 @@ public sealed partial class ShanheCampaignSession
     private static bool HasPrimaryReward(RunState state) =>
         state.Phase == ShanheCampaignPhase.Reward && state.BossRewardGroups.Count == 0 &&
         (state.RewardOfferIds.Count > 0 || state.CategoryRewardGroups.Count > 0 && state.SelectedRewardCategory is null);
+
+    private int PrimaryRewardSkipGold(RunState state) => HasPrimaryReward(state)
+        ? RewardSkipCompensation(state.RewardOfferIds, _nodes[state.CurrentNodeId!].RewardSkipGold) : 0;
+
+    private int RewardSkipCompensation(IReadOnlyList<string> offerIds, int configuredGold)
+    {
+        // A category must be committed before its actual reward can be declined.
+        // Tactics are mandatory, including additive bonuses and economy tactics.
+        if (configuredGold <= 0 || offerIds.Count == 0 || offerIds.Any(id => RewardCategory(_rewards[id]) == ShanheRewardCategory.Tactic))
+            return 0;
+        if (offerIds.All(id => _rewards[id].SkillId is not null))
+        {
+            var rarities = offerIds.Select(id => _rewards[id].Rarity).Distinct().ToArray();
+            if (rarities is [1]) return 50;
+            if (rarities is [2]) return 100;
+        }
+        // Card/equipment and unspecified epic compensation retain the authored
+        // amount; no new epic resale price is inferred from the rarity label.
+        return configuredGold;
+    }
 
     private static RunState ClearPrimaryRewardState(RunState state) => state with
     {

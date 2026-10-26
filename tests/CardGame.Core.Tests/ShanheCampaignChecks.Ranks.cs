@@ -1,9 +1,121 @@
 using System.Text.Json;
+using System.Reflection;
+using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
 
 internal static partial class ShanheCampaignChecks
 {
+    public static void CurrentRankHealthStartsFromPrintedHpAndRetainsExplicitGrowthCold()
+    {
+        var roster = StandardShanheCampaignCatalog.PlayerRosterRegistry;
+        Require(roster.Generals["classic:wei-yan"].BaseHp == 4 && roster.Generals["classic:qu-yi"].BaseHp == 4 &&
+            roster.Generals["classic:zhuge-liang"].BaseHp == 3,
+            "The production content gives Wei Yan and Qu Yi four printed HP and Zhuge Liang three.");
+        foreach (var difficulty in new[] { 1, 2, 3 })
+        foreach (var codex in new[] { false, true })
+        foreach (var general in new[] { "classic:wei-yan", "classic:qu-yi" })
+        {
+            var definition = codex ? StandardShanheCampaignCatalog.CreateCodexDefinition(difficulty, StandardShanheCampaignCatalog.Returning2026EditionId)
+                : StandardShanheCampaignCatalog.CreateDefinition(difficulty, StandardShanheCampaignCatalog.Returning2026EditionId);
+            var options = new ShanheCampaignOptions(71, general)
+            {
+                PlayerRank = 5, UseCodexRewardPool = codex,
+                EquippedTacticIds = [StandardShanheCampaignCatalog.CurrentDangtouRewardId]
+            };
+            var session = ShanheCampaignSession.Create(definition, options, StandardShanheCampaignCatalog.CreateBattleRegistry);
+            Require(definition.StartingBonuses == new ShanheTacticBonuses() && session.Snapshot is { Hp: 6, MaxHp: 6, PlayerRank: 5 } &&
+                session.Snapshot.Bonuses == ShanheGeneralRanks.GetBonuses(5) && session.Snapshot.TacticIds.SequenceEqual(options.EquippedTacticIds),
+                "A fifth-rank four-HP general with only Dangtou uses only rank privileges in every current difficulty and catalogue path.");
+            var checkpoint = ShanheCampaignJson.Deserialize(ShanheCampaignJson.Serialize(session.CreateCheckpoint()));
+            var restored = ShanheCampaignSession.Restore(checkpoint,
+                StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(checkpoint, difficulty), StandardShanheCampaignCatalog.CreateBattleRegistry);
+            Require(restored.Snapshot is { Hp: 6, MaxHp: 6 } && Snapshot(restored) == Snapshot(session),
+                "Cold campaign replay does not reapply rank or insert old local preparation HP.");
+            var firstNode = session.Snapshot.AvailableNodes[0];
+            Accept(session, new MoveShanheNodeCommand(firstNode.Id, session.Revision));
+            var setup = session.PendingBattleSetup!;
+            Require(setup is { Hp: 6, MaxHpBonus: 2, PlayerRank: 5, InitialHandBonus: 2, DrawBonus: 1, SlashBonus: 1 },
+                "The actual native recipe carries the rank's health, initial hand, normal draw and Slash bonuses exactly once.");
+            var battle = StandardShanheCampaignCatalog.CreateBattle(setup);
+            Require(battle.CreateSnapshot(0).Players[0] is { Hp: 6, MaxHp: 6, HandCount: 6 } &&
+                RankNativeCounters(battle) == (3, 2, 6),
+                "The real fifth-rank player starts with six HP, six physical cards, three normal draws, two Slashes and the ordinary six-card hand limit.");
+            Accept(battle, new StartGameCommand());
+            var coldBattle = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(battle.CreateCheckpoint())),
+                StandardShanheCampaignCatalog.CreateBattleRegistry(setup));
+            Require(coldBattle.CreateSnapshot(0).Players[0] is { Hp: 6, MaxHp: 6 } &&
+                RankNativeCounters(coldBattle) == (3, 2, 6) &&
+                SnapshotJson.Serialize(coldBattle.CreateSnapshot(0)) == SnapshotJson.Serialize(battle.CreateSnapshot(0)),
+                "The real started battle retains the same six HP and full state after native checkpoint replay.");
+        }
+
+        var current = StandardShanheCampaignCatalog.CreateCodexDefinition(2, StandardShanheCampaignCatalog.Returning2026EditionId);
+        foreach (var general in new[] { "classic:wei-yan", "classic:qu-yi", "classic:zhuge-liang" })
+        foreach (var rank in new[] { 1, 2, 3, 4, 5 })
+        {
+            var session = ShanheCampaignSession.Create(current, new(71, general) { PlayerRank = rank }, StandardShanheCampaignCatalog.CreateBattleRegistry);
+            var privilege = ShanheGeneralRanks.GetBonuses(rank);
+            var expected = roster.Generals[general].BaseHp + privilege.MaxHp;
+            Require(session.Snapshot.Hp == expected && session.Snapshot.MaxHp == expected,
+                "Current health follows each general's own printed value and selected rank, rather than fixing every general at six.");
+            Accept(session, new MoveShanheNodeCommand(session.Snapshot.AvailableNodes[0].Id, session.Revision));
+            var battle = StandardShanheCampaignCatalog.CreateBattle(session.PendingBattleSetup!);
+            Require(battle.CreateSnapshot(0).Players[0].HandCount == 4 + privilege.InitialHand &&
+                RankNativeCounters(battle) == (2 + privilege.Draw, 1 + privilege.Slash, expected),
+                "Every rank uses its printed opening-hand, normal-draw and Slash privileges while the ordinary hand limit follows actual HP.");
+            var cold = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(battle.CreateCheckpoint())),
+                StandardShanheCampaignCatalog.CreateBattleRegistry(session.PendingBattleSetup!));
+            Require(SnapshotJson.Serialize(cold.CreateSnapshot(0)) == SnapshotJson.Serialize(battle.CreateSnapshot(0)) &&
+                RankNativeCounters(cold) == RankNativeCounters(battle), "Each rank's physical hand and native quota queries survive cold replay unchanged.");
+        }
+        var grown = ShanheCampaignSession.Create(current, new(71, "classic:wei-yan")
+        { PlayerRank = 5, UseCodexRewardPool = true, EquippedTacticIds = ["tactic-build-2054", "tactic-build-2159",
+            StandardShanheCampaignCatalog.CurrentMuniuLiumaRewardId, StandardShanheCampaignCatalog.CurrentLianjiRewardId] },
+            StandardShanheCampaignCatalog.CreateBattleRegistry);
+        Accept(grown, new MoveShanheNodeCommand(grown.Snapshot.AvailableNodes[0].Id, grown.Revision));
+        var grownBattle = StandardShanheCampaignCatalog.CreateBattle(grown.PendingBattleSetup!);
+        Require(grownBattle.CreateSnapshot(0).Players[0] is { Hp: 6, MaxHp: 6, HandCount: 5 },
+            "Real logistics still subtracts one physical opening card from the six-card fifth-rank recipe.");
+        Accept(grownBattle, new StartGameCommand());
+        for (var step = 0; step < 80 && grownBattle.PendingDecision is not { Kind: DecisionKind.PlayCard, PlayerSeat: 0 }; step++)
+        {
+            Require(grownBattle.PendingDecision?.PlayerSeat != 0, "The owned opening and passive tactics must reach the first real play prompt without extra player input.");
+            Accept(grownBattle, new AdvanceOneStepCommand(grownBattle.Revision));
+        }
+        Require(grownBattle.PendingDecision is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } &&
+            grownBattle.CreateSnapshot(0).Players[0] is { Hp: 7, MaxHp: 7, HandCount: 11 } && RankNativeCounters(grownBattle) == (6, 3, 6),
+            "Tipo still adds and recovers one HP; logistics and Muniu add three real normal draws, Lianji adds a Slash, and Muniu subtracts one from the actual HP-based hand limit.");
+        var grownCold = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(grownBattle.CreateCheckpoint())),
+            StandardShanheCampaignCatalog.CreateBattleRegistry(grown.PendingBattleSetup!));
+        Require(SnapshotJson.Serialize(grownCold.CreateSnapshot(0)) == SnapshotJson.Serialize(grownBattle.CreateSnapshot(0)) &&
+            RankNativeCounters(grownCold) == (6, 3, 6),
+            "An explicit paid health tactic retains its actual effect through native replay.");
+
+        var oldPreparation = new ShanheTacticBonuses(MaxHp: 2, InitialHand: 2, Draw: 1, Slash: 1);
+        var oldDefinition = current with { StartingBonuses = oldPreparation };
+        var old = ShanheCampaignSession.Create(oldDefinition, new(71, "classic:wei-yan") { PlayerRank = 5, UseCodexRewardPool = true },
+            StandardShanheCampaignCatalog.CreateBattleRegistry);
+        Require(old.Snapshot is { Hp: 8, MaxHp: 8 }, "The old scenario recipe explains the original eight-HP result.");
+        var oldJson = ShanheCampaignJson.Serialize(old.CreateCheckpoint());
+        MustThrow(() => StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(ShanheCampaignJson.Deserialize(oldJson), 2));
+        Require(ShanheCampaignJson.Serialize(old.CreateCheckpoint()) == oldJson,
+            "The changed current recipe rejects a different old health fingerprint without mutating its source journal.");
+        Require(StandardShanheCampaignCatalog.CreateDefinition(2, StandardShanheCampaignCatalog.LocalEditionId).StartingBonuses == oldPreparation,
+            "The separately named legacy local edition retains its entire original preparation recipe.");
+    }
+
+    private static (int Draw, int Slash, int HandLimit) RankNativeCounters(GameEngine battle)
+    {
+        const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        var player = ((IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players", flags)!.GetValue(battle)!)[0];
+        var draw = (RuleQueryEvaluation)typeof(GameEngine).GetMethod("EvaluateDrawCount", flags)!.Invoke(battle, [player])!;
+        Require(draw.Value is FiniteRuleQueryValue, "The rank fixture's native normal draw count is finite.");
+        return (((FiniteRuleQueryValue)draw.Value).Value,
+            (int)typeof(GameEngine).GetMethod("GetSlashUseLimit", flags)!.Invoke(battle, [player, null, null])!,
+            (int)typeof(GameEngine).GetMethod("GetHandLimit", flags)!.Invoke(battle, [player])!);
+    }
+
     public static void GeneralRankBonusesFreezeOnceAndLegacyRecipesStayUnchanged()
     {
         ShanheTacticBonuses[] privileges = [new(), new(InitialHand: 1), new(MaxHp: 1, InitialHand: 1, Slash: 1),
@@ -32,6 +144,8 @@ internal static partial class ShanheCampaignChecks
             var player = battle.CreateSnapshot(0).Players[0];
             Require(player.MaxHp == 4 + expected.MaxHp && player.Hp == player.MaxHp && player.HandCount == 4 + expected.InitialHand,
                 "The native encounter receives the exact once-added rank health and opening-hand bonuses.");
+            Require(RankNativeCounters(battle) == (2 + expected.Draw, 1 + expected.Slash, player.Hp),
+                "Explicit authored starting draw and Slash bonuses remain additive with rank, and hand limit continues to follow actual HP.");
             Cold(session, definition);
             if (rank is null)
                 Require(!source.Contains("\"PlayerRank\"", StringComparison.Ordinal) &&

@@ -1,0 +1,4 @@
+{"schemaVersion":62,"skills":[{"id":"shanhe:companion-yingxiang","revision":1,"triggers":[
+ {"id":"marked-non-use-loss","window":"cardsMoved","subject":"owner","sourceZones":["hand"],"movementOccurrence":"perBatch","optional":false,"effects":[{"op":"resolveShanheYingxiangMovement","target":"owner"}]},
+ {"id":"marked-use","window":"cardUseCompleted","ownerRelation":"observer","includeResponseUses":true,"optional":false,"effects":[{"op":"resolveShanheYingxiangUse","target":"owner"}]}
+]}]}

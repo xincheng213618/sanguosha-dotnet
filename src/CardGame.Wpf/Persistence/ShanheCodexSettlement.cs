@@ -6,8 +6,8 @@ namespace CardGame.Wpf.Persistence;
 /// <summary>Prepares one account credit from a trusted, fully completed campaign session.</summary>
 public static class ShanheCodexSettlement
 {
-    // The verified normal-1 sample is ten books. All three local difficulty
-    // tiers use this same local completion floor, not an inferred official table.
+    // The verified normal-1 sample is ten books. Local editions and the source
+    // edition retain this explicitly local completion floor, not an inferred reward table.
     public const int NormalOneCompletionBooks = 10;
     public const int MaximumRunRecords = 100;
 
@@ -20,7 +20,7 @@ public static class ShanheCodexSettlement
     }
 
     public static bool CanSettle(ShanheCampaignSession session, int difficulty) =>
-        difficulty is >= 1 and <= 3 && session.Snapshot.Phase is ShanheCampaignPhase.Won or ShanheCampaignPhase.Lost &&
+        ShanheCampaignDifficultyContract.IsSupported(session, difficulty) && session.Snapshot.Phase is ShanheCampaignPhase.Won or ShanheCampaignPhase.Lost &&
         GetSettlementKey(session) is not null;
 
     public static string? GetSettlementKey(ShanheCampaignSession session)
@@ -64,7 +64,8 @@ public static class ShanheCodexSettlement
         var record = new ShanheRunRecord(claimKey, state.CampaignId, state.CampaignName, state.PlayerGeneralId,
             string.IsNullOrWhiteSpace(playerGeneralName) ? state.PlayerGeneralId : playerGeneralName,
             difficulty, state.Phase == ShanheCampaignPhase.Won, amount, state.CompletedNodeIds.Count,
-            state.EncounterOrdinal, DateTimeOffset.UtcNow, state.EndingText);
+            state.EncounterOrdinal, DateTimeOffset.UtcNow, state.EndingText)
+            { SourceDifficultyId = session.Definition.SourceDifficultyId };
         next = profile with
         {
             Books = checked(profile.Books + amount),
@@ -85,7 +86,7 @@ public static class ShanheCodexSettlement
                 string.IsNullOrWhiteSpace(r.CampaignId) || string.IsNullOrWhiteSpace(r.CampaignName) ||
                 string.IsNullOrWhiteSpace(r.PlayerGeneralId) || string.IsNullOrWhiteSpace(r.PlayerGeneralName) ||
                 r.CampaignId.Length > 256 || r.CampaignName.Length > 256 || r.PlayerGeneralId.Length > 256 ||
-                r.PlayerGeneralName.Length > 256 || r.Difficulty is < 1 or > 3 ||
+                r.PlayerGeneralName.Length > 256 || !ShanheCampaignDifficultyContract.IsSupported(r.CampaignId, r.Difficulty, r.SourceDifficultyId) ||
                 r.BooksEarned != (r.Won ? NormalOneCompletionBooks : 0) || r.CompletedNodes < 0 || r.Battles < 0 ||
                 r.CompletedAtUtc == default || r.EndingText is null || r.EndingText.Length > 4000) ||
             records.Select(r => r.ExpeditionKey).Distinct(StringComparer.Ordinal).Count() != records.Length)

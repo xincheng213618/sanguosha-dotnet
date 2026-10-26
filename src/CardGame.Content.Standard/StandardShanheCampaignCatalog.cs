@@ -238,12 +238,38 @@ public static partial class StandardShanheCampaignCatalog
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
         var schoolEffects = extraSkills.Any(id => ShanheSchoolEffects.SchoolId(id) is not null);
+        var guideSkills = extraSkills.Contains(StandardShanheGuideSkillsPackage.BuwuSkillId) ||
+            extraSkills.Contains(StandardShanheGuideSkillsPackage.ShuanghunSkillId);
+        var xiasheng = extraSkills.Contains(StandardShanheXiashengPackage.SkillId);
+        var chanrangEdict = extraSkills.Contains(StandardShanheChanrangEdictPackage.SkillId) ||
+            ShanheRecipeCards(setup).Any(card => card.Kind == CardKind.ShanRangZhaoShu) ||
+            setup.MarketSetup?.Definition.Rewards.Any(reward => (reward.StartingEquipment ?? []).Concat(reward.StartingCards ?? [])
+                .Any(card => card.Kind == CardKind.ShanRangZhaoShu)) == true;
         var currentFuqi = extraSkills.Contains(StandardShanheFuqiPackage.SkillId);
         var currentWangong = extraSkills.Contains(StandardShanheWangongPackage.SkillId);
         var currentLonghun = extraSkills.Contains(StandardShanheLonghunPackage.SkillId);
         var currentYiji = extraSkills.Contains(StandardShanheYijiPackage.SkillId);
         var currentCappedRefill = extraSkills.Contains(StandardShanheCappedRefillSkillsPackage.SkillId);
         var currentBeige = extraSkills.Contains(StandardShanheBeigeSkillsPackage.SkillId);
+        var fengxianBoss = ids.Any(id => id is StandardShanheFengxianBossPackage.FirstId or StandardShanheFengxianBossPackage.RageId) ||
+            extraSkills.Contains(StandardShanheFengxianBossPackage.XiuluoId) || extraSkills.Contains(StandardShanheFengxianBossPackage.MashuId);
+        var confidentLvbu = ids.Contains(StandardShanheConfidentLvbuPackage.LvbuId, StringComparer.Ordinal) ||
+            extraSkills.Contains(StandardShanheConfidentLvbuPackage.XiaoruiId);
+        var eliteDongwu = ids.Any(id => id is StandardShanheEliteDongwuPackage.HuangGaiId or StandardShanheEliteDongwuPackage.ChengPuId) ||
+            extraSkills.Contains(StandardShanheEliteDongwuPackage.ChunlaoId);
+        var eliteHandang = ids.Contains(StandardShanheEliteHandangPackage.HandangId, StringComparer.Ordinal) ||
+            extraSkills.Contains(StandardShanheEliteHandangPackage.ZizhongId) || extraSkills.Contains(StandardShanheEliteHandangPackage.MengwuId);
+        var recruitment = extraSkills.Contains(StandardShanheRecruitmentPackage.HuihuoSkillId) ||
+            ids.Any(id => id is StandardShanheRecruitmentPackage.XunyuNormalId or StandardShanheRecruitmentPackage.XunyuEliteId);
+        var caosongCompanion = ids.Contains(StandardShanheCaosongCompanionPackage.EliteId, StringComparer.Ordinal) ||
+            extraSkills.Contains(StandardShanheCaosongCompanionPackage.HuanghanSkillId);
+        var caoruiCompanion = ids.Any(id => id is StandardShanheCaoruiCompanionPackage.NormalId or StandardShanheCaoruiCompanionPackage.EliteId) ||
+            extraSkills.Contains(StandardShanheCaoruiCompanionPackage.LuanxinSkillId);
+        var wuguotaiCompanion = ids.Contains(StandardShanheWuguotaiCompanionPackage.EliteId, StringComparer.Ordinal);
+        var guanpingCompanion = ids.Contains(StandardShanheGuanpingCompanionPackage.EliteId, StringComparer.Ordinal) ||
+            extraSkills.Contains(StandardShanheGuanpingCompanionPackage.MoyanSkillId);
+        var chilianCompanion = ids.Contains(StandardShanheChilianCompanionPackage.ChilianId, StringComparer.Ordinal) ||
+            extraSkills.Contains(StandardShanheChilianCompanionPackage.ChunlaoId) || extraSkills.Contains(StandardShanheChilianCompanionPackage.LiangyinId);
         var currentDingcuo = extraSkills.Contains(StandardShanheDingcuoPackage.SkillId);
         var currentGuanchao = extraSkills.Contains(StandardShanheGuanchaoPackage.SkillId);
         var wealthTactics = extraSkills.Contains(StandardShanheWealthPackage.WealthHandLimitSkillId) ||
@@ -336,6 +362,9 @@ public static partial class StandardShanheCampaignCatalog
             ids.Contains(StandardShanheS5XuncanCaoshiPackage.CaoshiId, StringComparer.Ordinal);
         var s5Zaiqi = RequiresS5ZaiqiRegistry(requirements);
         var key = $"{setup.AllyRoster.Count}/{setup.EnemyRoster.Count}/" + string.Join("|", ids) +
+            (guideSkills ? "/guide-skills" : "") + (xiasheng ? "/xiasheng-3362" : "") +
+            (chanrangEdict ? "/chanrang-edict-1510" : "") +
+            (setup.TerrainSkillId is { } terrain ? "/" + terrain : "") +
             (s5MaPair ? "/s5-ma-pair-2640" : "") + (s5XuRong ? "/s5-xurong-2641" : "") +
             (s5XiliangDark ? "/s5-xiliang-dark-2663" : "") +
             (codexEquipment ? "/codex-equipment" : "") + (currentFarStrike ? "/current-yuanji-2129" : "") +
@@ -367,6 +396,15 @@ public static partial class StandardShanheCampaignCatalog
             (currentYiji ? "/current-yiji-3081" : "") +
             (currentCappedRefill ? "/current-jieming-3083" : "") +
             (currentBeige ? "/current-beige-3140" : "") +
+            (fengxianBoss ? "/fengxian-two-stage" : "") +
+            (confidentLvbu ? "/confident-lvbu" : "") +
+            (eliteDongwu ? "/elite-dongwu" : "") + (eliteHandang ? "/elite-handang" : "") +
+            (recruitment ? "/recruitment-huihuo" : "") +
+            (caosongCompanion ? "/caosong-companion" : "") +
+            (caoruiCompanion ? "/caorui-companion" : "") +
+            (wuguotaiCompanion ? "/wuguotai-companion" : "") +
+            (guanpingCompanion ? "/guanping-companion" : "") +
+            (chilianCompanion ? "/chilian-companion" : "") +
             (currentDingcuo ? "/current-dingcuo-3291" : "") +
             (currentGuanchao ? "/current-guanchao-3076" : "") +
             (localTroops ? "/local-troops" : "") +
@@ -421,6 +459,25 @@ public static partial class StandardShanheCampaignCatalog
                 packages.Add(new StandardShanheSchoolLatePackage());
                 packages.Add(new StandardShanheSchoolTeamPackage());
             }
+            if (guideSkills) packages.Add(new StandardShanheGuideSkillsPackage());
+            if (xiasheng) packages.Add(new StandardShanheXiashengPackage());
+            if (chanrangEdict) packages.Add(new StandardShanheChanrangEdictPackage());
+            if (ids.Any(StandardShanheMuluPackage.GeneralIds.Contains)) packages.Add(new StandardShanheMuluPackage());
+            if (setup.TerrainSkillId is not null) packages.Add(new StandardShanheTerrainPackage());
+            if (ids.Contains(StandardShanheGujinPackage.GujinId, StringComparer.Ordinal))
+                packages.Add(new StandardShanheGujinPackage());
+            if (ids.Contains(StandardShanheCompanionPackage.ManzhuId, StringComparer.Ordinal))
+                packages.Add(new StandardShanheCompanionPackage());
+            if (ids.Any(StandardShanheExpandedCompanionPackage.Contains))
+                packages.Add(new StandardShanheExpandedCompanionPackage());
+            if (ids.Any(StandardShanheAdditionalRecruitmentAPackage.Contains))
+                packages.Add(new StandardShanheAdditionalRecruitmentAPackage());
+            if (ids.Any(StandardShanheAdditionalRecruitmentBPackage.GeneralIds.Contains) ||
+                extraSkills.Contains(StandardShanheAdditionalRecruitmentBPackage.DuanziSkillId) ||
+                extraSkills.Contains(StandardShanheAdditionalRecruitmentBPackage.ShunxueSkillId))
+                packages.Add(new StandardShanheAdditionalRecruitmentBPackage());
+            if (ids.Any(id => id is StandardShanheOpeningEncounterPackage.ZhangheId or StandardShanheOpeningEncounterPackage.TadunId))
+                packages.Add(new StandardShanheOpeningEncounterPackage());
             if (setup.MarketSetup is not null) packages.Add(new StandardShanheMarketPackage());
             if (currentDingcuo) packages.Add(new StandardShanheDingcuoPackage());
             if (currentGuanchao) packages.Add(new StandardShanheGuanchaoPackage());
@@ -457,6 +514,16 @@ public static partial class StandardShanheCampaignCatalog
             if (currentYiji) packages.Add(new StandardShanheYijiPackage());
             if (currentCappedRefill) packages.Add(new StandardShanheCappedRefillSkillsPackage());
             if (currentBeige) packages.Add(new StandardShanheBeigeSkillsPackage());
+            if (fengxianBoss) packages.Add(new StandardShanheFengxianBossPackage());
+            if (confidentLvbu) packages.Add(new StandardShanheConfidentLvbuPackage());
+            if (eliteDongwu) packages.Add(new StandardShanheEliteDongwuPackage(importBaoli: !s5Zhuling));
+            if (eliteHandang) packages.Add(new StandardShanheEliteHandangPackage());
+            if (recruitment) packages.Add(new StandardShanheRecruitmentPackage());
+            if (caosongCompanion) packages.Add(new StandardShanheCaosongCompanionPackage());
+            if (caoruiCompanion) packages.Add(new StandardShanheCaoruiCompanionPackage());
+            if (wuguotaiCompanion) packages.Add(new StandardShanheWuguotaiCompanionPackage());
+            if (guanpingCompanion) packages.Add(new StandardShanheGuanpingCompanionPackage());
+            if (chilianCompanion) packages.Add(new StandardShanheChilianCompanionPackage());
             if (s5Zhangliao || ids.Any(id => id == StandardShanheS5BossPackage.ZhangliaoBaseId ||
                 id == StandardShanheS5BossPackage.ZhangliaoLingdongId || id == StandardShanheS5BossPackage.ZhangliaoHuangkongId ||
                 id == StandardShanheS5BossPackage.DongZhuoLuoyangId || id == StandardShanheS5BossPackage.DongMinBaseId ||

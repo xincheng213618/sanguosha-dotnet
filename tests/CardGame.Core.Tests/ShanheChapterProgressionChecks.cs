@@ -22,10 +22,12 @@ internal static class ShanheChapterProgressionChecks
                 .SequenceEqual([StandardShanheS5YuanshuPackage.YuanyaoId, StandardShanheS5YuanshuPackage.YuanshuId, StandardShanheS5YuanshuPackage.YuanyinId]) &&
             moved.encounter.Enemies.All(enemy => enemy.MaxHpBonus == 0 && enemy.InitialHandBonus == 0 && enemy.DrawBonus == 0),
             "The original three-person Yuan roster moves intact to chapter two without silently trimming a follower or changing its source panel.");
-        foreach (var final in definition.Nodes.Where(node => node.ChapterNumber == 3 && node.Encounters is { Count: > 0 }))
+        foreach (var final in definition.Nodes.Where(node => node.ChapterNumber == 3 && node.Kind == ShanheNodeKind.BossBattle))
         {
             var recipes = final.Encounters!;
-            Need(recipes.All(encounter => encounter.BossTransition is { EnemyIndex: 0, DrawCards: 3 }) &&
+            Need(recipes.All(encounter => encounter.BossTransition is { EnemyIndex: 0 }) &&
+                recipes.Where(encounter => encounter.Id != "luoyang:dong-clan-screenshot")
+                    .All(encounter => encounter.BossTransition is { DrawCards: 3 }) &&
                 recipes.Single(encounter => encounter.Id == final.Id + ":chapter-single").Enemies.Count == 1 &&
                 recipes.Single(encounter => encounter.Id == final.Id + ":chapter-warband").Enemies.Count == 6 &&
                 recipes.Single(encounter => encounter.Id == final.Id + ":chapter-encirclement") is { Enemies.Count: 7, Allies.Count: 0 } &&
@@ -35,7 +37,7 @@ internal static class ShanheChapterProgressionChecks
                     .Contains("classic:hua-tuo"),
                 "Every final route offers a two-stage single boss, boss with five/six troops, and the explicitly local Guo Jia/Hua Tuo support combination.");
         }
-        var representativeIds = new[] { "huaxiong:encounter", "lijue:encounter", "dagu:chapter-troops",
+        var representativeIds = new[] { "hulao:gu-jin", "huaxiong:encounter", "lijue:encounter", "dagu:chapter-troops",
             "huanyuan:chapter-troops", "luoyang:chapter-support", "henei:chapter-single" };
         foreach (var id in representativeIds)
         {

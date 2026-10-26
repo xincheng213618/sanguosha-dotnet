@@ -167,4 +167,18 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(frame with { SelectedTargetSeats = Array.AsReadOnly(new[] { target }) });
         AdvanceRuntimeProgram(frame.Id);
     }
+
+    // The selected character remains bound while its real fire damage runs,
+    // including its dying/death children and the judgment-card cleanup return.
+    private bool IsValidRedJudgmentFireSelection(ProgramSkillFrame frame, SkillProgramEffect effect, bool awaiting)
+    {
+        if (frame.WindowContext?.Window != SkillProgramTriggerWindow.CardsMoved || effect.SourceBind is null)
+            return false;
+        var red = GetProgramCardSet(frame, effect.SourceBind);
+        if (red.CardIds.Count == 0) return frame.SelectedTargetSeats.Count == 0;
+        if (red.CardIds.Count != 1) return false;
+        return frame.SelectedTargetSeats is [var target]
+            ? IsValidPlayerSeat(target) && target != frame.OwnerSeat
+            : frame.SelectedTargetSeats.Count == 0 && (awaiting || !_players.Any(player => player.IsAlive && player.Seat != frame.OwnerSeat));
+    }
 }

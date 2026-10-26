@@ -187,6 +187,7 @@ public sealed partial class MainViewModel
 
     private void CancelAction()
     {
+        if (IsCardEnhancementSelectionPending) { ClearCardEnhancementSelection(); return; }
         if (IsCardExchangePending)
         {
             if (IsCardExchangeViewPending && _snapshot.PendingDecision!.Choices.FirstOrDefault(choice => choice.Parameters.GetValueOrDefault("option") == "finish") is { } finishExchange)

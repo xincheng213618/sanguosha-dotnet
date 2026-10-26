@@ -3,7 +3,7 @@ namespace CardGame.Core.Campaigns;
 public sealed partial class ShanheCampaignSession
 {
     private sealed record BossRewardGroupState(string Id, string Name, IReadOnlyList<string> OfferIds,
-        string? SelectedRewardId = null, bool IsBonus = false);
+        string? SelectedRewardId = null, bool IsBonus = false, bool IsSkipped = false);
 
     private RunState BeginBossRewards(RunState state, ShanheNodeDefinition node)
     {
@@ -29,6 +29,7 @@ public sealed partial class ShanheCampaignSession
 
     private bool CanApplyBossReward(RunState state, ShanheRewardDefinition reward)
     {
+        if (reward.OpeningCompanionPool is not null) return false;
         // Victory rewards are earned by this run. Account research gates shop
         // stock and initial loadouts, not earned chapter or bonus skills.
         if (reward.SkillId is { } skill && HasSkill(state, skill) ||
@@ -49,7 +50,7 @@ public sealed partial class ShanheCampaignSession
         Require(_state.Phase == ShanheCampaignPhase.Reward && _state.BossRewardGroups.Count > 0,
             "There is no chapter boss reward bundle.");
         var group = _state.BossRewardGroups.SingleOrDefault(group => group.Id == command.GroupId);
-        Require(group is not null && group.SelectedRewardId is null && group.OfferIds.Contains(command.RewardId, StringComparer.Ordinal),
+        Require(group is not null && group.SelectedRewardId is null && !group.IsSkipped && group.OfferIds.Contains(command.RewardId, StringComparer.Ordinal),
             "Choose one of this unclaimed boss group's frozen rewards.");
         var next = ApplyReward(_state, _rewards[command.RewardId], command.ReplaceSkillId, allowLockedReward: true);
         return next with
@@ -60,12 +61,29 @@ public sealed partial class ShanheCampaignSession
         };
     }
 
+    private RunState SkipBossReward(string groupId)
+    {
+        Require(_state.Phase == ShanheCampaignPhase.Reward && _state.BossRewardGroups.Count > 0,
+            "There is no grouped battle reward to decline.");
+        var group = _state.BossRewardGroups.SingleOrDefault(group => group.Id == groupId);
+        Require(group is not null && group.SelectedRewardId is null && !group.IsSkipped,
+            "Choose an unresolved reward group to decline.");
+        var gold = RewardSkipCompensation(group!.OfferIds, _nodes[_state.CurrentNodeId!].RewardSkipGold);
+        Require(gold > 0, "Tactic rewards cannot be exchanged for copper.");
+        return _state with
+        {
+            Gold = checked(_state.Gold + gold),
+            BossRewardGroups = ShanheCampaignContent.Freeze(_state.BossRewardGroups.Select(item =>
+                item.Id == groupId ? item with { IsSkipped = true } : item))
+        };
+    }
+
     private RunState ConfirmBossReward()
     {
         Require(_state.Phase == ShanheCampaignPhase.Reward && _state.BossRewardGroups.Count > 0,
             "There is no chapter boss completion to confirm.");
         // Fully exhausted pools are explicitly reported by the snapshot, never silently rerolled.
-        Require(_state.BossRewardGroups.All(group => group.SelectedRewardId is not null || group.OfferIds.Count == 0),
+        Require(_state.BossRewardGroups.All(group => group.SelectedRewardId is not null || group.OfferIds.Count == 0 || group.IsSkipped),
             "Every available boss reward group must be claimed before continuing.");
         return FinishNode(_state);
     }
@@ -82,12 +100,14 @@ public sealed partial class ShanheCampaignSession
             ShanheCampaignContent.Freeze(state.BossRewardGroups.Select(group => new ShanheBossRewardGroupSnapshot(group.Id,
                 group.Name,
                 ShanheCampaignContent.Freeze(group.OfferIds.Select(rewardId => _rewards[rewardId])),
-                group.SelectedRewardId is { } selected ? _rewards[selected] : null))), revision)
+                group.SelectedRewardId is { } selected ? _rewards[selected] : null)
+            { IsSkipped = group.IsSkipped, SkipGold = group.SelectedRewardId is null
+                ? RewardSkipCompensation(group.OfferIds, node.RewardSkipGold) : 0 })), revision)
         { IsBonusOnly = isBonusOnly };
     }
 
     private IReadOnlyList<BossRewardGroupState> PruneUnavailableBossRewardOffers(RunState state,
         IEnumerable<BossRewardGroupState> groups) => ShanheCampaignContent.Freeze(groups.Select(group =>
-            group.SelectedRewardId is not null ? group : group with
+            group.SelectedRewardId is not null || group.IsSkipped ? group : group with
             { OfferIds = ShanheCampaignContent.Freeze(group.OfferIds.Where(id => CanApplyBossReward(state, _rewards[id]))) }));
 }

@@ -517,7 +517,7 @@ internal static partial class ShanheRewardUiChecks
         [
             new("guard", "既有守御", SkillId: Guard) { Description = "已有的额外技能，占用一个技能槽。" },
             new("learned", "传习·振奋", SkillId: Learned) { Description = "获得振奋技能，攻击范围加一；占用一个额外技能槽。" },
-            new("draw", "粮道", Bonuses: new(Draw: 1)) { Description = "此后每场战斗的摸牌阶段额外摸一张牌。" },
+            new("draw", "战备连弩", StartingEquipment: [new(CardKind.Crossbow)]) { Description = "此后每场战斗携带诸葛连弩。" },
             new("medicine", "随身药囊", StartingCards: [new(CardKind.Peach, Suit.Heart, 3)])
                 { Description = "此后每场战斗开局额外获得一张桃。" }
         ], StartingGold: 10, ExtraSkillSlots: 1);

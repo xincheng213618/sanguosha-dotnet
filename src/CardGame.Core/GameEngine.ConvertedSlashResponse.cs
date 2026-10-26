@@ -2,21 +2,24 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
-    // 界关兴张苞 父魂: the target of a converted Slash may only respond with hand
-    // cards of the same color as the converted physical cards. Mixed-color pairs
-    // impose no single-color requirement.
+    // 父魂 applies to every converted Slash, including the granted 武圣.
+    // A mixed-color conversion is colorless; null is its color, not permission
+    // to respond freely. Test the restriction separately before using this value.
+    private bool HasConvertedSlashSameColorResponseRestriction(CardAttackHandle attack)
+    {
+        if (attack.ConversionSource is null && attack.ProgramSkillCardUseFrameId is null)
+            return false;
+        return CardPolicies(_players[attack.CardUserSeat],
+            SkillProgramCardPolicyKind.ConvertedSlashSameColorResponseOnly,
+            attack.EffectiveCardKind).Any();
+    }
+
     private bool? ConvertedSlashSameColorResponseColor(CardAttackHandle attack)
     {
-        if (attack.ProgramSkillCardUseFrameId is not { } frameId ||
-            _resolutionStack.OfType<ProgramSkillFrame>().FirstOrDefault(frame => frame.Id == frameId) is not { } frame)
-            return null;
+        if (!HasConvertedSlashSameColorResponseRestriction(attack)) return null;
         var source = _players[attack.CardUserSeat];
-        if (!CardPolicies(source, SkillProgramCardPolicyKind.ConvertedSlashSameColorResponseOnly,
-                attack.EffectiveCardKind).Any(item => item.Source.SkillId == frame.SkillId))
-            return null;
         if (attack.PhysicalCards.Count == 0) return null;
-        var reds = attack.PhysicalCards.Count(card => IsRedSuit(EffectiveSuit(source, card)));
-        if (reds == attack.PhysicalCards.Count) return true;
-        return reds == 0 ? false : null;
+        var colors = attack.PhysicalCards.Select(card => SuitColor(EffectiveSuit(source, card))).ToArray();
+        return colors.All(color => color == true) ? true : colors.All(color => color == false) ? false : null;
     }
 }

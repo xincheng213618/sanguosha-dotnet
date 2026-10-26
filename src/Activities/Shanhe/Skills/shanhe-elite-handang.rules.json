@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:elite-zizhong", "revision": 1,
+      "triggers": [{
+        "id": "preparation-empty-slot-equipment", "window": "turnStartBeforeNormalFlow",
+        "subject": "owner", "optional": false,
+        "effects": [{ "op": "placeRandomEmptySlotDeckEquipment", "target": "owner" }]
+      }]
+    },
+    {
+      "id": "shanhe:elite-mengwu", "revision": 1,
+      "modifiers": [
+        { "id": "unlimited-slashes", "query": "slashLimit", "operation": "unlimited", "value": 0, "priority": 0 },
+        { "id": "unlimited-slash-distance", "query": "slashDistanceLimit", "operation": "unlimited", "value": 0, "priority": 0 }
+      ],
+      "triggers": [{
+        "id": "draw-after-own-slash-cancelled", "window": "slashFullyDodged", "ownerRelation": "actor",
+        "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"], "optional": false,
+        "effects": [{ "op": "draw", "target": "owner", "amount": 1 }]
+      }]
+    }
+  ]
+}

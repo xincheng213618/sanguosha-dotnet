@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:confident-xiaorui", "revision": 1,
+    "triggers": [{
+      "id": "allied-actual-turn-slash-damage", "window": "afterDamageApplied",
+      "subject": "any", "damageOccurrence": "perDamage", "optional": false,
+      "condition": { "kind": "damageCardIsSlash" },
+      "effects": [{ "op": "grantShanheXiaoruiSlashQuota", "target": "owner" }]
+    }]
+  }]
+}

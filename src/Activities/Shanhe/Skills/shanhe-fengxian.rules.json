@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:fengxian-xiuluo", "revision": 1,
+      "triggers": [{
+        "id": "pay-one-clear-judgment", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": true,
+        "effects": [
+          { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "owner" },
+            "zones": ["hand", "equipment"], "count": 1, "destination": "discardPile", "awaitMovementTriggers": true },
+          { "op": "discardOwnedZoneCards", "target": "owner", "zones": ["judgment"] }
+        ]
+      }]
+    },
+    {
+      "id": "shanhe:fengxian-mashu", "revision": 1,
+      "cardPolicies": [{ "id": "outgoing-one", "kind": "outgoingDistanceOne" }]
+    }
+  ]
+}

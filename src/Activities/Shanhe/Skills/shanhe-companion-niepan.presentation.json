@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:companion-niepan": {
+      "name": "涅槃",
+      "description": "限定技，当你处于濒死状态时，你可以弃置你区域内的所有牌，复原你的武将牌，摸三张牌，回复至3点体力。"
+    }
+  }
+}

@@ -48,6 +48,7 @@ internal static class ShanheBossOpeningStageChecks
             resolved.Activated && resolved.Completed);
         var laterOpeningIndex = Array.FindIndex(startupPayloads, e => e is ProgramBindingStartedEvent { SkillId: Driver });
         var stageSnapshot = game.CreateSnapshot(0);
+        RequireSecondFormResources(game);
         Need(Events<ShanheBossStageStartedEvent>(game) is
                 [{ BossSeat: 1, TurnNumber: 0, GeneralId: StandardShanheS5HuaxiongPackage.HuaxiongId, Hp: 8, MaxHp: 8 }] &&
             Events<DamageAppliedEvent>(game) is [{ SourceSeat: 0, TargetSeat: 1, Amount: 6, RemainingHp: <= 0 }] &&
@@ -75,6 +76,7 @@ internal static class ShanheBossOpeningStageChecks
         var openingSources = PreparationSkills.Append(Driver).ToArray();
         var invoices = Events<NativeDrawInvocationRecordedEvent>(game).Where(e => e.OwnerSeat == 0).ToArray();
         var payloads = game.Events.Select(e => e.Payload).ToArray();
+        RequireSecondFormResources(game);
         Need(game.CreateSnapshot(0) is { CurrentSeat: 0, TurnNumber: 1 } &&
             game.CreateSnapshot(0).Players[0].HandCount == 7 && game.CreateSnapshot(1).Players[1].HandCount == 2 &&
             openingSources.All(skill => Events<ProgramBindingResolvedEvent>(game).Count(e => e.SkillId == skill &&
@@ -108,6 +110,7 @@ internal static class ShanheBossOpeningStageChecks
         var turn = game.State.TurnNumber;
         Accept(game, new UseProgramSkillCommand(0, Driver, "finish", [], [1], game.Revision, game.PendingDecision!.PromptId));
         Until(game, () => Events<ShanheBossStageStartedEvent>(game).Length != 0);
+        RequireSecondFormResources(game);
         Need(Events<ShanheBossStageStartedEvent>(game).Single() is { TurnNumber: 1, BossSeat: 1 } &&
             Events<ShanheBossTurnInterruptedEvent>(game) is [{ TurnNumber: 1, PlayerSeat: 0, BossSeat: 1 }] &&
             Events<ShanheBossResolutionCancelledEvent>(game).Length > 0 &&
@@ -142,6 +145,10 @@ internal static class ShanheBossOpeningStageChecks
                 StandardShanheCampaignCatalog.CurrentJiyi3SkillId
             }).ToArray(),
             BossTransition = new(0, StandardShanheS5HuaxiongPackage.HuaxiongId, 8, 8, 2)
+            {
+                Combatant = new(StandardShanheS5HuaxiongPackage.HuaxiongId) { InitialArmor = 2 },
+                StartingEquipment = [new(CardKind.Crossbow, Suit.Club, 11)]
+            }
         };
         var game = GameEngine.CreateStandard(new()
         {
@@ -152,6 +159,13 @@ internal static class ShanheBossOpeningStageChecks
         }, Registry.Value);
         Accept(game, new StartGameCommand());
         return game;
+    }
+
+    private static void RequireSecondFormResources(GameEngine game)
+    {
+        var boss = game.CreateSnapshot(0).Players[1];
+        Need(boss.Armor == 2 && boss.Equipment is [{ Kind: CardKind.Crossbow, Suit: Suit.Club, Rank: 11 }],
+            "Both opening and actual-turn transitions install the grown second-form armor and one real configured equipment card before continuing.");
     }
 
     private static T[] Events<T>(GameEngine game) => game.Events.Select(e => e.Payload).OfType<T>().ToArray();

@@ -16,6 +16,7 @@ public sealed partial class ShanheCampaignSession
     private readonly HashSet<string>? _unlockedRewardIds;
     private readonly int _baseMaxHp;
     private readonly IReadOnlyList<string> _printedSkillIds;
+    private readonly string _playerCharacterId;
     private readonly List<ShanheCampaignCommand> _commands = [];
     private RunState _state;
     private ShanheCampaignSnapshot _snapshot;
@@ -60,6 +61,7 @@ public sealed partial class ShanheCampaignSession
         public int ShopCardPurchases { get; init; }
         public int ShopSkillPurchases { get; init; }
         public IReadOnlyList<string> CompletedNodeIds { get; init; } = Array.Empty<string>();
+        public IReadOnlyList<ShanheGuideBattleCompletion> CompletedBattles { get; init; } = Array.Empty<ShanheGuideBattleCompletion>();
         public ShanheBattleSetup? BattleSetup { get; init; }
     }
 
@@ -71,6 +73,8 @@ public sealed partial class ShanheCampaignSession
         Require(!options.PersistentMarket || options.UseCodexRewardPool, "Persistent markets require the current catalogue reward pool.");
         var rankBonuses = ShanheGeneralRanks.GetBonuses(options.PlayerRank ?? 1);
         Definition = ShanheCampaignContent.FreezeAndValidate(definition);
+        Require(options.SourceDifficultyId == Definition.SourceDifficultyId,
+            "The selected source difficulty must match the authored campaign recipe.");
         ContentHash = ShanheCampaignContent.GetContentHash(Definition);
         ShanheCampaignContent.Require(Definition.PlayerGeneralIds.Contains(options.PlayerGeneralId, StringComparer.Ordinal), "The selected general is not available in this campaign.");
         _options = options with { };
@@ -83,7 +87,8 @@ public sealed partial class ShanheCampaignSession
         foreach (var id in options.EquippedTacticIds)
         {
             Require(id is not null && _rewards.TryGetValue(id, out var equipped) &&
-                (!string.IsNullOrWhiteSpace(equipped.TacticSkillId) || equipped.OpeningSkillRewardIds is not null || equipped.CampaignEconomy is not null),
+                (!string.IsNullOrWhiteSpace(equipped.TacticSkillId) || equipped.OpeningSkillRewardIds is not null ||
+                    equipped.OpeningCompanionPool is not null || equipped.CampaignEconomy is not null),
                 "Only a known tactic reward may be equipped before an expedition.");
             var reward = _rewards[id!];
             Require(_unlockedRewardIds is null || _unlockedRewardIds.Contains(id!), "An equipped tactic must first be unlocked in the codex.");
@@ -123,6 +128,7 @@ public sealed partial class ShanheCampaignSession
         if (!registry.Generals.TryGetValue(options.PlayerGeneralId, out var general) || !registry.IsGeneralPlayable(options.PlayerGeneralId))
             throw new ArgumentException("The battle content does not contain the player's general.", nameof(options));
         _baseMaxHp = general.BaseHp;
+        _playerCharacterId = general.CharacterId ?? general.Id;
         _printedSkillIds = ShanheCampaignContent.Freeze(general.SkillIds);
         foreach (var skill in Definition.Rewards.SelectMany(reward => new[] { reward.SkillId }
                      .OfType<string>().Concat(PotentialBattleTacticSkills(reward))))
@@ -227,7 +233,7 @@ public sealed partial class ShanheCampaignSession
                 ChooseShanheOpeningSkillCommand skill => ChooseOpeningSkill(skill),
                 ChooseShanheBossRewardCommand reward => ChooseBossReward(reward),
                 ConfirmShanheBossRewardCommand => ConfirmBossReward(),
-                SkipShanheRewardCommand => SkipReward(),
+                SkipShanheRewardCommand skip => SkipReward(skip),
                 ChooseShanheNodeOptionCommand choice => ChooseOption(choice),
                 BuyShanheMarketItemCommand purchase => PreparePersistentMarketPurchase(_state, purchase.ChoiceId, purchase.ReplaceSkillId),
                 RefreshShanheShopCommand => HasPersistentMarket ? RefreshPersistentMarket(_state) : RefreshShop(_state),
@@ -252,13 +258,30 @@ public sealed partial class ShanheCampaignSession
     }
 
     private ShanheCampaignResult Reject(string message) => new(false, message, Revision, _snapshot);
+
+    /// <summary>Reads the exact next encounter without moving, advancing randomness or writing a journal command.</summary>
+    public ShanheEncounterDefinition PreviewEncounter(string nodeId)
+    {
+        Require(_state.Phase == ShanheCampaignPhase.Map && _state.AvailableNodeIds.Contains(nodeId, StringComparer.Ordinal),
+            "Choose an available map node.");
+        var node = _nodes[nodeId];
+        Require(ShanheCampaignContent.IsBattle(node.Kind), "Only a battle node has an encounter preview.");
+        return PrepareEncounter(node, checked(_state.EncounterOrdinal + 1), _state);
+    }
+
+    private ShanheEncounterDefinition SelectEncounter(ShanheNodeDefinition node, int ordinal)
+    {
+        var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, node.Id, ordinal));
+        return node.Encounters![random.Next(node.Encounters.Count)];
+    }
+
     private RunState MoveToNode(MoveShanheNodeCommand command)
     {
         Require(_state.Phase == ShanheCampaignPhase.Map && _state.AvailableNodeIds.Contains(command.NodeId, StringComparer.Ordinal), "Choose an available map node.");
         var node = _nodes[command.NodeId];
         var state = ClearPrimaryRewardState(_state) with
         {
-            CurrentNodeId = node.Id, AvailableNodeIds = [],
+            CurrentNodeId = node.Id, StoryEventId = null, StoryChoices = [], AvailableNodeIds = [],
             PurchasedChoiceIds = _options.PersistentMarket ? _state.PurchasedChoiceIds : [], BossRewardGroups = [],
             PendingBonusRewardGroups = []
         };
@@ -266,6 +289,7 @@ public sealed partial class ShanheCampaignSession
         if (!ShanheCampaignContent.IsBattle(node.Kind))
         {
             state = state with { Phase = ShanheCampaignPhase.NodeChoice };
+            state = EnterStoryEvent(state, node);
             if (_options.UseCodexRewardPool && node.Kind == ShanheNodeKind.Shop)
             {
                 state = state with
@@ -277,9 +301,13 @@ public sealed partial class ShanheCampaignSession
             }
             return state;
         }
+        return BeginNodeBattle(state, node);
+    }
+
+    private RunState BeginNodeBattle(RunState state, ShanheNodeDefinition node)
+    {
         var ordinal = checked(state.EncounterOrdinal + 1);
-        var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, node.Id, ordinal));
-        var encounter = node.Encounters![random.Next(node.Encounters.Count)];
+        var encounter = PrepareEncounter(node, ordinal, state);
         var bonuses = state.Bonuses;
         var rebirthAvailable = _options.PlayerRank == 5 && !state.RebirthUsed;
         var setup = ShanheBattleSetup.Freeze(new(_options.Seed, ordinal, node.Id, _options.PlayerGeneralId,
@@ -291,9 +319,13 @@ public sealed partial class ShanheCampaignSession
             ActiveSchoolIds = ShanheCampaignContent.Freeze(SchoolProgress(state).Where(p => p.IsComplete).Select(p => p.School.Id)),
             DefaultGodFactionId = Definition.DefaultGodFactionId,
             PlayerRank = _options.PlayerRank,
+            SharedAllyRank = GetSharedAllyRank(state),
+            AllyRankRebirthUsedSeats = GetAllyRankRebirthUsedSeats(state, encounter),
             RebirthAvailable = rebirthAvailable,
             StartingResourcesExpireOnUse = Definition.StartingResourcesExpireOnUse,
             BossTransition = encounter.BossTransition,
+            TerrainSkillId = encounter.TerrainSkillId,
+            SourceDifficultyId = Definition.SourceDifficultyId,
             MarketSetup = _options.PersistentMarket ? CreateMarketSetup(state) : null
         });
         return state with { Phase = ShanheCampaignPhase.Battle, EncounterOrdinal = ordinal, EncounterId = encounter.Id, BattleSetup = setup };
@@ -321,6 +353,9 @@ public sealed partial class ShanheCampaignSession
             result.ProcessingCardCount == 0 && battle.ResolutionStack.Count == 0, "The battle has not finished all of its resolutions.");
         var player = result.Players.Single(p => p.IsHuman && p.Seat == 0);
         Require(player.GeneralId == setup.PlayerGeneralId, "The completed player does not match this campaign setup.");
+        var node = _nodes[_state.CurrentNodeId!];
+        var encounter = node.Encounters!.Single(e => e.Id == _state.EncounterId);
+        var won = result.WinnerTeamId == ShanheBattleSetup.PlayerTeamId && player.IsAlive && player.Hp > 0;
         var completedMarket = _state;
         if (setup.MarketSetup is not null)
         {
@@ -332,23 +367,24 @@ public sealed partial class ShanheCampaignSession
         // tactic bonuses persist between encounters; remaining health is capped at that
         // persistent maximum rather than adding the battle's growth a second time.
         var rebirthUsed = _state.RebirthUsed || setup.RebirthAvailable && battle.Events.Select(e => e.Payload)
-            .OfType<SkillUsageConsumedEvent>().Any(e => ShanheTeamRankPrograms.IsExpeditionRebirthUsage(setup, e));
+            .OfType<SkillUsageConsumedEvent>().Any(ShanheTeamRankPrograms.IsPlayerExpeditionRebirthUsage);
         var state = completedMarket with
         {
             Hp = Math.Max(0, Math.Min(player.Hp, _baseMaxHp + completedMarket.Bonuses.MaxHp)), BattleSetup = null,
-            RebirthUsed = rebirthUsed
+            RebirthUsed = rebirthUsed,
+            CompletedBattles = ShanheCampaignContent.Freeze(_state.CompletedBattles.Append(new(
+                setup.EncounterOrdinal, node.Id, encounter.Id, encounter.SourceBattleId, encounter.SourceCityId, won)))
         };
-        if (result.WinnerTeamId != ShanheBattleSetup.PlayerTeamId || !player.IsAlive || player.Hp <= 0)
+        state = ApplyTeamRebirthUsage(state, battle, setup);
+        if (!won)
             return ClearPrimaryRewardState(state) with
             {
                 Phase = ShanheCampaignPhase.Lost, AvailableNodeIds = [], BossRewardGroups = [], PendingBonusRewardGroups = []
             };
-        var node = _nodes[state.CurrentNodeId!];
-        var encounter = node.Encounters!.Single(e => e.Id == state.EncounterId);
         state = state with
         {
             Gold = EconomyBattleBalance(state, node.BossRewards?.FixedGold ?? encounter.VictoryGold),
-            Hp = Math.Min(_baseMaxHp + state.Bonuses.MaxHp, checked(state.Hp + encounter.HealAfterVictory)),
+            Hp = Math.Min(_baseMaxHp + state.Bonuses.MaxHp, checked(state.Hp + (Definition.SourceDifficultyId is >= 6 ? 0 : encounter.HealAfterVictory))),
             ExtraSkillSlots = checked(state.ExtraSkillSlots + (node.BossRewards?.SkillSlots ?? node.AddSkillSlotsOnVictory))
         };
         Require(state.ExtraSkillSlots <= 8, "This victory exceeds the extra skill limit.");
@@ -357,7 +393,8 @@ public sealed partial class ShanheCampaignSession
         if (node.NextNodeIds.Count == 0 && node.ChapterNumber >= 3) return FinishNode(state);
         state = state with { PendingBonusRewardGroups = BuildBonusRewardGroups(state, node) };
         if (node.BossRewards is not null) return PromoteBattlePrimaryRewards(BeginBossRewards(state, node), node);
-        var rewards = (node.RewardIds ?? []).Where(id => CanReceiveReward(state, _rewards[id])).ToList();
+        var rewards = (node.RewardIds ?? []).Where(id => IsPrimaryRewardRarity(node, _rewards[id]) && (node.IsStoryBattle
+            ? CanApplyBossReward(state, _rewards[id]) : CanReceiveReward(state, _rewards[id]))).ToList();
         if (rewards.Count == 0) return BeginPendingBonusRewardsOrFinish(state);
         if (node.CategorizedRewards) return PromoteBattlePrimaryRewards(BeginCategorizedRewards(state, node, rewards), node);
         var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, node.Id + ":rewards", state.EncounterOrdinal));
@@ -373,15 +410,17 @@ public sealed partial class ShanheCampaignSession
     {
         Require(_state.BossRewardGroups.Count == 0, "A chapter boss requires grouped choices and final confirmation.");
         Require(_state.Phase == ShanheCampaignPhase.Reward && _state.RewardOfferIds.Contains(command.RewardId, StringComparer.Ordinal), "Choose one of the published battle rewards.");
-        return BeginPendingBonusRewardsOrFinish(ApplyReward(_state, _rewards[command.RewardId], command.ReplaceSkillId));
+        return BeginPendingBonusRewardsOrFinish(ApplyReward(_state, _rewards[command.RewardId], command.ReplaceSkillId,
+            allowLockedReward: _nodes[_state.CurrentNodeId!].IsStoryBattle));
     }
 
-    private RunState SkipReward()
+    private RunState SkipReward(SkipShanheRewardCommand command)
     {
+        if (command.GroupId is not null) return SkipBossReward(command.GroupId);
         Require(_state.BossRewardGroups.Count == 0, "Chapter boss reward groups cannot be skipped for ordinary compensation.");
         Require(HasPrimaryReward(_state),
             "There is no published battle reward to decline.");
-        var gold = _nodes[_state.CurrentNodeId!].RewardSkipGold;
+        var gold = PrimaryRewardSkipGold(_state);
         Require(gold > 0, "This reward offer does not grant compensation for declining.");
         return BeginPendingBonusRewardsOrFinish(_state with { Gold = checked(_state.Gold + gold) });
     }
@@ -422,11 +461,16 @@ public sealed partial class ShanheCampaignSession
         var choice = NodeStock(current, node).SingleOrDefault(c => c.Id == choiceId);
         Require(choice is not null && !current.PurchasedChoiceIds.Contains(choiceId, StringComparer.Ordinal), "Choose an available node option.");
         choice = WithShopPrice(current, node, choice!);
-        Require(choice!.RewardId is not { } offeredId || CanReceiveReward(current, _rewards[offeredId]), "The general already has this skill; no gold, health or extra slot was spent.");
+        Require(choice!.RewardId is not { } offeredId || CanReceiveStoryReward(current, node, offeredId), "The general already has this skill; no gold, health or extra slot was spent.");
         Require(current.Gold >= choice!.GoldCost && (choice.HpCost == 0 || current.Hp > choice.HpCost), "The choice costs more gold or health than you can pay.");
         var state = current with { Gold = checked(current.Gold - choice.GoldCost), Hp = checked(current.Hp - choice.HpCost) };
-        if (choice.RewardId is { } rewardId) state = ApplyReward(state, _rewards[rewardId], replaceSkillId);
+        if (choice.RewardId is { } rewardId) state = ApplyReward(state, _rewards[rewardId], replaceSkillId,
+            allowLockedReward: CurrentStoryEvent(current, node)?.SkillRewardIds?.Contains(rewardId, StringComparer.Ordinal) == true);
         else Require(replaceSkillId is null, "This choice grants no skill to replace.");
+        if (choice.Companion is { } companion) state = RecruitStoryCompanion(state, companion);
+        if (choice.BattleNodeId is { } battleId)
+            return BeginNodeBattle(state with { CurrentNodeId = battleId, StoryEventId = null,
+                CompletedNodeIds = ShanheCampaignContent.Freeze(state.CompletedNodeIds.Append(node.Id)) }, _nodes[battleId]);
         if (choice.LeavesNode) return FinishNode(state);
         var category = _options.UseCodexRewardPool && node.Kind == ShanheNodeKind.Shop && choice.RewardId is { } boughtId
             ? ShopCategory(_rewards[boughtId]) : ShopRewardCategory.Supply;
@@ -444,6 +488,7 @@ public sealed partial class ShanheCampaignSession
         bool atExpeditionStart = false)
     {
         Require(allowLockedReward || IsRewardUnlocked(reward), "This skill or equipment reward must first be unlocked in the codex.");
+        state = GrantOpeningCompanion(state, reward, atExpeditionStart);
         Require(atExpeditionStart || reward.CampaignEconomy?.StartingGold is not > 0,
             "This tactic grants copper only when equipped before an expedition.");
         Require(reward.OpeningSkillRewardIds is null || !state.TacticIds.Contains(reward.Id, StringComparer.Ordinal), "This initial tactic is already equipped.");
@@ -485,7 +530,7 @@ public sealed partial class ShanheCampaignSession
             Hp = Math.Min(MarketMaximumHp(state with { Bonuses = bonuses }), checked(state.Hp + reward.Heal)),
             Gold = checked(state.Gold + reward.Gold + (atExpeditionStart ? reward.CampaignEconomy?.StartingGold ?? 0 : 0) +
                 EconomyEquipmentRefund(state, reward.StartingEquipment)), Bonuses = bonuses, ExtraSkillSlots = slots,
-            TacticIds = reward.TacticSkillId is null && reward.OpeningSkillRewardIds is null && reward.CampaignEconomy is null ? state.TacticIds : ShanheCampaignContent.Freeze(state.TacticIds.Append(reward.Id)),
+            TacticIds = reward.TacticSkillId is null && reward.OpeningSkillRewardIds is null && reward.OpeningCompanionPool is null && reward.CampaignEconomy is null ? state.TacticIds : ShanheCampaignContent.Freeze(state.TacticIds.Append(reward.Id)),
             ExtraSkillIds = ShanheCampaignContent.Freeze(skills), StartingCards = ShanheCampaignContent.Freeze(cards),
             StartingEquipment = ShanheCampaignContent.Freeze(equipment)
         };
@@ -519,13 +564,19 @@ public sealed partial class ShanheCampaignSession
                 ? _nodes[id] with { NextNodeIds = ResolveVisibleNodeIds(_nodes[id].NextNodeIds) } : _nodes[id])),
             ShanheCampaignContent.Freeze(state.RewardOfferIds.Select(id => _rewards[id])), ShanheCampaignContent.Freeze(choices),
             state.CompletedNodeIds, state.BattleSetup,
-            state.CurrentNodeId is { } current ? _nodes[current].StoryText : Definition.IntroText,
+            state.CurrentNodeId is { } current
+                ? CurrentStoryEvent(state, _nodes[current])?.StoryText ?? _nodes[current].Encounters?.FirstOrDefault(encounter => encounter.Id == state.EncounterId)?.StoryText ?? _nodes[current].StoryText
+                : Definition.IntroText,
             state.Phase == ShanheCampaignPhase.Won ?
                 state.CurrentNodeId is { } endingNode && !string.IsNullOrEmpty(_nodes[endingNode].VictoryText) ? _nodes[endingNode].VictoryText : Definition.VictoryText
                 : state.Phase == ShanheCampaignPhase.Lost ? Definition.DefeatText : "")
         {
-            PlayerGeneralId = _options.PlayerGeneralId, StartingCards = state.StartingCards,
+            PlayerGeneralId = _options.PlayerGeneralId, PlayerCharacterId = _playerCharacterId,
+            CompletedBattles = state.CompletedBattles, StartingCards = state.StartingCards,
+            CurrentStoryEventName = state.CurrentNodeId is { } eventNode ? CurrentStoryEvent(state, _nodes[eventNode])?.Name : null,
+            RecruitedCompanions = state.RecruitedCompanions,
             PlayerRank = _options.PlayerRank ?? 1, RebirthUsed = state.RebirthUsed,
+            StartingCompanions = state.StartingCompanions,
             StartingEquipment = state.StartingEquipment, EncounterOrdinal = state.EncounterOrdinal, TacticIds = state.TacticIds,
             ChapterNumber = state.CurrentNodeId is { } chapterNode ? _nodes[chapterNode].ChapterNumber : 0,
             ChapterTitle = state.CurrentNodeId is { } titleNode ? _nodes[titleNode].ChapterTitle : null,
@@ -541,8 +592,7 @@ public sealed partial class ShanheCampaignSession
             ShopRefreshRemaining = checked(freeRefreshes + paidRefreshes),
             ShopRefreshCost = randomShop && freeRefreshes == 0 ? 100 : 0,
             ShopRestockOnPurchase = randomShop && RestocksShopOnPurchase(marketState),
-            RewardSkipGold = HasPrimaryReward(state)
-                ? _nodes[state.CurrentNodeId!].RewardSkipGold : 0
+            RewardSkipGold = PrimaryRewardSkipGold(state)
         };
     }
 
@@ -595,6 +645,7 @@ public sealed partial class ShanheCampaignSession
         _unlockedRewardIds.Contains(reward.Id);
     private bool CanReceiveReward(RunState state, ShanheRewardDefinition reward) =>
         IsRewardUnlocked(reward) &&
+        reward.OpeningCompanionPool is null &&
         reward.CampaignEconomy?.StartingGold is not > 0 &&
         (reward.SkillId is not { } skill || !HasSkill(state, skill)) &&
         (reward.OpeningSkillRewardIds is null || !state.TacticIds.Contains(reward.Id, StringComparer.Ordinal)) &&
@@ -602,14 +653,16 @@ public sealed partial class ShanheCampaignSession
         (reward.TacticSkillId is not { } tacticSkill || CanAcquireTactic(state, tacticSkill));
     private ShanheNodeChoiceDefinition[] AvailableChoices(RunState state, ShanheNodeDefinition node) =>
         NodeStock(state, node).Where(choice => !state.PurchasedChoiceIds.Contains(choice.Id, StringComparer.Ordinal) &&
-            (choice.RewardId is not { } rewardId || CanReceiveReward(state, _rewards[rewardId])))
+            (choice.Companion is null || CanRecruitStoryCompanion(state, choice.Companion)) &&
+            (choice.RewardId is not { } rewardId || CanReceiveStoryReward(state, node, rewardId)))
             .Select(choice => WithShopPrice(state, node, choice)).ToArray();
 
     private bool IsRandomShop(RunState state) => _options.UseCodexRewardPool &&
         state.Phase == ShanheCampaignPhase.NodeChoice && state.CurrentNodeId is { } id && _nodes[id].Kind == ShanheNodeKind.Shop;
 
     private IReadOnlyList<ShanheNodeChoiceDefinition> NodeStock(RunState state, ShanheNodeDefinition node) =>
-        _options.UseCodexRewardPool && node.Kind == ShanheNodeKind.Shop ? state.ShopStock : node.Choices ?? [];
+        _options.UseCodexRewardPool && node.Kind == ShanheNodeKind.Shop ? state.ShopStock :
+            CurrentStoryEvent(state, node) is not null ? state.StoryChoices : node.Choices ?? [];
 
     // Unsupported catalogue placeholders use 9999. Executable economy tactics may
     // also have that exact authored price, so price alone cannot exclude them.
@@ -618,7 +671,7 @@ public sealed partial class ShanheCampaignSession
 
     private enum ShopRewardCategory { Supply, Tactic, Skill, Equipment, Card }
     private static ShopRewardCategory ShopCategory(ShanheRewardDefinition reward) =>
-        reward.TacticSkillId is not null || reward.OpeningSkillRewardIds is not null || reward.CampaignEconomy is not null || reward.Bonuses is { } bonus &&
+        reward.TacticSkillId is not null || reward.OpeningSkillRewardIds is not null || reward.OpeningCompanionPool is not null || reward.CampaignEconomy is not null || reward.Bonuses is { } bonus &&
             (bonus.MaxHp != 0 || bonus.InitialHand != 0 || bonus.Draw != 0 || bonus.Slash != 0) ? ShopRewardCategory.Tactic :
         reward.SkillId is not null ? ShopRewardCategory.Skill :
         reward.StartingEquipment?.Count > 0 ? ShopRewardCategory.Equipment :

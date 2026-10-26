@@ -2,7 +2,7 @@ using CardGame.Core;
 
 namespace CardGame.Content.Standard;
 
-/// <summary>Source-verified S5 draw and sustain tactics built entirely from existing native operations.</summary>
+/// <summary>Source-verified S5 draw and sustain tactics.</summary>
 public sealed class StandardShanheBuildTacticsPackage : IGameContentPackage
 {
     public static readonly Version CurrentVersion = new(1, 0, 0);

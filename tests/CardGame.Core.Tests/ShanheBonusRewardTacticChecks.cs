@@ -75,6 +75,7 @@ internal static class ShanheBonusRewardTacticChecks
 
         var skipped = Create(definition, AceTactic);
         Complete(skipped, "elite");
+        Accept(skipped, new ChooseShanheRewardCategoryCommand(ShanheRewardCategory.Supply, skipped.Revision));
         Accept(skipped, new SkipShanheRewardCommand(skipped.Revision));
         Require(skipped.Snapshot.Gold == 120 && skipped.Snapshot.BossRewardSummary is { IsBonusOnly: true } &&
             !skipped.Submit(new SkipShanheRewardCommand(skipped.Revision)).Accepted,

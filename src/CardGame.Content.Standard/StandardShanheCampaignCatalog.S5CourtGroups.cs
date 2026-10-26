@@ -28,7 +28,7 @@ public static partial class StandardShanheCampaignCatalog
                 "不以其他董卓形态的额外技能或体力替代。",
                 [new(StandardShanheS5DongZhuoBasePackage.DongzhuoId) { QualifiedPrintedLordSkillIds = ["boundary:baonue-current"] }]),
                 "dongzhuo-2671", "董氏凶僚",
-                "采用原表2671独立战斗候选，与2670共享已核实的同一基础角色配置；不推断为变身或追加阶段。",
+                "采用原表2671独立战斗候选，与2670共享已核实的同一基础角色配置。此旧三档候选只投放基础形态；25档入口按General.w另接董旻阶段。",
                 [new(StandardShanheS5DongZhuoBasePackage.DongzhuoId) { QualifiedPrintedLordSkillIds = ["boundary:baonue-current"] }]),
             _ => node
         }).ToArray()

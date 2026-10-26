@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:chanrang-edict-1510": {
+      "name": "禅让诏书",
+      "description": "每回合每名角色限一次，当其他角色于其回合外首次获得牌时，你可以交给其一张牌或令其交给你一张牌。"
+    }
+  }
+}

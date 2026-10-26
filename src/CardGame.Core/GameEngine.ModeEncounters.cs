@@ -29,6 +29,7 @@ public sealed partial class GameEngine
             ArgumentNullException.ThrowIfNull(request);
             if (!engine.IsValidPlayerSeat(request.Seat) || engine._players[request.Seat].General.Id != request.ExpectedGeneralId)
                 throw new InvalidOperationException("An encounter replacement lost its original combatant.");
+            if (request.ArmorOverride is < 0 or > 1000) throw new InvalidOperationException("An encounter armor override is out of bounds.");
             var previous = engine._players[request.Seat];
             var general = engine._generalPool.Single(candidate => candidate.Id == request.GeneralId);
             CharacterState replacement;
@@ -57,6 +58,7 @@ public sealed partial class GameEngine
                 foreach (var key in engine._programBooleanStates.Keys.Where(key => key.OwnerSeat == replacement.Seat).ToArray()) engine._programBooleanStates.Remove(key);
                 engine._observedSkillGrantRevisions[replacement.Seat] = replacement.SkillGrants.Revision;
             }
+            if (request.ArmorOverride is { } armor) replacement.Armor = armor;
             engine._skillBindingIndex.Invalidate(replacement.Seat);
             foreach (var id in engine.EnabledContentSkillIds(replacement)) engine.RegisterTaggedConversionSkill(replacement, id);
         }

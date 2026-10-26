@@ -35,7 +35,7 @@ public static partial class StandardShanheCampaignCatalog
             {
                 SchoolMembership = ShopMetadataByRewardId.TryGetValue(reward.Id, out var metadata) &&
                     CurrentTacticSchoolMembershipBySourceId.TryGetValue(metadata.SourceRewardId, out var member)
-                    ? member : null
+                    ? member : reward.SchoolMembership
             }).ToArray()
         };
     }

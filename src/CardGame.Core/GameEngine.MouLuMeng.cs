@@ -13,7 +13,7 @@ public sealed partial class GameEngine
 
     private void BeginRoundForTurn(CharacterState current)
     {
-        if ((!_modeRules.RequiresRoundTracking && !UsesFormalMouLuMeng && !_contentRegistry.ProgramDependencies.UsesRoundTracking) ||
+        if ((!_modeRules.RequiresRoundTracking && !UsesFormalMouLuMeng && !_contentRegistry.ProgramDependencies.UsesRoundTracking && !RequiresShanheSourceArmorTracking) ||
             _turnProgression.Kind == ActualTurnKind.Extra) return;
 
         if (_roundNumber == 0 || _roundTurnSeats.Contains(current.Seat))
@@ -24,6 +24,7 @@ public sealed partial class GameEngine
             _roundTurnSeats.Clear();
             _skillRuntimeState.ResetRound();
             AdvanceEventRulesAndQueueFact(new RoundStartedEvent(_roundNumber, current.Seat));
+            RestoreShanheSourceRoundArmor();
             AddLog("RoundStarted", $"第 {_roundNumber} 轮开始。", current.Seat);
         }
 

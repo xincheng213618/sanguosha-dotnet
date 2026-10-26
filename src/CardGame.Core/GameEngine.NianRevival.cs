@@ -178,24 +178,13 @@ public sealed partial class GameEngine
         {
             if (target.IsAlive || target.MaxHp != r.MaximumHp || !target.HasHpValue)
                 throw new InvalidOperationException("A paid Nian revival lost its original dead character.");
-            var wasFaceDown = target.IsFaceDown;
-            target.IsAlive = true;
-            target.Hp = Math.Min(2, target.MaxHp);
-            target.IsFaceDown = false;
-            target.AlcoholDamageBonus = 0;
-            target.UsedPlayPhaseAlcoholThisTurn = false;
-            if (target.IsChained)
-            {
-                target.IsChained = false;
-                AdvanceEventRulesAndQueueFact(new IronChainStateChangedEvent(f.Id, f.OwnerSeat, target.Seat, false));
-            }
+            var wasFaceDown = RestoreProgramCharacterLife(f, target, Math.Min(2, target.MaxHp));
             ReplaceRuntimeTop(f = f with { NianRevival = r with { Stage = NianRevivalStage.StateChildren,
                 Before = _movementSequence, After = _movementSequence, Count = 0 } });
             AdvanceEventRulesAndQueueFact(new NianAllyRevivedEvent(f.Id, f.OwnerSeat, target.Seat, r.UsedRevives, target.Hp));
             // Direct life restoration intentionally issues no Recovery/HpRecovered
             // event. Actual face-state observers still receive their real change.
-            if (wasFaceDown) RecordCharacterStateChange(target.Seat, SkillProgramTriggerWindow.CharacterTurnedFaceUp);
-            RecordCharacterTurnedOver(target.Seat, wasFaceDown);
+            PublishProgramRevivalFaceState(target, wasFaceDown);
             CompleteNianSegment(f.Id, 0);
             ContinueNianRevival(GetActiveProgramFrame(f.Id));
             return;

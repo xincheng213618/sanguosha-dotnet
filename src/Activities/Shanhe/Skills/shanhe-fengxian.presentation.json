@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:fengxian-xiuluo": { "name": "修罗", "description": "准备阶段，你可以弃置一张牌，然后弃置你判定区里所有牌。" },
+    "shanhe:fengxian-mashu": { "name": "马术", "description": "锁定技，你计算与其他角色的距离都为1。" }
+  }
+}

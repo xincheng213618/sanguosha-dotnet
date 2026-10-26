@@ -600,10 +600,11 @@ public sealed partial class GameEngine
         NativeDrawThresholdDyingOrigin? drawDyingOrigin = null;
         var drawDyingNested = frame.AttackAttempt is null && TryDescribeNativeDrawThresholdDyingDamage(frame,
             targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat, out drawDyingOrigin);
-        if (CurrentDamageAttempt is not null && !judgmentNested && !damageWindowNested && !recoveryNested && !drawDyingNested &&
+        var ownerDeathNested = IsOwnerDeathProgramDamage(frame);
+        if (CurrentDamageAttempt is not null && !judgmentNested && !damageWindowNested && !recoveryNested && !drawDyingNested && !ownerDeathNested &&
             !RuntimeHooks.AllowsNestedDamage(ProgramNestedDamageProofPhase.BeforeFactionDebts, frame, targetSeat, amount, sourceReference, nature, sourceLess) &&
             frame.FactionRecoveryDraft?.SettlingDebts != true && !RuntimeHooks.AllowsNestedDamage(ProgramNestedDamageProofPhase.AfterFactionDebts, frame, targetSeat, amount, sourceReference, nature, sourceLess) ||
-            ActiveDying is not null && !recoveryNested && !drawDyingNested && !IsMobileJwShenpeiDamage(frame, targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat) ||
+            ActiveDying is not null && !recoveryNested && !drawDyingNested && !ownerDeathNested && !IsMobileJwShenpeiDamage(frame, targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat) ||
             _resolutionStack.LastOrDefault() is not ProgramSkillFrame current || current.Id != frame.Id ||
             amount <= 0 || !IsValidPlayerSeat(targetSeat) || !_players[targetSeat].IsAlive)
             throw new InvalidOperationException("A program damage effect requires one active program and living target.");
@@ -1099,7 +1100,7 @@ public sealed partial class GameEngine
                     SkillProgramEffectOp.DamageFarthestCharacter or SkillProgramEffectOp.OfferCompletedCardGift or
                     SkillProgramEffectOp.RequestLegalSlashByNearest or SkillProgramEffectOp.OfferUnlimitedVirtualSlash or
                     SkillProgramEffectOp.SelectIssuedFixedRecipientWithDeathReturn or SkillProgramEffectOp.SelectEquipmentPairAndPayment or SkillProgramEffectOp.SelectBoundaryBuLianShiAnxuLeast or SkillProgramEffectOp.SelectBoundaryLingTongEquipmentPair or
-                    SkillProgramEffectOp.SelectDyingOwnedCard or SkillProgramEffectOp.RequestFulueZeroDamageCounterSlash));
+                    SkillProgramEffectOp.SelectDyingOwnedCard or SkillProgramEffectOp.RequestFulueZeroDamageCounterSlash or SkillProgramEffectOp.SelectRedJudgmentFireTarget));
             var awaitingCurrentSelection = executedSelection is not null &&
                 ReferenceEquals(executedSelection, plan.Instructions[frame.InstructionIndex - 1]) &&
                 ReferenceEquals(frame, _resolutionStack.LastOrDefault()) &&
@@ -1110,6 +1111,7 @@ public sealed partial class GameEngine
                     choice.Parameters.GetValueOrDefault("program-action") ==
                     (executedSelection.Op == SkillProgramEffectOp.SelectTarget
                         ? "select-target"
+                        : executedSelection.Op == SkillProgramEffectOp.SelectRedJudgmentFireTarget ? "red-judgment-fire-target"
                         : executedSelection.Op == SkillProgramEffectOp.SelectRelativeZoneDemandTarget ? "relative-zone-target"
                         : executedSelection.Op == SkillProgramEffectOp.SelectEquipmentPairAndPayment ? "equipment-pair-payment"
                         : executedSelection.Op == SkillProgramEffectOp.SelectDyingOwnedCard ? "dying-owned-card"
@@ -1117,6 +1119,7 @@ public sealed partial class GameEngine
                             executedSelection.Op == SkillProgramEffectOp.DamageFarthestCharacter ? "advanced-lifecycle" : "strategic-choice"));
             var dynamicTargetsValid = executedSelection is null || executedSelection.Op switch
             {
+                SkillProgramEffectOp.SelectRedJudgmentFireTarget => IsValidRedJudgmentFireSelection(frame, executedSelection, awaitingCurrentSelection),
                 SkillProgramEffectOp.BindOwnTurnEnemyHandGain => HasExactOwnTurnEnemyHandGainSelection(frame),
                 SkillProgramEffectOp.SelectBoundaryBuLianShiAnxuLeast => ValidBoundaryBuLianShiAnxuLeastSelection(frame),
                 SkillProgramEffectOp.SelectBoundaryLingTongEquipmentPair => ValidBoundaryLingTongEquipmentSelection(frame),

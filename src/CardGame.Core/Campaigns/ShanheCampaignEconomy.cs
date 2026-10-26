@@ -22,7 +22,7 @@ public static partial class ShanheCampaignContent
             reward.Gold == 0 && reward.Heal == 0 && reward.AddSkillSlots == 0 &&
             reward.Bonuses is null or { MaxHp: 0, InitialHand: 0, Draw: 0, Slash: 0 },
             "An economy tactic cannot impersonate a battle skill, equipment or immediate reward.");
-        Require(economy.BattleGoldPercent is >= 0 and <= 100 && economy.PostBattleInterestPercent is >= 0 and <= 100 &&
+        Require(economy.BattleGoldPercent is >= -100 and <= 100 && economy.PostBattleInterestPercent is >= 0 and <= 100 &&
             economy.ShopDiscountPercent is >= 0 and <= 100 && economy.ShopRefreshLimit is >= 0 and <= 20 &&
             economy.ExtraStockPerCategory is >= 0 and <= 12 && economy.ReplacedEquipmentGold is >= 0 and <= 100000 &&
             economy.StartingGold is >= 0 and <= 100000 &&

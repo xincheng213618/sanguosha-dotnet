@@ -1,0 +1,12 @@
+{"schemaVersion":62,"skills":[
+ {"id":"shanhe:buwu-3365","revision":1,"triggers":[
+  {"id":"allied-damage","window":"beforeDamageApplied","subject":"any","optional":false,"effects":[{"op":"resolveShanheBuwu","target":"owner","stage":"before"}]},
+  {"id":"actual-damage-draw","window":"afterDamageApplied","subject":"any","damageOccurrence":"perDamage","optional":false,"effects":[{"op":"resolveShanheBuwu","target":"owner","stage":"after"}]}]},
+ {"id":"shanhe:shuanghun-3366","revision":1,"triggers":[
+  {"id":"rebirth","window":"selfDyingResponse","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"namedUsageGroup":"shuanghun","effects":[
+   {"op":"setChainedState","target":"owner","chained":false},
+   {"op":"setFaceState","target":"owner","faceDown":false},
+   {"op":"recoverShanheShuanghun","target":"owner"},
+   {"op":"draw","target":"owner","numberExpression":"targetMaxHpMinusHandCount"},
+   {"op":"restoreShanheShuanghunUse","target":"owner"}]}]}
+]}

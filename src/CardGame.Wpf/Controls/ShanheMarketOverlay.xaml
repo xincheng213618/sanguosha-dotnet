@@ -8,7 +8,7 @@
         <Border Margin="24" BorderBrush="#89683E" BorderThickness="1" Background="#641B1711">
             <controls:ShanheShopPanel x:Name="MarketHost" />
         </Border>
-        <controls:ShanheCampaignPanel x:Name="ReplacementHost" ShowDetachButton="False"
+        <controls:ShanheCampaignPanel x:Name="ReplacementHost"
             Visibility="{Binding IsShanheSkillReplacementOpen, Converter={StaticResource BoolToVisibility}}" />
     </Grid>
 </UserControl>

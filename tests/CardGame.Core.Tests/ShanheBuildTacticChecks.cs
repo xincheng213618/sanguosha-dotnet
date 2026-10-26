@@ -12,6 +12,44 @@ internal static class ShanheBuildTacticChecks
     private const string Fenjin = StandardShanheCampaignCatalog.CurrentFenjinSkillId;
     private const string Yuanzhu = StandardShanheCampaignCatalog.CurrentYuanzhu3SkillId;
 
+    public static void TigerWineFiniteOrdinaryQuotaConsumesRealUsesAndRecoversCold()
+    {
+        foreach (var invalid in new[] { "{\"id\":\"quota\",\"kind\":\"additionalAlcoholUses\",\"value\":0,\"cardKinds\":[\"alcohol\"]}",
+                     "{\"id\":\"quota\",\"kind\":\"additionalAlcoholUses\",\"value\":2,\"cardKinds\":[\"slash\"]}" })
+        {
+            var rejected = false;
+            try { _ = SkillProgramCatalog.Load($$"""{"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"fixture:wine-shape","revision":1,"cardPolicies":[{{invalid}}]}]}""",
+                JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                    skills = new Dictionary<string, object> { ["fixture:wine-shape"] = new { name = "酒次数", description = "静态形状" } } })); }
+            catch (InvalidOperationException) { rejected = true; }
+            Need(rejected, "The shared finite wine policy rejects a non-positive quota or unrelated static qualifiers in the loader.");
+        }
+        foreach (var (skill, extra) in new[] { (StandardShanheCampaignCatalog.CurrentHugujiuSkillId, 1),
+                     (StandardShanheCampaignCatalog.CurrentHugujiu2SkillId, 2) })
+        {
+            var cards = Enumerable.Range(0, extra + 2).Select(_ => new ShanheStartingCard(CardKind.Alcohol, Suit.Spade, 3))
+                .Concat(Enumerable.Range(0, extra + 1).Select(_ => new ShanheStartingCard(CardKind.Slash, Suit.Heart, 7))).ToArray();
+            var s = Scene.Start(false, 10, [skill], cards, slashBonus: 5);
+            for (var use = 0; use < 1 + extra; use++)
+            {
+                s.Wine(s.V().Hand.First(card => card.Kind == CardKind.Alcohol).Id);
+                s.Slash(s.V().Hand.First(card => card.Kind == CardKind.Slash).Id, 3);
+                if (use == 0) s = s.Cold();
+            }
+            var blocked = s.V().Hand.Single(card => card.Kind == CardKind.Alcohol).Id;
+            var revision = s.G.Revision;
+            var rejected = s.G.Submit(new PlayCardCommand(0, blocked, [], revision, s.G.PendingDecision!.PromptId));
+            Need(!s.G.GetHumanLegalActions().Any(action => action.CardId == blocked && action.Kind == LegalActionKind.Alcohol) &&
+                !rejected.Accepted && s.G.Revision == revision && s.V().Hand.Any(card => card.Id == blocked) &&
+                s.E<JianjiOrdinaryAlcoholPaidEvent>().Count(fact => fact.ActorSeat == 0 && fact.CountsQuota) == 1 + extra,
+                "Tiger wine grants exactly its finite extra uses; cold replay retains actual paid uses and a rejected excess cannot consume another card.");
+            s.NextOwnPlay();
+            s.Wine(blocked);
+            Need(s.E<JianjiOrdinaryAlcoholPaidEvent>().Last().ActualTurn == s.G.State.TurnNumber,
+                "A new actual turn restores the finite ordinary wine allowance.");
+        }
+    }
+
     public static void FirstRoundSlashDrawAndReflectionKillsPayNativeRecovery()
     {
         var s = Scene.Start(logistics: false, hp: 4,
@@ -111,7 +149,7 @@ internal static class ShanheBuildTacticChecks
 
     private static string Peer(int seat) => "fixture:build-tactic-peer-" + seat;
 
-    private sealed class Scene(GameEngine game)
+    private sealed class Scene(GameEngine game, ContentRegistry registry)
     {
         public GameEngine G { get; } = game;
         private PendingDecision? P => G.PendingDecision;
@@ -141,6 +179,18 @@ internal static class ShanheBuildTacticChecks
             Accept(new PlayCardCommand(0, cardId, action.TargetSeats, G.Revision, P!.PromptId, action.PlayedCardKind, action.TargetCardId));
             Play();
         }
+        public void Wine(int cardId)
+        {
+            var action = G.GetHumanLegalActions().Single(candidate => candidate.CardId == cardId && candidate.Kind == LegalActionKind.Alcohol);
+            Accept(new PlayCardCommand(0, cardId, action.TargetSeats, G.Revision, P!.PromptId, action.PlayedCardKind, action.TargetCardId));
+            Play();
+        }
+        public Scene Cold()
+        {
+            var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), registry);
+            Need(SnapshotJson.Serialize(restored.CreateSnapshot(0)) == SnapshotJson.Serialize(G.CreateSnapshot(0)), "Cold wine quota retains the actual prepared player view.");
+            return new(restored, registry);
+        }
         public void Use(string activation, int[] targets)
         { Accept(new UseProgramSkillCommand(0, Driver, activation, [], targets, G.Revision, P!.PromptId)); Play(); }
         public void NextOwnPlay()
@@ -149,12 +199,12 @@ internal static class ShanheBuildTacticChecks
             Accept(new EndPlayPhaseCommand(0, G.Revision, P!.PromptId));
             Until(() => G.State.TurnNumber > turn && P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
         }
-        public static Scene Start(bool logistics, int hp, string[] tactics)
+        public static Scene Start(bool logistics, int hp, string[] tactics, IReadOnlyList<ShanheStartingCard>? startingCards = null, int slashBonus = 0)
         {
             var registry = ContentRegistry.Build(new StandardContentPackage(), new StandardShanheLegendaryTacticsPackage(),
-                new StandardShanheBuildTacticsPackage(), new Fixture(logistics));
-            var setup = new ShanheBattleSetup(83, 1, "fixture:build-tactics", Owner, hp, 0, 0, 0, 0, [],
-                logistics ? [] : [new(CardKind.Slash, Suit.Spade, 7), new(CardKind.FireSlash, Suit.Spade, 8), new(CardKind.ThunderSlash, Suit.Spade, 9)], [],
+                new StandardShanheBuildTacticsPackage(), new StandardShanheWineTacticsPackage(), new Fixture(logistics));
+            var setup = new ShanheBattleSetup(83, 1, "fixture:build-tactics", Owner, hp, 0, 0, 0, slashBonus, [],
+                startingCards ?? (logistics ? [] : [new(CardKind.Slash, Suit.Spade, 7), new(CardKind.FireSlash, Suit.Spade, 8), new(CardKind.ThunderSlash, Suit.Spade, 9)]), [],
                 [new(Peer(1), Hp: 2) { StartingHand = [] }, new(Peer(2), Hp: 1) { StartingHand = [] }, new(Peer(3)) { StartingHand = [] }],
                 [], new string('b', 64)) { TacticSkillIds = tactics };
             var game = GameEngine.CreateStandard(new GameOptions
@@ -163,7 +213,7 @@ internal static class ShanheBuildTacticChecks
                 ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup, UseInteractiveSetup = false, UseInteractiveDiscard = false,
                 AdvanceAfterHumanCommands = false, MaxTurns = 12, AiPolicyVersion = AiDecisionPolicy.CurrentVersion
             }, registry);
-            var scene = new Scene(game); scene.Accept(new StartGameCommand()); scene.Play(); return scene;
+            var scene = new Scene(game, registry); scene.Accept(new StartGameCommand()); scene.Play(); return scene;
         }
     }
 

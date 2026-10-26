@@ -33,7 +33,8 @@ public static partial class StandardShanheCampaignCatalog
     };
 
     private static ShanheNodeDefinition AddS5BaseLordGroup(ShanheNodeDefinition node, string id, string name,
-        string story, IReadOnlyList<ShanheCombatantDefinition> enemies, bool hasFixedCards = false) => node with
+        string story, IReadOnlyList<ShanheCombatantDefinition> enemies, bool hasFixedCards = false,
+        int? sourceBattleId = null, int? sourceCityId = null) => node with
     {
         StoryText = node.StoryText + "\n" + story + (hasFixedCards
             ? "三档均无额外成长或友方同行；基础固定装备额外加入手牌，再由正常用牌安装。位置、抽选及奖励为本地编排。"
@@ -41,6 +42,7 @@ public static partial class StandardShanheCampaignCatalog
         Description = node.Description + "另有S5完整基础阵容：" + name + "。",
         Encounters = node.Encounters!.Append(new ShanheEncounterDefinition(
             node.Id + ":" + id + "-s5", node.Name + " · " + name + "（基础形态）",
-            enemies, [], VictoryGold: enemies.Count == 3 ? 120 : 100, HealAfterVictory: 2)).ToArray()
+            enemies, [], VictoryGold: enemies.Count == 3 ? 120 : 100, HealAfterVictory: 2)
+        { SourceBattleId = sourceBattleId, SourceCityId = sourceCityId }).ToArray()
     };
 }

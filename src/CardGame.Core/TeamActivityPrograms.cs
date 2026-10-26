@@ -8,6 +8,8 @@ internal interface ITeamActivityProgramHost
 internal sealed class SelectAllPublicTeamTargetsDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.SelectAllPublicTeamTargets;
+    public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) =>
+        context.Frame.WindowContext?.Window == SkillProgramTriggerWindow.OwnerDied;
     public override ISkillProgramEffectHandler Handler { get; } = new TeamActivityEffectHandler(SkillProgramEffectOp.SelectAllPublicTeamTargets);
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.SelectTargets,
         static (effect, context) => context.SelectTargets(effect));

@@ -92,6 +92,8 @@ internal static partial class ShanheCodexUiChecks
         var shop = new ShanheShopPanel { DataContext = vm };
         Layout(shop);
         var categories = (ListBox)shop.FindName("MarketCategories");
+        Program.Assert(categories.Items.Cast<string>().SequenceEqual(new[] { "战法", "装备", "卡牌", "技能" }),
+            "The market exposes its four real goods categories without an empty supplies category.");
         foreach (var category in new[] { "战法", "装备", "卡牌", "技能" })
         {
             categories.SelectedItem = category;

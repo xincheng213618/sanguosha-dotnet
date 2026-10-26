@@ -69,7 +69,8 @@ public static partial class ShanheCampaignContent
             if (reward.SchoolMembership is { } member)
                 Require(member.SourceId > 0 && ids.Contains(member.SchoolId) && member.Rarity is >= 1 and <= 4 &&
                     !derived.Contains(member.SourceId) && reward.SkillId is null &&
-                    (reward.TacticSkillId is not null || reward.CampaignEconomy is not null || reward.OpeningSkillRewardIds is not null),
+                    (reward.TacticSkillId is not null || reward.CampaignEconomy is not null ||
+                     reward.OpeningSkillRewardIds is not null || reward.OpeningCompanionPool is not null),
                     "Only a concrete tactic source may count toward a declared school.");
         Require(definition.Rewards.Select(r => r.SchoolMembership).OfType<ShanheTacticSchoolMembership>()
             .GroupBy(member => member.SourceId).All(group => group.Select(member => (member.SchoolId, member.Rarity)).Distinct().Count() == 1),

@@ -3,19 +3,39 @@ using CardGame.Core.Campaigns;
 
 namespace CardGame.Modes.Activities;
 
-internal sealed class ShanheBattleFeature(ShanheBattleSetup setup, IStandardBattleHost host) :
-    IShanheBattleFeature, IMatchModeNumericRules, IMatchModeLifecycle, IMatchModeInitialDeal
+internal sealed class ShanheBattleFeature :
+    IShanheBattleFeature, IMatchModeNumericRules, IMatchModeLifecycle, IMatchModeInitialDeal, IMatchModeDamageRuleProvider
 {
+    private readonly ShanheBattleSetup setup;
+    private readonly IStandardBattleHost host;
     int IMatchModeNumericRules.Order => 20;
     int IMatchModeLifecycle.Order => 10;
     int IMatchModeInitialDeal.Order => 10;
+    public IReadOnlyList<ModeDamageRuleRegistration> DamageRules { get; }
+    internal ShanheBattleFeature(ShanheBattleSetup setup, IStandardBattleHost host)
+    {
+        this.setup = setup; this.host = host;
+        DamageRules = Array.AsReadOnly<ModeDamageRuleRegistration>([ModeDamageRuleRegistration.Additive(280, damage =>
+        {
+            if (damage.IsSourceLess || damage.IsChainPropagation || damage.SourceSeat <= setup.AllyRoster.Count ||
+                damage.SourceSeat > setup.AllyRoster.Count + setup.EnemyRoster.Count) return 0;
+            return NumericMember(damage.SourceSeat).ExtraDamage;
+        })]);
+    }
+
+    private ShanheCombatantDefinition NumericMember(int seat)
+    {
+        if (setup.BossTransition is { Combatant: { } stage } transition &&
+            seat == setup.AllyRoster.Count + 1 + transition.EnemyIndex && host.Player(seat).GeneralId == transition.GeneralId)
+            return stage;
+        return seat == 0 ? new ShanheCombatantDefinition(setup.PlayerGeneralId,
+            setup.MaxHpBonus, setup.Hp, setup.InitialHandBonus, setup.DrawBonus, setup.SlashBonus) :
+            seat <= setup.AllyRoster.Count ? setup.AllyRoster[seat - 1] : setup.EnemyRoster[seat - setup.AllyRoster.Count - 1];
+    }
 
     public IEnumerable<RuleQueryContribution> NumericContributions(int seat, SkillRuleQuery query)
     {
-        var member = seat == 0 ? new ShanheCombatantDefinition(setup.PlayerGeneralId,
-            setup.MaxHpBonus, setup.Hp, setup.InitialHandBonus, setup.DrawBonus, setup.SlashBonus) :
-            seat <= setup.AllyRoster.Count ? setup.AllyRoster[seat - 1] :
-            setup.EnemyRoster[seat - setup.AllyRoster.Count - 1];
+        var member = NumericMember(seat);
         var bonus = query switch
         {
             SkillRuleQuery.InitialHandSize => member.InitialHandBonus +

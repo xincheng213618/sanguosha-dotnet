@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:elite-zizhong": {
+      "name": "辎重",
+      "description": "准备阶段，若你有空的装备栏，则将一件随机装备置入你的装备区。"
+    },
+    "shanhe:elite-mengwu": {
+      "name": "猛武",
+      "description": "锁定技，你使用【杀】无次数限制且无距离限制，当你使用的【杀】被抵消后，你摸1张牌。"
+    }
+  }
+}

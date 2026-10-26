@@ -37,6 +37,8 @@ public sealed record ModeSetupSkillGrant(string GrantId, string SkillId, string 
 public sealed record ModeSeatSetup(int Seat, string Name, bool IsHuman, Role Role,
     string? GeneralId, int MaxHp, int Hp)
 {
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public int InitialArmor { get; init; }
     public string? TeamId { get; init; }
     public bool TeamRevealed { get; init; }
     public bool RoleRevealed { get; init; }

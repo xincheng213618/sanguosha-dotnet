@@ -3,6 +3,8 @@ namespace CardGame.Core;
 /// <summary>Card and turn rules supplied by an enabled program instance.</summary>
 public enum SkillProgramCardPolicyKind
 {
+    MinimumHandLimit = 5410,
+    MaximumOwnPlayCardUses = 5411,
     ShanheFenchaiJudgment = 5771,
     OwnRecoveryAmountBonus = 27920,
     OwnTurnFirstLostHpUses = 29050,

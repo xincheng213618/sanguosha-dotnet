@@ -2,7 +2,7 @@ using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
-internal static class GhostRuleChecks
+internal static partial class GhostRuleChecks
 {
     private const string Driver = "fixture:ghost-rule-driver", Mode = "fixture:ghost-rule-mode";
 

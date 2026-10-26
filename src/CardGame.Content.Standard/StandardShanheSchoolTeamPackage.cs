@@ -21,7 +21,7 @@ public sealed class StandardShanheSchoolTeamPackage : IGameContentPackage
         """, $$$"""
         {"schemaVersion":{{{SkillProgramCatalog.PresentationSchemaVersion}}},"skills":{
           "{{{ShanheSchoolEffects.TeamRankSkillId}}}":{"name":"队友流套装","description":"队友共享你的等阶效果，最低按3阶。"},
-          "{{{ShanheTeamRankPrograms.SharedRebirthSkillId}}}":{"name":"重生","description":"濒死时可回复至5点体力并摸5张牌，与主将共用一次征程资格。"}
+          "{{{ShanheTeamRankPrograms.SharedRebirthSkillId}}}":{"name":"重生","description":"濒死时可回复至5点体力并摸5张牌。每名角色各自每征程限一次。"}
         }}
         """));
     public void Register(IContentRegistryBuilder builder)

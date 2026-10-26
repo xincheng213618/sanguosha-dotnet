@@ -29,20 +29,20 @@ internal static partial class ShanheRewardUiChecks
             var retiredCategoryButton = Bound(panel, vm.SelectShanheRewardCardCommand, category);
             Program.Assert(vm.IsShanheRewardOpen && rewardOverlay.Visibility == Visibility.Visible &&
                 vm.ShanheRewardCards.Count(card => card.RewardCategoryChoice is not null) == 2 &&
-                vm.ShanheRewardCards.Count(card => card.IsSkip) == 1 && session.Snapshot.RewardOffers.Count == 0 &&
+                vm.ShanheRewardCards.All(card => !card.IsSkip) && session.Snapshot.RewardOffers.Count == 0 &&
                 vm.ShanheRewardHeading.Contains("类", StringComparison.Ordinal) &&
                 confirm.Content.ToString()!.Contains("类", StringComparison.Ordinal) && !confirm.IsEnabled,
-                "An actual elite victory starts with bound category cards and a separate skip choice before exposing any candidates.");
+                "An actual elite victory starts with bound category cards; compensation requires committing an eligible category.");
             var before = Snapshot(session);
             Click(retiredCategoryButton, panel);
             Program.Assert(category.IsSelected && confirm.IsEnabled && Snapshot(session) == before,
                 "Selecting a category previews it; only the bound confirmation commits the category choice.");
             Click(confirm, panel);
             Program.Assert(session.Snapshot.RewardCategories.Count == 0 && session.Snapshot.RewardOffers.Count == 4 &&
-                vm.ShanheRewardCards.Count == 5 && vm.ShanheRewardCards.Count(card => card.IsSkip) == 1 &&
+                vm.ShanheRewardCards.Count == 4 && vm.ShanheRewardCards.All(card => !card.IsSkip) &&
                 vm.ShanheRewardCards.All(card => card.RewardCategoryChoice is null) && !confirm.IsEnabled &&
                 session.AcceptedCommands.OfType<ChooseShanheRewardCategoryCommand>().Single().Category == ShanheRewardCategory.Tactic,
-                "The equipped category tactic opens four actual frozen tactic candidates plus the independent skip card.");
+                "The equipped category tactic opens four actual frozen tactic candidates with no tactic decline route.");
             before = Snapshot(session);
             RawClick(retiredCategoryButton);
             vm.SelectShanheRewardCardCommand.Execute(category);

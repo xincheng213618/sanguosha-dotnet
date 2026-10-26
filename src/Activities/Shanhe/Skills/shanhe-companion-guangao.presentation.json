@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:companion-guangao": {
+      "name": "犷骜",
+      "description": "你使用【杀】可以多指定一个目标，其他角色使用【杀】可以多指定你为目标。若你的手牌数为偶数，你摸一张牌令此【杀】对任意目标无效。"
+    }
+  }
+}

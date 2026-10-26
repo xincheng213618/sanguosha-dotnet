@@ -94,19 +94,19 @@ internal static class ShanheSchoolTeamChecks
             "Buying another real tactic preserves the established source instead of initializing the rank health or hand benefit again.");
     }
 
-    public static void FifthRankAlliesAndPlayerConsumeOneSharedExpeditionRebirth()
+    public static void FifthRankAlliesAndPlayerHaveIndependentExpeditionRebirth()
     {
-        foreach (var allyFirst in new[] { true, false })
+        var s = Scene.Start(5, true);
+        Need(Enumerable.Range(1, 3).All(seat => s.View(seat).Skills!.Count(skill =>
+                skill.ContentId == ShanheTeamRankPrograms.SharedRebirthSkillId) == 1),
+            "Each actual ally receives exactly one native rank rebirth program.");
+        foreach (var beneficiary in new[] { 2, 3, 0 })
         {
-            var s = Scene.Start(5, true);
-            Need(Enumerable.Range(1, 3).All(seat => s.View(seat).Skills!.Any(skill => skill.ContentId == ShanheTeamRankPrograms.SharedRebirthSkillId)),
-                "All three real living allies receive the separate shared-rank rebirth program.");
-            var beneficiary = allyFirst ? 2 : 0;
             var beneficiaryBefore = s.Game.CreateSnapshot(beneficiary).Players[beneficiary];
             var originalHand = beneficiaryBefore.Hand.Select(c => c.Id).ToArray();
             Need(originalHand.Length == beneficiaryBefore.HandCount,
                 "The hand-preservation assertion reads the actual beneficiary's own private snapshot, not another viewer's redacted hand.");
-            if (allyFirst) s.Use("fall-target", [beneficiary]);
+            if (beneficiary != 0) s.Use("fall-target", [beneficiary]);
             else
             {
                 s.BeginUse("fall-owner", []); s.RescueOwner();
@@ -115,26 +115,45 @@ internal static class ShanheSchoolTeamChecks
                     c.Parameters.GetValueOrDefault("skill-id") == ShanheGeneralRanks.RebirthSkillId);
                 s.Accept(new AnswerPromptCommand(0, prompt.PromptId, choice.Id, s.Game.Revision)); s.Play();
             }
-            var usages = s.Events<SkillUsageConsumedEvent>().Where(e => ShanheTeamRankPrograms.IsExpeditionRebirthUsage(s.Setup!, e)).ToArray();
+            var usages = s.Events<SkillUsageConsumedEvent>().Where(e => e.SkillOwnerSeat == beneficiary &&
+                (ShanheTeamRankPrograms.IsPlayerExpeditionRebirthUsage(e) ||
+                 ShanheTeamRankPrograms.IsAllyExpeditionRebirthUsage(s.Setup!, e))).ToArray();
             Need(s.View(beneficiary) is { Hp: 5, IsAlive: true } && s.View(beneficiary).HandCount == originalHand.Length + 5 &&
                  originalHand.All(id => s.Game.CreateSnapshot(beneficiary).Players[beneficiary].Hand.Any(c => c.Id == id)) && usages is [var used] &&
-                 used.SkillOwnerSeat == beneficiary && used.SkillId == (allyFirst ? ShanheTeamRankPrograms.SharedRebirthSkillId : ShanheGeneralRanks.RebirthSkillId) &&
+                 used.SkillId == (beneficiary == 0 ? ShanheGeneralRanks.RebirthSkillId : ShanheTeamRankPrograms.SharedRebirthSkillId) &&
                  s.Events<NativeDrawInvocationRecordedEvent>().Count(e => e.OwnerSeat == beneficiary && e.Requested == 5 && e.ParentFrameId is not null) == 1,
-                "Either the ally or the player consumes one real common expedition entitlement, recovers to five and gains five additional physical hand cards. " + s.Details());
-            s.Use("fall-target", [3]);
-            Need(!s.View(3).IsAlive && s.Events<SkillUsageConsumedEvent>().Count(e => ShanheTeamRankPrograms.IsExpeditionRebirthUsage(s.Setup!, e)) == 1,
-                "After either first beneficiary uses rebirth, another ally truly dies instead of spending a private second copy.");
-            if (allyFirst)
-            {
-                s.BeginUse("fall-owner", []); s.CompleteSpentOwnerDeath();
-                Need(!s.View(0).IsAlive && s.Events<PlayerDiedEvent>().Count(e => e.VictimSeat == 0) == 1 &&
-                     s.Events<SkillUsageConsumedEvent>().Count(e => ShanheTeamRankPrograms.IsExpeditionRebirthUsage(s.Setup!, e)) == 1 &&
-                     s.Events<ProgramBindingStartedEvent>().All(e => e.SkillId != ShanheGeneralRanks.RebirthSkillId),
-                    "After an ally's first rebirth, the player really dies with no second original-rank activation or usage consumption.");
-            }
-            Need(!ShanheTeamRankPrograms.IsExpeditionRebirthUsage(s.Setup!, new(4, ShanheTeamRankPrograms.SharedRebirthSkillId, "campaign-rebirth", SkillUsageScope.Game, 1)),
-                "An enemy's same-named fake usage cannot spend this expedition's player-team entitlement.");
+                "Ally A, ally B and then the player each use their own real entitlement, recover to five and gain five additional physical cards. " + s.Details());
         }
+        Need(s.Events<SkillUsageConsumedEvent>().Count(ShanheTeamRankPrograms.IsPlayerExpeditionRebirthUsage) == 1 &&
+             s.Events<SkillUsageConsumedEvent>().Count(e => ShanheTeamRankPrograms.IsAllyExpeditionRebirthUsage(s.Setup!, e)) == 2,
+            "The player's usage and the two independently attributed allied usages remain separate expedition facts.");
+        s.Use("fall-target", [2]);
+        Need(!s.View(2).IsAlive && s.Events<SkillUsageConsumedEvent>().Count(e => e.SkillOwnerSeat == 2 &&
+                ShanheTeamRankPrograms.IsAllyExpeditionRebirthUsage(s.Setup!, e)) == 1,
+            "An ally that already used its privilege really dies on its next fatal loss.");
+        s.BeginUse("fall-owner", []); s.CompleteSpentOwnerDeath();
+        Need(!s.View(0).IsAlive && s.Events<PlayerDiedEvent>().Count(e => e.VictimSeat == 0) == 1 &&
+             s.Events<SkillUsageConsumedEvent>().Count(ShanheTeamRankPrograms.IsPlayerExpeditionRebirthUsage) == 1,
+            "The player's own privilege also cannot be spent a second time.");
+        Need(!ShanheTeamRankPrograms.IsAllyExpeditionRebirthUsage(s.Setup!, new(4,
+                ShanheTeamRankPrograms.SharedRebirthSkillId, "campaign-rebirth", SkillUsageScope.Game, 1)),
+            "An enemy's same-named fake usage cannot spend an allied privilege.");
+
+        var next = Scene.Start(5, false, usedSeats: [2], playerSpent: true);
+        next.Buy(Component);
+        Need(next.View(0).Skills!.All(skill => skill.ContentId != ShanheGeneralRanks.RebirthSkillId) &&
+             next.View(2).Skills!.All(skill => skill.ContentId != ShanheTeamRankPrograms.SharedRebirthSkillId) &&
+             new[] { 1, 3 }.All(seat => next.View(seat).Skills!.Count(skill =>
+                 skill.ContentId == ShanheTeamRankPrograms.SharedRebirthSkillId) == 1),
+            "A new native entry with spent player and ally A still grants only the other eligible allies when the school is bought during battle.");
+        next.Use("fall-target", [3]);
+        Need(next.View(3) is { Hp: 5, IsAlive: true } && next.Events<SkillUsageConsumedEvent>().Any(e =>
+                e.SkillOwnerSeat == 3 && ShanheTeamRankPrograms.IsAllyExpeditionRebirthUsage(next.Setup!, e)),
+            "Another ally's inherited entitlement works even after the player's expedition privilege was spent before this encounter.");
+        next.Use("fall-target", [2]);
+        Need(!next.View(2).IsAlive && next.Events<SkillUsageConsumedEvent>().All(e => e.SkillOwnerSeat != 2 ||
+                !ShanheTeamRankPrograms.IsAllyExpeditionRebirthUsage(next.Setup!, e)),
+            "An ally's previously spent expedition entitlement is not refreshed by the new battle or the live school purchase.");
     }
 
     public static void UnownedManualGrantAndOrdinaryTeamsCannotReceiveRankPrivileges()
@@ -213,12 +232,12 @@ internal static class ShanheSchoolTeamChecks
                     "A completed spent-rebirth fixture must not continue with an allegedly living owner.");
                 if (Game.PendingDecision is { PlayerSeat: 0 } prompt)
                     Need(prompt.Choices.All(c => c.Parameters.GetValueOrDefault("skill-id") != ShanheGeneralRanks.RebirthSkillId),
-                        "A real rescue prompt after spending the team entitlement cannot offer the player's original rebirth.");
+                        "A real rescue prompt after spending the player's own entitlement cannot offer its original rebirth.");
                 Advance();
             }
             Need(!View(0).IsAlive, "With no remaining real rescue source, the spent-rebirth owner must actually die. " + Details());
         }
-        public static Scene Start(int rank, bool complete)
+        public static Scene Start(int rank, bool complete, int[]? usedSeats = null, bool playerSpent = false)
         {
             var registry = ContentRegistry.Build(new StandardContentPackage(), new StandardShanheMarketPackage(),
                 new StandardShanheSchoolTeamPackage(), new StandardShanheRankPrivilegePackage(), new StandardShanheDrawThresholdPackage(), new Fixture(false));
@@ -240,7 +259,13 @@ internal static class ShanheSchoolTeamChecks
             var campaign = ShanheCampaignSession.Create(definition, new(71, Owner)
             { PlayerRank = rank, UseCodexRewardPool = true, PersistentMarket = true, EquippedTacticIds = complete ? [Component] : [] }, _ => registry);
             var moved = campaign.Submit(new MoveShanheNodeCommand("battle", campaign.Revision)); Need(moved.Accepted, moved.Error ?? "The actual team-school campaign could not enter battle.");
-            var setup = campaign.PendingBattleSetup!;
+            var setup = ShanheBattleSetup.Freeze(campaign.PendingBattleSetup! with
+            {
+                AllyRankRebirthUsedSeats = usedSeats ?? [],
+                RebirthAvailable = !playerSpent && campaign.PendingBattleSetup!.RebirthAvailable,
+                ExtraSkillIds = campaign.PendingBattleSetup!.ExtraSkillIds.Where(id =>
+                    !playerSpent || id != ShanheGeneralRanks.RebirthSkillId).ToArray()
+            });
             var engine = GameEngine.CreateStandard(new() { Seed = setup.BattleSeed, PlayerCount = 5, HumanSeat = 0, HumanRole = null,
                 HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup,
                 UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false,

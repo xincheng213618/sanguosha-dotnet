@@ -369,7 +369,7 @@ public sealed partial class MainViewModel
         : IsTeamSnapshot
         ? $"青队 {Seats.Count(seat => seat.IsAlive && seat.TeamId == "team:blue")} · 赤队 {Seats.Count(seat => seat.IsAlive && seat.TeamId == "team:red")} 存活"
         : $"{Seats.Count(seat => seat.IsAlive)} / {Seats.Count} 人存活";
-    public string PlayButtonText => IsCardExchangePending ? CardExchangeConfirmText : IsDeckReorderPending || IsRevealedSubsetSelectionPending ? "确 认" : IsMobileShiZhuangshiSelectionPending ? "确 定" : IsCardDistributionPending ? "确 定" : IsDiscardSelectionPending ? $"弃置 {SelectedDiscardCount} / {RequiredDiscardCount} 张"
+    public string PlayButtonText => IsCardEnhancementSelectionPending ? "确 定" : IsCardExchangePending ? CardExchangeConfirmText : IsDeckReorderPending || IsRevealedSubsetSelectionPending ? "确 认" : IsMobileShiZhuangshiSelectionPending ? "确 定" : IsCardDistributionPending ? "确 定" : IsDiscardSelectionPending ? $"弃置 {SelectedDiscardCount} / {RequiredDiscardCount} 张"
         : IsOwnedCardSelectionPending ? "确 定"
         : IsSkillTargetSelectionPending ? _snapshot.PendingDecision?.SkillPrompt is { } skill ? $"发动{skill.Name}" : "确 定"
         : IsHandResponsePending ? HandResponseButtonText
@@ -522,20 +522,20 @@ public sealed partial class MainViewModel
                 : $"{action.Description}（已选{BuildActiveSkillSelectionSummary()}）";
         }
     }
-    public bool CanConfirmSelected => !IsZhuqueFanSelectionPending && (IsCardExchangePending ? SelectedCardExchangeChoice is not null : IsDeckReorderPending ? CanConfirmDeckReorder : IsRevealedSubsetSelectionPending ? SelectedRevealedSubsetChoice is not null : IsMobileShiZhuangshiSelectionPending ? MobileShiZhuangshiPayChoice is not null : IsCardDistributionPending ? CanConfirmDistribution : IsDiscardSelectionPending ? SelectedDiscardCount > 0 && SelectedDiscardCount <= RequiredDiscardCount
+    public bool CanConfirmSelected => !IsZhuqueFanSelectionPending && (IsCardEnhancementSelectionPending ? SelectedCardEnhancementChoice is not null : IsCardExchangePending ? SelectedCardExchangeChoice is not null : IsDeckReorderPending ? CanConfirmDeckReorder : IsRevealedSubsetSelectionPending ? SelectedRevealedSubsetChoice is not null : IsMobileShiZhuangshiSelectionPending ? MobileShiZhuangshiPayChoice is not null : IsCardDistributionPending ? CanConfirmDistribution : IsDiscardSelectionPending ? SelectedDiscardCount > 0 && SelectedDiscardCount <= RequiredDiscardCount
         : IsOwnedCardSelectionPending ? CanConfirmOwnedCardSelection
         : IsSkillTargetSelectionPending ? SelectedSkillTargetChoice is not null
         : IsCardPaymentSelectionPending ? SelectedCardPaymentChoice is not null
         : IsHandResponsePending ? IsBaguaActivationPending || SelectedHandResponse is not null && Hand.Any(card => card.Id == _selectedCardId && card.IsPlayable)
         : IsActiveSkillSelectionPending ? CanConfirmActiveSkill : CanPlaySelected || CanPlaySelectedAsSlash);
-    public bool CanActFromHand => IsCardExchangePending || IsDeckReorderPending || IsRevealedSubsetSelectionPending || IsMobileShiZhuangshiSelectionPending || IsCardDistributionPending || CanEndTurn || IsDiscardSelectionPending || IsHandResponsePending || IsSkillTargetSelectionPending || IsOwnedCardSelectionPending;
+    public bool CanActFromHand => IsCardEnhancementSelectionPending || IsCardExchangePending || IsDeckReorderPending || IsRevealedSubsetSelectionPending || IsMobileShiZhuangshiSelectionPending || IsCardDistributionPending || CanEndTurn || IsDiscardSelectionPending || IsHandResponsePending || IsSkillTargetSelectionPending || IsOwnedCardSelectionPending;
     public bool HasAlternateSlash => CanPlaySelected && CanPlaySelectedAsSlash;
     public string AlternatePlayText => SelectedConversionAction() is { } conversion
         ? $"当作{CardCatalog.Get(conversion.PlayedCardKind!.Value).DisplayName}使用"
         : "转换使用";
     public string TurnHeadline => HasGameOver ? GameOverText : IsGeneralSelectionPending ? "点将出征" : IsDiscardSelectionPending ? "你的弃牌阶段" : _game.IsMoLuBuOpeningPhase ? $"{CenterTitle} · 夺炁额外出牌阶段" : CanEndTurn ? "你的出牌阶段" : CanStepAi ? $"{CenterTitle} 正在行动" : "等待你的响应";
     public bool HasChoicePrompt => IsDyingSelectionPending || IsHarvestSelectionPending || IsTargetCardSelectionPending || IsFireAttackSelectionPending || IsNullificationSelectionPending || IsResponseSelectionPending || IsSkillSelectionPending;
-    public bool HasCenterChoices => IsCardExchangePending || IsDeckReorderPending || IsCardDistributionPending || HasChoicePrompt && (HasDockSkillChoices || HasExpandedSelection ? false : IsOwnedCardSelectionPending && !IsForeignCardTakeSelectionPending ? OwnedSelectionExtraChoices.Count > 0 : IsHandResponsePending ? HandResponseExtraChoices.Count > 0
+    public bool HasCenterChoices => IsCardExchangePending || IsDeckReorderPending || IsCardDistributionPending || HasChoicePrompt && (IsCardEnhancementSelectionPending || HasDockSkillChoices || HasExpandedSelection ? false : IsOwnedCardSelectionPending && !IsForeignCardTakeSelectionPending ? OwnedSelectionExtraChoices.Count > 0 : IsHandResponsePending ? HandResponseExtraChoices.Count > 0
         : !IsSkillTargetSelectionPending || CenterSkillChoices.Count > 0) || HasPublicTargetChoices || HasTargetCombinationChoices ||
         HasPublicRevealedCards || HasPrivatelyViewedCards || HasDeclaredCards ||
         ActiveSkillEquipmentChoices.Count > 0 || CenterEquipmentPlayChoices.Count > 0;
@@ -552,7 +552,7 @@ public sealed partial class MainViewModel
     public bool IsTableIdle => !HasCenterChoices;
     public bool AreTablePlaysVisible => IsTableIdle || IsHandResponsePending && HandResponseExtraChoices.Count == 0 &&
         !HasPublicRevealedCards && !HasPrivatelyViewedCards && !HasDeclaredCards;
-    public bool HasSelection => HasMobileShiZhuangshiSelection || _distributionCardIds.Count > 0 || _distributionTarget is not null || IsResponseConversionSelectionPending || IsPlayConversionSelectionPending || _selectedCardId.HasValue || _discardCardIds.Count > 0 ||
+    public bool HasSelection => _selectedCardEnhancements.Count > 0 || HasMobileShiZhuangshiSelection || _distributionCardIds.Count > 0 || _distributionTarget is not null || IsResponseConversionSelectionPending || IsPlayConversionSelectionPending || _selectedCardId.HasValue || _discardCardIds.Count > 0 ||
         HasOwnedCardDraftSelection || _revealedSubsetCardIds.Count > 0 ||
         _paymentCardIds.Count > 0 ||
         _isSelectingActiveSkillCards || _selectedActiveSkillCardIds.Count > 0 ||
@@ -614,7 +614,8 @@ public sealed partial class MainViewModel
         ConfirmSelectedCommand = new RelayCommand(() =>
         {
             if (!CanConfirmSelected) return;
-            if (IsCardExchangePending) ConfirmCardExchange();
+            if (IsCardEnhancementSelectionPending) ConfirmCardEnhancements();
+            else if (IsCardExchangePending) ConfirmCardExchange();
             else if (IsDeckReorderPending) ConfirmDeckReorder();
             else if (IsRevealedSubsetSelectionPending) ConfirmRevealedSubset();
             else if (IsMobileShiZhuangshiSelectionPending) ConfirmMobileShiZhuangshi();
@@ -761,6 +762,7 @@ public sealed partial class MainViewModel
             : IsMobileShiZhuangshiSelectionPending ? MobileShiZhuangshiSelectionHint
             : IsCardDistributionPending ? DistributionSelectionHint
             : IsDiscardSelectionPending ? DiscardSelectionHint
+            : IsCardEnhancementSelectionPending ? $"已选 {_selectedCardEnhancements.Count}/{CardEnhancementMaximum} 项 · 再点可取消，选好后点击下方「确定」"
             : IsOwnedCardSelectionPending ? OwnedCardSelectionHint
             : IsSkillTargetSelectionPending ? SkillTargetSelectionHint
             : IsHandResponsePending ? HandResponseHint
@@ -873,6 +875,7 @@ public sealed partial class MainViewModel
 
     private void ClearSelection()
     {
+        if (IsCardEnhancementSelectionPending) { ClearCardEnhancementSelection(); return; }
         if (IsCardExchangePending) { ClearCardExchangeSelection(); return; }
         if (IsDeckReorderPending) return;
         if (IsRevealedSubsetSelectionPending)
