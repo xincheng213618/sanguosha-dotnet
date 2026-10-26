@@ -225,6 +225,8 @@ public static partial class StandardShanheCampaignCatalog
         var teamHealthTactic = RequiresCurrentTeamHealthRegistry(requirements);
         var wineTactics = RequiresCurrentWineTacticsRegistry(requirements);
         var zuiquanTactic = RequiresCurrentZuiquanRegistry(requirements);
+        var guandaoTactic = RequiresCurrentGuandaoRegistry(requirements);
+        var lowHpDrawTactics = RequiresCurrentLowHpDrawRegistry(requirements);
         var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
@@ -342,6 +344,8 @@ public static partial class StandardShanheCampaignCatalog
             (teamHealthTactic ? "/current-team-health" : "") +
             (wineTactics ? "/current-wine-tactics" : "") +
             (zuiquanTactic ? "/current-zuiquan-2001" : "") +
+            (guandaoTactic ? "/current-guandao-2010" : "") +
+            (lowHpDrawTactics ? "/current-low-hp-draw" : "") +
             (wealthTactics ? "/current-wealth-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
@@ -415,6 +419,8 @@ public static partial class StandardShanheCampaignCatalog
             if (teamHealthTactic) packages.Add(new StandardShanheTeamHealthPackage());
             if (wineTactics) packages.Add(new StandardShanheWineTacticsPackage());
             if (zuiquanTactic) packages.Add(new StandardShanheZuiquanPackage());
+            if (guandaoTactic) packages.Add(new StandardShanheGuandaoPackage());
+            if (lowHpDrawTactics) packages.Add(new StandardShanheLowHpDrawPackage());
             if (reactionTactics)
             {
                 packages.Add(new StandardShanheArmorTacticsPackage());

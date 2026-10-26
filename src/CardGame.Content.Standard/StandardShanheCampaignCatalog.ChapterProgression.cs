@@ -17,7 +17,7 @@ public static partial class StandardShanheCampaignCatalog
         return ShanheCampaignContent.FreezeAndValidate(definition with
         {
             IntroText = definition.IntroText + "\n\n【本地三章征程】第一章主要迎战单将、双将，第二章开始出现三人军阵，第三章迎战强大首领或带兵支援阵。" +
-                "全部席位含你、同行和敌人，至多八人。章尾首领分两阶段：第一阶段体力打空后原席进入第二阶段，不提前结算胜利；其余角色保留现状，首领开始新的自然回合。" +
+                "全部席位含你、同行和敌人，至多八人。章尾首领分两阶段：第一阶段体力打空后原席进入第二阶段，不提前结算胜利；回合中转换由首领开始新的自然回合，开局转换则继续完成开局效果。" +
                 "前两章分别领取红色战法与技能，第三章胜利后直接结算图册与征程记录。",
             Nodes = definition.Nodes.Select(node =>
             {

@@ -67,6 +67,7 @@ public static partial class StandardShanheCampaignCatalog
         new ReadOnlyDictionary<int, string>(CodexRewardBindings.Concat(Codex2026RewardBindings).Select(binding => new KeyValuePair<int, string>(binding.NodeId, binding.Reward.Id))
             .Concat(CurrentBuildSkillCodexBindings)
             .Concat(CurrentReactionTacticCodexBindings)
+            .Concat(CurrentLowHpDrawCodexBindings)
             .Concat(CurrentShopCardCodexBindings)
             .Append(new(2, OpeningInheritanceRewardId))
             // Availability still requires this reward in the selected edition.

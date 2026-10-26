@@ -36,25 +36,32 @@ internal sealed class ShanheBossStageFeature : IGameModeFeature,
         };
         if (affectedSeat != BossSeat) return;
         var facts = _host.CaptureFacts();
-        if (!facts.SetupComplete || facts.TurnNumber <= 0 || facts.HasWinner || HasTransformed) return;
+        if (!facts.SetupComplete || facts.HasWinner || HasTransformed) return;
         var boss = facts.Players[BossSeat];
-        if (boss.IsAlive && boss.Hp <= 0)
-            throw new ModeFlowInterruption(InterruptionHandlerId, new StageRequest(facts.TurnNumber, boss.GeneralId));
+        if (!boss.IsAlive || boss.Hp > 0) return;
+        if (facts.TurnNumber == 0)
+        {
+            // No actual turn exists to retire. Keep the paid opening draw and
+            // remaining GameStarting candidates on their original frames.
+            var transition = _setup.BossTransition!;
+            EnterSecondForm(facts);
+            if (transition.DrawCards != 0) _host.DrawInitialCards(BossSeat, transition.DrawCards);
+            _host.Log("ShanheBossTransformed", $"首领在开局进入第二阶段【{_host.General(transition.GeneralId).Name}】。", BossSeat);
+            _host.PublishState();
+            return;
+        }
+        throw new ModeFlowInterruption(InterruptionHandlerId, new StageRequest(facts.TurnNumber, boss.GeneralId));
     }
 
     public void CompleteInterruption(ModeFlowTransitionRequest request)
     {
         var facts = _host.CaptureFacts();
         var boss = facts.Players[BossSeat];
-        if (request is not StageRequest stage || facts.HasWinner || HasTransformed ||
+        if (request is not StageRequest stage || stage.TurnNumber <= 0 || facts.HasWinner || HasTransformed ||
             stage.TurnNumber != facts.TurnNumber || stage.GeneralId != boss.GeneralId || !boss.IsAlive || boss.Hp > 0)
             throw new InvalidOperationException("A Shanhe boss transition lost its lethal first-form owner.");
         var transition = _setup.BossTransition!;
-        _host.ReplaceCombatant(new(BossSeat, boss.GeneralId, transition.GeneralId, PreserveCurrentState: true,
-            MaximumHpOverride: transition.MaxHp, HpOverride: transition.Hp));
-        // Commit the once-only marker before any cleanup can publish another rule event.
-        _host.PublishFact(new ShanheBossStageStartedEvent(BossSeat, boss.GeneralId, transition.GeneralId,
-            facts.TurnNumber, transition.MaxHp, transition.Hp));
+        EnterSecondForm(facts);
         _host.ClearDecision(resumeRunning: true);
         _host.CancelResolutionTree(frame => new ShanheBossResolutionCancelledEvent(frame.FrameId, frame.Kind, frame.TurnNumber));
         _host.ClearTransientBatches();
@@ -65,6 +72,17 @@ internal sealed class ShanheBossStageFeature : IGameModeFeature,
         _host.BeginNaturalTurnAt(BossSeat);
         _host.Log("ShanheBossTransformed", $"首领进入第二阶段【{_host.General(transition.GeneralId).Name}】，当前回合中断，由首领开始新的自然回合。", BossSeat);
         _host.PublishState();
+    }
+
+    private void EnterSecondForm(ModeEncounterFacts facts)
+    {
+        var boss = facts.Players[BossSeat];
+        var transition = _setup.BossTransition!;
+        _host.ReplaceCombatant(new(BossSeat, boss.GeneralId, transition.GeneralId, PreserveCurrentState: true,
+            MaximumHpOverride: transition.MaxHp, HpOverride: transition.Hp));
+        // Commit the once-only marker before opening draws or cleanup publish another rule event.
+        _host.PublishFact(new ShanheBossStageStartedEvent(BossSeat, boss.GeneralId, transition.GeneralId,
+            facts.TurnNumber, transition.MaxHp, transition.Hp));
     }
 
     private sealed record StageRequest(int TurnNumber, string GeneralId) : ModeFlowTransitionRequest;
