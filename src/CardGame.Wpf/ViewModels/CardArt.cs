@@ -9,12 +9,20 @@ public static class CardArt
 {
     public static bool NeedsRuntimeNameOverlay(CardKind? kind) =>
         kind is CardKind.GeneralWeapon or CardKind.ScarletBloodSword or CardKind.Xuanjian or CardKind.ColdSlash or
-            CardKind.AnqiFeiren or CardKind.YaodaoChitong or CardKind.ShanheXingtianAxe or CardKind.Leizhen or CardKind.MantianGuohai;
+            CardKind.AnqiFeiren or CardKind.YaodaoChitong or CardKind.Leizhen or CardKind.MantianGuohai;
 
     public static ImageSource? Get(CardKind? kind)
     {
         if (kind is not { } key || !Enum.IsDefined(key)) return null;
-        return Load($"{(key is CardKind.Xuanjian or CardKind.AnqiFeiren or CardKind.YaodaoChitong or CardKind.ShanheXingtianAxe or CardKind.Leizhen ? CardKind.GeneralWeapon : key == CardKind.ColdSlash ? CardKind.Slash : key)}.png");
+        var artworkKind = key switch
+        {
+            // The S5 axe has independent rules and shares the existing printed artwork.
+            CardKind.ShanheXingtianAxe => CardKind.XingtianAxe,
+            CardKind.Xuanjian or CardKind.AnqiFeiren or CardKind.YaodaoChitong or CardKind.Leizhen => CardKind.GeneralWeapon,
+            CardKind.ColdSlash => CardKind.Slash,
+            _ => key
+        };
+        return Load($"{artworkKind}.png");
     }
 
     public static ImageSource? GetRank(string rank, string suit) =>
@@ -27,8 +35,17 @@ public static class CardArt
         "♠" => Load("suit-spade.png"), "♣" => Load("suit-club.png"), _ => null
     };
 
-    public static ImageSource? GetEquipment(CardKind kind) =>
-        EquipmentCatalog.IsEquipment(kind) ? Load($"equip-{(kind is CardKind.Xuanjian or CardKind.ShanheXingtianAxe or CardKind.Leizhen ? CardKind.GeneralWeapon : kind)}.png") : null;
+    public static ImageSource? GetEquipment(CardKind kind)
+    {
+        if (!EquipmentCatalog.IsEquipment(kind)) return null;
+        var artworkKind = kind switch
+        {
+            CardKind.ShanheXingtianAxe => CardKind.XingtianAxe,
+            CardKind.Xuanjian or CardKind.Leizhen => CardKind.GeneralWeapon,
+            _ => kind
+        };
+        return Load($"equip-{artworkKind}.png");
+    }
 
     private static ImageSource? Load(string key) => AssetImages.Load("Assets/Cards/" + key);
 }
