@@ -1,0 +1,24 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhao-yun",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 83499,
+      "pools": { "current": 83499 },
+      "definition": {
+        "id": "mobile:zhao-yun",
+        "name": "赵云·移动版",
+        "portraitKey": "mobile-zhao-yun",
+        "skillId": "classic:longdan",
+        "factionId": "shu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:zhao-yun",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:dian-wei",
+  "skills": [{
+    "registrationOrder": 82800,
+    "programBundle": "mobile-dian-wei",
+    "includeProgramPresentation": true,
+    "definition": {
+      "id": "mobile:qiangxi",
+      "name": "强袭",
+      "description": "出牌阶段限一次，你可以失去1点体力或弃置一张武器牌，然后对你攻击范围内的一名其他角色造成1点伤害。",
+      "actionForms": "Active"
+    }
+  }],
+  "generals": [{
+    "registrationOrder": 82899,
+    "pools": { "current": 82899 },
+    "definition": {
+      "id": "mobile:dian-wei",
+      "name": "典韦·移动版",
+      "portraitKey": "mobile-dian-wei",
+      "skillId": "mobile:qiangxi",
+      "factionId": "wei",
+      "baseHp": 4,
+      "gender": "Male",
+      "characterId": "character:dian-wei",
+      "variantId": "mobile",
+      "rulesetId": "sanguosha-mobile"
+    }
+  }]
+}

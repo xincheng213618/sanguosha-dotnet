@@ -1,0 +1,26 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:lu-bu",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 83399,
+      "pools": {
+        "current": 83399
+      },
+      "definition": {
+        "id": "mobile:lu-bu",
+        "name": "吕布·移动版",
+        "portraitKey": "mobile-lu-bu",
+        "skillId": "classic:wushuang",
+        "factionId": "qun",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:lu-bu",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

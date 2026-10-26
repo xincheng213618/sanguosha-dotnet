@@ -1,0 +1,26 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:guan-yu",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 83199,
+      "pools": {
+        "current": 83199
+      },
+      "definition": {
+        "id": "mobile:guan-yu",
+        "name": "关羽·移动版",
+        "portraitKey": "mobile-guan-yu",
+        "skillId": "classic:wusheng",
+        "factionId": "shu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:guan-yu",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

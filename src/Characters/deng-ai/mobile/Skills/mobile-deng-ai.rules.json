@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:tuntian",
+      "revision": 1,
+      "modifiers": [
+        { "id": "field-outgoing-distance", "query": "outgoingDistance", "operation": "add", "valueExpression": "negatedOwnedZoneCount", "valueZone": "authority", "priority": 0 }
+      ],
+      "triggers": [
+        {
+          "id": "judge-after-off-turn-owned-loss",
+          "window": "cardsMoved",
+          "subject": "owner",
+          "sourceZones": ["hand", "equipment"],
+          "movementOccurrence": "perOwnerBatch",
+          "optional": true,
+          "condition": { "kind": "not", "children": [{ "kind": "ownerIsTurnPlayer" }] },
+          "effects": [
+            { "op": "startJudgment", "target": "owner", "judgmentReason": "skill.mobile.tuntian", "resultBind": "tuntian-card", "outcomeBind": "tuntian-outcome", "visibility": "public" },
+            {
+              "op": "moveBoundCards", "target": "owner", "sourceBind": "tuntian-card", "destination": "discardPile", "awaitMovementTriggers": true,
+              "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "tuntian-outcome", "suits": ["heart"] }
+            },
+            {
+              "op": "moveBoundCards", "target": "owner", "sourceBind": "tuntian-card", "destination": "ownerPersistentZone", "destinationZone": "authority", "awaitMovementTriggers": true,
+              "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "tuntian-outcome", "suits": ["spade", "club", "diamond", "none"] }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

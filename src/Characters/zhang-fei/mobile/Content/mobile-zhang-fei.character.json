@@ -1,0 +1,26 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhang-fei",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 83299,
+      "pools": {
+        "current": 83299
+      },
+      "definition": {
+        "id": "mobile:zhang-fei",
+        "name": "张飞·移动版",
+        "portraitKey": "mobile-zhang-fei",
+        "skillId": "classic:paoxiao",
+        "factionId": "shu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:zhang-fei",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

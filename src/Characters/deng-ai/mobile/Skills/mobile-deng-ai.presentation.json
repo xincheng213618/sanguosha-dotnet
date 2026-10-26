@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:tuntian": {
+      "name": "屯田",
+      "authorityName": "田",
+      "description": "当你于回合外失去牌后，你可以进行判定，然后将生效后的非红桃判定牌置于你的武将牌上，称为“田”。你计算与其他角色的距离-X（X为“田”的数量）。"
+    }
+  }
+}

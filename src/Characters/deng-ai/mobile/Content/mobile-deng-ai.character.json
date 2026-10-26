@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:deng-ai",
+  "skills": [
+    {
+      "registrationOrder": 82900,
+      "programBundle": "mobile-deng-ai",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:tuntian",
+        "name": "屯田",
+        "description": "当你于回合外失去牌后，你可以进行判定，然后将生效后的非红桃判定牌置于你的武将牌上，称为“田”。你计算与其他角色的距离-X（X为“田”的数量）。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 82999,
+      "pools": { "current": 82999 },
+      "definition": {
+        "id": "mobile:deng-ai",
+        "name": "邓艾·移动版",
+        "portraitKey": "mobile-deng-ai",
+        "skillId": "mobile:tuntian",
+        "additionalSkillIds": ["boundary:zaoxian-mobile"],
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:deng-ai",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}
