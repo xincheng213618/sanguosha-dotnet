@@ -54,6 +54,7 @@ public sealed partial class ShanheCampaignSession
         public int ShopRefreshCount { get; init; }
         public int ShopFreeRefreshCount { get; init; }
         public int ShopPaidRefreshCount { get; init; }
+        public int ShopRestockCount { get; init; }
         public int ShopTacticPurchases { get; init; }
         public int ShopEquipmentPurchases { get; init; }
         public int ShopCardPurchases { get; init; }
@@ -261,7 +262,7 @@ public sealed partial class ShanheCampaignSession
             {
                 state = state with
                 {
-                    ShopRefreshCount = 0, ShopFreeRefreshCount = 0, ShopPaidRefreshCount = 0,
+                    ShopStock = [], ShopRefreshCount = 0, ShopFreeRefreshCount = 0, ShopPaidRefreshCount = 0, ShopRestockCount = 0,
                     ShopTacticPurchases = 0, ShopEquipmentPurchases = 0, ShopCardPurchases = 0, ShopSkillPurchases = 0
                 };
                 state = state with { ShopStock = CreateShopStock(state, node) };
@@ -365,8 +366,11 @@ public sealed partial class ShanheCampaignSession
         return BeginPendingBonusRewardsOrFinish(_state with { Gold = checked(_state.Gold + gold) });
     }
 
-    private RunState ChooseOption(ChooseShanheNodeOptionCommand command) =>
-        PrepareNodeOption(_state, command.ChoiceId, command.ReplaceSkillId);
+    private RunState ChooseOption(ChooseShanheNodeOptionCommand command)
+    {
+        var state = PrepareNodeOption(_state, command.ChoiceId, command.ReplaceSkillId);
+        return RestockPurchasedShopItem(state, command.ChoiceId);
+    }
 
     private RunState RefreshShop()
     {
@@ -510,6 +514,7 @@ public sealed partial class ShanheCampaignSession
             ShopPaidRefreshRemaining = paidRefreshes,
             ShopRefreshRemaining = checked(freeRefreshes + paidRefreshes),
             ShopRefreshCost = randomShop && freeRefreshes == 0 ? 100 : 0,
+            ShopRestockOnPurchase = randomShop && RestocksShopOnPurchase(state),
             RewardSkipGold = HasPrimaryReward(state)
                 ? _nodes[state.CurrentNodeId!].RewardSkipGold : 0
         };
@@ -605,9 +610,8 @@ public sealed partial class ShanheCampaignSession
     private IReadOnlyList<ShanheNodeChoiceDefinition> CreateShopStock(RunState state, ShanheNodeDefinition node)
     {
         var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, node.Id + ":shop", state.ShopRefreshCount));
-        // Supply choices retain their authored prices and once-per-shop purchase state.
-        var stock = (node.Choices ?? []).Where(choice => choice.RewardId is not { } id ||
-            ShopCategory(_rewards[id]) == ShopRewardCategory.Supply).ToList();
+        // Preserve current supply positions and their replacement identities on whole-shop refreshes.
+        var stock = RetainedShopSupplyChoices(state, node).ToList();
         var previous = state.ShopStock.Select(choice => choice.RewardId).OfType<string>().ToHashSet(StringComparer.Ordinal);
         foreach (var category in new[] { ShopRewardCategory.Tactic, ShopRewardCategory.Skill, ShopRewardCategory.Equipment, ShopRewardCategory.Card })
         {

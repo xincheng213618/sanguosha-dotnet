@@ -391,6 +391,8 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe retaliation skill stock: bought ordinary Chengxiang per-damage subset", ShanheRetaliationSkillStockChecks.PurchasedChengxiangRevealsOncePerDamageAndMovesLegalSubset),
     ("Shanhe shop refresh: free quota stacks before independent paid allowance", ShanheShopRefreshChecks.FreeRefreshesStackBeforeMembershipPaidAllowanceAndNeedNoCopper),
     ("Shanhe shop refresh: mid-shop gain and next-shop counter reset", ShanheShopRefreshChecks.MidShopAcquisitionAddsFreeUsesAndNextShopResetsEveryCounter),
+    ("Shanhe shop restock: same position prices supplies and refresh budgets", ShanheShopRestockChecks.RestockingKeepsPositionsPricesSuppliesAndRefreshBudgets),
+    ("Shanhe shop restock: perk purchase skill replacement and unique stock", ShanheShopRestockChecks.BuyingRestockAndReplacingSkillsAreAtomicAndHonorUniqueStock),
     ("Shanhe Wangong: previous actual card paid distance quota damage", ShanheWangongChecks.PreviousActualCardControlsPaidSlashDistanceQuotaAndDamage),
     ("Shanhe Wangong: previous basic survives actual turn boundary", ShanheWangongChecks.LastActualBasicSurvivesTurnBoundaryWithoutKeepingAlcoholBonus),
     ("Shanhe player Fuqi: nearby non-targets and delayed cards", ShanhePlayerFuqiChecks.NearbyNonTargetsAndDelayedCardsRespectDistance),

@@ -51,7 +51,7 @@
       </ScrollViewer>
      </Grid>
     </Border>
-    <Grid Grid.Row="2"><TextBlock Text="{Binding ShanheMarketSurchargeNotice}" Foreground="#B39A6F" FontSize="11" VerticalAlignment="Center" MaxWidth="610" TextWrapping="Wrap" HorizontalAlignment="Left"/><ItemsControl ItemsSource="{Binding ShanheShopActions}" HorizontalAlignment="Right" VerticalAlignment="Center"><ItemsControl.ItemTemplate><DataTemplate><Button Content="{Binding Name}" Command="{Binding DataContext.ChooseShanheOptionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Style="{StaticResource TradeButton}" Padding="12,5"/></DataTemplate></ItemsControl.ItemTemplate></ItemsControl></Grid>
+    <Grid Grid.Row="2"><TextBlock x:Name="MarketPurchaseNotice" Text="{Binding ShanheMarketSurchargeNotice}" Foreground="#B39A6F" FontSize="11" VerticalAlignment="Center" MaxWidth="610" TextWrapping="Wrap" HorizontalAlignment="Left"/><ItemsControl ItemsSource="{Binding ShanheShopActions}" HorizontalAlignment="Right" VerticalAlignment="Center"><ItemsControl.ItemTemplate><DataTemplate><Button Content="{Binding Name}" Command="{Binding DataContext.ChooseShanheOptionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Style="{StaticResource TradeButton}" Padding="12,5"/></DataTemplate></ItemsControl.ItemTemplate></ItemsControl></Grid>
    </Grid>
   </Grid>
  </Grid></Viewbox>
