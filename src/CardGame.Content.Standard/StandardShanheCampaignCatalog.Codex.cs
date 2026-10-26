@@ -68,6 +68,7 @@ public static partial class StandardShanheCampaignCatalog
             .Concat(CurrentBuildSkillCodexBindings)
             .Concat(CurrentReactionTacticCodexBindings)
             .Concat(CurrentLowHpDrawCodexBindings)
+            .Concat(CurrentLateRoundTacticCodexBindings)
             .Concat(CurrentShopCardCodexBindings)
             .Append(new(2, OpeningInheritanceRewardId))
             // Availability still requires this reward in the selected edition.

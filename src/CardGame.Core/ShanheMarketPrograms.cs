@@ -22,6 +22,7 @@ public sealed record ShanheMarketPurchaseFrame(long Id, string ChoiceId, string 
 {
     public long? ProgramFrameId { get; init; }
     public bool Applied { get; init; }
+    public ShanheMarketDiscardQuote? DiscardQuote { get; init; }
 }
 
 public enum ShanheMarketApplicationStage { PayingHealth, Granting, Opening, Materials, Recovery, Children, Complete }

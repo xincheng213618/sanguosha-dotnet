@@ -45,6 +45,51 @@ internal static class ShanheLateRoundTacticChecks
             "Round three activates both independent +1 card-damage sources and exactly two extra Slashes, including Cold Slash; a fourth real material remains unusable.");
     }
 
+    public static void CompleteLateRoundStockStacksNativeDrawsAndRoundTwoSlashQuota()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new StandardShanheLateRoundTacticsPackage(), new Fixture(drawPerTurn: 2));
+        var setup = new ShanheBattleSetup(71, 1, "fixture:late-round-complete", Owner, 8, 0, 0, 0, 0, [],
+            Enumerable.Range(0, 9).Select(_ => new ShanheStartingCard(CardKind.Slash, Suit.Club, 7)).ToArray(), [],
+            Enumerable.Range(0, 3).Select(_ => new ShanheCombatantDefinition(Peer) { StartingHand = [] }).ToArray(), [], new string('d', 64))
+        {
+            TacticSkillIds = [StandardShanheCampaignCatalog.CurrentYuzhanSkillId,
+                StandardShanheCampaignCatalog.CurrentBuzhenSkillId, StandardShanheCampaignCatalog.CurrentBuzhen2SkillId,
+                StandardShanheCampaignCatalog.CurrentBuzhen3SkillId, StandardShanheCampaignCatalog.CurrentBattleLearningSkillId,
+                StandardShanheCampaignCatalog.CurrentBattleLearning2SkillId]
+        };
+        var game = GameEngine.CreateStandard(new()
+        {
+            Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null,
+            HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup,
+            UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false,
+            MaxTurns = 16, AiPolicyVersion = AiDecisionPolicy.CurrentVersion
+        }, registry);
+        var s = new Scene(game); s.Accept(new StartGameCommand()); s.Play();
+        Need(s.NormalDraws(0) == 2 && s.View().HandCount == 11,
+            "Registered and owned late-round stock keeps the real first-round draw at two and the initial supplied nine Slash entities intact.");
+        s.Card(CardKind.Slash, [1], 1);
+        Need(!game.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash),
+            "Both round-two Battle Learning sources are inactive during the first actual global round.");
+        var drawn = s.NormalDraws(0); var enemyDrawn = s.NormalDraws(1);
+        s.NextOwnPlay();
+        Need(s.NormalDraws(0) - drawn == 9 && s.NormalDraws(1) - enemyDrawn == 2,
+            "At actual round two, owned Buzhen +4 and +3 stack on the owner's normal two-card phase; opponents keep two and the round-three source stays inactive.");
+        for (var slash = 0; slash < 7; slash++) s.Card(CardKind.Slash, [1], 3);
+        Need(s.View().Hand.Any(card => card.Kind == CardKind.Slash) &&
+                !game.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash) &&
+                s.Events<ProgramCardDamageModifiedEvent>().Count(e => e.Source.SkillId == StandardShanheCampaignCatalog.CurrentYuzhanSkillId) == 7,
+            "Both owned round-two Battle Learning sources add four and two real uses to the base one; Yuzhan adds two damage to each paid Slash and an eighth real material remains unusable.");
+        var hand = s.View().HandCount;
+        drawn = s.NormalDraws(0); s.DrawOne();
+        Need(s.View().HandCount == hand + 1 && s.NormalDraws(0) == drawn,
+            "The active +7 normal-draw bonus does not increase a real skill's separate one-card draw.");
+        drawn = s.NormalDraws(0); enemyDrawn = s.NormalDraws(1);
+        s.NextOwnPlay();
+        Need(s.NormalDraws(0) - drawn == 11 && s.NormalDraws(1) - enemyDrawn == 2,
+            "At actual round three, Buzhen III contributes its two cards alongside the existing seven; quantities are normal native draws and never leak to the opponent.");
+        s.Card(CardKind.Slash, [2], 3);
+    }
+
     private static void Need(bool valid, string message)
     { if (!valid) throw new InvalidOperationException(message); }
     private sealed class Scene(GameEngine game)
@@ -53,6 +98,8 @@ internal static class ShanheLateRoundTacticChecks
         public PlayerSnapshot View() => G.CreateSnapshot(0).Players[0];
         public T[] Events<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
         public DamageAppliedEvent[] Hits() => Events<DamageAppliedEvent>().Where(e => e.SourceSeat == 0).ToArray();
+        public int NormalDraws(int seat) => G.CardMovements.Count(move => move.From == CardLocation.DrawPile &&
+            move.To == CardLocation.Hand(seat) && move.Reason == CardMoveReasons.Draw);
         public void Accept(GameCommand command)
         { var result = G.Submit(command); Need(result.Accepted, result.Error?.Message ?? "Rejected real late-round tactic command."); }
         public void Play()
@@ -88,9 +135,13 @@ internal static class ShanheLateRoundTacticChecks
             Accept(new EndPlayPhaseCommand(0, G.Revision, G.PendingDecision!.PromptId)); Play();
             Need(Events<RoundStartedEvent>().Last().RoundNumber == round + 1, "Threshold checks must cross a real global round, rather than a fabricated local counter.");
         }
+        public void DrawOne()
+        {
+            Accept(new UseProgramSkillCommand(0, Driver, "draw-one", [], [], G.Revision, G.PendingDecision!.PromptId)); Play();
+        }
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(int drawPerTurn = 0) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture:late-round-stock", new(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
@@ -100,7 +151,9 @@ internal static class ShanheLateRoundTacticChecks
                 {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
                   {"id":"{{Driver}}","revision":1,"modifiers":[
                     {"id":"range","query":"attackRange","operation":"add","value":10,"priority":0},
-                    {"id":"hand","query":"handLimit","operation":"add","value":20,"priority":0}]},
+                    {"id":"hand","query":"handLimit","operation":"add","value":20,"priority":0}],"activations":[
+                    {"id":"draw-one","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
+                     "effects":[{"op":"draw","target":"owner","amount":1}]}]},
                   {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,
                     "effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}
                 ]}
@@ -110,8 +163,9 @@ internal static class ShanheLateRoundTacticChecks
                 builder.AddSkill(new(id, id, id) { Program = program, ProgramPresentation = programs.Presentations[id] });
             builder.AddGeneral(new(Owner, "后期战法使用者", "supporter", Driver, "qun", 8));
             builder.AddGeneral(new(Peer, "固定守军", "supporter", Quiet, "wei", 30));
-            builder.AddDeck(new(Deck, "备用实体", 0, 0, [])
-                { PhysicalCards = Enumerable.Range(0, 32).Select(_ => new ContentDeckPhysicalCard("standard:dodge", Suit.Club, 7)).ToArray() });
+            builder.AddDeck(new(Deck, "备用实体", 0, drawPerTurn, [])
+                { PhysicalCards = Enumerable.Range(0, drawPerTurn == 0 ? 32 : 96).Select(_ =>
+                    new ContentDeckPhysicalCard(drawPerTurn == 0 ? "standard:dodge" : "standard:slash", Suit.Club, 7)).ToArray() });
             builder.AddMode(new(ShanheBattleSetup.BattleModeId, "后期战法原生战斗", 4, 4, new Dictionary<string, int>(), Deck,
                 GeneralPoolIds: [Owner, Peer], ModeKind: ContentModeKind.Team,
                 TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 1, [ShanheBattleSetup.EnemyTeamId] = 3 }));

@@ -58,13 +58,14 @@ public sealed partial class GameEngine
             var decision = _pendingDecision is { } pending ? CaptureSuspendedDecision(pending) : null;
             var status = _status; var depth = _resolutionStack.Count;
             var parent = _resolutionStack.LastOrDefault()?.Id;
+            var discardQuote = CaptureShanheMarketDiscardQuote();
             var bought = _shanheMarket.Submit(new Campaigns.BuyShanheMarketItemCommand(
                 command.ChoiceId, command.ReplaceSkillId, _shanheMarket.Revision));
             if (!bought.Accepted) throw new InvalidOperationException(bought.Error ?? "The validated market purchase changed before payment.");
             ClearPendingDecision();
             var frame = new ShanheMarketPurchaseFrame(++_resolutionSequence, command.ChoiceId, reward.Id,
                 command.ReplaceSkillId, item.GoldCost, item.HpCost, _shanheMarket.Revision, _shanheMarket.Snapshot.Gold,
-                parent, depth, decision, status);
+                parent, depth, decision, status) { DiscardQuote = discardQuote };
             PushRuntimeFrame(frame);
             AdvanceEventRulesAndQueueFact(new ShanheMarketPurchaseCommittedEvent(frame.Id, frame.MarketRevision,
                 frame.ChoiceId, frame.RewardId, frame.Price, frame.GoldAfter));
@@ -116,7 +117,7 @@ public sealed partial class GameEngine
         {
             _status = market.Status;
             _pendingDecision = market.Decision is { } decision ? RestoreSuspendedDecision(decision) : null;
-            RefreshShanheMarketSuspendedPrompt();
+            RefreshShanheMarketSuspendedPrompt(market.DiscardQuote);
         }
     }
 
@@ -191,8 +192,9 @@ public sealed partial class GameEngine
             _ => 0
         };
 
-    private void RefreshShanheMarketSuspendedPrompt()
+    private void RefreshShanheMarketSuspendedPrompt(ShanheMarketDiscardQuote? discardQuote)
     {
+        if (RefreshShanheMarketDiscardPrompt(discardQuote)) return;
         if (_pendingDecision is not { } pending || pending.PlayerSeat != 0) return;
         var actor = _players[0];
         if (pending.Kind is DecisionKind.RespondDodge or DecisionKind.RespondSlash)

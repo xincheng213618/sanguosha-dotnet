@@ -233,9 +233,11 @@ public sealed partial class GameEngine
         return suppressHanSongYinbi ? ordinary : ApplyAnniversaryHanSongHandLimit(player, ordinary);
     }
 
-    private RuleQueryEvaluation EvaluateCardTargetCount(CharacterState player, CardKind effectiveCardKind)
+    private RuleQueryEvaluation EvaluateCardTargetCount(CharacterState player, CardKind effectiveCardKind,
+        long? declaredUseFrameId = null)
     {
         var contributions = CollectNumericRuleContributions(player, SkillRuleQuery.CardTargetCount, effectiveCardKind)
+            .Concat(RoundFirstSlashTargetContributions(player, effectiveCardKind, declaredUseFrameId))
             .Concat(_turnCardUseEffects.GetRuleModifiers(_turnNumber, _currentSeat, player.Seat,
                     SkillRuleQuery.CardTargetCount, effectiveCardKind)
                 .Where(item => item.Operation == SkillRuleOperation.Add)

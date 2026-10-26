@@ -2,7 +2,11 @@ namespace CardGame.Core;
 
 public sealed record ManualDiscardFrame(long Id, int OwnerSeat, int ActualTurnNumber,
     int InitialRequiredCount, int RemainingCount)
-    : ResolutionFrame(Id, ResolutionFrameKind.ManualDiscard, ResolutionFrameStep.ResolvingEffect);
+    : ResolutionFrame(Id, ResolutionFrameKind.ManualDiscard, ResolutionFrameStep.ResolvingEffect)
+{
+    public int QuotaMultiplier { get; init; } = 1;
+    public int PaidCount { get; init; }
+}
 
 public sealed partial class GameEngine
 {
@@ -12,7 +16,8 @@ public sealed partial class GameEngine
         if (frame is null)
         {
             var required = RequiredSelfHandLimitDiscard(player);
-            frame = new ManualDiscardFrame(++_resolutionSequence, player.Seat, _turnNumber, required, required);
+            frame = new ManualDiscardFrame(++_resolutionSequence, player.Seat, _turnNumber, required, required)
+                { QuotaMultiplier = GetDiscardQuotaMultiplier(player) };
             PushRuntimeFrame(frame);
         }
         var hand = GetSelfDiscardableHand(player);
@@ -58,7 +63,9 @@ public sealed partial class GameEngine
     {
         if (_resolutionStack.FirstOrDefault() is not ManualDiscardFrame frame) return false;
         if (frame.OwnerSeat != _currentSeat || frame.ActualTurnNumber != _turnNumber || _phase != TurnPhase.Discard ||
-            frame.InitialRequiredCount <= 0 || frame.RemainingCount < 0 || frame.RemainingCount > frame.InitialRequiredCount)
+            frame.InitialRequiredCount <= 0 || frame.PaidCount < 0 || frame.PaidCount > frame.InitialRequiredCount ||
+            frame.RemainingCount < 0 || frame.RemainingCount > frame.InitialRequiredCount - frame.PaidCount ||
+            frame.QuotaMultiplier is < 1 or > 20)
             throw new InvalidOperationException("Manual discard lost its frozen remaining quota.");
         return true;
     }
@@ -91,7 +98,8 @@ public sealed partial class GameEngine
         var cards = hand.Where(card => selected.Contains(card.Id)).OrderBy(card => card.Id).ToArray();
         return Accept(() =>
         {
-            ReplaceRuntimeTop(frame with { RemainingCount = frame.RemainingCount - cards.Length });
+            ReplaceRuntimeTop(frame with { RemainingCount = frame.RemainingCount - cards.Length,
+                PaidCount = checked(frame.PaidCount + cards.Length) });
             var discardInvocation = CaptureNativeLogicalDiscardInvocation(actor.Seat, actor.Seat,
                 cards.Select(card => card.Id).ToArray(), CardMoveReasons.HandLimitDiscard);
             MoveCards(cards, CardLocation.Hand(actor.Seat), CardLocation.DiscardPile,

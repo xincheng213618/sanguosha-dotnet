@@ -229,6 +229,8 @@ public static partial class StandardShanheCampaignCatalog
         var lowHpDrawTactics = RequiresCurrentLowHpDrawRegistry(requirements);
         var ershengsanTactic = RequiresCurrentErshengsanRegistry(requirements);
         var heartBladeTactic = RequiresCurrentHeartBladeRegistry(requirements);
+        var dualBladeTactics = RequiresCurrentDualBladeRegistry(requirements);
+        var handLimitStock = RequiresCurrentHandLimitStockRegistry(requirements);
         var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
@@ -350,6 +352,8 @@ public static partial class StandardShanheCampaignCatalog
             (lowHpDrawTactics ? "/current-low-hp-draw" : "") +
             (ershengsanTactic ? "/current-ershengsan-2030" : "") +
             (heartBladeTactic ? "/current-heart-blade-2045" : "") +
+            (dualBladeTactics ? "/current-dual-blade" : "") +
+            (handLimitStock ? "/current-hand-limit-stock" : "") +
             (wealthTactics ? "/current-wealth-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
@@ -427,6 +431,8 @@ public static partial class StandardShanheCampaignCatalog
             if (lowHpDrawTactics) packages.Add(new StandardShanheLowHpDrawPackage());
             if (ershengsanTactic) packages.Add(new StandardShanheErshengsanPackage());
             if (heartBladeTactic) packages.Add(new StandardShanheHeartBladePackage());
+            if (dualBladeTactics) packages.Add(new StandardShanheDualBladePackage());
+            if (handLimitStock) packages.Add(new StandardShanheHandLimitStockPackage());
             if (reactionTactics)
             {
                 packages.Add(new StandardShanheArmorTacticsPackage());

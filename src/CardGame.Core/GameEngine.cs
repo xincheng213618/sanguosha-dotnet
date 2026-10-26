@@ -6816,7 +6816,7 @@ public sealed partial class GameEngine
         }
         if (usesProgramTargetCount)
         {
-            var targetCountRule = EvaluateCardTargetCount(source, playedCardKind);
+            var targetCountRule = EvaluateCardTargetCount(source, playedCardKind, resolutionId);
             AdvanceEventRulesAndQueueFact(new ProgramCardTargetCountAppliedEvent(
                 resolutionId,
                 source.Seat,

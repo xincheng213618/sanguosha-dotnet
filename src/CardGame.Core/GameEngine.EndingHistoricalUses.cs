@@ -139,7 +139,7 @@ public sealed partial class GameEngine
                 if (use.EndingHistoricalUsesFangtian) AdvanceEventRulesAndQueueFact(new FangtianHalberdUsedEvent(id,actor.Seat,card.Id,kind,targets));
                 if (use.EndingHistoricalUsesProgramTargetCount)
                 {
-                    var targetCountRule=EvaluateCardTargetCount(actor,kind);
+                    var targetCountRule=EvaluateCardTargetCount(actor,kind,id);
                     AdvanceEventRulesAndQueueFact(new ProgramCardTargetCountAppliedEvent(id,actor.Seat,kind,targets,
                         Array.AsReadOnly(targetCountRule.Value.Contributions.Select(c=>c.SourceId).ToArray())));
                 }

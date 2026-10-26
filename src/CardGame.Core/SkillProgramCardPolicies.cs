@@ -36,6 +36,8 @@ public enum SkillProgramCardPolicyKind
     UnlimitedAlcoholUse = 3900,
     AdditionalAlcoholUses = 3901,
     AdditionalDrawTwoCards = 3902,
+    HandLimitCardKindExemption = 3903,
+    RoundFirstSlashAdditionalTargets = 3904,
     SuppressOthersNonLockedDuringDying = 4000, ExclusiveTurnPeachUse = 4001, ProhibitBlackTrickTarget = 4002,
     PindianOpponentRandomHand = 3100,
     PindianMaximumSlashClaim = 3101,

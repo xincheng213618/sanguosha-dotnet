@@ -4006,6 +4006,11 @@ public sealed class SkillProgramCatalog
             if (requiredKinds.Count != 0 || value is < 1 or > 20)
                 Fail(path, "Additional DrawTwo cards require a bounded positive amount and no response kinds.");
         }
+        else if (kind == SkillProgramCardPolicyKind.RoundFirstSlashAdditionalTargets)
+        {
+            if (requiredKinds.Count != 0 || value is < 1 or > 20)
+                Fail(path, "The first Slash of each round requires a bounded target bonus and no response kinds.");
+        }
         else if (kind is not (SkillProgramCardPolicyKind.PindianRankBySuit or SkillProgramCardPolicyKind.PindianRankBonus) && (requiredKinds.Count != 0 || value != 0))
             Fail(path, "requiredCardKinds and value require a minimum response count policy");
         if (kind is SkillProgramCardPolicyKind.SlashMustTargetOverHpHandOwner or SkillProgramCardPolicyKind.ProhibitOthersResponse or SkillProgramCardPolicyKind.XiaHuiBlackHandAndGainedEntityRestrictions or SkillProgramCardPolicyKind.StopUsingAfterTrickOrHpCount or SkillProgramCardPolicyKind.RoundGainedOtherSourceUse or SkillProgramCardPolicyKind.DistanceOneToNotHigherHp or SkillProgramCardPolicyKind.SlashExtraTargetsByLostHp or SkillProgramCardPolicyKind.ClaimedEntitiesFaceDownUse or SkillProgramCardPolicyKind.SuppressOthersNonLockedDuringDying or SkillProgramCardPolicyKind.ProhibitBlackTrickTarget or SkillProgramCardPolicyKind.PreventForeignEquipmentDiscard or SkillProgramCardPolicyKind.OfferSkipDiscard or SkillProgramCardPolicyKind.DrawFromBottom or
@@ -4076,6 +4081,16 @@ public sealed class SkillProgramCatalog
              inputSuit is not null || outputSuit is not null || factionId is not null || ownerRole is not null ||
              OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
             Fail(path, "Additional DrawTwo cards require exactly DrawTwo, a bounded positive amount and no other qualifiers.");
+        if (kind == SkillProgramCardPolicyKind.HandLimitCardKindExemption &&
+            (cardKinds.Count == 0 || requiredKinds.Count != 0 || value != 0 ||
+             inputSuit is not null || outputSuit is not null || factionId is not null || ownerRole is not null ||
+             OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
+            Fail(path, "Hand-limit exemptions require effective card kinds and no other qualifiers.");
+        if (kind == SkillProgramCardPolicyKind.RoundFirstSlashAdditionalTargets &&
+            (!ProgramCardKindMatch.IsFullSlashFamily(cardKinds) || requiredKinds.Count != 0 || value is < 1 or > 20 ||
+             inputSuit is not null || outputSuit is not null || factionId is not null || ownerRole is not null ||
+             OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
+            Fail(path, "The first Slash of each round requires the full Slash family, a bounded target bonus and no other qualifiers.");
         if (kind is SkillProgramCardPolicyKind.AlcoholKingIdentityRank or SkillProgramCardPolicyKind.ForeignTurnAlcoholUseProhibition &&
             (!cardKinds.SequenceEqual([CardKind.Alcohol]) || requiredKinds.Count != 0 || value != 0 || inputSuit is not null || outputSuit is not null ||
              factionId is not null || ownerRole is not null || OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
@@ -4412,10 +4427,10 @@ public sealed class SkillProgramCatalog
             Fail(path + ".recipientScope", "otherPublicTeamAllies requires an unconditional positive fixed additive drawCount or slashLimit modifier");
         var minimumRound = node.TryGetProperty("minimumRound", out _)
             ? PositiveInt(node, "minimumRound", path) : (int?)null;
-        if (minimumRound is not null && (minimumRound is < 1 or > 1000 || query != SkillRuleQuery.SlashLimit ||
+        if (minimumRound is not null && (minimumRound is < 1 or > 1000 || query is not (SkillRuleQuery.SlashLimit or SkillRuleQuery.DrawCount) ||
             operation != SkillRuleOperation.Add || recipientScope != SkillRuleRecipientScope.Owner || valueExpression is not null ||
             value is < 1 or > 20 || sourceCardIdentityId is not null))
-            Fail(path + ".minimumRound", "round-gated modifiers require a fixed positive owner Slash-limit addition and a round between 1 and 1000");
+            Fail(path + ".minimumRound", "round-gated modifiers require a fixed positive owner draw-count or Slash-limit addition and a round between 1 and 1000");
         return new SkillProgramModifier(id, query, operation, value, valueExpression, valueZone, priority,
             sourceCardIdentityId, cardKinds, condition)
             { ValueMarker = valueMarker, ValueMultiplier = valueMultiplier, RecipientScope = recipientScope, MinimumRound = minimumRound };
