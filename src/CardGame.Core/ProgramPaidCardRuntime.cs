@@ -55,6 +55,8 @@ internal interface IProgramPaidCardOperations : IProgramRuntimeOperations
     void CompleteLogicalDiscard(NativeLogicalDiscardInvocationDraft? invocation);
     void Move(Card card, CardLocation source, CardLocation destination, CardMoveReason reason,
         CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified);
+    bool MoveToProcessing(ProgramSkillFrame frame, Card card, CardLocation source, CardMoveReason reason,
+        CardMovementDisclosure disclosure);
     bool SettleRetainedGain(ProgramSkillFrame frame, Card card, CardLocation source,
         CardLocation destination, CardMoveReason reason);
     void Give(ProgramSkillFrame frame, int giver, Card card, CardLocation source, CardLocation destination, CardMoveReason reason, bool throughProcessing, CardMovementDisclosure disclosure);
@@ -156,6 +158,22 @@ public sealed partial class GameEngine
         public void Move(Card card, CardLocation source, CardLocation destination, CardMoveReason reason,
             CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified) =>
             engine.MoveCard(card, source, destination, reason, disclosure: disclosure);
+        public bool MoveToProcessing(ProgramSkillFrame frame, Card card, CardLocation source, CardMoveReason reason,
+            CardMovementDisclosure disclosure)
+        {
+            var before = engine._movementSequence;
+            engine.MoveCard(card, source, CardLocation.Processing, reason, disclosure: disclosure);
+            if (engine._cardZones.GetLocation(card.Id) == CardLocation.Processing) return true;
+            // A generated field entity can be destroyed by this exact first
+            // departure. Credit that real payment; never run a second transfer
+            // from Processing or report an obtain that did not take place.
+            if (engine._resolutionStack.LastOrDefault()?.Id == frame.Id && source.Zone == CardZoneKind.Equipment &&
+                engine._cardMovements.Where(move => move.Sequence > before && move.CardId == card.Id).ToArray() is [var movement] &&
+                movement.CardKind == card.Kind && movement.From == source && movement.To == CardLocation.OutsideGame &&
+                movement.Reason == reason && engine._cardZones.GetLocation(card.Id) == movement.To &&
+                engine.IsEphemeralCardDestroyedMaterial(movement)) return false;
+            throw new InvalidOperationException("A selected transfer lost its exact first processing entry or native destruction proof.");
+        }
         public bool SettleRetainedGain(ProgramSkillFrame frame, Card card, CardLocation source,
             CardLocation destination, CardMoveReason reason) =>
             engine.TrySettleHappyWeiYanRetainedGain(card, source, destination, reason, frame.Id);
@@ -163,7 +181,7 @@ public sealed partial class GameEngine
         {
             if (SettleRetainedGain(frame, card, source, destination, reason)) return;
             var before = engine._movementSequence;
-            if (throughProcessing) engine.MoveCard(card, source, CardLocation.Processing, reason, disclosure: disclosure);
+            if (throughProcessing && !MoveToProcessing(frame, card, source, reason, disclosure)) return;
             engine.MoveCard(card, throughProcessing ? CardLocation.Processing : source, destination, reason,
                 engine.NativeGiveCompletion(frame.Id, giver, destination.OwnerSeat!.Value, [card.Id], before), disclosure: disclosure);
         }

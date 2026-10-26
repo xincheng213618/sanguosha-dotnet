@@ -8,6 +8,35 @@ internal static class DuFuRenChecks
     private const string Driver="fixture:df-driver",Owner="fixture:df-owner",Quiet="fixture:df-quiet",Peer="fixture:df-peer-damage";
     private const string Watch="fixture:df-gift-watch",Health="fixture:df-health",Conditional="fixture:df-conditional",Freeze="fixture:df-freeze";
     private const string Skip="fixture:df-skip",Arm="fixture:df-arm-skip",Prevent="fixture:df-prevent",Mid="fixture:df-mid-chain",Transfer="fixture:df-transfer",Mode="identity:classic-du-fu-ren-fixture",Legacy="identity:du-fu-ren-legacy-fixture";
+    private const string DiscardWin="fixture:df-discard-win";
+
+    public static void TerminalDiscardStartingChildClosesWithoutReconsumingItsRetiredPhaseCold()
+    {
+        var (g,r)=Start("discard-win");
+        End(g);
+        Reach(g,()=>P(g)?.SkillPrompt?.SkillId==DiscardWin&&P(g)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="select-owned-cards"));
+        var selected=P(g)!.Choices.First(c=>c.Parameters.GetValueOrDefault("program-action")=="select-owned-cards");
+        var cost=selected.Cards.Single();
+        Answer(g,c=>c.Id==selected.Id);
+        Reach(g,()=>P(g)?.SkillPrompt?.SkillId==DiscardWin&&P(g)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("option-id")=="continue"));
+        var parent=g.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(f=>f.Window==SkillProgramTriggerWindow.DiscardPhaseStarting);
+        var phase=E<ActualDiscardRecoveryPhaseStartedEvent>(g).Last(e=>e.Phase.Kind==ActualDiscardRecoveryPhaseKind.Discard).Phase;
+        var paid=g.CardMovements.Single(m=>m.CardId==cost&&m.From==CardLocation.Hand(0)&&m.To==CardLocation.DiscardPile);
+        Need(g.State.Winner==Winner.None&&parent.OwnerSeat==0&&phase.ActorSeat==0&&
+            !E<DuFuRenPhaseConfirmedEvent>(g).Any(e=>e.Phase==phase),
+            "The real Discard starting window retains its original phase while its single paid child awaits the lethal continuation.");
+        g=Cold(g,r);
+        Continue(g);
+        Reach(g,()=>g.State.Status==EngineStatus.Completed);
+        Need(g.State.Winner!=Winner.None&&V(g,0).IsAlive&&Enumerable.Range(1,3).All(s=>!V(g,s).IsAlive)&&
+            g.ResolutionStack.Count==0&&P(g) is null&&
+            g.CardMovements.Count(m=>m.CardId==cost&&m.From==paid.From&&m.To==paid.To)==1&&
+            E<ActualDiscardRecoveryPhaseStartedEvent>(g).Count(e=>e.Phase==phase)==1&&
+            !E<DuFuRenPhaseConfirmedEvent>(g).Any(e=>e.Phase==phase)&&
+            !E<DuFuRenPhaseIssuedEvent>(g).Any(e=>e.Phase==phase),
+            "A terminal paid Discard child retires its native parent without paying again, inventing a new phase token or spending Shunshi after the winner is settled.");
+        _=Cold(g,r);
+    }
 
     public static void MixedOwnedGainsStackBlackActualSlashSourceLossDodgePreventionAndSnatchCold()
     {
@@ -141,15 +170,17 @@ internal static class DuFuRenChecks
               {"id":"{{Arm}}","revision":1,"triggers":[{"id":"arm-after-real-first-discard","window":"turnEnding","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"grantSkills","target":"owner","skillIds":["{{Skip}}"]}]}]},
               {"id":"{{Prevent}}","revision":1,"triggers":[{"id":"prevent","window":"beforeDamageApplied","subject":"damageTarget","optional":true,"usageScope":"game","usageLimit":1,"effects":[{"op":"preventCurrentDamage","target":"owner"}]}]},
               {"id":"{{Mid}}","revision":1,"triggers":[{"id":"middle-black-gift","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamage","optional":false,"priority":-100,"usageScope":"game","usageLimit":1,"effects":[{"op":"selectTarget","target":"owner","targetKind":"otherLiving"},{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"zones":["hand"],"count":1,"destination":"selectedTargetHand","targetRef":{"kind":"selectedTarget"},"awaitMovementTriggers":true},{"op":"chooseOption","target":"owner","resultBind":"middle","options":[{"id":"continue"}]}]}]},
-              {"id":"{{Transfer}}","revision":1,"triggers":[{"id":"real-transfer","window":"beforeDamageApplied","subject":"damageTarget","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"selectTarget","target":"owner","targetKind":"eventSource"},{"op":"selectOwnedCards","target":"owner","zones":["hand"],"minimumCards":1,"maximumCards":1,"resultBind":"cost"},{"op":"moveBoundCards","target":"owner","sourceBind":"cost","destination":"discardPile"},{"op":"redirectCurrentDamage","target":"selectedTarget","sourceBind":"cost","drawLostHpAfterDamage":false}]}]}
+              {"id":"{{Transfer}}","revision":1,"triggers":[{"id":"real-transfer","window":"beforeDamageApplied","subject":"damageTarget","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"selectTarget","target":"owner","targetKind":"eventSource"},{"op":"selectOwnedCards","target":"owner","zones":["hand"],"minimumCards":1,"maximumCards":1,"resultBind":"cost"},{"op":"moveBoundCards","target":"owner","sourceBind":"cost","destination":"discardPile"},{"op":"redirectCurrentDamage","target":"selectedTarget","sourceBind":"cost","drawLostHpAfterDamage":false}]}]},
+              {"id":"{{DiscardWin}}","revision":1,"triggers":[{"id":"paid-terminal-discard","window":"discardPhaseStarting","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"selectOwnedCards","target":"owner","zones":["hand"],"minimumCards":1,"maximumCards":1,"resultBind":"cost"},{"op":"moveBoundCards","target":"owner","sourceBind":"cost","destination":"discardPile"},{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]},{"op":"damageParticipants","target":"owner","targetKind":"otherLiving","amount":20}]}]}
             ]}
             """;
-            var ids=new[]{Driver,Quiet,Peer,Watch,Health,Conditional,Freeze,Skip,Arm,Prevent,Mid,Transfer};
-            var catalog=SkillProgramCatalog.Load(rules,JsonSerializer.Serialize(new{schemaVersion=SkillProgramCatalog.PresentationSchemaVersion,skills=ids.ToDictionary(id=>id,id=>new{name=id,description="杜夫人真实命令夹具",optionLabels=id is Watch or Health or Freeze or Mid?new Dictionary<string,string>{{"continue","继续"}}:new Dictionary<string,string>()})}));
+            var ids=new[]{Driver,Quiet,Peer,Watch,Health,Conditional,Freeze,Skip,Arm,Prevent,Mid,Transfer,DiscardWin};
+            var catalog=SkillProgramCatalog.Load(rules,JsonSerializer.Serialize(new{schemaVersion=SkillProgramCatalog.PresentationSchemaVersion,skills=ids.ToDictionary(id=>id,id=>new{name=id,description="杜夫人真实命令夹具",optionLabels=id is Watch or Health or Freeze or Mid or DiscardWin?new Dictionary<string,string>{{"continue","继续"}}:new Dictionary<string,string>()})}));
             foreach(var(id,p)in catalog.Programs)b.AddSkill(new(id,id,"杜夫人实际原生行为"){Program=p,ProgramPresentation=catalog.Presentations[id]});
             var humanRole=scenario=="death-peer"?Role.Renegade:Role.Lord;
             b.AddSkill(new("fixture:df-pick-owner","固定本人","公开评分"){SelectionWeights=Enum.GetValues<Role>().ToDictionary(role=>role,role=>role==humanRole?100000d:-100000d)});
             var own=new List<string>{Driver,Yise,scenario=="loss"?Conditional:Shunshi};if(scenario=="loss"||scenario.StartsWith("death",StringComparison.Ordinal))own.Add(Watch);if(scenario=="equipment")own.Add(Health);if(scenario=="phase")own.Add(Freeze);if(scenario=="extra")own.Add("ol:fengzi");if(scenario.StartsWith("chain-",StringComparison.Ordinal)&&!scenario.Contains("transfer",StringComparison.Ordinal))own.AddRange([Kangrui,Mid]);
+            if(scenario=="discard-win")own.Add(DiscardWin);
             b.AddGeneral(new(Owner,"杜夫人实际本人","ol-du-fu-ren","fixture:df-pick-owner","wei",4,own));
             var peers=Enumerable.Range(1,3).Select(i=>$"fixture:df-peer-{i}").ToArray();
             foreach(var(id,index)in peers.Select((id,index)=>(id,index)))

@@ -86,6 +86,7 @@ internal static class Program
             Check("stale prompt choices cannot answer reloaded or consecutive decisions", () => StalePromptChoiceChecks.ReloadedChoices(output));
             Check("skill quantity activation and effect choices share the lower action dock", () => DockSkillChoiceUiChecks.QuantityActivationAndEffectsUseSameDock(output));
             Check("Selection area: Gongxin Zhiheng repeatable skills and Slash native drafts", () => SelectionAreaChecks.NativeDraftsAndUsageLimits(output));
+            Check("Zhiheng UI: classic and boundary select all hand remain editable until confirmation", () => MultiCardDraftUiChecks.ZhihengSelectsAllHandBeforeConfirmation(output));
             Check("Shi Zhao Yun UI: cardless rail draft cancel target and round limit", () => ShiZhaoYunUiChecks.CardlessSkillRailDraftCancelTargetsAndRoundLimit(output));
             Check("Shi batch UI: public progress and committed preparation choices", () => ShiBatchUiChecks.PublicProgressAndCommittedPreparationChoices(output));
             Check("Shi second batch UI: skill progress native preparation and gift drafts", () => ShiSecondBatchUiChecks.SkillProgressAndNativePreparationAndGiftDrafts(output));
@@ -231,6 +232,7 @@ internal static class Program
             Check("Shanhe campaign UI: inheritance before map and cold restore", () => ShanheCampaignUiChecks.InheritanceOffersBeforeFirstMapAndSurvivesColdRestore(output));
             Check("Shanhe campaign UI: shop purchase states and codex navigation", () => ShanheModulesUiChecks.ShopPurchaseAndCodexNavigation(output));
             Check("Shanhe codex UI: unlock equip persist and market", () => ShanheCodexUiChecks.UnlockEquipPersistAndMarket(output));
+            Check("Shanhe market UI: free refresh clicks paid allowance and zero wallet", () => ShanheCodexUiChecks.FreeRefreshClicksKeepPaidAllowancePricesAndZeroWalletState(output));
             Check("Shanhe codex UI: failed profile write preserves progress", ShanheCodexUiChecks.FailedProfileWritePreservesProgress);
             Check("Shanhe loadout plans: legacy JSON and detached operations", ShanheCodexLoadoutPersistenceChecks.LegacyJsonAndLoadoutOperationsStayDetached);
             Check("Shanhe loadout plans: invalid metadata and operations rejected", ShanheCodexLoadoutPersistenceChecks.DamagedLoadoutsAndInvalidOperationsAreRejected);
@@ -273,8 +275,9 @@ internal static class Program
             Check("multi-target Slash portraits: Tianyi Lihuo Fangtian conversions and exact confirmation", () => MultiTargetSlashUiChecks.PortraitDraftsUseExactNativeTargets(output));
             Check("conversion skill rail selects published materials including chains and delayed cards", () => ConversionSkillSelectionChecks.SingleCardRules(output));
             Check("conversion skill rail chooses output before materials and retires old mode buttons", () => ConversionSkillSelectionChecks.MultipleOutputs(output));
-            Check("conversion response rail: explicit skill mode and exact hand equipment payment", () => ResponseConversionSelectionChecks.ResponsesRequireSkillAndExactMaterials(output));
-            Check("conversion skill rail: groups single and multiple card outputs", ResponseConversionSelectionChecks.PlayGroupsSingleAndMultipleCardConversions);
+            Check("conversion response rail: material driven exact hand equipment payment", () => ResponseConversionSelectionChecks.ResponsesRequireSkillAndExactMaterials(output));
+            Check("conversion skill rail: material driven one and two card Longhun", () => ResponseConversionSelectionChecks.PlayGroupsSingleAndMultipleCardConversions(output));
+            Check("conversion skill rail: material determines Boundary Longdan output", () => ConversionSkillSelectionChecks.MaterialsDetermineOutput(output));
             Check("composed skills share the generic WPF draft and submit their stable program identity", SkillProgramUiChecks.ActiveSelectionAndSubmission);
             Check("Program paid choices preserve actor control and opaque slots", () => ProgramPaidChoiceUiChecks.SharedChoiceSurfaces(output));
             Check("Fuchao UI: incremental discard exposes pick undo and finish cold", () => KongShuUiChecks.FuchaoIncrementalDiscardKeepsPickUndoAndFinishVisible(output));
@@ -320,6 +323,8 @@ internal static class Program
             Check("card flights keep local hand origins private and retire cached layout", () => HandCardFlightChecks.OriginBoundaries(output));
             Check("card flights hand off public faces once and restore interrupted arrivals", () => PublicCardHandoffChecks.ArrivalAndBoundaries(output));
             Check("card flights preserve public suit rank and converted effective faces", () => PublicCardIdentityChecks.PublicFaces(output));
+            Check("multi material responses display one virtual card", PublicCardIdentityChecks.MultiMaterialResponses);
+            Check("Guanxu UI: fixed exchange separate discard and cancellation", () => CardExchangeUiChecks.FixedExchangeDiscardAndCancellation(output));
             Check("audio follows committed actions and survives mute, background and device failure", AudioChecks.CommandRouting);
             if (args.Contains("--verify-native-audio")) Check("official native audio plays MP3 and converted WAV at zero volume", OfficialAudioChecks.NativeSilentPlayback);
             if (args.Contains("--verify-native-audio")) Check("native WPF audio opens and completes every effect at zero volume", AudioChecks.NativeSilentPlayback);

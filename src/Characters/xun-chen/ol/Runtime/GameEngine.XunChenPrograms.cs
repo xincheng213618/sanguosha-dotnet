@@ -9,9 +9,15 @@ public sealed partial class GameEngine
         var active = GetActiveProgramFrame(frame.Id);
         if (active.SelectedTargetSeats is not [var selected] || selected != targetSeat)
             throw new InvalidOperationException("Fenglue gift lost its selected counterpart.");
-        var result = _events.Select(e => e.Payload).OfType<PindianResultDeterminedEvent>()
-            .LastOrDefault(e => e.SkillId == frame.SkillId && e.Result.SourceSeat == frame.OwnerSeat)?.Result
-            ?? throw new InvalidOperationException("Fenglue gift lost its pindian result.");
+        var binding = active.PindianResultBindings.SingleOrDefault(b => b.Name == "fenglve-contest");
+        if (binding?.NativePindianFrameId is not { } nativeId || binding.SourceSeat != frame.OwnerSeat ||
+            binding.OpponentSeat != targetSeat ||
+            ProgramEventHistory<PindianResultDeterminedEvent>().Where(e => e.FrameId == nativeId && e.SkillId == frame.SkillId)
+                .ToArray() is not [var fact] || fact.Result.SourceSeat != binding.SourceSeat ||
+            fact.Result.OpponentSeat != binding.OpponentSeat || fact.Result.SourceRank != binding.SourceRank ||
+            fact.Result.OpponentRank != binding.OpponentRank || fact.Result.SourceWon != binding.SourceWon)
+            throw new InvalidOperationException("Fenglue gift lost its exact native pindian result.");
+        var result = fact.Result;
         var cardId = result.SourceCardId;
         var location = _cardZones.GetLocation(cardId);
         if (location.Zone != CardZoneKind.DiscardPile ||

@@ -4,7 +4,7 @@ namespace CardGame.Wpf.ViewModels;
 
 public sealed partial class MainViewModel
 {
-    private sealed record PlayConversionDraft(string SkillId, PlayConversionMode? Mode);
+    private sealed record PlayConversionDraft(string SkillId, PlayConversionMode? Mode, bool SelectByMaterials = false);
     private sealed record PlayConversionMode(CardConversionSource? Source, CardKind Kind,
         IReadOnlyList<CardConversionSource> AdditionalSources, LegalAction? Activation = null)
     {
@@ -104,6 +104,9 @@ public sealed partial class MainViewModel
     private CardKind? SelectedPlayConversionKind => _playConversionSelection?.Mode?.Kind;
     private string PlayConversionSkillName => _playConversionSelection is { } draft
         ? CurrentPresentationRegistry.GetSkill(draft.SkillId).Name : "技能";
+    private string PlayConversionStateText => IsMaterialPlayConversionPending
+        ? SelectedMaterialPlayMode is { } mode ? $"已选择 · 当{CardCatalog.Get(mode.Kind).DisplayName}" : "已选择 · 选择材料牌"
+        : $"已选择 · {(_playConversionSelection?.Mode is null ? "选择牌型" : $"当{PlayConversionCardName}")}";
     private string PlayConversionCardName => SelectedPlayConversionKind is { } kind ? CardCatalog.Get(kind).DisplayName : "牌";
     private string PlayConversionMaterialName
     {
@@ -134,6 +137,15 @@ public sealed partial class MainViewModel
         var cancel = IsPlayConversionSelectionPending && _playConversionSelection!.SkillId == skillId;
         ClearSelection();
         if (cancel) return true;
+        if (CanSelectPlayConversionByMaterials(modes))
+        {
+            _playConversionSelection = new(skillId, null, SelectByMaterials: true);
+            _isSelectingActiveSkillCards = true;
+            _humanSkillSnapshot = null;
+            SelectedCardText = MaterialPlayConversionHint;
+            RefreshCurrentView();
+            return true;
+        }
         if (modes is [{ Activation: { } activation }])
         {
             SelectActiveSkillCommand.Execute(activation);

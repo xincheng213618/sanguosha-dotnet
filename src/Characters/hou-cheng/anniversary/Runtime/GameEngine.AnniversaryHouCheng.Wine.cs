@@ -9,7 +9,10 @@ public sealed partial class GameEngine
             ProgramEventHistory<AnniversaryHouChengMovementEvent>().Count(m => m.FrameId == e.FrameId && m.Giving == e.Giving) != 1) return false;
         var moves = _cardMovements.Where(m => m.Sequence > e.Before && m.Sequence <= e.After && m.Reason.Value == (e.Giving ? HouChengGiveReason : HouChengObtainReason)).ToArray();
         return moves.Length is >= 1 and <= 2 && moves.Select(m => m.CardId).Distinct().Count() == moves.Length && moves.All(m => m.TurnNumber == e.Turn && m.From.OwnerSeat == e.CardOwner && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment &&
-            (m.To == CardLocation.Hand(e.Recipient) || m.To == CardLocation.OutsideGame && GetAdvancedCard(m.CardId).IsGeneralWeapon || IsHappyWeiYanRedirectedGain(m, CardLocation.Hand(e.Recipient)))) &&
+            (m.To == CardLocation.Hand(e.Recipient) || m.To == CardLocation.OutsideGame &&
+                (GetAdvancedCard(m.CardId).IsGeneralWeapon || IsWushuangShopDestroyedMaterial(m) &&
+                    ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Any(d => d.CardId == m.CardId && d.MovementSequence == m.Sequence && d.ParentFrameId == e.FrameId)) ||
+                IsHappyWeiYanRedirectedGain(m, CardLocation.Hand(e.Recipient)))) &&
             moves.Count(m => m.To == CardLocation.Hand(e.Recipient) && m.From != m.To) == e.ActualCount;
     }
     // Its exact completed movement marks the entity. Later transfers never revoke the mark.

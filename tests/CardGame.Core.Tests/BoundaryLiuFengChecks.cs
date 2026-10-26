@@ -6,6 +6,38 @@ namespace CardGame.Core.Tests;
 
 internal static class BoundaryLiuFengChecks
 {
+    public static void NativeAiCollectsOnlyHostileOpaqueSlotsAndReturnsPaidQinlingCold()
+    {
+        var s = Scene.Start();
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == Xiansi && s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
+        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate"); s.Menu(BoundaryLiuFengStage.Collect);
+        var choice = s.AiChoice();
+        s.Need(choice.Parameters.GetValueOrDefault("branch") == "collect" && choice.Parameters["count"] == "2" &&
+            choice.Targets.All(seat => seat is 2 or 3) && choice.Cards.Count == 0 &&
+            s.G.CreateSnapshot(0).Players.Where(p => p.Seat != 0).All(p => p.Hand.Count == 0),
+            "The registered native AI takes two hostile published opaque slots without inspecting any foreign hand contents or sacrificing an ally.");
+        s.Cold(); s.Need(s.AiChoice().Id == choice.Id, "The exact published collection choice remains deterministic after cold.");
+        s.Answer(c => c.Id == choice.Id); s.Play();
+        s.Need(s.V(0).AuthorityCount == 2, "The real collection moves two distinct cards into inverse once.");
+        s.Qinling(); s.Menu(BoundaryLiuFengStage.Targets); choice = s.AiChoice();
+        s.Need(choice.Parameters.GetValueOrDefault("branch") == "target" && choice.Targets.All(seat => seat is 2 or 3),
+            "The related native Qinling target stage chooses a legal hostile target.");
+        var target = choice.Targets.Single(); var hp = s.V(target).Hp;
+        s.Answer(c => c.Id == choice.Id); s.Menu(BoundaryLiuFengStage.Cost); choice = s.AiChoice();
+        s.Need(choice.Parameters.GetValueOrDefault("branch") == "cost" && choice.Cards.Count == 1,
+            "The cost stage selects an actual expendable own published material for its favorable native attack.");
+        var cost = choice.Cards.Single(); s.Cold();
+        s.Need(s.AiChoice().Id == choice.Id, "Cold preserves the same owned unpaid material choice.");
+        s.Answer(c => c.Id == choice.Id); s.Watch(); s.Cold(); s.Continue();
+        s.Watch(); s.Continue(); // Actual native reward draw request.
+        s.Watch(); s.Continue(); // Its paid cards-gained child returns to Qinling.
+        s.Play();
+        s.Need(s.E<BoundaryLiuFengCostPaidEvent>().Count(e => e.CardId == cost) == 1 &&
+            s.E<BoundaryLiuFengUseIssuedEvent>().Length == 1 && s.E<BoundaryLiuFengUseReturnedEvent>().Length == 1 &&
+            s.V(target).Hp <= hp && !s.G.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.BoundaryLiuFeng is not null),
+            "The routed native attack returns through its once-paid material and original parent without reopening payment.");
+        s.Cold();
+    }
     private const string Hero = "boundary:liu-feng", Xiansi = "boundary:xiansi", Qinling = "boundary:qinling", Driver = "fixture:liu-feng-driver", Quiet = "fixture:liu-feng-quiet", NoDraw = "fixture:liu-feng-no-draw", Ask = "fixture:liu-feng-ask", Watch = "fixture:liu-feng-cost-watch", Deck = "fixture:liu-feng-deck";
     private static string Peer(int seat) => "fixture:liu-feng-peer-" + seat;
     public static void SameOwnerTwoCardPileTrueDiscardSlashAndForeignTurnRequestCold()
@@ -92,6 +124,15 @@ internal static class BoundaryLiuFengChecks
         public PlayerSnapshot V(int seat) => G.CreateSnapshot(seat).Players.Single(p => p.Seat == seat);
         public ProgramSkillFrame? Root => G.ResolutionStack.OfType<ProgramSkillFrame>().FirstOrDefault(f => f.BoundaryLiuFeng is { Stage: not BoundaryLiuFengStage.Completed });
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
+        public PromptChoice AiChoice()
+        {
+            var frame = G.ResolutionStack.OfType<ProgramSkillFrame>().Last();
+            var effect = ProgramInstructionResolver.Default.Resolve(frame, registry.GetSkill(frame.SkillId).Program!)
+                .GetPausedInstruction(frame.InstructionIndex).Effect;
+            var router = (ProgramInteractionRouter)typeof(GameEngine).GetProperty("ProgramInteractions",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(G)!;
+            return router.SelectAi(P!, frame, effect);
+        }
         public CardLocation Zone(int id) => G.CreateCardZoneDiagnostics().Single(c => c.CardId == id).Location;
         public void Play() => Reach(() => P is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
         public void Menu(BoundaryLiuFengStage stage) => Reach(() => Root?.BoundaryLiuFeng?.Stage == stage && P?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "boundary-liu-feng") == true);

@@ -443,6 +443,7 @@
                                         <DataTrigger Binding="{Binding IsHarvestDisplayVisible}" Value="True"><Setter Property="Grid.Row" Value="0" /><Setter Property="Grid.RowSpan" Value="2" /></DataTrigger>
                                         <DataTrigger Binding="{Binding IsRevealedSubsetSelectionPending}" Value="True"><Setter Property="Grid.Row" Value="0" /><Setter Property="Grid.RowSpan" Value="2" /></DataTrigger>
                                         <DataTrigger Binding="{Binding IsDeckReorderPending}" Value="True"><Setter Property="Grid.Row" Value="0" /><Setter Property="Grid.RowSpan" Value="2" /></DataTrigger>
+                                        <DataTrigger Binding="{Binding IsCardExchangePending}" Value="True"><Setter Property="Grid.Row" Value="0" /><Setter Property="Grid.RowSpan" Value="2" /></DataTrigger>
                                         <DataTrigger Binding="{Binding HasTargetCardPicker}" Value="True"><Setter Property="Grid.Row" Value="0" /><Setter Property="Grid.RowSpan" Value="2" /></DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -604,7 +605,7 @@
                                             <DataTrigger Binding="{Binding IsHandResponsePending}" Value="True"><Setter Property="VerticalAlignment" Value="Top" /></DataTrigger>
                                             <DataTrigger Binding="{Binding AreTablePlaysVisible}" Value="True"><Setter Property="Grid.Row" Value="1" /></DataTrigger>
                                             <DataTrigger Binding="{Binding IsGodFactionSelectionPending}" Value="True"><Setter Property="VerticalAlignment" Value="Center" /><Setter Property="Height" Value="150" /></DataTrigger>
-                                            <DataTrigger Binding="{Binding HasTargetCardPicker}" Value="True"><Setter Property="Background" Value="#F51E1C19" /></DataTrigger>
+                                            <DataTrigger Binding="{Binding HasTargetCardPicker}" Value="True"><Setter Property="Background" Value="#F51E1C19" /><Setter Property="VerticalAlignment" Value="Center" /></DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
@@ -642,6 +643,9 @@
                                     <Viewbox Grid.Row="2" Stretch="Uniform" StretchDirection="DownOnly" Visibility="{Binding IsDeckReorderPending, Converter={StaticResource BoolToVisibility}}">
                                         <controls:DeckReorderPicker x:Name="DeckReorderSelection" Width="520" />
                                     </Viewbox>
+                                    <Viewbox Grid.Row="2" Stretch="Uniform" StretchDirection="DownOnly" Visibility="{Binding IsCardExchangePending, Converter={StaticResource BoolToVisibility}}">
+                                        <controls:PrivateCardExchangePicker x:Name="CardExchangeSelection" Width="520" />
+                                    </Viewbox>
                                     <Viewbox Grid.Row="2" Stretch="Uniform" StretchDirection="DownOnly" Visibility="{Binding IsRevealedSubsetSelectionPending, Converter={StaticResource BoolToVisibility}}">
                                         <StackPanel>
                                             <ItemsControl ItemsSource="{Binding PublicRevealedCards}" ItemTemplate="{StaticResource HarvestCardTemplate}">
@@ -655,6 +659,7 @@
                                     <ScrollViewer Grid.Row="2" x:Name="ResponseViewport" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" MaxWidth="760">
                                         <ScrollViewer.Style><Style TargetType="ScrollViewer"><Style.Triggers>
                                             <DataTrigger Binding="{Binding IsDeckReorderPending}" Value="True"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                                            <DataTrigger Binding="{Binding IsCardExchangePending}" Value="True"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
                                             <DataTrigger Binding="{Binding IsRevealedSubsetSelectionPending}" Value="True"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
                                             <DataTrigger Binding="{Binding IsGodFactionSelectionPending}" Value="True"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
                                         </Style.Triggers></Style></ScrollViewer.Style>
@@ -968,6 +973,7 @@
                             <Button x:Name="EndTurnButton" Grid.Column="2" Content="结 束" Command="{Binding EndTurnCommand}" Style="{StaticResource TableSecondaryButton}" Width="84" HorizontalAlignment="Center" Visibility="{Binding SelectionArea.ShowEndTurn, Converter={StaticResource BoolToVisibility}}" ToolTip="结束出牌 · Ctrl + Enter" AutomationProperties.Name="结束出牌" />
                             <Button x:Name="RecommendDiscardButton" Grid.Column="1" Content="推荐弃牌" Command="{Binding RecommendDiscardCommand}" Style="{StaticResource TableSecondaryButton}" MinWidth="104" HorizontalAlignment="Center" Visibility="{Binding IsDiscardSelectionPending, Converter={StaticResource BoolToVisibility}}" AutomationProperties.Name="推荐弃牌" />
                         </Grid>
+                            <Button x:Name="SelectAllHandButton" Content="全选手牌" Command="{Binding SelectionArea.SelectAllHandCommand}" IsEnabled="{Binding SelectionArea.CanSelectAllHand}" Style="{StaticResource TableSecondaryButton}" MinWidth="104" Margin="5,0" Visibility="{Binding SelectionArea.ShowSelectAllHand, Converter={StaticResource BoolToVisibility}}" ToolTip="选中全部可用于制衡的手牌，确认后发动；装备可单独选择" AutomationProperties.Name="全选手牌" />
                             <ItemsControl x:Name="DockSkillChoices" ItemsSource="{Binding SelectionArea.Choices}" Visibility="{Binding SelectionArea.HasChoices, Converter={StaticResource BoolToVisibility}}">
                                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate><DataTemplate>

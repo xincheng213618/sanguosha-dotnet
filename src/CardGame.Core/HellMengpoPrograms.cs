@@ -230,10 +230,9 @@ public sealed partial class GameEngine
             !_contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.BanHellWangshiCategory)) return false;
         var category = CardUseCategoryCatalog.Get(kind) switch
         { CardUseCategories.Basic => "basic", CardUseCategories.Equipment => "equipment", _ => "trick" };
-        var history = CompleteProgramEventHistory().ToArray();
-        return history.OfType<HellWangshiCategoryBanEvent>().Any(e => e.TurnNumber == _turnNumber &&
+        return ProgramEventHistory<HellWangshiCategoryBanEvent>().Any(e => e.TurnNumber == _turnNumber &&
             e.TurnOwnerSeat == actorSeat && e.TurnOwnerSeat == _turnProgression.OwnerSeat && e.Category == category &&
-            !history.OfType<TurnEndedEvent>().Any(end => end.TurnNumber == e.TurnNumber && end.ActorSeat == e.TurnOwnerSeat));
+            !ProgramEventHistory<TurnEndedEvent>().Any(end => end.TurnNumber == e.TurnNumber && end.ActorSeat == e.TurnOwnerSeat));
     }
 
     private bool HasHellShiyouCapability => _contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.HellShiyouIntercept);

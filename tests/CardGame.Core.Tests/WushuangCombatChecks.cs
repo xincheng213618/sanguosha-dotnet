@@ -3,10 +3,12 @@ using System.Reflection;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
-internal static class WushuangCombatChecks
+internal static partial class WushuangCombatChecks
 {
     private const string Driver = "fixture:wushuang-combat-driver", Quiet = "fixture:wushuang-combat-quiet", Human = "fixture:wushuang-combat-human";
-    private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(new Fixture(StandardWushuangContentRegistry.Create())));
+    private static readonly Lazy<ContentRegistry> CombatSource = new(StandardWushuangContentRegistry.Create);
+    private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(new Fixture(CombatSource.Value)));
+    private static readonly Dictionary<int, ContentRegistry> LegacyCombatRegistries = [];
 
     public static void NoArmorFixedDamageAndFiniteReduction()
     {
@@ -63,7 +65,7 @@ internal static class WushuangCombatChecks
             Cold(g);
         }
         {
-            var g = Start(280, 2239); Use(g, "obtain-dismantlement"); Play(g);
+            var g = Start(9, 2239); Use(g, "obtain-dismantlement"); Play(g);
             var hand = Player(g, 1).HandCount; var use = Card(g, CardKind.Dismantlement);
             Until(g, () => P(g)?.Kind == DecisionKind.SelectTargetCard); Cold(g);
             Answer(g, c => c.Parameters.GetValueOrDefault("slot-index") == "0");
@@ -146,10 +148,15 @@ internal static class WushuangCombatChecks
 
     private static GameEngine Start(int seed, int tactic)
     {
+        var legacy = WushuangCatalogue.CanOfferAsOpening(WushuangTactics.ById[tactic]) ? (int?)null : tactic;
+        var registry = Registry.Value;
+        if (legacy is { } preset && !LegacyCombatRegistries.TryGetValue(preset, out registry))
+            LegacyCombatRegistries[preset] = registry = ContentRegistry.Build(new Fixture(CombatSource.Value, preset));
         var g = GameEngine.CreateStandard(StandardWushuangContentRegistry.CreateOptions(seed) with
-        { AdvanceAfterHumanCommands = false, UseInteractiveDiscard = false }, Registry.Value);
+        { AdvanceAfterHumanCommands = false, UseInteractiveDiscard = false }, registry);
         Accept(g, new StartGameCommand()); Until(g, () => P(g)?.Kind == DecisionKind.SelectGeneral);
         Accept(g, new SelectGeneralCommand(0, Human, g.Revision, P(g)!.PromptId));
+        if (legacy is not null) { Play(g); return g; }
         Until(g, () => V(g, 0).Wushuang is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
         var offer = V(g, 0).Wushuang!.Offers.SingleOrDefault(o => o.TacticId == tactic);
         Require(offer is not null, $"The verified seed {seed} must still expose official tactic {tactic}.");
@@ -188,7 +195,10 @@ internal static class WushuangCombatChecks
     { var p = P(g)!; var c = p.Choices.FirstOrDefault(predicate) ?? p.Choices[0]; Accept(g, new AnswerPromptCommand(0, p.PromptId, c.Id, g.Revision)); }
     private static void Cold(GameEngine g)
     {
-        var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(g.CreateCheckpoint())), Registry.Value);
+        var checkpoint = g.CreateCheckpoint();
+        var registry = checkpoint.ContentHash == Registry.Value.ContentHash ? Registry.Value :
+            LegacyCombatRegistries.Values.Single(candidate => candidate.ContentHash == checkpoint.ContentHash);
+        var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(checkpoint)), registry);
         Require(Enumerable.Range(0, 2).All(seat => SnapshotJson.Serialize(V(g, seat)) == SnapshotJson.Serialize(V(restored, seat))) &&
             JsonSerializer.Serialize(g.CardMovements) == JsonSerializer.Serialize(restored.CardMovements),
             "Cold replay preserves both private player views and each exact movement at this paid continuation.");
@@ -203,12 +213,12 @@ internal static class WushuangCombatChecks
         events = g.Events.TakeLast(8).Select(e => new { type = e.Payload.GetType().Name, payload = JsonSerializer.Serialize(e.Payload, e.Payload.GetType()) })
     });
 
-    private sealed class Fixture(ContentRegistry source) : IGameContentPackage
+    private sealed class Fixture(ContentRegistry source, int? legacyOpeningTactic = null) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture:wushuang-combat", new Version(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
-            b.CopyModeFeatureFactoriesFrom(source);
+            WushuangLegacyOpeningFixture.CopyModeFactories(b, source, legacyOpeningTactic);
             foreach (var x in source.Cards.Values) b.AddCard(x);
             foreach (var x in source.Skills.Values) b.AddSkill(x);
             foreach (var x in source.Generals.Values) b.AddGeneral(x);

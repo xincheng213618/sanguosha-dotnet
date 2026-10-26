@@ -1,6 +1,7 @@
 using System.Text.Json;
 using CardGame.Core;
 using CardGame.Content.Standard;
+using CardGame.Core.Campaigns;
 
 internal static class BoundaryZhangChunHuaChecks
 {
@@ -72,12 +73,55 @@ internal static class BoundaryZhangChunHuaChecks
         RejectSecondActivation(tie); Cold(tie, tieRegistry);
     }
 
+    public static void TerminalDuelReturnsToItsPaidParentOnceCold()
+    {
+        foreach (var ownerDies in new[] { false, true })
+        {
+            var (game, registry) = Create(dodges: true, terminalDuel: true);
+            var inventory = game.CreateCardZoneDiagnostics().Select(c => c.CardId).Order().ToArray();
+            Begin(game, 1); var parentId = Paid(game).Id;
+            // Six black Dodges versus four. Choosing black makes the owner
+            // issue Duel; choosing red makes the hostile peer issue it back.
+            AnswerColor(game, ownerDies ? "red" : "black");
+            Reach(game, p => p.SkillPrompt?.SkillId == Before);
+            var parent = Paid(game); var payment = parent.DualColorDuel!;
+            var use = game.ResolutionStack.OfType<CardUseFrame>().Single(f => f.DualColorDuelOrigin is not null);
+            var origin = use.DualColorDuelOrigin!; var victim = ownerDies ? 0 : 1;
+            Require(origin.ParentProgramFrameId == parentId && origin.InitialActorSeat == 1 - victim && origin.InitialTargetSeat == victim &&
+                payment.OwnerCardIds.Count == (ownerDies ? 0 : 6) && payment.OtherCardIds.Count == 4 &&
+                origin.OwnerDiscardCount == payment.OwnerCardIds.Count && origin.OtherDiscardCount == payment.OtherCardIds.Count &&
+                CostMoves(game).Length == payment.OwnerCardIds.Count + payment.OtherCardIds.Count,
+                "The two native private commitments freeze their real paid counts and issue one correctly directed zero-entity Duel.");
+            Cold(game, registry); Continue(game);
+            ReachUntil(game, () => game.ResolutionStack.OfType<DyingFrame>().Any());
+            var dying = game.ResolutionStack.OfType<DyingFrame>().Single();
+            Require(dying.VictimSeat == victim && dying.Continuation == DyingContinuationKind.Damage &&
+                game.ResolutionStack.OfType<CardUseFrame>().Single(f => f.Id == use.Id).DualColorDuelOrigin is { AttackStarted: true } &&
+                Paid(game).DualColorDuel is { Stage: ProgramDualColorDuelStage.DuelIssued, CardUseFrameId: var issued } && issued == use.Id,
+                "The lethal actual Duel retains its original paid program and typed native use through the real dying frame.");
+            Cold(game, registry);
+            ReachUntil(game, () => game.State.Status == EngineStatus.Completed && game.ResolutionStack.Count == 0);
+            var final = game.CreateSnapshot(-1, true);
+            var paidIds = payment.OwnerCardIds.Concat(payment.OtherCardIds).Order().ToArray();
+            Require(!final.Players[victim].IsAlive && final.Players[1 - victim].IsAlive &&
+                final.WinnerTeamId == final.Players[1 - victim].TeamId && final.ProcessingCardCount == 0 && PaidOrNull(game) is null &&
+                Facts<GameEndedEvent>(game).Length == 1 && Facts<ProgramDualColorsCommittedEvent>(game).Length == 1 &&
+                Facts<ProgramDualColorCardsDiscardedEvent>(game).Length == 1 && Facts<ProgramDualColorDuelIssuedEvent>(game).Length == 1 &&
+                Facts<CardUseFinishedEvent>(game).Count(e => e.ResolutionId == use.Id && e.CardKind == CardKind.Duel) == 1 &&
+                Facts<ProgramSkillResolvedEvent>(game).Count(e => e.FrameId == parentId) == 1 &&
+                CostMoves(game).Select(m => m.CardId).Order().SequenceEqual(paidIds) && CostMoves(game).Select(m => m.CardId).Distinct().Count() == paidIds.Length &&
+                game.CreateCardZoneDiagnostics().Select(c => c.CardId).Order().SequenceEqual(inventory),
+                "Victory and either participant's death settle the exact issued Duel and its paid parent once, without paying again, reissuing, stranding Processing or altering the physical inventory.");
+            Cold(game, registry);
+        }
+    }
+
     private static ProgramSkillFrame? PaidOrNull(GameEngine game) => game.ResolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.SkillId == Skill);
     private static ProgramSkillFrame Paid(GameEngine game) => PaidOrNull(game)!;
     private static IReadOnlyList<CardSnapshot> Hand(GameEngine game, int seat) => game.CreateSnapshot(seat).Players[seat].Hand;
     private static T[] Facts<T>(GameEngine game) where T : IGameEvent => game.Events.Select(item => item.Payload).OfType<T>().ToArray();
     private static CardMovementRecord[] CostMoves(GameEngine game) => game.CardMovements.Where(move => move.Reason.Value == Reason).ToArray();
-    private static PendingDecision? P(GameEngine game) => Enumerable.Range(0, 4).Select(seat => game.CreateSnapshot(seat).PendingDecision).FirstOrDefault(prompt => prompt is not null);
+    private static PendingDecision? P(GameEngine game) => Enumerable.Range(0, game.State.Players.Count).Select(seat => game.CreateSnapshot(seat).PendingDecision).FirstOrDefault(prompt => prompt is not null);
     private static bool Action(PendingDecision prompt, string action) => prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == action);
     private static void Begin(GameEngine game, int target) => Accept(game, new UseProgramSkillCommand(0, Skill, Binding, [], [target], game.Revision, P(game)!.PromptId));
     private static void AnswerColor(GameEngine game, string color) => Answer(game, choice => choice.Parameters.GetValueOrDefault("color") == color);
@@ -139,19 +183,33 @@ internal static class BoundaryZhangChunHuaChecks
     }
     private static void Frozen<T>(IReadOnlyList<T> list)
     { Require(list is IList<T> { IsReadOnly: true }, "The owning receipt is immutable."); try { ((IList<T>)list).Add(default!); throw new InvalidOperationException("Receipt collection permitted mutation."); } catch (NotSupportedException) { } }
-    private static string State(GameEngine game) => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, 4).Select(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat))).ToArray(), Frames = JsonSerializer.Serialize(game.ResolutionStack), Events = game.Events.Select(item => JsonSerializer.Serialize(item.Payload, item.Payload.GetType())).ToArray(), game.CardMovements, Commands = CommandJson.Serialize(game.AcceptedCommands), Zones = game.CreateCardZoneDiagnostics() });
+    private static string State(GameEngine game) => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, game.State.Players.Count).Select(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat))).ToArray(), Frames = JsonSerializer.Serialize(game.ResolutionStack), Events = game.Events.Select(item => JsonSerializer.Serialize(item.Payload, item.Payload.GetType())).ToArray(), game.CardMovements, Commands = CommandJson.Serialize(game.AcceptedCommands), Zones = game.CreateCardZoneDiagnostics() });
     private static void Cold(GameEngine game, ContentRegistry registry) => Require(State(game) == State(GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry)), "The real command journal cold-restores all four filtered views, typed owners, facts and exact payment ledger.");
     private static void Require(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 
-    private static (GameEngine, ContentRegistry) Create(bool dodges = false, bool sourceDeath = false)
+    private static (GameEngine, ContentRegistry) Create(bool dodges = false, bool sourceDeath = false, bool terminalDuel = false)
     {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(true), new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(), new Fixture(dodges, sourceDeath));
-        var game = GameEngine.CreateStandard(new GameOptions { Seed = 31, PlayerCount = 4, HumanSeat = 0, HumanRole = sourceDeath ? Role.Rebel : Role.Lord, ModeId = Mode, UseInteractiveSetup = true, UseInteractiveDiscard = true, AdvanceAfterHumanCommands = false, MaxTurns = 10 }, registry);
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(true), new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(), new Fixture(dodges, sourceDeath, terminalDuel));
+        if (terminalDuel)
+        {
+            // Use the existing explicit two-seat encounter adapter. A custom
+            // two-seat Team definition alone cannot bypass built-in validation.
+            var setup = new ShanheBattleSetup(31, 1, "fixture-terminal-dual-color", "fixture:dual-owner", 1,
+                0, 0, 0, 0, [], [], [], [new("fixture:dual-other-1", Hp: 1)], [], new string('d',64));
+            var encounter = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 2, HumanSeat = 0,
+                HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId, ShanheBattle = setup,
+                ModeId = ShanheBattleSetup.BattleModeId, UseInteractiveSetup = false, UseInteractiveDiscard = true,
+                AdvanceAfterHumanCommands = false, MaxTurns = 10 }, registry);
+            Accept(encounter, new StartGameCommand()); ReachPlay(encounter); return (encounter,registry);
+        }
+        var game = GameEngine.CreateStandard(new GameOptions { Seed = 31, PlayerCount = 4, HumanSeat = 0,
+            HumanRole = sourceDeath ? Role.Rebel : Role.Lord, ModeId = Mode, UseInteractiveSetup = true,
+            UseInteractiveDiscard = true, AdvanceAfterHumanCommands = false, MaxTurns = 10 }, registry);
         Accept(game, new StartGameCommand()); Reach(game, prompt => prompt.Kind == DecisionKind.SelectGeneral && prompt.PlayerSeat == 0);
         Accept(game, new SelectGeneralCommand(0, "fixture:dual-owner", game.Revision, P(game)!.PromptId)); ReachPlay(game); return (game, registry);
     }
 
-    private sealed class Fixture(bool dodges, bool sourceDeath) : IGameContentPackage
+    private sealed class Fixture(bool dodges, bool sourceDeath, bool terminalDuel) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-private-color-duel", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder builder)
@@ -168,10 +226,14 @@ internal static class BoundaryZhangChunHuaChecks
             foreach (var (id, program) in catalog.Programs) builder.AddSkill(new(id, id, "实际子结算夹具") { Program = program });
             builder.AddSkill(new("fixture:dual-pick", "稳定候选", "无运行程序的选将偏好") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => 100d) });
             builder.AddGeneral(new("fixture:dual-owner", "选色真实程序", "supporter", Skill, "wei", 3,
-                sourceDeath ? [Cost, Before] : [Cost, Hp, Gain, Before, "classic:jueqing", "classic:shangshi"]) { InitialHp = 1 });
-            for (var index = 1; index < 4; index++) builder.AddGeneral(new($"fixture:dual-other-{index}", "实际另一参与者", "supporter", "fixture:dual-pick", "shu", 3, ["fixture:dual-quiet", Before]));
+                terminalDuel ? [Cost, Hp, Before] : sourceDeath ? [Cost, Before] : [Cost, Hp, Gain, Before, "classic:jueqing", "classic:shangshi"]) { InitialHp = 1 });
+            for (var index = 1; index < 4; index++) builder.AddGeneral(new($"fixture:dual-other-{index}", "实际另一参与者", "supporter", "fixture:dual-pick", "shu", terminalDuel ? 1 : 3, ["fixture:dual-quiet", Before]));
             builder.AddDeck(new("fixture:dual-deck", "固定黑色真实实体", 4, 2, []) { PhysicalCards = Enumerable.Range(0, 80).Select(_ => new ContentDeckPhysicalCard(dodges ? "standard:dodge" : "standard:slash", Suit.Spade, 7)).ToArray() });
-            builder.AddMode(new(Mode, "私密选色真实父链", 4, 4, new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 3 }, "fixture:dual-deck", GeneralCandidateCount: 4, GeneralPoolIds: ["fixture:dual-owner", "fixture:dual-other-1", "fixture:dual-other-2", "fixture:dual-other-3"]));
+            builder.AddMode(terminalDuel
+                ? new(ShanheBattleSetup.BattleModeId, "双色真实死亡返回", 2, 2, new Dictionary<string, int>(), "fixture:dual-deck", GeneralCandidateCount: 2,
+                    GeneralPoolIds: ["fixture:dual-owner", "fixture:dual-other-1"], ModeKind: ContentModeKind.Team,
+                    TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 1, [ShanheBattleSetup.EnemyTeamId] = 1 })
+                : new(Mode, "私密选色真实父链", 4, 4, new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 3 }, "fixture:dual-deck", GeneralCandidateCount: 4, GeneralPoolIds: ["fixture:dual-owner", "fixture:dual-other-1", "fixture:dual-other-2", "fixture:dual-other-3"]));
         }
         private static object Observer(string name) => new { name, description = "暂停真实子结算", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } };
     }

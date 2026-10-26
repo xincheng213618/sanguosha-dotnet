@@ -30,7 +30,9 @@ public sealed partial class GameEngine
             origin.OwnerSeat != frame.OwnerSeat || origin.InitialActorSeat != frame.OwnerSeat || origin.InitialTargetSeat != frame.OwnerSeat || origin.BindingId != frame.ActivationId ||
             origin.SkillInstanceId != frame.SkillInstanceId || origin.GameplayHash != frame.GameplayHash || origin.InstructionIndex != frame.InstructionIndex || origin.LifecycleFrameId != 0 || origin.TurnNumber != receipt.Turn ||
             receipt.UseId != 0 && (receipt.UseId != use.Id || receipt.ActionId != action.ActionId)) return false;
-        return ProgramEventHistory<ShenGuoJiaMaximumPaidEvent>().Count(fact => fact.FrameId == frame.Id && fact.Purpose == "happy-zuoxing" && fact.Seat == receipt.Benefactor && fact.After == fact.Before - 1) == 1 &&
+        return ProgramEventHistory<ShenGuoJiaMaximumPaidEvent>().Count(fact => fact.FrameId == frame.Id && fact.Purpose == "happy-zuoxing" && fact.Seat == receipt.Benefactor &&
+                fact.Before == receipt.MaximumBefore && fact.After == receipt.MaximumAfter &&
+                fact.After == HappyGjMaximumAfterPayment(fact.Seat, fact.Before, -1)) == 1 &&
             (ProgramEventHistory<CardUseDeclaredEvent>().Any(fact => fact.ResolutionId == use.Id) ? ShownEntityUseActorMatches(use, frame.OwnerSeat, frame.OwnerSeat) : action.ActorSeat == frame.OwnerSeat);
     }
     private bool TryReturnHappyGuoJiaVirtualUse(CardUseFrame use)

@@ -13,16 +13,22 @@ internal static class NativeDrawCardEffectChecks
         CompensationReason = "skill-program.sun-hong.zenrun.compensation";
     private static string _scene = "";
 
-    public static void NativeDrawTwoWaitsForAttemptAndActualGainChildrenCold()
+    public static void NativeDrawTwoWaitsForAttemptAndActualGainChildrenCold() => CheckNativeDrawTwoScenes(["decline", "repeat"]);
+
+    public static void UnnullifiableRepeatedNativeDrawTwoKeepsIssuedEffectIdentityCold() => CheckNativeDrawTwoScenes(["unnullifiable-repeat"]);
+
+    private static void CheckNativeDrawTwoScenes(IReadOnlyList<string> scenes)
     {
-        foreach (var scene in new[] { "decline", "repeat" })
+        foreach (var scene in scenes)
         {
+            var repeated = scene.Contains("repeat", StringComparison.Ordinal);
+            var bypassed = scene.StartsWith("unnullifiable-", StringComparison.Ordinal);
             var (g, registry) = Start(scene);
             var handBefore = Hand(g, 0).HandCount;
             var sequenceBefore = g.CardMovements.Last().Sequence;
             var drawFactsBefore = E<CardsDrawnEvent>(g).Length;
             var material = PlayDrawTwo(g);
-            if (scene == "repeat")
+            if (repeated)
             {
                 Drive(g, () => Optional(g, Fengzi));
                 Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
@@ -35,7 +41,7 @@ internal static class NativeDrawCardEffectChecks
             var attempts = new List<long>();
             var effectWindows = new List<long>();
             var allDrawn = new List<int>();
-            var effects = scene == "repeat" ? 2 : 1;
+            var effects = repeated ? 2 : 1;
             for (var round = 0; round < effects; round++)
             {
                 Need(Optional(g, Before), "Each real effect must publish its own pre-draw choice.", g);
@@ -51,14 +57,18 @@ internal static class NativeDrawCardEffectChecks
                     attempt.Context.ActualTurnOwnerSeat == 0 &&
                     !g.ResolutionStack.OfType<NullificationWindowFrame>().Any() &&
                     E<NullificationResolvedEvent>(g).Count(e => e.ResolutionId == useId &&
-                        e.EffectCardId == material && !e.EffectNullified) == round + 1 &&
+                        e.EffectCardId == material && !e.EffectNullified) == (bypassed ? 0 : round + 1) &&
                     NewDraws(g, sequenceBefore, 0).Length == round * 2 &&
                     E<CardsDrawnEvent>(g).Length == drawFactsBefore + round &&
                     g.CardMovements.Last(m => m.CardId == material).To == CardLocation.Processing &&
                     !E<CardUseFinishedEvent>(g).Any(e => e.ResolutionId == useId),
                     "The popped native counterspell window yields to the same paid Use before DrawPile material or use completion.", g);
-                Need(!attempts.Contains(attempt.Id) && !effectWindows.Contains(receipt!.NullificationFrameId),
-                    "Extra effects have independent real windows/attempts rather than a reused Use-id sentinel.", g);
+                Need(!attempts.Contains(attempt.Id) && (bypassed ? receipt is { NullificationFrameId: 0 } &&
+                        receipt.BypassedActionId == use.Action!.ActionId && receipt.BypassedEffectOrdinal == round + 1 &&
+                        E<OrdinaryTrickCannotNullifyIssuedEvent>(g).Count(e => e.Receipt.CardUseFrameId == useId) == 1 :
+                        receipt!.NullificationFrameId > 0 && !effectWindows.Contains(receipt.NullificationFrameId) &&
+                        receipt.BypassedActionId is null && receipt.BypassedEffectOrdinal is null),
+                    "Each actual draw has its own attempt; ordinary effects retain real counterspell windows, while an issued cannot-nullify use truthfully retains window zero and a distinct exact action/effect ordinal.", g);
                 attempts.Add(attempt.Id); effectWindows.Add(receipt!.NullificationFrameId);
                 AssertPrivate(g, 0);
                 g = Cold(g, registry);
@@ -96,7 +106,7 @@ internal static class NativeDrawCardEffectChecks
                 E<NativeDrawAttemptDecidedEvent>(g).Count(e => e.ParentFrameId == useId && !e.Replaced) == effects &&
                 allDrawn.Distinct().Count() == effects * 2 &&
                 NewDraws(g, sequenceBefore, 0).Select(m => m.CardId).SequenceEqual(allDrawn) &&
-                Hand(g, 0).HandCount == handBefore - 1 - (scene == "repeat" ? 1 : 0) + effects * 2 &&
+                Hand(g, 0).HandCount == handBefore - 1 - (repeated ? 1 : 0) + effects * 2 &&
                 E<CardUseDeclaredEvent>(g).Count(e => e.ResolutionId == useId) == 1 &&
                 E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == useId) == 1 &&
                 g.CardMovements.Count(m => m.CardId == material && m.From == CardLocation.Hand(0) &&
@@ -105,7 +115,7 @@ internal static class NativeDrawCardEffectChecks
                     m.To == CardLocation.DiscardPile) == 1 &&
                 !g.ResolutionStack.OfType<CardUseFrame>().Any(f => f.Id == useId),
                 "Every genuine effect draws once, while the original physical card is paid/finished only once after all children.", g);
-            if (scene == "repeat")
+            if (repeated)
                 Need(E<ExtraCardEffectIssuedEvent>(g).Count(e => e.CardUseFrameId == useId) == 1 &&
                     g.CardMovements.Count(m => m.Reason.Value == "skill-program.extra-effect.cost") == 1,
                     "The repeated Draw2 comes from one real production Fengzi cost, not a second use or fabricated effect.", g);
@@ -355,7 +365,9 @@ internal static class NativeDrawCardEffectChecks
                 Add(Gain, "triggers", new[] { new { id = "actual-draw-child", window = "cardsGained", subject = "owner",
                     condition = new { kind = "phaseIsPlay" }, destinationZones = new[] { "hand" }, movementOccurrence = "perBatch",
                     movementReasons = new[] { CardMoveReasons.Draw.Value }, optional = false, effects = new[] { Choice("gained") } } }, "gained");
-                if (scene == "repeat") { RegisterProduction(b, "ol-wang-rong", Fengzi); ownerSkills.Add(Fengzi); }
+                if (scene.Contains("repeat", StringComparison.Ordinal)) { RegisterProduction(b, "ol-wang-rong", Fengzi); ownerSkills.Add(Fengzi); }
+                if (scene.StartsWith("unnullifiable-", StringComparison.Ordinal))
+                { RegisterProduction(b, "ordinary-sp-jia-xu", "ol:zhenlue"); ownerSkills.Add("ol:zhenlue"); }
             }
             var catalog = SkillProgramCatalog.Load(JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills = definitions }),
                 JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));

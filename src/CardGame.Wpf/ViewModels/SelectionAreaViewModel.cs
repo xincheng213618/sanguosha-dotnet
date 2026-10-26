@@ -17,6 +17,9 @@ public sealed record SelectionAreaViewModel
     public bool ShowPrimaryButtons { get; init; }
     public ICommand ConfirmCommand { get; init; } = null!;
     public ICommand CancelCommand { get; init; } = null!;
+    public bool ShowSelectAllHand { get; init; }
+    public bool CanSelectAllHand { get; init; }
+    public ICommand SelectAllHandCommand { get; init; } = null!;
     public IReadOnlyList<PromptChoice> Choices { get; init; } = [];
     public ICommand ChoiceCommand { get; init; } = null!;
     public bool HasChoices => Choices.Count > 0;

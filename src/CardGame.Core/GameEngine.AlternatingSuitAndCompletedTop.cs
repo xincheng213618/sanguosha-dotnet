@@ -43,7 +43,7 @@ public sealed partial class GameEngine
                     .Any(ended => ended.ActualTurn == e.TurnNumber && ended.OwnerSeat == e.ActualTurnOwnerSeat)
             : _phase == TurnPhase.Play && seat == _currentSeat && e.PhaseInstanceId == _cardUseDebitPhaseInstanceId);
     private bool HasPhaseSuitAllowance(int seat,Suit? suit)=>suit is { } s && s!=Suit.None &&
-        CompleteProgramEventHistory().OfType<PlayPhaseSuitAllowanceGrantedEvent>().Any(e=>IsLiveSuitAllowance(e,seat)&&e.Suits.Contains(s));
+        ProgramEventHistory<PlayPhaseSuitAllowanceGrantedEvent>().Any(e=>IsLiveSuitAllowance(e,seat)&&e.Suits.Contains(s));
     private IReadOnlyList<IssuedPlayPhaseSuitUseAllowance>? GetIssuedPlayPhaseSuitUseAllowances(int seat)
     {
         var issued = CompleteProgramEventHistory().OfType<PlayPhaseSuitAllowanceGrantedEvent>()

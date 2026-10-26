@@ -40,6 +40,34 @@ internal static class GaoGanChecks
         g = Cold(g, registry); Continue(g); Play(g); _ = Cold(g, registry);
     }
 
+    public static void NativeInlineRetaliationFreezesPendingVictimsAndRecordsOnceCold()
+    {
+        var (g, registry) = Start("retaliation-inline");
+        g = Cold(g, registry);
+        var action = Actions(g).First(a => a.PlayedCardKind == CardKind.Duel && a.TargetSeats.SequenceEqual([1]));
+        var material = action.CardId!.Value;
+        SubmitPlay(g, action); Play(g);
+        var victim = E<JuguanVictimDamagedEvent>(g).Single();
+        var returned = E<JuguanRetaliationRecordedEvent>(g).Single();
+        Need(returned.CardUseFrameId == victim.CardUseFrameId && returned.OwnerSeat == 0 && returned.VictimSeat == 1 &&
+            returned.DamageFrameId != victim.DamageFrameId &&
+            E<DamageRequestedEvent>(g).Any(e => e.ResolutionId == returned.DamageFrameId && e.SourceSeat == 1 && e.TargetSeat == 0 && e.Amount == 1) &&
+            E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == victim.CardUseFrameId) == 1 &&
+            g.CardMovements.Count(m => m.CardId == material && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1 &&
+            E<ProgramBindingStartedEvent>(g).Count(e => e.SkillId == Counter) == 1,
+            "The actual Duel victim counterattacks the event source without an intervening choice, so pending-history publication records the exact retaliation once and preserves the native material payment.");
+        g = Cold(g, registry);
+        Use(g, "retaliate", [1]); Play(g);
+        Need(E<JuguanRetaliationRecordedEvent>(g).Count() == 1 && E<JuguanVictimDamagedEvent>(g).Count() == 1,
+            "Another genuine hit by that same victim cannot publish a second retaliation for the original issued Use.");
+        var turn = g.State.TurnNumber;
+        Use(g, "extra"); Play(g); End(g); OwnDraw(g, turn);
+        Need(E<JuguanDeadlineSettledEvent>(g).Last() is { OwnerSeat: 0, Qualified: false } && ActualDrawCount(g) == 2 &&
+            !E<JuguanDrawPhaseBoundEvent>(g).Any(),
+            "The next real owner turn sees the recorded retaliation and keeps its actual Draw at two instead of granting the deferred bonus.");
+        g = Cold(g, registry); Continue(g); Play(g); _ = Cold(g, registry);
+    }
+
     private static PlayerSnapshot V(GameEngine g, int s) => g.CreateSnapshot(s).Players[s];
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 4).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static IEnumerable<T> E<T>(GameEngine g) where T : IGameEvent => g.Events.Select(e => e.Payload).OfType<T>();
@@ -106,7 +134,7 @@ internal static class GaoGanChecks
               {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]},
               {"id":"{{Extra}}","revision":1,"triggers":[{"id":"extra-play","window":"playEnding","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"selectTarget","target":"owner","targetKind":"currentTurnPlayer"},{"op":"insertPhase","target":"selectedTarget","phase":"play","phaseContinuation":"beforeNormalPreparation"}]}]},
               {"id":"{{Skip}}","revision":1,"triggers":[{"id":"real-skip","window":"turnStartBeforeNormalFlow","subject":"owner","optional":true,"usageScope":"game","usageLimit":1,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["draw"]}]}]},
-              {"id":"{{Counter}}","revision":1,"triggers":[{"id":"immediate","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamage","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"selectTarget","target":"owner","targetKind":"currentTurnPlayer"},{"op":"damage","target":"selectedTarget","amount":1}]}]},
+              {"id":"{{Counter}}","revision":1,"triggers":[{"id":"immediate","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamage","optional":false,"usageScope":"game","usageLimit":1,"effects":[{{(scenario == "retaliation-inline" ? "{\"op\":\"damage\",\"target\":\"owner\",\"targetRef\":{\"kind\":\"eventSource\"},\"amount\":1}" : "{\"op\":\"selectTarget\",\"target\":\"owner\",\"targetKind\":\"currentTurnPlayer\"},{\"op\":\"damage\",\"target\":\"selectedTarget\",\"amount\":1}")}}]}]},
               {"id":"{{Prevent}}","revision":1,"triggers":[{"id":"prevent","window":"beforeDamageApplied","subject":"damageTarget","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"preventCurrentDamage","target":"owner"}]}]},
               {"id":"{{PeerSlash}}","revision":1,"viewAs":[{"id":"respond-native","inputKinds":[],"inputSuits":[],"outputKind":"slash","forPlay":false,"forResponse":true}]}
             ]}
@@ -124,7 +152,7 @@ internal static class GaoGanChecks
             foreach (var id in peers)
             {
                 var skills = new List<string> { Quiet, Gain };
-                if (scenario == "self") skills.Add(PeerSlash); if (scenario == "immediate") skills.Add(Counter); if (scenario == "prevent") skills.Add(Prevent);
+                if (scenario == "self") skills.Add(PeerSlash); if (scenario is "immediate" or "retaliation-inline") skills.Add(Counter); if (scenario == "prevent") skills.Add(Prevent);
                 b.AddGeneral(new(id, "其他", "supporter", "fixture:gg-peer-pick", "wei", scenario == "self" ? 1 : 8, skills));
             }
             b.AddDeck(new("fixture:gg-deck", "固定无基本响应实体", 4, 2, []) { PhysicalCards = Enumerable.Range(0, 160).Select(i => new ContentDeckPhysicalCard("standard:crossbow", Suit.Spade, i % 13 + 1)).ToArray() });

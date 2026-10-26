@@ -45,13 +45,20 @@ public sealed partial class GameEngine
         MoveFinishedTrickCard(use.Id, card); FinishCardUse(use.Id, card, CardKind.Dismantlement);
     }
 
-    private void WushuangClaimNullifiedTrick(NullificationWindowFrame window)
+    private void WushuangClaimNullifiedTrick(NullificationWindowFrame window,
+        IReadOnlyList<Card> finishedPhysicalCards, int beforeFinishMovement)
     {
         if (!IsWushuangMode || !window.EffectNullified) return;
         var response = ProgramEventHistory<NullificationRespondedEvent>().LastOrDefault(e =>
             e.ResolutionId == window.ParentFrameId && e.ChainDepth == window.ChainDepth && e.EffectNullified);
         if (response is null || !HasWushuangTactic(response.ResponderSeat, 2008) || !_players[response.ResponderSeat].IsAlive) return;
-        foreach (var card in GetCardUsePhysicalCards(window.ParentFrameId).Where(c => _cardZones.GetLocation(c.Id) == CardLocation.DiscardPile))
+        if (LifecycleCardUse(window.ParentFrameId) is not { Action: { } action } use ||
+            action.ActorSeat != window.SourceSeat ||
+            !(use.PhysicalCardIds ?? [use.CardId]).SequenceEqual(finishedPhysicalCards.Select(card => card.Id)))
+            throw new InvalidOperationException("A counterspell claim lost its exact native trick materials.");
+        foreach (var card in finishedPhysicalCards.Where(c => _cardZones.GetLocation(c.Id) == CardLocation.DiscardPile &&
+            _cardMovements.Any(move => move.Sequence > beforeFinishMovement && move.CardId == c.Id &&
+                move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.UseFinished)))
             MoveCard(card, CardLocation.DiscardPile, CardLocation.Hand(response.ResponderSeat), new("wushuang.counterspell-claim"));
     }
 }

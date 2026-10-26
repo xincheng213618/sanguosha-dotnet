@@ -81,8 +81,14 @@ public sealed partial class GameEngine
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 47801)]
     private bool IsIssuedShiCdResponse(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId == ShiCdWanglie &&
         c.BindingId == "wanglie-response-complete" && context is { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } card } &&
+        _resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId) is ProgramCardTriggerWindowFrame
+            { Action.Type: CardActionType.Response, CompletedResponseReturn: { IsCommitted: false } response } window &&
+        window.Action.ActionId == card.CardActionId && window.Action.ActorSeat == c.OwnerSeat && card.ActorSeat == c.OwnerSeat &&
+        window.Action.EffectiveKind == card.EffectiveKind && IsCompletedResponseUse(window.Action, response.Kind) &&
+        IsCompletedResponseParentConsistent(window) &&
         ProgramEventHistory<MobileShiWanglieUsedEvent>().Any(e => e.ActionId == card.CardActionId && e.OwnerSeat == c.OwnerSeat &&
-            ProgramEventHistory<MobileShiWanglieSelectedEvent>().Any(g => g.FrameId == e.SelectionId && g.Source.SkillInstanceId == c.SkillInstanceId && g.GameplayHash == c.GameplayHash));
+            ProgramEventHistory<MobileShiWanglieSelectedEvent>().Any(g => g.FrameId == e.SelectionId && g.Source.OwnerSeat == c.OwnerSeat &&
+                g.Source.SkillId == c.SkillId && g.Source.SkillInstanceId == c.SkillInstanceId && g.GameplayHash == c.GameplayHash));
     private IReadOnlyList<ProgramPublicRuleStateSnapshot> MobileShiChenDaoPublicStates(CharacterState owner, string skillId)
     {
         if (skillId is not (ShiCdWanglie or ShiCdHongyi)) return [];

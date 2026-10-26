@@ -5,7 +5,7 @@ using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.Tests;
 
-internal static class AnniversaryXiahouHuiChecks
+internal static partial class AnniversaryXiahouHuiChecks
 {
     private const string Hero = "anniversary:xiahou-hui", Dujun = "anniversary:dujun", Jikun = "anniversary:jikun",
         Driver = "fixture:xiahou-hui-driver", Counter = "fixture:xiahou-hui-counter", Watch = "fixture:xiahou-hui-watch",

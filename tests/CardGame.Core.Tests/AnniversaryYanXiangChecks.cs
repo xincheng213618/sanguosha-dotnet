@@ -7,6 +7,22 @@ using CardGame.Core.Campaigns;
 internal static class AnniversaryYanXiangChecks
 {
  private const string Hero="anniversary:yan-xiang",Yuzheng="anniversary:yuzheng",Suishi="anniversary:suishi",Peer="fixture:yan-xiang-peer-",NoDraw="fixture:yan-xiang-no-draw",Watch="fixture:yan-xiang-native-watch",Deck="fixture:yan-xiang-deck",Mode="identity:classic-yan-xiang";
+ public static void EndingNativePlansRespectExhaustedTrueUseQuotaCold()
+ {
+  var s=Scene.Start(false);s.UseYuzheng(0);s.Menu(AnniversaryYanXiangStage.Option);s.Answer(c=>Value(c)=="2");s.Play(0);
+  var quota=s.E<AnniversaryYanXiangLeaseEvent>().Single(e=>e.Option==2);
+  s.NativeKind(0,CardKind.Crossbow);s.Play(0);
+  for(var i=1;i<quota.Amount;i++){s.NativeKind(0,CardKind.Slash,3);s.Play(0);}
+  s.Need(s.E<CurrentTurnCardUseKindsRecordedEvent>().Skip(quota.UseCutoff).Count(e=>e.ActorSeat==0)==quota.Amount,
+   "The native ending test first spends the recipient's exact admitted true-use quota through real cards.");
+  s.End(0);s.Offer();s.Activate();s.Menu(AnniversaryYanXiangStage.DamageName);s.Answer(c=>Value(c)==CardKind.Slash.ToString());s.Menu(AnniversaryYanXiangStage.UseChoice);
+  var frame=s.Root!.Id;var issued=s.E<AnniversaryYanXiangUseIssuedEvent>().Length;
+  s.Need(s.P!.Choices is[{Parameters:var choice}]&&choice.GetValueOrDefault("verb")=="decline",
+   "Suishi publishes only decline when this actor cannot begin another true Use; its custom HE conversion cannot bypass the quota.");
+  s.Cold();s.Answer(c=>c.Parameters.GetValueOrDefault("verb")=="decline");
+  s.Reach(()=>s.E<AnniversaryYanXiangCompletedEvent>().Any(e=>e.FrameId==frame));
+  s.Need(s.E<AnniversaryYanXiangUseIssuedEvent>().Length==issued,"Cold unpaid decline never invents another accepted action or material payment.");
+ }
  public static void RecipientBranchesActualDiscardRewardAndRoundUseQuotaCold()
  {
   var s=Scene.Start(false);s.Play(0);var crossbow=s.V(0).Hand.Single(c=>c.Kind==CardKind.Crossbow).Id;
@@ -72,6 +88,8 @@ internal static class AnniversaryYanXiangChecks
    s.Need(s.G.GetLegalActions(3).All(a=>a.CardId!=black)&&s.G.GetLegalActions(3).Any(a=>a.CardId==red),"The injured role cannot use its black Peach, while its genuinely red usable Peach remains legal.");
    var extra=s.V(3).Hand.Single(c=>c.Kind==CardKind.Dodge).Id;s.End(3);s.Reach(()=>s.P is{Kind:DecisionKind.DiscardCards,PlayerSeat:3});s.Discard([extra]);
    s.Offer();s.Activate();s.Menu(AnniversaryYanXiangStage.DamageName);s.Answer(c=>Value(c)==CardKind.Duel.ToString());s.Menu(AnniversaryYanXiangStage.UseChoice);
+   s.Need(s.P!.Choices.Where(c=>c.Parameters.GetValueOrDefault("verb")=="use").All(c=>!c.Cards.Contains(black))&&
+    s.P.Choices.Any(c=>c.Cards.SequenceEqual([red])),"The actual foreign Suishi menu filters its still-banned black materials while retaining legal red native plans.");
    s.Need(s.P!.PlayerSeat==3,"At another role's Ending, the actual executor owns the material and native target choice.");
    s.Answer(c=>c.Cards.SequenceEqual([red])&&c.Targets.SequenceEqual([0]));s.Reach(()=>s.P?.SkillPrompt?.SkillId==Watch);
    var foreign=s.E<AnniversaryYanXiangUseIssuedEvent>().Last();var use=s.G.ResolutionStack.OfType<CardUseFrame>().Single(u=>u.Id==foreign.UseId);

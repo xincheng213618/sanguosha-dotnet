@@ -3,15 +3,17 @@ using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
 /// <summary>Visible executable build traits, not a promise that a conditional bonus currently applies.</summary>
-public sealed record WushuangBuildProfile(double InjuryDrawPerDamagePoint, double InjuryRecoverPerDamagePoint,
+public sealed partial record WushuangBuildProfile(double InjuryDrawPerDamagePoint, double InjuryRecoverPerDamagePoint,
     double SlashBurstBonus, bool SlashSealsTargetCards, double ProactiveHpCost)
 {
     internal static WushuangBuildProfile Read(IEnumerable<SkillProgram> programs)
     {
         double draw = 0, recover = 0, burst = 0, hpCost = 0;
         var seals = false;
+        var chainSynergy = false;
         foreach (var program in programs.DistinctBy(p => p.Id))
         {
+            chainSynergy |= ProgramMayBenefitFromChain(program);
             foreach (var trigger in program.Triggers)
             {
                 // Per-event damage and dying rescue do not establish a safe
@@ -44,7 +46,7 @@ public sealed record WushuangBuildProfile(double InjuryDrawPerDamagePoint, doubl
                 hpCost = Math.Max(hpCost, activation.Effects.Where(effect => DirectOwnerAmount(effect) &&
                     effect.Op is SkillProgramEffectOp.LoseHp or SkillProgramEffectOp.LoseHpUnclamped).Sum(effect => (double)effect.Amount));
         }
-        return new(draw, recover, burst, seals, hpCost);
+        return new(draw, recover, burst, seals, hpCost) { HasChainSynergy = chainSynergy };
     }
 
     private static bool DirectOwnerAmount(SkillProgramEffect effect) =>

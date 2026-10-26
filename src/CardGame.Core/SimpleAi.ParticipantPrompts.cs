@@ -11,6 +11,8 @@ public sealed partial class SimpleAiBrain
         foreach (var item in _nationalEnemySuspicion) copy._nationalEnemySuspicion.Add(item.Key, item.Value);
         if (_policyVersion >= AiDecisionPolicy.IdentityStrategyVersion)
             CopyIdentityEvidenceTo(copy);
+        if (_policyVersion >= AiDecisionPolicy.WushuangStrategyVersion)
+            CopyWushuangShopStateTo(copy);
         return copy;
     }
 

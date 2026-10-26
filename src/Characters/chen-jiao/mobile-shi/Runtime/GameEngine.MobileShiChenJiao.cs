@@ -218,14 +218,50 @@ public sealed partial class GameEngine
             _ => throw new InvalidOperationException("QingYan chose an unsupported virtual card kind."),
         };
         var useId = ++_resolutionSequence;
-        // The shown cards stay in hand; this declaration-level use has no entity.
+        var action = CaptureFactionAction(new CardActionContext(++_cardActionSequence,
+            _resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use,
+            f.OwnerSeat, f.OwnerSeat, null, null, null, kind, [f.OwnerSeat], [], [ChenJiaoSource(f)],
+            effectiveSuit: Suit.None, effectiveRank: 0));
+        // Showing is not payment. Keep the real zero-entity Use on its original
+        // skill parent so declared-use observers can inspect the actual action.
+        ReplaceRuntimeTop(f = f with { ChenJiao = r with { Stage = ChenJiaoStage.Issue, Kind = kind, UseId = useId } });
+        PushRuntimeFrame(new CardUseFrame(useId, f.OwnerSeat, 0, kind, [f.OwnerSeat], PhysicalCardIds: []) { Action = action });
+        if (TracksPlayCardHistory) AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
         AdvanceEventRulesAndQueueFact(new CardUseDeclaredEvent(useId, 0, kind, f.OwnerSeat));
         AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, kind, f.OwnerSeat, f.OwnerSeat));
         AdvanceEventRulesAndQueueFact(new ChenJiaoQingYanUsedEvent(f.Id, r.Round, f.OwnerSeat, r.Ordinal, kind, useId));
         AddLog("SkillTriggered", $"{_players[f.OwnerSeat].Name} 的“清严”视为使用了一张【{(kind == CardKind.Dodge ? "闪" : "无懈可击")}】。", f.OwnerSeat);
-        f = GetActiveProgramFrame(f.Id);
-        ReplaceRuntimeTop(f = f with { ChenJiao = f.ChenJiao! with { Kind = kind, UseId = useId } });
-        FinishChenJiaoOperation(GetActiveProgramFrame(f.Id));
+        TryMarkProgramUseCommitted(useId);
+        RecordActualPlayPhaseUse(action);
+        FinishCardUse(useId, new Card(0, kind, Suit.None, 0), kind);
+    }
+
+    [NativeUsePreparation(68100, 68100, nameof(ReturnChenJiaoQingYanUse))]
+    private bool PrepareChenJiaoQingYanUse(CardUseFrame use)
+    {
+        if (use.CardId != 0 || use.CardKind is not (CardKind.Dodge or CardKind.Nullification) ||
+            use.Action?.ConversionChain is not [var source] || source.SkillId != QingYanSkill) return false;
+        var index = _resolutionStack.FindIndex(frame => frame.Id == use.Id);
+        if (index < 1 || _resolutionStack[index - 1] is not ProgramSkillFrame { ChenJiao: { Operation: "qingyan", Stage: ChenJiaoStage.Issue } receipt } parent ||
+            receipt.UseId != use.Id || receipt.Kind != use.CardKind || source != ChenJiaoSource(parent) ||
+            _contentRegistry.GetSkill(parent.SkillId).Program?.GameplayHash != parent.GameplayHash ||
+            use.SourceSeat != parent.OwnerSeat || use.Action is not { Type: CardActionType.Use } action ||
+            action.ActorSeat != parent.OwnerSeat || action.ProviderSeat != parent.OwnerSeat || action.RequesterSeat is not null ||
+            action.EffectiveKind != use.CardKind || action.PhysicalCards.Count != 0 || use.PhysicalCardIds is not { Count: 0 } ||
+            !action.TargetSeats.SequenceEqual([parent.OwnerSeat]) || !use.TargetSeats.SequenceEqual(action.TargetSeats) ||
+            ProgramEventHistory<ChenJiaoQingYanUsedEvent>().Count(fact => fact.FrameId == parent.Id && fact.UseId == use.Id &&
+                fact.Kind == use.CardKind && fact.OwnerSeat == parent.OwnerSeat && fact.Round == receipt.Round && fact.Ordinal == receipt.Ordinal) != 1 ||
+            ProgramEventHistory<CardUseFinishedEvent>().Count(fact => fact.ResolutionId == use.Id && fact.CardId == 0 && fact.CardKind == use.CardKind) != 1)
+            throw new InvalidOperationException("QingYan lost its exact original zero-entity use and skill parent.");
+        return true;
+    }
+
+    private void ReturnChenJiaoQingYanUse(CardUseFrame use)
+    {
+        if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { ChenJiao: { Operation: "qingyan", Stage: ChenJiaoStage.Issue } receipt } parent ||
+            receipt.UseId != use.Id || receipt.Kind != use.CardKind || use.Action?.ConversionChain is not [var source] || source != ChenJiaoSource(parent))
+            throw new InvalidOperationException("QingYan cannot return another or already-completed native use.");
+        FinishChenJiaoOperation(parent);
     }
 
     private void ResolveChenJiaoCeDuanShow(ProgramSkillFrame f, int holder, int cardId)

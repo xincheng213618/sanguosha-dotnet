@@ -2,6 +2,10 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
+    private bool IsSaoguPaidDestination(ProgramSkillFrame frame, CardMovementRecord movement) =>
+        movement.To == CardLocation.DiscardPile || IsWushuangShopDestroyedMaterial(movement) &&
+        ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Count(e => e.CardId == movement.CardId &&
+            e.MovementSequence == movement.Sequence && e.ParentFrameId == frame.Id) == 1;
     private bool ValidSaogu(ProgramSkillFrame f)
     {
         if (f.DuanJiongSaogu is not { } r || !HasDuanJiongSaoguCapability || f.SkillId != "ol:saogu" || r.Source != DuanJiongSource(f) || r.GameplayHash != f.GameplayHash ||
@@ -28,7 +32,7 @@ public sealed partial class GameEngine
             if (card is null || card.CardId != e.CardId || card.From != e.From || card.Kind != e.Kind || card.Suit != e.Suit || e.ActorSeat != (e.DelegateFee ? f.OwnerSeat : r.ActorSeat) ||
                 e.From.OwnerSeat != e.ActorSeat || e.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) ||
                 entities.Count(p => p.DelegateFee == e.DelegateFee && p.CardId == e.CardId) != 1 ||
-                _cardMovements.Count(m => m.Sequence == e.Sequence && m.CardId == e.CardId && m.CardKind == e.Kind && m.From == e.From && m.To == CardLocation.DiscardPile && m.Reason.Value == SaoguDiscardReason) != 1) return false;
+                _cardMovements.Count(m => m.Sequence == e.Sequence && m.CardId == e.CardId && m.CardKind == e.Kind && m.From == e.From && IsSaoguPaidDestination(f, m) && m.Reason.Value == SaoguDiscardReason) != 1) return false;
         }
         if (r.DelegateFee is not null && entities.Count(e => e.DelegateFee) != 1 || r.DelegateFee is null && entities.Any(e => e.DelegateFee) ||
             entities.Count(e => !e.DelegateFee) != r.Payments.Count || r.Ending && r.Stage != DuanJiongSaoguStage.DelegateChoice && (r.DelegateFee is null || r.ActorSeat == f.OwnerSeat)) return false;

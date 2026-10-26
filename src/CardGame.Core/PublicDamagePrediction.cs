@@ -7,7 +7,7 @@ public enum PublicHealthEffectKind { Damage, HpLoss, MaximumHpLoss, GrantArmor, 
 
 public sealed record PublicHealthEffect(PublicHealthEffectKind Kind, int Amount);
 
-public sealed record PublicDamagePrediction(int HpBefore, int ArmorBefore, int DamageAmount,
+public sealed partial record PublicDamagePrediction(int HpBefore, int ArmorBefore, int DamageAmount,
     int ArmorAbsorbed, int HpLossAmount, int HpAfter, int ArmorAfter, int MaxHpAfter,
     int DirectHpLossAmount = 0, int MaximumHpLossAmount = 0)
 {

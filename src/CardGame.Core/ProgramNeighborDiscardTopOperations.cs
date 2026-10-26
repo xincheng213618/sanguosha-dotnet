@@ -78,19 +78,27 @@ internal sealed class LoseHpIfRevealedNonEquipmentDiffersDescriptor : ProgramOpe
         {
             bool IsEquipmentCondition(SkillProgramEffect e) => e.Condition.Kind == SkillProgramConditionKind.BoundCardsMatchCategories &&
                 e.Condition.SourceBind == "equipment" && e.Condition.CardCategories.SequenceEqual([SkillProgramCardCategory.Equipment]);
+            var available = effects.Count == 8;
+            var offset = available ? 1 : 0;
+            var revealedBind = available ? "available-drawn" : "drawn";
             if (window != SkillProgramTriggerWindow.TurnEnding || subject != SkillProgramTriggerSubject.Owner ||
-                scope != SkillProgramTurnOwnerScope.OwnOrPreviousLiving || effects.Count != 7 ||
+                scope != SkillProgramTurnOwnerScope.OwnOrPreviousLiving || effects.Count is not (7 or 8) ||
                 effects[0] is not { Op: SkillProgramEffectOp.SelectTarget, TargetKind: SkillProgramTargetKind.AnyLiving, Condition.Kind: SkillProgramConditionKind.Always } ||
                 effects[1] is not { Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.SelectedTarget, Amount: 1,
                     ResultBind: "drawn", NumberExpression: null, Condition.Kind: SkillProgramConditionKind.Always } ||
-                effects[2] is not { Op: SkillProgramEffectOp.RevealBoundCards, SourceBind: "drawn", Condition.Kind: SkillProgramConditionKind.Always } ||
-                effects[3] is not { Op: SkillProgramEffectOp.FilterBoundCards, SourceBind: "drawn", ResultBind: "equipment", Condition.Kind: SkillProgramConditionKind.Always } ||
-                !effects[3].CardCategories.SequenceEqual([SkillProgramCardCategory.Equipment]) ||
-                effects[4] is not { Op: SkillProgramEffectOp.UseBoundCardByTarget, Target: SkillProgramEffectTarget.SelectedTarget, SourceBind: "equipment" } ||
-                !IsEquipmentCondition(effects[4]) ||
-                effects[5] is not { Op: SkillProgramEffectOp.Recover, Target: SkillProgramEffectTarget.SelectedTarget, Amount: 1, NumberExpression: null } ||
-                !IsEquipmentCondition(effects[5]) ||
-                comparison is not { Op: SkillProgramEffectOp.LoseHpIfRevealedNonEquipmentDiffers, SourceBind: "drawn", Condition.Kind: SkillProgramConditionKind.Always })
+                available && (effects[2] is not { Op: SkillProgramEffectOp.FilterBoundCards, SourceBind: "drawn", ResultBind: "available-drawn", AvailableAtSourceOnly: true,
+                    Condition.Kind: SkillProgramConditionKind.Always, TargetReference: null, MatchSuitOfBind: null } ||
+                    !effects[2].CardCategories.SequenceEqual([SkillProgramCardCategory.Basic, SkillProgramCardCategory.Trick, SkillProgramCardCategory.Equipment]) ||
+                    effects[2].Suits.Count + effects[2].EquipmentSlots.Count + effects[2].CardKinds.Count != 0) ||
+                effects[2 + offset] is not { Op: SkillProgramEffectOp.RevealBoundCards, Condition.Kind: SkillProgramConditionKind.Always } ||
+                effects[2 + offset].SourceBind != revealedBind ||
+                effects[3 + offset] is not { Op: SkillProgramEffectOp.FilterBoundCards, ResultBind: "equipment", Condition.Kind: SkillProgramConditionKind.Always } ||
+                effects[3 + offset].SourceBind != revealedBind || !effects[3 + offset].CardCategories.SequenceEqual([SkillProgramCardCategory.Equipment]) ||
+                effects[4 + offset] is not { Op: SkillProgramEffectOp.UseBoundCardByTarget, Target: SkillProgramEffectTarget.SelectedTarget, SourceBind: "equipment" } ||
+                !IsEquipmentCondition(effects[4 + offset]) ||
+                effects[5 + offset] is not { Op: SkillProgramEffectOp.Recover, Target: SkillProgramEffectTarget.SelectedTarget, Amount: 1, NumberExpression: null } ||
+                !IsEquipmentCondition(effects[5 + offset]) ||
+                comparison is not { Op: SkillProgramEffectOp.LoseHpIfRevealedNonEquipmentDiffers, Condition.Kind: SkillProgramConditionKind.Always } || comparison.SourceBind != revealedBind)
                 throw new InvalidOperationException($"Invalid skill program at {path}: own/previous Ending requires the exact draw/reveal/equipment/use/recovery/comparison composition.");
         }
     }

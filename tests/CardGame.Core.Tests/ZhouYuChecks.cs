@@ -3,7 +3,7 @@ using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
 
-internal static class ZhouYuChecks
+internal static partial class ZhouYuChecks
 {
     private const string Hero = "mobile:shi-zhou-yu",
         Quiet = "fixture:shi-zhou-yu-quiet", Keeper = "fixture:shi-zhou-yu-keeper",

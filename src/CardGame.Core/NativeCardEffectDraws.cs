@@ -11,6 +11,10 @@ public sealed record NativeCardEffectDrawReceipt(long NullificationFrameId, int 
     public long? AwaitingProgramFrameId { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public NativeDrawOutcome? Outcome { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public long? BypassedActionId { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? BypassedEffectOrdinal { get; init; }
 }
 
 public sealed partial record CardUseFrame
@@ -27,9 +31,19 @@ public sealed partial record CardsMovedTriggerWindowFrame
 
 public sealed record NativeCardEffectDrawStartedEvent(long UseFrameId, long NullificationFrameId,
     int EffectCardId, CardKind EffectCardKind, int RecipientSeat, int TargetIndex,
-    long? AwaitingProgramFrameId = null) : IGameEvent;
+    long? AwaitingProgramFrameId = null) : IGameEvent
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public long? BypassedActionId { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? BypassedEffectOrdinal { get; init; }
+}
 public sealed record NativeCardEffectDrawAppliedEvent(long UseFrameId, long NullificationFrameId,
-    int RecipientSeat, int ActualDrawCount, long SequenceBefore, long SequenceAfter) : IGameEvent;
+    int RecipientSeat, int ActualDrawCount, long SequenceBefore, long SequenceAfter) : IGameEvent
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? BypassedEffectOrdinal { get; init; }
+}
 
 public sealed partial class GameEngine
 {
@@ -40,16 +54,24 @@ public sealed partial class GameEngine
             pending.ActionKind != LegalActionKind.DrawTwo || pending.EffectCardKind != CardKind.DrawTwo ||
             use.NativeDraw is not null || use.NativeCardEffectDraw is not null || _pendingDecision is not null)
             throw new InvalidOperationException("DrawTwo requires its actual resolved effect and owning CardUse.");
+        if (pending.Id < 0 || pending.Id == 0 && (use.Action is null ||
+            !IsOriginalOrdinaryTrickCannotNullify(use.Id) && !IsYingboUnrespondable(use.Id) && !IsIssuedCardUnrespondable(use.Id)))
+            throw new InvalidOperationException("A windowless DrawTwo requires its exact already-issued native no-response policy.");
         var recipient = GetNullificationTargetSeat(pending) ?? pending.SourceSeat;
         var receipt = new NativeCardEffectDrawReceipt(pending.Id, pending.EffectCardId,
             pending.EffectCardKind, recipient, use.TargetIndex, NativeCardEffectDrawStage.Requesting)
-        { RequestedCount = WushuangDrawTwoCount(pending.SourceSeat), AwaitingProgramFrameId = _resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault() is { } parent &&
+        { RequestedCount = WushuangDrawTwoCount(pending.SourceSeat),
+            BypassedActionId = pending.Id == 0 ? use.Action!.ActionId : null,
+            BypassedEffectOrdinal = pending.Id == 0 ? 1 + ProgramEventHistory<NativeCardEffectDrawStartedEvent>()
+                .Count(fact => fact.UseFrameId == use.Id && fact.NullificationFrameId == 0) : null,
+            AwaitingProgramFrameId = _resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault() is { } parent &&
                 IsAwaitingProgramMovement(parent) ? parent.Id : null };
         ReplaceRuntimeTop(use with { NativeCardEffectDraw = receipt,
             NativeDraw = new NativeDrawProducerReceipt(0, receipt.RequestedCount, null, SkillProgramCardSetVisibility.Private, CardMoveReasons.Draw)
             { Recipients = [recipient], ReturnKind = NativeDrawAttemptReturnKind.CardUseDrawTwo } });
         AdvanceEventRulesAndQueueFact(new NativeCardEffectDrawStartedEvent(use.Id, pending.Id,
-            receipt.EffectCardId, receipt.EffectCardKind, recipient, use.TargetIndex, receipt.AwaitingProgramFrameId));
+            receipt.EffectCardId, receipt.EffectCardKind, recipient, use.TargetIndex, receipt.AwaitingProgramFrameId)
+            { BypassedActionId = receipt.BypassedActionId, BypassedEffectOrdinal = receipt.BypassedEffectOrdinal });
         ContinueNativeDrawTwo(use.Id);
         return true;
     }
@@ -77,7 +99,8 @@ public sealed partial class GameEngine
             ReplaceRuntimeTop(use = use with { NativeDraw = null, NativeCardEffectDraw = receipt = receipt with
                 { Stage = NativeCardEffectDrawStage.DrawingChildren, Outcome = outcome } });
             AdvanceEventRulesAndQueueFact(new NativeCardEffectDrawAppliedEvent(id, receipt.NullificationFrameId,
-                receipt.RecipientSeat, ids.Count, outcome.SequenceBefore, outcome.SequenceAfter));
+                receipt.RecipientSeat, ids.Count, outcome.SequenceBefore, outcome.SequenceAfter)
+                { BypassedEffectOrdinal = receipt.BypassedEffectOrdinal });
         }
         if (TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.NativeCardEffectDraw) ||
             TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.NativeCardEffectDraw) ||
@@ -131,13 +154,18 @@ public sealed partial class GameEngine
     private void AssertNativeCardEffectDraw(CardUseFrame use)
     {
         if (use.NativeCardEffectDraw is not { } receipt) return;
-        if (!HasNativeDrawAttemptCapability || receipt.RequestedCount is < 2 or > 3 || receipt.NullificationFrameId <= 0 ||
+        if (!HasNativeDrawAttemptCapability || receipt.RequestedCount is < 2 or > 3 || receipt.NullificationFrameId < 0 ||
+            (receipt.NullificationFrameId == 0 ? use.Action?.ActionId != receipt.BypassedActionId || receipt.BypassedActionId is not > 0 ||
+                receipt.BypassedEffectOrdinal is not > 0 ||
+                ProgramEventHistory<NativeCardEffectDrawStartedEvent>().Count(e => e.UseFrameId == use.Id && e.NullificationFrameId == 0) != receipt.BypassedEffectOrdinal :
+                receipt.BypassedActionId is not null || receipt.BypassedEffectOrdinal is not null) ||
             receipt.EffectCardKind != CardKind.DrawTwo || LeChengyanNativeEffectKind(use) != CardKind.DrawTwo ||
             !IsValidPlayerSeat(receipt.RecipientSeat) || receipt.TargetIndex != use.TargetIndex || !Enum.IsDefined(receipt.Stage) ||
             ProgramEventHistory<NativeCardEffectDrawStartedEvent>().Count(e => e.UseFrameId == use.Id &&
                 e.NullificationFrameId == receipt.NullificationFrameId && e.EffectCardId == receipt.EffectCardId &&
                 e.EffectCardKind == receipt.EffectCardKind && e.RecipientSeat == receipt.RecipientSeat &&
-                e.TargetIndex == receipt.TargetIndex && e.AwaitingProgramFrameId == receipt.AwaitingProgramFrameId) != 1 ||
+                e.TargetIndex == receipt.TargetIndex && e.AwaitingProgramFrameId == receipt.AwaitingProgramFrameId &&
+                e.BypassedActionId == receipt.BypassedActionId && e.BypassedEffectOrdinal == receipt.BypassedEffectOrdinal) != 1 ||
             receipt.AwaitingProgramFrameId is { } programId && !_resolutionStack.OfType<ProgramSkillFrame>()
                 .Any(parent => parent.Id == programId && IsAwaitingProgramMovement(parent)))
             throw new InvalidOperationException("A native card draw lost its once-issued resolved effect or recipient.");
@@ -163,7 +191,7 @@ public sealed partial class GameEngine
             ProgramEventHistory<NativeCardEffectDrawAppliedEvent>().Count(e => e.UseFrameId == use.Id &&
                 e.NullificationFrameId == receipt.NullificationFrameId && e.RecipientSeat == receipt.RecipientSeat &&
                 e.ActualDrawCount == result.ActualDrawIds.Count && e.SequenceBefore == result.SequenceBefore &&
-                e.SequenceAfter == result.SequenceAfter) != 1 ||
+                e.SequenceAfter == result.SequenceAfter && e.BypassedEffectOrdinal == receipt.BypassedEffectOrdinal) != 1 ||
             result.AttemptFrameId is { } attempt && ProgramEventHistory<NativeDrawAttemptDecidedEvent>().Count(e =>
                 e.AttemptFrameId == attempt && e.ParentFrameId == use.Id && e.RecipientSeat == receipt.RecipientSeat &&
                 e.RequestedCount == receipt.RequestedCount && e.Replaced == (result.Replacement is not null)) != 1)

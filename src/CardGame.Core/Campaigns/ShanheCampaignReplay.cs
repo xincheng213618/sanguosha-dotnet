@@ -110,8 +110,11 @@ public sealed record ShanheCampaignSnapshot(
         get => _openingSkillOffers;
         init => _openingSkillOffers = ShanheCampaignContent.Freeze(value);
     }
-    /// <summary>Refreshes left at the active shop; legacy fixed-stock shops have none.</summary>
+    /// <summary>Total free and paid refreshes left at the active random shop.</summary>
     public int ShopRefreshRemaining { get; init; }
+    /// <summary>Additional free refreshes left, independent from the ordinary or membership paid allowance.</summary>
+    public int ShopFreeRefreshRemaining { get; init; }
+    public int ShopPaidRefreshRemaining { get; init; }
     public int ShopRefreshCost { get; init; }
     /// <summary>Exact compensation for the currently published reward offer; zero outside it.</summary>
     public int RewardSkipGold { get; init; }

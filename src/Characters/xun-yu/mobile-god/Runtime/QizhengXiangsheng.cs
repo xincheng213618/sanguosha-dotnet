@@ -225,6 +225,19 @@ public sealed partial class GameEngine
         if (r.Stage != QizhengStage.Damage) throw new InvalidOperationException("Qizheng completed before its exact damage return.");
         UpdateLifecycleCardUse(use.Id, f => f with { Qizheng = null }); return false;
     }
+    // Complete this typed zero-material ordinary trick before unrelated native
+    // Slash finishers ask for their physical-card representation. The common
+    // attack-completion prelude still runs before this issued-use dispatch.
+    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 5)]
+    private bool FinishVirtualQizhengAttack(CardAttackHandle attack, out bool paused)
+    {
+        paused = false;
+        if (LifecycleCardUse(attack.ResolutionId) is not { CardId: 0, CardKind: CardKind.QizhengXiangsheng,
+                VirtualOrdinaryTrickOrigin: not null }) return false;
+        if (!FinishProgramVirtualOrdinaryAttack(attack, out paused))
+            throw new InvalidOperationException("A virtual Qizheng completion lost its exact native ordinary-trick origin.");
+        return true;
+    }
     [NativeFrameRoute(typeof(CardUseFrame), 51, typeof(QizhengRoutes), nameof(QizhengRoutes.HasReceipt))]
     private void ContinueQizheng(long id)
     { if (LifecycleCardUse(id) is { Qizheng.Stage: QizhengStage.Designation or QizhengStage.Response or QizhengStage.Gain } use) PublishQizheng(use); }
@@ -238,6 +251,34 @@ public sealed partial class GameEngine
         AnswerQizheng(choice); return true;
     }
     private bool HasQizhengProcessing(IReadOnlyList<Card> processing) => _resolutionStack.OfType<CardUseFrame>().Any(use => use.Qizheng is not null && processing.All(c => use.PhysicalCardIds?.Contains(c.Id) == true || use.Action?.PhysicalCards.Any(p => p.CardId == c.Id) == true));
+    private bool IsVirtualQizhengAttackConsistent(CardAttackHandle attack, IReadOnlyList<Card> processing)
+    {
+        if (LifecycleCardUse(attack.ResolutionId) is not { CardId: 0, CardKind: CardKind.QizhengXiangsheng,
+                PhysicalCardIds.Count: 0, Qizheng: { } receipt } use ||
+            !ValidProgramVirtualOrdinaryTrickUse(use) || processing.Count != 0 || attack.PhysicalCards.Count != 0 ||
+            attack.EffectiveCardKind != CardKind.QizhengXiangsheng || attack.CardUserSeat != use.SourceSeat ||
+            attack.SourceSeat != use.SourceSeat || attack.IsSourceLess || attack.IsDelayedJudgmentDamage ||
+            attack.ProgramSkillFrameId is not null || attack.ProgramJudgmentFrameId is not null ||
+            ActiveCardAttack is not { } current || !SameAttackOwner(current, attack)) return false;
+        AssertQizheng(use);
+        var appearance = GetCardAttackState(attack.ResolutionId);
+        if (appearance.CardId != 0 || appearance.AppearanceKind != CardKind.QizhengXiangsheng ||
+            appearance.AppearanceSuit != Suit.None || appearance.AppearanceRank != 0) return false;
+        // The native designation creates the attack before publishing the
+        // secret response menu. It remains owned by this use during an actual
+        // response/declaration child, before damage has been determined.
+        return receipt.Stage switch
+        {
+            QizhengStage.Response => receipt.ResponseKind is null && receipt.ResponseActionId == 0 &&
+                attack.TargetSeat == receipt.Target && !attack.DamageRedirected && !attack.IsChainPropagation,
+            QizhengStage.PaidResponse => receipt.ResponseKind is not null &&
+                attack.TargetSeat == receipt.Target && !attack.DamageRedirected && !attack.IsChainPropagation,
+            QizhengStage.Damage => receipt.Ambush &&
+                (receipt.ResponseKind is not { } response || !IsSlashCard(response)) &&
+                VirtualTrickDamageTargetMatches(use, attack, receipt.Target),
+            _ => false
+        };
+    }
     private void AssertQizheng(CardUseFrame use)
     {
         if (use.Qizheng is not { } r) return;

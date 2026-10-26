@@ -324,6 +324,8 @@ internal static class InvariantHistoryIndexChecks
         ActualDiscardRecoveryPhaseKey? Current() => (ActualDiscardRecoveryPhaseKey?)method.Invoke(game, []);
         Pending(game).Add(new ActualDiscardRecoveryPhaseStartedEvent(phase));
         Require(Current() == phase, "A pending real phase is visible before commit.");
+        using ((IDisposable)typeof(GameEngine).GetMethod("BeginActionQuery", Flags)!.Invoke(game, [])!)
+            Require(Current() == phase && Current() == phase, "One pure action read shares its exact actual phase.");
         CommitFacts(game);
         Pending(game).Add(new TurnStartedEvent(1, owner));
         Require(Current() == phase, "Unrelated pending facts cannot hide the latest committed phase.");

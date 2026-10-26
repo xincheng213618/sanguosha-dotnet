@@ -73,6 +73,8 @@ internal sealed partial class WushuangModeFeature : IMatchModeCommandHandler, IM
     private void CompleteAtLimit(string reason, bool clockExpired)
     {
         var survivors = _host.Players.Where(player => player.IsAlive).OrderByDescending(player => player.Hp).ToArray();
+        if (survivors.Any(player => player.Hp is null))
+            throw new InvalidOperationException("Wushuang survival adjudication requires one defined current HP value per living player.");
         var team = survivors.Length > 0 && (survivors.Length == 1 || survivors[0].Hp > survivors[1].Hp)
             ? survivors[0].TeamId : null;
         _host.RetirePendingMatch(team, (id, kind) => new WushuangResolutionCancelledEvent(id, kind),

@@ -4199,8 +4199,9 @@ public sealed class SkillProgramCatalog
         var valueZone = node.TryGetProperty("valueZone", out _)
             ? EnumValue<CardZoneKind>(node, "valueZone", path) : (CardZoneKind?)null;
         if (valueExpression == SkillRuleValueExpression.OwnerMaxHp &&
-            (operation != SkillRuleOperation.Add || query is not (SkillRuleQuery.HandLimit or SkillRuleQuery.InitialHandSize)))
-            Fail(path, "ownerMaxHp requires an additive hand-limit or initial-hand-size modifier");
+            !(query == SkillRuleQuery.HandLimit && operation is SkillRuleOperation.Add or SkillRuleOperation.Set ||
+                query == SkillRuleQuery.InitialHandSize && operation == SkillRuleOperation.Add))
+            Fail(path, "ownerMaxHp requires an additive or set hand-limit modifier, or an additive initial-hand-size modifier");
         if (query == SkillRuleQuery.InitialHandSize &&
             (recipientScope != SkillRuleRecipientScope.Owner || operation != SkillRuleOperation.Add ||
              !(valueExpression == SkillRuleValueExpression.OwnerMaxHp || valueExpression is null && value != 0)))
@@ -4249,7 +4250,9 @@ public sealed class SkillProgramCatalog
             (operation != SkillRuleOperation.Add || query != SkillRuleQuery.OutgoingDistance))
             Fail(path + ".valueExpression",
                 "negatedOwnedZoneCount is currently supported only by additive outgoingDistance modifiers");
-        if (valueExpression is not null && valueExpression is not (SkillRuleValueExpression.NegatedOwnedZoneCount or SkillRuleValueExpression.NegatedOwnerLostHp or SkillRuleValueExpression.NegatedLivingFemaleCount or SkillRuleValueExpression.NegatedCurrentRoundActualUseCount or SkillRuleValueExpression.OtherLivingPlayerCount) &&
+        if (valueExpression is not null &&
+            !(valueExpression == SkillRuleValueExpression.OwnerMaxHp && query == SkillRuleQuery.HandLimit && operation == SkillRuleOperation.Set) &&
+            valueExpression is not (SkillRuleValueExpression.NegatedOwnedZoneCount or SkillRuleValueExpression.NegatedOwnerLostHp or SkillRuleValueExpression.NegatedLivingFemaleCount or SkillRuleValueExpression.NegatedCurrentRoundActualUseCount or SkillRuleValueExpression.OtherLivingPlayerCount) &&
             (operation != SkillRuleOperation.Add || query != SkillRuleQuery.HandLimit &&
                 !(query == SkillRuleQuery.CardTargetCount && valueExpression == SkillRuleValueExpression.OwnerLostHp) &&
                 !(query is (SkillRuleQuery.IncomingDistance or SkillRuleQuery.OutgoingDistance) && valueExpression == SkillRuleValueExpression.OwnerMarkerCount) &&

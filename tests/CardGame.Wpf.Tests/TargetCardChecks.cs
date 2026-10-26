@@ -173,6 +173,20 @@ internal static class TargetCardChecks
                 Program.Assert(model.TargetCardRegions.Select(region => region.Zone).SequenceEqual(equipmentIds.Length == 0
                     ? [CardZoneKind.Hand] : new[] { CardZoneKind.Hand, CardZoneKind.Equipment }),
                     "Empty equipment and judgment regions must be absent from the same concrete-card picker.");
+                if (equipmentIds.Length == 0)
+                {
+                    foreach (var (width, height) in new[] { (1120, 740), (1600, 1000) })
+                    {
+                        using var host = CreatePickerHost(model, width, height);
+                        Program.Render(host.Root, width, height, Path.Combine(output, $"target-hand-only-compact-{effect.Split(':')[1]}-{width}.png"));
+                        var panel = (Border)host.Window.FindName("DecisionPanel");
+                        var picker = Program.Find<TargetCardPicker>(panel).Single();
+                        var pickerBottom = picker.TransformToAncestor(panel).Transform(new Point(0, picker.ActualHeight)).Y;
+                        Program.Assert(((ItemsControl)picker.FindName("TargetRegions")).Items.Count == 1 &&
+                            panel.ActualHeight - pickerBottom <= panel.Padding.Bottom + panel.BorderThickness.Bottom + 2,
+                            "A hand-only trick picker must end immediately after its occupied region, without reserving height for empty equipment or judgment zones.");
+                    }
+                }
                 var selected = choices.Last();
                 model.SelectPublicTargetChoiceCommand.Execute(selected);
                 Program.AdvanceToDecision(model);

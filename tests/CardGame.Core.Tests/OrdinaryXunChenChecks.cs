@@ -4,7 +4,7 @@ using CardGame.Content.Standard;
 using static BoundaryLiDianChecks;
 
 // Current OL Xun Chen: docs/content/sources/ol-xun-chen-2026-10-05.json.
-internal static class OrdinaryXunChenChecks
+internal static partial class OrdinaryXunChenChecks
 {
     private const string Fenglve = "ol:fenglve";
     private const string Moushi = "ol:moushi";
@@ -56,7 +56,7 @@ internal static class OrdinaryXunChenChecks
             c.Targets.SequenceEqual([seat]));
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool allFenglve = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-xc", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
@@ -65,7 +65,7 @@ internal static class OrdinaryXunChenChecks
             // Elevated fixture HP keeps the lord alive across the AI slash cycle (no peaches exist).
             b.AddGeneral(new("fixture:xc", "荀谌", "ol-xun-chen", Fenglve, "qun", 6, [Moushi]));
             for (var i = 1; i < 4; i++)
-                b.AddGeneral(new($"fixture:xc-{i}", "其他" + i, "supporter", "standard:none", "wei", 5, null));
+                b.AddGeneral(new($"fixture:xc-{i}", "其他" + i, "supporter", allFenglve ? Fenglve : "standard:none", "wei", 5, null));
             // Alternating hearts: ranks stay equal (pindian ties are losses) while
             // the AI still holds slashes it will play during its own turns.
             b.AddDeck(new("fixture:xc-deck", "固定", 4, 1, [])

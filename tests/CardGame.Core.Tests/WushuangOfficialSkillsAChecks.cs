@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.IO;
 using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
@@ -76,11 +77,32 @@ internal static class WushuangOfficialSkillsAChecks
         s.Need(s.G.CreateSnapshot(0).PrivateRevealedCards!.Count >= 5 && s.G.CreateSnapshot(1).PrivateRevealedCards is null or { Count: 0 },
             "Guanxu exposes the target hand and original top five only to its actual owner.");
         var before = s.V(2).HandCount;
+        var beforeDeck = s.G.CreateCardZoneDiagnostics().Where(card => card.Location == CardLocation.DrawPile)
+            .OrderByDescending(card => card.ZoneIndex).Select(card => card.CardId).ToArray();
+        var beforeHand = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Last().WushuangOriginalSkill!.Cards.ToArray();
+        var exchanged = s.P!.Choices.First(c => c.Parameters.GetValueOrDefault("option") == "guanxu-exchange" &&
+            s.G.CreateCardZoneDiagnostics().Single(z => z.CardId == c.Cards[0]).CardKind == CardKind.Duel && c.Cards[1] == beforeDeck[2]);
         s.Answer(c => c.Parameters.GetValueOrDefault("option") == "guanxu-exchange" &&
-            s.G.CreateCardZoneDiagnostics().Single(z => z.CardId == c.Cards[0]).CardKind == CardKind.Duel);
-        s.Reach(() => s.Stage == "guanxu-discard"); s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("option") == "guanxu-discard"); s.Play();
+            c.Id == exchanged.Id);
+        s.Reach(() => s.Stage == "guanxu-discard");
+        s.Need(s.G.CreateCardZoneDiagnostics().Where(card => card.Location == CardLocation.DrawPile)
+                .OrderByDescending(card => card.ZoneIndex).Select(card => card.CardId)
+                .SequenceEqual(beforeDeck.Select(id => id == exchanged.Cards[1] ? exchanged.Cards[0] : id)) &&
+            s.G.CreateSnapshot(0).PrivateRevealedCards!.Select(card => card.Id)
+                .SequenceEqual(beforeHand.Select(id => id == exchanged.Cards[0] ? exchanged.Cards[1] : id)) &&
+            s.G.CreateSnapshot(1).PrivateRevealedCards is null or { Count: 0 },
+            "The exchange replaces only the selected deck slot and retains the complete private hand in its displayed order for the separate discard stage.");
+        s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("option") == "guanxu-discard"); s.Play();
         s.Need(s.V(2).HandCount == before - 3 && s.G.CardMovements.Count(m => m.Reason.Value == "skill-program.wushuang:skill-3282.discard") == 3,
             "The optional exact exchange precedes the real mandatory same-suit triple discard.");
+
+        s = Scene.Start([3282]); s.Activate(3282, "inspect-and-exchange"); s.Reach(() => s.Stage == "begin");
+        s.Answer(c => c.Parameters.GetValueOrDefault("option") == "guanxu-target" && c.Targets.Single() == 2);
+        s.Reach(() => s.Stage == "guanxu-view"); s.Cold();
+        var movements = s.G.CardMovements.Count;
+        s.Answer(c => c.Parameters.GetValueOrDefault("option") == "finish"); s.Play();
+        s.Need(s.G.CardMovements.Count == movements && s.G.CreateSnapshot(0).PrivateRevealedCards is null or { Count: 0 },
+            "Canceling the inspection makes no exchange or discard, even when the viewed hand already has three cards of one suit.");
     }
     public static void ChoufaRewritesOnlyFrozenHandEntitiesWithoutInspectingTheirNames()
     {
@@ -187,8 +209,30 @@ internal static class WushuangOfficialSkillsAChecks
             "A use-only hand restriction permits Jinzhi's legal discard cost and its separate colorless virtual response.");
     }
 
-    private sealed class Scene(GameEngine game, ContentRegistry registry)
+    public static void JinzhiVirtualResponseCannotBeTakenAsFunanDiscardMaterialCold()
     {
+        var s = Scene.Start([3252], activeEnemy: true, enemyFunan: true);
+        s.End(); s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge });
+        var sourceSeat = s.P!.SourceSeat ?? throw new InvalidOperationException("The real incoming Slash must publish its source seat.");
+        s.Need(s.V(sourceSeat).GeneralId == "fixture:wushuang-a-enemy" &&
+            s.V(sourceSeat).Skills!.Any(skill => skill.ContentId == "classic:funan"), "The actual Slash source owns production Funan before its opponent's virtual response.");
+        s.Cold();
+        s.Answer(choice => choice.Parameters.GetValueOrDefault("response") == "extended-view-as" &&
+            choice.Parameters.GetValueOrDefault("conversion-skill-id") == "wushuang:skill-3252" && choice.Cards.Count == 1);
+        s.Reach(() => s.E<WushuangJinzhiPaidEvent>().Any()); s.Cold(); s.Play();
+        var paid = s.E<WushuangJinzhiPaidEvent>().Single();
+        s.Need(paid is { Ordinal: 1, Action.Type: CardActionType.Response } && paid.Action.OpponentSeat == sourceSeat &&
+            s.E<WushuangOriginalSkillDrawEvent>().Count(fact => fact.FrameId == paid.FrameId && fact.Requested == 1 && fact.Actual == 1) == 1 &&
+            !s.E<ProgramResponseEntityClaimedEvent>().Any(fact => fact.ClaimedActionId == paid.Action.ActionId) &&
+            paid.Action.PhysicalCards.All(cost => s.G.CardMovements.Count(move => move.CardId == cost.CardId &&
+                move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile && move.Reason.Value == "skill-program.wushuang.jinzhi.discard") == 1),
+            "Funan cannot take the unrelated physical discard cost of a zero-entity Jinzhi Dodge before its actual once-paid same-color invoice; the original response still pays, draws and returns once.");
+        s.Cold();
+    }
+
+    internal sealed class Scene(GameEngine game, ContentRegistry registry)
+    {
+        public ContentRegistry Registry => registry;
         public GameEngine G = game;
         public PendingDecision? P => Enumerable.Range(0, 4).Select(i => G.CreateSnapshot(i).PendingDecision).FirstOrDefault(p => p is not null);
         public string? Stage => G.ResolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()?.WushuangOriginalSkill?.Stage;
@@ -237,9 +281,9 @@ internal static class WushuangOfficialSkillsAChecks
             Need(before == SnapshotJson.Serialize(G.CreateSnapshot(0)), "Cold replay retains the exact owning skill, physical payment and current private prompt.");
         }
         public static Scene Start(int[] skills, bool activeEnemy = false, bool recoveryLoss = false, bool responseBan = false,
-            bool tauntSlash = false, bool equipmentOnly = false, bool extraPlay = false)
+            bool tauntSlash = false, bool equipmentOnly = false, bool extraPlay = false, bool enemyFunan = false)
         {
-            var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture(skills, activeEnemy, recoveryLoss, responseBan, extraPlay));
+            var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture(skills, activeEnemy, recoveryLoss, responseBan, extraPlay, enemyFunan));
             var hand = new[] { new ShanheStartingCard(CardKind.Slash, Suit.Heart, 7), new(CardKind.Peach, Suit.Heart, 3), new(CardKind.Duel, Suit.Club, 6), new(CardKind.Dodge, Suit.Heart, 7), new(CardKind.Dodge, Suit.Heart, 7), new(CardKind.Dodge, Suit.Heart, 7) };
             var enemy = activeEnemy ? new[] { new ShanheStartingCard(CardKind.DrawTwo, Suit.Heart, 3), new(CardKind.DrawTwo, Suit.Club, 4), new(CardKind.Slash, Suit.Diamond, 7) }
                 : new[] { new ShanheStartingCard(CardKind.Peach, Suit.Heart, 3), new(CardKind.Slash, Suit.Heart, 7), new(CardKind.Duel, Suit.Club, 6), new(CardKind.BaguaFormation, Suit.Heart, 2) };
@@ -253,7 +297,7 @@ internal static class WushuangOfficialSkillsAChecks
             var s = new Scene(g, r); s.Accept(new StartGameCommand()); s.Play(); return s;
         }
     }
-    private sealed class Fixture(int[] skills, bool activeEnemy, bool recoveryLoss, bool responseBan, bool extraPlay) : IGameContentPackage
+    private sealed class Fixture(int[] skills, bool activeEnemy, bool recoveryLoss, bool responseBan, bool extraPlay, bool enemyFunan) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-wushuang-a", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
@@ -266,6 +310,13 @@ internal static class WushuangOfficialSkillsAChecks
                 return SkillProgramCatalog.Load(rules.ReadToEnd(), presentation.ReadToEnd());
             }
             var official = Bundle("wushuang-skills-a"); var audit = Bundle("wushuang-audit-a");
+            if (enemyFunan)
+            {
+                var exchanged = Bundle("classic-xue-zong");
+                const string id = "classic:funan";
+                b.AddSkill(new(id, exchanged.Presentations[id].Name, exchanged.Presentations[id].Description)
+                    { Program = exchanged.Programs[id], ProgramPresentation = exchanged.Presentations[id] });
+            }
             foreach (var number in skills)
             { var id = "wushuang:skill-" + number; var cat = official.Programs.ContainsKey(id) ? official : audit; b.AddSkill(new(id, cat.Presentations[id].Name, cat.Presentations[id].Description) { Program = cat.Programs[id], ProgramPresentation = cat.Presentations[id], Tags = number is 3246 or 3265 or 3106 ? SkillTag.Locked : SkillTag.None }); }
             if (skills.Contains(3140))
@@ -296,7 +347,7 @@ internal static class WushuangOfficialSkillsAChecks
                 .Concat(recoveryLoss ? ["fixture:wushuang-a-recovery-loss"] : Array.Empty<string>()).ToArray()));
             foreach (var id in new[] { "fixture:wushuang-a-enemy", "fixture:wushuang-a-other", "fixture:wushuang-a-ally" })
                 b.AddGeneral(new(id, id, "", activeEnemy && id.EndsWith("enemy", StringComparison.Ordinal) ? "fixture:wushuang-a-range" : Quiet, "wei", 12,
-                    id.EndsWith("enemy", StringComparison.Ordinal) ? responseBan ? ["fixture:wushuang-a-response-ban"] : [] : ["fixture:wushuang-a-shield"]));
+                    id.EndsWith("enemy", StringComparison.Ordinal) ? responseBan ? ["fixture:wushuang-a-response-ban"] : enemyFunan ? ["classic:funan"] : [] : ["fixture:wushuang-a-shield"]));
             b.AddDeck(new("fixture:wushuang-a-deck", "固定红桃闪补牌", 0, 0, []) { PhysicalCards = Enumerable.Range(0, 96).Select(_ => new ContentDeckPhysicalCard("standard:dodge", Suit.Heart, 7)).ToArray() });
             b.AddMode(new(ShanheBattleSetup.BattleModeId, "单骑无双官方技能规则小局", 4, 4, new Dictionary<string, int>(), "fixture:wushuang-a-deck",
                 GeneralPoolIds: [Hero, "fixture:wushuang-a-enemy", "fixture:wushuang-a-other", "fixture:wushuang-a-ally"], ModeKind: ContentModeKind.Team,

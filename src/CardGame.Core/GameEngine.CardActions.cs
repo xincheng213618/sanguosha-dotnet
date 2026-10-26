@@ -931,7 +931,7 @@ public sealed partial class GameEngine
                      !_cardMovements.Any(m => IsHappyZuoCiDestroyedResponseFinish(frame.Action, cost, m)) &&
                      !(frame.Action.Type == CardActionType.Use && LifecycleCardUse(frame.ParentFrameId)?.Action is { } startingUse &&
                          startingUse.ActionId == frame.Action.ActionId && startingUse.PhysicalCards.Contains(cost) &&
-                         IsShanheStartingResourceDestroyedUseMaterial(frame.ParentFrameId, cost.CardId)) &&
+                         IsEphemeralCardDestroyedMaterial(frame.ParentFrameId, cost.CardId)) &&
                      !IsExchangedCardClaim(frame.Action.ActionId,cost.CardId) &&
                      !TryGetSiruiDestroyedResponseCost(frame.Action,cost.CardId,out _) &&
                      !(frame.Action.Type == CardActionType.Use && IsJiyunClaimedUseEntity(frame.ParentFrameId, cost.CardId)) &&
@@ -940,6 +940,7 @@ public sealed partial class GameEngine
                      !IsHappyFeifuClaimedResponseEntity(frame.Action, cost.CardId) &&
                      !IsSoleTargetQuarantinedMaterial(frame.ParentFrameId, cost.CardId) &&
                      GuanduChariotResponsePayment(frame.Action, frame.ParentFrameId, cost) is null &&
+                     !IsWushuangShopDestroyedNullificationPayment(frame.Action, frame.ParentFrameId, cost) &&
                      !(frame.Action.Type == CardActionType.Use &&
                        LifecycleCardUse(frame.ParentFrameId)?.Action is { } nativeAction &&
                        nativeAction.ActionId == frame.Action.ActionId && nativeAction.PhysicalCards.Contains(cost) &&

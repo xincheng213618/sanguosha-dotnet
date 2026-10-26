@@ -11,6 +11,8 @@ internal sealed partial class ResponseCompletionRuntime
     internal bool HasCardResponseCompletedObserver(CardActionContext action, ProgramCardContinuation continuation) =>
         action.Type == CardActionType.Response && IsResponseCompletionContinuation(continuation) &&
         (_facts.HasTriggerWindow(SkillProgramTriggerWindow.CardResponseCompleted) ||
+         _frames.Top is { } paidParent && action.PhysicalCards.Any(cost =>
+             _native.DestroyedEquipmentResponsePayment(action, paidParent.Id, cost, continuation) is not null) ||
          _native.HasJiyunResponseCompletion(action, continuation) ||
          action.PhysicalCards.Any(cost => _native.IsNativePublicPileOriginalActionCost(action, cost)) ||
          IsJueshengPaidDuelResponse(action, continuation) || _native.HasGuanduChariotResponsePayment(action, continuation) || _native.HasChenglieResponseObserver(action, continuation) ||
@@ -61,6 +63,8 @@ internal sealed partial class ResponseCompletionRuntime
         var paid = new List<CardMovementRecord>();
         foreach (var cost in a.PhysicalCards)
         {
+            if (_native.DestroyedEquipmentResponsePayment(a, parentFrameId, cost, continuation) is { } equipmentPayment)
+            { paid.Add(equipmentPayment); continue; }
             if (_native.GuanduChariotResponsePayment(a, parentFrameId, cost, continuation) is { } destroyed)
             { paid.Add(destroyed); continue; }
             if (_native.TryGetSiruiDestroyedResponseCost(a,cost.CardId,out var destroyedSirui))
@@ -154,6 +158,8 @@ internal sealed partial class ResponseCompletionRuntime
         if (window.ResponseCompletion is not { } r || !window.Action.PhysicalCards.Contains(cost)) return false;
         var records = r.NativeCosts.Where(m => m.CardId == cost.CardId).ToArray();
         if (records.Length == 0 || records.Any(m => !_facts.ContainsMovement(m) || m.CardKind != cost.CardKind)) return false;
+        if (_native.DestroyedEquipmentResponsePayment(window.Action, r.ParentFrameId, cost, r.OriginalContinuation) is { } equipmentPayment)
+            return records is [var originalEquipment] && originalEquipment == equipmentPayment;
         if (_native.GuanduChariotResponsePayment(window.Action, r.ParentFrameId, cost, r.OriginalContinuation) is { } destroyed)
             return records is [var only] && only == destroyed;
         if (_native.TryGetSiruiDestroyedResponseCost(window.Action,cost.CardId,out var destroyedSirui))

@@ -14,7 +14,7 @@ public sealed partial class GameEngine
     }
 
     private bool DualColorSourceCurrent(ProgramSkillFrame frame) =>
-        _winner == Winner.None && _players[frame.OwnerSeat].IsAlive &&
+        _winner == Winner.None && _phase == TurnPhase.Play && _currentSeat == frame.OwnerSeat && _players[frame.OwnerSeat].IsAlive &&
         HasRuntimeSkillInstance(_players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId);
 
     private bool DualColorDraftMatches(ProgramSkillFrame frame)
@@ -24,8 +24,7 @@ public sealed partial class GameEngine
             frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats is not [var other] || other != draft.OtherSeat ||
             other == frame.OwnerSeat || !IsValidPlayerSeat(other) || draft.TurnNumber != _turnNumber ||
             string.IsNullOrWhiteSpace(frame.SkillId) || string.IsNullOrWhiteSpace(frame.ActivationId) ||
-            string.IsNullOrWhiteSpace(frame.SkillInstanceId) || string.IsNullOrWhiteSpace(frame.GameplayHash) ||
-            _phase != TurnPhase.Play || _currentSeat != frame.OwnerSeat)
+            string.IsNullOrWhiteSpace(frame.SkillInstanceId) || string.IsNullOrWhiteSpace(frame.GameplayHash))
             return false;
         var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!);
         return plan.Instructions is [{ Op: SkillProgramEffectOp.ChoosePrivateColorsDiscardAndDuel }] &&

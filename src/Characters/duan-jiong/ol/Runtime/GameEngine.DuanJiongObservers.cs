@@ -23,7 +23,7 @@ public sealed partial class GameEngine
             {
                 var actor = r.Stage == DuanJiongSaoguStage.DelegateChildren ? f.OwnerSeat : r.ActorSeat;
                 return moved.Batch.Movements.All(m => _cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After &&
-                    (moved.Batch.Id == r.PaidBatchId && r.Selected.Any(c => c.CardId == m.CardId && c.From == m.From) && m.To == CardLocation.DiscardPile && m.Reason.Value == SaoguDiscardReason ||
+                    (moved.Batch.Id == r.PaidBatchId && r.Selected.Any(c => c.CardId == m.CardId && c.From == m.From) && IsSaoguPaidDestination(f, m) && m.Reason.Value == SaoguDiscardReason ||
                     moved.Batch.ParentBatchId == r.PaidBatchId && m.From == CardLocation.WoodenOxGrain(actor) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard && r.WoodenOxGrainIds.Contains(m.CardId)));
             }
             if (r.Stage == DuanJiongSaoguStage.DrawChildren) return moved.Batch.Movements.All(m => _cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After &&

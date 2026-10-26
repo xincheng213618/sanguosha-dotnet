@@ -10,7 +10,7 @@ public sealed partial class MainViewModel
             TryReadConversionSource(choice.Parameters, out var source) && source == Source;
     }
 
-    private sealed record ResponseConversionDraft(string SkillId, ResponseConversionMode? Mode);
+    private sealed record ResponseConversionDraft(string SkillId, ResponseConversionMode? Mode, bool SelectByMaterials = false);
     private ResponseConversionDraft? _responseConversionSelection;
     private IReadOnlyList<ResponseConversionMode> _responseConversionOfferedModes = [];
     private IReadOnlyList<PromptChoice> _responseConversionModeChoices = [];
@@ -18,7 +18,13 @@ public sealed partial class MainViewModel
     private IReadOnlyList<ResponseConversionMode> _responseConversionModes = [];
 
     private bool IsResponseConversionSelectionPending => IsHandResponsePending && _responseConversionSelection is not null;
-    private bool IsResponseConversionPaymentPending => IsResponseConversionSelectionPending && _responseConversionSelection!.Mode is not null;
+    private bool IsResponseConversionPaymentPending => IsResponseConversionSelectionPending &&
+        (_responseConversionSelection!.Mode is not null || _responseConversionSelection.SelectByMaterials);
+
+    private bool CanSelectResponseConversionByMaterials(string skillId) => _snapshot.PendingDecision!.Choices
+        .Where(choice => TryReadConversionSource(choice.Parameters, out var source) && source.SkillId == skillId &&
+            ResponseConversionRule(choice) is not null)
+        .GroupBy(choice => string.Join(",", choice.Cards.Order())).All(group => group.Count() == 1);
 
     // Only the viewer's published hand/equipment payments enter this draft.
     // Public-pile and special response operations retain their own controls.
@@ -48,7 +54,9 @@ public sealed partial class MainViewModel
 
     private IEnumerable<PromptChoice> AvailableHandResponseChoices => _snapshot.PendingDecision!.Choices.Where(choice =>
         IsResponseConversionSelectionPending
-            ? choice.Cards.Count == 0 || _responseConversionSelection!.Mode?.Matches(choice) == true
+            ? choice.Cards.Count == 0 || (_responseConversionSelection!.SelectByMaterials
+                ? ResponseConversionModes.Any(mode => mode.Source.SkillId == _responseConversionSelection.SkillId && mode.Matches(choice))
+                : _responseConversionSelection.Mode?.Matches(choice) == true)
             : ResponseConversionRule(choice) is null);
 
     private bool TrySelectResponseConversion(HumanSkillViewModel skill)
@@ -59,7 +67,8 @@ public sealed partial class MainViewModel
         var cancel = _responseConversionSelection?.SkillId == id;
         ClearSelection();
         if (cancel) return true;
-        _responseConversionSelection = new(id, modes.Length == 1 ? modes[0] : null);
+        _responseConversionSelection = new(id, modes.Length == 1 ? modes[0] : null,
+            SelectByMaterials: modes.Length > 1 && CanSelectResponseConversionByMaterials(id));
         SetResponseConversionModeChoices(modes);
         RefreshResponseConversionDraft();
         return true;
@@ -68,7 +77,7 @@ public sealed partial class MainViewModel
     private void SetResponseConversionModeChoices(ResponseConversionMode[] modes)
     {
         _responseConversionOfferedModes = modes;
-        _responseConversionModeChoices = modes.Length == 1 ? [] : modes.Select((mode, index) =>
+        _responseConversionModeChoices = modes.Length == 1 || _responseConversionSelection?.SelectByMaterials == true ? [] : modes.Select((mode, index) =>
             new PromptChoice(new ChoiceId($"response-conversion-mode-{index}"),
                 $"{mode.Count}张牌当【{CardCatalog.Get(mode.Kind).DisplayName}】", [], [],
                 new Dictionary<string, string> { ["action"] = "select-response-conversion-mode", ["mode-index"] = index.ToString(System.Globalization.CultureInfo.InvariantCulture) })).ToArray();
@@ -101,7 +110,9 @@ public sealed partial class MainViewModel
     }
 
     private string ResponseConversionSelectionText => _responseConversionSelection is { } draft
-        ? $"已选择【{CurrentPresentationRegistry.GetSkill(draft.SkillId).Name}】· " + (draft.Mode is { } mode
+        ? $"已选择【{CurrentPresentationRegistry.GetSkill(draft.SkillId).Name}】· " + (draft.SelectByMaterials
+            ? "直接选择合法材料牌，按所选牌确定效果；确认后发动"
+            : draft.Mode is { } mode
             ? $"选择{mode.Count}张合法牌当【{CardCatalog.Get(mode.Kind).DisplayName}】；确认后发动"
             : "请选择转化方式，再选择材料牌") : string.Empty;
 
@@ -126,7 +137,7 @@ public sealed partial class MainViewModel
         }
         else if (draft.Mode is null && !_responseConversionOfferedModes.SequenceEqual(modes))
         {
-            if (modes.Length == 1)
+            if (modes.Length == 1 && !draft.SelectByMaterials)
             {
                 _responseConversionSelection = draft with { Mode = modes[0] };
                 _paymentSnapshot = null;

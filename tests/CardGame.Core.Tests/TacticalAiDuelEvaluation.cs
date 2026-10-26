@@ -23,8 +23,14 @@ internal static class TacticalAiDuelEvaluation
         int pairs = 12,
         int baselinePolicy = AiDecisionPolicy.CooperativeCategoryGiftVersion,
         int? candidatePolicy = null,
-        int firstPair = 0)
+        int firstPair = 0,
+        string profile = "mixed", string? wushuangPoolSnapshot = null)
     {
+        profile = profile.ToLowerInvariant();
+        if (profile is "wushuang" or "wushuang-smoke")
+            return WushuangAiDuelEvaluation.Run(output, pairs, baselinePolicy, candidatePolicy, firstPair, profile, wushuangPoolSnapshot);
+        if (wushuangPoolSnapshot is not null) throw new ArgumentException("A pinned general pool is available only for Wushuang evaluation.");
+        if (profile != "mixed") throw new ArgumentException("AI duel profile must be mixed, wushuang-smoke or wushuang.", nameof(profile));
         var candidate = candidatePolicy ?? AiDecisionPolicy.CurrentVersion;
         if (pairs is < 1 or > 120)
             throw new ArgumentOutOfRangeException(nameof(pairs), "The diagnostic accepts 1 to 120 paired setups.");

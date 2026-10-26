@@ -254,7 +254,7 @@ public sealed partial class GameEngine
                     !IsOriginalDyingSuspendedByHappyGuardElai(frame) &&
                     !IsOriginalDyingSuspendedByDeathGrowth(frame) && !IsOriginalDyingSuspendedByHeJinYanhuo(frame) &&
                     !IsOriginalDyingSuspendedByHellKing(frame) && !IsOriginalDyingSuspendedByWenhePoison(frame) &&
-                    !IsOriginalDyingSuspendedByRecoveryDamage(frame) && !IsOriginalDyingSuspendedByDiou(frame) &&
+                    !IsOriginalDyingSuspendedByRecoveryDamage(frame) && !IsOriginalDyingSuspendedByMobileJwShenpei(frame) && !IsOriginalDyingSuspendedByDiou(frame) &&
                     !IsOriginalDyingSuspendedByWuZishengMovement(frame) && !MouXiaoQiaoOl.PublicRevealSuspends(frame.Id)) return frame;
             return null;
         }
@@ -880,6 +880,8 @@ public sealed partial class GameEngine
 
         if (command.EquipmentKind == CardKind.ZhangbaSerpentSpear && ValidateNextActualUseZhangba(actor, cardIds, targets) is { } adjustedError)
             return Reject(adjustedError.Code, adjustedError.Message);
+        if (!MatchesPublishedCardGroupTarget(action, cardIds, targets))
+            return Reject(CommandErrorCode.InvalidTarget, "The selected materials cannot be used against this target.");
         if (command.EquipmentKind == CardKind.ZhangbaSerpentSpear && IsTurnPhysicalUseForbidden(actor.Seat, cardIds))
             return Reject(CommandErrorCode.IllegalAction, "The effective suit of this card use is forbidden this turn.");
 
@@ -3035,6 +3037,9 @@ public sealed partial class GameEngine
 
     private void BeginTurnStartAfterProgramLifecycle(CharacterState current)
     {
+        // The original Preparation child and its lifecycle have returned. A
+        // lethal native use can already have decided the game in that child.
+        if (_winner != Winner.None) return;
         if (RuntimeHooks.TryAdvance(ProgramRuntimePhase.BeforeJudgmentPhase)) return;
         if (TryBeginActualPhaseEnd(ActualDiscardRecoveryPhaseKind.Preparation, ActualPhaseEndContinuation.Preparation)) return;
         if (_pendingTurnDelayedEffects.HasFlag(DelayedTurnEffects.SkipJudgmentPhase))
@@ -3070,6 +3075,8 @@ public sealed partial class GameEngine
 
     private void CompleteTurnStart(CharacterState current, DelayedTurnEffects delayedEffects, bool skippedActualJudgment = false)
     {
+        // Judgment-ending children can likewise finish the game before Draw.
+        if (_winner != Winner.None) return;
         if (!skippedActualJudgment && TryBeginActualPhaseEnd(ActualDiscardRecoveryPhaseKind.Judgment,
                 ActualPhaseEndContinuation.Judgment, (int)delayedEffects)) return;
         if (ConsumeKuanshiDrawSkip(current.Seat))
@@ -3551,6 +3558,8 @@ public sealed partial class GameEngine
             {
                 throw new InvalidOperationException("The equipment-effect selection is invalid.");
             }
+            if (!MatchesPublishedCardGroupTarget(action, cardIds, targets))
+                throw new InvalidOperationException("The equipment-effect materials have no published compatible target.");
 
             if (action.EquipmentKind == CardKind.WoodenOx)
             {
@@ -4259,6 +4268,12 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("The selected Nullification card is not in the responder's hand.");
         }
         ValidateNullificationConversion(responder, card, selectedConversionSource);
+        // This native path captures its response action explicitly below. Its
+        // selected source has now been validated, so consume this transient
+        // choice just as GetSelectedResponseConversion does for other replies.
+        // A declaration child returns above before reaching this payment path.
+        _selectedResponseConversion = null;
+        _hasSelectedResponseConversionChoice = false;
         if (selectedConversionSource is not null && ViewAsRule(selectedConversionSource) is { } usageRule &&
             (usageRule.TieredRoundConversion is not null || usageRule.UnusedOutputNameThisGame || usageRule.ConversionStateId is not null && usageRule.UsesPerPhase is not null)) ConsumeProgramViewAsUsage([selectedConversionSource]);
 
@@ -4270,12 +4285,15 @@ public sealed partial class GameEngine
         var responseFrom = FindOwnedCardLocation(responder, card);
         var responseCostIsRed = CapturePhysicalCardColor(responder.Seat,card);
         var completedResponseUseSuit = FreezeCompletedResponseUseSuit(responder, [card], CardKind.Nullification);
+        var responsePaymentBefore = _movementSequence;
         MoveCard(
             card,
             responseFrom,
             CardLocation.Processing,
             CardMoveReasons.Nullification, disclosure: CardMovementDisclosure.FaceUp);
-        if (!IsSiruiOutsideResponseMaterial(pending.Id,card.Id))
+        if (!IsSiruiOutsideResponseMaterial(pending.Id,card.Id) &&
+            !IsWushuangShopDestroyedNullificationPayment(pending.Id, responder.Seat,
+                new(card.Id, card.Kind, responseFrom, responseCostIsRed), responsePaymentBefore))
         MoveCard(
             card,
             CardLocation.Processing,
@@ -4379,11 +4397,13 @@ public sealed partial class GameEngine
         if (pending.EffectNullified && !HasCurrentCardEnhancement(pending.ParentFrameId, CurrentCardEnhancement.Uncancelable))
         {
             if (TryCompleteCanceledNativeSlashTargetDuel(pending)) return;
-            foreach (var physicalCard in GetCardUsePhysicalCards(pending.ParentFrameId))
+            var finishedPhysicalCards = GetCardUsePhysicalCards(pending.ParentFrameId);
+            var beforeFinishMovement = _movementSequence;
+            foreach (var physicalCard in finishedPhysicalCards)
             {
                 MoveFinishedTrickCard(pending.ParentFrameId, physicalCard);
             }
-            WushuangClaimNullifiedTrick(pending);
+            WushuangClaimNullifiedTrick(pending, finishedPhysicalCards, beforeFinishMovement);
             AddLog(
                 "CardEffect",
                 $"【{CardCatalog.Get(pending.EffectCardKind).DisplayName}】的效果被无懈。",
@@ -5332,10 +5352,12 @@ public sealed partial class GameEngine
     {
         if (PlaceOriginalUseLightning(pending)) return;
         if (TrySkipAnniversaryCuiLieDelayedTarget(pending)) return;
-        if (IsClaimedUseCardEntity(pending.ParentFrameId, pending.EffectCardId))
+        if (IsClaimedUseCardEntity(pending.ParentFrameId, pending.EffectCardId) ||
+            _cardZones.GetLocation(pending.EffectCardId) == CardLocation.OutsideGame &&
+            IsEphemeralCardDestroyedMaterial(pending.ParentFrameId, pending.EffectCardId))
         {
             FinishCardUse(pending.ParentFrameId, GetNullificationEffectCard(pending), pending.EffectCardKind);
-            AddLog("CardEffect", "延时锦囊的原实体已被取得，不能置入判定区。", pending.SourceSeat);
+            AddLog("CardEffect", "延时锦囊的原实体已离开处理区，不能置入判定区。", pending.SourceSeat);
             return;
         }
         var source = _players[pending.SourceSeat];
@@ -5961,6 +5983,7 @@ public sealed partial class GameEngine
         if (!IsTianChouShandaoUse(group.ResolutionId) && !SkipTieredRoundZeroFinishedMovement(group.ResolutionId, group.Card) && !SkipDiouFinishedMovement(group.ResolutionId, group.Card) && !SkipMouXqJueyanFinishedMovement(group.ResolutionId, group.Card) &&
             !IsProgramVirtualOrdinaryTrickUse(group.ResolutionId) &&
             !IsClaimedUseCardEntity(group.ResolutionId, group.Card.Id) && !IsSiruiOutsideGeneralWeaponMaterial(group.ResolutionId,group.Card.Id) &&
+            !IsEphemeralCardDestroyedMaterial(group.ResolutionId, group.Card.Id) &&
             !(LifecycleCardUse(group.ResolutionId) is { } completedMaterialUse && TryFinishAnniversaryXunXuUseMaterials(completedMaterialUse)))
         {
             var cardLocation = _cardZones.GetLocation(group.Card.Id);
@@ -11050,7 +11073,9 @@ public sealed partial class GameEngine
         OriginalUseLightningAttachment? originalUseLightning = null,
         int? originalUseLightningExcludedCardId = null)
     {
-        if (ActiveJudgment is not null)
+        if (ActiveJudgment is { } originalJudgment &&
+            !CanBeginFinalizedDamageChildJudgment(originalJudgment, parentFrameId, targetSeat, reason,
+                continuation, programResultBind, programResultVisibility))
         {
             throw new InvalidOperationException("The engine cannot resolve two judgments at once.");
         }
@@ -11800,7 +11825,8 @@ public sealed partial class GameEngine
     }
 
     private int GetIceSwordTargetCardCount(CharacterState target, int actorSeat) =>
-        GetHand(target).Count + GetEquipment(target).Count(card =>
+        GetHand(target).Count(card => !IsForeignEquipmentDiscardPrevented(actorSeat, card,
+            CardLocation.Hand(target.Seat), OwnedCardMoveIntent.Discard)) + GetEquipment(target).Count(card =>
             !IsForeignEquipmentDiscardPrevented(actorSeat, card, CardLocation.Equipment(target.Seat), OwnedCardMoveIntent.Discard));
 
     private bool TryBeginIceSwordChoice(CardAttackHandle attack, int preventedDamageAmount)
@@ -11843,16 +11869,18 @@ public sealed partial class GameEngine
         var source = _players[attack.SourceSeat];
         var target = _players[attack.TargetSeat];
         var hand = GetHand(target);
+        var handSlots = Enumerable.Range(0, hand.Count).Where(slot => !IsForeignEquipmentDiscardPrevented(
+            source.Seat, hand[slot], CardLocation.Hand(target.Seat), OwnedCardMoveIntent.Discard)).ToArray();
         var equipment = GetEquipment(target).Where(card => !IsForeignEquipmentDiscardPrevented(
             source.Seat, card, CardLocation.Equipment(target.Seat), OwnedCardMoveIntent.Discard)).ToArray();
-        if (hand.Count + equipment.Length == 0)
+        if (handSlots.Length + equipment.Length == 0)
         {
             FinishIceSwordPrevention(pending);
             return;
         }
 
         var choices = new List<PromptChoice>();
-        for (var slot = 0; pending.Activated && slot < hand.Count; slot++)
+        foreach (var slot in pending.Activated ? handSlots : [])
         {
             choices.Add(new PromptChoice(
                 new ChoiceId($"ice-sword.hand-slot-{slot}.resolution-{attack.ResolutionId}.pick-{pending.DiscardedCardIds.Count + 1}"),
@@ -13548,7 +13576,7 @@ public sealed partial class GameEngine
 
         foreach (var physicalCard in group.PhysicalCards)
         {
-            if (IsClaimedUseCardEntity(group.ResolutionId, physicalCard.Id)) continue;
+            if (IsClaimedUseCardEntity(group.ResolutionId, physicalCard.Id) || IsEphemeralCardDestroyedMaterial(group.ResolutionId, physicalCard.Id)) continue;
             var cardLocation = _cardZones.GetLocation(physicalCard.Id);
             if (cardLocation == CardLocation.Processing)
             {
@@ -13616,6 +13644,7 @@ public sealed partial class GameEngine
         if (!IsTianChouShandaoUse(group.ResolutionId) && !SkipTieredRoundZeroFinishedMovement(group.ResolutionId, group.Card) && !SkipDiouFinishedMovement(group.ResolutionId, group.Card) && !SkipMouXqJueyanFinishedMovement(group.ResolutionId, group.Card) &&
             !IsProgramVirtualOrdinaryTrickUse(group.ResolutionId) &&
             !IsClaimedUseCardEntity(group.ResolutionId, group.Card.Id) && !IsSiruiOutsideGeneralWeaponMaterial(group.ResolutionId,group.Card.Id) &&
+            !IsEphemeralCardDestroyedMaterial(group.ResolutionId, group.Card.Id) &&
             !(LifecycleCardUse(group.ResolutionId) is { } completedMaterialUse && TryFinishAnniversaryXunXuUseMaterials(completedMaterialUse)))
         {
             var cardLocation = _cardZones.GetLocation(group.Card.Id);
@@ -14264,6 +14293,7 @@ public sealed partial class GameEngine
         IReadOnlyList<int>? physicalCardIds = null, bool ignoreDistance = false,
         CardConversionSource? conversionSource = null, bool actualUnconvertedPhysical = false, bool countsTowardLimit = true)
     {
+        if (!target.IsAlive || target.Seat == source.Seat) return false;
         if (!TargetRules.AllowsSlash(new(source, target, effectiveKind, conversionSource, physicalCardIds))) return false;
         if (IsProgramMaterialUseForbidden(source.Seat, effectiveKind, physicalCardIds ?? [])) return false;
         ignoreDistance |= IsMoGangquanSource(conversionSource);
@@ -14279,8 +14309,6 @@ public sealed partial class GameEngine
         }
         return TargetRules.AllowsNativeUseMaterial(new(source.Seat, effectiveKind, physicalCardIds ?? [], conversionSource)) &&
         !IsCardUseForbidden(source.Seat, effectiveKind, CardActionType.Use) &&
-        target.IsAlive &&
-        target.Seat != source.Seat &&
         CanSpendSlashUse(source, target, ignoresCount: !countsTowardLimit || HasPhaseSuitAllowance(source.Seat,physicalSuit), effectiveKind, effectiveRank: effectiveRank, physicalCardIds: physicalCardIds, effectiveSuit: physicalSuit) &&
         (ignoreDistance || DistanceRules.AllowsSlashDistance(ProgramDistanceStage.VirtualSlash,
             new(source, target, effectiveKind, Conversion: conversionSource, PhysicalCardIds: physicalCardIds,
@@ -14606,12 +14634,8 @@ public sealed partial class GameEngine
 
             if (selectedPhysicalCardId is null && CanUseZhangbaSerpentSpear(actor))
             {
-                var targets = SlashKinds
-                    .SelectMany(kind => _players.Where(target => GetZhangbaSlashPairs(actor).Any(pair => CanUseVirtualSlashTarget(actor, target, kind, PhysicalGroupSuit(actor,pair), PhysicalGroupColor(actor,pair), ZhangbaSpecificSlashRank(actor,pair), pair.Select(c=>c.Id).ToArray()))))
-                    .Select(target => target.Seat)
-                    .Distinct()
-                    .Order()
-                    .ToArray();
+                var groupTargets = GetZhangbaSlashGroupTargets(actor);
+                var targets = groupTargets.Select(group => group.TargetSeat).Distinct().Order().ToArray();
                 if (targets.Length > 0)
                 {
                     actions.Add(new LegalAction(
@@ -14625,8 +14649,9 @@ public sealed partial class GameEngine
                         MaxTargetCount: 1,
                         EquipmentKind: CardKind.ZhangbaSerpentSpear)
                     {
-                        SelectableCardIds = physicalPlayableCards.Where(card => !IsWuZglCopyBlocked(actor.Seat, card.Id)).Select(card => card.Id).Order().ToArray(),
-                        SelectableTargetSeats = targets
+                        SelectableCardIds = groupTargets.SelectMany(group => group.CardIds).Distinct().Order().ToArray(),
+                        SelectableTargetSeats = targets,
+                        SelectableCardGroupTargets = groupTargets
                     });
                 }
             }
@@ -16203,6 +16228,9 @@ public sealed partial class GameEngine
 
     private void CompleteDiscardPhaseAfterProgramWindow(CharacterState current)
     {
+        // A paid starting-window child may already have ended the game and
+        // retired its actual phase. Its native parent only needs to close.
+        if (_winner != Winner.None) return;
         if (_pendingTurnDelayedEffects.HasFlag(DelayedTurnEffects.SkipDiscardPhase))
         {
             if (_programPipelineHooks.TryBeginPhaseSkipped(new(current.Seat, _turnNumber, SkillProgramTurnPhase.Discard,
@@ -17694,7 +17722,7 @@ public sealed partial class GameEngine
             (ShenDaCuixinAncestorProcessing(nativeGroup.ResolutionId) ?? MouZyNativeAncestorProcessing(nativeGroup.ResolutionId) ?? MouXqNativeAncestorProcessing(nativeGroup.ResolutionId) ?? DiouNativeAncestorProcessing(nativeGroup.ResolutionId)) is { } diouGroupAncestors
             ? processing.Where(card => !diouGroupAncestors.Contains(card.Id)).ToArray() : processing;
         if (ActiveGroupCard is { Effect: GroupCardEffect.Recovery } recoveryGroup &&
-            (IsZeroEntityUse(recoveryGroup.ResolutionId) || IsClaimedUseCardEntity(recoveryGroup.ResolutionId, recoveryGroup.Card.Id) ? groupProcessing.Count != 0 :
+            (IsZeroEntityUse(recoveryGroup.ResolutionId) || IsClaimedUseCardEntity(recoveryGroup.ResolutionId, recoveryGroup.Card.Id) || IsEphemeralCardDestroyedMaterial(recoveryGroup.ResolutionId, recoveryGroup.Card.Id) ? groupProcessing.Count != 0 :
                 groupProcessing.Count != 1 || groupProcessing[0].Id != recoveryGroup.Card.Id))
         {
             throw new InvalidOperationException(
@@ -17702,8 +17730,8 @@ public sealed partial class GameEngine
         }
 
         if (ActiveGroupCard is { Effect: GroupCardEffect.PublicDraft } publicDraft &&
-            (groupProcessing.Count != (IsZeroEntityUse(publicDraft.ResolutionId) || IsClaimedUseCardEntity(publicDraft.ResolutionId, publicDraft.Card.Id) ? 0 : 1) + publicDraft.RevealedCardIds.Count ||
-             !IsZeroEntityUse(publicDraft.ResolutionId) && !IsClaimedUseCardEntity(publicDraft.ResolutionId, publicDraft.Card.Id) && groupProcessing.All(card => card.Id != publicDraft.Card.Id) ||
+            (groupProcessing.Count != (IsZeroEntityUse(publicDraft.ResolutionId) || IsClaimedUseCardEntity(publicDraft.ResolutionId, publicDraft.Card.Id) || IsEphemeralCardDestroyedMaterial(publicDraft.ResolutionId, publicDraft.Card.Id) ? 0 : 1) + publicDraft.RevealedCardIds.Count ||
+             !IsZeroEntityUse(publicDraft.ResolutionId) && !IsClaimedUseCardEntity(publicDraft.ResolutionId, publicDraft.Card.Id) && !IsEphemeralCardDestroyedMaterial(publicDraft.ResolutionId, publicDraft.Card.Id) && groupProcessing.All(card => card.Id != publicDraft.Card.Id) ||
              publicDraft.RevealedCardIds.Any(cardId => groupProcessing.All(card => card.Id != cardId))))
         {
             throw new InvalidOperationException(
@@ -17856,7 +17884,8 @@ public sealed partial class GameEngine
             var expectedSelectionProcessing = IsZeroEntityProcessingParent(targetCardSelection.ParentFrameId, targetCardSelection.EffectCardId) ||
                 targetCardSelection.EffectCardId == 0 && IsProgramVirtualOrdinaryTrickUse(targetCardSelection.ParentFrameId) ||
                 IsClaimedUseCardEntity(targetCardSelection.ParentFrameId, targetCardSelection.EffectCardId) ||
-                IsMouLixianRemovedMaterial(targetCardSelection.ParentFrameId, targetCardSelection.EffectCardId)
+                IsMouLixianRemovedMaterial(targetCardSelection.ParentFrameId, targetCardSelection.EffectCardId) ||
+                IsEphemeralCardDestroyedMaterial(targetCardSelection.ParentFrameId, targetCardSelection.EffectCardId)
                     ? Array.Empty<int>() : new[] { targetCardSelection.EffectCardId };
             if (!processing.Select(c => c.Id).Order().SequenceEqual(expectedSelectionProcessing.Concat(lixianParentProcessing ?? []).Order()))
             {
@@ -18077,7 +18106,9 @@ public sealed partial class GameEngine
             var iceSwordAttack = iceSword.Attack;
             var source = _players[iceSwordAttack.SourceSeat];
             var target = _players[iceSwordAttack.TargetSeat];
-            var handCount = GetHand(target).Count;
+            var targetHand = GetHand(target);
+            var legalHandSlots = Enumerable.Range(0, targetHand.Count).Where(slot => !IsForeignEquipmentDiscardPrevented(
+                iceSwordAttack.SourceSeat, targetHand[slot], CardLocation.Hand(target.Seat), OwnedCardMoveIntent.Discard)).ToArray();
             var equipmentIds = GetEquipment(target).Where(card => !IsForeignEquipmentDiscardPrevented(
                 iceSwordAttack.SourceSeat, card, CardLocation.Equipment(target.Seat), OwnedCardMoveIntent.Discard))
                 .Select(card => card.Id).ToArray();
@@ -18085,7 +18116,7 @@ public sealed partial class GameEngine
             var discardChoices = decision?.Choices.Where(choice =>
                 choice.Parameters.GetValueOrDefault("action") == "ice-sword-discard").ToArray() ?? [];
             var expectedSkipCount = iceSword.Activated ? 0 : 1;
-            var expectedHandCount = iceSword.Activated ? handCount : 0;
+            var expectedHandCount = iceSword.Activated ? legalHandSlots.Length : 0;
             var expectedEquipmentIds = iceSword.Activated ? equipmentIds : [];
             var handSlots = discardChoices
                 .Where(choice => choice.Parameters.GetValueOrDefault("target-zone") == "hand")
@@ -18109,7 +18140,7 @@ public sealed partial class GameEngine
                 discardChoices.Length != expectedHandCount + expectedEquipmentIds.Length ||
                 decision.Choices.Count != discardChoices.Length + expectedSkipCount * 2 ||
                 handSlots.Length != expectedHandCount ||
-                !handSlots.SequenceEqual(Enumerable.Range(0, expectedHandCount)
+                !handSlots.SequenceEqual((iceSword.Activated ? legalHandSlots : [])
                     .Select(slot => slot.ToString(System.Globalization.CultureInfo.InvariantCulture))) ||
                 discardChoices.Any(choice => !choice.Targets.SequenceEqual([target.Seat])) ||
                 decision.Choices.Count(choice =>
@@ -18724,6 +18755,7 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("A dying continuation must retain its active card resolution.");
         }
 
+        AssertFinalizedJudgmentDamageChildren();
         if (ActiveJudgment is { } pendingJudgment)
         {
             var programJudgmentFrame = _resolutionStack
@@ -19406,6 +19438,9 @@ public sealed partial class GameEngine
             else if (responseIds.Any(id => processing.All(card => card.Id != id))) return false;
             processing = processing.Where(card => !responseIds.Contains(card.Id)).ToArray();
         }
+        if (LifecycleCardUse(attack.ResolutionId) is { CardId: 0, CardKind: CardKind.QizhengXiangsheng,
+                Qizheng: not null, VirtualOrdinaryTrickOrigin: not null })
+            return IsVirtualQizhengAttackConsistent(attack, processing);
         if (LifecycleCardUse(attack.ResolutionId)?.HeJinMouzhu is not null)
             return IsHeJinMouzhuAttackConsistent(attack, processing);
         if (LifecycleCardUse(attack.ResolutionId)?.WuAnGuoLiyong is not null)
@@ -19568,8 +19603,9 @@ public sealed partial class GameEngine
                     IsNativeSlashTargetDuelAttack(attack)) &&
                    attack.PhysicalCards.Count == 1 &&
                    attack.PhysicalCards[0].Id == fangtian.Card.Id &&
-                   fangtianCardLocation.Zone is CardZoneKind.Processing or CardZoneKind.Hand or
-                       CardZoneKind.DrawPile or CardZoneKind.DiscardPile &&
+                   (fangtianCardLocation.Zone is CardZoneKind.Processing or CardZoneKind.Hand or
+                       CardZoneKind.DrawPile or CardZoneKind.DiscardPile ||
+                    IsEphemeralCardDestroyedMaterial(attack.ResolutionId, fangtian.Card.Id)) &&
                    processing.All(card => card.Id == fangtian.Card.Id);
         }
 

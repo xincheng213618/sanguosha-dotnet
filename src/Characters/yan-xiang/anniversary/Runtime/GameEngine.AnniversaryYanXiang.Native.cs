@@ -8,7 +8,7 @@ public sealed partial class GameEngine
  private IReadOnlyList<AnniversaryYanXiangPlan> YanXiangUsePlans(ProgramSkillFrame f)
  {
   var r=f.AnniversaryYanXiang!;var actor=_players[r.Actor];var result=new List<AnniversaryYanXiangPlan>();
-  if(!actor.IsAlive||_winner!=Winner.None||r.Name is not{} name)return [];
+  if(!actor.IsAlive||_winner!=Winner.None||r.Name is not{} name||YanXiangQuotaForbidden(actor.Seat))return [];
   foreach(var card in GetHand(actor).Concat(GetEquipment(actor)).OrderBy(c=>c.Id).Where(c=>!IsTurnHandCardRestricted(actor,c)&&!IsTurnPhysicalUseForbidden(actor.Seat,[c.Id])))
   {
    var from=_cardZones.GetLocation(card.Id);var suit=GetProgramEffectiveSuit(actor,card);var color=CapturePhysicalCardColor(actor.Seat,card);
@@ -17,6 +17,7 @@ public sealed partial class GameEngine
     var actions=new List<LegalAction>();
     foreach(var kind in SlashKinds)
     {
+     if(YanXiangColorBanned(actor.Seat,YanXiangUseColor(actor.Seat,kind,[card.Id],[r.Source])))continue;
      var targets=_players.Where(t=>CanUseVirtualSlashTarget(actor,t,kind,suit,color,card.Rank,[card.Id],conversionSource:r.Source)&&
       !IsDirectedCardTargetProhibited(actor.Seat,t.Seat,kind)&&!IsCardTargetProhibited(t,kind,suit,color)&&!HasBeneficiarySuitShield(actor.Seat,t.Seat,suit)).ToArray();
      foreach(var target in targets)actions.Add(new(LegalActionKind.Slash,card.Id,target.Seat,"邃识",kind,TargetSeats:[target.Seat]));
@@ -26,7 +27,7 @@ public sealed partial class GameEngine
     AddNextActualUseAdjustmentActions(actions,actor);
     result.AddRange(actions.Select(a=>new AnniversaryYanXiangPlan(card.Id,from,a.PlayedCardKind!.Value,a.Kind,Adjusted:a.ProgramActivationId==NextActualUseAdjustmentBinding){Targets=a.TargetSeats}));
    }
-   else
+   else if(!YanXiangColorBanned(actor.Seat,YanXiangUseColor(actor.Seat,name,[card.Id],[r.Source])))
     result.AddRange(BuildProgramOrdinaryTrickUseOptions(actor,name,suit,enforceUsePermission:true,beneficiaryShieldSuit:suit,actualEffectiveColor:color,hasActualColor:true,physicalCardIds:[card.Id],includeNextActualUseAdjustment:true,conversionSource:r.Source)
      .Select(o=>new AnniversaryYanXiangPlan(card.Id,from,o.EffectiveCardKind,o.ActionKind,o.TargetCardId,o.RequiredCardKind,o.NextActualUseAdjusted){Targets=GetImplicitSelfCardUseTargets(o.EffectiveCardKind,actor.Seat,o.TargetSeats)}));
   }
@@ -70,7 +71,9 @@ public sealed partial class GameEngine
   if(use.AnniversaryYanXiangUse is not{}o)return;
   var f=GetActiveProgramFrame(o.FrameId);var r=f.AnniversaryYanXiang!;
   if(!IsYanXiangNativeUse(use)||r.Returned||LifecycleCardUse(use.Id) is not null||ProgramEventHistory<CardUseFinishedEvent>().Count(e=>e.ResolutionId==use.Id&&e.CardId==o.CardId)!=1||
-   _cardMovements.Count(m=>m.CardId==o.CardId&&m.Sequence>r.Before&&m.From==o.From&&m.To==CardLocation.Processing&&m.Reason==CardMoveReasons.Use)!=1)throw new InvalidOperationException("Suishi cannot pay or retire another use, or complete the same use twice.");
+   _cardMovements.Count(m=>m.CardId==o.CardId&&m.Sequence>r.Before&&m.From==o.From&&m.Reason==CardMoveReasons.Use&&
+    (m.To==CardLocation.Processing||m.To==CardLocation.OutsideGame&&IsWushuangShopDestroyedMaterial(m)&&
+     ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Any(d=>d.CardId==m.CardId&&d.MovementSequence==m.Sequence&&d.ParentFrameId==use.Id)))!=1)throw new InvalidOperationException("Suishi cannot pay or retire another use, or complete the same use twice.");
   ReplaceRuntimeFrame(f.Id,f with{AnniversaryYanXiang=r with{Returned=true}});AdvanceEventRulesAndQueueFact(new AnniversaryYanXiangUseReturnedEvent(f.Id,use.Id,o.ActionId));
   if(use.CardAttack is not{Active:true})SettleYanXiangUse(GetActiveProgramFrame(f.Id));
  }

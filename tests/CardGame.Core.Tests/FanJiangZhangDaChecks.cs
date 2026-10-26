@@ -78,6 +78,29 @@ internal static class FanJiangZhangDaChecks
                 "Lifetime Slash ownership follows the real final actor chain, rather than the original physical provider or accepted-window count."); _ = Cold(g, r);
         }
     }
+    public static void JueshengCommittedZeroEntityKeepsCanonicalNoRankAcrossCapabilitiesCold()
+    {
+        foreach (var scene in new[] { "committed-null-rank", "committed-zero-rank" })
+        {
+            var (g, r) = Start(scene);
+            var hp = V(g, 1).Hp;
+            Juesheng(g, 1); Reach(g, () => P(g)?.SkillPrompt?.SkillId == Watch);
+            var origin = E<JueshengDuelIssuedEvent>(g).Single().Origin;
+            var use = g.ResolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == origin.UseId);
+            Need(use is { CardId: 0, CardKind: CardKind.Duel, PhysicalCardIds.Count: 0,
+                    Action: { PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: null, EffectiveIsRed: null } } &&
+                use.Action!.EffectiveRank == (scene == "committed-zero-rank" ? (int?)0 : null) &&
+                E<JueshengTargetDamageFrozenEvent>(g).Length == 0 && E<CardUseFinishedEvent>(g).All(fact => fact.ResolutionId != use.Id),
+                "The committed native zero-entity Duel keeps the actual captured no-rank form, its exact issued owner and receipt before any effect or finish.");
+            g = Cold(g, r); Continue(g); Play(g);
+            Need(V(g, 1).Hp == hp - 1 && E<JueshengTargetDamageFrozenEvent>(g) is [{ TargetSeat: 1, SlashCount: 0, Amount: 1 }] &&
+                E<CardUseFinishedEvent>(g).Count(fact => fact.ResolutionId == origin.UseId && fact.CardId == 0 && fact.CardKind == CardKind.Duel) == 1 &&
+                E<JueshengDuelReturnedEvent>(g).Count(fact => fact.UseId == origin.UseId) == 1 &&
+                E<JueshengSkillGrantedEvent>(g) is [{ RecipientSeat: 1 }] && E<JueshengCompletedEvent>(g).Count(fact => fact.UseId == origin.UseId) == 1,
+                "Cold committed return resolves exactly the original zero-entity Duel, freezes real lifetime damage and issues its then-clause once with either canonical no-rank form.");
+            _ = Cold(g, r);
+        }
+    }
     public static void JueshengWholeMultiTargetExtraEffectsAndTemporaryExpiryCold()
     {
         {
@@ -153,7 +176,10 @@ internal static class FanJiangZhangDaChecks
                     Recoveries = E<RecoveryAppliedEvent>(g), Losses = E<ProgramSkillHpLostEvent>(g), Dying = E<PlayerDyingEvent>(g), Deaths = E<PlayerDiedEvent>(g),
                     HealthBindings = E<ProgramBindingResolvedEvent>(g).Where(e => e.SkillId == Health), Granted = E<JueshengSkillGrantedEvent>(g), State = Diagnostic(g) });
                 Need(E<RecoveryAppliedEvent>(g).Any(e => e.TargetSeat == 0 && e.Amount == 1), "The actual Lion payment recovers its real original owner before the death child: " + proof);
-                Need(E<ProgramSkillHpLostEvent>(g).Any(e => e.SkillId == Health && e.TargetSeat == 0 && e.RemainingHp == 0), "The real recovery observer executes its lethal original-owner loss: " + proof);
+                var recoveredHp = E<RecoveryAppliedEvent>(g).Last(e => e.TargetSeat == 0 && e.Amount == 1).RemainingHp;
+                Need(E<ProgramSkillHpLostEvent>(g).Where(e => e.SkillId == Health && e.TargetSeat == 0).ToArray() is [var loss] &&
+                    loss.Amount == 20 && loss.RemainingHp == recoveredHp - loss.Amount && loss.RemainingHp < 0 && V(g, 0).Hp == 0,
+                    "The real recovery observer records the exact unclamped twenty-HP debt after Lion recovery; only the later death snapshot normalizes HP to zero: " + proof);
                 Need(!V(g, 0).IsAlive, "Actual native recovery children kill the already paid issuer before its complete return: " + proof);
                 Need(E<PlayerDiedEvent>(g).Any(e => e.VictimSeat == 0) && HasSkill(g, 1, Skill), "Actual native issuer death is recorded and its living recipient still receives the then-clause: " + proof);
                 var events = g.Events.ToArray();
@@ -214,6 +240,7 @@ internal static class FanJiangZhangDaChecks
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b, "ol:fan-jiang-zhang-da");
+            if (scene == "committed-zero-rank") CharacterFixtureContent.Register(b, "wumiao:huangfu-song");
             if (scene == "multi") { CharacterFixtureContent.Register(b, "ol:yang-fu"); CharacterFixtureContent.Register(b, "ol:wang-rong"); }
             if (scene == "effective-red") CharacterFixtureContent.Register(b, "classic:xiao-qiao");
             var armor = scene is "black" or "red" or "effective-red" or "actor-black"; var material = scene.StartsWith("lion", StringComparison.Ordinal) ? "silverLion" : scene == "ox" ? "woodenOx" : scene == "multi" ? "duel" : "crossbow";
@@ -234,6 +261,7 @@ internal static class FanJiangZhangDaChecks
             if (scene is "actor" or "actor-black") defs.Add("""{"id":"fixture:fjzd-actor","revision":1,"triggers":[{"id":"actual-actor","window":"cardUseTargetsFinalized","ownerRelation":"actor","cardKinds":["slash"],"optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"selectTarget","target":"owner","targetKind":"otherLegalCurrentCardTarget"},{"op":"replaceCurrentCardUseActor","target":"selectedTarget"}]}]}""");
             if (scene == "actor-black") defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"actual-rewritten-black","window":"cardUseBeforeTargetEffects","ownerRelation":"observer","cardKinds":["slash"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"rewritten","options":[{"id":"continue"}]}]}]}""");
             if (scene == "multi") defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"real-native-damage","window":"afterDamageApplied","subject":"damageSource","damageOccurrence":"perDamage","optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"damage","options":[{"id":"continue"}]}]}]}""");
+            if (scene.StartsWith("committed-", StringComparison.Ordinal)) defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"real-committed-duel","window":"cardUseCommitted","ownerRelation":"actor","cardKinds":["duel"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"committed","options":[{"id":"continue"}]}]}]}""");
             if (scene == "nullified") defs.Add("""{"id":"fixture:fjzd-nullification","revision":1,"viewAs":[{"id":"real-nullification","inputKinds":["crossbow"],"inputSuits":[],"outputKind":"nullification","forPlay":false,"forResponse":true}]}""");
             if (scene == "lion-loss") defs.Add("""{"id":"fixture:fjzd-conditional","revision":1,"hpSkillGrants":[{"id":"healthy-source","skillId":"ol:juesheng","minimumHp":12}]}""");
             if (scene.StartsWith("lion", StringComparison.Ordinal)) defs.Add($$"""{"id":"{{Health}}","revision":1,"triggers":[{"id":"real-lion-health","window":"afterHpRecovered","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]},{"op":"loseHp","target":"owner","amount":{{(scene=="lion-death"?20:2)}}}]}]}""");
@@ -244,6 +272,7 @@ internal static class FanJiangZhangDaChecks
             var own = new List<string> { Driver, Armor, scene == "lion-loss" ? "fixture:fjzd-conditional" : Skill };
             if (scene == "effective-red") own.Add("classic:hongyan"); if (scene is "actor" or "actor-black") own.Add("fixture:fjzd-actor"); if (scene == "actor-black") own.Add(Watch);
             if (scene == "nullified") own.Add("fixture:fjzd-nullification");
+            if (scene.StartsWith("committed-", StringComparison.Ordinal)) own.Add(Watch);
             if (scene == "multi") own.AddRange(["ol:bingzhong", "ol:fengzi", Watch]); if (scene.StartsWith("lion", StringComparison.Ordinal)) own.Add(Health);
             b.AddGeneral(new(Owner, "实际范疆张达", "ol-fan-jiang-zhang-da", "fixture:fjzd-pick", "wu", 12, own, GeneralGender.Male));
             var peers = Enumerable.Range(1, 3).Select(i => "fixture:fjzd-peer-" + i).ToArray();

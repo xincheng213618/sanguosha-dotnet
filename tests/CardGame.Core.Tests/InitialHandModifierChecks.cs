@@ -164,6 +164,21 @@ internal static class InitialHandModifierChecks
         var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
             skills = new Dictionary<string, object> { [Modifier] = new { name = "初始手牌修正", description = "当前最大体力" } } });
         _ = SkillProgramCatalog.Load(valid.ToJsonString(), presentation);
+        var handLimit = JsonNode.Parse(valid.ToJsonString())!;
+        var handModifier = handLimit["skills"]![0]!["modifiers"]![0]!.AsObject();
+        handModifier["query"] = "handLimit";
+        foreach (var operation in new[] { "add", "set" })
+        {
+            handModifier["operation"] = operation;
+            _ = SkillProgramCatalog.Load(handLimit.ToJsonString(), presentation);
+        }
+        foreach (var query in new[] { "drawCount", "slashLimit" })
+        {
+            handModifier["query"] = query;
+            try { _ = SkillProgramCatalog.Load(handLimit.ToJsonString(), presentation); }
+            catch (InvalidOperationException error) when (error.Message.Contains("modifiers[0]", StringComparison.Ordinal)) { continue; }
+            throw new InvalidOperationException("ownerMaxHp Set must remain restricted to the hand-limit query.");
+        }
         foreach (var change in new Action<JsonObject>[]
         {
             node => node["operation"] = "set",

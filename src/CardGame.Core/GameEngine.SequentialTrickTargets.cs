@@ -33,6 +33,7 @@ public sealed partial class GameEngine
         if (card.Id == 0 && (IsOriginalUseLightning(frameId) || IsZeroEntityUse(frameId) || IsProgramVirtualOrdinaryTrickUse(frameId) || IsJueshengDuelUse(frameId))) return;
         if (IsClaimedUseCardEntity(frameId,card.Id) || (IsHellDestroyedSoulMaterial(frameId, card.Id) || (IsHuiyunOutsideGeneralWeaponMaterial(frameId, card.Id) || IsSiruiOutsideGeneralWeaponMaterial(frameId, card.Id)) || IsGuanduDestroyedChariotMaterial(frameId, card.Id)) || HasRemainingSequentialTrickTargets(frameId) || HasRemainingAdjustedBorrowedSwordTargets(frameId)) return;
         if (LifecycleCardUse(frameId) is { } use && TryFinishAnniversaryXunXuUseMaterials(use)) return;
+        if (IsEphemeralCardDestroyedMaterial(frameId, card.Id)) return;
         MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.UseFinished);
     }
 

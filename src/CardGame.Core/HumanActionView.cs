@@ -17,6 +17,9 @@ public sealed class HumanActionView
             SelectableTargetSeats = Array.AsReadOnly(action.SelectableTargetSeats.ToArray()),
             SelectableCardTargets = action.SelectableCardTargets is { } cardTargets
                 ? Array.AsReadOnly(cardTargets.ToArray()) : null,
+            SelectableCardGroupTargets = action.SelectableCardGroupTargets is { } groupTargets
+                ? Array.AsReadOnly(groupTargets.Select(group => group with
+                    { CardIds = Array.AsReadOnly(group.CardIds.ToArray()) }).ToArray()) : null,
             SelectableTargetSequences = action.SelectableTargetSequences is { } targetSequences
                 ? Array.AsReadOnly(targetSequences.Select(sequence =>
                     (IReadOnlyList<int>)Array.AsReadOnly(sequence.ToArray())).ToArray()) : null,

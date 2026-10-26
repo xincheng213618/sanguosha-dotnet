@@ -212,7 +212,8 @@ public interface ISkillProgramEffectHost
         IReadOnlyList<SkillProgramCardCategory>? categories = null,
         IReadOnlyList<EquipmentSlot>? equipmentSlots = null,
         IReadOnlyList<CardKind>? cardKinds = null,
-        string? matchSuitOfBind = null);
+        string? matchSuitOfBind = null,
+        bool availableAtSourceOnly = false);
     SkillProgramStepOutcome SelectCardSubset(
         long frameId,
         int ownerSeat,
@@ -950,7 +951,7 @@ public sealed class FilterBoundCardsSkillProgramEffectHandler : ISkillProgramEff
             effect.TargetReference,
             effect.CardCategories,
             effect.EquipmentSlots,
-            effect.CardKinds, effect.MatchSuitOfBind);
+            effect.CardKinds, effect.MatchSuitOfBind, effect.AvailableAtSourceOnly == true);
         return SkillProgramStepOutcome.Continue;
     }
 }

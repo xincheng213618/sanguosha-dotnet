@@ -35,6 +35,29 @@ public sealed partial class GameEngine
         source is not null && ViewAsRule(source) is
             { UseOnly: true, OutputKind: CardKind.Dodge, CostDestination: SkillProgramCardDestination.DrawPileTop };
 
+    private CardMovementRecord? DestroyedAlternativeResponsePayment(CardActionContext action, long parentFrameId,
+        CardActionCost cost, ProgramCardContinuation continuation)
+    {
+        if (continuation != ProgramCardContinuation.Dodge || action.Type != CardActionType.Response ||
+            action.EffectiveKind != CardKind.Dodge || action.ActorSeat != action.ProviderSeat ||
+            action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null ||
+            action.PhysicalCards is not [var only] || only != cost || cost.From != CardLocation.Equipment(action.ProviderSeat) ||
+            action.ConversionChain is not [var source] || source.OwnerSeat != action.ProviderSeat || !IsProgramTopDeckDodgeSource(source) ||
+            LifecycleCardUse(parentFrameId) is not { Action: { } incoming, CardAttack: { Active: true } attack } ||
+            action.ParentActionId != incoming.ActionId || attack.TargetSeat != action.ActorSeat ||
+            attack.SourceSeat != action.OpponentSeat || _cardZones.GetLocation(cost.CardId) != CardLocation.OutsideGame ||
+            ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Where(fact => fact.CardId == cost.CardId).ToArray() is not [var destroyed] ||
+            destroyed.ParentFrameId != parentFrameId ||
+            !ProgramEventHistory<CardActionAcceptedEvent>().Any(fact => fact.Action.ActionId == action.ActionId &&
+                fact.Action.Type == action.Type && fact.Action.ActorSeat == action.ActorSeat && fact.Action.ProviderSeat == action.ProviderSeat &&
+                fact.Action.ParentActionId == action.ParentActionId && fact.Action.PhysicalCards.SequenceEqual(action.PhysicalCards) &&
+                fact.Action.ConversionChain.SequenceEqual(action.ConversionChain))) return null;
+        var movement = _cardMovements.SingleOrDefault(move => move.Sequence == destroyed.MovementSequence);
+        return movement is not null && movement.CardId == cost.CardId && movement.CardKind == cost.CardKind &&
+            movement.From == cost.From && movement.Reason == CardMoveReasons.Respond && IsWushuangShopDestroyedMaterial(movement)
+                ? movement : null;
+    }
+
     private void PaySingleCardResponse(Card card, CharacterState provider, CardKind effectiveKind,
         CardConversionSource? source)
     {
@@ -81,6 +104,11 @@ public sealed partial class GameEngine
         if (SkipChainedStateBasicFinishedMovement(use.Id, card)) return;
         if (SkipDrawFundedDistinctBasicFinishedMovement(use.Id, card)) return;
         if (IsGuanduDestroyedChariotMaterial(use.Id, card.Id)) return;
+        // The original native use already paid this generated field material
+        // through its producer's exact destruction receipt. It never reached
+        // Processing and cannot be discarded or resurrected at completion.
+        if (card.Id > 0 && _cardZones.GetLocation(card.Id) == CardLocation.OutsideGame &&
+            IsEphemeralCardDestroyedMaterial(use.Id, card.Id)) return;
         if (SkipHuanpeiFinishedMovement(use.Id, card) || SkipDiouFinishedMovement(use.Id, card) || SkipMouXqJueyanFinishedMovement(use.Id, card) || SkipMouLiuChengFinishedMovement(use.Id, card)) return;
         if (IsProgramAlternativeCost(use.Action, card.Id))
         {

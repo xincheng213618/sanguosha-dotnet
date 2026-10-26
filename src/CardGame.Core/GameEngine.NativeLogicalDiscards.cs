@@ -76,15 +76,25 @@ public sealed partial class GameEngine
         });
     }
 
-    private void CompleteNativeLogicalDiscardInvocation(NativeLogicalDiscardInvocationDraft? draft)
+    private void CompleteNativeLogicalDiscardInvocation(NativeLogicalDiscardInvocationDraft? draft,
+        IReadOnlyList<CardMovementRecord>? prepaidMaterials = null)
     {
         if (draft is null) return;
         if (ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(e => e.InvocationId == draft.InvocationId))
             throw new InvalidOperationException("A logical discard must finish exactly once.");
+        // Some native conversion costs destroy ephemeral equipment before the
+        // skill's discard instruction runs. Only an explicitly supplied, signed
+        // discard-origin proof can credit that already completed movement.
+        if (prepaidMaterials is not null && (prepaidMaterials.Select(m => m.CardId).Distinct().Count() != prepaidMaterials.Count ||
+            prepaidMaterials.Any(move => !_cardMovements.Contains(move) || move.Sequence <= draft.SequenceBefore ||
+                move.Sequence > _movementSequence || !IsEphemeralCardDestroyedMaterial(move) ||
+                !draft.Materials.Any(material => material.CardId == move.CardId && material.From == move.From &&
+                    GetProgramDiscardSource(move) == material.From))))
+            throw new InvalidOperationException("A prepaid logical discard needs its exact completed native material proof.");
         CloseWuZishengNativeDiscard(draft);
         var actual = draft.Materials.Select(material =>
         {
-            var move = _cardMovements.FirstOrDefault(move =>
+            var move = prepaidMaterials?.SingleOrDefault(move => move.CardId == material.CardId) ?? _cardMovements.FirstOrDefault(move =>
                 move.CardId == material.CardId && move.Sequence > draft.SequenceBefore && move.Sequence <= _movementSequence &&
                 (move.From == material.From && move.To == CardLocation.DiscardPile && move.Reason == draft.Reason ||
                     GetProgramDiscardSource(move) == material.From &&

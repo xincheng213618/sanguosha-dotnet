@@ -11,6 +11,40 @@ internal static class BoundaryZhouCangMobileChecks
         Skip = "fixture:boundary-zhou-cang-skip", Hold = "fixture:boundary-zhou-cang-paid", Peer = "fixture:boundary-zhou-cang-peer";
     private const string Reason = "skill-program.boundary-zhou-cang.zhongyong";
 
+    public static void NativeAiRoutesPreferAlliedGiftsAndKeepEmergencyDodgeCold()
+    {
+        foreach (var hp in new[] { 4, 2 })
+        {
+            var s = Scene.Start(dodge: true, hp: hp); s.Play();
+            var slash = s.V().Hand.First(c => c.Kind == CardKind.Slash).Id;
+            var dodge = s.V(3).Hand.Single().Id;
+            s.Native(slash, 3); s.Offer(); s.Activate(); s.Menu();
+            var choice = s.AiChoice();
+            s.Need(choice.Parameters.GetValueOrDefault("branch") == (hp == 2 ? "acquire-dodge" : "give-dodge") &&
+                (hp == 2 || choice.Targets.SequenceEqual([1])),
+                "The registered native AI retains a missing Dodge at low HP, otherwise gifts an ally for its own follow-up Slash instead of helping the enemy.");
+            s.Cold();
+            s.Need(s.AiChoice().Id == choice.Id, "Cold retains the exact native menu and deterministic public choice.");
+            s.Answer(c => c.Id == choice.Id);
+            if (hp == 2)
+            {
+                s.Held(); s.Cold(); s.Release(); s.Menu();
+                choice = s.AiChoice();
+                s.Need(choice.Parameters.GetValueOrDefault("branch") == "give-slash" && choice.Targets.SequenceEqual([1]),
+                    "The second native stage gifts the available Slash to an ally, never to the responding enemy.");
+                s.Answer(c => c.Id == choice.Id);
+            }
+            s.Held();
+            s.Need(s.P!.PlayerSeat == 1, "The gift's actual recipient owns its paid cards-gained watcher.");
+            s.Cold(); s.Release();
+            s.Play(); s.Cold();
+            s.Need(s.Zone(dodge) == CardLocation.Hand(hp == 2 ? 0 : 1) &&
+                s.G.CardMovements.Count(m => m.CardId == dodge && m.Reason.Value == Reason) == 1 &&
+                s.Facts<BoundaryZhongyongBonusEvent>().Length == (hp == 2 ? 0 : 1),
+                "Each routed branch pays and returns once through the real native completed-use parent.");
+        }
+    }
+
     public static void AcquireOriginalSlashAndDodgeThenOptionalGiftWithCold()
     {
         var s = Scene.Start(dodge: false); s.Play();
@@ -82,6 +116,15 @@ internal static class BoundaryZhouCangMobileChecks
         public PlayerSnapshot V(int seat = 0) => G.CreateSnapshot(seat).Players.Single(p => p.Seat == seat);
         public CardLocation Zone(int id) => G.CreateCardZoneDiagnostics().Single(c => c.CardId == id).Location;
         public T[] Facts<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
+        public PromptChoice AiChoice()
+        {
+            var frame = G.ResolutionStack.OfType<ProgramSkillFrame>().Last();
+            var effect = ProgramInstructionResolver.Default.Resolve(frame, registry.GetSkill(frame.SkillId).Program!)
+                .GetPausedInstruction(frame.InstructionIndex).Effect;
+            var router = (ProgramInteractionRouter)typeof(GameEngine).GetProperty("ProgramInteractions",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(G)!;
+            return router.SelectAi(P!, frame, effect);
+        }
         public void Play() => Reach(() => P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
         public void Offer() => Reach(() => P?.SkillPrompt?.SkillId == Skill && P.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
         public void Menu() => Reach(() => P?.SkillPrompt?.SkillId == Skill && P.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "boundary-zhongyong"));
@@ -124,11 +167,11 @@ internal static class BoundaryZhouCangMobileChecks
         }
         private void Accept(GameCommand command)
         { var result = G.Submit(command); Need(result.Accepted, result.Error?.Message ?? "Rejected original Zhongyong command."); }
-        public static Scene Start(bool dodge)
+        public static Scene Start(bool dodge, int hp = 4)
         {
             var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
             ShanheStartingCard[] hand = [new(CardKind.Slash, Suit.Spade, 7), new(CardKind.Slash, Suit.Diamond, 8), new(CardKind.Slash, Suit.Club, 9), new(CardKind.Crossbow, Suit.Club, 1)];
-            var setup = new ShanheBattleSetup(29, 1, "boundary-zhou-cang", Hero, 4, 0, 0, 0, 0, [Quiet, Hold, "classic:longdan"], hand, [],
+            var setup = new ShanheBattleSetup(29, 1, "boundary-zhou-cang", Hero, hp, 0, 0, 0, 0, [Quiet, Hold, "classic:longdan"], hand, [],
                 [new(Peer, Hp: 8) { StartingHand = [] }, new(Peer, Hp: 8) { StartingHand = dodge ? [new(CardKind.Dodge, Suit.Heart, 2)] : [] }],
                 [new(Peer, Hp: 8) { StartingHand = [] }], new string('a', 64));
             var g = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null,

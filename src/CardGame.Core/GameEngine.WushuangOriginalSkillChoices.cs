@@ -58,7 +58,8 @@ public sealed partial class GameEngine
                 _cardZones.GetLocation(hand) != CardLocation.Hand(r.Target) || _cardZones.GetLocation(deck) != CardLocation.DrawPile)
                 throw new InvalidOperationException("Guanxu exchange changed its private hand or original top-five entity.");
             var finalOrder = r.Top.Select(id => id == deck ? hand : id).ToArray();
-            f = UpdateWushuangOriginal(f, r with { Stage = "guanxu-discard", Cards = [], Top = [] });
+            f = UpdateWushuangOriginal(f, r with { Stage = "guanxu-discard",
+                Cards = r.Cards.Select(id => id == hand ? deck : id).ToArray(), Top = [] });
             MoveCard(GetAdvancedCard(deck), CardLocation.DrawPile, CardLocation.Hand(r.Target), new("skill-program.wushuang.guanxu.exchange"), disclosure: CardMovementDisclosure.FaceDown);
             MoveCard(GetAdvancedCard(hand), CardLocation.Hand(r.Target), CardLocation.DrawPile, new("skill-program.wushuang.guanxu.exchange"), disclosure: CardMovementDisclosure.FaceDown);
             _cardZones.ReorderDrawPileSubsetToTop(finalOrder, finalOrder);

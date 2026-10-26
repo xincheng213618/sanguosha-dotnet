@@ -101,7 +101,8 @@ public sealed partial class GameEngine
                     OtherDamageSourceAlive = sourceSeat != owner.Seat && CurrentDamageAttempt?.IsSourceLess != true && _players[sourceSeat].IsAlive,
                     BlockedDamageSourceSkills = GetSkillBindingShard(owner).ProgramInstances.Where(instance => IsDamageOfferPairBlocked(owner.Seat, instance.SkillId, sourceSeat)).Select(instance => instance.SkillId).Distinct().ToArray(),
                     DamageCardIsSlash = CurrentDamageAttempt is { EffectiveCardKind: { } beforeDamageKind, IsChainPropagation: false, IsSourceLess: false } && IsSlashCard(beforeDamageKind),
-                    DirectCardUseDamage = CurrentDamageAttempt is { Card: not null, IsChainPropagation: false, IsSourceLess: false },
+                    DirectCardUseDamage = CurrentDamageAttempt is { IsChainPropagation: false, IsSourceLess: false } direct &&
+                        (direct is CardAttackHandle native ? LifecycleCardUse(native.ResolutionId) is { Action.Type: CardActionType.Use } : direct.Card is not null),
                     DamageSourceGender = CurrentDamageAttempt?.IsDelayedJudgmentDamage != true && CurrentDamageAttempt?.IsSourceLess != true &&
                         _contentRegistry.ProgramDependencies.UsesTriggerCondition(SkillProgramTriggerConditionKind.DamageSourceGenderIs)
                         ? _players[sourceSeat].Gender : null

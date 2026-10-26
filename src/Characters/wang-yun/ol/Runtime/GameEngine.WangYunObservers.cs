@@ -30,7 +30,7 @@ public sealed partial class GameEngine
         if(LifecycleCardUse(useId)?.WangYunNativeOrigin is not{}old || old.PaymentCompleted)return;
         var f=_resolutionStack.OfType<ProgramSkillFrame>().Single(x=>x.Id==old.ProgramFrameId);var after=_movementSequence;
         if(old.Materials.Count==0 && (old.RoundOncePayment is null||LifecycleCardUse(useId)is not{}zero||zero.Action is not{}action||zero.RoundOnceCardlessBasicUse is not{}receipt||receipt.Payment!=old.RoundOncePayment||!IsIssuedRoundOnceCardlessBasicUse(receipt,zero,action)||!ValidWangYunRoundOnceHeader(old.RoundOncePayment,action,old.Actor)))throw new InvalidOperationException("Lianji zero native payment requires the actual independent Use receipt, never an empty material predicate.");
-        if(old.Materials.Any(c=>_cardMovements.Count(m=>m.Sequence>old.Before && m.Sequence<=after && m.CardId==c.CardId && m.From==c.From && m.To==CardLocation.Processing)!=1))
+        if(old.Materials.Any(c=>_cardMovements.Count(m=>IsWangYunNativeMaterialPayment(old,c,m,after))!=1))
             throw new InvalidOperationException("Wang Yun native use did not pay every accepted physical source entity exactly once.");
         var paid=old with{After=after,PaymentCompleted=true};ReplaceRuntimeFrame(f.Id,f.WangYunPlan is{}p?f with{WangYunPlan=p with{NativeUse=paid}}:f with{WangYunTrick=f.WangYunTrick! with{NativeUse=paid}});
         UpdateLifecycleCardUse(useId,use=>use with{WangYunNativeOrigin=paid});AdvanceEventRulesAndQueueFact(new WangYunNativePaymentCompletedEvent(paid));
@@ -50,7 +50,21 @@ public sealed partial class GameEngine
         if(!r.PaymentCompleted)return paid.Length==0;
         if(r.Materials.Count==0 && (use.RoundOnceCardlessBasicUse is not{}zeroReceipt||zeroReceipt.Payment!=r.RoundOncePayment||!ValidWangYunRoundOnceStoredUse(use,r)))return false;
         return paid is[var invoice] && WangYunOriginsEqual(invoice.Origin,r) && MatchesDeclaredActualDamageUse(use,action.ActorSeat,r.Actor) &&
-            r.Materials.All(c=>_cardMovements.Count(m=>m.Sequence>r.Before && m.Sequence<=r.After && m.CardId==c.CardId && m.From==c.From && m.To==CardLocation.Processing)==1);
+            r.Materials.All(c=>_cardMovements.Count(m=>IsWangYunNativeMaterialPayment(r,c,m,r.After))==1);
+    }
+    private bool IsWangYunNativeMaterialPayment(WangYunNativeUseOrigin origin,CardActionCost material,CardMovementRecord movement,long after)
+    {
+        if(movement.Sequence<=origin.Before || movement.Sequence>after || movement.CardId!=material.CardId || movement.From!=material.From)return false;
+        if(movement.To==CardLocation.Processing)return true;
+        // A purchased equipment entity is destroyed by its normal Use movement.
+        // Credit only this accepted source and owning native Use, never an
+        // arbitrary outside-game destination or an earlier destruction.
+        return material.From==CardLocation.Equipment(origin.Actor) && movement.CardKind==material.CardKind &&
+            movement.Reason==CardMoveReasons.Use && IsWushuangShopDestroyedMaterial(movement) &&
+            ProgramEventHistory<WushuangShopEquipmentCreatedEvent>().Where(e=>e.CardId==material.CardId).ToArray() is [var created] &&
+            created.Seat==origin.Actor &&
+            ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Where(e=>e.CardId==material.CardId).ToArray() is [var destroyed] &&
+            destroyed.MovementSequence==movement.Sequence && destroyed.ParentFrameId==origin.UseId;
     }
     private bool ValidWangYunRoundOnceStoredUse(CardUseFrame use,WangYunNativeUseOrigin origin)
     {

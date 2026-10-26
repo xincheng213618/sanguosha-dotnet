@@ -130,6 +130,11 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("Xiaosi cannot return before its whole native use or twice.");
         ReplaceRuntimeTop(f with { FuRongPair = r with { Stage = FuRongPairStage.NativeChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         AdvanceEventRulesAndQueueFact(new FuRongNativeReturnedEvent(ret));
+        // A lethal use (including retaliation against its owner) has already
+        // returned its exact physical action. Complete the paid instruction
+        // here: a finished game will neither enter another Play-phase step nor
+        // offer the remaining discarded card for a second use.
+        if (_winner != Winner.None) FinishFuRongPair(GetActiveProgramFrame(f.Id));
         // The native producer must finish its tail before this parent issues a
         // second card. The normal runtime loop resumes the owning instruction.
     }

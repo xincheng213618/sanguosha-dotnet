@@ -731,7 +731,8 @@ public sealed partial class GameEngine
         IReadOnlyList<SkillProgramCardCategory> categories,
         IReadOnlyList<EquipmentSlot> equipmentSlots,
         IReadOnlyList<CardKind> cardKinds,
-        string? matchSuitOfBind)
+        string? matchSuitOfBind,
+        bool availableAtSourceOnly = false)
     {
         var frame = GetActiveProgramFrame(frameId);
         var source = GetProgramCardSet(frame, sourceBind);
@@ -739,13 +740,16 @@ public sealed partial class GameEngine
             GetProgramCardSet(frame, matchSuitOfBind).FrozenRevealedSuit ??
             throw new InvalidOperationException("The referenced public suit is unavailable.");
         var effectiveSuitSeat = effectiveSuitFor is null ? (int?)null : ResolveProgramParticipant(frame, effectiveSuitFor);
-        var selected = source.CardIds.Select((cardId, index) =>
+        var candidates = source.CardIds.Select((cardId, index) => (CardId: cardId, Index: index));
+        if (availableAtSourceOnly)
+            candidates = candidates.Where(item => _cardZones.GetLocation(item.CardId) == source.SourceLocations[item.Index]);
+        var selected = candidates.Select(item =>
             {
-                var location = source.SourceLocations[index];
-                if (_cardZones.GetLocation(cardId) != location)
+                var location = source.SourceLocations[item.Index];
+                if (_cardZones.GetLocation(item.CardId) != location)
                     throw new InvalidOperationException(
                         "A bound card left its frozen source before its configured filter.");
-                var card = _cardZones.CardsAt(location).Single(current => current.Id == cardId);
+                var card = _cardZones.CardsAt(location).Single(current => current.Id == item.CardId);
                 return (Card: card, Location: location);
             })
             .Where(item =>

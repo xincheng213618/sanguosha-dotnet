@@ -3,6 +3,44 @@ using CardGame.Core;
 using CardGame.Content.Standard;
 internal static class FengLinKuaiChecks
 {
+    public static void ShenshiAiRoutesPrivateObservationAndExactGiftCold()
+    {
+        var (g, r) = Create(shenshi: true);
+        ReachPlay(g);
+        Submit(g, new UseProgramSkillCommand(0, "classic:shenshi", "yang", [Hand(g, 0)[0]], [1], g.Revision, P(g)!.PromptId));
+        ReachPlay(g);
+        Driver(g, "hurt", [1]);
+        Reach(g, p => p.SkillPrompt?.SkillId == "classic:shenshi" &&
+            p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
+        Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
+        Reach(g, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("gift-action") == "observed"));
+        PromptChoice AiChoice()
+        {
+            var router = (ProgramInteractionRouter)typeof(GameEngine).GetProperty("ProgramInteractions",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(g)!;
+            var frame = g.ResolutionStack.OfType<ProgramSkillFrame>().Last();
+            var effect = ProgramInstructionResolver.Default.Resolve(frame, r.GetSkill(frame.SkillId).Program!)
+                .GetPausedInstruction(frame.InstructionIndex).Effect;
+            return router.SelectAi(P(g)!, frame, effect);
+        }
+        var observed = AiChoice();
+        Require(observed.Parameters.GetValueOrDefault("gift-action") == "observed",
+            "The actual suspended observation instruction has a registered AI continuation.");
+        Replay(g, r);
+        Answer(g, c => c.Id == observed.Id);
+        Reach(g, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("gift-action") == "give"));
+        var gift = AiChoice(); var card = gift.Cards.Single();
+        Require(Hand(g, 0).Contains(card) && !Hand(g, 1).Contains(card),
+            "The AI selects an offered owned entity after observation, never an observed enemy card.");
+        Replay(g, r);
+        Answer(g, c => c.Id == gift.Id);
+        ReachPlay(g);
+        Require(!Hand(g, 0).Contains(card) && Hand(g, 1).Contains(card) &&
+            g.CardMovements.Count(m => m.CardId == card && m.From == CardLocation.Hand(0) &&
+                m.To == CardLocation.Hand(1) && m.Reason.Value == "skill-program.converting-gift.give") == 1,
+            "The AI continuation uses the original prompt and native gift exactly once.");
+        Replay(g, r);
+    }
     public static void JianxiangActualFinalTargetMinimumTie()
     {
         var(g,r)=Create(slashDeck:true);ReachPlay(g);Driver(g,"discard",[]);Driver(g,"grow-owner",[]);Driver(g,"request",[1]);
@@ -28,13 +66,13 @@ internal static class FengLinKuaiChecks
     private static void Replay(GameEngine g,ContentRegistry r){var restored=GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(g.CreateCheckpoint())),r);Require(State(g)==State(restored),"All viewer and AI snapshots and physical zones replay identically.");Require(g.CreateCardZoneDiagnostics().Count==100&&g.CreateCardZoneDiagnostics().Select(c=>c.CardId).Distinct().Count()==100,"Entities conserved.");}
     private static string State(GameEngine g)=>JsonSerializer.Serialize(Enumerable.Range(0,4).SelectMany(v=>new[]{g.CreateSnapshot(v),g.CreateSnapshot(v,true)}))+JsonSerializer.Serialize(g.CreateCardZoneDiagnostics());
     private static void Require(bool value,string message){if(!value)throw new InvalidOperationException(message);}
-    private static (GameEngine,ContentRegistry) Create(bool lethal=false,bool giftDeath=false,bool slashDeck=false,bool endingDamage=false)
+    private static (GameEngine,ContentRegistry) Create(bool lethal=false,bool giftDeath=false,bool slashDeck=false,bool endingDamage=false,bool shenshi=false)
     {
-        var r=ContentRegistry.Build(new StandardContentPackage(),new StandardActiveSkillExpansionPackage(true),new StandardRescueSkillExpansionPackage(),new StandardClassicGeneralPackage(),new Fixture(lethal,giftDeath,slashDeck,endingDamage));
+        var r=ContentRegistry.Build(new StandardContentPackage(),new StandardActiveSkillExpansionPackage(true),new StandardRescueSkillExpansionPackage(),new StandardClassicGeneralPackage(),new Fixture(lethal,giftDeath,slashDeck,endingDamage,shenshi));
         var g=GameEngine.CreateStandard(new GameOptions{Seed=17,PlayerCount=4,HumanSeat=0,HumanRole=Role.Lord,ModeId="identity:classic-kuai-check",UseInteractiveSetup=true,UseInteractiveDiscard=false,AdvanceAfterHumanCommands=false,MaxTurns=10},r);
         Submit(g,new StartGameCommand());Submit(g,new SelectGeneralCommand(0,"fixture:kuai-owner",g.Revision,P(g)!.PromptId));return(g,r);
     }
-    private sealed class Fixture(bool lethal,bool giftDeath,bool slashDeck,bool endingDamage):IGameContentPackage
+    private sealed class Fixture(bool lethal,bool giftDeath,bool slashDeck,bool endingDamage,bool shenshi):IGameContentPackage
     {
         public PackageManifest Manifest{get;}=new("fixture:kuai",new Version(1,0,0),[]);
         public void Register(IContentRegistryBuilder b)
@@ -51,7 +89,7 @@ internal static class FengLinKuaiChecks
             var ending=SkillProgramCatalog.Load($$"""{"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"fixture:ending-hurt","revision":1,"triggers":[{"id":"hurt","window":"turnEnding","subject":"owner","optional":false,"effects":[{"op":"selectTarget","target":"owner","targetKind":"otherLiving"},{"op":"damage","target":"owner","sourceRef":{"kind":"selectedTarget"},"amount":1}]}]}]}""","""{"schemaVersion":3,"skills":{"fixture:ending-hurt":{"name":"结束阶段伤害","description":"测试"}}}""");
             b.AddSkill(new("fixture:ending-hurt","结束阶段伤害","测试"){Program=ending.Programs["fixture:ending-hurt"]});
             b.AddSkill(new("fixture:kuai-idle","静态","测试"));
-            b.AddGeneral(new("fixture:kuai-owner","拥有者","supporter","classic:shenshi","wei",20,endingDamage?["classic:jianxiang","fixture:kuai-driver","fixture:retention-observer","fixture:ending-hurt"]:["classic:jianxiang","fixture:kuai-driver","fixture:retention-observer"]));
+            b.AddGeneral(new("fixture:kuai-owner","拥有者","supporter","classic:shenshi","wei",20,shenshi?["fixture:kuai-driver","fixture:retention-observer"]:endingDamage?["classic:jianxiang","fixture:kuai-driver","fixture:retention-observer","fixture:ending-hurt"]:["classic:jianxiang","fixture:kuai-driver","fixture:retention-observer"]));
             b.AddGeneral(new("fixture:kuai-target-1","受赠者","supporter",giftDeath?"fixture:gift-kill":"fixture:gift-observer","wei",lethal?1:20));
             for(var i=2;i<4;i++)b.AddGeneral(new($"fixture:kuai-target-{i}","目标","supporter",giftDeath?"fixture:gift-kill":"fixture:gift-observer","wei",lethal?1:20));
             b.AddDeck(new("fixture:kuai-deck","固定",4,2,[]){PhysicalCards=Enumerable.Range(0,100).Select(i=>new ContentDeckPhysicalCard(slashDeck?"standard:slash":"standard:crossbow",i%2==0?Suit.Spade:Suit.Heart,i%13+1)).ToArray()});

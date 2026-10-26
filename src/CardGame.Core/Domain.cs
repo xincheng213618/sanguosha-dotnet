@@ -1021,6 +1021,7 @@ public sealed partial record PendingDecision
 
 /// <summary>A currently legal single-card active-skill cost and recipient.</summary>
 public sealed record ActiveSkillCardTarget(int CardId, int TargetSeat);
+public sealed record ActiveSkillCardGroupTarget(IReadOnlyList<int> CardIds, int TargetSeat);
 
 public sealed record LegalAction
 {
@@ -1153,6 +1154,10 @@ public sealed record LegalAction
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyList<ActiveSkillCardTarget>? SelectableCardTargets { get; init; }
+
+    /// <summary>Complete material groups and their compatible targets; null retains independent selection.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<ActiveSkillCardGroupTarget>? SelectableCardGroupTargets { get; init; }
 
     /// <summary>
     /// Complete ordered target selections for correlated active-skill inputs.

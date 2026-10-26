@@ -52,6 +52,8 @@ public sealed partial class ShanheCampaignSession
         public IReadOnlyList<string> PurchasedChoiceIds { get; init; } = Array.Empty<string>();
         public IReadOnlyList<ShanheNodeChoiceDefinition> ShopStock { get; init; } = Array.Empty<ShanheNodeChoiceDefinition>();
         public int ShopRefreshCount { get; init; }
+        public int ShopFreeRefreshCount { get; init; }
+        public int ShopPaidRefreshCount { get; init; }
         public int ShopTacticPurchases { get; init; }
         public int ShopEquipmentPurchases { get; init; }
         public int ShopCardPurchases { get; init; }
@@ -257,7 +259,11 @@ public sealed partial class ShanheCampaignSession
             state = state with { Phase = ShanheCampaignPhase.NodeChoice };
             if (_options.UseCodexRewardPool && node.Kind == ShanheNodeKind.Shop)
             {
-                state = state with { ShopRefreshCount = 0, ShopTacticPurchases = 0, ShopEquipmentPurchases = 0, ShopCardPurchases = 0, ShopSkillPurchases = 0 };
+                state = state with
+                {
+                    ShopRefreshCount = 0, ShopFreeRefreshCount = 0, ShopPaidRefreshCount = 0,
+                    ShopTacticPurchases = 0, ShopEquipmentPurchases = 0, ShopCardPurchases = 0, ShopSkillPurchases = 0
+                };
                 state = state with { ShopStock = CreateShopStock(state, node) };
             }
             return state;
@@ -366,9 +372,16 @@ public sealed partial class ShanheCampaignSession
     {
         Require(_options.UseCodexRewardPool && _state.Phase == ShanheCampaignPhase.NodeChoice &&
             _state.CurrentNodeId is { } id && _nodes[id].Kind == ShanheNodeKind.Shop, "There is no refreshable shop.");
-        Require(_state.ShopRefreshCount < ShopRefreshLimit(_state), "This shop has no refreshes remaining.");
-        Require(_state.Gold >= 100, "Refreshing this shop costs 100 copper coins.");
-        var next = _state with { Gold = checked(_state.Gold - 100), ShopRefreshCount = checked(_state.ShopRefreshCount + 1) };
+        var free = ShopFreeRefreshRemaining(_state) > 0;
+        Require(free || ShopPaidRefreshRemaining(_state) > 0, "This shop has no refreshes remaining.");
+        var cost = free ? 0 : 100;
+        Require(_state.Gold >= cost, "Refreshing this shop costs 100 copper coins.");
+        var next = _state with
+        {
+            Gold = checked(_state.Gold - cost), ShopRefreshCount = checked(_state.ShopRefreshCount + 1),
+            ShopFreeRefreshCount = checked(_state.ShopFreeRefreshCount + (free ? 1 : 0)),
+            ShopPaidRefreshCount = checked(_state.ShopPaidRefreshCount + (free ? 0 : 1))
+        };
         return next with { ShopStock = CreateShopStock(next, _nodes[next.CurrentNodeId!]) };
     }
 
@@ -470,6 +483,9 @@ public sealed partial class ShanheCampaignSession
             AvailableChoices(state, _nodes[state.CurrentNodeId!]);
         if (state.Phase == ShanheCampaignPhase.NodeChoice && (choices.Length == 0 || _nodes[state.CurrentNodeId!].Kind == ShanheNodeKind.Shop))
             choices = [.. choices, new("$leave", _nodes[state.CurrentNodeId!].Kind == ShanheNodeKind.Shop ? "离开商店" : "继续行军")];
+        var randomShop = IsRandomShop(state);
+        var freeRefreshes = randomShop ? ShopFreeRefreshRemaining(state) : 0;
+        var paidRefreshes = randomShop ? ShopPaidRefreshRemaining(state) : 0;
         return new(Definition.Id, Definition.Name, state.Phase, revision, state.CurrentNodeId,
             state.Hp, checked(_baseMaxHp + state.Bonuses.MaxHp), state.Gold, state.ExtraSkillSlots, state.Bonuses,
             state.ExtraSkillIds, ShanheCampaignContent.Freeze(state.AvailableNodeIds.Select(id => _nodes[id])),
@@ -490,8 +506,10 @@ public sealed partial class ShanheCampaignSession
                 ? ShanheCampaignContent.Freeze(state.CategoryRewardGroups.Select(group => group.Category)) : [],
             OpeningSkillOffers = ShanheCampaignContent.Freeze(state.OpeningSkillOfferIds.Select(id => _rewards[id])),
             ShopItems = CreateShopItems(state, revision),
-            ShopRefreshRemaining = IsRandomShop(state) ? Math.Max(0, ShopRefreshLimit(state) - state.ShopRefreshCount) : 0,
-            ShopRefreshCost = IsRandomShop(state) ? 100 : 0,
+            ShopFreeRefreshRemaining = freeRefreshes,
+            ShopPaidRefreshRemaining = paidRefreshes,
+            ShopRefreshRemaining = checked(freeRefreshes + paidRefreshes),
+            ShopRefreshCost = randomShop && freeRefreshes == 0 ? 100 : 0,
             RewardSkipGold = HasPrimaryReward(state)
                 ? _nodes[state.CurrentNodeId!].RewardSkipGold : 0
         };

@@ -13,7 +13,8 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("A tactic acquisition lost its paid shop window.");
         var instance = GetRuntimeSkillInstanceId(_players[parent.SeatCursor], skillId);
         var receipt = new WushuangAcquisitionReceipt(parent.SeatCursor, id, offer.Id, skillId, instance,
-            program.GameplayHash, parent.Opening || !_players[parent.SeatCursor].IsHuman);
+            program.GameplayHash, parent.Opening || !_players[parent.SeatCursor].IsHuman &&
+                _aiBrains[parent.SeatCursor].PolicyVersion < AiDecisionPolicy.WushuangStrategyVersion);
         ReplaceRuntimeTop(parent with { Acquisition = receipt });
         var candidate = new ProgramTriggerCandidate(receipt.Seat, skillId, trigger.Id, instance, program.GameplayHash, trigger.Priority);
         BeginProgramBinding(candidate, new(SkillProgramTriggerWindow.SkillsChanged, windowId, receipt.Seat,

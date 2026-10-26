@@ -273,8 +273,11 @@ public sealed partial class GameEngine
                 SelectedCardPaymentResult = null
             });
             var destination = toDiscard ? CardLocation.DiscardPile : CardLocation.Hand(targetSeat);
+            // Removing a persistent-pile cost still pays the selected entities,
+            // but only owned Hand/Equipment/Judgment materials form a discard invoice.
             var discardInvocation = toDiscard ? engine.CaptureNativeLogicalDiscardInvocation(frame.OwnerSeat,
-                frame.OwnerSeat, cardIds, reason, frame.Id) : null;
+                frame.OwnerSeat, selected.Where(item => IsOwnedDiscardSource(item.Location))
+                    .Select(item => item.Card.Id).ToArray(), reason, frame.Id) : null;
             var nativeGiveBefore = engine._movementSequence;
             if (toDiscard && engine.TryPayOrderedSelectedActorDuel(engine.GetActiveProgramFrame(frame.Id), cardIds, reason)) { }
             else if (toDiscard && engine.HasHellShiyouCapability)
@@ -473,9 +476,10 @@ public sealed partial class GameEngine
             IReadOnlyList<Suit> suits, ProgramParticipantReference? effectiveSuitFor = null,
             IReadOnlyList<SkillProgramCardCategory>? categories = null,
             IReadOnlyList<EquipmentSlot>? equipmentSlots = null,
-            IReadOnlyList<CardKind>? cardKinds = null, string? matchSuitOfBind = null) =>
+            IReadOnlyList<CardKind>? cardKinds = null, string? matchSuitOfBind = null,
+            bool availableAtSourceOnly = false) =>
             engine.FilterProgramBoundCards(frameId, sourceBind, resultBind, suits, effectiveSuitFor,
-                categories ?? [], equipmentSlots ?? [], cardKinds ?? [], matchSuitOfBind);
+                categories ?? [], equipmentSlots ?? [], cardKinds ?? [], matchSuitOfBind, availableAtSourceOnly);
 
         public SkillProgramStepOutcome SelectCardSubset(long frameId, int ownerSeat, string sourceBind,
             string resultBind, int minimumCards, int maximumCards, int maximumRankSum,

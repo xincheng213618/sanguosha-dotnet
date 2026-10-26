@@ -9,7 +9,7 @@ public sealed partial class GameEngine
     // reader remains active until the native turn cursor actually returns.
     private bool HasOngoingWholeActualUseTurn => _turnNumber > 0 &&
         _turnProgression.TurnNumber == _turnNumber && _turnProgression.OwnerSeat == _currentSeat &&
-        !CompleteProgramEventHistory().OfType<ActualTurnCursorReturnedEvent>()
+        !ProgramEventHistory<ActualTurnCursorReturnedEvent>()
             .Any(e => e.ActualTurn == _turnNumber && e.OwnerSeat == _currentSeat);
 
     private CurrentTurnCardUseKindsRecordedEvent[] WholeActualTurnUseHistory() =>

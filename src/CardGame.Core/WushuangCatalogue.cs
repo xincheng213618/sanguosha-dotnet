@@ -30,6 +30,7 @@ public static class WushuangCatalogue
     private static readonly HashSet<CardKind> ExcludedCardKinds;
     private static readonly HashSet<string> ExcludedSkillIds;
     private static readonly HashSet<string> ExcludedGeneralIds;
+    private static readonly HashSet<int> ExcludedOpeningTacticQualities;
 
     public static bool IsCardAllowed(CardKind kind) => !ExcludedCardKinds.Contains(kind) &&
         (!EquipmentCatalog.IsEquipment(kind) || AllowedEquipmentKinds.Contains(kind));
@@ -38,6 +39,9 @@ public static class WushuangCatalogue
         !skill.Description.Contains("护甲", StringComparison.Ordinal);
 
     public static bool IsGeneralAllowed(string id) => !ExcludedGeneralIds.Contains(id);
+
+    public static bool CanOfferAsOpening(WushuangTactic tactic) => tactic.IsImplemented && tactic.IsAvailableInShop &&
+        !ExcludedOpeningTacticQualities.Contains(tactic.Quality);
 
     static WushuangCatalogue()
     {
@@ -55,6 +59,11 @@ public static class WushuangCatalogue
             .Select(row => Enum.Parse<CardKind>(row.GetString()!)).ToHashSet();
         var excludedSkills = restrictions.GetProperty("excludedSkillOffers");
         var excludedTactics = restrictions.GetProperty("excludedTacticOffers");
+        var strictExcludedTactics = excludedTactics.EnumerateObject().Select(row => int.Parse(row.Name)).ToHashSet();
+        var offerOnlyExcludedTactics = restrictions.TryGetProperty("shopOnlyExcludedTacticOffers", out var shopOnly)
+            ? shopOnly.EnumerateObject().Select(row => int.Parse(row.Name)).ToHashSet() : [];
+        ExcludedOpeningTacticQualities = restrictions.TryGetProperty("excludedOpeningTacticQualities", out var openingQualities)
+            ? openingQualities.EnumerateArray().Select(row => row.GetInt32()).ToHashSet() : [];
         ExcludedGeneralIds = restrictions.GetProperty("excludedGenerals").EnumerateObject().Select(row => row.Name)
             .ToHashSet(StringComparer.Ordinal);
         var skillBindings = runtime.RootElement.GetProperty("skills");
@@ -90,7 +99,7 @@ public static class WushuangCatalogue
                 row.GetProperty("quality").GetInt32(), binding?.StartsWith('@') == true ? null : binding)
             {
                 IsImplemented = binding is not null,
-                IsAvailableInShop = !excludedTactics.TryGetProperty(id.ToString(), out _) &&
+                IsAvailableInShop = !strictExcludedTactics.Contains(id) && !offerOnlyExcludedTactics.Contains(id) &&
                     !Text(row, "description").Contains("护甲", StringComparison.Ordinal),
                 StartOnly = Text(row, "description").StartsWith("游戏开始时", StringComparison.Ordinal) ||
                     Text(row, "description").StartsWith("开局", StringComparison.Ordinal),
@@ -98,7 +107,11 @@ public static class WushuangCatalogue
                     .Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray())
             };
         }).ToArray());
-        ExcludedSkillIds.UnionWith(Tactics.Where(t => !t.IsAvailableInShop && t.SkillId is not null).Select(t => t.SkillId!));
+        // Balance exclusions only remove offers. Strict mechanical exclusions
+        // also prohibit binding; an explicitly owned historical tactic keeps
+        // its native rule without reopening the current shop or opening pool.
+        ExcludedSkillIds.UnionWith(Tactics.Where(t => t.SkillId is not null &&
+            (strictExcludedTactics.Contains(t.Id) || t.Description.Contains("护甲", StringComparison.Ordinal))).Select(t => t.SkillId!));
         // A new verification date or an unrelated client-table update must not
         // invalidate saves when the mode's actual catalogue is unchanged.
         Fingerprint = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(
@@ -106,11 +119,14 @@ public static class WushuangCatalogue
                 EquipmentKinds = AllowedEquipmentKinds.Order().ToArray(),
                 ExcludedCards = ExcludedCardKinds.Order().ToArray(),
                 ExcludedGenerals = ExcludedGeneralIds.Order(StringComparer.Ordinal).ToArray(),
+                OfferOnlyExcludedTactics = offerOnlyExcludedTactics.Order().ToArray(),
+                ExcludedOpeningTacticQualities = ExcludedOpeningTacticQualities.Order().ToArray(),
                 AdditionalGeneralIds, NumericArmor = false, DistanceModifiers = false })))).ToLowerInvariant();
         if (Skills.Select(row => row.Id).Distinct().Count() != Skills.Count ||
             Tactics.Select(row => row.Id).Distinct().Count() != Tactics.Count ||
             Skills.Any(row => row.Cost < 0 || row.Quality is < 0 or > 4) ||
             Tactics.Any(row => row.Cost < 0 || row.Quality is < 1 or > 4) ||
+            ExcludedOpeningTacticQualities.Any(quality => quality is < 1 or > 4) ||
             Cards.Select(row => row.Id).Distinct().Count() != Cards.Count ||
             AllowedEquipmentKinds.Count == 0 || AllowedEquipmentKinds.Any(kind => !EquipmentCatalog.IsEquipment(kind) ||
                 EquipmentCatalog.Get(kind).Slot is not (EquipmentSlot.Weapon or EquipmentSlot.Armor)) ||

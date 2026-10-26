@@ -56,6 +56,8 @@ public sealed partial class GameEngine
             !HasBeiMiHuPreludeBindings(owner, SkillProgramTriggerWindow.TurnBeforeStart,
                 SkillProgramEffectOp.AwakenJianghuo) &&
             !HasBeiMiHuPreludeBindings(owner, SkillProgramTriggerWindow.TurnBeforeStart,
+                SkillProgramEffectOp.ObtainWushuangDeckCards) &&
+            !HasBeiMiHuPreludeBindings(owner, SkillProgramTriggerWindow.TurnBeforeStart,
                 SkillProgramEffectOp.ResolveMobileShiGuoYuanXiugeng) && !HasShiLsHandGrantsToExpire(owner.Seat) && ShiCzPendingExtra(owner.Seat) is null && ShiDzPendingExtra(owner.Seat) is null) return false;
         if (_pendingDecision is not null || _resolutionStack.Count != 0 || owner.Seat != _currentSeat)
             throw new InvalidOperationException("Before-turn work requires a clean actual turn boundary.");
@@ -147,6 +149,7 @@ public sealed partial class GameEngine
                         !isRound && ProgramInstructionResolver.Default.Features(GetProgramTrigger(candidate)).HasOperation(SkillProgramEffectOp.ObtainHappyTaishiCiStartSlash) ||
                         !isRound && ProgramInstructionResolver.Default.Features(GetProgramTrigger(candidate)).HasOperation(SkillProgramEffectOp.EditDinghanNames) ||
                         !isRound && ProgramInstructionResolver.Default.Features(GetProgramTrigger(candidate)).HasOperation(SkillProgramEffectOp.AwakenJianghuo) ||
+                        !isRound && ProgramInstructionResolver.Default.Features(GetProgramTrigger(candidate)).HasOperation(SkillProgramEffectOp.ObtainWushuangDeckCards) ||
                         !isRound && ProgramInstructionResolver.Default.Features(GetProgramTrigger(candidate)).HasOperation(SkillProgramEffectOp.ResolveMobileShiChenZhiQuanchong) ||
                         !isRound && ProgramInstructionResolver.Default.Features(GetProgramTrigger(candidate)).HasOperation(SkillProgramEffectOp.ResolveMobileShiDongZhaoYingjia) ||
                         !isRound && ProgramInstructionResolver.Default.Features(GetProgramTrigger(candidate)).HasOperation(SkillProgramEffectOp.ResolveMobileShiGuoYuanXiugeng) ||

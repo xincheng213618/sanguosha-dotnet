@@ -53,6 +53,49 @@ internal static class ShiChenDaoChecks
             "Draw first means clearing all live Yi at the real ending, including damage earned later in that turn.");
     }
 
+    public static void NormalUseAndIssuedCounterspellHaveSeparateCompletionOwnersCold()
+    {
+        var ordinary = Scene.Start(); ordinary.Prepare("draw"); ordinary.SelectWanglie(CardKind.Slash); ordinary.Play(); ordinary.Cold();
+        var selected = ordinary.E<MobileShiWanglieSelectedEvent>().Single(); var hp = ordinary.V(1).Hp;
+        ordinary.Use(a => a.Kind == LegalActionKind.Slash && a.CardId == selected.CardId && a.TargetSeats.SequenceEqual([1])); ordinary.Play();
+        var normalUse = ordinary.E<MobileShiWanglieUsedEvent>().Single();
+        ordinary.Need(ordinary.V(1).Hp == hp - 1 && ordinary.E<MobileShiWanglieCompletedEvent>() is [var normalDone] &&
+            normalDone.ActionId == normalUse.ActionId && normalDone.SelectionId == selected.FrameId &&
+            ordinary.E<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == normalUse.ActionId && e.Action.Type == CardActionType.Use) &&
+            !ordinary.E<ProgramBindingStartedEvent>().Any(e => e.SkillId == Wanglie && e.BindingId == "wanglie-response-complete") &&
+            ordinary.V(0).Skills.Any(s => s.ContentId == Wanglie),
+            "A selected ordinary Slash with Wanglie still present completes exactly once through CardUseFinished; it cannot borrow the response-completion binding.");
+        ordinary.Cold(); ordinary.Replay();
+
+        var response = Scene.Start(withCounterspell: true); response.Prepare("draw"); response.SelectWanglie(CardKind.Nullification); response.Play();
+        var grant = response.E<MobileShiWanglieSelectedEvent>().Single();
+        response.DriverAction("drop-wanglie"); response.Play(); response.Cold();
+        response.Use(a => a.Kind == LegalActionKind.Duel && a.TargetSeats.SequenceEqual([1]));
+        response.Reach(() => response.P is { PlayerSeat: 0, Kind: DecisionKind.Nullification } p && p.Choices.Any(c => c.Cards.SequenceEqual([grant.CardId])));
+        response.Answer(c => c.Cards.SequenceEqual([grant.CardId]));
+        response.Reach(() => response.P?.SkillPrompt?.SkillId == Driver && response.P.Choices.Any(c => c.Parameters.GetValueOrDefault("option-id") == "continue"));
+        var window = response.G.ResolutionStack.OfType<ProgramCardTriggerWindowFrame>().Last(w =>
+            w.CompletedResponseReturn is { Kind: ProgramCompletedResponseKind.Nullification, IsCommitted: false });
+        var paid = response.E<MobileShiWanglieUsedEvent>().Single();
+        response.Need(window.Action.Type == CardActionType.Response && window.Action.ActionId == paid.ActionId &&
+            window.Action.ActorSeat == 0 && window.Action.ProviderSeat == 0 && window.Action.RequesterSeat is null &&
+            window.Action.PhysicalCards is [var material] && material.CardId == grant.CardId && material.From == CardLocation.Hand(0) &&
+            response.E<MobileShiWanglieCompletedEvent>().Length == 0 &&
+            response.G.CardMovements.Count(m => m.CardId == grant.CardId && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Nullification) == 1 &&
+            response.G.CardMovements.Count(m => m.CardId == grant.CardId && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.NullificationFinished) == 1,
+            "The actual counterspell is fully paid on its own typed native completion parent; the earlier mandatory observer suspends before Wanglie's issued completion.");
+        response.Cold(); response.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue"); response.Play();
+        response.Need(response.E<MobileShiWanglieCompletedEvent>() is [var done] && done.ActionId == paid.ActionId && done.SelectionId == grant.FrameId &&
+            response.E<ProgramBindingStartedEvent>().Count(e => e.SkillId == Wanglie && e.BindingId == "wanglie-response-complete") == 1 &&
+            response.E<UnrespondableCounterspellIssuedEvent>().Count(e => e.ActionId == paid.ActionId && e.Source == grant.Source) == 1 &&
+            response.G.CardMovements.Count(m => m.CardId == grant.CardId && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Nullification) == 1 &&
+            response.G.CardMovements.Count(m => m.CardId == grant.CardId && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.NullificationFinished) == 1 &&
+            !response.G.GetHumanLegalActions().Any(a => a.Kind is LegalActionKind.Duel or LegalActionKind.Slash) &&
+            response.G.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.DrawTwo),
+            "The original issued response survives source loss and cold return, completes once without repaying, and applies only the later other-target ban.");
+        response.Cold(); response.Replay();
+    }
+
     private static string? Branch(PromptChoice c) => c.Parameters.GetValueOrDefault("branch");
     private static string? Key(PromptChoice c) => c.Parameters.GetValueOrDefault("program-action");
     private sealed class Scene(GameEngine game, ContentRegistry registry)
@@ -109,12 +152,15 @@ internal static class ShiChenDaoChecks
             Events = G.Events.Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray(), Commands = CommandJson.Serialize(G.AcceptedCommands) });
         private string Dump() => JsonSerializer.Serialize(new { G.State.TurnNumber, P, Owner = new { V(0).Hp, V(0).HandCount, Marks },
             Prepared = E<MobileShiHongyiPreparedEvent>(), Ending = E<MobileShiHongyiEndingEvent>(), Draws = E<MobileShiHongyiDrawBoundEvent>(),
+            WanglieSelected = E<MobileShiWanglieSelectedEvent>(), WanglieUsed = E<MobileShiWanglieUsedEvent>(), WanglieCompleted = E<MobileShiWanglieCompletedEvent>(),
+            ResponseBindings = E<ProgramBindingStartedEvent>().Where(e => e.SkillId == Wanglie && e.BindingId == "wanglie-response-complete").ToArray(),
             Frames = G.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())).ToArray() });
-        public static Scene Start()
+        public static Scene Start(bool withCounterspell = false)
         {
             var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
             ShanheStartingCard[] hand = [new(CardKind.Slash, Suit.Spade, 4), new(CardKind.Slash, Suit.Heart, 5), new(CardKind.Duel, Suit.Diamond, 6),
                 new(CardKind.DrawTwo, Suit.Heart, 7), new(CardKind.Alcohol, Suit.Spade, 8), new(CardKind.IronChain, Suit.Club, 9)];
+            if (withCounterspell) hand = [..hand, new(CardKind.Nullification, Suit.Club, 10)];
             var setup = new ShanheBattleSetup(617, 1, "shi-chen-dao-native", Hero, 4, 0, 0, 0, 0, [Driver], hand, [],
                 Enumerable.Range(1, 3).Select(_ => new ShanheCombatantDefinition(Peer, Hp: 8) { StartingHand = [new(CardKind.Dodge, Suit.Heart, 2)] }).ToArray(), [], new string('e', 64));
             var g = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null,
@@ -132,7 +178,8 @@ internal static class ShiChenDaoChecks
             var rules = $$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
               {"id":"{{Driver}}","revision":1,"modifiers":[{"id":"keep","query":"handLimit","operation":"add","value":20,"priority":0}],
-               "triggers":[{"id":"no-draw","window":"drawPhaseStarting","subject":"owner","optional":false,"effects":[{"op":"adjustNormalDraw","target":"owner","amount":-2}]}],
+               "triggers":[{"id":"no-draw","window":"drawPhaseStarting","subject":"owner","optional":false,"effects":[{"op":"adjustNormalDraw","target":"owner","amount":-2}]},
+                 {"id":"completed-response","window":"cardUseCompleted","ownerRelation":"actor","includeResponseUses":true,"cardKinds":["nullification"],"priority":1000,"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"response-child","options":[{"id":"continue"}]}]}],
                "activations":[
                  {"id":"damage-two","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"selectedTarget","amount":2}]},
                  {"id":"drop-wanglie","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"loseOwnerSkillsAndGrant","target":"owner","skillIds":["{{Wanglie}}"],"sourceBind":"{{Quiet}}"}]},
@@ -143,7 +190,7 @@ internal static class ShiChenDaoChecks
                 {"id":"no-play","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}
             ]}
             """;
-            var presentations = new Dictionary<string, object> { [Driver] = new { name = "真实伤害与技能变更驱动", description = "实际伤害和共享技能变化指令。" },
+            var presentations = new Dictionary<string, object> { [Driver] = new { name = "真实伤害与技能变更驱动", description = "实际伤害和共享技能变化指令。", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } },
                 [Quiet] = new { name = "安静同桌", description = "保留实际回合和原生防御。" } };
             var catalog = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = presentations }));
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description)

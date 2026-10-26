@@ -8,6 +8,49 @@ internal static class MobileShenCaoCaoChecks
     private const string Driver = "fixture:mobile-caocao-driver", Watch = "fixture:mobile-caocao-watch", Quiet = "fixture:mobile-caocao-quiet";
     private const string Mode = "identity:classic-mobile-caocao-fixture", Reason = "skill-program.mobile:guixin.obtain";
 
+    public static void GuixinKeepsRealForeignPhantomGainAndExactDestructionTailCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(phantoms: true));
+        var g = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord,
+            ModeId = Mode, UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 4 }, registry);
+        Accept(g, new StartGameCommand()); Reach(g, p => p.Kind == DecisionKind.SelectGeneral);
+        Accept(g, new SelectGeneralCommand(0, Hero, g.Revision, P(g)!.PromptId)); Play(g);
+        var issuer = Enumerable.Range(1, 3).Single(seat => g.CreateSnapshot(seat).Players[seat].Skills!.Any(skill => skill.ContentId == "happy:huanshu"));
+        var phantom = g.CreateSnapshot(issuer).Players[issuer].Hand.First(card => card.SkillMarkLabel == "幻术").Id;
+        Use(g, "damage"); Offer(g); Activate(g);
+        long frameId = 0;
+        foreach (var seat in new[] { 1, 2, 3 })
+        {
+            var cards = g.CreateSnapshot(seat).Players[seat].Hand;
+            var id = seat == issuer ? phantom : cards.First(card => card.SkillMarkLabel is null).Id;
+            var slot = cards.Select((card, index) => (card, index)).Single(item => item.card.Id == id).index;
+            Claim(g, seat, choice => choice.Parameters.GetValueOrDefault("source-zone") == nameof(CardZoneKind.Hand) &&
+                choice.Parameters.GetValueOrDefault("slot-index") == slot.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            Paid(g);
+            var frame = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.MobileGuixin is not null);
+            frameId = frame.Id;
+            if (seat == issuer)
+            {
+                var payment = frame.MobileGuixin!.Payments.Single(paid => paid.CardId == phantom);
+                var gain = payment.Movements.Single();
+                var destroyed = g.CardMovements.Single(move => move.CardId == phantom && move.From == CardLocation.Hand(0) &&
+                    move.HappyZuoCiPhantomDestination?.OriginalForeignGainSequence == gain.Sequence);
+                Need(gain.From == CardLocation.Hand(issuer) && gain.To == CardLocation.Hand(0) && gain.Reason.Value == Reason &&
+                    destroyed.Sequence == payment.After && destroyed.Sequence > gain.Sequence &&
+                    destroyed.HappyZuoCiPhantomDestination is { OriginalRecipient: 0 } && Zone(g, phantom) == CardLocation.OutsideGame,
+                    "The original damage-point Guixin payment retains one real foreign hand gain and the uniquely linked synchronous phantom destruction, without a fabricated persistent hand entity.");
+            }
+            g = Cold(g, registry); Continue(g);
+        }
+        Offer(g); Answer(g, choice => Action(choice) == "skip"); Play(g);
+        Need(E<MobileGuixinCompletedEvent>(g).Single(fact => fact.FrameId == frameId) is { PaidCharacters: 3, TurnoverIssued: true, Cancelled: false } &&
+            E<MobileGuixinTurnoverIssuedEvent>(g).Count(fact => fact.FrameId == frameId) == 1 &&
+            g.CardMovements.Count(move => move.CardId == phantom && move.To == CardLocation.Hand(0) && move.Reason.Value == Reason) == 1 &&
+            g.CardMovements.Count(move => move.CardId == phantom && move.HappyZuoCiPhantomDestination?.OriginalForeignGainSequence is not null) == 1,
+            "Cold continuation visits each original participant once, flips once, and never reclaims or destroys the same phantom payment twice.");
+        _ = Cold(g, registry);
+    }
+
     public static void GuixinSelectsAreasPerDamagePointAndColdReturnsOnce()
     {
         var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
@@ -109,12 +152,13 @@ internal static class MobileShenCaoCaoChecks
         Facts = g.Events.Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray(),
         g.CardMovements, Zones = g.CreateCardZoneDiagnostics(), Commands = CommandJson.Serialize(g.AcceptedCommands)
     });
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool phantoms = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-mobile-caocao", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(new OwnerBuilder(b), Hero);
+            if (phantoms) CharacterFixtureContent.Register(b, "happy:shen-zuo-ci");
             var rules = $$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
               {"id":"{{Driver}}","revision":1,"activations":[
@@ -133,7 +177,8 @@ internal static class MobileShenCaoCaoChecks
             };
             var catalog = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, id, "Native mobile Guixin fixture") { Program = program, ProgramPresentation = catalog.Presentations[id] });
-            for (var n = 1; n < 4; n++) b.AddGeneral(new($"fixture:mobile-caocao-peer-{n}", "真实目标", "supporter", Quiet, "wei", 8));
+            for (var n = 1; n < 4; n++) b.AddGeneral(new($"fixture:mobile-caocao-peer-{n}", "真实目标", "supporter", Quiet, "wei", 8,
+                AdditionalSkillIds: phantoms && n == 1 ? ["happy:huanshu"] : null));
             var kinds = new[] { "standard:crossbow", "standard:indulgence", "standard:dodge", "standard:slash" };
             b.AddDeck(new("fixture:mobile-caocao-deck", "固定实体牌堆", 4, 2, [])
             { PhysicalCards = Enumerable.Range(0, 96).Select(i => new ContentDeckPhysicalCard(kinds[i % kinds.Length], (Suit)(i % 4), i % 13 + 1)).ToArray() });

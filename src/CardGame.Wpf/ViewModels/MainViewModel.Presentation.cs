@@ -96,7 +96,7 @@ public sealed partial class MainViewModel
                                     : IsResponseConversionSelectionPending && _responseConversionSelection!.SkillId == skill.Id
                                     ? "已选择 · 转化响应"
                                     : IsPlayConversionSelectionPending && _playConversionSelection!.SkillId == skill.Id
-                                    ? $"已选择 · {(_playConversionSelection.Mode is null ? "选择牌型" : $"当{PlayConversionCardName}")}"
+                                    ? PlayConversionStateText
                                     : GetSkillStateText(active, isAvailable, skill.ExecutionForms, "已启用", skill.Tags, runtimeState),
                                 acquired ? $"{human.GeneralName} · 获得技能"
                                     : $"{slot.Label}将 · {(slot.Revealed ? "明置" : "暗置")}",
@@ -140,7 +140,7 @@ public sealed partial class MainViewModel
                         IsResponseConversionSelectionPending && _responseConversionSelection!.SkillId == skill.Id
                             ? "已选择 · 转化响应"
                             : IsPlayConversionSelectionPending && _playConversionSelection!.SkillId == skill.Id
-                            ? $"已选择 · {(_playConversionSelection.Mode is null ? "选择牌型" : $"当{PlayConversionCardName}")}"
+                            ? PlayConversionStateText
                             : GetSkillStateText(
                             active,
                             isAvailable,
@@ -369,10 +369,11 @@ public sealed partial class MainViewModel
         : IsTeamSnapshot
         ? $"青队 {Seats.Count(seat => seat.IsAlive && seat.TeamId == "team:blue")} · 赤队 {Seats.Count(seat => seat.IsAlive && seat.TeamId == "team:red")} 存活"
         : $"{Seats.Count(seat => seat.IsAlive)} / {Seats.Count} 人存活";
-    public string PlayButtonText => IsDeckReorderPending || IsRevealedSubsetSelectionPending ? "确 认" : IsMobileShiZhuangshiSelectionPending ? "确 定" : IsCardDistributionPending ? "确 定" : IsDiscardSelectionPending ? $"弃置 {SelectedDiscardCount} / {RequiredDiscardCount} 张"
+    public string PlayButtonText => IsCardExchangePending ? CardExchangeConfirmText : IsDeckReorderPending || IsRevealedSubsetSelectionPending ? "确 认" : IsMobileShiZhuangshiSelectionPending ? "确 定" : IsCardDistributionPending ? "确 定" : IsDiscardSelectionPending ? $"弃置 {SelectedDiscardCount} / {RequiredDiscardCount} 张"
         : IsOwnedCardSelectionPending ? "确 定"
         : IsSkillTargetSelectionPending ? _snapshot.PendingDecision?.SkillPrompt is { } skill ? $"发动{skill.Name}" : "确 定"
         : IsHandResponsePending ? HandResponseButtonText
+        : IsMaterialPlayConversionPending ? SelectedMaterialPlayMode is { } materialMode ? $"使用【{CardCatalog.Get(materialMode.Kind).DisplayName}】" : "出 牌"
         : IsActiveSkillSelectionPending ? HumanActiveSkillAction is { PlayedCardKind: { } kind } zero && IsTieredRoundZeroAction(zero)
             ? $"使用【{CardCatalog.Get(kind).DisplayName}】" : $"发动{HumanActiveSkillName}"
         : !CanPlaySelected && CanPlaySelectedAsSlash ? AlternatePlayText
@@ -416,6 +417,7 @@ public sealed partial class MainViewModel
     }
 
     private LegalAction? HumanActiveSkillAction =>
+        IsMaterialPlayConversionPending ? MaterialPlaySelectionAction :
         _selectedTieredRoundZeroAction is not null ? SelectedTieredRoundZeroAction() :
         _selectedActiveSkillIdentity is { IsSpecified: true } identity
             ? HumanActiveSkillActions.FirstOrDefault(identity.Matches)
@@ -442,6 +444,7 @@ public sealed partial class MainViewModel
                   CurrentPresentationRegistry.Skills.TryGetValue(source.SkillId, out var zeroSkill)
                     ? zeroSkill.Name : "技能";
     public bool CanConfirmActiveSkill => IsActiveSkillSelectionPending && HumanActiveSkillAction is { } action &&
+        (!IsMaterialPlayConversionPending || SelectedMaterialPlayMode is not null) &&
         (!IsJinzhiDraft(action) || SelectedJinzhiAction is not null) &&
         (IsTieredRoundZeroAction(action) ? CanConfirmTieredRoundZeroAction(action) :
         _selectedActiveSkillCardIds.Count >= action.MinCardCount && _selectedActiveSkillCardIds.Count <= action.MaxCardCount &&
@@ -470,17 +473,18 @@ public sealed partial class MainViewModel
              sequence.Take(_selectedActiveSkillTargetSeats.Count).SequenceEqual(_selectedActiveSkillTargetSeats) &&
              sequence[_selectedActiveSkillTargetSeats.Count] == seat));
 
-    private bool SelectedActiveSkillCardsMatchContract(LegalAction action)
+    private bool SelectedActiveSkillCardsMatchContract(LegalAction action, IReadOnlySet<int>? materialIds = null)
     {
         if (!action.SelectedCardsSameSuit && !action.SelectedCardsDistinctSuits &&
             !action.SelectedCardsSameNameOrAllEquipment) return true;
         // Published costs can include equipment and public piles. Read their
         // physical faces from the current player view, never trusted engine state.
+        materialIds ??= _selectedActiveSkillCardIds;
         var selectedCards = _snapshot.Players.SelectMany(player => player.Hand.Concat(player.Equipment)
                 .Concat(player.Judgment).Concat(player.WoodenOxGrain ?? []).Concat(player.BuquWounds ?? [])
                 .Concat(player.AuthorityCards ?? []).Concat(player.ChunlaoCards ?? []))
-            .Where(card => _selectedActiveSkillCardIds.Contains(card.Id)).ToArray();
-        if (selectedCards.Length != _selectedActiveSkillCardIds.Count) return false;
+            .Where(card => materialIds.Contains(card.Id)).ToArray();
+        if (selectedCards.Length != materialIds.Count) return false;
         var distinct = action.SelectedCardsSameSuit || action.SelectedCardsDistinctSuits
             ? selectedCards.Select(card => card.Suit).Distinct().Count() : 0;
         return (!action.SelectedCardsSameSuit || distinct == 1) &&
@@ -515,20 +519,20 @@ public sealed partial class MainViewModel
                 : $"{action.Description}（已选{BuildActiveSkillSelectionSummary()}）";
         }
     }
-    public bool CanConfirmSelected => IsDeckReorderPending ? CanConfirmDeckReorder : IsRevealedSubsetSelectionPending ? SelectedRevealedSubsetChoice is not null : IsMobileShiZhuangshiSelectionPending ? MobileShiZhuangshiPayChoice is not null : IsCardDistributionPending ? CanConfirmDistribution : IsDiscardSelectionPending ? SelectedDiscardCount > 0 && SelectedDiscardCount <= RequiredDiscardCount
+    public bool CanConfirmSelected => IsCardExchangePending ? SelectedCardExchangeChoice is not null : IsDeckReorderPending ? CanConfirmDeckReorder : IsRevealedSubsetSelectionPending ? SelectedRevealedSubsetChoice is not null : IsMobileShiZhuangshiSelectionPending ? MobileShiZhuangshiPayChoice is not null : IsCardDistributionPending ? CanConfirmDistribution : IsDiscardSelectionPending ? SelectedDiscardCount > 0 && SelectedDiscardCount <= RequiredDiscardCount
         : IsOwnedCardSelectionPending ? CanConfirmOwnedCardSelection
         : IsSkillTargetSelectionPending ? SelectedSkillTargetChoice is not null
         : IsCardPaymentSelectionPending ? SelectedCardPaymentChoice is not null
         : IsHandResponsePending ? IsBaguaActivationPending || SelectedHandResponse is not null && Hand.Any(card => card.Id == _selectedCardId && card.IsPlayable)
         : IsActiveSkillSelectionPending ? CanConfirmActiveSkill : CanPlaySelected || CanPlaySelectedAsSlash;
-    public bool CanActFromHand => IsDeckReorderPending || IsRevealedSubsetSelectionPending || IsMobileShiZhuangshiSelectionPending || IsCardDistributionPending || CanEndTurn || IsDiscardSelectionPending || IsHandResponsePending || IsSkillTargetSelectionPending || IsOwnedCardSelectionPending;
+    public bool CanActFromHand => IsCardExchangePending || IsDeckReorderPending || IsRevealedSubsetSelectionPending || IsMobileShiZhuangshiSelectionPending || IsCardDistributionPending || CanEndTurn || IsDiscardSelectionPending || IsHandResponsePending || IsSkillTargetSelectionPending || IsOwnedCardSelectionPending;
     public bool HasAlternateSlash => CanPlaySelected && CanPlaySelectedAsSlash;
     public string AlternatePlayText => SelectedConversionAction() is { } conversion
         ? $"当作{CardCatalog.Get(conversion.PlayedCardKind!.Value).DisplayName}使用"
         : "转换使用";
     public string TurnHeadline => HasGameOver ? GameOverText : IsGeneralSelectionPending ? "点将出征" : IsDiscardSelectionPending ? "你的弃牌阶段" : _game.IsMoLuBuOpeningPhase ? $"{CenterTitle} · 夺炁额外出牌阶段" : CanEndTurn ? "你的出牌阶段" : CanStepAi ? $"{CenterTitle} 正在行动" : "等待你的响应";
     public bool HasChoicePrompt => IsDyingSelectionPending || IsHarvestSelectionPending || IsTargetCardSelectionPending || IsFireAttackSelectionPending || IsNullificationSelectionPending || IsResponseSelectionPending || IsSkillSelectionPending;
-    public bool HasCenterChoices => IsDeckReorderPending || IsCardDistributionPending || HasChoicePrompt && (HasDockSkillChoices || HasExpandedSelection ? false : IsOwnedCardSelectionPending && !IsForeignCardTakeSelectionPending ? OwnedSelectionExtraChoices.Count > 0 : IsHandResponsePending ? HandResponseExtraChoices.Count > 0
+    public bool HasCenterChoices => IsCardExchangePending || IsDeckReorderPending || IsCardDistributionPending || HasChoicePrompt && (HasDockSkillChoices || HasExpandedSelection ? false : IsOwnedCardSelectionPending && !IsForeignCardTakeSelectionPending ? OwnedSelectionExtraChoices.Count > 0 : IsHandResponsePending ? HandResponseExtraChoices.Count > 0
         : !IsSkillTargetSelectionPending || CenterSkillChoices.Count > 0) || HasPublicTargetChoices || HasTargetCombinationChoices ||
         HasPublicRevealedCards || HasPrivatelyViewedCards || HasDeclaredCards ||
         ActiveSkillEquipmentChoices.Count > 0 || CenterEquipmentPlayChoices.Count > 0;
@@ -588,11 +592,13 @@ public sealed partial class MainViewModel
     private void InitializePresentation(bool autoAdvance)
     {
         InitializeDeckReorder();
+        InitializeCardExchange();
         InitializeBattleLogFilters();
         InitializePlayback();
         RecastSelectedCommand = new RelayCommand(RecastSelected, () => CanRecastSelected);
         ClearSelectionCommand = new RelayCommand(ClearSelection);
         CancelActionCommand = new RelayCommand(CancelAction, () => CanCancelAction);
+        SelectAllZhihengHandCommand = new RelayCommand(SelectAllZhihengHand, () => CanSelectAllZhihengHand);
         SelectHandResponseChoiceCommand = new RelayCommand<PromptChoice>(SelectResponseAlternative,
             choice => HandResponseExtraChoices.Any(candidate => ReferenceEquals(candidate, choice)));
         SelectRevealedCardCommand = new RelayCommand<CardViewModel>(card =>
@@ -605,7 +611,8 @@ public sealed partial class MainViewModel
         ConfirmSelectedCommand = new RelayCommand(() =>
         {
             if (!CanConfirmSelected) return;
-            if (IsDeckReorderPending) ConfirmDeckReorder();
+            if (IsCardExchangePending) ConfirmCardExchange();
+            else if (IsDeckReorderPending) ConfirmDeckReorder();
             else if (IsRevealedSubsetSelectionPending) ConfirmRevealedSubset();
             else if (IsMobileShiZhuangshiSelectionPending) ConfirmMobileShiZhuangshi();
             else if (IsCardDistributionPending) ConfirmCardDistribution();
@@ -744,6 +751,7 @@ public sealed partial class MainViewModel
         var target = Seats.FirstOrDefault(item => item.Seat == _selectedTargetSeat);
         ActionHint = HasGameOver ? "对局结束 · 点击「新对局」再战一局"
             : IsSpectating ? SpectatorHint
+            : IsCardExchangePending ? CardExchangeHint
             : IsDeckReorderPending ? DeckReorderHint
             : IsRevealedSubsetSelectionPending ? RevealedSubsetSelectionHint
             : IsMobileShiZhuangshiSelectionPending ? MobileShiZhuangshiSelectionHint
@@ -860,6 +868,7 @@ public sealed partial class MainViewModel
 
     private void ClearSelection()
     {
+        if (IsCardExchangePending) { ClearCardExchangeSelection(); return; }
         if (IsDeckReorderPending) return;
         if (IsRevealedSubsetSelectionPending)
         {
@@ -946,6 +955,7 @@ public sealed partial class MainViewModel
 
     private string GetActiveSkillSelectionHint()
     {
+        if (IsMaterialPlayConversionPending) return MaterialPlayConversionHint;
         if (IsJinzhiSelectionPending) return JinzhiSelectionHint;
         var action = HumanActiveSkillAction;
         if (action is null) return "正在选择主动技能参数。";

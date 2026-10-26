@@ -2,7 +2,7 @@ using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
-internal static class WushuangSkillsBChecks
+internal static partial class WushuangSkillsBChecks
 {
     private const string Mode = "identity:classic-wushuang-b", Driver = "fixture:wushuang-b-driver", Human = "fixture:wushuang-b-human";
     private static string Skill(int id) => $"wushuang:skill-{id}";
@@ -288,15 +288,15 @@ internal static class WushuangSkillsBChecks
             "B skills cold-restore their owning frames, hidden prompts and exact physical movements.");
     }
     private static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
-    private static (GameEngine, ContentRegistry) Create(int[] skills, CardKind cards, int initialHp = 3, int otherHp = 8, bool attackOther = false)
+    private static (GameEngine, ContentRegistry) Create(int[] skills, CardKind cards, int initialHp = 3, int otherHp = 8, bool attackOther = false, bool dinganDamage = false)
     {
-        var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture(skills, cards, initialHp, otherHp, attackOther));
+        var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture(skills, cards, initialHp, otherHp, attackOther, dinganDamage));
         var g = GameEngine.CreateStandard(new GameOptions { Seed = 17, ModeId = Mode, PlayerCount = 4, HumanSeat = 0,
             HumanRole = null, HumanTeamId = "player", UseInteractiveSetup = true, UseInteractiveDiscard = true, AdvanceAfterHumanCommands = false, MaxTurns = 20 }, r);
         Accept(g, new StartGameCommand()); Reach(g, p => p.Kind == DecisionKind.SelectGeneral && p.PlayerSeat == 0);
         Accept(g, new SelectGeneralCommand(0, Human, g.Revision, P(g)!.PromptId)); return (g, r);
     }
-    private sealed class Fixture(int[] skills, CardKind cards, int initialHp, int otherHp, bool attackOther) : IGameContentPackage
+    private sealed class Fixture(int[] skills, CardKind cards, int initialHp, int otherHp, bool attackOther, bool dinganDamage) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-wushuang-b", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
@@ -321,7 +321,19 @@ internal static class WushuangSkillsBChecks
                         ["fixture:wushuang-b-attack"] = new { name = "对手原生杀", description = "出牌阶段对唯一对手使用杀" },
                         ["fixture:wushuang-b-twin"] = new { name = "双闪多目标夹具", description = "双目标杀各需两闪" } } }));
             foreach (var (id, program) in fixtures.Programs) b.AddSkill(new(id, id, id) { Program = program, ProgramPresentation = fixtures.Presentations[id] });
-            b.AddGeneral(new(Human, "无双B组主将", "", Driver, "qun", 8, skills.Select(id => id == 3218 ? "ol:weijing" : Skill(id)).Concat(skills.Contains(3287) ? ["fixture:wushuang-b-twin"] : Array.Empty<string>()).ToArray()) { InitialHp = initialHp });
+            if (dinganDamage)
+            {
+                const string watcher = "fixture:wushuang-b-dingan-damage";
+                var damageFixture = SkillProgramCatalog.Load(
+                    "{\"schemaVersion\":" + SkillProgramCatalog.RulesSchemaVersion + ",\"skills\":[{\"id\":\"" + watcher + "\",\"revision\":1," +
+                    "\"modifiers\":[{\"id\":\"two-slashes\",\"query\":\"slashLimit\",\"operation\":\"add\",\"value\":1,\"priority\":0}]," +
+                    "\"triggers\":[{\"id\":\"damage-child\",\"window\":\"afterDamageApplied\",\"subject\":\"damageSource\",\"damageOccurrence\":\"perDamage\",\"optional\":true," +
+                    "\"effects\":[{\"op\":\"draw\",\"target\":\"owner\",\"amount\":1}]}]}]}",
+                    JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                        skills = new Dictionary<string, object> { [watcher] = new { name = "伤害冷恢复边界", description = "第二张原生杀及伤害观察" } } }));
+                b.AddSkill(new(watcher, "伤害冷恢复边界", "第二张原生杀及伤害观察") { Program = damageFixture.Programs[watcher], ProgramPresentation = damageFixture.Presentations[watcher] });
+            }
+            b.AddGeneral(new(Human, "无双B组主将", "", Driver, "qun", 8, skills.Select(id => id == 3218 ? "ol:weijing" : Skill(id)).Concat(skills.Contains(3287) ? ["fixture:wushuang-b-twin"] : Array.Empty<string>()).Concat(dinganDamage ? ["fixture:wushuang-b-dingan-damage"] : Array.Empty<string>()).ToArray()) { InitialHp = initialHp });
             for (var i = 1; i < 4; i++)
                 b.AddGeneral(new($"fixture:wushuang-b-other-{i}", "固定对手", "", "fixture:wushuang-b-quiet", "qun", otherHp, attackOther ? ["fixture:wushuang-b-attack"] : []));
             var cardId = cards == CardKind.DrawTwo ? "standard:draw_two" : cards == CardKind.Duel ? "standard:duel" : cards == CardKind.Dodge ? "standard:dodge" : "standard:slash";

@@ -4,6 +4,54 @@ using CardGame.Core;
 
 internal static partial class WushuangModeChecks
 {
+    public static void HandLimitExemptTacticsSkipBothManualAndAutomaticDiscard()
+    {
+        foreach (var (seed, tactic, kind) in new[] { (26, 2002, CardKind.Dodge), (28, 2003, CardKind.Peach) })
+        foreach (var interactive in new[] { false, true })
+        {
+            var (game, registry) = Start(false, seed, initialHp: 3, peaches: kind == CardKind.Peach, interactiveDiscard: interactive);
+            Drive(game, () => Shop(game) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
+            Buy(game, Shop(game).Offers.Single(offer => offer.TacticId == tactic).Id); Play(game);
+            var hand = game.CreateSnapshot(0).Players[0].HandCount;
+            Require(hand > 3 && game.CreateSnapshot(0).Players[0].Hand.All(card => card.Kind == kind),
+                "The real low-HP owner holds more exempt physical cards than its ordinary hand limit.");
+            var discarded = game.CardMovements.Count(move => move.From == CardLocation.Hand(0) && move.Reason == CardMoveReasons.HandLimitDiscard);
+            End(game); Shopping(game);
+            Require(game.CreateSnapshot(0).Players[0].HandCount == hand &&
+                game.CardMovements.Count(move => move.From == CardLocation.Hand(0) && move.Reason == CardMoveReasons.HandLimitDiscard) == discarded,
+                "Dodge/Peach exemptions must prevent both a manual discard debt and automatic card loss.");
+            Cold(game, registry);
+        }
+    }
+
+    public static void BowenTiersObtainRealTricksAtEachOwnTurnStart()
+    {
+        foreach (var (seed, tactic, amount) in new[] { (139, 2249, 1), (21, 2250, 2), (214, 2251, 3) })
+        {
+            // Red Bowen tiers remain executable legacy mechanisms, although
+            // the current opening pool no longer offers either free tier.
+            var legacy = tactic is 2250 or 2251;
+            var (game, registry) = Start(false, seed, mixedTricks: true, legacyOpeningTactic: legacy ? tactic : null);
+            if (!legacy)
+            {
+                Drive(game, () => Shop(game) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
+                Buy(game, Shop(game).Offers.Single(offer => offer.TacticId == tactic).Id);
+            }
+            Play(game);
+            var id = "wushuang:tactic-" + tactic;
+            WushuangDeckCardsObtainedEvent[] Gains() => E<WushuangDeckCardsObtainedEvent>(game).Where(gain => gain.OwnerSeat == 0 &&
+                E<ProgramBindingStartedEvent>(game).Any(binding => binding.FrameId == gain.ProgramFrameId && binding.SkillId == id)).ToArray();
+            Require(Gains() is [var first] && first.Count == amount && game.CardMovements.Where(move =>
+                    move.Sequence > first.SequenceBefore && move.Sequence <= first.SequenceAfter).Count(move =>
+                        move.CardKind == CardKind.DrawTwo && move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0)) == amount,
+                "Every purchased Bowen tier must obtain its exact number of genuine trick entities at the owner's turn start.");
+            Cold(game, registry); NextHumanTurn(game);
+            Require(Gains().Length == 2 && Gains().All(gain => gain.Count == amount),
+                $"The next real own turn must trigger the same tier once again, independently of normal drawing. Tactic {tactic}; counts [{string.Join(',', Gains().Select(gain => gain.Count))}]; turn {game.State.TurnNumber}; current tactics [{string.Join(',', Shop(game).TacticIds)}].");
+            Cold(game, registry);
+        }
+    }
+
     public static void OfficialPoolsPricesVersionsAndAcquisitionRecovery()
     {
         var registry = StandardWushuangContentRegistry.Create();
@@ -58,9 +106,9 @@ internal static partial class WushuangModeChecks
         Require(Shop(slots).ExtraSkillCapacity == 3 && Shop(slots).ExtraSkillIds.Count == 0,
             "Tactics increase the real shop capacity without occupying that capacity themselves.");
         Cold(slots, sr);
-        var (original, or) = Start(false, 54);
-        Drive(original, () => Shop(original) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
-        Buy(original, Shop(original).Offers.Single(o => o.TacticId == 2221).Id);
+        // The red opening reward is a historical acquisition configuration;
+        // the actual printed-slot replacement and cold assertions stay native.
+        var (original, or) = Start(false, 54, legacyOpeningTactic: 2221);
         Shopping(original);
         AffordableSkillPage(original);
         var skill = Shop(original).Offers.First(o => o.SkillId is not null && o.Cost <= Shop(original).Tokens);

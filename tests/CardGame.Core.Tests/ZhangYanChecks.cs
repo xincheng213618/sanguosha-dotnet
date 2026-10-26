@@ -4,6 +4,25 @@ using CardGame.Core;
 internal static class ZhangYanChecks
 {
  private const string Suji="ol:suji",Lang="ol:langdao",Owner="fixture:zy-owner",Driver="fixture:zy-driver",Quiet="fixture:zy-quiet",Prep="fixture:zy-prep",Watch="fixture:zy-watch",Conditional="fixture:zy-conditional",Health="fixture:zy-health",Mode="identity:classic-zhang-yan-fixture";
+ public static void ConvertedCounterspellReturnsBeforeIndependentSujiUseCold()
+ {
+  var(g,r)=Start("counterspell");Use(g,"lose");Play(g);
+  var draw=g.GetHumanLegalActions().First(a=>a.Kind==LegalActionKind.DrawTwo);
+  Accept(g,new PlayCardCommand(0,draw.CardId!.Value,draw.TargetSeats,g.Revision,P(g)!.PromptId,draw.PlayedCardKind,draw.TargetCardId));
+  Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.Nullification}p&&p.Choices.Any(c=>c.Parameters.Values.Contains("boundary:kanpo-current")));
+  g=Cold(g,r);var response=P(g)!.Choices.First(c=>c.Parameters.Values.Contains("boundary:kanpo-current"));var responseCard=response.Cards.Single();
+  Answer(g,c=>c.Id==response.Id);Play(g);
+  Need(E<CardActionAcceptedEvent>(g).Count(e=>e.Action.EffectiveKind==CardKind.Nullification&&e.Action.ConversionChain.Any(c=>c.SkillId=="boundary:kanpo-current")&&e.Action.PhysicalCards.Any(c=>c.CardId==responseCard))==1,
+   "A real published black-material Kanpo counterspell has one accepted action and returns to its original trick.");
+  // Keep this live brain/engine state: a cold restore here would hide a leaked
+  // transient response choice instead of testing the next native producer.
+  End(g);Reach(g,()=>Optional(P(g),Suji));Activate(g);Reach(g,()=>Current(g)is{Stage:ZhangYanStage.SujiCard});
+  var material=P(g)!.Choices.First(c=>c.Cards.Count==1).Cards.Single();Answer(g,c=>c.Cards.SequenceEqual([material]));Reach(g,()=>Current(g)is{Stage:ZhangYanStage.SujiTarget});
+  Answer(g,c=>c.Targets.SequenceEqual([1]));Play(g);var issued=E<ZhangYanSujiIssuedEvent>(g).Single().Return;
+  Need(issued.Source.SkillId==Suji&&g.CardMovements.Count(m=>m.CardId==material&&m.From==CardLocation.Hand(0)&&m.To==CardLocation.Processing&&m.Reason==CardMoveReasons.Use)==1&&E<ZhangYanSujiReturnedEvent>(g).Count()==1,
+   "The next actual Suji uses its own explicit source and real material once, without inheriting the completed counterspell's source.");
+  _=Cold(g,r);
+ }
  public static void SujiAnyTargetOwnForeignNormalRangeAndDamageOwnerCold()
  {
   var(g,r)=Start("own",true);Activate(g);Reach(g,()=>Current(g)is{Stage:ZhangYanStage.SujiCard});var material=P(g)!.Choices.First(c=>c.Cards.Count==1).Cards.Single();g=Cold(g,r);Answer(g,c=>c.Cards.SequenceEqual([material]));Reach(g,()=>Current(g)is{Stage:ZhangYanStage.SujiTarget});
@@ -64,6 +83,7 @@ internal static class ZhangYanChecks
   public void Register(IContentRegistryBuilder b)
   {
    CharacterFixtureContent.Register(b,"ol:zhang-yan");
+   if(scenario=="counterspell")CharacterFixtureContent.Register(b,"boundary:wolong-zhuge-liang","classic:wolong-zhuge-liang");
    var rules=$$"""
    {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
     {"id":"{{Driver}}","revision":1,"activations":[
@@ -86,12 +106,13 @@ internal static class ZhangYanChecks
    foreach(var(id,p)in catalog.Programs)b.AddSkill(new(id,id,"真实边界"){Program=p,ProgramPresentation=catalog.Presentations[id]});var human=scenario is"allies" or"chain"?Role.Rebel:Role.Lord;
    b.AddSkill(new("fixture:zy-pick-owner","本人公开评分","固定选择"){SelectionWeights=Enum.GetValues<Role>().ToDictionary(role=>role,role=>role==human?100000d:-100000d)});
    var skills=new List<string>{Driver,Lang,scenario=="payment-loss"?Conditional:Suji};if(scenario=="own")skills.Add(Prep);if(scenario is"payment-loss" or"payment-death")skills.Add(Watch);
+   if(scenario=="counterspell")skills.Add("boundary:kanpo-current");
    b.AddGeneral(new(Owner,"张燕真实本人","ol-zhang-yan","fixture:zy-pick-owner","qun",8,skills,GeneralGender.Male));var peers=Enumerable.Range(1,3).Select(i=>$"fixture:zy-peer-{i}").ToArray();
    foreach(var(id,index)in peers.Select((id,index)=>(id,index)))
    {var pick="fixture:zy-pick-"+index;b.AddSkill(new(pick,"其他公开评分","固定顺序"){SelectionWeights=Enum.GetValues<Role>().ToDictionary(role=>role,role=>role==human?-100000d:100003d-index)});b.AddGeneral(new(id,"其他真实角色","supporter",pick,"qun",8,scenario=="reward-lion"?[Health]:scenario=="foreign"?[]:[Quiet]));}
    b.AddCard(new("fixture:zy-lion","白银狮子","装备牌","真实原生移除回复",CardKind.SilverLion));b.AddCard(new("fixture:zy-ox","木牛流马","装备牌","真实原生存粮与移除",CardKind.WoodenOx));b.AddCard(new("fixture:zy-halberd","方天画戟","装备牌","真实原生距离",CardKind.FangtianHalberd));
    b.AddCard(new("fixture:zy-fire","火杀","基本牌","真实原生链伤",CardKind.FireSlash));
-   b.AddDeck(new("fixture:zy-deck","固定实体牌堆",4,2,[]){PhysicalCards=Enumerable.Range(0,96).Select(i=>new ContentDeckPhysicalCard(scenario=="extra"?"fixture:zy-halberd":scenario=="chain"?"fixture:zy-fire":scenario=="rescued"?"standard:peach":scenario=="dodge"?"standard:dodge":(scenario.StartsWith("payment-",StringComparison.Ordinal)||scenario=="reward-lion")&&i%5==0?scenario=="payment-ox"?"fixture:zy-ox":"fixture:zy-lion":"standard:slash",Suit.Spade,i%13+1)).ToArray()});
+   b.AddDeck(new("fixture:zy-deck","固定实体牌堆",4,2,[]){PhysicalCards=Enumerable.Range(0,96).Select(i=>new ContentDeckPhysicalCard(scenario=="counterspell"?"standard:draw_two":scenario=="extra"?"fixture:zy-halberd":scenario=="chain"?"fixture:zy-fire":scenario=="rescued"?"standard:peach":scenario=="dodge"?"standard:dodge":(scenario.StartsWith("payment-",StringComparison.Ordinal)||scenario=="reward-lion")&&i%5==0?scenario=="payment-ox"?"fixture:zy-ox":"fixture:zy-lion":"standard:slash",Suit.Spade,i%13+1)).ToArray()});
    b.AddMode(new(Mode,"张燕原生规则",4,4,scenario is"allies" or"chain"?new Dictionary<string,int>{{nameof(Role.Lord),1},{nameof(Role.Rebel),3}}:new Dictionary<string,int>{{nameof(Role.Lord),1},{nameof(Role.Renegade),3}},"fixture:zy-deck",GeneralCandidateCount:4,GeneralPoolIds:[Owner,..peers]));
   }
  }

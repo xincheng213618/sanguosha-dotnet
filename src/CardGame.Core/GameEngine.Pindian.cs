@@ -190,7 +190,7 @@ public sealed partial class GameEngine
                     new ProgramPindianResultBinding(
                         bind, result.SourceSeat, result.OpponentSeat,
                         result.SourceRank, result.OpponentRank, result.SourceWon,
-                        frame.ProgramResultVisibility) { ForeignTurnOrigin = foreignOrigin }).ToArray())
+                        frame.ProgramResultVisibility) { ForeignTurnOrigin = foreignOrigin, NativePindianFrameId = frame.Id }).ToArray())
             });
             RecordPindianHandContestReturn(GetActiveProgramFrame(program.Id), frame);
             CaptureMobileZhuRongPindianReturn(GetActiveProgramFrame(program.Id), frame);

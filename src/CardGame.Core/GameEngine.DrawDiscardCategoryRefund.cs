@@ -101,7 +101,7 @@ public sealed partial class GameEngine
         void Commit(long? batch, IReadOnlyList<CardMovementRecord> records)
         {
             var current = GetActiveProgramFrame(f.Id); var paid = current.DrawDiscardCategoryRefund!;
-            var invoice = records.Where(m => m.To == CardLocation.DiscardPile && m.From.OwnerSeat == r.TargetSeat &&
+            var invoice = records.Where(m => IsDrawDiscardCategoryPaidDestination(f, m) && m.From.OwnerSeat == r.TargetSeat &&
                 m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && m.Reason.Value == DrawDiscardCategoryReason(f, "discard"))
                 .Select(m => new DrawDiscardCategoryDiscard(m.CardId, m.From, GetProgramCardCategory(m.CardKind), m.Sequence)).ToArray();
             var distinct = invoice.Length > 0 && invoice.Select(m => m.Category).Distinct().Count() == invoice.Length;
@@ -118,6 +118,12 @@ public sealed partial class GameEngine
             new(DrawDiscardCategoryReason(f, "discard")), (batch, records) => Commit(batch, records));
         AdvanceRuntimeProgram(f.Id);
     }
+
+    private bool IsDrawDiscardCategoryPaidDestination(ProgramSkillFrame frame, CardMovementRecord movement) =>
+        movement.To == CardLocation.DiscardPile ||
+        IsWushuangShopDestroyedMaterial(movement) &&
+        ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Where(e => e.CardId == movement.CardId).ToArray() is [var destroyed] &&
+        destroyed.MovementSequence == movement.Sequence && destroyed.ParentFrameId == frame.Id;
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 210)]
     private bool ResumeDrawDiscardCategoryRefund(long frameId)
@@ -237,7 +243,7 @@ public sealed partial class GameEngine
                 r.DistinctNonEmpty != (r.ActualDiscards.Count > 0 && r.ActualDiscards.Select(m => m.Category).Distinct().Count() == r.ActualDiscards.Count)) return false;
             var movements = _cardMovements.Where(m => m.Sequence > r.PaymentBefore && m.Sequence <= r.PaymentAfter &&
                 m.Reason.Value == DrawDiscardCategoryReason(f, "discard")).ToArray();
-            if (!movements.Select(m => m.CardId).SequenceEqual(r.SelectedCardIds) || movements.Any(m => m.To != CardLocation.DiscardPile ||
+            if (!movements.Select(m => m.CardId).SequenceEqual(r.SelectedCardIds) || movements.Any(m => !IsDrawDiscardCategoryPaidDestination(f, m) ||
                 m.TurnNumber != r.ActualTurnNumber || !r.EligibleMaterials.Any(x => x.CardId == m.CardId && x.From == m.From && x.Category == GetProgramCardCategory(m.CardKind))) ||
                 !movements.Select(m => new DrawDiscardCategoryDiscard(m.CardId, m.From, GetProgramCardCategory(m.CardKind), m.Sequence)).SequenceEqual(r.ActualDiscards) ||
                 !entities.Select(x => new DrawDiscardCategoryDiscard(x.CardId, x.From, x.Category, x.MovementSequence)).SequenceEqual(r.ActualDiscards) ||

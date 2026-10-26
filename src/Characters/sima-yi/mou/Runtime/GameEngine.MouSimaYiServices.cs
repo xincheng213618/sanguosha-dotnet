@@ -47,7 +47,9 @@ public sealed partial class GameEngine
         {
             if(!e.MouSimaYi.Valid(f)||f.MouSimaYi is not{Stage:MouSmStage.GiveChildren,Materials:[var c]}r||!new MouSmFacts(e).Gifts(f,r.Target).Contains(c))throw new InvalidOperationException("Quanmou requires the giver's current real entity.");
             e.MoveProgramCardsFromMultipleSources([c.Id],CardLocation.Hand(f.OwnerSeat),new(MouSimaYiRuntime.GiveReason),(_,moves)=>{
-                if(moves is not[var m]||m.CardId!=c.Id||m.CardKind!=c.Kind||m.From!=c.From||m.To!=CardLocation.Hand(f.OwnerSeat)||m.Sequence<=r.Before)throw new InvalidOperationException("Quanmou lost the exact native Give movement.");
+                if(moves is not[var m]||m.CardId!=c.Id||m.CardKind!=c.Kind||m.From!=c.From||m.Reason.Value!=MouSimaYiRuntime.GiveReason||m.Sequence<=r.Before||
+                    m.To!=CardLocation.Hand(f.OwnerSeat)&&!e.IsMouSmShopEquipmentGivePayment(f,r,c,m)||
+                    e.ProgramEventHistory<MouSmGivePaidEvent>().Any(p=>p.FrameId==f.Id))throw new InvalidOperationException("Quanmou lost the exact native Give movement.");
                 var own=e.GetActiveProgramFrame(f.Id);e.ReplaceRuntimeFrame(f.Id,own with{MouSimaYi=own.MouSimaYi! with{After=m.Sequence}});e.AdvanceEventRulesAndQueueFact(new MouSmGivePaidEvent(f.Id,r.Target,c.Id,m.Sequence));e.RecordNativeGivenCards(f.Id,r.Target,f.OwnerSeat,[c.Id],r.Before);
             });
         }
@@ -68,5 +70,12 @@ public sealed partial class GameEngine
         public void Play(ProgramSkillFrame f)=>e.IssueMouSmPlayed(f);
         public void CompletePlayed(ProgramSkillFrame f)=>e.BeginMouSmPlayedCompleted(f);
     }
+    private bool IsMouSmShopEquipmentGivePayment(ProgramSkillFrame f,MouSmReceipt receipt,MouSmEntity material,CardMovementRecord movement)=>
+        MouSimaYi.Valid(f)&&receipt.Source==MouSimaYiRuntime.Source(f)&&material.From==CardLocation.Equipment(receipt.Target)&&
+        movement.CardId==material.Id&&movement.CardKind==material.Kind&&movement.From==material.From&&
+        movement.Reason.Value==MouSimaYiRuntime.GiveReason&&movement.Sequence>receipt.Before&&IsWushuangShopDestroyedMaterial(movement)&&
+        ProgramEventHistory<WushuangShopEquipmentCreatedEvent>().Where(p=>p.CardId==material.Id).ToArray()is[var created]&&created.Seat==receipt.Target&&
+        ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Where(p=>p.CardId==material.Id).ToArray()is[var destroyed]&&
+        destroyed.MovementSequence==movement.Sequence&&destroyed.ParentFrameId==f.Id;
     private IEnumerable<RuleQueryContribution> MouSmSlashContributions(CharacterState player,SkillRuleQuery query)=>query!=SkillRuleQuery.SlashLimit?[]:ProgramEventHistory<MouSmSlashAllowanceEvent>().Where(x=>x.Source.OwnerSeat==player.Seat&&x.Turn==_turnNumber&&x.TurnOwner==_turnProgression.OwnerSeat&&x.PhaseId==_cardUseDebitPhaseInstanceId&&_phase==TurnPhase.Play&&ProgramEventHistory<MouSmStartedEvent>().Count(s=>s.FrameId==x.FrameId&&s.Source==x.Source&&s.Operation==SkillProgramEffectOp.ResolveMouSimaYiPingliao)==1).Select(x=>(RuleQueryContribution)new FiniteRuleQueryContribution($"mou-sima-yi:{x.FrameId}",SkillRuleOperation.Add,1));
 }

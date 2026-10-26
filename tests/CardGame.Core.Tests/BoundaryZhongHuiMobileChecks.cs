@@ -35,16 +35,28 @@ internal static class BoundaryZhongHuiMobileChecks
             s.E<SkillAwakenedEvent>().Count(e=>e.SkillId==Zili&&e.AcquiredSkillIds.SequenceEqual([Paiyi]))==1&&
             s.E<MaximumHpChangedEvent>().Count(e=>e.PlayerSeat==0&&e.SkillId==Zili&&e.Delta==-1)==1,
             "The real shared awakening draws2, reduces maximum HP once and grants this verified mobile Paiyi, before the same turn's normal draw2.");
+        var handCost=s.V(0).Hand[0].Id;
+        s.Accept(new UseProgramSkillCommand(0,Driver,"real-hand-discard",[handCost],[],s.G.Revision,s.P!.PromptId));s.Play(0);
+        var nativeHand=s.E<NativeLogicalDiscardInvocationRecordedEvent>().Single(e=>e.Reason.Value=="skill-program."+Driver+".DiscardSelected");
+        s.Need(nativeHand is{InitiatorSeat:0,ExecutorSeat:0,SubjectSeat:0,ActualCount:1,HandCount:1}&&
+            s.E<NativeLogicalDiscardMaterialCompletedEvent>().Single(e=>e.InvocationId==nativeHand.InvocationId) is{CardId:var paidHand,From:var handFrom,To:var handTo}&&
+            paidHand==handCost&&handFrom==CardLocation.Hand(0)&&handTo==CardLocation.DiscardPile,
+            "With a real native discard observer installed, an ordinary selected Hand payment still records its exact owned primary entity and whole invoice.");
+        var logicalBefore=s.E<NativeLogicalDiscardInvocationRecordedEvent>().Count();
         var targetHand=s.V(1).HandCount;var hp=s.V(1).Hp;var cost=stored[1];
         s.Accept(new UseProgramSkillCommand(0,Paiyi,"remove-authority",[cost],[1],s.G.Revision,s.P!.PromptId));s.AtPayment();
         var frame=s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.SkillId==Paiyi);
-        s.Need(s.V(0).AuthorityCount==2&&s.V(1).HandCount==targetHand&&s.V(1).Hp==hp&&frame.SelectedCardPayment is{MovementCommitted:true},
+        s.Need(s.V(0).AuthorityCount==2&&s.V(1).HandCount==targetHand&&s.V(1).Hp==hp&&frame.SelectedCardPayment is{MovementCommitted:true}&&
+            s.E<NativeLogicalDiscardInvocationRecordedEvent>().Count()==logicalBefore&&
+            !s.E<NativeLogicalDiscardMaterialCompletedEvent>().Any(e=>e.CardId==cost),
             "The activated native ability pays exactly its chosen original Authority card and waits on the original selected-card payment before drawing or damaging the selected target.");
         s.Cold();s.Answer(_=>true);s.Play(0);
         s.Need(s.V(1).HandCount==targetHand+2&&s.V(1).Hp==hp-1&&s.V(0).AuthorityCount==2&&s.Limit()==5&&
             s.E<DamageAppliedEvent>().Count(e=>e.SourceSeat==0&&e.TargetSeat==1&&e.Amount==1)==1&&
             s.G.CardMovements.Count(m=>m.CardId==cost&&m.From==CardLocation.Authority(0)&&m.To==CardLocation.DiscardPile&&m.Reason.Value=="skill-program."+Paiyi+".DiscardSelected")==1&&
             s.G.GetLegalActions(0).All(a=>a.ProgramSkillId!=Paiyi)&&
+            s.E<NativeLogicalDiscardInvocationRecordedEvent>().Count()==logicalBefore&&
+            !s.E<NativeLogicalDiscardMaterialCompletedEvent>().Any(e=>e.CardId==cost)&&
             stored.All(id=>s.G.CardMovements.Count(m=>m.CardId==id&&m.To==CardLocation.Authority(0)&&m.Reason.Value=="skill-program."+Quanji+".MoveBoundCards")==1),
             "Paid cold returns without paying Authority twice: the identity edition draws exactly2 and conditionally deals one real damage, consumes its one Play-phase use, and updates the Authority-derived hand limit.");
     }
@@ -85,7 +97,8 @@ internal static class BoundaryZhongHuiMobileChecks
         public PackageManifest Manifest{get;}=new("fixture-boundary-zhong-hui",new(1,0,0));
         internal static string Rules()=>$$"""
         {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
-         {"id":"{{Driver}}","revision":1,"activations":[{"id":"real-two-damage","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"owner","sourceRef":{"kind":"selectedTarget"},"amount":2}]}]},
+         {"id":"{{Driver}}","revision":1,"activations":[{"id":"real-two-damage","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"owner","sourceRef":{"kind":"selectedTarget"},"amount":2}]},
+          {"id":"real-hand-discard","minCards":1,"maxCards":1,"sourceZones":["hand"],"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"discardSelected","target":"owner","amount":1}]}]},
          {"id":"{{Stock}}","revision":1,"triggers":[{"id":"real-starting-stock","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"draw","target":"owner","amount":6}]}]},
          {"id":"{{Watch}}","revision":1,"triggers":[
           {"id":"stored-authority-movement","window":"cardsMoved","subject":"owner","sourceZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["skill-program.boundary:quanji-mobile.MoveBoundCards"],"optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]},
@@ -97,7 +110,8 @@ internal static class BoundaryZhongHuiMobileChecks
             [Driver]=new{name="真实2点伤害",description="由选定角色造成一次原生2点伤害"},[Stock]=new{name="真实起手补给",description="开局实际摸6张牌"},[Watch]=new{name="权的真实付款子窗",description="在原始实体移动后返回原帧",optionLabels=new Dictionary<string,string>{{"continue","继续"}}}}});
         public void Register(IContentRegistryBuilder b)
         {
-            CharacterFixtureContent.Register(b,Hero);var c=SkillProgramCatalog.Load(Rules(),Presentation());foreach(var(id,p)in c.Programs)b.AddSkill(new(id,c.Presentations[id].Name,c.Presentations[id].Description){Program=p,ProgramPresentation=c.Presentations[id]});
+            CharacterFixtureContent.Register(b,Hero);CharacterFixtureContent.Register(b,"ol:meng-da");
+            var c=SkillProgramCatalog.Load(Rules(),Presentation());foreach(var(id,p)in c.Programs)b.AddSkill(new(id,c.Presentations[id].Name,c.Presentations[id].Description){Program=p,ProgramPresentation=c.Presentations[id]});
             b.AddGeneral(new(Owner,"界钟会真实权计与觉醒","supporter",Quanji,"wei",4,AdditionalSkillIds:[Zili,Driver,Watch]));var peers=Enumerable.Range(1,4).Select(i=>"fixture:boundary-zhong-hui-peer-"+i).ToArray();
             foreach(var p in peers)b.AddGeneral(new(p,"固定实体角色","supporter","standard:none","wei",12,AdditionalSkillIds:p.EndsWith("-1",StringComparison.Ordinal)?[Stock]:[]));
             const string deck="fixture:boundary-zhong-hui-deck";b.AddDeck(new(deck,"固定真实实体",4,2,[]){PhysicalCards=Enumerable.Range(0,120).Select(i=>new ContentDeckPhysicalCard("standard:slash",Suit.Heart,i%13+1)).ToArray()});

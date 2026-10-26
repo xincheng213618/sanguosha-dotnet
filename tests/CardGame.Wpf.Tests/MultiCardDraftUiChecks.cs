@@ -15,6 +15,80 @@ using CardGame.Wpf.ViewModels;
 
 internal static class MultiCardDraftUiChecks
 {
+    public static void ZhihengSelectsAllHandBeforeConfirmation(string output)
+    {
+        foreach (var skillId in new[] { "classic:zhiheng", "boundary:zhiheng" })
+        {
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(timed: false, zhihengSkill: skillId, initialHand: 14));
+            var game = GameEngine.CreateStandard(new GameOptions { Seed = 31, PlayerCount = 4, HumanSeat = 0,
+                HumanRole = Role.Lord, ModeId = Fixture.PlainMode, UseInteractiveSetup = true,
+                UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false }, registry);
+            Accept(game, new StartGameCommand()); ReachSetup(game);
+            Accept(game, new SelectGeneralCommand(0, Fixture.Owner, game.Revision, game.PendingDecision!.PromptId));
+            using var model = Restore(game, registry);
+            DriveToPlay(model);
+            game = Program.Engine(model);
+            model.SelectCardCommand.Execute(model.Hand.First());
+            model.ConfirmSelectedCommand.Execute(null);
+            DriveToPlay(model);
+            var equipmentId = model.HumanEquipmentSlots.Single(slot => slot.Card?.Kind == CardKind.Crossbow).Card!.Id;
+            var handIds = game.CreateSnapshot(0).Players[0].Hand.Select(card => card.Id).ToArray();
+            using var host = new NativeResponseStatusChecks.NativeHost(model);
+            Layout(host.Root);
+            var button = (Button)host.Window.FindName("SelectAllHandButton");
+            Program.Assert(button.Visibility == Visibility.Collapsed && !model.SelectAllZhihengHandCommand.CanExecute(null),
+                "Select all hand must only be available inside a Zhiheng draft.");
+            model.ActivateHumanSkillCommand.Execute(model.HumanSkillCards.Single(skill => skill.ContentId == skillId));
+            Layout(host.Root);
+            var before = Boundary();
+            Program.Assert(button.IsVisible && button.IsEnabled && ReferenceEquals(button.Command, model.SelectionArea.SelectAllHandCommand),
+                "Both editions must expose an enabled select-all button in the actual action dock.");
+            Click(button); Layout(host.Root);
+            Program.Assert(Boundary() == before && model.Hand.All(card => card.IsSelected) && !Equipment().IsSelected &&
+                model.CanConfirmSelected && !button.IsEnabled,
+                "One select-all click must prepare every hand card without selecting equipment or committing a command.");
+            model.SelectAllZhihengHandCommand.Execute(null);
+            Program.Assert(Boundary() == before && model.Hand.All(card => card.IsSelected), "Repeating select all must leave the draft unchanged.");
+            model.SelectActiveEquipmentCommand.Execute(Equipment());
+            PressRelease(host, handIds[0]); Layout(host.Root);
+            Program.Assert(!model.Hand.Single(card => card.Id == handIds[0]).IsSelected && Equipment().IsSelected && button.IsEnabled,
+                "Each hand card must remain reversible after select all, with equipment selected independently.");
+            Click(button); Layout(host.Root);
+            Program.Assert(model.Hand.All(card => card.IsSelected) && Equipment().IsSelected && Boundary() == before,
+                "Selecting the whole hand again must retain the independently selected equipment without paying it.");
+            model.CancelActionCommand.Execute(null); Layout(host.Root);
+            model.SelectAllZhihengHandCommand.Execute(null);
+            Program.Assert(!model.HasSelection && model.Hand.All(card => !card.IsSelected) && !Equipment().IsSelected &&
+                button.Visibility == Visibility.Collapsed && Boundary() == before,
+                "Cancel and a stale select-all command must leave all cards unpaid and unselected.");
+            model.ActivateHumanSkillCommand.Execute(model.HumanSkillCards.Single(skill => skill.ContentId == skillId));
+            Layout(host.Root); Click(button);
+            model.SelectActiveEquipmentCommand.Execute(Equipment());
+            Layout(host.Root);
+            Program.Render(host.Root, 1120, 740, Path.Combine(output, $"{skillId.Replace(':', '-')}-select-all-hand.png"));
+            var moves = game.CardMovements.Count;
+            var uses = game.AcceptedCommands.OfType<UseProgramSkillCommand>().Count();
+            Click((Button)host.Window.FindName("PlayCardButton")); DriveToPlay(model);
+            var paid = game.AcceptedCommands.OfType<UseProgramSkillCommand>().Skip(uses).Single();
+            var expected = handIds.Append(equipmentId).ToHashSet();
+            Program.Assert(paid.SkillId == skillId && paid.CardIds.ToHashSet().SetEquals(expected) &&
+                expected.All(id => game.CardMovements.Skip(moves).Count(move => move.CardId == id && move.To == CardLocation.DiscardPile) == 1) &&
+                model.Hand.Count == expected.Count + (skillId == "boundary:zhiheng" ? 1 : 0) &&
+                !model.HasSelection && !model.SelectAllZhihengHandCommand.CanExecute(null),
+                "Confirmation must pay the exact selected hand/equipment once and retain each edition's native draw count.");
+            model.ActivateHumanSkillCommand.Execute(model.HumanSkillCards.Single(skill => skill.ContentId == Fixture.OwnedSkill));
+            Layout(host.Root);
+            var otherPrompt = Boundary();
+            model.SelectAllZhihengHandCommand.Execute(null);
+            Program.Assert(model.IsOwnedCardSelectionPending && button.Visibility == Visibility.Collapsed &&
+                model.Hand.All(card => !card.IsSelected) && Boundary() == otherPrompt,
+                "The Zhiheng shortcut must not select cards in another skill's prompt.");
+
+            string Boundary() => $"{game.Revision}:{game.AcceptedCommands.Count}:{game.CardMovements.Count}:{game.Events.Count}";
+            EquipmentSlotViewModel Equipment() => model.HumanEquipmentSlots.Single(slot => slot.Card?.Id == equipmentId);
+        }
+    }
+
     public static void ActiveDiscardSurvivesReleaseAndClock(string output)
     {
         var registry = ComposedSkillContentRegistry.CreateShowcase(additionalPackages: [new Fixture()]);
@@ -221,7 +295,7 @@ internal static class MultiCardDraftUiChecks
     private static void Layout(FrameworkElement root)
     { root.Width = 1120; root.Height = 740; root.Measure(new Size(1120, 740)); root.Arrange(new Rect(0, 0, 1120, 740)); root.UpdateLayout(); Dispatcher.CurrentDispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle); }
 
-    private sealed class Fixture(bool timed = true) : IGameContentPackage
+    private sealed class Fixture(bool timed = true, string zhihengSkill = "classic:zhiheng", int initialHand = 4) : IGameContentPackage
     {
         internal const string Owner = "fixture:multi-card-draft-owner";
         internal const string OwnedSkill = "fixture:multi-card-draft-owned";
@@ -239,7 +313,7 @@ internal static class MultiCardDraftUiChecks
                     skill.Id.StartsWith("hulao:", StringComparison.Ordinal) || skill.Id.StartsWith("shenwu:", StringComparison.Ordinal) ||
                     skill.Id.StartsWith("ghost:", StringComparison.Ordinal))) builder.AddSkill(skill);
             }
-            else CharacterFixtureContent.Register(builder, "classic:sun-quan");
+            else CharacterFixtureContent.Register(builder, zhihengSkill == "boundary:zhiheng" ? "boundary:sun-quan" : "classic:sun-quan");
             var catalog = SkillProgramCatalog.Load($$$$"""
                 {"schemaVersion":{{{{SkillProgramCatalog.RulesSchemaVersion}}}},"skills":[{"id":"{{{{OwnedSkill}}}}","revision":1,
                  "activations":[{"id":"select","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,
@@ -251,11 +325,11 @@ internal static class MultiCardDraftUiChecks
                 """);
             builder.AddSkill(new(OwnedSkill, "区域选择", "选择两张真实手牌后一次弃置。")
                 { Program = catalog.Programs[OwnedSkill], ProgramPresentation = catalog.Presentations[OwnedSkill] });
-            builder.AddGeneral(new(Owner, "制衡选择", "supporter", "classic:zhiheng", "wu", BaseHp: 20, AdditionalSkillIds: [OwnedSkill]));
+            builder.AddGeneral(new(Owner, "制衡选择", "supporter", zhihengSkill, "wu", BaseHp: 20, AdditionalSkillIds: [OwnedSkill]));
             var peers = timed ? new[] { "fixture:multi-card-draft-ai" } : Enumerable.Range(1, 3)
                 .Select(index => $"fixture:multi-card-draft-ai-{index}").ToArray();
             foreach (var peer in peers) builder.AddGeneral(new(peer, "对手", "supporter", "standard:none", "wei", BaseHp: 20));
-            builder.AddDeck(new("fixture:multi-card-draft-deck", "多选实际牌堆", 4, 0, [])
+            builder.AddDeck(new("fixture:multi-card-draft-deck", "多选实际牌堆", initialHand, 0, [])
                 { PhysicalCards = Enumerable.Range(0, 160).Select(_ => new ContentDeckPhysicalCard("standard:crossbow", Suit.Heart, 7)).ToArray() });
             builder.AddMode(timed
                 ? new(WushuangMode.ModeId, "多选计时场景", 2, 2, new Dictionary<string, int>(), "fixture:multi-card-draft-deck", 2,

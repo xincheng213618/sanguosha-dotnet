@@ -98,5 +98,8 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("Suyi cannot return or pay the same native child twice.");
         ReplaceRuntimeTop(f with { YangFu = r with { Stage = r.Stage == YangFuStage.EquipmentUse ? YangFuStage.EquipmentChildren : YangFuStage.SlashChildren }, PendingMovementContinuation = new(r.Stage == YangFuStage.EquipmentUse ? r.TargetSeat : f.OwnerSeat, 0, null) });
         AdvanceEventRulesAndQueueFact(new SuyiNativeReturnedEvent(origin));
+        // The native child is fully paid and returned. A decided game will not
+        // run another engine step to finish this exact ancestor.
+        if (_winner != Winner.None) AdvanceRuntimeProgram(origin.ProgramFrameId);
     }
 }

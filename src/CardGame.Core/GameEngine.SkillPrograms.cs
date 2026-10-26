@@ -321,6 +321,9 @@ public sealed partial class GameEngine
                     program.Id, usageId, SkillUsageScope.Phase),
                 BooleanState = stateId => GetProgramBooleanState(owner.Seat, program.Id, instanceId, stateId)
             }).Hint;
+        var actorPolicy = _aiBrains.TryGetValue(owner.Seat, out var brain) ? brain.PolicyVersion : _options.AiPolicyVersion;
+        if (IsWushuangMode && actorPolicy >= AiDecisionPolicy.WushuangRefinementVersion)
+            hint = WushuangDeferredPhaseAi.Describe(activation, hint);
         return ProgramSelections.DecorateAi(new(context.Seat, program,
             ProgramInstructionResolver.Default.Resolve(program, ProgramInstructionSourceKind.Activation, activation.Id))
             { PlayerContext = context }, hint);

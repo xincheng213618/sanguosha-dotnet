@@ -3,7 +3,7 @@ using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
 
-internal static class AnniversaryMaTieChecks
+internal static partial class AnniversaryMaTieChecks
 {
     private const string Hero = "anniversary:ma-tie", Quxian = "anniversary:quxian", Quiet = "fixture:ma-tie-quiet", Watch = "fixture:ma-tie-reward-watch", Deck = "fixture:ma-tie-deck";
     private static string Peer(int seat) => "fixture:ma-tie-peer-" + seat;
@@ -61,7 +61,7 @@ internal static class AnniversaryMaTieChecks
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {
         public GameEngine G { get; private set; } = game;
-        public PendingDecision? P => Enumerable.Range(0, 4).Select(i => G.CreateSnapshot(i).PendingDecision).FirstOrDefault(p => p is not null);
+        public PendingDecision? P => Enumerable.Range(0, G.State.Players.Count).Select(i => G.CreateSnapshot(i).PendingDecision).FirstOrDefault(p => p is not null);
         public PlayerSnapshot V(int seat) => G.CreateSnapshot(seat).Players.Single(p => p.Seat == seat);
         public ProgramSkillFrame? Root => G.ResolutionStack.OfType<ProgramSkillFrame>().FirstOrDefault(f => f.AnniversaryMaTie is { RewardParent: 0 });
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
@@ -103,32 +103,33 @@ internal static class AnniversaryMaTieChecks
             }
             Need(false, "Ma Tie did not reach its bounded native continuation.");
         }
-        private string State() => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, 4).Select(i => SnapshotJson.Serialize(G.CreateSnapshot(i))).ToArray(),
+        private string State() => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, G.State.Players.Count).Select(i => SnapshotJson.Serialize(G.CreateSnapshot(i))).ToArray(),
             Frames = G.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())).ToArray(), Events = G.Events.Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray(),
             G.CardMovements, Zones = G.CreateCardZoneDiagnostics(), Commands = CommandJson.Serialize(G.AcceptedCommands) });
         public void Cold() { var before = State(); G = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), registry); Need(before == State(), "Cold preserves the original unpublished native choice or already-paid reward child exactly."); }
         public void Replay() { var before = State(); G = GameReplay.Replay(G.CreateCheckpoint().Options, G.AcceptedCommands, registry); Need(before == State(), "The two actual boundaries, native requested uses, rewards, HP payments and directed distance replay exactly."); }
         public void Need(bool yes, string text) { if (!yes) throw new InvalidOperationException(text + Dump()); }
         private string Dump() => JsonSerializer.Serialize(new { G.State.TurnNumber, G.State.CurrentSeat, P, Receipt = Root?.AnniversaryMaTie,
-            Views = Enumerable.Range(0, 4).Select(i => new { Seat = i, V(i).Hp, V(i).HandCount }), Last = G.Events.TakeLast(12).Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray() });
-        public static Scene Start()
+            Views = Enumerable.Range(0, G.State.Players.Count).Select(i => new { Seat = i, V(i).Hp, V(i).HandCount }), Last = G.Events.TakeLast(12).Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray() });
+        public static Scene Start(bool terminal = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(terminal));
             var setup = new ShanheBattleSetup(7, 1, "anniversary-ma-tie", Hero, 4, 0, 0, 0, 0, [AnniversaryMaTieChecks.Watch, "ol:weijing"],
                 [new(CardKind.IronChain, Suit.Club, 12)], [],
-                [new(Peer(2), Hp: 12) { StartingHand = [] }, new(Peer(3), Hp: 12) { StartingHand = [] }],
-                [new(Peer(1), Hp: 12) { StartingHand = [new(CardKind.Dodge, Suit.Heart, 2)] }], new string('d', 64));
-            var g = GameEngine.CreateStandard(new() { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,
+                terminal ? [new(Peer(1), Hp: 1) { StartingHand = [] }] : [new(Peer(2), Hp: 12) { StartingHand = [] }, new(Peer(3), Hp: 12) { StartingHand = [] }],
+                terminal ? [] : [new(Peer(1), Hp: 12) { StartingHand = [new(CardKind.Dodge, Suit.Heart, 2)] }], new string('d', 64));
+            var g = GameEngine.CreateStandard(new() { Seed = setup.BattleSeed, PlayerCount = terminal ? 2 : 4, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,
                 ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup, UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 5 }, registry);
             var s = new Scene(g, registry); s.Accept(new StartGameCommand()); return s;
         }
     }
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool terminal = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-anniversary-ma-tie", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b, Hero, "ol:lu-zhi-wei");
+            if (terminal) CharacterFixtureContent.Register(b, "ol:du-fu-ren");
             var c = SkillProgramCatalog.Load($$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
               {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"isSkillInvocation":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]},
@@ -142,8 +143,8 @@ internal static class AnniversaryMaTieChecks
             foreach (var (id, p) in c.Programs) b.AddSkill(new(id, c.Presentations[id].Name, c.Presentations[id].Description) { Program = p, ProgramPresentation = c.Presentations[id] });
             for (var i = 1; i < 4; i++) b.AddGeneral(new(Peer(i), "固定安静同桌", "", Quiet, "wei", 12));
             b.AddDeck(new(Deck, "驱险固定实体杀牌堆", 0, 0, []) { PhysicalCards = Enumerable.Range(0, 32).Select(_ => new ContentDeckPhysicalCard("standard:slash", Suit.Club, 8)).ToArray() });
-            b.AddMode(new(ShanheBattleSetup.BattleModeId, "马铁真实双边界与原生用杀", 4, 4, new Dictionary<string, int>(), Deck, GeneralPoolIds: [Hero, Peer(1), Peer(2), Peer(3)], ModeKind: ContentModeKind.Team,
-                TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 2, [ShanheBattleSetup.EnemyTeamId] = 2 }));
+            b.AddMode(new(ShanheBattleSetup.BattleModeId, "马铁真实双边界与原生用杀", terminal ? 2 : 4, terminal ? 2 : 4, new Dictionary<string, int>(), Deck, GeneralPoolIds: terminal ? [Hero, Peer(1)] : [Hero, Peer(1), Peer(2), Peer(3)], ModeKind: ContentModeKind.Team,
+                TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = terminal ? 1 : 2, [ShanheBattleSetup.EnemyTeamId] = terminal ? 1 : 2 }));
         }
     }
 }

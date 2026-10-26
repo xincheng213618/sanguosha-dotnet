@@ -72,8 +72,10 @@ public sealed partial class GameEngine
         if (damageKind == CardKind.Duel && TryGetShanheS5ShuangxiongPublicDuelBaseDamage(viewerSeat, action, out var scaled))
             amount = scaled;
         amount = checked(amount + BoundaryChengPuPublicActionBonus(viewerSeat, action, targetSeat));
-        return PredictVisibleDamage(view, viewerSeat, targetSeat, kind is null ? 0 : amount,
+        var prediction = PredictVisibleDamage(view, viewerSeat, targetSeat, kind is null ? 0 : amount,
             kind, kind is not null, false, false, false, paidHand, HasArmorBypass(_players[viewerSeat]));
+        return AttachWushuangPublicCombatPrediction(view, viewerSeat, action, targetSeat,
+            amount, damageKind, paidHand, prediction);
     }
 
     private PublicDamagePrediction PredictPublicIncomingDamage(IDamageAttempt attack, int viewerSeat,
@@ -81,15 +83,31 @@ public sealed partial class GameEngine
     {
         var source = sourceSeat ?? attack.SourceSeat;
         var target = targetSeat ?? attack.TargetSeat;
-        return PredictVisibleDamage(CreateSnapshot(viewerSeat), source, target, damageAmount ?? attack.DamageAmount,
-            attack.EffectiveCardKind, attack is CardAttackHandle && !attack.IsDelayedJudgmentDamage &&
-            !attack.IsProgramJudgmentDamage && attack.CardUserSeat == source, attack.IsSourceLess,
+        var view = CreateSnapshot(viewerSeat);
+        var amount = damageAmount ?? attack.DamageAmount;
+        var cardUse = attack is CardAttackHandle && !attack.IsDelayedJudgmentDamage &&
+            !attack.IsProgramJudgmentDamage && attack.CardUserSeat == source;
+        var legacy = PredictVisibleDamage(view, source, target, amount,
+            attack.EffectiveCardKind, cardUse, attack.IsSourceLess,
             attack.IsChainPropagation, attack.DamageAmountFinalized, 0, attack.IgnoresArmor, GetDamageNature(attack), attack);
+        if (!IsWushuangMode || view.Players.Count != 2 || source == target) return legacy;
+        // The incoming use is already declared. Its public receipt freezes the
+        // suit and use ordinal; never inspect an opponent's unplayed materials.
+        var use = ProgramEventHistory<WushuangCombatUseFactEvent>()
+            .LastOrDefault(fact => fact.CardUseFrameId == attack.ResolutionId);
+        var payment = PredictVisibleDamage(view, source, target, amount,
+            attack.EffectiveCardKind, cardUse, attack.IsSourceLess,
+            attack.IsChainPropagation, attack.DamageAmountFinalized, 0, attack.IgnoresArmor, GetDamageNature(attack), attack,
+            wushuangTactics: true, prospectiveSuit: use?.Suit ?? Suit.None);
+        return legacy with { Wushuang = new(payment, null, false,
+            !attack.IsSourceLess && view.Players.Single(player => player.Seat == source).WushuangTacticIds?.Contains(2210) == true) };
     }
 
     private PublicDamagePrediction PredictVisibleDamage(GameSnapshot view, int sourceSeat, int targetSeat,
         int amount, CardKind? kind, bool cardUse, bool sourceLess, bool chain, bool finalized,
-        int paidHandCards, bool ignoresEquipmentArmor, DamageNature? damageNature = null, IDamageAttempt? issuedAttack = null)
+        int paidHandCards, bool ignoresEquipmentArmor, DamageNature? damageNature = null, IDamageAttempt? issuedAttack = null,
+        bool wushuangTactics = false, Suit prospectiveSuit = Suit.None, int additionalIncomingSegments = 0,
+        int priorTargetSegments = 0)
     {
         var target = view.Players.Single(player => player.Seat == targetSeat);
         var source = view.Players.Single(player => player.Seat == sourceSeat);
@@ -158,6 +176,9 @@ public sealed partial class GameEngine
             additional = checked(additional + WangongPublicProposedBonus(view, sourceSeat, kind));
         if (!finalized && (issuedAttack is not null || cardUse))
             additional = checked(additional + WoxinPublicBonus(view, sourceSeat, sourceLess, chain, issuedAttack));
+        if (wushuangTactics && !finalized && !sourceLess && !chain)
+            additional = checked(additional + WushuangPublicNativeDamageBonus(view, sourceSeat, targetSeat,
+                kind, prospectiveSuit, additionalIncomingSegments, priorTargetSegments, issuedAttack?.ResolutionId));
         cardLayer = Math.Max(0, cardLayer);
         if (!sourceLess && (HasVisiblePolicy(sourceState, sourceVisible, SkillProgramCardPolicyKind.DamageBecomesHpLoss) ||
             sourceSeat != targetSeat && (HasVisiblePolicy(sourceState, sourceVisible, SkillProgramCardPolicyKind.OtherParticipantDamageBecomesHpLoss) ||
@@ -171,9 +192,11 @@ public sealed partial class GameEngine
             return PublicDamagePrediction.Calculate(target.Hp, target.Armor, cardLayer, PublicDamagePaymentKind.MaximumHpLoss, target.MaxHp);
 
         var full = Math.Max(0, checked(cardLayer + additional));
-        if (!finalized && UsesFormalSilverLion && (chain || !ignoresEquipmentArmor) && HasSilverLion(targetState))
+        var fixedWushuang = wushuangTactics && !sourceLess && source.WushuangTacticIds?.Contains(2210) == true;
+        if (fixedWushuang) full = 2;
+        if (!fixedWushuang && !finalized && UsesFormalSilverLion && (chain || !ignoresEquipmentArmor) && HasSilverLion(targetState))
             full = Math.Min(1, full);
-        if (!finalized && FindPassiveProgramDamageCap(targetState, sourceLess ? null : sourceSeat, targetVisible) is { } damageCap)
+        if (!fixedWushuang && !finalized && FindPassiveProgramDamageCap(targetState, sourceLess ? null : sourceSeat, targetVisible) is { } damageCap)
             full = Math.Min(damageCap.Cap, full);
         var bypass = sourceSeat != targetSeat && HasNativeDamageArmorPolicy(sourceSeat, sourceLess,
             SkillProgramCardPolicyKind.BypassOtherParticipantArmor, sourceVisible);

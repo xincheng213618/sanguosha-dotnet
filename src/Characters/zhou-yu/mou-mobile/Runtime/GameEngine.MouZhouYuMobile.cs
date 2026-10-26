@@ -162,6 +162,7 @@ public sealed partial class GameEngine
             return cards.Length == 0 ? p.Choices.Single(c => c.Parameters["branch"] == "cancel") : cards[_random.Next(Math.Min(4, cards.Length))];
         }
         // The target never inspects the covered entity/suit or the source Hand.
-        return p.Choices.Single(c => c.Parameters["branch"] == (_random.Next(2) == 0 ? "same" : "different"));
+        var guess = _random.Next(2) == 0 ? "same" : "different";
+        return p.Choices.Single(c => c.Parameters["branch"] == guess);
     }
 }

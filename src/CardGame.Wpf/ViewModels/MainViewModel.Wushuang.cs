@@ -23,7 +23,7 @@ public sealed partial class MainViewModel
     public bool IsWushuangTable => _game?.IsWushuangMode == true;
     public bool IsWushuangModeSelection => SelectedTableMode?.ModeId == WushuangMode.ModeId;
     public bool IsWushuangGuide => IsNewGameSetupOpen ? IsWushuangModeSelection : IsWushuangTable;
-    public string WushuangRulesText => "单机 1v1，对手由 AI 操控。开局免费从三个战法中选一个；战法不占额外技能槽。单局限时15分钟，暂停自动推进、浏览指南和商店仍然计时。\n\n虎符是本模式货币：每个自然回合开始双方各获得1枚，新一轮开始另获得1枚。没有经验和商店升级。每个自然回合结束后进入购买阶段，商品包含技能、实体卡牌和战法。回合中仅可预览下次商品；购买、刷新、锁定只在购买阶段开放。优先消耗免费刷新次数，否则花1虎符刷新；锁定后保留整页，已购买的商品不会补货。购买阶段20秒，结束后继续牌局。\n\n初始有两个额外技能槽，战法可增加槽位；满槽后选择替换。持有一忘皆空时也可替换武将初始技能。击败AI获胜；时间到按本地体力比例、体力值、手牌数依次计分。独立存档保存在本机。";
+    public string WushuangRulesText => "单机 1v1，对手由 AI 操控。开局免费从三个战法中选一个；战法不占额外技能槽。单局限时15分钟，暂停自动推进、浏览指南和商店仍然计时。\n\n虎符是本模式货币：每个自然回合开始双方各获得1枚，新一轮开始另获得1枚。没有经验和商店升级。每个自然回合结束后进入购买阶段，商品包含技能、实体卡牌和战法。回合中仅可预览下次商品；购买、刷新、锁定只在购买阶段开放。优先消耗免费刷新次数，否则花1虎符刷新；锁定后保留整页，已购买的商品不会补货。购买阶段20秒，结束后继续牌局。\n\n初始有两个额外技能槽，战法可增加槽位；满槽后选择替换。持有一忘皆空时也可替换武将初始技能。击败AI获胜；时间到比较当前体力，当前体力较高的一方获胜，相同则和局；不比较体力比例或手牌。独立存档保存在本机。";
     public bool IsWushuangShopOpen { get => _isWushuangShopOpen; private set => SetProperty(ref _isWushuangShopOpen, value); }
     public bool HasWushuangSave { get => _hasWushuangSave; private set => SetProperty(ref _hasWushuangSave, value); }
     public bool HasWushuangManualSave { get => _hasWushuangManualSave; private set => SetProperty(ref _hasWushuangManualSave, value); }
@@ -39,7 +39,7 @@ public sealed partial class MainViewModel
     }
     public string WushuangShopMessage { get => _wushuangShopMessage; private set => SetProperty(ref _wushuangShopMessage, value); }
     public string WushuangClockText => FormatWushuangTime(WushuangVisibleRemainingMilliseconds);
-    public string WushuangClockCaption => $"总局时限 · 剩余 {WushuangClockText}";
+    public string WushuangClockCaption => $"超时比体力 · 剩余 {WushuangClockText}";
     public string WushuangProgressText => _game?.CreateWushuangSnapshot(0) is { } state
         ? $"虎符 {state.Tokens}" : "虎符商店 · 15 分钟 1v1";
     public bool IsWushuangOpening => _game?.CreateWushuangSnapshot(0)?.Phase == WushuangShopPhase.OpeningTactic;

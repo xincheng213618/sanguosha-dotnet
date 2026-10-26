@@ -693,7 +693,7 @@ internal sealed class FilterBoundCardsProgramOperationDescriptor : ProgramOperat
         static (effect, context) => context.Filter(effect));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "sourceBind", "resultBind", "suits", "categories", "equipmentSlots", "cardKinds", "effectiveSuitForRef", "matchSuitOfBind", "condition");
+        r.AllowOnly("op", "target", "sourceBind", "resultBind", "suits", "categories", "equipmentSlots", "cardKinds", "effectiveSuitForRef", "matchSuitOfBind", "availableAtSourceOnly", "condition");
         var target = Owner(r);
         var source = r.RequiredIdentifier("sourceBind"); var result = r.RequiredIdentifier("resultBind");
         if (source == result) throw new InvalidOperationException($"Invalid skill program at {r.Path}: sourceBind and resultBind must differ.");
@@ -713,9 +713,12 @@ internal sealed class FilterBoundCardsProgramOperationDescriptor : ProgramOperat
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: effectiveSuitForRef cannot be mixed with card-class filters.");
         var effectiveSuitForRef = r.Has("effectiveSuitForRef")
             ? r.RequiredParticipantReference("effectiveSuitForRef") : null;
+        if (r.Has("availableAtSourceOnly") && !r.RequiredBool("availableAtSourceOnly"))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}.availableAtSourceOnly: opt-in requires true.");
         var effect = new SkillProgramEffect(Op, target, 0, r.Condition(), sourceBind: source, resultBind: result,
             suits: suits, cardCategories: categories, equipmentSlots: equipmentSlots,
-            cardKinds: cardKinds, targetReference: effectiveSuitForRef, matchSuitOfBind: matchSuitOfBind);
+            cardKinds: cardKinds, targetReference: effectiveSuitForRef, matchSuitOfBind: matchSuitOfBind)
+        { AvailableAtSourceOnly = r.Has("availableAtSourceOnly") ? true : null };
         RequireAlways(effect, r.Path); return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>

@@ -508,6 +508,7 @@ public static class BattleCueProjector
     {
         var events = source.ToArray();
         var duelResponses = AssociateDuelResponses(events);
+        var convertedResponses = AssociateConvertedResponses(events);
         var responses = events.Where(item => item.Payload is CardRespondedEvent)
             .Select(item => (item.Revision, Card: (CardRespondedEvent)item.Payload))
             .Select(item => (item.Revision, item.Card.ResponderSeat, item.Card.CardId)).ToHashSet();
@@ -517,6 +518,8 @@ public static class BattleCueProjector
         var result = new List<BattleCue>();
         foreach (var envelope in events)
         {
+            var convertedResponse = convertedResponses.GetValueOrDefault(envelope.Sequence);
+            if (convertedResponse.Count > 1 && convertedResponse.First != envelope.Sequence) continue;
             (int? Id, int Seat, CardKind? Kind, bool Use, string? Detail) play = envelope.Payload switch
             {
                 CardUseDeclaredEvent use => (use.CardId, use.SourceSeat, use.CardKind, true, null),
@@ -544,17 +547,37 @@ public static class BattleCueProjector
                 _ => null
             };
             if (cardId <= 0 || publicCard?.Id != cardId) publicCard = null;
+            // Several paid entities form one virtual response, whose face must
+            // not inherit an arbitrary material's printed suit and rank.
+            if (convertedResponse.Count > 1) publicCard = null;
             var label = play.Kind is { } kind ? CardCatalog.Get(kind).DisplayName : "响应牌";
             if (!play.Use) label = "打出" + label;
             if (envelope.Payload is CardRecastEvent) label = "重铸" + label;
             if (envelope.Payload is NullificationRespondedEvent chainResponse) label += $" · 第 {chainResponse.ChainDepth} 层";
             var duelResponse = duelResponses.GetValueOrDefault(envelope.Sequence);
             result.Add(new(envelope.Sequence, play.Use ? BattleCueKind.Card : BattleCueKind.Response,
-                play.Seat, [], label, name, Detail: play.Detail)
-                { CardKind = play.Kind, PublicCardId = cardId, PublicCard = publicCard, Revision = envelope.Revision,
+                play.Seat, [], label, name, Detail: convertedResponse.Count > 1 ? $"{convertedResponse.Count}张牌转化为一张【{CardCatalog.Get(play.Kind!.Value).DisplayName}】" : play.Detail)
+                { CardKind = play.Kind, PublicCardId = convertedResponse.Count > 1 ? null : cardId, PublicCard = publicCard, Revision = envelope.Revision,
                     SourceCardUseResolutionId = (envelope.Payload as CardUseDeclaredEvent)?.ResolutionId,
                     ResponseResolutionId = duelResponse?.ResolutionId, DuelOpponentSeat = duelResponse?.OpponentSeat,
                     IsUseCompletion = envelope.Payload is DyingResponseEvent });
+        }
+        return result;
+    }
+
+    private static Dictionary<long, (long First, int Count)> AssociateConvertedResponses(EventEnvelope[] events)
+    {
+        var result = new Dictionary<long, (long First, int Count)>();
+        foreach (var envelope in events)
+        {
+            if (envelope.Payload is not ProgramViewAsConvertedEvent { IsUse: false, PhysicalCardIds.Count: > 1 } conversion) continue;
+            var ids = conversion.PhysicalCardIds.ToHashSet();
+            var materials = events.Where(item => item.Revision == envelope.Revision && item.Sequence < envelope.Sequence &&
+                !result.ContainsKey(item.Sequence) && item.Payload is CardRespondedEvent response &&
+                response.ResponderSeat == conversion.OwnerSeat && response.EffectiveCardKind == conversion.OutputKind &&
+                ids.Contains(response.CardId)).TakeLast(ids.Count).ToArray();
+            if (materials.Length != ids.Count || !ids.SetEquals(materials.Select(item => ((CardRespondedEvent)item.Payload).CardId))) continue;
+            foreach (var material in materials) result[material.Sequence] = (materials[0].Sequence, ids.Count);
         }
         return result;
     }

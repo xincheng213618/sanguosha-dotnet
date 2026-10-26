@@ -142,7 +142,7 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
     {
         // Commit the next seat before any movement children run: replay or recovery
         // must never pay this purchase or repeat this AI action a second time.
-        _host.ReplaceFrame(f.Id, f with { SeatCursor = f.SeatCursor + 1 });
+        _host.ReplaceFrame(f.Id, f with { SeatCursor = f.SeatCursor + 1, AiShopActions = 0 });
         _host.AdvanceState();
         if (_host.Frames.LastOrDefault()?.Id == f.Id) ContinueWushuangIntermission(f.Id);
     }
@@ -160,7 +160,7 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
             (t.SkillId is null || _definitions.Skills.TryGetValue(t.SkillId, out var definition) && definition.ImplementationStatus == SkillImplementationStatus.Complete)).ToList();
         random.Shuffle(tactics); var offers = new List<WushuangShopOffer>();
         // A removed entry must not reorder all surviving opening candidates.
-        if (opening) foreach (var t in tactics.Where(t => t.IsAvailableInShop).Take(3)) offers.Add(TacticOffer(t, offers.Count, 0));
+        if (opening) foreach (var t in tactics.Where(WushuangCatalogue.CanOfferAsOpening).Take(3)) offers.Add(TacticOffer(t, offers.Count, 0));
         else
         {
             var owned = _host.EnabledSkillIds(seat).ToHashSet(StringComparer.Ordinal);
@@ -206,6 +206,9 @@ internal sealed partial class WushuangModeFeature(int seed, ContentRegistry defi
     public string? ValidateWushuangPurchase(int seat, WushuangShopOffer? offer, string? replacement)
     {
         if (offer is null || offer.Cost > _players[seat].Tokens) return "商品已刷新或虎符不足。";
+        if (ActiveWushuangWindow(seat) is { Opening: true } && offer.TacticId is { } openingTactic &&
+            !WushuangCatalogue.CanOfferAsOpening(WushuangTactics.ById[openingTactic]))
+            return "此战法不参与单骑无双初始奖励。";
         if (offer.CardKind is { } unavailableCard && !WushuangCatalogue.IsCardAllowed(unavailableCard) ||
             offer.SkillId is { } unavailableSkill && !WushuangCatalogue.IsSkillAllowed(_definitions.GetSkill(unavailableSkill)) ||
             offer.TacticId is { } unavailableTactic && !WushuangTactics.ById[unavailableTactic].IsAvailableInShop)

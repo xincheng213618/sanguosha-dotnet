@@ -8,7 +8,41 @@ internal static class ChenJiaoChecks
     private const string Hero = "mobile:shi-chen-jiao", QingYan = "mobile:shi-qingyan", CeDuan = "mobile:shi-ceduan",
         Quiet = "fixture:shi-chen-jiao-quiet", Peer = "fixture:shi-chen-jiao-peer",
         HandKeeper = "fixture:shi-chen-jiao-keeper", RangeBoost = "fixture:shi-chen-jiao-range",
-        Deck = "fixture:shi-chen-jiao-deck";
+        Deck = "fixture:shi-chen-jiao-deck", QingYanUseWatch = "fixture:shi-chen-jiao-use-watch";
+
+    public static void QingYanUsesExactCardlessFrameWithFullTrackedCatalogueCold()
+    {
+        foreach (var (answer, kind) in new[] { ("dodge", CardKind.Dodge), ("nullification", CardKind.Nullification) })
+        {
+            var s = Scene.Start("qingyan-tracked-" + answer, 3, [HandKeeper, QingYanUseWatch],
+                [new(8), new(8), new(8), new(8)], openingSlashes: 4, fullCatalogue: true);
+            s.Play(); s.ActivateQingYan(); var shown = s.ShowNext();
+            var parent = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.ChenJiao is { Operation: "qingyan" });
+            var hand = s.V(0).Hand.Select(card => card.Id).Order().ToArray();
+            var before = s.G.CardMovements.Count;
+            s.Cold(); s.AnswerKind(answer);
+            s.Reach(() => s.P?.SkillPrompt?.SkillId == QingYanUseWatch);
+            var used = s.E<ChenJiaoQingYanUsedEvent>().Single();
+            var use = s.G.ResolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == used.UseId);
+            s.Need(used.FrameId == parent.Id && used.Kind == kind && use is { CardId: 0, PhysicalCardIds.Count: 0 } &&
+                use.Action is { Type: CardActionType.Use, ActorSeat: 0, ProviderSeat: 0, RequesterSeat: null, PhysicalCards.Count: 0 } action &&
+                action.EffectiveKind == kind && action.TargetSeats.SequenceEqual([0]) &&
+                action.ConversionChain is [{ SkillId: QingYan, OwnerSeat: 0 } source] && source.SkillInstanceId == parent.SkillInstanceId &&
+                s.E<CurrentTurnCardUseKindsRecordedEvent>().Count(fact => fact.OriginFrameId == use.Id && fact.CardActionId == action.ActionId && fact.HandSuitMask == 0) == 1 &&
+                s.E<CardUseDeclaredEvent>().Count(fact => fact.ResolutionId == use.Id && fact.CardKind == kind && fact.CardId == 0) == 1 &&
+                s.E<CardUseFinishedEvent>().Count(fact => fact.ResolutionId == use.Id) == 1 &&
+                hand.SequenceEqual(s.V(0).Hand.Select(card => card.Id).Order()) && s.V(0).Hand.Any(card => card.Id == shown) && s.G.CardMovements.Count == before,
+                "With the complete tracked catalogue, QingYan declares one actual source-bound Use while shown entities remain untouched; completion observers still suspend its original native child.");
+            s.Cold();
+            s.Answer(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue"); s.Play();
+            s.Need(!s.G.ResolutionStack.Any(frame => frame.Id == parent.Id || frame.Id == use.Id) &&
+                s.E<ChenJiaoQingYanUsedEvent>().Length == 1 && s.E<CardUseFinishedEvent>().Count(fact => fact.ResolutionId == use.Id) == 1 &&
+                s.E<ProgramSkillResolvedEvent>().Count(fact => fact.FrameId == parent.Id) == 1 && s.G.CardMovements.Count == before &&
+                hand.SequenceEqual(s.V(0).Hand.Select(card => card.Id).Order()),
+                "Cold completion returns to the original QingYan once without replaying declarations, consuming shown cards or inventing a counterspell response.");
+            s.Cold();
+        }
+    }
 
     public static void QingYanEscalatesLocksAndRearms()
     {
@@ -210,9 +244,10 @@ internal static class ChenJiaoChecks
             Damage = E<DamageAppliedEvent>().Select(e => new { e.TargetSeat, e.Amount }),
             Moves = G.CardMovements.TakeLast(40).Select(m => new { m.CardId, From = m.From.Zone, FromSeat = m.From.OwnerSeat, To = m.To.Zone, ToSeat = m.To.OwnerSeat, Reason = m.Reason.Value }),
             Last = G.Events.TakeLast(6).Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray() });
-        public static Scene Start(string nodeId, int heroHp, string[] heroExtras, Enemy[] enemies, int openingSlashes = 3)
+        public static Scene Start(string nodeId, int heroHp, string[] heroExtras, Enemy[] enemies, int openingSlashes = 3, bool fullCatalogue = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+            var registry = fullCatalogue ? ComposedSkillContentRegistry.CreateShowcase(additionalPackages: [new Fixture(true)]) :
+                ContentRegistry.Build(new StandardContentPackage(), new Fixture());
             ShanheStartingCard[] opening = Enumerable.Range(0, openingSlashes)
                 .Select(i => new ShanheStartingCard(CardKind.Slash, i % 2 == 0 ? Suit.Club : Suit.Heart, 4 + i % 9)).ToArray();
             ShanheCombatantDefinition Combatant(int seat, Enemy enemy) => new(Peer, Hp: enemy.Hp, ExtraSkillIds: [Quiet])
@@ -226,12 +261,25 @@ internal static class ChenJiaoChecks
         }
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool trackedQingYanUse = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-shi-chen-jiao", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
-            CharacterFixtureContent.Register(b, Hero);
+            if (!trackedQingYanUse) CharacterFixtureContent.Register(b, Hero);
+            if (trackedQingYanUse)
+            {
+                // Observe any actual completed Use. This window's explicit
+                // cardKinds schema excludes response-only printed names; the
+                // regression still asserts both exact kinds and owning frame.
+                var useWatch = SkillProgramCatalog.Load($$"""
+                {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{QingYanUseWatch}}","revision":1,"triggers":[{"id":"exact-use-finished","window":"cardUseCompleted","ownerRelation":"actor","optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"finished","options":[{"id":"continue"}]}]}]}]}
+                """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                    skills = new Dictionary<string, object> { [QingYanUseWatch] = new { name = "清严原生完成窗", description = "真实零实体Use完成后的原父链。",
+                        optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } } }));
+                b.AddSkill(new(QingYanUseWatch, "清严原生完成窗", "真实零实体Use完成后的原父链。")
+                    { Program = useWatch.Programs[QingYanUseWatch], ProgramPresentation = useWatch.Presentations[QingYanUseWatch] });
+            }
             var rules = $$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
               {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"no-draw","window":"drawPhaseStarting","subject":"owner","optional":false,"isSkillInvocation":false,

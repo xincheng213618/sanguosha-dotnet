@@ -81,6 +81,10 @@ public sealed partial class GameEngine
             CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == o.CardUseFrameId) != 1 ||
             CompleteProgramEventHistory().OfType<DuanJiongSaoguNativeReturnedEvent>().Any(e => e.Origin == o)) throw new InvalidOperationException("Saogu must return after one complete native use.");
         ReplaceRuntimeTop(f with { DuanJiongSaogu = r with { Stage = DuanJiongSaoguStage.NativeChildren } }); AdvanceEventRulesAndQueueFact(new DuanJiongSaoguNativeReturnedEvent(o));
+        // A lethal native Slash has already finished its physical use. Its
+        // exact paid ancestor still needs the ordinary typed continuation,
+        // because a decided game will not run another engine step for it.
+        if (_winner != Winner.None) AdvanceRuntimeProgram(o.ProgramFrameId);
     }
 }
 
