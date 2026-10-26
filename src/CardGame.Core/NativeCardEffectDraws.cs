@@ -33,6 +33,7 @@ public sealed record NativeCardEffectDrawStartedEvent(long UseFrameId, long Null
     int EffectCardId, CardKind EffectCardKind, int RecipientSeat, int TargetIndex,
     long? AwaitingProgramFrameId = null) : IGameEvent
 {
+    public int RequestedCount { get; init; } = 2;
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public long? BypassedActionId { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -49,7 +50,7 @@ public sealed partial class GameEngine
 {
     private bool TryBeginNativeDrawTwo(NullificationWindowFrame pending)
     {
-        if (!HasNativeDrawAttemptCapability) return false;
+        if (!HasNativeDrawTwoCapability) return false;
         if (_resolutionStack.LastOrDefault() is not CardUseFrame use || use.Id != pending.ParentFrameId ||
             pending.ActionKind != LegalActionKind.DrawTwo || pending.EffectCardKind != CardKind.DrawTwo ||
             use.NativeDraw is not null || use.NativeCardEffectDraw is not null || _pendingDecision is not null)
@@ -60,7 +61,7 @@ public sealed partial class GameEngine
         var recipient = GetNullificationTargetSeat(pending) ?? pending.SourceSeat;
         var receipt = new NativeCardEffectDrawReceipt(pending.Id, pending.EffectCardId,
             pending.EffectCardKind, recipient, use.TargetIndex, NativeCardEffectDrawStage.Requesting)
-        { RequestedCount = WushuangDrawTwoCount(pending.SourceSeat),
+        { RequestedCount = NativeDrawTwoCount(pending.SourceSeat),
             BypassedActionId = pending.Id == 0 ? use.Action!.ActionId : null,
             BypassedEffectOrdinal = pending.Id == 0 ? 1 + ProgramEventHistory<NativeCardEffectDrawStartedEvent>()
                 .Count(fact => fact.UseFrameId == use.Id && fact.NullificationFrameId == 0) : null,
@@ -71,7 +72,8 @@ public sealed partial class GameEngine
             { Recipients = [recipient], ReturnKind = NativeDrawAttemptReturnKind.CardUseDrawTwo } });
         AdvanceEventRulesAndQueueFact(new NativeCardEffectDrawStartedEvent(use.Id, pending.Id,
             receipt.EffectCardId, receipt.EffectCardKind, recipient, use.TargetIndex, receipt.AwaitingProgramFrameId)
-            { BypassedActionId = receipt.BypassedActionId, BypassedEffectOrdinal = receipt.BypassedEffectOrdinal });
+            { RequestedCount = receipt.RequestedCount,
+                BypassedActionId = receipt.BypassedActionId, BypassedEffectOrdinal = receipt.BypassedEffectOrdinal });
         ContinueNativeDrawTwo(use.Id);
         return true;
     }
@@ -154,7 +156,7 @@ public sealed partial class GameEngine
     private void AssertNativeCardEffectDraw(CardUseFrame use)
     {
         if (use.NativeCardEffectDraw is not { } receipt) return;
-        if (!HasNativeDrawAttemptCapability || receipt.RequestedCount is < 2 or > 3 || receipt.NullificationFrameId < 0 ||
+        if (!HasNativeDrawTwoCapability || receipt.RequestedCount < 2 || receipt.NullificationFrameId < 0 ||
             (receipt.NullificationFrameId == 0 ? use.Action?.ActionId != receipt.BypassedActionId || receipt.BypassedActionId is not > 0 ||
                 receipt.BypassedEffectOrdinal is not > 0 ||
                 ProgramEventHistory<NativeCardEffectDrawStartedEvent>().Count(e => e.UseFrameId == use.Id && e.NullificationFrameId == 0) != receipt.BypassedEffectOrdinal :
@@ -164,6 +166,7 @@ public sealed partial class GameEngine
             ProgramEventHistory<NativeCardEffectDrawStartedEvent>().Count(e => e.UseFrameId == use.Id &&
                 e.NullificationFrameId == receipt.NullificationFrameId && e.EffectCardId == receipt.EffectCardId &&
                 e.EffectCardKind == receipt.EffectCardKind && e.RecipientSeat == receipt.RecipientSeat &&
+                e.RequestedCount == receipt.RequestedCount &&
                 e.TargetIndex == receipt.TargetIndex && e.AwaitingProgramFrameId == receipt.AwaitingProgramFrameId &&
                 e.BypassedActionId == receipt.BypassedActionId && e.BypassedEffectOrdinal == receipt.BypassedEffectOrdinal) != 1 ||
             receipt.AwaitingProgramFrameId is { } programId && !_resolutionStack.OfType<ProgramSkillFrame>()

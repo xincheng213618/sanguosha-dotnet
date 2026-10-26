@@ -8,9 +8,17 @@ public static partial class StandardShanheCampaignCatalog
     public static IReadOnlyList<ShanheSchoolDefinition> CurrentSchools => SchoolMetadata.Definitions;
     public static IReadOnlyDictionary<int, ShanheTacticSchoolMembership> CurrentTacticSchoolMembershipBySourceId => SchoolMetadata.Members;
 
-    private static ShanheCampaignDefinition WithRemainingSchoolComponents(ShanheCampaignDefinition definition) =>
-        WithCurrentGuandaoTactic(WithCurrentLowHpDrawTactics(WithCurrentZuiquanTactic(WithCurrentWineTactics(
-            WithCurrentTeamHealthTactic(WithCurrentLateRoundTactics(definition))))));
+    private static ShanheCampaignDefinition WithRemainingSchoolComponents(ShanheCampaignDefinition definition)
+    {
+        definition = WithCurrentLateRoundTactics(definition);
+        definition = WithCurrentTeamHealthTactic(definition);
+        definition = WithCurrentWineTactics(definition);
+        definition = WithCurrentZuiquanTactic(definition);
+        definition = WithCurrentLowHpDrawTactics(definition);
+        definition = WithCurrentErshengsanTactic(definition);
+        definition = WithCurrentHeartBladeTactic(definition);
+        return WithCurrentGuandaoTactic(definition);
+    }
 
     private static ShanheCampaignDefinition WithCurrentSchools(ShanheCampaignDefinition definition)
     {

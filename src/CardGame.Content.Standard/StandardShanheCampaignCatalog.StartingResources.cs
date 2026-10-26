@@ -8,6 +8,7 @@ public static partial class StandardShanheCampaignCatalog
     private static ShanheCampaignDefinition WithStartingResourcesContract(ShanheCampaignDefinition definition,
         bool categorizeNormalRewards = false)
     {
+        var currentSeason = definition.Id.StartsWith("shanhe:zhuhou-2026-", StringComparison.Ordinal);
         definition = definition with
         {
             Rewards = definition.Rewards.Select(reward => ShopMetadataByRewardId.TryGetValue(reward.Id, out var metadata)
@@ -32,6 +33,9 @@ public static partial class StandardShanheCampaignCatalog
             {
                 CategorizedRewards = node.CategorizedRewards || categorizeNormalRewards &&
                     node.Kind is ShanheNodeKind.Battle or ShanheNodeKind.EliteBattle,
+                Encounters = currentSeason && node.Kind == ShanheNodeKind.Battle
+                    ? node.Encounters!.Select(encounter => encounter with { VictoryGold = 200 }).ToArray()
+                    : node.Encounters,
                 // Codex shops copy the reward text before adding the price. Keep
                 // that authored price and update only the copied resource contract.
                 Choices = node.Choices?.Select(choice => choice.RewardId is { } id && physical.TryGetValue(id, out var updated) &&

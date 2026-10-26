@@ -73,7 +73,8 @@ public sealed partial class GameEngine
             amount = scaled;
         amount = checked(amount + BoundaryChengPuPublicActionBonus(viewerSeat, action, targetSeat));
         var prediction = PredictVisibleDamage(view, viewerSeat, targetSeat, kind is null ? 0 : amount,
-            kind, kind is not null, false, false, false, paidHand, HasArmorBypass(_players[viewerSeat]));
+            kind, kind is not null, false, false, false, paidHand, HasArmorBypass(_players[viewerSeat]),
+            prospectiveSuit: PublicProposedSlashSuit(view, viewerSeat, action, damageKind));
         return AttachWushuangPublicCombatPrediction(view, viewerSeat, action, targetSeat,
             amount, damageKind, paidHand, prediction);
     }
@@ -151,6 +152,8 @@ public sealed partial class GameEngine
                         {
                             SkillProgramDamageModifierCondition.Always => true,
                             SkillProgramDamageModifierCondition.OwnerUsedFromRound => _roundNumber >= modifier.MinimumRound,
+                            SkillProgramDamageModifierCondition.OwnerUsedHeartSlash => issuedAttack is null
+                                ? prospectiveSuit == Suit.Heart : MatchesOwnerUsedHeartSlash(issuedAttack),
                             SkillProgramDamageModifierCondition.SourceHandBelowLimit =>
                                 Math.Max(0, source.HandCount - paidHandCards) < modifier.SourceHandCountLimit,
                             SkillProgramDamageModifierCondition.SourceNotFewerHandAndEquipmentThanTarget =>

@@ -8,6 +8,12 @@ internal static class ShanheChapterProgressionChecks
     {
         var definition = StandardShanheCampaignCatalog.CreateDefinition(2, StandardShanheCampaignCatalog.Returning2026EditionId);
         var encounters = definition.Nodes.SelectMany(node => (node.Encounters ?? []).Select(encounter => (node, encounter))).ToArray();
+        var ordinary = encounters.Where(item => item.node.Kind == ShanheNodeKind.Battle).ToArray();
+        var codex = StandardShanheCampaignCatalog.CreateCodexDefinition(2, StandardShanheCampaignCatalog.Returning2026EditionId);
+        Need(ordinary.Length > 0 && ordinary.All(item => item.encounter.VictoryGold == 200) &&
+            codex.Nodes.Where(node => node.Kind == ShanheNodeKind.Battle)
+                .SelectMany(node => node.Encounters!).All(encounter => encounter.VictoryGold == 200),
+            "Every current ordinary encounter has the configured 200-coin base victory reward in both expedition entrypoints.");
         Need(encounters.All(item => item.encounter.Enemies.Count + (item.encounter.Allies?.Count ?? 0) + 1 <= 8) &&
             encounters.Where(item => item.node.ChapterNumber == 1).All(item => item.encounter.Enemies.Count is 1 or 2),
             "First-chapter encounters keep complete one/two-enemy rosters, and player, companion and all enemies count toward eight seats.");

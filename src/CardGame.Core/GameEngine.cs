@@ -4530,7 +4530,7 @@ public sealed partial class GameEngine
         var source = _players[GetNullificationTargetSeat(pending) ?? pending.SourceSeat];
         SetCardUseStep(pending.ParentFrameId, ResolutionFrameStep.ResolvingEffect);
         var canDraw = source.IsAlive && _winner == Winner.None;
-        if (canDraw) DrawCards(source, WushuangDrawTwoCount(pending.SourceSeat), log: true);
+        if (canDraw) DrawCards(source, NativeDrawTwoCount(pending.SourceSeat), log: true);
         MoveFinishedTrickCard(pending.ParentFrameId, GetNullificationEffectCard(pending));
         FinishCardUse(pending.ParentFrameId, GetNullificationEffectCard(pending), pending.EffectCardKind);
         AddLog("CardEffect", canDraw ? $"{source.Name} 使用【无中生有】，摸两张牌。" :
@@ -15913,6 +15913,7 @@ public sealed partial class GameEngine
                   {
                       SkillProgramDamageModifierCondition.Always => true,
                       SkillProgramDamageModifierCondition.OwnerUsedFromRound => _roundNumber >= item.modifier.MinimumRound,
+                      SkillProgramDamageModifierCondition.OwnerUsedHeartSlash => MatchesOwnerUsedHeartSlash(attack),
                       SkillProgramDamageModifierCondition.SourceOutsideTargetAttackRange =>
                           !IsWithinAttackRange(attack.TargetSeat, attack.SourceSeat),
                       SkillProgramDamageModifierCondition.SourceNotFewerHandAndEquipmentThanTarget =>

@@ -241,7 +241,8 @@ public enum SkillProgramDamageModifierCondition
     DirectSkillDamage = 1041,
     SourceHpAtMost = 1042,
     OwnerGameSlashUseOrdinalMultipleOfThree = 1043,
-    OwnerUsedFromRound = 1044
+    OwnerUsedFromRound = 1044,
+    OwnerUsedHeartSlash = 1045
 }
 public sealed record SkillProgramDamageModifier(
     string Id, IReadOnlyList<CardKind> CardKinds, int Amount,
@@ -4000,6 +4001,11 @@ public sealed class SkillProgramCatalog
             if (requiredKinds.Count != 0 || value is < 1 or > 20)
                 Fail(path, "Additional Alcohol uses require a bounded positive quota and no response kinds.");
         }
+        else if (kind == SkillProgramCardPolicyKind.AdditionalDrawTwoCards)
+        {
+            if (requiredKinds.Count != 0 || value is < 1 or > 20)
+                Fail(path, "Additional DrawTwo cards require a bounded positive amount and no response kinds.");
+        }
         else if (kind is not (SkillProgramCardPolicyKind.PindianRankBySuit or SkillProgramCardPolicyKind.PindianRankBonus) && (requiredKinds.Count != 0 || value != 0))
             Fail(path, "requiredCardKinds and value require a minimum response count policy");
         if (kind is SkillProgramCardPolicyKind.SlashMustTargetOverHpHandOwner or SkillProgramCardPolicyKind.ProhibitOthersResponse or SkillProgramCardPolicyKind.XiaHuiBlackHandAndGainedEntityRestrictions or SkillProgramCardPolicyKind.StopUsingAfterTrickOrHpCount or SkillProgramCardPolicyKind.RoundGainedOtherSourceUse or SkillProgramCardPolicyKind.DistanceOneToNotHigherHp or SkillProgramCardPolicyKind.SlashExtraTargetsByLostHp or SkillProgramCardPolicyKind.ClaimedEntitiesFaceDownUse or SkillProgramCardPolicyKind.SuppressOthersNonLockedDuringDying or SkillProgramCardPolicyKind.ProhibitBlackTrickTarget or SkillProgramCardPolicyKind.PreventForeignEquipmentDiscard or SkillProgramCardPolicyKind.OfferSkipDiscard or SkillProgramCardPolicyKind.DrawFromBottom or
@@ -4065,6 +4071,11 @@ public sealed class SkillProgramCatalog
              inputSuit is not null || outputSuit is not null || factionId is not null || ownerRole is not null ||
              OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
             Fail(path, "Additional Alcohol uses require exactly Alcohol, a bounded positive quota and no other qualifiers.");
+        if (kind == SkillProgramCardPolicyKind.AdditionalDrawTwoCards &&
+            (!cardKinds.SequenceEqual([CardKind.DrawTwo]) || requiredKinds.Count != 0 || value is < 1 or > 20 ||
+             inputSuit is not null || outputSuit is not null || factionId is not null || ownerRole is not null ||
+             OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
+            Fail(path, "Additional DrawTwo cards require exactly DrawTwo, a bounded positive amount and no other qualifiers.");
         if (kind is SkillProgramCardPolicyKind.AlcoholKingIdentityRank or SkillProgramCardPolicyKind.ForeignTurnAlcoholUseProhibition &&
             (!cardKinds.SequenceEqual([CardKind.Alcohol]) || requiredKinds.Count != 0 || value != 0 || inputSuit is not null || outputSuit is not null ||
              factionId is not null || ownerRole is not null || OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
@@ -4220,6 +4231,10 @@ public sealed class SkillProgramCatalog
             Fail(path + ".sourceScope", "card damage modifiers require ownerUsed");
         var damageLayer = node.TryGetProperty("damageLayer", out _)
             ? EnumValue<SkillProgramDamageLayer>(node, "damageLayer", path) : SkillProgramDamageLayer.AdditionalDamage;
+        if (condition == SkillProgramDamageModifierCondition.OwnerUsedHeartSlash &&
+            (scope != SkillProgramDamageModifierSourceScope.OwnerUsed || damageLayer != SkillProgramDamageLayer.CardDamage ||
+                !ProgramCardKindMatch.IsFullSlashFamily(kinds) || capsToAmount))
+            Fail(path, "Heart Slash damage requires ownerUsed, cardDamage and the complete Slash family without a cap");
         var minimumRound = node.TryGetProperty("minimumRound", out _)
             ? PositiveInt(node, "minimumRound", path) : (int?)null;
         if (condition == SkillProgramDamageModifierCondition.OwnerUsedFromRound)

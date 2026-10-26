@@ -35,6 +35,7 @@ public enum SkillProgramCardPolicyKind
     IgnoreUseDistanceBeforeDealingDamage = 3800,
     UnlimitedAlcoholUse = 3900,
     AdditionalAlcoholUses = 3901,
+    AdditionalDrawTwoCards = 3902,
     SuppressOthersNonLockedDuringDying = 4000, ExclusiveTurnPeachUse = 4001, ProhibitBlackTrickTarget = 4002,
     PindianOpponentRandomHand = 3100,
     PindianMaximumSlashClaim = 3101,
