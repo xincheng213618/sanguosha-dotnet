@@ -390,6 +390,7 @@ var tests = new (string Name, Action Body)[]
     ("Program capped refill: loader shape hashes and public AI", ProgramCappedRefillChecks.LoaderAndPublicAiHonorFixedCappedRefillGoals),
     ("Program capped refill: native target cap excess hand and existing goals", ProgramCappedRefillChecks.NativeRefillCapsCurrentMaxHpAndPreservesExcessHands),
     ("Shanhe capped refill skills: bought Jieming per-point allied five-card cap", ShanheCappedRefillSkillChecks.PurchasedJiemingOffersEachDamagePointAndCapsAlliedRefillAtFive),
+    ("Shanhe Fencheng skill stock: bought three skills native NPC discard and fire", ShanheFenchengSkillStockChecks.BoughtThreeSkillsEscalateShopPricesAndFenchengUsesNativeNpcDiscardAndFire),
     ("Shanhe retaliation skill stock: bought Tuifeng per-point Feng and actual Slash quota", ShanheRetaliationSkillStockChecks.PurchasedTuifengStoresEachDamagePointAndCashOutAddsRealSlashUses),
     ("Shanhe retaliation skill stock: bought ordinary Chengxiang per-damage subset", ShanheRetaliationSkillStockChecks.PurchasedChengxiangRevealsOncePerDamageAndMovesLegalSubset),
     ("Shanhe shop refresh: free quota stacks before independent paid allowance", ShanheShopRefreshChecks.FreeRefreshesStackBeforeMembershipPaidAllowanceAndNeedNoCopper),
