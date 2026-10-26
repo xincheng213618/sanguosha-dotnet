@@ -13,6 +13,10 @@ internal static class ShanheShopAvailabilityChecks
             new[] { "original-shizhan", "original-jueqing", "original-sanyao", "original-qingxian", "original-huituo" }
                 .All(id => !defaults.Contains(id)),
             "Only the verified source skills without S5 research bindings receive default supply eligibility.");
+        Need(defaults.Contains("build-skill-3199") && defaults.Contains("build-skill-3291") &&
+            !defaults.Contains("build-skill-3128") &&
+            StandardShanheCampaignCatalog.CodexRewardIdsByNodeId[50] == "build-skill-3128",
+            "New cycling skills without research enter normal supply while limited Tishen retains the actual researched route.");
         var ids = new[] { "original-jijiu", "original-kuanggu", "original-lianying", "original-jishe", "original-wusheng",
             "original-huituo", "codex-card-4059" };
         var choices = source.Nodes.First(node => node.Kind == ShanheNodeKind.Shop).Choices!

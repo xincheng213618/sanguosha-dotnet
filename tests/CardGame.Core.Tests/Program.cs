@@ -375,6 +375,7 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe incoming reduction: zeroed segments round quota and reset", ShanheIncomingReductionChecks.RoundBudgetCountsZeroedSegmentsAndResetsAfterThree),
     ("Shanhe incoming reduction: elemental chain independent recipient budgets", ShanheIncomingReductionChecks.ElementalChainRecipientsReduceWithIndependentOwnerBudgets),
     ("Shanhe shop availability: verified skills real purchase and research gate", ShanheShopAvailabilityChecks.VerifiedUnmappedSkillsReachTheActualShopWithoutUnlockingResearchSkills),
+    ("Shanhe Dingcuo: self damage actual colors and shared turn allowance", ShanheDingcuoChecks.NativeSelfDamageUsesActualDrawColorsAndOneSharedTurnAllowance),
     ("Shanhe shop stock: five base items and owned expansion", ShanheShopQualityChecks.BaseFiveSlotsAndOwnedExpansionUseRealCategoryStock),
     ("Shanhe persistent market: chapter shelf survives ordinary map choices", ShanhePersistentMarketChecks.ChapterShelfSurvivesMapChoicesAndOnlyResetsAcrossChapters),
     ("Shanhe persistent market: frozen battle seed isolated wallet and health quotes", ShanhePersistentMarketChecks.BattleMarketStartsFromFrozenStateWithoutCampaignHistoryOrDoublePayment),

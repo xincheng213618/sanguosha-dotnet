@@ -227,6 +227,7 @@ public static partial class StandardShanheCampaignCatalog
         var currentYiji = extraSkills.Contains(StandardShanheYijiPackage.SkillId);
         var currentCappedRefill = extraSkills.Contains(StandardShanheCappedRefillSkillsPackage.SkillId);
         var currentBeige = extraSkills.Contains(StandardShanheBeigeSkillsPackage.SkillId);
+        var currentDingcuo = extraSkills.Contains(StandardShanheDingcuoPackage.SkillId);
         var wealthTactics = extraSkills.Contains(StandardShanheWealthPackage.WealthHandLimitSkillId) ||
             extraSkills.Contains(StandardShanheWealthPackage.WealthInitialHandSkillId) ||
             extraSkills.Contains(StandardShanheWealthPackage.WealthDrawSkillId) ||
@@ -333,6 +334,7 @@ public static partial class StandardShanheCampaignCatalog
             (currentYiji ? "/current-yiji-3081" : "") +
             (currentCappedRefill ? "/current-jieming-3083" : "") +
             (currentBeige ? "/current-beige-3140" : "") +
+            (currentDingcuo ? "/current-dingcuo-3291" : "") +
             (localTroops ? "/local-troops" : "") +
             (currentSlashTactics ? "/current-slash-tactics" : "") +
             (s5Chengxiong ? "/s5-chengxiong-14055" : "") +
@@ -376,6 +378,7 @@ public static partial class StandardShanheCampaignCatalog
         {
             var packages = new List<IGameContentPackage> { new StandardShanheBossPackage() };
             if (setup.MarketSetup is not null) packages.Add(new StandardShanheMarketPackage());
+            if (currentDingcuo) packages.Add(new StandardShanheDingcuoPackage());
             if (localTroops) packages.Add(new StandardShanheLocalTroopPackage());
             if (currentLegendaryTactics) packages.Add(new StandardShanheLegendaryTacticsPackage());
             if (buildTactics) packages.Add(new StandardShanheBuildTacticsPackage());
