@@ -65,7 +65,13 @@ public static partial class StandardShanheCampaignCatalog
         new(2292, "tactic-economy-2292", "刷新Ⅱ", 3, 500,
             "商店免费刷新次数+4", new(FreeShopRefreshes: 4)),
         new(2252, "tactic-economy-2252", "补货", 2, 300,
-            "集市中购买后立即刷新同位置商品", new(RestockOnPurchase: true))
+            "集市中购买后立即刷新同位置商品", new(RestockOnPurchase: true)),
+        new(2213, "tactic-economy-2213", "战争店铺", 1, 200,
+            "商店有20%几率刷新出更高品质的战法", new(ShopTacticPromotionPercent: 20)),
+        new(2214, "tactic-economy-2214", "决斗店铺", 1, 200,
+            "商店有20%几率刷新出更高品质的技能", new(ShopSkillPromotionPercent: 20)),
+        new(2215, "tactic-economy-2215", "物资店铺", 1, 200,
+            "商店有20%几率刷新出更高品质的卡牌和装备", new(ShopMaterialPromotionPercent: 20))
     });
 
     private static ShanheCampaignDefinition WithCurrentEconomyTactics(ShanheCampaignDefinition definition)

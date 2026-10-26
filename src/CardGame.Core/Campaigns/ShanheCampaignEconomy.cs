@@ -8,7 +8,8 @@ public sealed record ShanheCampaignEconomy(
     int? GoldAbove = null, string? BattleSkillId = null,
     int TacticRewardChoiceCount = 0, int CardRewardChoiceCount = 0,
     int ExtraEliteRareTactics = 0, int ExtraBossEpicSkills = 0, int SkillRewardChoiceCount = 0,
-    int FreeShopRefreshes = 0, bool RestockOnPurchase = false);
+    int FreeShopRefreshes = 0, bool RestockOnPurchase = false,
+    int ShopTacticPromotionPercent = 0, int ShopSkillPromotionPercent = 0, int ShopMaterialPromotionPercent = 0);
 
 public static partial class ShanheCampaignContent
 {
@@ -27,6 +28,8 @@ public static partial class ShanheCampaignContent
             economy.TacticRewardChoiceCount is 0 or >= 3 and <= 8 && economy.CardRewardChoiceCount is 0 or >= 3 and <= 8 &&
             economy.SkillRewardChoiceCount is 0 or >= 3 and <= 8 &&
             economy.FreeShopRefreshes is >= 0 and <= 20 &&
+            economy.ShopTacticPromotionPercent is >= 0 and <= 100 && economy.ShopSkillPromotionPercent is >= 0 and <= 100 &&
+            economy.ShopMaterialPromotionPercent is >= 0 and <= 100 &&
             economy.ExtraEliteRareTactics is >= 0 and <= 4 && economy.ExtraBossEpicSkills is >= 0 and <= 4 &&
             (economy.GoldAbove is null && economy.BattleSkillId is null ||
                 economy.GoldAbove is >= 0 and <= 1000000 && !string.IsNullOrWhiteSpace(economy.BattleSkillId)) &&
