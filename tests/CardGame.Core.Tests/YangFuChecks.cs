@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
-internal static class YangFuChecks
+internal static partial class YangFuChecks
 {
     private const string Bing="ol:bingzhong",Suyi="ol:suyi",Owner="fixture:yfu-owner",Driver="fixture:yfu-driver",Quiet="fixture:yfu-quiet",Watch="fixture:yfu-watch",Health="fixture:yfu-health",Mode="identity:classic-yang-fu-fixture";
     public static void BingzhongWholeActualTurnOrdinalDynamicTargetsAndCold()
@@ -154,7 +154,7 @@ internal static class YangFuChecks
         }
     }
     private static PlayerSnapshot V(GameEngine g,int seat)=>g.CreateSnapshot(seat).Players[seat];
-    private static PendingDecision? P(GameEngine g)=>Enumerable.Range(0,4).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);
+    private static PendingDecision? P(GameEngine g)=>Enumerable.Range(0,g.State.Players.Count).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);
     private static T[] E<T>(GameEngine g)where T:IGameEvent=>g.Events.Select(e=>e.Payload).OfType<T>().ToArray();
     private static int? Ordinal(GameEngine g,CardActionContext a)=>(int?)typeof(GameEngine).GetMethod("CapturedWholeActualTurnActorUseOrdinal",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(g,[a]);
     private static bool Action(GameEngine g,string a)=>P(g)?.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")==a)==true;
@@ -207,12 +207,13 @@ internal static class YangFuChecks
         }
         throw new InvalidOperationException($"Missing bounded Yang Fu {caller}:{line}: "+Diagnostic(g));
     }
-    private static string Diagnostic(GameEngine g)=>JsonSerializer.Serialize(new{g.State.TurnNumber,g.State.CurrentSeat,g.State.Phase,Players=Enumerable.Range(0,4).Select(s=>new{Seat=s,V(g,s).Hp,V(g,s).HandCount,V(g,s).IsAlive}),Prompt=P(g)is{}p?new{p.PlayerSeat,p.Kind,Skill=p.SkillPrompt?.SkillId,Choices=p.Choices.Take(6).Select(c=>new{c.Cards,c.Targets,c.Parameters})}:null,Frames=g.ResolutionStack.TakeLast(5).Select(f=>new{f.Id,Type=f.GetType().Name,Stage=(f as ProgramSkillFrame)?.YangFu?.Stage}),Tail=g.Events.TakeLast(5).Select(e=>e.Payload.ToString())});
-    private static string State(GameEngine g)=>JsonSerializer.Serialize(new{Views=Enumerable.Range(0,4).Select(s=>SnapshotJson.Serialize(g.CreateSnapshot(s))),Frames=g.ResolutionStack.Select(f=>JsonSerializer.Serialize(f,f.GetType())),g.CardMovements,Events=g.Events.Select(e=>JsonSerializer.Serialize(e.Payload,e.Payload.GetType())),Commands=CommandJson.Serialize(g.AcceptedCommands)});
+    private static string Diagnostic(GameEngine g)=>JsonSerializer.Serialize(new{g.State.TurnNumber,g.State.CurrentSeat,g.State.Phase,Players=Enumerable.Range(0,g.State.Players.Count).Select(s=>new{Seat=s,V(g,s).Hp,V(g,s).HandCount,V(g,s).IsAlive}),Prompt=P(g)is{}p?new{p.PlayerSeat,p.Kind,Skill=p.SkillPrompt?.SkillId,Choices=p.Choices.Take(6).Select(c=>new{c.Cards,c.Targets,c.Parameters})}:null,Frames=g.ResolutionStack.TakeLast(5).Select(f=>new{f.Id,Type=f.GetType().Name,Stage=(f as ProgramSkillFrame)?.YangFu?.Stage}),Tail=g.Events.TakeLast(5).Select(e=>e.Payload.ToString())});
+    private static string State(GameEngine g)=>JsonSerializer.Serialize(new{Views=Enumerable.Range(0,g.State.Players.Count).Select(s=>SnapshotJson.Serialize(g.CreateSnapshot(s))),Frames=g.ResolutionStack.Select(f=>JsonSerializer.Serialize(f,f.GetType())),g.CardMovements,Events=g.Events.Select(e=>JsonSerializer.Serialize(e.Payload,e.Payload.GetType())),Commands=CommandJson.Serialize(g.AcceptedCommands)});
     private static GameEngine Cold(GameEngine g,ContentRegistry r){var copy=GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(g.CreateCheckpoint())),r);Need(State(g)==State(copy),"Cold restore preserves every permitted view, declaration prefix, frozen X, native material and typed child return.");return copy;}
     private static(GameEngine,ContentRegistry)Start(string scene)
     {
-        var r=ContentRegistry.Build(new StandardContentPackage(),new Fixture(scene));var g=GameEngine.CreateStandard(new GameOptions{Seed=7,PlayerCount=4,HumanSeat=0,HumanRole=scene is"draw-death"or"suyi-death"?Role.Rebel:Role.Lord,ModeId=Mode,UseInteractiveSetup=true,UseInteractiveDiscard=false,AdvanceAfterHumanCommands=false,MaxTurns=8},r);
+        var terminal=scene=="suyi-terminal";
+        var r=ContentRegistry.Build(new StandardContentPackage(),new Fixture(scene));var g=GameEngine.CreateStandard(new GameOptions{Seed=7,PlayerCount=terminal?2:4,HumanSeat=0,HumanRole=terminal?null:scene is"draw-death"or"suyi-death"?Role.Rebel:Role.Lord,HumanTeamId=terminal?"player":null,ModeId=Mode,UseInteractiveSetup=true,UseInteractiveDiscard=false,AdvanceAfterHumanCommands=false,MaxTurns=8},r);
         Accept(g,new StartGameCommand());Reach(g,()=>P(g)is{Kind:DecisionKind.SelectGeneral});Accept(g,new SelectGeneralCommand(0,Owner,g.Revision,P(g)!.PromptId));Play(g);return(g,r);
     }
     private sealed class Fixture(string scene):IGameContentPackage
@@ -251,6 +252,7 @@ internal static class YangFuChecks
             if(scene is"draw-loss"or"suyi-loss")defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"actual-health-child","window":"afterHealthChanged","subject":"owner","condition":{"kind":"healthChangeKindIs","hpChangeKind":"loss"},"usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"health","options":[{"id":"continue"}]}]}]}""");
             if(scene is"suyi-empty-hand"or"suyi-fire")defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"real-adjusted-use-child","window":"cardUseBeforeTargetEffects","ownerRelation":"actor","cardKinds":["slash","fireSlash"],"usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"proof","options":[{"id":"continue"}]}]}]}""");
             if(scene=="suyi-lion")defs.Add($$"""{"id":"{{Health}}","revision":1,"triggers":[{"id":"native-recovery","window":"afterHealthChanged","subject":"owner","condition":{"kind":"healthChangeKindIs","hpChangeKind":"recovery"},"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"lion","options":[{"id":"continue"}]}]}]}""");
+            if(scene=="suyi-terminal")defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"real-lethal-use-child","window":"cardUseCommitted","ownerRelation":"actor","cardKinds":["slash"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"proof","options":[{"id":"continue"}]}]}]}""");
             if(scene is"suyi-loss"or"suyi-death")defs.Add($$"""{"id":"fixture:yfu-equipment-child","revision":1,"triggers":[{"id":"actual-equipment-finalization","window":"cardUseTargetsFinalized","ownerRelation":"actor","cardCategories":["equipment"],"usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"selectTarget","target":"owner","targetKind":"currentTurnPlayer"},{"op":"loseHp","target":"selectedTarget","amount":{{(scene=="suyi-loss"?1:20)}}}]}]}""");
             if(scene=="suyi-target-death")defs.Add("""{"id":"fixture:yfu-equipment-child","revision":1,"triggers":[{"id":"actual-equipment-owner-death","window":"cardUseTargetsFinalized","ownerRelation":"actor","cardCategories":["equipment"],"usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"loseHp","target":"owner","amount":20}]}]}""");
             var labels=defs.Select(d=>JsonNode.Parse(d)!).ToDictionary(d=>d["id"]!.GetValue<string>(),d=>new{name=d["id"]!.GetValue<string>(),description="杨阜原生真实命令小夹具",optionLabels=new[]{"activations","triggers"}.SelectMany(k=>d[k]?.AsArray()??new JsonArray()).SelectMany(t=>t!["effects"]!.AsArray()).SelectMany(e=>e!["options"]?.AsArray()??new JsonArray()).Select(o=>o!["id"]!.GetValue<string>()).Distinct().ToDictionary(id=>id,id=>id)});
@@ -258,16 +260,21 @@ internal static class YangFuChecks
             foreach(var(id,p)in catalog.Programs)b.AddSkill(new(id,id,"杨阜原生真实用牌与付款子链"){Program=p,ProgramPresentation=catalog.Presentations[id]});
             b.AddSkill(new("fixture:yfu-pick","真实杨阜","固定公开选将权重"){SelectionWeights=Enum.GetValues<Role>().ToDictionary(role=>role,_=>-100000d)});
             var own=new List<string>{Driver};own.Add(scene=="draw-loss"?"fixture:yfu-conditional":Bing);own.Add(scene=="suyi-loss"?"fixture:yfu-conditional":Suyi);
-            if(scene.StartsWith("draw",StringComparison.Ordinal))own.Add("fixture:yfu-gain");if(scene is"draw-loss"or"suyi-loss"or"suyi-empty-hand"or"suyi-fire")own.Add(Watch);if(scene=="actor")own.Add("fixture:yfu-actor");if(scene=="tail")own.Add("ol:dianjun");if(scene=="issued-distance")own.Add("fixture:yfu-first-distance");if(scene=="suyi-fire")own.Add("fixture:yfu-fire");
+            if(scene.StartsWith("draw",StringComparison.Ordinal))own.Add("fixture:yfu-gain");if(scene is"draw-loss"or"suyi-loss"or"suyi-empty-hand"or"suyi-fire"or"suyi-terminal")own.Add(Watch);if(scene=="actor")own.Add("fixture:yfu-actor");if(scene=="tail")own.Add("ol:dianjun");if(scene=="issued-distance")own.Add("fixture:yfu-first-distance");if(scene=="suyi-fire")own.Add("fixture:yfu-fire");
             b.AddGeneral(new(Owner,"实际杨阜","ol-yang-fu","fixture:yfu-pick","wei",12,own,GeneralGender.Male));
             var peers=Enumerable.Range(1,3).Select(i=>$"fixture:yfu-peer-{i}").ToArray();foreach(var peer in peers)
             {
                 var extra=new List<string>();if(scene=="suyi-lion")extra.Add(Health);if(scene=="suyi-abolished")extra.Add("fixture:yfu-abolished");if(scene is"suyi-loss"or"suyi-death"or"suyi-target-death")extra.Add("fixture:yfu-equipment-child");
-                b.AddGeneral(new(peer,"实际其他角色","supporter",Quiet,"qun",12,extra));
+                b.AddGeneral(new(peer,"实际其他角色","supporter",Quiet,"qun",12,extra){InitialHp=scene=="suyi-terminal"?1:null});
             }
             b.AddCard(new("fixture:yfu-card","真实"+kind,CardCatalog.Get(kind).CategoryName,"固定原生实体",kind));
             b.AddDeck(new("fixture:yfu-deck","杨阜同质真实小牌堆",4,2,[]){PhysicalCards=Enumerable.Range(0,100).Select(_=>new ContentDeckPhysicalCard("fixture:yfu-card",Suit.Spade,7)).ToArray()});
-            b.AddMode(new(Mode,"杨阜真实实际回合小局面",4,4,new Dictionary<string,int>{[nameof(Role.Lord)]=1,[nameof(Role.Rebel)]=3},"fixture:yfu-deck",GeneralCandidateCount:4,GeneralPoolIds:[Owner,..peers]));
+            if(scene=="suyi-terminal")
+            {
+                b.AddModeFeatureFactory(new SuyiTerminalSetupFactory());
+                b.AddMode(new(Mode,"杨阜真实终局小局面",2,2,new Dictionary<string,int>(),"fixture:yfu-deck",2,[Owner,peers[0]],ContentModeKind.Team,new Dictionary<string,int>{["player"]=1,["other"]=1}));
+            }
+            else b.AddMode(new(Mode,"杨阜真实实际回合小局面",4,4,new Dictionary<string,int>{[nameof(Role.Lord)]=1,[nameof(Role.Rebel)]=3},"fixture:yfu-deck",GeneralCandidateCount:4,GeneralPoolIds:[Owner,..peers]));
         }
     }
 }

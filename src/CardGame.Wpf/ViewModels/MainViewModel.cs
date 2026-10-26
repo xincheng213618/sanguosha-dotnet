@@ -588,6 +588,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             ? _game.CreateSnapshot(snapshot.HumanSeat, revealAll: true)
             : snapshot;
         RaisePropertyChanged(nameof(ChoiceSnapshot));
+        SyncCardExchange();
         SyncRevealedSubsetSelection();
         SyncDeckReorder();
         SyncResponseConversionSelection();
@@ -948,7 +949,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                     : TutorialHandAvailability(card, normallyPlayable, IsHandResponsePending
                         ? responseChoice is not null ? $"{responseChoice.Description}；选中后按 Enter 确认。" : HandResponseUnavailableHint(card.Id)
                         : handGuidance.GetValueOrDefault(card.Id)?.Message ?? string.Empty);
-                if (IsPlayConversionSelectionPending)
+                if (IsPlayConversionSelectionPending && !IsMaterialPlayConversionPending)
                     availability = normallyPlayable ? $"{PlayConversionSkillName}：当作【{PlayConversionCardName}】使用；选牌后选择目标。"
                         : $"这张牌当前不能用于{PlayConversionSkillName}；可按 Esc 退出技能选择。";
                 if (IsPhysicalCardRestricted(human.Seat, card.Id))
@@ -958,7 +959,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 var kindLabel = grainIds.Contains(card.Id)
                     ? $"粮 · {CardCatalog.Get(card.Kind).CategoryName}"
                     : CardCatalog.Get(card.Kind).CategoryName;
-                if (IsPlayConversionSelectionPending && normallyPlayable) kindLabel += $" · {PlayConversionSkillName}当{PlayConversionCardName}";
+                if (IsPlayConversionSelectionPending && !IsMaterialPlayConversionPending && normallyPlayable) kindLabel += $" · {PlayConversionSkillName}当{PlayConversionCardName}";
                 var originalHandTag = string.Join(" / ", (human.OriginalHandEntities ?? [])
                     .Where(item => item.CardIds?.Contains(card.Id) == true).Select(item => item.Name)
                     .Concat(card.SkillMarkLabel is { } skillMark ? new[] { skillMark } : [])
@@ -1144,6 +1145,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private void ToggleActiveSkillCard(int cardId)
     {
+        if (IsMaterialPlayConversionPending) { ToggleMaterialPlayCard(cardId); return; }
         if (_snapshot.PendingDecision is not { Kind: DecisionKind.PlayCard })
         {
             return;
@@ -1165,6 +1167,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             _selectedActiveSkillCardIds.Add(cardId);
         }
 
+        RefreshActiveSkillCardSelection(action);
+    }
+
+    private void RefreshActiveSkillCardSelection(LegalAction action)
+    {
         foreach (var item in Hand)
         {
             item.IsSelected = _selectedActiveSkillCardIds.Contains(item.Id);
@@ -1852,6 +1859,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private void UseActiveSkill()
     {
+        if (IsMaterialPlayConversionPending) { ConfirmMaterialPlayConversion(); return; }
         if (_snapshot.PendingDecision is not { Kind: DecisionKind.PlayCard } prompt)
         {
             return;

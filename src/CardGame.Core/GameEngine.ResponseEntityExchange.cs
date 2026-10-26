@@ -45,9 +45,10 @@ public sealed partial class GameEngine
         var original=ActualRespondedAction(response);
         if(original is null || original.ActorSeat!=owner || response.ActorSeat==owner ||
             original.Type!=CardActionType.Use && original.EffectiveKind!=CardKind.Nullification || response.PhysicalCards.Count==0 ||
+            response.ConversionChain.Any(IsWushuangJinzhiSource) ||
             response.PhysicalCards.Any(c=>IsExchangedCardClaim(response.ActionId,c.CardId)||_cardZones.GetLocation(c.CardId).Zone is not(CardZoneKind.Processing or CardZoneKind.DiscardPile))) return false;
         if(ResponseExchangeUpgraded(owner,skill,instance,state)) return true;
-        return _players[response.ActorSeat].IsAlive&&original.PhysicalCards.Count>0&&original.PhysicalCards.All(c=>!IsExchangedCardClaim(original.ActionId,c.CardId)&&_cardZones.GetLocation(c.CardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile);
+        return _players[response.ActorSeat].IsAlive&&!original.ConversionChain.Any(IsWushuangJinzhiSource)&&original.PhysicalCards.Count>0&&original.PhysicalCards.All(c=>!IsExchangedCardClaim(original.ActionId,c.CardId)&&_cardZones.GetLocation(c.CardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile);
     }
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 70)]
     private bool CanOfferResponseExchange(ProgramTriggerCandidate candidate,SkillProgramTrigger trigger,ProgramSkillWindowContext context)
@@ -62,7 +63,7 @@ public sealed partial class GameEngine
         var window=_resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(w=>w.Id==frame.WindowContext!.ParentFrameId);
         var response=window.Action;var original=ActualRespondedAction(response);
         if(original is null||!CanExchangeResponseEntities(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,state,response)) return SkillProgramStepOutcome.Continue;
-        var originals=ResponseExchangeUpgraded(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,state)?[]:original.PhysicalCards.Select(c=>c.CardId).ToArray();
+        var originals=ResponseExchangeUpgraded(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,state)||original.ConversionChain.Any(IsWushuangJinzhiSource)?[]:original.PhysicalCards.Select(c=>c.CardId).ToArray();
         ReplaceRuntimeTop(frame=frame with {ResponseEntityExchange=new(original.ActionId,response.ActionId,response.ActorSeat,originals,response.PhysicalCards.Select(c=>c.CardId).ToArray(),state,1)});
         ClaimResponseEntities(frame,original.ActionId,response.ActorSeat,originals,true);
         if(AwaitProgramBoundCardMovements(frame.Id,frame.OwnerSeat)==SkillProgramStepOutcome.Continue) AdvanceRuntimeProgram(frame.Id);

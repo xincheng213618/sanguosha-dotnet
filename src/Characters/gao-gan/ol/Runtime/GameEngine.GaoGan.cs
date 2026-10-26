@@ -41,8 +41,10 @@ public sealed partial class GameEngine
                     applied.TargetSeat, damage.Id, _turnNumber, applied.SourceSeat, applied.Amount));
         }
         if (applied.SourceLess) return;
+        // Publishing a retaliation fact reenters observers and appends to the
+        // same pending history. Freeze this qualified set before the first fact.
         foreach (var v in PendingJuguanVictims(applied.TargetSeat).Where(v => v.VictimSeat == applied.SourceSeat && v.DamageFrameId != damage.Id)
-            .DistinctBy(v => (v.CardUseFrameId, v.OwnerSeat, v.VictimSeat)))
+            .DistinctBy(v => (v.CardUseFrameId, v.OwnerSeat, v.VictimSeat)).ToArray())
             if (!CompleteProgramEventHistory().OfType<JuguanRetaliationRecordedEvent>().Any(e => e.CardUseFrameId == v.CardUseFrameId && e.OwnerSeat == v.OwnerSeat && e.VictimSeat == v.VictimSeat))
                 AdvanceEventRulesAndQueueFact(new JuguanRetaliationRecordedEvent(v.CardUseFrameId, v.OwnerSeat, v.VictimSeat, damage.Id, _turnNumber));
     }

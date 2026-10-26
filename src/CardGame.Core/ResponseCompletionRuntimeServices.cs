@@ -51,6 +51,8 @@ internal interface IResponseCompletionNativeProtocols : IProgramRuntimeOperation
     bool TryGetWushuangJinzhiResponseMovements(CardActionContext action, int cardId, out IReadOnlyList<CardMovementRecord> movements);
     CardMovementRecord? GuanduChariotResponsePayment(CardActionContext action, long parentFrameId,
         CardActionCost cost, ProgramCardContinuation continuation);
+    CardMovementRecord? DestroyedEquipmentResponsePayment(CardActionContext action, long parentFrameId,
+        CardActionCost cost, ProgramCardContinuation continuation);
     bool IsProgramAlternativeCost(CardActionContext action, int cardId);
     bool IsExchangedCardClaim(long actionId, int cardId);
     bool IsWuZglReturnedCopyCost(CardActionContext action, CardActionCost cost, CardMovementRecord finish);
@@ -159,6 +161,9 @@ public sealed partial class GameEngine
         public bool TryGetWushuangJinzhiResponseMovements(CardActionContext action, int cardId, out IReadOnlyList<CardMovementRecord> movements) => engine.TryGetWushuangJinzhiResponseMovements(action, cardId, out movements);
         public CardMovementRecord? GuanduChariotResponsePayment(CardActionContext action, long parentFrameId,
             CardActionCost cost, ProgramCardContinuation continuation) => engine.GuanduChariotResponsePayment(action, parentFrameId, cost, continuation);
+        public CardMovementRecord? DestroyedEquipmentResponsePayment(CardActionContext action, long parentFrameId,
+            CardActionCost cost, ProgramCardContinuation continuation) => engine.DestroyedEquipmentResponsePayment(action, parentFrameId, cost, continuation) ??
+                engine.DestroyedAlternativeResponsePayment(action, parentFrameId, cost, continuation);
         public bool IsProgramAlternativeCost(CardActionContext action, int cardId) => engine.IsProgramAlternativeCost(action, cardId);
         public bool IsExchangedCardClaim(long actionId, int cardId) => engine.IsExchangedCardClaim(actionId, cardId);
         public bool IsWuZglReturnedCopyCost(CardActionContext action, CardActionCost cost, CardMovementRecord finish) => engine.IsWuZglReturnedCopyCost(action, cost, finish);

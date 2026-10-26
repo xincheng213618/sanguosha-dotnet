@@ -52,7 +52,7 @@ public sealed partial class GameEngine
     private bool IsJueshengDuelUse(long id)
     {
         if (LifecycleCardUse(id) is not { JueshengDuel: { } origin, CardId: 0, CardKind: CardKind.Duel, PhysicalCardIds.Count: 0,
-                Action: { Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: null, EffectiveRank: null, EffectiveIsRed: null } } use ||
+                Action: { Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: null, EffectiveRank: null or 0, EffectiveIsRed: null } } use ||
             origin.UseId != id || !JueshengActorMatches(use, origin) || ProgramEventHistory<JueshengDuelIssuedEvent>().Count(e => e.Origin == origin && e.InstructionIndex == 1) != 1) return false;
         var at = _resolutionStack.FindIndex(p => p.Id == id);
         return at > 0 && _resolutionStack[at - 1] is ProgramSkillFrame { Juesheng: { Stage: JueshengStage.NativeUse, NativeCompleted: false } r } f &&

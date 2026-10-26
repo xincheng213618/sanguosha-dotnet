@@ -49,4 +49,29 @@ public sealed partial class GameEngine
         IsWushuangShopEquipment(movement.CardId) && _cardMovements.Contains(movement) &&
         ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Where(e => e.CardId == movement.CardId).ToArray() is [var fact] &&
         fact.MovementSequence == movement.Sequence;
+
+    private bool IsWushuangShopDestroyedNullificationPayment(long windowId, int provider,
+        CardActionCost material, int afterSequence = -1) =>
+        material.From == CardLocation.Equipment(provider) &&
+        _cardZones.GetLocation(material.CardId) == CardLocation.OutsideGame &&
+        ProgramEventHistory<WushuangShopEquipmentCreatedEvent>().SingleOrDefault(e => e.CardId == material.CardId)?.Seat == provider &&
+        ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().SingleOrDefault(e => e.CardId == material.CardId) is { } destroyed &&
+        destroyed.ParentFrameId == windowId && destroyed.MovementSequence > afterSequence &&
+        _cardMovements.SingleOrDefault(m => m.Sequence == destroyed.MovementSequence) is { } movement &&
+        movement.CardId == material.CardId && movement.CardKind == material.CardKind && movement.From == material.From &&
+        movement.Reason == CardMoveReasons.Nullification && IsWushuangShopDestroyedMaterial(movement);
+
+    private bool IsWushuangShopDestroyedNullificationPayment(CardActionContext action, long windowId, CardActionCost material) =>
+        action is { Type: CardActionType.Response, EffectiveKind: CardKind.Nullification } &&
+        action.ActorSeat == action.ProviderSeat && action.PhysicalCards.Contains(material) &&
+        _resolutionStack.OfType<NullificationWindowFrame>().SingleOrDefault(f => f.Id == windowId) is { } window &&
+        action.ParentActionId == NullificationParentActionId(window) &&
+        IsWushuangShopDestroyedNullificationPayment(windowId, action.ProviderSeat, material);
+
+    private CardMovementRecord? DestroyedEquipmentResponsePayment(CardActionContext action, long windowId,
+        CardActionCost material, ProgramCardContinuation continuation) =>
+        continuation == ProgramCardContinuation.NullificationResponse &&
+        IsWushuangShopDestroyedNullificationPayment(action, windowId, material)
+            ? _cardMovements.Single(m => m.Sequence == ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>()
+                .Single(e => e.CardId == material.CardId).MovementSequence) : null;
 }

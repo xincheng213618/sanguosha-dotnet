@@ -48,6 +48,10 @@ public sealed partial class GameEngine
     private void SignTousuiBottomPayment(CardMovementBatchContext batch)
     {
         if (_resolutionStack.LastOrDefault() is not CardUseFrame { Tousui: { } r } use || batch.ParentFrameId != use.Id) return;
+        // Responses and their cleanup can still use this suspended Slash as
+        // their native parent. Only its own frozen Use materials pay Tousui.
+        if (!batch.Movements.Any(move => move.Reason == CardMoveReasons.Use &&
+            use.Action?.PhysicalCards.Any(cost => cost.CardId == move.CardId && cost.From == move.From) == true)) return;
         if (!TousuiUseProof(use) || r.BottomPaid || batch.ParentFrameId != use.Id || batch.Movements.Count != r.MaterialCount ||
             !use.Action!.PhysicalCards.All(cost => batch.Movements.Count(m => m.CardId == cost.CardId &&
                 m.CardKind == cost.CardKind && m.From == cost.From && m.Reason == CardMoveReasons.Use &&

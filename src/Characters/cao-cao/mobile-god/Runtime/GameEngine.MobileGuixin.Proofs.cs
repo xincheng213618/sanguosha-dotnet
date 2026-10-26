@@ -27,7 +27,8 @@ public sealed partial class GameEngine
             if (payments is not [var p] || p.TargetSeat != r.OtherSeats[cursor] || p.From.OwnerSeat != p.TargetSeat ||
                 !MobileGuixinZones.Contains(p.From.Zone) || p.CardId <= 0 || p.BatchId <= 0 || p.Before < prior || p.Before < 0 ||
                 p.After <= p.Before || p.After > _movementSequence || p.Movements is not [var movement] ||
-                movement.CardId != p.CardId || movement.From != p.From || movement.Sequence <= p.Before || movement.Sequence != p.After ||
+                movement.CardId != p.CardId || movement.From != p.From || movement.Sequence <= p.Before ||
+                !MobileGuixinPaymentTail(f, p, movement) ||
                 movement.Reason.Value != MobileGuixinReason || _cardMovements.Count(m => m == movement) != 1 ||
                 ProgramEventHistory<MobileGuixinMovementPaidEvent>().Count(e => e == new MobileGuixinMovementPaidEvent(f.Id, cursor,
                     p.TargetSeat, p.BatchId, 1, p.Before, p.After)) != 1 ||
@@ -47,6 +48,19 @@ public sealed partial class GameEngine
                 ProgramEventHistory<MobileGuixinTurnoverIssuedEvent>().Count(e => e == new MobileGuixinTurnoverIssuedEvent(f.Id,
                     r.FaceDownBefore.Value, r.FaceDownAfter.Value)) == 1;
         return r.FaceDownBefore is null && r.FaceDownAfter is null && r.Stage != MobileGuixinStage.TurnoverChildren;
+    }
+    private bool MobileGuixinPaymentTail(ProgramSkillFrame frame, MobileGuixinPayment payment, CardMovementRecord gain)
+    {
+        if (gain.Sequence == payment.After) return true;
+        // A phantom really reaches the recipient's hand, then its original
+        // issuer destroys it synchronously after that exact gain event. The
+        // frozen payment ends after both records; no extra acquisition occurred.
+        return gain.To == CardLocation.Hand(frame.OwnerSeat) &&
+            _cardMovements.Where(move => move.Sequence > gain.Sequence && move.Sequence <= payment.After).ToArray() is [var destroyed] &&
+            destroyed.Sequence == payment.After && destroyed.CardId == payment.CardId && destroyed.From == gain.To &&
+            destroyed.HappyZuoCiPhantomDestination is { OriginalForeignGainSequence: { } original, OriginalRecipient: { } recipient, Issuer: var issuer } &&
+            original == gain.Sequence && recipient == frame.OwnerSeat && issuer == payment.TargetSeat &&
+            IsHappyZuoCiDestroyedMaterial(destroyed);
     }
     [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 40300)] private void RequireMobileGuixin(ProgramSkillFrame f)
     {

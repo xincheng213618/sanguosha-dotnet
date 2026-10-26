@@ -106,7 +106,11 @@ public sealed partial class GameEngine
         if (current?.AcceptedDeclarationPayment is { Claimed: false } paid && paid.ActorSeat == actor.Seat &&
             _cardZones.GetLocation(paid.Cost.CardId) == CardLocation.Processing)
             return paid.MouZhaJiang is { } q && ValidMouZhaJiangDeclaration(paid, q) && q.Applies;
-        return CaptureMouZhaJiangAdmission(actor).Applies;
+        // A catalog containing ZhaJiang does not give its privilege to every
+        // actor. Paid declarations above retain their frozen admission even
+        // after source loss; an unpaid preview first needs its own live policy.
+        return CardPolicies(actor, SkillProgramCardPolicyKind.OwnTurnFirstLostHpUses).Any() &&
+            CaptureMouZhaJiangAdmission(actor).Applies;
     }
     private bool HasMouZhaJiangUseDistance(CharacterState actor, long? useId = null) => useId is { } id
         ? HasIssuedMouZhaJiangUse(id, actor.Seat) : HasMouZhaJiangPreUsePrivilege(actor);

@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using CardGame.Core;
 using CardGame.Wpf.Controls;
@@ -33,6 +34,7 @@ internal static class HandPointerChecks
             IsPlayable = true
         });
         vm.Hand[2].IsSelected = true;
+        vm.Hand[4].IsPlayable = vm.Hand[6].IsPlayable = vm.Hand[9].IsPlayable = false;
         Program.Render(root, 1120, 740, Path.Combine(output, "hand-pointer-before.png"));
         var items = (ItemsControl)window.FindName("HandCards");
         var panel = Program.Find<HandPanel>(items).Single();
@@ -65,11 +67,18 @@ internal static class HandPointerChecks
         vm.ClearSelectionCommand.Execute(null);
         vm.Hand[3].IsPlayable = false;
         root.UpdateLayout();
+        var unavailable = CardPixel();
+        Program.Assert(unavailable.A == 255, $"An unavailable card must fully cover the cards behind it instead of letting their artwork bleed through: {unavailable}.");
+        Program.Render(root, 1120, 740, Path.Combine(output, "hand-pointer-unavailable-opaque.png"));
         Program.Assert(press.Invoke(panel, [point]) is true && !vm.HasSelection,
             "An unavailable card selected itself or allowed the press to reach a covered card.");
         Program.Assert(press.Invoke(panel, [new Point(-10, 80)]) is false && !vm.HasSelection,
             "An empty hand margin selected a card.");
         vm.Hand[3].IsPlayable = true;
+        root.UpdateLayout();
+        var available = CardPixel();
+        Program.Assert(available.A == 255 && available.R + available.G + available.B > unavailable.R + unavailable.G + unavailable.B,
+            "Disabled hand cards must retain a visible darkened state and return to full brightness when selectable.");
         press.Invoke(panel, [point]);
         Program.Render(root, 1120, 740, Path.Combine(output, "hand-pointer-after.png"));
         var viewport = (HandScrollViewer)window.FindName("HandViewport");
@@ -134,6 +143,20 @@ internal static class HandPointerChecks
         {
             window.Content = null;
             window.Close();
+        }
+
+        Color CardPixel()
+        {
+            var container = (FrameworkElement)items.ItemContainerGenerator.ContainerFromIndex(3);
+            var button = Program.Find<Button>(container).Single();
+            var bitmap = new RenderTargetBitmap(110, 156, 96, 96, PixelFormats.Pbgra32);
+            var visual = new DrawingVisual();
+            using (var context = visual.RenderOpen())
+                context.DrawRectangle(new VisualBrush(button), null, new Rect(0, 0, 110, 156));
+            bitmap.Render(visual);
+            var pixel = new byte[4];
+            bitmap.CopyPixels(new Int32Rect(55, 20, 1, 1), pixel, 4, 0);
+            return Color.FromArgb(pixel[3], pixel[2], pixel[1], pixel[0]);
         }
     }
 

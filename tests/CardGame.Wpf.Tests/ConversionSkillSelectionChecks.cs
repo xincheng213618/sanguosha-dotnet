@@ -13,6 +13,44 @@ using CardGame.Wpf.ViewModels;
 
 internal static class ConversionSkillSelectionChecks
 {
+    public static void MaterialsDetermineOutput(string output)
+    {
+        foreach (var kind in new[] { CardKind.Slash, CardKind.Alcohol })
+        {
+            var (model, registry) = Create(new Scenario("boundary:longdan", "boundary:zhao-yun", "standard:dodge", kind));
+            using (model)
+            using (var host = new NativeResponseStatusChecks.NativeHost(model))
+            {
+                var root = host.Root;
+                var game = Program.Engine(model);
+                var revision = game.Revision;
+                var commands = game.AcceptedCommands.Count;
+                model.ActivateHumanSkillCommand.Execute(model.HumanSkillCards.Single(skill => skill.ContentId == "boundary:longdan"));
+                Program.Assert(model.EquipmentPlayChoices.Count == 0 && !model.HasCardNameSelection &&
+                    model.Hand.Where(card => card.Kind is CardKind.Dodge or CardKind.Peach).All(card => card.IsPlayable),
+                    "Boundary Longdan must expose both Dodge and Peach directly instead of asking whether to use Slash or Alcohol.");
+                var action = game.GetHumanLegalActions().First(candidate => candidate.ConversionSource?.SkillId == "boundary:longdan" && candidate.PlayedCardKind == kind);
+                var card = model.Hand.Single(item => item.Id == action.CardId);
+                model.SelectCardCommand.Execute(card);
+                Program.Assert(model.PlayButtonText.Contains(CardCatalog.Get(kind).DisplayName) &&
+                    !model.HumanSkillCards.Single(skill => skill.ContentId == "boundary:longdan").StateText.Contains("选择牌型"),
+                    "The material's printed kind must determine the conversion name in the main button and rail.");
+                model.SelectCardCommand.Execute(model.Hand.Single(item => item.Id == card.Id));
+                Program.Assert(!model.CanConfirmSelected && model.Seats.All(seat => !seat.IsSelectedTarget),
+                    "Unselecting the material must clear the inferred output and its targets.");
+                model.ActivateHumanSkillCommand.Execute(model.HumanSkillCards.Single(skill => skill.ContentId == "boundary:longdan"));
+                Program.Assert(!model.HasSelection && game.Revision == revision, "Re-clicking the selected material skill must cancel its unpaid draft.");
+                model.ActivateHumanSkillCommand.Execute(model.HumanSkillCards.Single(skill => skill.ContentId == "boundary:longdan"));
+                model.SelectCardCommand.Execute(model.Hand.Single(item => item.Id == card.Id));
+                foreach (var target in action.TargetSeats) model.SelectTargetCommand.Execute(model.Seats.Single(seat => seat.Seat == target));
+                Program.Assert(model.CanConfirmSelected && game.Revision == revision, "Material-driven outputs must still require confirmation.");
+                Layout(root);
+                Program.Render(root, 1120, 740, Path.Combine(output, $"boundary-longdan-material-{kind}.png"));
+                VerifyCommit(model, registry, action, revision, commands);
+            }
+        }
+    }
+
     public static void SingleCardRules(string output)
     {
         foreach (var scenario in new[]
@@ -281,7 +319,8 @@ internal static class ConversionSkillSelectionChecks
             foreach (var peer in peers) builder.AddGeneral(new(peer, "合法目标", "supporter", "standard:none", "wei", 6));
             builder.AddDeck(new("fixture:conversion-skill-deck", "转换材料", 8, 0, [])
             {
-                PhysicalCards = Enumerable.Range(0, 80).Select(index => new ContentDeckPhysicalCard(scenario.Material,
+                PhysicalCards = Enumerable.Range(0, 80).Select(index => new ContentDeckPhysicalCard(
+                    scenario.Skill == "boundary:longdan" && index % 2 == 0 ? "standard:peach" : scenario.Material,
                     (Suit)(index % 4), index % 13 + 1)).ToArray()
             });
             builder.AddMode(new(Mode, "转换选牌", 4, 4, new Dictionary<string, int>

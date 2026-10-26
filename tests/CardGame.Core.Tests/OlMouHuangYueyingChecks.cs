@@ -214,6 +214,38 @@ internal static class OlMouHuangYueyingChecks
         }
     }
 
+    public static void LixianAfterDamageAiCounterspellAdvancesItsPaidNativeChildCold()
+    {
+        var s = MhyScenario.Start("lixian-ai-nullification");
+        var material = s.V().Hand.First().Id;
+        s.Use("hurt-self");
+        var issued = s.ResolveLixian(CardKind.DrawTwo, material, pauseAtAiCounterspell: true);
+        var window = s.G.ResolutionStack.OfType<NullificationWindowFrame>().Single();
+        var parent = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == issued.FrameId);
+        s.Need(s.P is { PlayerSeat: not 0, Kind: DecisionKind.Nullification } && window.ParentFrameId == issued.UseId &&
+            parent.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied } context &&
+            s.G.ResolutionStack.OfType<DamageTriggerWindowFrame>().Any(f => f.Id == context.ParentFrameId) &&
+            parent.MouLixian is { Stage: MouLixianStage.NativeUse, Paid: true, NativeReturned: false } &&
+            s.E<MouLixianMaterialPaidEvent>().Count(e => e.FrameId == parent.Id && e.CardId == material) == 1,
+            "A real after-damage Lixian DrawTwo suspends its ancestral damage window while another actual AI owns the native counterspell decision.");
+        var prompt = s.P!.PromptId;
+        s.Cold();
+        s.Accept(new AdvanceOneStepCommand(s.G.Revision));
+        s.Need(s.P?.PromptId != prompt || !s.G.ResolutionStack.OfType<NullificationWindowFrame>()
+            .Any(f => f.Id == window.Id && f.CandidateIndex == window.CandidateIndex && f.ChainDepth == window.ChainDepth),
+            "One native paced step advances the owned AI counterspell instead of repeatedly dispatching the suspended damage ancestor.");
+        s.Play();
+        s.Need(s.E<MouLixianUseReturnedEvent>().Count(e => e.FrameId == parent.Id && e.UseId == issued.UseId) == 1 &&
+            s.E<MouLixianCompletedEvent>().Count(e => e.FrameId == parent.Id && e.Used) == 1 &&
+            s.E<MouLixianMaterialPaidEvent>().Count(e => e.FrameId == parent.Id && e.CardId == material) == 1 &&
+            s.E<NullificationResolvedEvent>().Count(e => e.ResolutionId == issued.UseId) == 1 &&
+            s.E<DamageAppliedEvent>().Count(e => e.TargetSeat == 0 && e.Amount == 1) == 1 &&
+            s.G.CardMovements.Count(m => m.CardId == material && m.To == CardLocation.Processing) == 1 &&
+            s.G.CardMovements.Count(m => m.CardId == material && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile) == 1,
+            "Cold AI response completion returns the same real native trick and damage parent once without paying, cleaning up or applying the original damage twice.");
+        s.Cold();
+    }
+
     public static void BingcaiPaidForeignUseEquipmentLossAndDeathCold()
     {
         foreach (var scene in new[] { "lion", "ox", "loss", "death" })
@@ -295,7 +327,8 @@ internal static class OlMouHuangYueyingChecks
             }
             Reach(() => E<MouBingcaiCompletedEvent>().Any(e => e.FrameId == frame));
         }
-        public MouLixianUseIssuedEvent ResolveLixian(CardKind kind, int? material = null, int? target = null, CardUseFrame? outerPhysicalAttack = null)
+        public MouLixianUseIssuedEvent ResolveLixian(CardKind kind, int? material = null, int? target = null, CardUseFrame? outerPhysicalAttack = null,
+            bool pauseAtAiCounterspell = false)
         {
             Reach(() => Optional(Lixian) || HasBranch("mou-lixian", "name"));
             if (Optional(Lixian)) Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
@@ -327,6 +360,12 @@ internal static class OlMouHuangYueyingChecks
                 !E<CardUseFinishedEvent>().Any(e => e.ResolutionId == outer.Id || e.ResolutionId == issue.UseId),
                 "The live physical Slash ancestor and the nested paid Snatch retain exactly their distinct two Processing entities across the native committed child.");
             Private(); Cold(); Continue();
+            if (pauseAtAiCounterspell)
+            {
+                Reach(() => P is { PlayerSeat: not 0, Kind: DecisionKind.Nullification } &&
+                    G.ResolutionStack.LastOrDefault() is NullificationWindowFrame { ParentFrameId: var owner } && owner == issue.UseId);
+                return issue;
+            }
             if (scene == "unlock-used" && kind == CardKind.IronChain)
             {
                 Reach(() => Hold("chain"));
@@ -494,7 +533,8 @@ internal static class OlMouHuangYueyingChecks
             var kind = scene switch { "peach" => CardKind.Peach, "alcohol" => CardKind.Alcohol, "dodge" or "legacy-wine" => CardKind.Dodge,
                 "damage-trick" => CardKind.UnexpectedAssault, "delayed-trick" => CardKind.Lightning,
                 "lion" or "lixian-equipment" => CardKind.SilverLion, "ox" or "lixian-ox" => CardKind.WoodenOx,
-                "lixian-hand" or "unlock-added" or "unlock-used" => CardKind.IronChain, _ => CardKind.Slash };
+                "lixian-hand" or "unlock-added" or "unlock-used" => CardKind.IronChain,
+                "lixian-ai-nullification" => CardKind.Nullification, _ => CardKind.Slash };
             const string physical = "fixture:omhy-entity"; var card = CardCatalog.Get(kind); b.AddCard(new(physical, card.DisplayName, card.CategoryName, "实际小牌堆原实体", kind));
             const string mixedIronChain = "fixture:omhy-physical-iron-chain";
             if (scene == "lixian-physical") { var ironChain = CardCatalog.Get(CardKind.IronChain); b.AddCard(new(mixedIronChain, ironChain.DisplayName, ironChain.CategoryName, "实际混合实体", CardKind.IronChain)); }

@@ -52,4 +52,8 @@ public sealed record SkillProgramAiHint(
     public bool ArbitraryOwnedRecastInput { get; init; }
     public double ValueAdjustment { get; init; }
     public double TargetValueAdjustment { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public int TargetNextDrawBonus { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public int TargetNextDiscardHandLimitPenalty { get; init; }
 }

@@ -30,8 +30,8 @@ public sealed partial class GameEngine
 
     private bool IsRoundOnceCardlessProgramRequestAttackConsistent(CardAttackHandle attack, IReadOnlyList<Card> processing)
     {
-        if (attack.Card is not null || attack.PhysicalCards.Count != 0 ||
-            LifecycleCardUse(attack.ResolutionId) is not { RoundOnceCardlessProgramRequest: { } receipt } use ||
+        if (LifecycleCardUse(attack.ResolutionId) is not { RoundOnceCardlessProgramRequest: { } receipt } use ||
+            attack.Card is not null || attack.PhysicalCards.Count != 0 ||
             _resolutionStack.SingleOrDefault(frame => frame.Id == receipt.ProgramFrameId) is not ProgramSkillFrame parent ||
             !RoundOnceCardlessProgramRequestRidesOn(use, parent) || attack.EffectiveCardKind != use.CardKind ||
             attack.SourceSeat != use.SourceSeat || attack.ProgramSkillCardUseFrameId != parent.Id) return false;

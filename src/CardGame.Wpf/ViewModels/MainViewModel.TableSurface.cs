@@ -79,7 +79,7 @@ public sealed partial class MainViewModel
     public ICommand ActivateHumanSkillCommand => _activateHumanSkillCommand ??= new RelayCommand<HumanSkillViewModel>(skill =>
     {
         // Drafts commit only through the primary confirmation; re-clicking a chip must not pay its cost.
-        if (IsActiveSkillSelectionPending ||
+        if (IsActiveSkillSelectionPending && !IsMaterialPlayConversionPending ||
             !HumanSkillCards.Any(current => ReferenceEquals(current, skill))) return;
         if (skill.IsAvailable && !skill.IsDisabled && TrySelectResponseConversion(skill)) return;
         if (skill.IsAvailable && !skill.IsDisabled && TrySelectPlayConversion(skill)) return;

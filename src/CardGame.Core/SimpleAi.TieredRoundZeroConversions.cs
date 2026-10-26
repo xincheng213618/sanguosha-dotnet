@@ -5,7 +5,7 @@ public sealed partial class SimpleAiBrain
     private (double Score, string Reason) ScoreTieredRoundZeroAction(GameSnapshot view, PlayerSnapshot self,
         Role role, LegalAction action)
     {
-        if (action.CardId != 0 || action.TieredRoundZeroUse is null || action.ConversionSource is null ||
+        if (action.CardId != 0 || (action.TieredRoundZeroUse is null && action.RoundOnceCardlessBasicUse is null) || action.ConversionSource is null ||
             action.PlayedCardKind is not { } kind)
             return (-1000d, "零材料动作缺少已发布的转换政策。");
         var profile = CardCatalog.Get(kind);

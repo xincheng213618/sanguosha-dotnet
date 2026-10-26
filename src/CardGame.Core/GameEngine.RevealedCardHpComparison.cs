@@ -52,10 +52,11 @@ public sealed partial class GameEngine
             _contentRegistry.Skills.GetValueOrDefault(root.SkillId)?.Program is not { } definition ||
             definition.GameplayHash != root.GameplayHash) return false;
         var plan = ProgramInstructionResolver.Default.Resolve(root, definition);
-        if (plan.Instructions.Count != 7 || root.InstructionIndex != plan.Instructions.Count ||
+        if (plan.Instructions.Count is not (7 or 8) || root.InstructionIndex != plan.Instructions.Count ||
             plan.GetPausedInstruction(root.InstructionIndex).Effect is not
-                { Op: SkillProgramEffectOp.LoseHpIfRevealedNonEquipmentDiffers, SourceBind: "drawn" } ||
-            root.CardSetBindings.SingleOrDefault(b => b.Name == "drawn") is not
+                { Op: SkillProgramEffectOp.LoseHpIfRevealedNonEquipmentDiffers, SourceBind: { } revealedBind } ||
+            revealedBind != (plan.Instructions.Count == 8 ? "available-drawn" : "drawn") ||
+            root.CardSetBindings.SingleOrDefault(b => b.Name == revealedBind) is not
                 { Visibility: SkillProgramCardSetVisibility.Public, CardIds: [var cardId], SourceLocations: [var from] } ||
             from != CardLocation.Hand(target)) return false;
 
@@ -65,7 +66,7 @@ public sealed partial class GameEngine
         var history = NeighborDiscardHistory().ToArray();
         var reveal = history.OfType<ProgramCardsRevealedEvent>().LastOrDefault(e =>
             e.FrameId == root.Id && e.SkillId == root.SkillId && e.BindingId == root.TriggerId &&
-            e.OwnerSeat == root.OwnerSeat && e.Bind == "drawn");
+            e.OwnerSeat == root.OwnerSeat && e.Bind == revealedBind);
         var comparisons = history.OfType<RevealedCardHpComparedEvent>().Where(e => e.ProgramFrameId == root.Id).ToArray();
         var losses = history.OfType<ProgramSkillHpLostEvent>().Where(e => e.FrameId == root.Id).ToArray();
         if (reveal is not { Cards: [var shown] } || shown.Id != cardId || EquipmentRules.IsEquipment(shown.Kind) ||

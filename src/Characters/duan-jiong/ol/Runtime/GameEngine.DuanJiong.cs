@@ -16,7 +16,8 @@ public sealed partial class GameEngine
         if (!HasDuanJiongSaoguCapability || batch.DiscardRecoveryPhase is not { } phase || !IsRecordedActualDiscardRecoveryPhase(phase)) return;
         foreach (var m in batch.Movements)
         {
-            if (!_cardMovements.Contains(m) || GetProgramDiscardSource(m) is not { OwnerSeat: { } actor } || !IsValidPlayerSeat(actor) ||
+            var source = GetProgramDiscardSource(m) ?? (IsWushuangShopDestroyedMaterial(m) && IsProgramDiscardOriginReason(m.Reason) ? m.From : (CardLocation?)null);
+            if (!_cardMovements.Contains(m) || source is not { OwnerSeat: { } actor } || !IsValidPlayerSeat(actor) ||
                 CompleteProgramEventHistory().OfType<DuanJiongSaoguDiscardSuitEvent>().Any(e => e.MovementSequence == m.Sequence)) continue;
             var suit = EffectiveSuit(_players[actor], GetAdvancedCard(m.CardId));
             AdvanceEventRulesAndQueueFact(new DuanJiongSaoguDiscardSuitEvent(batch.Id, phase, actor, m.CardId, m.Sequence, suit));

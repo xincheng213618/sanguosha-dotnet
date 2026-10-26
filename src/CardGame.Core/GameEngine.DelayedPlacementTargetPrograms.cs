@@ -24,7 +24,8 @@ public sealed partial class GameEngine
             action.TargetSeats is not [var target] || !IsValidPlayerSeat(target) ||
             !action.TargetSeats.SequenceEqual(use.TargetSeats) ||
             !(action.PhysicalCards.Any(cost => cost.CardId == card.Id) || IsDiouUse(frameId)) ||
-            _cardZones.GetLocation(card.Id) != CardLocation.Processing)
+            _cardZones.GetLocation(card.Id) != CardLocation.Processing &&
+            !(_cardZones.GetLocation(card.Id) == CardLocation.OutsideGame && IsEphemeralCardDestroyedMaterial(frameId, card.Id)))
             throw new InvalidOperationException("A delayed placement lost its exact paid use and target.");
         TryMarkProgramUseAccepted(frameId);
         if (!TryMarkFinalizedTrickProgramsStarted(frameId)) return false;

@@ -212,7 +212,8 @@ public sealed partial class GameEngine
         if (invoice.Length != receipt.FrozenCount || receipt.PaidCardIds.Select((id, index) => (id, from: receipt.PaidFrom[index])).Any(item =>
             (receipt.Operation == SkillProgramEffectOp.StoreBoundCardsInPublicPile ? item.from.OwnerSeat != frame.OwnerSeat ||
                 item.from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) : item.from != pile.Location) ||
-            invoice.Count(move => move.CardId == item.id && move.From == item.from && move.To == destination) != 1)) return false;
+            invoice.Count(move => move.CardId == item.id && move.From == item.from &&
+                PublicPileCashOutPaymentDestination(frame, move, destination)) != 1)) return false;
         if (receipt.Operation == SkillProgramEffectOp.StoreBoundCardsInPublicPile)
         {
             var binding = GetProgramCardSet(frame, GetProgramTrigger(frame).Effects[1].SourceBind!);
@@ -235,6 +236,15 @@ public sealed partial class GameEngine
             drawInvoice.All(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(frame.OwnerSeat)) &&
             (receipt.DrawActual > 0 || receipt.DrawBefore == receipt.DrawAfter);
     }
+
+    private bool PublicPileCashOutPaymentDestination(ProgramSkillFrame frame, CardMovementRecord movement, CardLocation destination) =>
+        movement.To == destination || frame.PublicPileCashOut is { Operation: SkillProgramEffectOp.StoreBoundCardsInPublicPile } receipt &&
+        destination == receipt.Pile.Location && movement.From == CardLocation.Equipment(frame.OwnerSeat) &&
+        movement.Sequence > receipt.Before && movement.Sequence <= receipt.After &&
+        movement.Reason.Value == PublicPileCashOutReason(frame, "payment") &&
+        IsWushuangShopDestroyedMaterial(movement) &&
+        ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Count(fact => fact.CardId == movement.CardId &&
+            fact.MovementSequence == movement.Sequence && fact.ParentFrameId == frame.Id) == 1;
 
     [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 150)]
     private void AssertPublicPileCashOut(ProgramSkillFrame frame)
@@ -284,7 +294,8 @@ public sealed partial class GameEngine
         var storage = receipt.Operation == SkillProgramEffectOp.StoreBoundCardsInPublicPile;
         bool EquipmentPayment(CardKind kind) => storage && !drawing && _cardMovements.Any(move =>
             move.Sequence > receipt.Before && move.Sequence <= receipt.After && receipt.PaidCardIds.Contains(move.CardId) &&
-            move.CardKind == kind && move.From == CardLocation.Equipment(frame.OwnerSeat) && move.To == receipt.Pile.Location &&
+            move.CardKind == kind && move.From == CardLocation.Equipment(frame.OwnerSeat) &&
+            PublicPileCashOutPaymentDestination(frame, move, receipt.Pile.Location) &&
             move.Reason.Value == PublicPileCashOutReason(frame, "payment"));
         if (child is CardsMovedTriggerWindowFrame moved)
             return moved.ResumeProgramFrameId is null && moved.Batch.ParentFrameId == frame.Id &&

@@ -50,7 +50,13 @@ public sealed partial class GameEngine
   if(!actor.IsAlive&&n.Intent is WeijieIntent.Dodge or WeijieIntent.Group or WeijieIntent.Duel)
   {if(_resolutionStack.LastOrDefault()is ResponseWindowFrame response&&response.ParentFrameId==n.OwnerFrameId)PopResponseWindow(n.OwnerFrameId);SetResponseParentStep(n.OwnerFrameId,ResolutionFrameStep.ResolvingEffect);var attack=n.Intent==WeijieIntent.Group?ActiveGroupCard?.CurrentAttack:n.Intent==WeijieIntent.Duel?ActiveDuel?.Attack:ActiveCardAttack;if(attack is not null&&attack.ResolutionId==n.OwnerFrameId)CompleteAttack(attack);return;}
   if(!actor.IsAlive&&n.Intent==WeijieIntent.Dying){RunOneDyingStep();return;}
-  if(n.Intent==WeijieIntent.Dying){RequestHumanDyingResponse(actor,GetDyingPeaches(actor),GetDyingAlcohols(actor,ActiveDying!.VictimSeat));return;}
+  if(n.Intent==WeijieIntent.Dying)
+  {
+   if(ActiveDying is not{}dying||dying.Id!=n.OwnerFrameId||dying.ResponderSeat!=n.ProviderSeat||dying.ResponderIndex!=n.Cursor)throw new InvalidOperationException("Weijie lost its original dying responder return.");
+   if(actor.IsHuman)RequestHumanDyingResponse(actor,GetDyingPeaches(actor),GetDyingAlcohols(actor,dying.VictimSeat));
+   else RunOneDyingStep();
+   return;
+  }
   if(n.Intent==WeijieIntent.FactionDodge){AdvanceFactionDefenseCandidate(keepCurrentRequest:keepCurrentRequest);return;}
   if(n.Intent is WeijieIntent.FactionSlashPlayed or WeijieIntent.FactionSlashUse){AdvanceFactionSlashCandidate(keepCurrentRequest:keepCurrentRequest);return;}
   if(n.Intent==WeijieIntent.Qinglong)

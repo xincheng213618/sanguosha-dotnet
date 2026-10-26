@@ -3,7 +3,7 @@ using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
 
-internal static class ShiTaiShiCiChecks
+internal static partial class ShiTaiShiCiChecks
 {
     private const string Hero = "mobile:shi-tai-shi-ci", Hanzhan = "mobile:shi-hanzhan", Zhanlie = "mobile:shi-zhanlie",
         Zhenfeng = "mobile:shi-zhenfeng", Quiet = "fixture:shi-tai-shi-ci-quiet", Peer = "fixture:shi-tai-shi-ci-peer",
@@ -116,16 +116,19 @@ internal static class ShiTaiShiCiChecks
             Rally = E<ShiTzHanzhanStartedEvent>(), Draws = E<ShiTzHanzhanRallyDrawnEvent>(), Lies = E<ShiTzLieGainedEvent>(),
             Issued = E<ShiTzSlashIssuedEvent>(), Damage = E<DamageAppliedEvent>().Select(e => new { e.TargetSeat, e.Amount }),
             Last = G.Events.TakeLast(6).Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray() });
-        public static Scene Start(string nodeId)
+        public static Scene Start(string nodeId, int heroHp = 4, bool recoveryWatch = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+            var packages = new List<IGameContentPackage> { new StandardContentPackage(), new Fixture() };
+            if (recoveryWatch) packages.Add(new ZhenfengRecoveryWatchPackage());
+            var registry = ContentRegistry.Build(packages.ToArray());
             ShanheStartingCard[] opening =
             [
                 new(CardKind.Slash, Suit.Heart, 4), new(CardKind.Slash, Suit.Club, 5), new(CardKind.Slash, Suit.Spade, 6)
             ];
             ShanheStartingCard[] PeerHand(int seat) => Enumerable.Range(0, 6).Select(i => new ShanheStartingCard(CardKind.Peach, Suit.Heart, 3 + i)).ToArray();
             ShanheCombatantDefinition Combatant(int seat) => new(Peer, Hp: 8, ExtraSkillIds: [Quiet]) { StartingHand = PeerHand(seat) };
-            var setup = new ShanheBattleSetup(96, 1, nodeId, Hero, 4, 0, 0, 0, 0, [HandKeeper, RangeBoost], opening, [],
+            var setup = new ShanheBattleSetup(96, 1, nodeId, Hero, heroHp, 0, 0, 0, 0,
+                recoveryWatch ? [HandKeeper, RangeBoost, RecoveryWatch] : [HandKeeper, RangeBoost], opening, [],
                 [Combatant(1), Combatant(2), Combatant(3)], [], new string('e', 64));
             var game = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null,
                 HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup,

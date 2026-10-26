@@ -342,6 +342,9 @@ public sealed partial class GameEngine
             case ("zhenfeng", 9):
                 ContinueShiTzZhenfengRecovery(GetActiveProgramFrame(id));
                 return;
+            case ("zhenfeng", 12):
+                FinishShiTzOperation(GetActiveProgramFrame(id));
+                return;
             default:
                 throw new InvalidOperationException("Shi Tai Shi Ci has an unknown continuation stage.");
         }
@@ -400,7 +403,13 @@ public sealed partial class GameEngine
         var r = f.ShiTaiShiCi!;
         if (!_players[f.OwnerSeat].IsAlive || _players[f.OwnerSeat].Hp >= _players[f.OwnerSeat].MaxHp)
         { FinishShiTzOperation(GetActiveProgramFrame(f.Id)); return; }
-        BeginRecovery(f.Id, f.OwnerSeat, f.OwnerSeat, 2);
+        // Recovery is issued once before its replacement/HP-change children.
+        // BeginRecovery alone only creates a primitive frame; the shared host
+        // applies the real clamped recovery and retains any queued invoice.
+        ReplaceRuntimeTop(f = f with { ShiTaiShiCi = r with { Stage = 12 },
+            PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        new ProgramSkillHost(this).Recover(f.Id, f.OwnerSeat, f.OwnerSeat, 2, null, null);
+        ContinueShiTz(f.Id);
     }
 
     private bool DrainShiTz(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
@@ -462,7 +471,8 @@ public sealed partial class GameEngine
 
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 67600)]
     private bool ShiTzMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) =>
-        f.ShiTaiShiCi is { Stage: 8 or 14 or 18 } r && p.CoverageResultBind is null && p.BeforeCount == 0 &&
+        f.ShiTaiShiCi is { } r && (r.Stage is 8 or 14 or 18 || r is { Operation: "zhenfeng", Stage: 12 }) &&
+        p.CoverageResultBind is null && p.BeforeCount == 0 &&
         p.SubjectSeat == (r.Stage == 18 ? r.TargetSeat : f.OwnerSeat);
 
     [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 67600)]

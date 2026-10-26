@@ -92,6 +92,7 @@ internal static class WushuangUiChecks
             var game = Program.Engine(vm);
             Program.Assert(game.CreateSnapshot(0).Players.Count == 2 && vm.TableModeText.Contains("1v1") &&
                 vm.IdentityObjective.Contains("AI") && vm.WindowTitle.Contains("单骑无双") && vm.WushuangClockText.Contains(':') &&
+                vm.WushuangClockCaption.Contains("超时比体力") && vm.WushuangRulesText.Contains("当前体力较高的一方获胜") &&
                 game.WushuangRemainingMilliseconds is > 840_000 and <= WushuangMode.TimeLimitMilliseconds,
                 "The entry starts a real two-seat engine and the table identifies its single-player duel and fifteen-minute countdown.");
             Layout(root);

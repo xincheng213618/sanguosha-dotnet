@@ -143,6 +143,9 @@ public sealed record ProgramPindianResultBinding(
     SkillProgramCardSetVisibility Visibility)
 {
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public long? NativePindianFrameId { get; init; }
+
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public ForeignTurnPindianOrigin? ForeignTurnOrigin { get; init; }
 }
 

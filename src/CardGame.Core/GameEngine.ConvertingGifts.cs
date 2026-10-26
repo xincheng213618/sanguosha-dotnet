@@ -90,6 +90,32 @@ public sealed partial class GameEngine
         _status=_players[f.OwnerSeat].IsHuman ? EngineStatus.AwaitingHumanResponse:EngineStatus.Running;
         AdvanceRulesAndPublishState();
     }
+    [ProgramAiChoice(SkillProgramEffectOp.ObserveDamageSourceHandAndGive,
+        SkillProgramEffectOp.GiveSelectedOwnedCardAndDamage)]
+    private PromptChoice SelectAiConvertingGift(PendingDecision decision, ProgramSkillFrame frame)
+    {
+        var draft = frame.ConvertingGift ?? throw new InvalidOperationException("The gift AI lost its native draft.");
+        var view = CreateSnapshot(frame.OwnerSeat);
+        var self = view.Players.Single(player => player.Seat == frame.OwnerSeat);
+        if (draft.Stage == "observe") return decision.Choices.Single();
+        if (draft.Stage == "give-choice")
+        {
+            var owned = self.Hand.Concat(self.Equipment).ToDictionary(card => card.Id);
+            return decision.Choices.Where(choice => choice.Cards is [var id] && owned.ContainsKey(id))
+                .OrderBy(choice => CardCatalog.Get(owned[choice.Cards[0]].Kind).HandKeepValue +
+                    (self.Equipment.Any(card => card.Id == choice.Cards[0]) ? 8 : 0))
+                .ThenBy(choice => choice.Cards[0]).First();
+        }
+        if (draft.Stage == "reward-choice")
+        {
+            return decision.Choices.OrderByDescending(choice => choice.Targets is [var seat]
+                    ? _aiBrains[frame.OwnerSeat].ScoreProgramTarget(view, seat,
+                        new(0, 0, 0, Math.Max(0, draft.HandLimit - view.Players.Single(player => player.Seat == seat).HandCount),
+                            0, 0, false, false)) : 0)
+                .ThenBy(choice => choice.Id.Value, StringComparer.Ordinal).First();
+        }
+        throw new InvalidOperationException("The gift AI has no published choice at this native cursor.");
+    }
     [ProgramAnswer("converting-gift")]
     private void ResolveConvertingGiftChoice(PromptChoice choice)
     {

@@ -141,24 +141,68 @@ internal static partial class WushuangModeChecks
         var paid = slash.CardId.Value;
         Require(game.CreateCardZoneDiagnostics().Single(c => c.CardId == paid).Location == CardLocation.Processing,
             "The deadline fixture reaches a real paid Slash suspended at its optional after-damage child.");
+        var contenders = game.CreateSnapshot(0).Players;
+        Require(contenders[0].Hp > contenders[1].Hp,
+            "The actual paid damage leaves the source with more current HP at the deadline.");
         Cold(game, registry);
         Accept(game, new TickWushuangClockCommand(1, game.Revision));
-        Require(game.State.Status == EngineStatus.Completed && game.WushuangRemainingMilliseconds == 0 &&
+        Require(game.State.Status == EngineStatus.Completed && game.State.Winner == Winner.TeamA &&
+            game.State.WinnerSeat is null && game.State.WinnerTeamId == WushuangMode.PlayerTeamId && game.WushuangRemainingMilliseconds == 0 &&
             game.PendingDecision is null && game.ResolutionStack.Count == 0 &&
             game.CreateCardZoneDiagnostics().Single(c => c.CardId == paid).Location == CardLocation.DiscardPile &&
             E<WushuangClockExpiredEvent>(game).Count() == 1 &&
             game.CardMovements.Count(m => m.CardId == paid && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1,
-            "The explicit deadline retires the exact pending subtree and already-paid material once, then records deterministic scoring.");
+            "The explicit deadline retires the paid subtree once and awards victory to the higher current-HP team.");
         Require(!game.Submit(new TickWushuangClockCommand(1, game.Revision)).Accepted,
             "A finished challenge cannot be reopened with another clock tick.");
         Cold(game, registry);
+        var (shopClock, shopRegistry) = Start(clock: false);
+        Drive(shopClock, () => Shop(shopClock) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
+        var openingCandidates = Shop(shopClock).Offers.Select(offer => offer.Id).ToArray();
+        Cold(shopClock, shopRegistry);
+        Accept(shopClock, new TickWushuangClockCommand(WushuangMode.TimeLimitMilliseconds, shopClock.Revision));
+        Require(shopClock.State.Winner == Winner.Draw && shopClock.State.WinnerSeat is null &&
+            shopClock.ResolutionStack.Count == 0 && shopClock.PendingDecision is null &&
+            !E<WushuangOfferBoughtEvent>(shopClock).Any(offer => openingCandidates.Contains(offer.OfferId)),
+            "Expiring at the mandatory opening shop ends in a draw without inventing a tactic purchase or leaving a private prompt.");
+        Cold(shopClock, shopRegistry);
     }
 
-    private static (GameEngine, ContentRegistry) Start(bool clock, int seed = 17, string[]? skills = null, bool gain = false, int? initialHp = null, int? aiQuota = null, bool confirmOpeningHand = false)
+    public static void SurvivalLimitsCompareCurrentHpWithoutRatioOrCards()
     {
-        var registry = ComposedSkillContentRegistry.CreateShowcase(additionalPackages: [new Fixture(clock, skills, gain, initialHp, aiQuota)]);
+        foreach (var (hp, expectedTeam) in new (int, string?)[]
+            { (21, WushuangMode.PlayerTeamId), (19, WushuangMode.AiTeamId), (20, null) })
+        {
+            var (game, registry) = Start(false, initialHp: hp, aiBaseHp: 20);
+            Drive(game, () => Shop(game) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
+            var contenders = game.CreateSnapshot(0).Players;
+            Require(contenders[0].MaxHp == 30 && contenders[1].MaxHp == 20 && contenders[0].Hp == hp &&
+                contenders[0].HandCount != contenders[1].HandCount,
+                "The real limit fixture distinguishes current HP from HP ratio and unequal initial hands.");
+            Accept(game, new TickWushuangClockCommand(WushuangMode.TimeLimitMilliseconds, game.Revision));
+            Require(game.State.WinnerTeamId == expectedTeam && (game.State.Winner == Winner.Draw) == (expectedTeam is null),
+                "Only current HP decides the survival winner; equal HP remains a draw despite different maximum HP and hand counts.");
+            Cold(game, registry);
+        }
+        var (limited, limitedRegistry) = Start(false, 57, maxTurns: 1);
+        Drive(limited, () => Shop(limited) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
+        Buy(limited, Shop(limited).Offers.Single(offer => offer.TacticId == 2293).Id);
+        Drive(limited, () => limited.State.Status == EngineStatus.Completed);
+        var ordered = limited.CreateSnapshot(0).Players.OrderByDescending(player => player.Hp).ToArray();
+        var team = ordered[0].Hp == ordered[1].Hp ? null : ordered[0].TeamId;
+        Require(limited.State.Status == EngineStatus.Completed && limited.State.TurnNumber == 1 &&
+            limited.State.WinnerTeamId == team && (limited.State.Winner == Winner.Draw) == (team is null) &&
+            limited.ResolutionStack.Count == 0 && !E<WushuangClockExpiredEvent>(limited).Any(),
+            "The configured native turn boundary uses the same HP result without advancing or expiring the host clock.");
+        Cold(limited, limitedRegistry);
+    }
+
+    private static (GameEngine, ContentRegistry) Start(bool clock, int seed = 17, string[]? skills = null, bool gain = false, int? initialHp = null, int? aiQuota = null, bool confirmOpeningHand = false, int aiBaseHp = 30, int maxTurns = 300, bool grantCategoryRefund = false, bool grantWangYunTrick = false, bool simaYiShopGive = false, bool peaches = false, bool interactiveDiscard = false, bool mixedTricks = false, bool publicPileStorage = false, string? materialCase = null, int? legacyOpeningTactic = null)
+    {
+        var registry = ComposedSkillContentRegistry.CreateShowcase(additionalPackages: [new Fixture(clock, skills, gain, initialHp, aiQuota, aiBaseHp, grantCategoryRefund, grantWangYunTrick, simaYiShopGive, peaches, mixedTricks, publicPileStorage, materialCase, legacyOpeningTactic)]);
         var game = GameEngine.CreateStandard(StandardWushuangContentRegistry.CreateOptions(seed) with
-        { ConfirmOpeningHand = confirmOpeningHand, AdvanceAfterHumanCommands = false, UseInteractiveDiscard = false }, registry);
+        { AiPolicyVersion = AiDecisionPolicy.RebelCoordinationVersion, MaxTurns = maxTurns, ConfirmOpeningHand = confirmOpeningHand,
+            AdvanceAfterHumanCommands = false, UseInteractiveDiscard = interactiveDiscard }, registry);
         Require(!game.IsWushuangClockRunning && !game.Submit(new TickWushuangClockCommand(1, game.Revision)).Accepted,
             "A started, selected game is required before the trusted host clock can advance.");
         Accept(game, new StartGameCommand());
@@ -225,21 +269,43 @@ internal static partial class WushuangModeChecks
     { var r = g.Submit(c); Require(r.Accepted, r.Error?.Message ?? "Wushuang command rejected."); }
     private static void Require(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 
-    private sealed class Fixture(bool clock, string[]? skills = null, bool gain = false, int? initialHp = null, int? aiQuota = null) : IGameContentPackage
+    private sealed class Fixture(bool clock, string[]? skills = null, bool gain = false, int? initialHp = null, int? aiQuota = null, int aiBaseHp = 30, bool grantCategoryRefund = false, bool grantWangYunTrick = false, bool simaYiShopGive = false, bool peaches = false, bool mixedTricks = false, bool publicPileStorage = false, string? materialCase = null, int? legacyOpeningTactic = null) : IGameContentPackage
     {
-        public PackageManifest Manifest { get; } = new("wushuang-fixture", new Version(1, 0, 0));
+        public PackageManifest Manifest { get; } = new(legacyOpeningTactic is { } preset
+            ? $"wushuang-fixture-legacy-seat0-{preset}" : "wushuang-fixture", new Version(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
             var source = StandardWushuangContentRegistry.Create();
-            builder.CopyModeFeatureFactoriesFrom(source);
+            WushuangLegacyOpeningFixture.CopyModeFactories(builder, source, legacyOpeningTactic);
             foreach (var skill in source.Skills.Values.Where(s =>
                 s.Id.StartsWith("wushuang:", StringComparison.Ordinal) || s.Id.StartsWith("shanhe:", StringComparison.Ordinal) ||
                 s.Id.StartsWith("hulao:", StringComparison.Ordinal) || s.Id.StartsWith("shenwu:", StringComparison.Ordinal) ||
                 s.Id.StartsWith("ghost:", StringComparison.Ordinal))) builder.AddSkill(skill);
+            var categoryRefundActivation = grantCategoryRefund ? """
+                ,{"id":"acquire-category-refund","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,"effects":[{"op":"grantSkills","target":"owner","skillIds":["ol:sanchen"]}]}
+                """ : "";
+            var wangYunActivation = grantWangYunTrick ? $$$"""
+                ,{"id":"acquire-native-jingong","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,"effects":[{"op":"grantSkills","target":"owner","skillIds":["ol:jingong","{{{WangYunShopWatch}}}"]}]}
+                ,{"id":"shop-conversion-setup","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,"effects":[{"op":"grantSkills","target":"owner","skillIds":["wushuang:skill-3329","{{{ShopPaidConverter}}}","{{{ShopPaidConversionWatch}}}"]},{"op":"obtainWushuangDeckCards","target":"owner","amount":1,"outputKind":"drawTwo"}]}
+                """ : "";
+            var simaYiActivation = simaYiShopGive ? $$$"""
+                ,{"id":"observe-native-quanmou-give","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,"effects":[{"op":"grantSkills","target":"owner","skillIds":["{{{MouSmShopGiveWatch}}}"]}]}
+                """ : "";
+            var publicPileActivation = publicPileStorage ? $$$"""
+                ,{"id":"acquire-native-tuifeng","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,"effects":[{"op":"grantSkills","target":"owner","skillIds":["ol:tuifeng","{{{PublicPileShopWatch}}}"]}]}
+                ,{"id":"public-pile-incoming","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"owner","amount":1}]}
+                """ : "";
+            var materialSkill = materialCase == "happy-zuoxing" ? HappyGjShopDriver : materialCase == "huomo" ? "classic:huomo" : materialCase == "jiqiao" ? "ol:jiqiao" : materialCase == "suji" ? "ol:suji" :
+                materialCase == "xianniang" ? "anniversary:xianniang" : materialCase == "suishi" ? "anniversary:suishi" : materialCase == "alcohol" ? "boundary:jianying-mobile" : MaterialFlowWatch;
+            var materialSkills = JsonSerializer.Serialize(materialSkill == MaterialFlowWatch ? new[] { MaterialFlowWatch } : new[] { materialSkill, MaterialFlowWatch });
+            var materialActivation = materialCase is not null ? $$$"""
+                ,{"id":"acquire-material-flow","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,"effects":[{"op":"grantSkills","target":"owner","skillIds":{{{materialSkills}}}}]}
+                ,{"id":"return-self-equipment","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,"effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"targetRef":{"kind":"owner"},"zones":["equipment"],"count":1,"destination":"selectedTargetHand","allowSameOwnerHandReturn":true,"awaitMovementTriggers":true,"resultBind":"returned"}]}
+                """ : "";
             var rules = $$$"""
             {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[
               {"id":"{{{Driver}}}","revision":1,
-               "activations":[{"id":"extra","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,"effects":[{"op":"pendExtraTurn","target":"owner"}]}],
+               "activations":[{"id":"extra","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,"effects":[{"op":"pendExtraTurn","target":"owner"}]}{{{categoryRefundActivation}}}{{{wangYunActivation}}}{{{simaYiActivation}}}{{{publicPileActivation}}}{{{materialActivation}}}],
                "triggers":[{"id":"paid-child","window":"afterDamageApplied","subject":"damageSource","damageOccurrence":"perDamage","optional":true,"effects":[{"op":"draw","target":"owner","amount":1}]}]}]}
             """;
             var catalog = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new
@@ -247,6 +313,67 @@ internal static partial class WushuangModeChecks
                 skills = new Dictionary<string, object> { [Driver] = new { name = "无双小型验证", description = "原生额外回合与付费后窗口。" } } }));
             builder.AddSkill(new(Driver, "无双小型验证", "原生额外回合与付费后窗口。")
             { Program = catalog.Programs[Driver], ProgramPresentation = catalog.Presentations[Driver] });
+            if (materialCase == "happy-zuoxing") RegisterHappyGjShopFixture(builder);
+            if (materialCase is not null)
+            {
+                var extraMovementReason = materialCase == "xianniang" ? ",\"skill-program.anniversary:xianniang.obtain\"" : "";
+                var paidBasicUseWatch = materialCase == "alcohol" ? """
+                  ,{"id":"paid-basic-use","window":"cardUseCommitted","ownerRelation":"actor","cardKinds":["alcohol"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid-basic","options":[{"id":"continue"}]}]}
+                  """ : "";
+                var watch = SkillProgramCatalog.Load($$$"""
+                {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[{"id":"{{{MaterialFlowWatch}}}","revision":1,"triggers":[
+                  {"id":"paid-equipment","window":"cardsMoved","subject":"owner","sourceZones":["equipment"],"movementOccurrence":"perOwnerBatch","movementReasons":["program.jiqiao.cost","skill-program.{{{Driver}}}.SelectAndMoveOwnedCard"{{{extraMovementReason}}}],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]},
+                  {"id":"completed-dodge","window":"cardResponseCompleted","ownerRelation":"actor","cardKinds":["dodge"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"completed","options":[{"id":"continue"}]}]}{{{paidBasicUseWatch}}}
+                ]}]}
+                """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                    skills = new Dictionary<string, object> { [MaterialFlowWatch] = new { name = "原实体支付回归窗口", description = "等待真实装备支付或响应完成返回。",
+                        optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } } }));
+                builder.AddSkill(new(MaterialFlowWatch, "原实体支付回归窗口", "真实原生付款子窗")
+                    { Program = watch.Programs[MaterialFlowWatch], ProgramPresentation = watch.Presentations[MaterialFlowWatch] });
+            }
+            if (publicPileStorage)
+            {
+                var watch = SkillProgramCatalog.Load($$$"""
+                {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[{"id":"{{{PublicPileShopWatch}}}","revision":1,"triggers":[{"id":"real-storage-payment","window":"cardsMoved","subject":"owner","sourceZones":["equipment"],"movementOccurrence":"perOwnerBatch","movementReasons":["skill-program.ol:tuifeng.StoreBoundCardsInPublicPile.payment","skill-program.ma-mi-di.bingjie.discard"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]}]}]}
+                """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                    skills = new Dictionary<string, object> { [PublicPileShopWatch] = new { name = "真实装备储存付款子窗",
+                        description = "装备销毁后等待原始储存费用返回。", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } } }));
+                builder.AddSkill(new(PublicPileShopWatch, "真实装备储存付款子窗", "装备销毁后等待原始储存费用返回。")
+                    { Program = watch.Programs[PublicPileShopWatch], ProgramPresentation = watch.Presentations[PublicPileShopWatch] });
+            }
+            if (grantWangYunTrick)
+            {
+                var conversions = SkillProgramCatalog.Load($$$"""
+                {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[
+                  {"id":"{{{ShopPaidConverter}}}","revision":1,"viewAs":[{"id":"equipment-supply","inputKinds":[],"inputSuits":[],"sourceZones":["equipment"],"outputKind":"supplyShortage","forPlay":true,"forResponse":false}]},
+                  {"id":"{{{ShopPaidConversionWatch}}}","revision":1,"triggers":[
+                    {"id":"response","window":"cardResponseAccepted","ownerRelation":"actor","cardKinds":["nullification"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]},
+                    {"id":"delayed","window":"cardUseTargetsFinalized","ownerRelation":"actor","cardKinds":["supplyShortage"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]}]}]}
+                """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                    skills = new Dictionary<string, object> {
+                        [ShopPaidConverter] = new { name = "真实装备转延时", description = "使用原生单实体转换。" },
+                        [ShopPaidConversionWatch] = new { name = "装备费用原生子窗", description = "真实付款后等待。",
+                            optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } } }));
+                foreach (var (id, program) in conversions.Programs)
+                    builder.AddSkill(new(id, id, "原生购买装备转换回归") { Program = program, ProgramPresentation = conversions.Presentations[id] });
+                var watch = SkillProgramCatalog.Load($$$"""
+                {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[{"id":"{{{WangYunShopWatch}}}","revision":1,"triggers":[{"id":"paid-native-trick","window":"cardUseCommitted","ownerRelation":"actor","optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]}]}]}
+                """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                    skills = new Dictionary<string, object> { [WangYunShopWatch] = new { name = "矜功原生使用子窗",
+                        description = "真实装备费用结算后的已确认Use子窗。", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } } }));
+                builder.AddSkill(new(WangYunShopWatch, "矜功原生使用子窗", "真实装备费用结算后的已确认Use子窗。")
+                    { Program = watch.Programs[WangYunShopWatch], ProgramPresentation = watch.Presentations[WangYunShopWatch] });
+            }
+            if (simaYiShopGive)
+            {
+                var watch = SkillProgramCatalog.Load($$$"""
+                {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[{"id":"{{{MouSmShopGiveWatch}}}","revision":1,"triggers":[{"id":"actual-native-give","window":"cardsMoved","subject":"owner","sourceZones":["equipment"],"movementOccurrence":"perBatch","movementReasons":["skill-program.mou:quanmou.give"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"give","options":[{"id":"continue"}]}]}]}]}
+                """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                    skills = new Dictionary<string, object> { [MouSmShopGiveWatch] = new { name = "权谋原生交牌子窗",
+                        description = "购买装备实际离场后仍在原权谋父帧。", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } } }));
+                builder.AddSkill(new(MouSmShopGiveWatch, "权谋原生交牌子窗", "购买装备实际离场后仍在原权谋父帧。")
+                    { Program = watch.Programs[MouSmShopGiveWatch], ProgramPresentation = watch.Presentations[MouSmShopGiveWatch] });
+            }
             if (gain)
             {
                 var gainCatalog = SkillProgramCatalog.Load($$$"""
@@ -264,9 +391,10 @@ internal static partial class WushuangModeChecks
                 """, """{"schemaVersion":3,"skills":{"fixture:wushuang-ai-quota":{"name":"固定额度","description":"固定摸牌与出杀额度。"}}}""");
                 builder.AddSkill(new("fixture:wushuang-ai-quota", "固定额度", "固定摸牌与出杀额度。") { Program = quotaCatalog.Programs["fixture:wushuang-ai-quota"] });
             }
-            builder.AddGeneral(new("fixture:wushuang-ai", "无双对手", "", aiQuota is null ? "classic:qianxun" : "fixture:wushuang-ai-quota", "qun", BaseHp: 30));
+            builder.AddGeneral(new("fixture:wushuang-ai", "无双对手", "", aiQuota is null ? "classic:qianxun" : "fixture:wushuang-ai-quota", "qun", BaseHp: aiBaseHp,
+                AdditionalSkillIds: simaYiShopGive ? ["mou:quanmou"] : clock && publicPileStorage ? ["ol:bingjie", "ol:zhengding"] : null));
             builder.AddDeck(new("fixture:wushuang-deck", "Bounded native shop material", 4, 0, [])
-            { PhysicalCards = Enumerable.Range(0, 240).Select(_ => new ContentDeckPhysicalCard(gain ? "standard:draw_two" : clock ? "standard:slash" : "standard:dodge", Suit.Heart, 7)).ToArray() });
+            { PhysicalCards = Enumerable.Range(0, 240).Select(index => new ContentDeckPhysicalCard(mixedTricks && index < 24 ? "standard:draw_two" : peaches ? "standard:peach" : gain ? "standard:draw_two" : clock ? "standard:slash" : "standard:dodge", Suit.Heart, 7)).ToArray() });
             builder.AddMode(new(WushuangMode.ModeId, "无双小型验证", 2, 2, new Dictionary<string, int>(),
                 "fixture:wushuang-deck", 2, [Human, "fixture:wushuang-ai"], ContentModeKind.Team,
                 new Dictionary<string, int> { [WushuangMode.PlayerTeamId] = 1, [WushuangMode.AiTeamId] = 1 }));

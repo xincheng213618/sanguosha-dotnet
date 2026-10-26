@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 /// <summary>Immutable native facts consumed by the optional single-match feature.</summary>
 public sealed record WushuangPlayerFacts(int Seat, string Name, bool IsHuman, bool IsAlive,
-    int Hp, int MaxHp, IReadOnlyList<SkillGrant> SkillGrants)
+    int? Hp, int MaxHp, IReadOnlyList<SkillGrant> SkillGrants)
 {
     public string? TeamId { get; init; }
 }

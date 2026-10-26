@@ -2,7 +2,7 @@ using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
-internal static class IceSwordChecks
+internal static partial class IceSwordChecks
 {
     public static void SequentialDiscardPreventsDamageAndReplays()
     {

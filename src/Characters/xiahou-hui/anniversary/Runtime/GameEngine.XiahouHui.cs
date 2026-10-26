@@ -142,6 +142,19 @@ public sealed partial class GameEngine
         }
         return Array.AsReadOnly(choices.ToArray());
     }
+    [ProgramAiChoice(SkillProgramEffectOp.GiveAnniversaryXiahouHuiDujunDrawnCards,
+        SkillProgramEffectOp.ResolveAnniversaryXiahouHuiJikun)]
+    private PromptChoice SelectAiXiahouHuiTransfer(PendingDecision decision, ProgramSkillFrame frame)
+    {
+        var brain = _aiBrains[decision.PlayerSeat];
+        var view = CreateSnapshot(decision.PlayerSeat);
+        var result = frame.XiahouHui?.Operation == SkillProgramEffectOp.GiveAnniversaryXiahouHuiDujunDrawnCards
+            ? brain.ChooseSupportDrawTargets(view, decision.Choices, ++_thoughtSequence)
+            : brain.ChooseSupportFirstTransferTargets(view, decision.Choices, ++_thoughtSequence);
+        AddThought(result.Thought);
+        return decision.Choices.Single(choice => choice.Id == result.Choice);
+    }
+
     private void PublishXiahouHui(ProgramSkillFrame f)
     {
         var choices = _players[f.OwnerSeat].IsAlive && _winner == Winner.None ? XiahouHuiChoices(f) : [];

@@ -25,13 +25,20 @@ internal static partial class WushuangModeChecks
             "The actual shop catalogue contains only basic weapons/armor and no mounts, treasures, special equipment or BorrowedSword.");
         Require(new[] { 3099, 3103, 3153, 3157, 3275, 3276 }.All(id => !WushuangCatalogue.Skills.Single(s => s.Id == id).IsAvailableInShop) &&
             new[] { 3027, 3048, 3100, 3282, 3163 }.All(id => WushuangCatalogue.Skills.Single(s => s.Id == id).IsAvailableInShop) &&
-            WushuangTactics.All.Where(t => t.Description.Contains("护甲") || t.Id is 2010 or 2129 or 2238 or 2244).All(t => !t.IsAvailableInShop),
+            WushuangTactics.All.Where(t => t.Description.Contains("护甲") || t.Id is 2007 or 2010 or 2033 or 2034 or 2129 or 2238 or 2244).All(t => !t.IsAvailableInShop),
             "Third-player-only skills, armor, distance-only and BorrowedSword tactics are unavailable; useful close-range skills, Guanxu and Gongxin remain.");
         var pool = standard.Modes[WushuangMode.ModeId].GeneralPoolIds!;
+        Require(standard.Generals.Values.Where(general => general.CharacterId == "character:lu-su").All(general => !pool.Contains(general.Id)) &&
+            standard.Generals.ContainsKey("happy:shen-lu-su") && standard.Generals.ContainsKey("mobile:shi-lu-su"),
+            "All Lu Su editions stay globally registered while the user's duel-specific family exclusion removes them from this mode.");
         Require(pool.Contains("classic:sun-quan") && pool.Contains("classic:lu-meng") && pool.Contains("boundary:xu-sheng") &&
+            !pool.Contains("classic:gongsun-zan") && pool.Contains("boundary:gongsun-zan") &&
             pool.Contains("boundary:zhang-jiao") &&
             !pool.Contains("classic:liu-bei") && !pool.Contains("classic:hua-tuo") &&
-            !pool.Contains("mou:huang-gai-mobile") && standard.Generals.ContainsKey("classic:liu-bei"),
+            !pool.Contains("mou:huang-gai-mobile") && !pool.Contains("ol:wen-pin") && !pool.Contains("boundary:zhu-zhi-mobile") &&
+            !pool.Contains("ol:bu-zhi") && !pool.Contains("classic:bu-lian-shi") && !pool.Contains("ol:guan-suo") &&
+            standard.Generals.ContainsKey("ol:wen-pin") && standard.Generals.ContainsKey("boundary:zhu-zhi-mobile") &&
+            standard.Generals.ContainsKey("classic:liu-bei"),
             "The single-duel pool excludes specific support/armor editions while retaining standard duel generals and the global collection.");
         var (noArmor, noArmorRegistry) = Start(false, skills: ["wushuang:tactic-2069", "wushuang:tactic-2074"]);
         Play(noArmor);
@@ -47,7 +54,7 @@ internal static partial class WushuangModeChecks
             "Single-duel distance stays one even when a wounded general's Yicong would increase incoming distance.");
         Cold(noDistance, noDistanceRegistry);
 
-        var (game, registry) = Start(false, 119, skills: ["boundary:zhiheng"]);
+        var (game, registry) = Start(false, 1050, skills: ["boundary:zhiheng"]);
         Drive(game, () => Shop(game) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
         Buy(game, Shop(game).Offers[0].Id);
         Shopping(game);
@@ -70,7 +77,7 @@ internal static partial class WushuangModeChecks
             "Buying equipment equips one physical entity with the original suit/rank and a single paid receipt.");
         Cold(game, registry);
 
-        var (converted, convertedRegistry) = Start(false, 7, skills: ["boundary:wusheng"]);
+        var (converted, convertedRegistry) = Start(false, 133, skills: ["boundary:wusheng"]);
         Drive(converted, () => Shop(converted) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
         Buy(converted, Shop(converted).Offers[0].Id);
         Shopping(converted);

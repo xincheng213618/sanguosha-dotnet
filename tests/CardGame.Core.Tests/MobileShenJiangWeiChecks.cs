@@ -4,7 +4,7 @@ using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
 
-internal static class MobileShenJiangWeiChecks
+internal static partial class MobileShenJiangWeiChecks
 {
     private const string Hero = "mobile:shen-jiang-wei", Driver = "fixture:mobile-jw-driver", Watch = "fixture:mobile-jw-watch", Rescue = "fixture:mobile-jw-rescue", Quiet = "fixture:mobile-jw-quiet", Mode = "identity:classic-mobile-jw-fixture";
     public static void XinghunPhysicalExchangeAndOrderedSlashesCold()
@@ -94,17 +94,22 @@ internal static class MobileShenJiangWeiChecks
             "An empty equipment region is legal and costs no HP; the following round causes actual Huitian direct death without inventing another Dying entry.");
         _ = tiantao;
     }
-    private static GameOptions Options()
+    private static GameOptions Options(bool nestedDying = false)
     {
         var setup = new ShanheBattleSetup(7, 1, "mobile-jiang-wei", Hero, 4, 0, 0, 0, 0, [],
             [new(CardKind.Slash, Suit.Spade, 7), new(CardKind.Dodge, Suit.Heart, 2), new(CardKind.Slash, Suit.Club, 4), new(CardKind.Dodge, Suit.Diamond, 6)], [],
             [new("fixture:mobile-jw-peer-2") { StartingHand = [new(CardKind.Slash, Suit.Club, 7), new(CardKind.Dodge, Suit.Heart, 9)] }, new("fixture:mobile-jw-peer-3") { StartingHand = [new(CardKind.Slash, Suit.Spade, 8)] }],
             [new("fixture:mobile-jw-peer-1") { StartingHand = [new(CardKind.Slash, Suit.Club, 7), new(CardKind.Dodge, Suit.Heart, 9)] }], new string('f', 64)) { DefaultGodFactionId = "shu" };
+        if (nestedDying) setup = setup with
+        {
+            StartingCards = [.. setup.StartingCards, new(CardKind.Peach, Suit.Heart, 3)],
+            AllyRoster = setup.AllyRoster.Select(p => p with { Hp = 2 }).ToArray()
+        };
         return new() { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup, UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 12 };
     }
-    private static (GameEngine, ContentRegistry) Start()
+    private static (GameEngine, ContentRegistry) Start(bool nestedDying = false)
     {
-        var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture()); var g = GameEngine.CreateStandard(Options(), r);
+        var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture()); var g = GameEngine.CreateStandard(Options(nestedDying), r);
         Accept(g, new StartGameCommand()); return (g, r);
     }
     private static PlayerSnapshot V(GameEngine g, int seat = 0) => g.CreateSnapshot(seat).Players.Single(p => p.Seat == seat);

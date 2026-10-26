@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Reflection;
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core.Campaigns;
@@ -47,6 +48,37 @@ internal static class MouZhouYuMobileChecks
             s.E<MouZhouYuMobileCoveredEvent>().Length == 1 && s.E<MouZhouYuMobileGiftedEvent>().Length == 1,
             "After real equipment loss and HP Loss2, the issued Yingzi contribution remains three for this turn, independently of now-failed live conditions. Cover and gift never repeat after Cold.");
     }
+
+    public static void ActualAiGuessDrawsOnceAndSelectsOnePublishedBranchCold()
+    {
+        var s = Scene.Start(); s.Play();
+        var card = s.V().Hand.Single(c => c.Kind == CardKind.Slash && c.Suit == Suit.Spade).Id;
+        s.Fanjian(1); s.Reach(() => s.P is { PlayerSeat: 0 } && s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("branch") == "cover"));
+        s.Answer(c => c.Cards.SequenceEqual([card]) && c.Parameters.GetValueOrDefault("declared-suit") == "Heart");
+        s.Reach(() => s.P is { PlayerSeat: 1 } && s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("branch") == "same"));
+        var guesses = s.P!.Choices.Where(c => c.Parameters.GetValueOrDefault("branch") is "same" or "different").ToArray();
+        s.Need(guesses.Length == 2 && guesses.All(c => c.Cards.Count == 0 && c.Targets.Count == 0),
+            "The real NPC receives exactly the two published hidden-card guess branches without a material or target payload.");
+        s.Cold();
+        var native = NativeRandom(s.G); var state = RandomState(native);
+        // Preview on an independent generator only. Never replace or advance
+        // the engine generator, mutate the prompt, or inspect the covered card.
+        var preview = Activator.CreateInstance(native.GetType(), unchecked((int)state))!;
+        var expected = (int)preview.GetType().GetMethod("Next", [typeof(int)])!.Invoke(preview, [2])! == 0 ? "same" : "different";
+        var expectedState = RandomState(preview);
+        s.Accept(new AdvanceOneStepCommand(s.G.Revision));
+        s.Need(RandomState(NativeRandom(s.G)) == expectedState && s.E<MouZhouYuMobileAnsweredEvent>() is [var answered] &&
+            answered.Answer == expected && guesses.Count(c => c.Parameters["branch"] == answered.Answer) == 1 &&
+            s.E<MouZhouYuMobileGiftedEvent>() is [var gift] && gift.CardId == card && gift.To == CardLocation.Hand(1) &&
+            s.E<MouZhouYuMobileCompletedEvent>() is [{ Paid: true }] &&
+            s.G.CardMovements.Count(m => m.CardId == card && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing && m.Reason.Value == "skill-program.mou-mobile:fanjian.cover") == 1 &&
+            s.G.CardMovements.Count(m => m.CardId == card && m.From == CardLocation.Processing && m.To == CardLocation.Hand(1) && m.Reason.Value == "skill-program.mou-mobile:fanjian.gift") == 1,
+            "One actual AI step freezes one random guess, selects exactly one original published branch and settles the original covered payment/gift once.");
+        s.Play(); s.Cold();
+    }
+
+    private static object NativeRandom(GameEngine g) => typeof(GameEngine).GetField("_random", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(g)!;
+    private static uint RandomState(object random) => (uint)random.GetType().GetProperty("State")!.GetValue(random)!;
     private static ShanheStartingCard C(CardKind kind, Suit suit, int rank) => new(kind, suit, rank);
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {

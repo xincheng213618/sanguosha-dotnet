@@ -18,6 +18,7 @@ public sealed partial class GameEngine
         _cardMovements.Any(m => m.CardId == cardId && m.From == from && m.To == to && IsWushuangShopDestroyedMaterial(m));
 
     private bool IsEphemeralCardDestroyedMaterial(long useId, int cardId) =>
+        IsPaidDestroyedGeneralWeaponUseMaterial(useId, cardId) ||
         IsDagongCheDestroyedMaterial(useId, cardId) || IsHappyZuoCiDestroyedMaterial(useId, cardId) || IsShenDaCarrierDestroyedMaterial(useId, cardId) || IsDiouCarrierDestroyedMaterial(useId, cardId) ||
         ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Any(e => e.CardId == cardId && e.ParentFrameId == useId &&
             _cardMovements.SingleOrDefault(m => m.Sequence == e.MovementSequence) is { } m && IsShanheStartingResourceDestroyedMaterial(m)) || LifecycleCardUse(useId)?.Action?.PhysicalCards

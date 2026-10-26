@@ -75,7 +75,7 @@ public sealed partial class MainViewModel
             if (!IsHandResponsePending) return _handResponseExtraChoices = [];
             if (IsBaguaActivationPending) return _handResponseExtraChoices = [];
             if (IsStoneAxeSelectionPending || IsOwnedCardSelectionPending) return _handResponseExtraChoices = [];
-            if (IsResponseConversionSelectionPending && _responseConversionSelection!.Mode is null)
+            if (IsResponseConversionSelectionPending && !_responseConversionSelection!.SelectByMaterials && _responseConversionSelection.Mode is null)
                 return _responseConversionModeChoices;
             var choices = AvailableHandResponseChoices.ToArray();
             if (IsCardPaymentSelectionPending)
@@ -103,8 +103,8 @@ public sealed partial class MainViewModel
         }
     }
 
-    public bool CanCancelAction => IsDeckReorderPending ? false : IsRevealedSubsetSelectionPending ? EmptyRevealedSubsetChoice is not null : HasSelection || OwnedCardDeclineChoice is not null || HandResponseDeclineChoice is not null || SkillTargetDeclineChoice is not null;
-    public string CancelActionHint => EmptyRevealedSubsetChoice is not null ? "不选择任何展示牌；Esc 仅清空当前选择。" : OwnedCardDeclineChoice is not null ? "放弃本次选牌；Esc 仅取消当前选牌。" : HandResponseDeclineChoice is { } choice
+    public bool CanCancelAction => IsCardExchangePending ? IsCardExchangeViewPending || HasCardExchangeDraft : IsDeckReorderPending ? false : IsRevealedSubsetSelectionPending ? EmptyRevealedSubsetChoice is not null : HasSelection || OwnedCardDeclineChoice is not null || HandResponseDeclineChoice is not null || SkillTargetDeclineChoice is not null;
+    public string CancelActionHint => IsCardExchangeViewPending ? "不交换，结束观看；不触发后续弃牌。Esc 仅清空选择。" : EmptyRevealedSubsetChoice is not null ? "不选择任何展示牌；Esc 仅清空当前选择。" : OwnedCardDeclineChoice is not null ? "放弃本次选牌；Esc 仅取消当前选牌。" : HandResponseDeclineChoice is { } choice
         ? $"{choice.Description} · Esc 仅取消选牌。"
         : SkillTargetDeclineChoice is { } decline ? $"{decline.Description} · Esc 仅取消选择。"
         : "取消当前选牌和目标 · Esc";
@@ -138,7 +138,7 @@ public sealed partial class MainViewModel
         HandResponseMaterials.Single(card => card.Id == choice.Cards[0]).Kind is { } physical &&
         (required == CardKind.Slash ? physical is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash) : physical != required);
 
-    private string HandResponseHint => IsResponseConversionSelectionPending && _responseConversionSelection!.Mode is null
+    private string HandResponseHint => IsResponseConversionSelectionPending && !IsResponseConversionPaymentPending
         ? ResponseConversionSelectionText + "；再点技能或按 Esc 取消。"
         : IsBaguaActivationPending
         ? "是否发动【八卦阵】？红色判定视为打出【闪】；不发动或判定失败后，可以继续选择手牌出闪。"
@@ -184,6 +184,13 @@ public sealed partial class MainViewModel
 
     private void CancelAction()
     {
+        if (IsCardExchangePending)
+        {
+            if (IsCardExchangeViewPending && _snapshot.PendingDecision!.Choices.FirstOrDefault(choice => choice.Parameters.GetValueOrDefault("option") == "finish") is { } finishExchange)
+                SubmitPublishedPromptChoice(finishExchange, IsCardExchangePending, "观虚取消未执行");
+            else ClearCardExchangeSelection();
+            return;
+        }
         if (IsDeckReorderPending) return;
         if (EmptyRevealedSubsetChoice is { } empty)
         {

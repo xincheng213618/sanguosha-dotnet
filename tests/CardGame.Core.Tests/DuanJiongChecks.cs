@@ -3,7 +3,7 @@ using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
-internal static class DuanJiongChecks
+internal static partial class DuanJiongChecks
 {
     private const string Skill = "ol:saogu", Owner = "fixture:dj-owner", Driver = "fixture:dj-driver", Quiet = "fixture:dj-quiet", Watch = "fixture:dj-watch",
         Commit = "fixture:dj-commit", Health = "fixture:dj-health", Grain = "fixture:dj-grain", Source = "fixture:dj-source", Mode = "identity:classic-duan-jiong-fixture";
@@ -42,7 +42,7 @@ internal static class DuanJiongChecks
             "Both conversion halves have their own real once-paid receipt, without adding a once-per-phase limit to the alternating skill."); _ = Cold(g, r);
     }
     private static PlayerSnapshot V(GameEngine g, int seat = 0) => g.CreateSnapshot(seat).Players[seat];
-    private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 4).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
+    private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, g.State.Players.Count).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static T[] E<T>(GameEngine g) where T : IGameEvent => g.Events.Select(e => e.Payload).OfType<T>().ToArray();
     private static DuanJiongSaoguReceipt? Current(GameEngine g) => g.ResolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.DuanJiongSaogu is not null)?.DuanJiongSaogu;
     private static bool Yin(GameEngine g) => V(g).SkillRuntimeStates!.Single(s => s.SkillId == Skill).BooleanStates!.Single().Value;
@@ -76,12 +76,12 @@ internal static class DuanJiongChecks
         throw new InvalidOperationException("Missing bounded Saogu boundary: " + Diagnostic(g));
     }
     private static string Diagnostic(GameEngine g) => JsonSerializer.Serialize(new { g.State.TurnNumber, g.State.Winner, Stage = Current(g)?.Stage, Prompt = P(g) is { } p ? new { p.PlayerSeat, p.Kind, Skill = p.SkillPrompt?.SkillId, Choices = p.Choices.Select(c => new { c.Cards, c.Targets, c.Parameters }) } : null, Tail = g.Events.TakeLast(6).Select(e => e.Payload.ToString()) });
-    private static string State(GameEngine g) => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, 4).Select(s => SnapshotJson.Serialize(g.CreateSnapshot(s))), Frames = g.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())), Events = g.Events.Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())), g.CardMovements, Commands = CommandJson.Serialize(g.AcceptedCommands), Zones = g.CreateCardZoneDiagnostics() });
+    private static string State(GameEngine g) => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, g.State.Players.Count).Select(s => SnapshotJson.Serialize(g.CreateSnapshot(s))), Frames = g.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())), Events = g.Events.Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())), g.CardMovements, Commands = CommandJson.Serialize(g.AcceptedCommands), Zones = g.CreateCardZoneDiagnostics() });
     private static GameEngine Cold(GameEngine g, ContentRegistry r) { var copy = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(g.CreateCheckpoint())), r); Need(State(g) == State(copy), "Cold replay preserves every private original payer, actual phase suit, converted side, exact discarded entity and native child return."); return copy; }
     private static (GameEngine, ContentRegistry) Start(string scenario = "plain")
     {
-        var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture(scenario)); var g = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 4, HumanSeat = 0,
-            HumanRole = scenario is "source-death" or "delegate-death" ? Role.Renegade : Role.Lord, ModeId = Mode, UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 10 }, r);
+        var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture(scenario)); var g = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = scenario == "terminal" ? 2 : 4, HumanSeat = 0,
+            HumanRole = scenario == "terminal" ? null : scenario is "source-death" or "delegate-death" ? Role.Renegade : Role.Lord, HumanTeamId = scenario == "terminal" ? "player" : null, ModeId = Mode, UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 10 }, r);
         Accept(g, new StartGameCommand()); Reach(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.SelectGeneral }); Accept(g, new SelectGeneralCommand(0, Owner, g.Revision, P(g)!.PromptId)); Play(g); return (g, r);
     }
     private sealed class Fixture(string scenario) : IGameContentPackage
@@ -116,7 +116,7 @@ internal static class DuanJiongChecks
                     "\"effects\":[{\"op\":\"chooseOption\",\"target\":\"owner\",\"resultBind\":\"child\",\"options\":[{\"id\":\"continue\"}]}" + tail + "]}]"); skills.Add(Watch);
                 if (scenario == "slashes") rules["skills"]!.AsArray().Last()!["triggers"]!.AsArray().Add(JsonNode.Parse("""{"id":"yin-child","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementReasons":["skill-program.duan-jiong.saogu.draw"],"movementOccurrence":"perBatch","optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"draw","options":[{"id":"continue"}]}]}"""));
             }
-            if (scenario == "slashes")
+            if (scenario is "slashes" or "terminal")
             { Add(Commit, "\"triggers\":[{\"id\":\"native-use\",\"window\":\"cardUseCommitted\",\"ownerRelation\":\"actor\",\"cardKinds\":[\"slash\"],\"optional\":false,\"effects\":[{\"op\":\"chooseOption\",\"target\":\"owner\",\"resultBind\":\"native\",\"options\":[{\"id\":\"continue\"}]}]}]"); skills.Add(Commit); }
             if (scenario == "ox")
             { Add(Grain, "\"triggers\":[{\"id\":\"grain\",\"window\":\"cardsMoved\",\"subject\":\"owner\",\"sourceZones\":[\"woodenOxGrain\"],\"movementReasons\":[\"equipment.wooden-ox.grain-discard\"],\"movementOccurrence\":\"perBatch\",\"optional\":false,\"effects\":[{\"op\":\"chooseOption\",\"target\":\"owner\",\"resultBind\":\"grain\",\"options\":[{\"id\":\"continue\"}]},{\"op\":\"damage\",\"target\":\"owner\",\"amount\":1}]}]"); skills.Add(Grain); }
@@ -125,12 +125,17 @@ internal static class DuanJiongChecks
             b.AddSkill(new("fixture:dj-pick-owner", "本人", "固定选将") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => -100000000d) });
             b.AddGeneral(new(Owner, "真实段颎", "ol-duan-jiong", "fixture:dj-pick-owner", "qun", 8, skills));
             var peers = Enumerable.Range(0, 3).Select(i => "fixture:dj-peer-" + i).ToArray();
-            foreach (var (peer, i) in peers.Select((peer, i) => (peer, i))) { var id = "fixture:dj-pick-" + i; b.AddSkill(new(id, "其他角色", "固定顺序") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => 1000000d * (3 - i)) }); b.AddGeneral(new(peer, "真实其他角色", "supporter", id, "wei", 12, [Quiet])); }
+            foreach (var (peer, i) in peers.Select((peer, i) => (peer, i))) { var id = "fixture:dj-pick-" + i; b.AddSkill(new(id, "其他角色", "固定顺序") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => 1000000d * (3 - i)) }); b.AddGeneral(new(peer, "真实其他角色", "supporter", id, "wei", 12, [Quiet]) { InitialHp = scenario == "terminal" ? 1 : null }); }
             b.AddCard(new("fixture:dj-lion", "白银狮子", "装备牌", "真实回血", CardKind.SilverLion)); b.AddCard(new("fixture:dj-ox", "木牛流马", "装备牌", "真实粮", CardKind.WoodenOx));
-            var ids = scenario is "slashes" or "paid-loss" or "source-death" or "delegate-death" or "delegate-yang" ? new[] { "standard:slash" } : new[] { "standard:slash", "standard:dodge", "standard:iron_chain", "fixture:dj-lion", "fixture:dj-ox" };
+            var ids = scenario is "slashes" or "paid-loss" or "source-death" or "delegate-death" or "delegate-yang" or "terminal" ? new[] { "standard:slash" } : new[] { "standard:slash", "standard:dodge", "standard:iron_chain", "fixture:dj-lion", "fixture:dj-ox" };
             var suits = new[] { Suit.Spade, Suit.Heart, Suit.Club, Suit.Diamond };
             b.AddDeck(new("fixture:dj-deck", "固定真实小牌堆", 4, 2, []) { PhysicalCards = Enumerable.Range(0, 120).Select(i => new ContentDeckPhysicalCard(ids[i % ids.Length], suits[i / ids.Length % 4], i % 13 + 1)).ToArray() });
-            b.AddMode(new(Mode, "段颎原生小局", 4, 4, new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Renegade)] = 3 }, "fixture:dj-deck", GeneralCandidateCount: 4, GeneralPoolIds: [Owner, .. peers]));
+            if (scenario == "terminal")
+            {
+                b.AddModeFeatureFactory(new SaoguTerminalSetupFactory());
+                b.AddMode(new(Mode, "段颎原生终局小局", 2, 2, new Dictionary<string, int>(), "fixture:dj-deck", 2, [Owner, peers[0]], ContentModeKind.Team, new Dictionary<string, int> { ["player"] = 1, ["other"] = 1 }));
+            }
+            else b.AddMode(new(Mode, "段颎原生小局", 4, 4, new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Renegade)] = 3 }, "fixture:dj-deck", GeneralCandidateCount: 4, GeneralPoolIds: [Owner, .. peers]));
         }
     }
 }

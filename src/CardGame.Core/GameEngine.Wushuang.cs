@@ -53,7 +53,11 @@ public sealed partial class GameEngine
         public WushuangPlayerFacts Player(int seat)
         {
             var player = engine._players[seat];
-            return new(player.Seat, player.Name, player.IsHuman, player.IsAlive, player.Hp, player.MaxHp,
+            // Identity/shop queries do not own a sister-health selection. Keep
+            // its absence explicit rather than inventing a current HP value.
+            var hp = player.HappyQiaoHealth is { } health && health.DaQiaoHp != health.XiaoQiaoHp &&
+                player.HappyQiaoPoolQuery?.Invoke(player) is null ? (int?)null : player.Hp;
+            return new(player.Seat, player.Name, player.IsHuman, player.IsAlive, hp, player.MaxHp,
                 Array.AsReadOnly(player.SkillGrants.Grants.ToArray())) { TeamId = player.TeamId };
         }
         public IReadOnlyList<string> EnabledSkillIds(int seat) => Array.AsReadOnly(engine.EnabledContentSkillIds(engine._players[seat]).ToArray());
@@ -91,7 +95,12 @@ public sealed partial class GameEngine
         public void PlaceFallbackCard(int seat, CardKind kind) => engine.PlaceShanhePhysicalCard(
             new(kind, kind == CardKind.Dodge ? Suit.Spade : Suit.Heart, kind == CardKind.Dodge ? 2 : 7), seat, equipment: false);
         public bool TryBeginAcquisition(long frameId, WushuangShopOffer offer) => engine.TryBeginWushuangAcquisition(frameId, offer);
-        public bool TryContinueAiShopping(int seat, WushuangIntermissionFrame frame) => false;
+        public bool TryContinueAiShopping(int seat, WushuangIntermissionFrame frame)
+        {
+            if (engine._aiBrains[seat].PolicyVersion < AiDecisionPolicy.WushuangStrategyVersion) return false;
+            engine.ContinueWushuangAiShopping(engine._players[seat], frame);
+            return true;
+        }
         public void ContinueAfterShopping(int endedSeat, bool skipped) => engine.ContinueAfterWushuangShopping(engine._players[endedSeat], skipped);
         public void RetirePendingMatch(string? winningTeamId, Func<long, ResolutionFrameKind, IGameEvent> cancellationFact,
             string processingReason, string judgmentReason) => engine.RetirePendingMatchAtModeLimit(winningTeamId, cancellationFact, processingReason, judgmentReason);

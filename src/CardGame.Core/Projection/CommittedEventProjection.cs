@@ -47,6 +47,8 @@ internal static class CommittedEventProjection
             SelectableCardIds = FreezeList(receipt.Action.SelectableCardIds),
             SelectableTargetSeats = FreezeList(receipt.Action.SelectableTargetSeats),
             SelectableCardTargets = receipt.Action.SelectableCardTargets is { } pairs ? FreezeList(pairs) : null,
+            SelectableCardGroupTargets = receipt.Action.SelectableCardGroupTargets is { } groups
+                ? Array.AsReadOnly(groups.Select(group => group with { CardIds = FreezeList(group.CardIds) }).ToArray()) : null,
             SelectableTargetSequences = receipt.Action.SelectableTargetSequences is { } sequences
                 ? Array.AsReadOnly(sequences.Select(sequence => (IReadOnlyList<int>)FreezeList(sequence)).ToArray()) : null
         }

@@ -11,6 +11,34 @@ public static class HappyShenDaXiaoQiaoChecks
         NoDraw = "fixture:happy-qiao-no-draw", Quiet = "fixture:happy-qiao-quiet", Deck = "fixture:happy-qiao-deck", GainHold = "fixture:happy-qiao-gain",
         MaximumCounter = "fixture:happy-qiao-maximum-counter", MaximumHold = "fixture:happy-qiao-maximum-hold";
 
+    public static void WushuangFactsPreserveUndefinedSisterHpAndRejectScalarLimitCold()
+    {
+        var s = Scene.Start(); s.Play();
+        s.Use("damage", [0]); s.PoolBoundary(); s.Pool(HappyQiaoPool.XiaoQiao); s.Play();
+        s.Need(s.Health == new HappyQiaoDualHealth(3, 2, 3), "A real native damage receipt creates different sister pools.");
+        var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+        IWushuangModeHost Host() => (IWushuangModeHost)Activator.CreateInstance(
+            typeof(GameEngine).GetNestedType("WushuangModeHost", System.Reflection.BindingFlags.NonPublic)!, flags, null, [s.G], null)!;
+        void CheckFactsAndLimit()
+        {
+            var host = Host(); var facts = host.Players.ToArray();
+            s.Need(facts.Length == 4 && facts[0].Hp is null && facts.Skip(1).All(p => p.Hp is not null) &&
+                facts[0].IsAlive && facts[0].Seat == 0,
+                "Pure mode identity/shop facts can traverse unequal pools, preserving undefined HP instead of choosing a sister or aggregate.");
+            var featureType = System.Reflection.Assembly.Load("CardGame.Modes.Wushuang")
+                .GetType("CardGame.Modes.Wushuang.WushuangModeFeature", throwOnError: true)!;
+            var feature = Activator.CreateInstance(featureType, flags, null, [17, s.Definitions, host], null)!;
+            var revision = s.G.Revision; var ended = s.E<WushuangClockExpiredEvent>().Length; var rejected = false;
+            try { featureType.GetMethod("CompleteAtLimit", flags)!.Invoke(feature, ["undefined-health legacy mode", true]); }
+            catch (System.Reflection.TargetInvocationException exception) when (exception.InnerException is InvalidOperationException error &&
+                error.Message.Contains("one defined current HP", StringComparison.Ordinal)) { rejected = true; }
+            s.Need(rejected && s.G.Revision == revision && s.G.State.Winner == Winner.None && s.E<WushuangClockExpiredEvent>().Length == ended &&
+                s.Health == new HappyQiaoDualHealth(3, 2, 3),
+                "An unsupported scalar survival limit rejects before scoring, retiring frames, publishing a winner or changing either pool.");
+        }
+        CheckFactsAndLimit(); s.Cold(); CheckFactsAndLimit();
+    }
+
     public static void IndependentPoolsNativeRecoveryAndDyingResumeCold()
     {
         var s = Scene.Start(); s.Play();
@@ -225,6 +253,7 @@ public static class HappyShenDaXiaoQiaoChecks
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {
         public GameEngine G { get; private set; } = game;
+        public ContentRegistry Definitions => registry;
         public PlayerSnapshot V => G.CreateSnapshot(0).Players[0];
         public HappyQiaoDualHealth Health => V.HappyQiaoHealth!;
         public PendingDecision? P => Enumerable.Range(0, 4).Select(i => G.CreateSnapshot(i).PendingDecision).FirstOrDefault(p => p is not null);

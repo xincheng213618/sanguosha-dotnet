@@ -210,6 +210,7 @@ public sealed partial class GameEngine
                 AdvanceRuntimeProgram(id);
                 return;
             case ("chiyun", ShiZhouYuComposition.ChiyunStageResolveDamage):
+            case ("chiyun-option", ShiZhouYuComposition.ChiyunStageResolveDamage):
             case ("yanhui-ending", ShiZhouYuComposition.YanhuiStageEndingDamage):
             case ("fentao", ShiZhouYuComposition.FentaoStageFinished):
             case ("xiongzi", ShiZhouYuComposition.XiongziStageFinished):

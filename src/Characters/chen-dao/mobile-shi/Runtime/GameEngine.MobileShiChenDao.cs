@@ -162,6 +162,19 @@ public sealed partial class GameEngine
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 47800)]
     private bool KeepPaidShiCdDraw(ProgramSkillFrame f)
     {
+        if (f.SkillId == ShiCdWanglie)
+        {
+            // Selection already issued this exact response obligation. Retain
+            // only its original completed-response candidate, not a fresh use
+            // or a later replacement instance of Wanglie.
+            var responseIndex = _resolutionStack.FindIndex(x => x.Id == f.Id);
+            return f.TriggerId == "wanglie-response-complete" && f.ActivationId == f.TriggerId && f.InstructionIndex is 0 or 1 &&
+                f.MobileShiChenDao is null && f.WindowContext is { } responseContext && responseIndex > 0 &&
+                _resolutionStack[responseIndex - 1] is ProgramCardTriggerWindowFrame window && window.Id == responseContext.ParentFrameId &&
+                window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count &&
+                MountObserverCandidateMatches(f, ToSharedCandidate(window.Candidates[window.CandidateIndex])) &&
+                IsIssuedShiCdResponse(ToSharedCandidate(window.Candidates[window.CandidateIndex]), responseContext);
+        }
         if (f.SkillId != ShiCdHongyi) return false;
         if (IsMobileShiChenDaoChoiceResult(f, f.ChoiceBindings.FirstOrDefault(b => b.Name == "hongyi-draw") ?? new("", "", -1)))
             return true;

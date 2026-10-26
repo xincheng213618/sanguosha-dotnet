@@ -139,10 +139,12 @@ public sealed partial class GameEngine
         f = GetActiveProgramFrame(f.Id);
         ReplaceRuntimeTop(f = f with { HappyGuoJia = f.HappyGuoJia! with { Stage = stage, Before = _movementSequence, After = _movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) }); return f;
     }
+    private int HappyGjMaximumAfterPayment(int seat, int before, int amount) =>
+        HasWushuangTactic(seat, 2020) ? 7 : Math.Max(0, checked(before + amount));
     private void PayHappyGjMaximum(ProgramSkillFrame f, int seat, int amount, string purpose)
     {
         var p = _players[seat]; var before = p.MaxHp; var hp = p.Hp;
-        var after = HasWushuangTactic(seat, 2020) ? 7 : Math.Max(0, checked(before + amount)); p.MaxHp = after; p.Hp = Math.Min(hp, after);
+        var after = HappyGjMaximumAfterPayment(seat, before, amount); p.MaxHp = after; p.Hp = Math.Min(hp, after);
         f = GetActiveProgramFrame(f.Id); ReplaceRuntimeTop(f with { HappyGuoJia = f.HappyGuoJia! with { MaximumBefore = before, MaximumAfter = after } });
         AdvanceEventRulesAndQueueFact(new MaximumHpChangedEvent(seat, after - before, after, f.SkillId) { HpBeforeClamp = hp });
         AdvanceEventRulesAndQueueFact(new ShenGuoJiaMaximumPaidEvent(f.Id, ProgramEventHistory<ShenGuoJiaMaximumPaidEvent>().Count(e => e.FrameId == f.Id), seat, before, after, purpose));

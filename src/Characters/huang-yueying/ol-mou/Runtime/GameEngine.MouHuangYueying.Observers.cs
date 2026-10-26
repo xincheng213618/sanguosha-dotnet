@@ -78,7 +78,7 @@ public sealed partial class GameEngine
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28960)]
     private bool AdvanceMouHuangYueyingChildren()
     {
-        if (_pendingDecision is not null) return false;
+        if (_pendingDecision is not null) return TryAdvanceMouLixianAiNullification();
         if (_resolutionStack.LastOrDefault() is ProgramSkillFrame f && IsReturnedMouLixianUse(f))
         {
             ContinueMouLixian(f.Id);

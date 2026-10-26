@@ -160,6 +160,128 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new MaximumHpChangedEvent(target.Seat, target.MaxHp - before, target.MaxHp, skill) { HpBeforeClamp = hpBefore });
     }
 
+    // A native draw made by a damage binding can itself reach the
+    // sixth/ninth-card damage threshold. The draw's exact producer and invoice
+    // keep this child on the suspended attack; a generic gain is insufficient.
+    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 61410)]
+    private bool AllowsWushuangNativeDrawDamage(ProgramSkillFrame f, int target, int amount,
+        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
+    {
+        if (!IsWushuangMode || source is not null || sourceLess || nature != DamageNature.Normal || amount != 1 ||
+            f.AttackAttempt is not null || ActiveDying is not null || _resolutionStack.Count < 5 ||
+            _resolutionStack[^1].Id != f.Id ||
+            f.WushuangCombat is not { TacticId: 2104 or 2143, Stage: 3, Index: 1, Amount: 1,
+                Nature: DamageNature.Normal, Seats: [var victim] } r || victim != target || target == f.OwnerSeat ||
+            r.InstructionIndex != f.InstructionIndex || f.SkillId != $"wushuang:tactic-{r.TacticId}" ||
+            GetPausedPrivateOfferEffect(f) is not { Op: SkillProgramEffectOp.ResolveWushuangCombatTactic } effect || effect.Amount != r.TacticId ||
+            f.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained, MovementBatch: { } batch } context ||
+            _resolutionStack[^2] is not CardsMovedTriggerWindowFrame moved || moved.Id != context.ParentFrameId ||
+            f.ParentFrameId != moved.Id || moved.Batch.Id != batch.Id || !moved.Batch.Movements.SequenceEqual(batch.Movements) ||
+            moved.CandidateIndex < 0 || moved.CandidateIndex >= moved.Candidates.Count ||
+            moved.Candidates[moved.CandidateIndex] is not { } candidate || candidate.OwnerSeat != f.OwnerSeat ||
+            candidate.SkillId != f.SkillId || candidate.BindingId != f.TriggerId || candidate.SkillInstanceId != f.SkillInstanceId || candidate.GameplayHash != f.GameplayHash ||
+            _resolutionStack[^3] is not ProgramSkillFrame producer || producer.Id != batch.ParentFrameId ||
+            !IsWushuangNativeDrawDamageParent(producer) ||
+            !IsWushuangActualDraw(context, f.OwnerSeat, out var material) || material is null || !_cardMovements.Contains(material) ||
+            !IsWushuangNativeDrawDamageMaterial(producer, batch, material, f.OwnerSeat))
+            return false;
+        return ProgramEventHistory<WushuangCombatIssuedEvent>().Where(issued => issued.ProgramFrameId == f.Id &&
+            issued.InstructionIndex == f.InstructionIndex).ToArray() is [var paid] && paid.TacticId == r.TacticId && paid.OwnerSeat == f.OwnerSeat;
+    }
+
+    private bool IsWushuangNativeDrawDamageMaterial(ProgramSkillFrame producer, CardMovementBatchContext batch,
+        CardMovementRecord material, int recipient)
+    {
+        if (batch.NativeDrawInvocation is { } draw)
+            return draw.ParentFrameId == producer.Id && draw.OwnerSeat == recipient && draw.LastBatchId == batch.Id &&
+                draw.ActualTurnNumber == batch.TurnNumber && ValidNativeDrawInvocation(draw) &&
+                draw.Materials.Any(card => card.CardId == material.CardId && card.PrintedKind == material.CardKind && card.MovementSequence == material.Sequence);
+        // Draw2 can emit one physical batch per card. Its last batch carries
+        // the full projection; an earlier card is linked to the real recorded
+        // invocation and its still-active native producer receipt instead.
+        var invocations = ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(invocation =>
+            invocation.ParentFrameId == producer.Id && invocation.OwnerSeat == recipient && invocation.TurnNumber == batch.TurnNumber &&
+            invocation.Reason == material.Reason && invocation.SequenceBefore < material.Sequence && invocation.SequenceAfter >= material.Sequence).ToArray();
+        if (invocations is not [var actualDraw] || actualDraw.InvocationId <= 0 || actualDraw.Requested < 1 ||
+            actualDraw.ActualCount < 1 || actualDraw.ActualCount > actualDraw.Requested || actualDraw.SequenceBefore < 0 ||
+            actualDraw.SequenceAfter > _movementSequence || actualDraw.LastBatchId < batch.Id ||
+            batch.ParentFrameId != producer.Id || batch.OriginOwnerSeat != producer.OwnerSeat ||
+            batch.OriginSkillId != producer.SkillId || batch.OriginSkillInstanceId != producer.SkillInstanceId ||
+            material.From != CardLocation.DrawPile || material.To != CardLocation.Hand(recipient) ||
+            batch.Movements.Count == 0 || !batch.Movements.Contains(material) || batch.Movements.Any(move => !_cardMovements.Contains(move))) return false;
+        var cursorMatches = producer.NativeDraw is { RecipientApplied: true } cursor && cursor.InstructionIndex == producer.InstructionIndex &&
+            cursor.RecipientIndex >= 0 && cursor.RecipientIndex < cursor.Recipients.Count && cursor.Recipients[cursor.RecipientIndex] == recipient &&
+            cursor.RequestedCount == actualDraw.Requested && cursor.Reason == actualDraw.Reason;
+        if (!cursorMatches && !IsWushuangPaidTargetDrawInvocation(producer, actualDraw, recipient)) return false;
+        var actual = _cardMovements.Where(move => move.Sequence > actualDraw.SequenceBefore && move.Sequence <= actualDraw.SequenceAfter &&
+            move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(recipient) && move.Reason == actualDraw.Reason).ToArray();
+        return actual.Length == actualDraw.ActualCount && actual.Select(move => move.CardId).Distinct().Count() == actual.Length && actual.Contains(material);
+    }
+
+    private bool IsWushuangPaidTargetDrawInvocation(ProgramSkillFrame producer, NativeDrawInvocationRecordedEvent actualDraw, int recipient)
+    {
+        if (producer.UniqueHpPeer is not { Stage: UniqueHpPeerStage.DrawChildren } paid ||
+            paid.ChooserSeat != recipient || !ValidUniqueHpPeer(producer)) return false;
+        var invoice = recipient == producer.OwnerSeat ? paid.OwnerInvoice : paid.PeerInvoice;
+        return invoice is { DrawIssued: true, ActualDrawCount: > 0 and <= 2 } && invoice.ActorSeat == recipient &&
+            invoice.DrawBefore >= invoice.CostAfter && invoice.DrawAfter > invoice.DrawBefore &&
+            actualDraw.Requested == 2 && actualDraw.ActualCount == invoice.ActualDrawCount && actualDraw.TurnNumber == paid.TurnNumber &&
+            actualDraw.Reason.Value == UniqueHpPeerDrawReason(producer, recipient) &&
+            actualDraw.SequenceBefore == invoice.DrawBefore && actualDraw.SequenceAfter == invoice.DrawAfter &&
+            ProgramEventHistory<UniqueHpPeerDrawIssuedEvent>().Where(issued => issued.FrameId == producer.Id && issued.ActorSeat == recipient)
+                .ToArray() is [var issued] && issued.Before == invoice.DrawBefore && issued.After == invoice.DrawAfter && issued.ActualCount == invoice.ActualDrawCount;
+    }
+
+    private bool IsWushuangNativeDrawDamageParent(ProgramSkillFrame producer)
+    {
+        var rootIndex = _resolutionStack.FindIndex(frame => frame.Id == producer.Id);
+        // Reuse the existing typed movement/HP observer edges rather than
+        // identifying each descendant by the name of its trigger window.
+        while (rootIndex > 0 && WushuangNativeDrawObserverEdge(_resolutionStack[rootIndex - 1], _resolutionStack[rootIndex]))
+            rootIndex--;
+        if (rootIndex < 1 || _resolutionStack[rootIndex] is not ProgramSkillFrame root ||
+            root.WindowContext is not { } origin || root.ParentFrameId != origin.ParentFrameId) return false;
+        if (root.UniqueHpPeer is { } paidTarget && CurrentDamageAttempt?.ResolutionId == paidTarget.CardUseFrameId &&
+            ActiveCardAttack?.ResolutionId == paidTarget.CardUseFrameId &&
+            RecipientContestPaidObserverRoot()?.Id == root.Id && HasUniqueHpPeerActualTargetObserver(paidTarget.CardUseFrameId))
+            return true;
+        if (origin.Window == SkillProgramTriggerWindow.BeforeDamageApplied &&
+            _resolutionStack[rootIndex - 1] is BeforeDamageProgramWindowFrame before)
+        {
+            if (before.Id != origin.ParentFrameId || before.TargetSeat != origin.TargetSeat || before.Amount != origin.Amount ||
+                (BeforeDamageHasNoSource(before) ? origin.SourceSeat is not null : origin.SourceSeat != before.SourceSeat) ||
+                CurrentDamageAttempt?.ResolutionId != (before.ContinuationAttackResolutionId ?? before.ParentFrameId) ||
+                before.CandidateIndex < 0 || before.CandidateIndex >= before.Candidates.Count) return false;
+            var candidate = before.Candidates[before.CandidateIndex].Candidate;
+            return candidate.OwnerSeat == root.OwnerSeat && candidate.SkillId == root.SkillId &&
+                candidate.BindingId == root.TriggerId && candidate.SkillInstanceId == root.SkillInstanceId && candidate.GameplayHash == root.GameplayHash;
+        }
+        return origin.Window is SkillProgramTriggerWindow.AfterDamageApplied or SkillProgramTriggerWindow.DamageAppliedBeforeDying &&
+            rootIndex >= 2 && _resolutionStack[rootIndex - 1] is DamageTriggerWindowFrame after &&
+            _resolutionStack[rootIndex - 2] is DamageFrame damage && after.Id == origin.ParentFrameId &&
+            after.ParentFrameId == damage.Id && origin.DamageFrameId == damage.Id &&
+            origin.SourceSeat == damage.SourceSeat && origin.TargetSeat == damage.TargetSeat && origin.Amount == damage.Amount &&
+            CurrentDamageAttempt?.ResolutionId == damage.ParentFrameId && DamageProgramMatchesWindow(root, after);
+    }
+
+    private bool WushuangNativeDrawObserverEdge(ResolutionFrame parent, ResolutionFrame child)
+    {
+        if (TypedDamagePostEventEdge(parent, child)) return true;
+        return parent is ProgramSkillFrame { NativeDraw: { RecipientApplied: true } paid } producer &&
+            child is CardsMovedTriggerWindowFrame moved &&
+            paid.InstructionIndex == producer.InstructionIndex && paid.RecipientIndex >= 0 && paid.RecipientIndex < paid.Recipients.Count &&
+            moved.Id == moved.Batch.Id && moved.Batch.ParentFrameId == producer.Id &&
+            moved.Batch.OriginOwnerSeat == producer.OwnerSeat && moved.Batch.OriginSkillId == producer.SkillId &&
+            moved.Batch.OriginSkillInstanceId == producer.SkillInstanceId &&
+            (moved.ResumeProgramFrameId is null || moved.ResumeProgramFrameId == producer.Id) &&
+            (moved.Batch.AwaitingProgramFrameId is null || moved.Batch.AwaitingProgramFrameId == producer.Id) &&
+            !RuntimeSkills.RuntimeRules_Core_CommonRules.HasAlternateProgramMovementReturn(moved) &&
+            (moved.Batch.NativeDrawInvocation is not { } draw || paid.RequestedCount == draw.RequestedCount && paid.Reason == draw.Reason) &&
+            moved.Batch.Movements.Any(material => material.From == CardLocation.DrawPile &&
+                material.To == CardLocation.Hand(paid.Recipients[paid.RecipientIndex]) && material.Reason == paid.Reason &&
+                IsWushuangNativeDrawDamageMaterial(producer, moved.Batch, material, paid.Recipients[paid.RecipientIndex]));
+    }
+
     [ProgramContinuation(ProgramContinuationKind.Resume, 61400)]
     private bool ContinueWushuangCombat(long frameId)
     {

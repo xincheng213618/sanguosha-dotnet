@@ -1,7 +1,11 @@
 namespace CardGame.Core;
 
 public sealed record WushuangJinzhiPaidEvent(long FrameId, int Owner, int RoundNumber, int Ordinal,
-    int ActualTurn, int MovementBefore, CardActionContext Action) : IGameEvent;
+    int ActualTurn, int MovementBefore, CardActionContext Action) : IGameEvent
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public long? MaterialPaymentFrameId { get; init; }
+}
 
 public sealed record WushuangJinzhiMaterialSelection(int RequiredCount, IReadOnlyList<int> CardIds);
 
@@ -76,28 +80,79 @@ public sealed partial class GameEngine
             action.ConversionChain.Count(IsWushuangJinzhiSource) != 1 || action.PhysicalCards.Count != WushuangJinzhiNextCount(f.OwnerSeat) ||
             action.PhysicalCards.Any(cost => cost.From.OwnerSeat != f.OwnerSeat || cost.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) ||
             action.PhysicalCards.Select(cost => cost.EffectiveIsRed).Distinct().Count() != 1 ||
-            action.PhysicalCards.Any(cost => _cardZones.GetLocation(cost.CardId) != CardLocation.Processing))
+            action.PhysicalCards.Any(cost => _cardZones.GetLocation(cost.CardId) != CardLocation.Processing &&
+                WushuangJinzhiDestroyedPayment(action, cost, c.ParentCardUseFrameId, _movementSequence) is null))
             throw new InvalidOperationException("Jinzhi requires its exact accepted once-paid same-color material action.");
         if (ProgramEventHistory<WushuangJinzhiPaidEvent>().Any(e => e.Action.ActionId == action.ActionId))
             throw new InvalidOperationException("One Jinzhi action cannot pay its dynamic ordinal twice.");
         var ordinal = WushuangJinzhiNextCount(f.OwnerSeat);
+        var prepaid = action.PhysicalCards.Select(cost =>
+            WushuangJinzhiDestroyedPayment(action, cost, c.ParentCardUseFrameId, _movementSequence))
+            .OfType<CardMovementRecord>().ToArray();
         AdvanceEventRulesAndQueueFact(new WushuangJinzhiPaidEvent(f.Id, f.OwnerSeat, _roundNumber, ordinal,
-            _turnNumber, _movementSequence, action));
+            _turnNumber, _movementSequence, action)
+            { MaterialPaymentFrameId = prepaid.Length > 0 ? c.ParentCardUseFrameId : null });
         var reason = new CardMoveReason(WushuangJinzhiDiscardReason);
         var invoice = TracksNativeLogicalDiscards ? new NativeLogicalDiscardInvocationDraft
         {
             InvocationId = ++_resolutionSequence, TurnNumber = _turnNumber, ActualTurnOwnerSeat = _currentSeat,
             InitiatorSeat = f.OwnerSeat, ExecutorSeat = f.OwnerSeat, ParentFrameId = f.Id, Reason = reason,
-            SequenceBefore = _movementSequence, Materials = action.PhysicalCards.Select(cost => new NativeLogicalDiscardMaterial(cost.CardId, cost.From)).ToArray()
+            SequenceBefore = prepaid.Length == 0 ? _movementSequence : prepaid.Min(m => m.Sequence) - 1,
+            Materials = action.PhysicalCards.Select(cost => new NativeLogicalDiscardMaterial(cost.CardId, cost.From)).ToArray()
         } : null;
         f = WushuangOriginalStage(f, "jinzhi-draw");
-        MoveProgramCardsFromMultipleSources(action.PhysicalCards.Select(cost => cost.CardId).ToArray(),
-            CardLocation.DiscardPile, reason, disclosure: CardMovementDisclosure.FaceUp);
-        CompleteNativeLogicalDiscardInvocation(invoice);
+        // Shop equipment has already paid by its irreversible native departure.
+        // Credit that exact movement; never move the destroyed entity again.
+        var processing = action.PhysicalCards.Where(cost => _cardZones.GetLocation(cost.CardId) == CardLocation.Processing)
+            .Select(cost => cost.CardId).ToArray();
+        if (processing.Length > 0)
+            MoveProgramCardsFromMultipleSources(processing, CardLocation.DiscardPile, reason, disclosure: CardMovementDisclosure.FaceUp);
+        CompleteNativeLogicalDiscardInvocation(invoice, prepaid);
         RunWushuangOriginalSkill(f.Id);
+    }
+    private CardMovementRecord? WushuangJinzhiDestroyedPayment(CardActionContext action, CardActionCost cost,
+        long paymentFrameId, int movementThrough)
+    {
+        if (cost.From != CardLocation.Equipment(action.ProviderSeat) ||
+            action.ConversionChain.Count(IsWushuangJinzhiSource) != 1 ||
+            _cardZones.GetLocation(cost.CardId) != CardLocation.OutsideGame ||
+            !HasWushuangJinzhiPaymentAction(action, paymentFrameId) ||
+            ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Where(e => e.CardId == cost.CardId).ToArray() is not [var destroyed] ||
+            destroyed.ParentFrameId != paymentFrameId || destroyed.MovementSequence > movementThrough)
+            return null;
+        var movement = _cardMovements.LastOrDefault(m => m.CardId == cost.CardId && m.Sequence == destroyed.MovementSequence);
+        return movement is not null && movement.CardKind == cost.CardKind && movement.From == cost.From &&
+            movement.Reason == (action.Type == CardActionType.Use ? CardMoveReasons.Use : CardMoveReasons.Respond) &&
+            IsWushuangShopDestroyedMaterial(movement) ? movement : null;
+    }
+    private bool HasWushuangJinzhiPaymentAction(CardActionContext action, long paymentFrameId)
+    {
+        bool Matches(CardActionContext issued) => issued.ActionId == action.ActionId &&
+            issued.Type == action.Type && issued.ActorSeat == action.ActorSeat && issued.ProviderSeat == action.ProviderSeat &&
+            issued.RequesterSeat == action.RequesterSeat && issued.ResponderSeat == action.ResponderSeat &&
+            issued.OpponentSeat == action.OpponentSeat && issued.EffectiveKind == action.EffectiveKind &&
+            issued.PhysicalCards.SequenceEqual(action.PhysicalCards) && issued.ConversionChain.SequenceEqual(action.ConversionChain);
+        var accepted = ProgramEventHistory<CardActionAcceptedEvent>().Where(e => e.Action.ActionId == action.ActionId).ToArray();
+        if (accepted.Length > 0) return accepted.All(e => Matches(e.Action));
+        // Simple-card commitment runs before its optional finalized-target
+        // acceptance event. Its issued native owner is already authoritative.
+        if (action.Type == CardActionType.Use && LifecycleCardUse(paymentFrameId) is
+            { ProgramUseCommitted: true, Action: { } committed } use &&
+            use.SourceSeat == action.ActorSeat && use.CardKind == action.EffectiveKind && Matches(committed)) return true;
+        // The paid receipt retains that checked owner after its native frame
+        // retires, including catalogs with no finalized-target subscribers.
+        return ProgramEventHistory<WushuangJinzhiPaidEvent>().Where(e => e.Action.ActionId == action.ActionId).ToArray() is [var paid] &&
+            paid.MaterialPaymentFrameId == paymentFrameId && Matches(paid.Action);
     }
     private CardLocation? WushuangJinzhiDiscardSource(CardMovementRecord movement)
     {
+        if (movement.To == CardLocation.OutsideGame)
+        {
+            var prepaid = ProgramEventHistory<WushuangJinzhiPaidEvent>().LastOrDefault(e =>
+                e.MaterialPaymentFrameId is { } parent && e.Action.PhysicalCards.Any(cost =>
+                    cost.CardId == movement.CardId && WushuangJinzhiDestroyedPayment(e.Action, cost, parent, e.MovementBefore) == movement));
+            return prepaid?.Action.PhysicalCards.Single(cost => cost.CardId == movement.CardId).From;
+        }
         if (movement.From != CardLocation.Processing || movement.To != CardLocation.DiscardPile ||
             movement.Reason.Value != WushuangJinzhiDiscardReason) return null;
         var previous = _cardMovements.LastOrDefault(m => m.CardId == movement.CardId && m.Sequence < movement.Sequence);
@@ -116,6 +171,9 @@ public sealed partial class GameEngine
         if (!IsWushuangJinzhiPaidMaterial(action, card)) return false;
         var paid = ProgramEventHistory<WushuangJinzhiPaidEvent>().Single(e => e.Action.ActionId == action.ActionId);
         var cost = paid.Action.PhysicalCards.Single(c => c.CardId == card);
+        if (paid.MaterialPaymentFrameId is { } parent &&
+            WushuangJinzhiDestroyedPayment(paid.Action, cost, parent, paid.MovementBefore) is { } destroyed)
+        { movements = Array.AsReadOnly(new[] { destroyed }); return true; }
         var entry = _cardMovements.LastOrDefault(m => m.CardId == card && m.Sequence <= paid.MovementBefore && m.From == cost.From && m.To == CardLocation.Processing);
         var finish = _cardMovements.FirstOrDefault(m => m.CardId == card && m.Sequence > paid.MovementBefore && m.Reason.Value == WushuangJinzhiDiscardReason && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile);
         if (entry is null || finish is null) throw new InvalidOperationException("A Jinzhi response lost its exact entered and discarded materials.");

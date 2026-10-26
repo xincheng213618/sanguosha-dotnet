@@ -13,17 +13,25 @@ public sealed partial class GameEngine
         if(index<1 || _resolutionStack[index-1] is not PlayPhaseStartingBoundaryFrame w || w.Id!=i.WindowId || w.OwnerSeat!=f.OwnerSeat || w.ItemIndex<0 || w.ItemIndex>=w.Items.Count || w.Items[w.ItemIndex] is not {Kind:TurnEndingBoundaryItemKind.Program,Candidate:{} candidate} || candidate.OwnerSeat!=f.OwnerSeat || candidate.SkillId!=f.SkillId || candidate.SkillInstanceId!=f.SkillInstanceId || candidate.BindingId!=f.TriggerId || candidate.GameplayHash!=f.GameplayHash)return false;
         var cost=f.CardSetBindings.SingleOrDefault(b=>b.Name==i.CostBind);
         if(cost is null || cost.CardIds.Count!=i.PaidCount || CompleteProgramEventHistory().OfType<JiqiaoCostPaidEvent>().Count(x=>x.ProgramFrameId==f.Id && x.Invoice==i)!=1 ||
-            cost.CardIds.Any(cid=>_cardMovements.Count(m=>m.Sequence>i.CostBefore && m.Sequence<=i.CostAfter && m.CardId==cid && m.From.OwnerSeat==f.OwnerSeat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && m.To==CardLocation.DiscardPile && m.Reason.Value==JiqiaoCostReason)!=1))return false;
+            cost.CardIds.Any(cid=>_cardMovements.Count(m=>m.Sequence>i.CostBefore && m.Sequence<=i.CostAfter && m.CardId==cid && m.From.OwnerSeat==f.OwnerSeat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && IsJiqiaoPaidCostDestination(f,m) && m.Reason.Value==JiqiaoCostReason)!=1))return false;
         return CompleteProgramEventHistory().OfType<JiqiaoStageIssuedEvent>().Count(x=>x.ProgramFrameId==f.Id && x.Stage==r.Stage && x.Before==r.Before && x.After==r.After && x.ActualCount==r.ActualCount)==1 &&
             _cardMovements.Count(m=>m.Sequence>r.Before && m.Sequence<=r.After && IsExactJiqiaoStageMovement(f,r,m))==r.ActualCount;
     }
     private bool IsExactJiqiaoStageMovement(ProgramSkillFrame f,JiqiaoPaidPending r,CardMovementRecord m)=>r.Stage switch
     {
-        JiqiaoPaidStage.CostChildren=>m.Reason.Value==JiqiaoCostReason && m.From.OwnerSeat==f.OwnerSeat && m.To==CardLocation.DiscardPile && GetProgramCardSet(f,r.Invoice.CostBind).CardIds.Contains(m.CardId),
+        JiqiaoPaidStage.CostChildren=>m.Reason.Value==JiqiaoCostReason && m.From.OwnerSeat==f.OwnerSeat && IsJiqiaoPaidCostDestination(f,m) && GetProgramCardSet(f,r.Invoice.CostBind).CardIds.Contains(m.CardId),
         JiqiaoPaidStage.RevealChildren=>m.Reason.Value==$"skill-program.{f.SkillId}.{GetProgramBindingId(f)}.reveal" && m.From==CardLocation.DrawPile && m.To==CardLocation.Processing && GetProgramCardSet(f,r.Invoice.RevealBind).CardIds.Contains(m.CardId),
         JiqiaoPaidStage.ClaimChildren=>m.Reason.Value==JiqiaoClaimReason && m.From==CardLocation.Processing && m.To==CardLocation.Hand(f.OwnerSeat) && GetProgramCardSet(f,r.Invoice.RevealBind).CardIds.Contains(m.CardId),
         JiqiaoPaidStage.CleanupChildren=>m.Reason.Value==JiqiaoRemainderReason && m.From==CardLocation.Processing && m.To==CardLocation.DiscardPile && GetProgramCardSet(f,r.Invoice.RevealBind).CardIds.Contains(m.CardId),_=>false
     };
+    private bool IsJiqiaoPaidCostDestination(ProgramSkillFrame frame, CardMovementRecord movement) =>
+        movement.To == CardLocation.DiscardPile || frame.JiqiaoPaid is { } pending &&
+        movement.From == CardLocation.Equipment(frame.OwnerSeat) && movement.Reason.Value == JiqiaoCostReason &&
+        movement.Sequence > pending.Invoice.CostBefore && movement.Sequence <= pending.Invoice.CostAfter &&
+        GetProgramCardSet(frame, pending.Invoice.CostBind).CardIds.Contains(movement.CardId) &&
+        IsWushuangShopDestroyedMaterial(movement) &&
+        ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Count(fact => fact.CardId == movement.CardId &&
+            fact.MovementSequence == movement.Sequence && fact.ParentFrameId == frame.Id) == 1;
     [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 150)]
     private void RequireIssuedJiqiao(ProgramSkillFrame f)
     {if(f.JiqiaoPaid is not null && !CanContinueIssuedJiqiao(f))throw new InvalidOperationException("Jiqiao lost its actual paid equipment, native stage movements or owning source invoice.");}
@@ -40,7 +48,7 @@ public sealed partial class GameEngine
         if(child is HpChangedTriggerWindowFrame hp)return hp.Change.ParentFrameId==root.Id && hp.ResumeFrameId==root.Id && hp.Change.TargetSeat==root.OwnerSeat && hp.Change.Kind==HpChangeKind.Recovery && hp.Change.Amount==1 && hp.Continuation==PostEventContinuation.AwaitedProgramMovement && HasPaidJiqiaoSilverLion(root);
         return false;
     }
-    private bool HasPaidJiqiaoSilverLion(ProgramSkillFrame f)=>f.JiqiaoPaid is {} r && _cardMovements.Any(m=>m.Sequence>r.Invoice.CostBefore && m.Sequence<=r.Invoice.CostAfter && m.From==CardLocation.Equipment(f.OwnerSeat) && m.To==CardLocation.DiscardPile && m.Reason.Value==JiqiaoCostReason && JiqiaoCard(m.CardId).Kind==CardKind.SilverLion);
+    private bool HasPaidJiqiaoSilverLion(ProgramSkillFrame f)=>f.JiqiaoPaid is {} r && _cardMovements.Any(m=>m.Sequence>r.Invoice.CostBefore && m.Sequence<=r.Invoice.CostAfter && m.From==CardLocation.Equipment(f.OwnerSeat) && IsJiqiaoPaidCostDestination(f,m) && m.Reason.Value==JiqiaoCostReason && JiqiaoCard(m.CardId).Kind==CardKind.SilverLion);
     private ProgramSkillFrame? JiqiaoObserverRoot()=>FindProgramObserverRoot(static(e,r,c)=>e.JiqiaoFirstChild(r,c),static(e,i)=>e.HasMovementObserverSuffix(i));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 70)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 180)]

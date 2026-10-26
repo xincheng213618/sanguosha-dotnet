@@ -41,7 +41,8 @@ public sealed partial class GameEngine
         foreach (var pair in r.PaidIds.Select((id, i) => (id, from: r.PaidFrom[i])))
             if ((r.Operation == SkillProgramEffectOp.StoreNonBasicOwnedPublicPile ? pair.from.OwnerSeat != f.OwnerSeat || pair.from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) :
                     r.Pile is null || pair.from != r.Pile.Location) ||
-                _cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == pair.id && m.From == pair.from && m.To == to &&
+                _cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == pair.id && m.From == pair.from &&
+                    PublicPilePreparationPaymentDestination(f, m, to.Value) &&
                     m.Reason.Value == PreparationReason(f, "payment")) != 1) return false;
         if (r.Stage != PublicPilePreparationStage.PaymentChildren && r.Operation != SkillProgramEffectOp.ResolvePreparationPublicPile) return false;
         if (r.RecoveryIssued != (r.Branch == 2 && r.Stage is PublicPilePreparationStage.RecoveryChildren or PublicPilePreparationStage.DrawChildren) ||
@@ -64,6 +65,13 @@ public sealed partial class GameEngine
         return awaiting ? f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } pending && pending.SubjectSeat == f.OwnerSeat :
             f.PendingMovementContinuation is null;
     }
+    private bool PublicPilePreparationPaymentDestination(ProgramSkillFrame f, CardMovementRecord movement, CardLocation destination) =>
+        movement.To == destination || f.PublicPilePreparation is { Operation: SkillProgramEffectOp.StoreNonBasicOwnedPublicPile, Pile: { } pile } receipt &&
+        destination == pile.Location && movement.From == CardLocation.Equipment(f.OwnerSeat) &&
+        movement.Sequence > receipt.Before && movement.Sequence <= receipt.After &&
+        movement.Reason.Value == PreparationReason(f, "payment") && IsWushuangShopDestroyedMaterial(movement) &&
+        ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Count(fact => fact.CardId == movement.CardId &&
+            fact.MovementSequence == movement.Sequence && fact.ParentFrameId == f.Id) == 1;
     [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 350)]
     private void AssertPublicPilePreparation(ProgramSkillFrame f)
     {
@@ -96,7 +104,8 @@ public sealed partial class GameEngine
         }
         var lion = r.Operation == SkillProgramEffectOp.StoreNonBasicOwnedPublicPile && r.PaidIds.Select((id, i) => (id, from: r.PaidFrom[i])).Any(p =>
             p.from == CardLocation.Equipment(f.OwnerSeat) && _cardMovements.Any(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == p.id &&
-                m.CardKind == CardKind.SilverLion && m.From == p.from && m.To == r.Pile!.Location && m.Reason.Value == PreparationReason(f, "payment")));
+                m.CardKind == CardKind.SilverLion && m.From == p.from && PublicPilePreparationPaymentDestination(f, m, r.Pile!.Location) &&
+                m.Reason.Value == PreparationReason(f, "payment")));
         if (r.Stage != PublicPilePreparationStage.RecoveryChildren && !lion) return false;
         var target = lion ? f.OwnerSeat : r.BeneficiarySeat;
         var continuation = lion ? PostEventContinuation.AwaitedProgramMovement : PostEventContinuation.Program;

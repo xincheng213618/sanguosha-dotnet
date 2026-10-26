@@ -6,9 +6,9 @@ public sealed partial class GameEngine
     private bool _synchronizingCategoryTalismans;
     private bool TracksCategoryTalismans => _contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.PlaceBoundHandAsCategoryTalisman);
     private CategoryTalismanPlacedEvent? LiveCategoryTalisman(int seat) => !TracksCategoryTalismans ? null :
-        CompleteProgramEventHistory().OfType<CategoryTalismanPlacedEvent>().LastOrDefault(e => e.HolderSeat == seat &&
-            _cardZones.GetLocation(e.CardId) == e.Pile.Location && !CompleteProgramEventHistory()
-                .OfType<CategoryTalismanReleasedEvent>().Any(release => release.PlacementFrameId == e.FrameId));
+        ProgramEventHistory<CategoryTalismanPlacedEvent>().LastOrDefault(e => e.HolderSeat == seat &&
+            _cardZones.GetLocation(e.CardId) == e.Pile.Location && !ProgramEventHistory<CategoryTalismanReleasedEvent>()
+                .Any(release => release.PlacementFrameId == e.FrameId));
     private bool IsCategoryTalismanUseForbidden(int actorSeat, CardKind effectiveKind, CardActionType type) =>
         type is CardActionType.Use or CardActionType.Response && LiveCategoryTalisman(actorSeat) is { } talisman &&
         GetProgramCardCategory(effectiveKind) == talisman.Category;

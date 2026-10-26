@@ -124,7 +124,7 @@ public sealed partial class GameEngine
             contributions), SkillRuleQuery.DrawCount);
     }
 
-    private RuleQueryEvaluation EvaluateSlashUseLimit(CharacterState player, int? excludedEquipmentId = null, EquipmentSlot? excludedEquipmentSlot = null)
+    private RuleQueryEvaluation CalculateSlashUseLimit(CharacterState player, int? excludedEquipmentId = null, EquipmentSlot? excludedEquipmentSlot = null)
     {
         var baseTerms = new[]
         {

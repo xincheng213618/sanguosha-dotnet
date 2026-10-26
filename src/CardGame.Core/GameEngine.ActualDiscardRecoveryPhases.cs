@@ -15,6 +15,17 @@ public sealed partial class GameEngine
 
     private ActualDiscardRecoveryPhaseKey? CurrentActualDiscardRecoveryPhase()
     {
+        if (_actionQuery is not { } query) return ReadActualDiscardRecoveryPhase();
+        if (!query.HasActualDiscardRecoveryPhase)
+        {
+            query.ActualDiscardRecoveryPhase = ReadActualDiscardRecoveryPhase();
+            query.HasActualDiscardRecoveryPhase = true;
+        }
+        return query.ActualDiscardRecoveryPhase;
+    }
+
+    private ActualDiscardRecoveryPhaseKey? ReadActualDiscardRecoveryPhase()
+    {
         if (!TracksActualDiscardRecoveryPhases || _turnNumber < 1 || _phase is TurnPhase.NotStarted or TurnPhase.Finished) return null;
         // Pending facts follow committed facts. Search that exact order in
         // reverse: material queries need the latest phase, not a full replay of

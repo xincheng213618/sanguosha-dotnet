@@ -259,14 +259,7 @@
           "id": "hp-independent-base",
           "query": "handLimit",
           "operation": "set",
-          "value": 0,
-          "priority": 0
-        },
-        {
-          "id": "handLimit",
-          "query": "handLimit",
-          "operation": "add",
-          "priority": 0,
+          "priority": -1,
           "valueExpression": "ownerMaxHp"
         }
       ]
@@ -279,14 +272,7 @@
           "id": "hp-independent-base",
           "query": "handLimit",
           "operation": "set",
-          "value": 0,
-          "priority": 0
-        },
-        {
-          "id": "handLimit",
-          "query": "handLimit",
-          "operation": "add",
-          "priority": 0,
+          "priority": -1,
           "valueExpression": "ownerMaxHp"
         }
       ]

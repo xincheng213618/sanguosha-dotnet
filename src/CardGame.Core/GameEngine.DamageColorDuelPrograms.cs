@@ -68,8 +68,33 @@ public sealed partial class GameEngine
         cardId==0 && IsProgramVirtualOrdinaryTrickUse(frameId) ? new Card(0,LifecycleCardUse(frameId)!.CardKind,Suit.None,0) :
         cardId==0 && IsIssuedZeroEntityDuel(frameId) ? new Card(0,CardKind.Duel,Suit.None,0) :
         cardId > 0 && LifecycleCardUse(frameId) is { DiouOrigin: { } diou } && diou.CarrierId == cardId && IsDiouUse(frameId) ? EntityAtCurrentLocation(cardId) :
-            (IsClaimedUseCardEntity(frameId, cardId) || (IsHuiyunOutsideGeneralWeaponMaterial(frameId, cardId) || (IsSiruiOutsideGeneralWeaponMaterial(frameId, cardId) || IsMouLixianRemovedMaterial(frameId, cardId))) || IsGuanduDestroyedChariotMaterial(frameId, cardId) || IsHellDestroyedSoulMaterial(frameId, cardId)) ? EntityAtCurrentLocation(cardId) :
+            (IsClaimedUseCardEntity(frameId, cardId) || (IsHuiyunOutsideGeneralWeaponMaterial(frameId, cardId) || (IsSiruiOutsideGeneralWeaponMaterial(frameId, cardId) || IsMouLixianRemovedMaterial(frameId, cardId))) || IsGuanduDestroyedChariotMaterial(frameId, cardId) || IsHellDestroyedSoulMaterial(frameId, cardId) || IsEphemeralCardDestroyedMaterial(frameId, cardId)) ? EntityAtCurrentLocation(cardId) :
+            cardId == 0 ? UnrepresentedZeroTrick(frameId) :
             _cardZones.CardsAt(requireProcessing ? CardLocation.Processing : _cardZones.GetLocation(cardId)).Single(c=>c.Id==cardId);
+    private Card UnrepresentedZeroTrick(long frameId)
+    {
+        var use = LifecycleCardUse(frameId);
+        var origin = use?.JueshengDuel;
+        var action = use?.Action;
+        var parent = origin is null ? null : _resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == origin.ProgramFrameId);
+        var at = _resolutionStack.FindIndex(frame => frame.Id == frameId);
+        throw new InvalidOperationException("A zero-entity trick lost its native representation. " +
+            System.Text.Json.JsonSerializer.Serialize(new
+            {
+                UseId = frameId, use?.CardId, use?.CardKind, PhysicalCount = use?.PhysicalCardIds?.Count,
+                use?.SourceSeat, Origin = origin, CurrentTurn = _turnNumber, Phase = _phase.ToString(), Winner = _winner.ToString(),
+                Action = action is null ? null : new { action.ActionId, action.Type, action.ActorSeat, action.ProviderSeat,
+                    action.EffectiveKind, action.EffectiveSuit, action.EffectiveRank, action.EffectiveIsRed,
+                    PhysicalCount = action.PhysicalCards.Count, ConversionCount = action.ConversionChain.Count },
+                Parent = parent is null ? null : new { parent.Id, parent.OwnerSeat, parent.SkillId, parent.SkillInstanceId,
+                    parent.GameplayHash, parent.InstructionIndex, Receipt = parent.Juesheng },
+                ImmediateParentMatches = at > 0 && _resolutionStack[at - 1].Id == parent?.Id,
+                OriginUseMatches = origin?.UseId == frameId,
+                ActorMatches = use is not null && origin is not null && JueshengActorMatches(use, origin),
+                IssuedCount = origin is null ? 0 : ProgramEventHistory<JueshengDuelIssuedEvent>().Count(e => e.Origin == origin && e.InstructionIndex == 1),
+                HuangFuSongRankCapture = HasWuHuangFuSongCapability
+            }));
+    }
     private bool MatchesSelectedActorDuelAction(long frameId,CardActionContext action,int cardId) =>
         cardId==0 && IsIssuedZeroEntityDuel(frameId) && LifecycleCardUse(frameId)?.Action?.ActionId==action.ActionId &&
         action.Type==CardActionType.Use && action.EffectiveKind==CardKind.Duel && action.PhysicalCards.Count==0 && action.ConversionChain.Count==0;

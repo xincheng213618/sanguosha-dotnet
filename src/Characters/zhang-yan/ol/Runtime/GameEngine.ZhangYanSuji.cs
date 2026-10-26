@@ -15,7 +15,8 @@ public sealed partial class GameEngine
   if(LifecycleCardUse(id)is not{ZhangYanSuji:{}ret}use)return;var parent=_resolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.Id==ret.ProgramFrameId);var r=parent.ZhangYan!;
   if(r.Stage!=ZhangYanStage.NativeUse||r.NativeReturn!=ret||r.BatchId is not null)throw new InvalidOperationException("Suji cannot pay the same native entity twice.");
   var paid=_cardMovements.Where(m=>m.Sequence>r.Before&&m.CardId==ret.CardId&&m.From==ret.From&&m.Reason==CardMoveReasons.Use).ToArray();
-  if(paid is not[var move]||move.To!=(ret.PrintedKind==CardKind.GeneralWeapon&&ret.From.Zone==CardZoneKind.Equipment?CardLocation.OutsideGame:IsProgramAlternativeCost(use.Action!,ret.CardId)?CardLocation.DrawPile:CardLocation.Processing))throw new InvalidOperationException("Suji lost its actual native payment destination.");
+  if(paid is not[var move]||move.To!=(ret.PrintedKind==CardKind.GeneralWeapon&&ret.From.Zone==CardZoneKind.Equipment?CardLocation.OutsideGame:IsProgramAlternativeCost(use.Action!,ret.CardId)?CardLocation.DrawPile:CardLocation.Processing)&&
+   !(move.To==CardLocation.OutsideGame&&IsZhangYanSujiRemovedMaterial(id,ret.CardId)))throw new InvalidOperationException("Suji lost its actual native payment destination.");
   var batch=use.PaymentMovementReceipt?.Batch??_pendingCardsMovedBatches.Single(b=>b.ParentFrameId==id&&b.Movements.Contains(move));
   ReplaceRuntimeFrame(parent.Id,parent with{ZhangYan=r with{After=_movementSequence,BatchId=batch.Id}});AdvanceEventRulesAndQueueFact(new ZhangYanSujiPaidEvent(parent.Id,id,ret.CardId,ret.From,move.To,r.Before,_movementSequence,batch.Id));
  }
@@ -24,7 +25,8 @@ public sealed partial class GameEngine
   if(use.ZhangYanSuji is not{}r||use.Action is not{Type:CardActionType.Use}a||r.UseId!=use.Id||r.ActionId!=a.ActionId||r.CardId!=use.CardId||use.PhysicalCardIds is not[var material]||material!=r.CardId||!IsSlashCard(use.CardKind)||a.PhysicalCards is not[var cost]||cost.CardId!=r.CardId||cost.CardKind!=r.PrintedKind||cost.From!=r.From||!a.ConversionChain.Contains(r.Source)||!ShownEntityUseActorMatches(use,r.Source.OwnerSeat,r.Source.OwnerSeat)||ProgramEventHistory<ZhangYanSujiIssuedEvent>().Count(e=>e.Return==r)!=1)return false;
   var at=_resolutionStack.FindIndex(f=>f.Id==use.Id);return at>0&&_resolutionStack[at-1]is ProgramSkillFrame{ZhangYan:{Stage:ZhangYanStage.NativeUse,NativeCompleted:false}p}parent&&parent.Id==r.ProgramFrameId&&p.NativeReturn==r&&p.Source==r.Source&&p.GameplayHash==r.GameplayHash;
  }
- private bool IsZhangYanSujiRemovedMaterial(long useId,int cardId)=>LifecycleCardUse(useId)is{ZhangYanSuji:{PrintedKind:CardKind.GeneralWeapon}r}u&&r.CardId==cardId&&r.From.Zone==CardZoneKind.Equipment&&_cardZones.Contains(CardLocation.OutsideGame,cardId)&&IsZhangYanSujiUse(u);
+ private bool IsZhangYanSujiRemovedMaterial(long useId,int cardId)=>LifecycleCardUse(useId)is{ZhangYanSuji:{}r}u&&r.CardId==cardId&&_cardZones.Contains(CardLocation.OutsideGame,cardId)&&IsZhangYanSujiUse(u)&&
+  (r.PrintedKind==CardKind.GeneralWeapon&&r.From.Zone==CardZoneKind.Equipment||IsEphemeralCardDestroyedMaterial(useId,cardId));
  [NativeUseValidation(27000)]private void ValidateZhangYanSujiUse(CardUseFrame use)
  {if(use.ZhangYanSuji is not null&&!IsZhangYanSujiUse(use))throw new InvalidOperationException("Suji's retiring native Use lost its original actor/material parent or issued conversion.");}
  [NativeUseReturn(27000)]private void ReturnZhangYanSujiUse(CardUseFrame use)

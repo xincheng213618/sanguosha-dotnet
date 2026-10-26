@@ -18,8 +18,9 @@
         "effects": [
           { "op": "selectTarget", "target": "owner", "targetKind": "anyLiving" },
           { "op": "draw", "target": "selectedTarget", "amount": 1, "resultBind": "drawn" },
-          { "op": "revealBoundCards", "target": "owner", "sourceBind": "drawn" },
-          { "op": "filterBoundCards", "target": "owner", "sourceBind": "drawn", "resultBind": "equipment", "categories": ["equipment"] },
+          { "op": "filterBoundCards", "target": "owner", "sourceBind": "drawn", "resultBind": "available-drawn", "categories": ["basic", "trick", "equipment"], "availableAtSourceOnly": true },
+          { "op": "revealBoundCards", "target": "owner", "sourceBind": "available-drawn" },
+          { "op": "filterBoundCards", "target": "owner", "sourceBind": "available-drawn", "resultBind": "equipment", "categories": ["equipment"] },
           { "op": "useBoundCardByTarget", "target": "selectedTarget", "sourceBind": "equipment", "condition": { "kind": "boundCardsMatchCategories", "sourceBind": "equipment", "cardCategories": ["equipment"] } },
           { "op": "recover", "target": "selectedTarget", "amount": 1, "condition": { "kind": "boundCardsMatchCategories", "sourceBind": "equipment", "cardCategories": ["equipment"] } }
         ] }]

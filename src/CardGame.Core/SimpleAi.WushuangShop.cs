@@ -39,6 +39,7 @@ public sealed partial class SimpleAiBrain
             .Concat(ownShop.ExtraSkillIds).Distinct(StringComparer.Ordinal).ToArray();
         var opening = ownShop.Phase == WushuangShopPhase.OpeningTactic;
         var future = ownShop.RemainingMilliseconds < 60_000 ? .25d : self.Hp <= 1 ? 1d : 2.5d;
+        if (ownShop.RemainingTurns is { } remaining) future = Math.Min(future, Math.Max(0, remaining) / 2d);
         var savings = new List<(WushuangShopOffer Offer, double Net)>();
         foreach (var offer in ownShop.Offers)
         {
@@ -54,16 +55,19 @@ public sealed partial class SimpleAiBrain
             {
                 var programs = owned.Where(id => id != replacement).Select(id => publicDefinitions.Skills.GetValueOrDefault(id)?.Program)
                     .Where(p => p is not null).Cast<SkillProgram>().ToArray();
-                var value = ShopOfferValue(offer, self, opponent, ownShop, publicDefinitions, programs, future);
+                var value = ShopOfferValue(offer, self, opponent, ownShop, publicDefinitions, programs, future, _policyVersion);
                 if (replacement is not null)
-                    value -= ShopSkillValue(publicDefinitions.Skills.GetValueOrDefault(replacement)?.Program,
-                        self, opponent, programs, future, acquiring: false);
+                    value -= ShopSkillReviewValue(publicDefinitions.Skills.GetValueOrDefault(replacement)?.Program,
+                        self, opponent, programs, future, acquiring: false, _policyVersion);
+                // An unconfirmed/conflicting hypothetical draw build is not
+                // a legal purchase estimate, including during opening choice.
+                if (!double.IsFinite(value)) continue;
                 var net = value - (opening ? 0 : offer.Cost * 3d);
                 if (offer.Cost <= ownShop.Tokens)
                     Add(WushuangShopAction.Buy, opening ? net + 100 : net,
                         replacement is null ? "按当前生存、持续收益和手牌协同购买。" : "新增能力的净收益超过被替换技能。",
                         offer.Id, replacement);
-                else if (!opening && replacement is null && net > 5)
+                else if (!opening && net > 5)
                     savings.Add((offer, net));
             }
         }
@@ -71,20 +75,24 @@ public sealed partial class SimpleAiBrain
         var bestBuy = candidates.Where(c => c.Action == WushuangShopAction.Buy).Select(c => c.Score).DefaultIfEmpty(0).Max();
         if (bestBuy <= 0)
         {
-            var saving = savings.Where(s => s.Offer.Cost <= ownShop.Tokens + 2)
-                .OrderByDescending(s => s.Net).ThenBy(s => s.Offer.Id, StringComparer.Ordinal).FirstOrDefault();
+            var savingTurns = WushuangSavingTurnBudget(self, ownShop);
+            var saving = savings.Where(s => s.Offer.Cost <= ownShop.Tokens + savingTurns)
+                .OrderByDescending(s => s.Net / (1 + (s.Offer.Cost - ownShop.Tokens) * .15))
+                .ThenBy(s => s.Offer.Id, StringComparer.Ordinal).FirstOrDefault();
             var savedStillUseful = ownShop.IsLocked && saving.Offer is not null && saving.Offer.Id == _wushuangSavedOffer &&
-                ownView.TurnNumber - _wushuangSavedTurn <= 2;
+                ownView.TurnNumber - _wushuangSavedTurn <= savingTurns;
             if (ownShop.IsLocked && !savedStillUseful)
                 Add(WushuangShopAction.Lock, 2, "保存商品已无净收益或等待已到界限，解除锁页。");
             else if (!ownShop.IsLocked && saving.Offer is not null &&
-                (_wushuangSavedOffer != saving.Offer.Id || ownView.TurnNumber - _wushuangSavedTurn <= 2))
-                Add(WushuangShopAction.Lock, 2, "保存两虎符以内即可购买的有效商品，最多等待两个正常回合。", saving.Offer.Id);
+                (_wushuangSavedOffer != saving.Offer.Id || ownView.TurnNumber - _wushuangSavedTurn <= savingTurns))
+                Add(WushuangShopAction.Lock, 2, $"保存当前构筑有净收益的商品，保留虎符等待购买；本次最多等待{savingTurns}个行动回合。", saving.Offer.Id);
             else if (!ownShop.IsLocked && ownShop.FreeRerolls > 0 && _wushuangFreeRefreshes < 2)
                 Add(WushuangShopAction.Reroll, 1, "当前页没有正净收益，使用本窗口有限的免费刷新。");
             else if (!ownShop.IsLocked && ownShop.FreeRerolls == 0 && ownShop.RerollCost > 0 &&
-                ownShop.Tokens >= ownShop.RerollCost + 4 && _wushuangPaidRefreshes == 0)
-                Add(WushuangShopAction.Reroll, .5, "保留四虎符购买预算，仅付费寻找一次更合适的商品。");
+                WushuangPaidRefreshNeed(self, ownShop, publicDefinitions, owned) is { } need &&
+                ownShop.Tokens >= ownShop.RerollCost + need.PurchaseReserve &&
+                _wushuangPaidRefreshes < need.MaximumRefreshes)
+                Add(WushuangShopAction.Reroll, .5, need.Reason);
         }
         var result = Result();
         if (result.Action == WushuangShopAction.Reroll)
@@ -126,7 +134,7 @@ public sealed partial class SimpleAiBrain
     }
 
     private static double ShopOfferValue(WushuangShopOffer offer, PlayerSnapshot self, PlayerSnapshot? opponent,
-        WushuangSnapshot shop, ContentRegistry definitions, SkillProgram[] owned, double future)
+        WushuangSnapshot shop, ContentRegistry definitions, SkillProgram[] owned, double future, int policyVersion)
     {
         if (offer.CardKind is { } card) return ShopCardValue(card, self, opponent, owned);
         var skill = offer.SkillId;
@@ -143,38 +151,71 @@ public sealed partial class SimpleAiBrain
                 2290 => future * 2, 2291 => 3, 2292 => 5, _ => 0d
             };
             if (economy > 0) return economy;
+            if (ShopNativeTacticValue(id, self, opponent, shop, owned, future, policyVersion) is { } native)
+                return native + ShopNativeBuildFit(id, native, self, opponent, owned);
         }
         if (skill is not null)
-            return ShopSkillValue(definitions.Skills.GetValueOrDefault(skill)?.Program, self, opponent, owned, future, acquiring: true);
+            return ShopSkillReviewValue(definitions.Skills.GetValueOrDefault(skill)?.Program, self, opponent, owned, future, acquiring: true, policyVersion);
         return offer.Kind switch
         {
-            WushuangOfferKind.Recover => self.Hp < self.MaxHp ? ShopHealthValue(self) : 0,
-            WushuangOfferKind.Draw => 7, WushuangOfferKind.MaxHp => 4, _ => 0
+            WushuangOfferKind.Recover => self.Hp < self.MaxHp ? ShopHealthValue(self) + ShopBuildRecoveryBonus(owned) : 0,
+            WushuangOfferKind.Draw => 7, WushuangOfferKind.MaxHp => 4 + ShopBuildRecoveryBonus(owned) * .5, _ => 0
         };
     }
 
     private static double ShopSkillValue(SkillProgram? program, PlayerSnapshot self, PlayerSnapshot? opponent,
         SkillProgram[] owned, double future, bool acquiring)
+        => ShopSkillValueCore(program, self, opponent, owned, future, acquiring, review: false);
+
+    private static double ShopSkillReviewValue(SkillProgram? program, PlayerSnapshot self, PlayerSnapshot? opponent,
+        SkillProgram[] owned, double future, bool acquiring, int policyVersion)
+        => ShopSkillValueCore(program, self, opponent, owned, future, acquiring,
+            review: policyVersion >= AiDecisionPolicy.WushuangLossReviewVersion,
+            refinement: policyVersion >= AiDecisionPolicy.WushuangRefinementVersion);
+
+    private static double ShopSkillValueCore(SkillProgram? program, PlayerSnapshot self, PlayerSnapshot? opponent,
+        SkillProgram[] owned, double future, bool acquiring, bool review, bool refinement = false)
     {
         if (program is null) return 0;
         var value = 0d;
-        var draws = 2 + owned.SelectMany(p => p.Modifiers).Where(m => m.Query == SkillRuleQuery.DrawCount &&
-            m.Operation == SkillRuleOperation.Add && m.ValueExpression is null).Sum(m => m.Value);
+        var ownedDraw = owned.SelectMany(p => p.Modifiers).Where(m =>
+                m.Query == SkillRuleQuery.DrawCount && m.RecipientScope == SkillRuleRecipientScope.Owner)
+            .Select(m => (Modifier: m, Amount: ShopKnownModifierAmount(m, self), Active: ShopDrawConditionApplies(m.Condition, self))).ToArray();
+        if (program.Modifiers.Any(m => m.Query == SkillRuleQuery.DrawCount) &&
+            ownedDraw.Any(item => item.Active is null || item.Active == true && item.Amount is null)) return double.NegativeInfinity;
+        var drawContributions = ownedDraw.Where(item => item.Active == true && item.Amount is not null)
+            .Select((item, index) => (RuleQueryContribution)new FiniteRuleQueryContribution(
+                "shop-owned-draw:" + index, item.Modifier.Operation, item.Amount!.Value, item.Modifier.Priority)).ToList();
+        if (ShopReducedDrawCount(drawContributions) is not { } draws) return double.NegativeInfinity;
+        var offeredDraw = program.Modifiers.Where(m => m.Query == SkillRuleQuery.DrawCount && m.RecipientScope == SkillRuleRecipientScope.Owner)
+            .Select(m => (Modifier: m, Amount: ShopKnownModifierAmount(m, self), Active: ShopDrawConditionApplies(m.Condition, self))).ToArray();
+        if (offeredDraw.Any(item => item.Active is null || item.Active == true && item.Amount is null)) return double.NegativeInfinity;
+        var additions = offeredDraw.Where(item => item.Active == true).Select((item, index) =>
+            (item.Modifier, Contribution: (RuleQueryContribution)new FiniteRuleQueryContribution("shop-added-draw:" + index,
+                item.Modifier.Operation, item.Amount!.Value, item.Modifier.Priority))).ToArray();
+        // Add each complete modifier group atomically: an intermediate lower
+        // Set conflict may be resolved by the same skill's higher Set.
+        if (ShopReducedDrawCount(drawContributions.Concat(additions.Where(item =>
+                item.Modifier.Condition.Kind == SkillProgramConditionKind.Always).Select(item => item.Contribution)).ToArray()) is not { } guaranteedDraws ||
+            ShopReducedDrawCount(drawContributions.Concat(additions.Select(item => item.Contribution)).ToArray()) is not { } possibleDraws)
+            return double.NegativeInfinity;
+        value += (guaranteedDraws - draws + (possibleDraws - guaranteedDraws) * .5) * future * 7 / (1 + Math.Max(0, draws - 2) * .3);
+        if (ShopHandLimitValue(program, self, owned, draws) is not { } handLimitValue) return double.NegativeInfinity;
+        value += handLimitValue;
         var unlimitedSlash = self.Equipment.Any(c => c.Kind == CardKind.Crossbow) || owned.SelectMany(p => p.Modifiers)
             .Any(m => m.Query == SkillRuleQuery.SlashLimit && m.Operation == SkillRuleOperation.Unlimited);
         var slashes = self.Hand.Count(c => IsSlashCard(c.Kind));
         foreach (var modifier in program.Modifiers)
         {
+            var conditional = modifier.Condition.Kind == SkillProgramConditionKind.Always ? 1d : .5d;
+            if (modifier.Query is SkillRuleQuery.DrawCount or SkillRuleQuery.HandLimit) continue;
             var amount = modifier.ValueExpression switch
             {
                 null => modifier.Value, SkillRuleValueExpression.OwnerLostHp => Math.Max(0, self.MaxHp - self.Hp),
                 SkillRuleValueExpression.OwnerMaxHp => self.MaxHp, _ => 0
             };
-            var conditional = modifier.Condition.Kind == SkillProgramConditionKind.Always ? 1d : .5d;
             value += conditional * (modifier.Query switch
             {
-                SkillRuleQuery.DrawCount => amount * future * 7 / (1 + Math.Max(0, draws - 2) * .3),
-                SkillRuleQuery.HandLimit => amount * (self.HandCount + Math.Max(0, draws) > (self.HandLimit ?? self.Hp) ? 2.5 : .7),
                 SkillRuleQuery.SlashLimit => unlimitedSlash ? 0 : modifier.Operation == SkillRuleOperation.Unlimited
                     ? 4 + Math.Max(0, slashes - 1) * 5 : Math.Max(0, amount) * (2 + Math.Min(3, Math.Max(0, slashes - 1)) * 2),
                 _ => 0
@@ -211,18 +252,21 @@ public sealed partial class SimpleAiBrain
         foreach (var trigger in program.Triggers)
         {
             if (trigger.Window == SkillProgramTriggerWindow.SkillsChanged && !acquiring) continue;
-            var frequency = trigger.Window == SkillProgramTriggerWindow.SkillsChanged ? 1 : future;
-            if (trigger.Window == SkillProgramTriggerWindow.AfterDamageApplied) frequency *= .6;
+            var frequency = ShopTriggerFrequency(trigger, self, owned.Append(program).ToArray(), future);
             if (trigger.Condition.Kind == SkillProgramTriggerConditionKind.CardActionActualTurnUseOrdinalIs &&
                 trigger.Condition.ActualTurnUseOrdinal > self.HandCount + Math.Max(0, draws)) frequency *= .15;
-            value += frequency * ShopEffectsValue(trigger.Effects, self, opponent, owned);
+            value += frequency * (review ? ShopReviewedTriggerValue(program, trigger, self, opponent, owned) :
+                ShopEffectsValue(trigger.Effects, self, opponent, owned));
         }
         foreach (var activation in program.Activations)
-            value += future * .7 * Math.Max(0, ShopEffectsValue(activation.Effects, self, opponent, owned) - DraftActivationCardCost(activation) * 3);
+            value += future * .7 * Math.Max(0, review
+                ? ShopReviewedActivationValue(program, activation, self, opponent, owned, future, refinement)
+                : ShopEffectsValue(activation.Effects, self, opponent, owned) - DraftActivationCardCost(activation) * 3);
         // Custom executable operations already have a bounded capability reader
         // used by general selection. Reuse it for otherwise unscored programs;
         // reach/support have no value in this two-seat mode.
-        if (value == 0 && program.Modifiers.Count == 0 && program.ViewAs.Count == 0 && program.CardPolicies.Count == 0 &&
+        if (value == 0 && (!review || !ShopReviewHasPricedEffects(program)) &&
+            program.Modifiers.Count == 0 && program.ViewAs.Count == 0 && program.CardPolicies.Count == 0 &&
             (program.Triggers.Any(t => t.Window != SkillProgramTriggerWindow.SkillsChanged) || program.Activations.Count > 0))
         {
             var capability = ReadDraftSkillBenefits(program, null);
@@ -230,8 +274,51 @@ public sealed partial class SimpleAiBrain
                 + capability.Recovery * (self.Hp < self.MaxHp ? ShopHealthValue(self) : 2)
                 - capability.PaidHp * ShopHealthValue(self) - capability.Attrition * ShopHealthValue(self);
         }
-        return value;
+        return value + ShopSkillBuildFit(program, self, opponent, owned, future);
     }
+
+    private static int? ShopKnownModifierAmount(SkillProgramModifier modifier, PlayerSnapshot self) => modifier.ValueExpression switch
+    {
+        null => modifier.Value,
+        SkillRuleValueExpression.OwnerLostHp => Math.Max(0, self.MaxHp - self.Hp),
+        SkillRuleValueExpression.OwnerMaxHp => self.MaxHp,
+        _ => null
+    };
+
+    private static int? ShopReducedDrawCount(IReadOnlyList<RuleQueryContribution> contributions)
+        => ShopReducedFiniteCount(2, contributions);
+
+    private static int? ShopReducedFiniteCount(int baseValue, IReadOnlyList<RuleQueryContribution> contributions)
+    {
+        // The native query applies the highest-priority Set to its base, adds
+        // all Add contributions, then clamps once. Price only its change;
+        // replacing a skill uses the same remaining build on both sides.
+        var sets = contributions.OfType<FiniteRuleQueryContribution>().Where(item => item.Operation == SkillRuleOperation.Set).ToArray();
+        if (sets.Length > 0)
+        {
+            var priority = sets.Max(set => set.Priority);
+            if (sets.Where(item => item.Priority == priority).Select(item => item.Value).Distinct().Skip(1).Any()) return null;
+        }
+        return ((FiniteRuleQueryValue)RuleQueryReducer.Reduce(baseValue, new(0, int.MaxValue), contributions)).Value;
+    }
+
+    // Estimate the owner's next normal Draw from current public state. Unknown
+    // frame/state conditions are not assumed active, or silently treated as off.
+    private static bool? ShopDrawConditionApplies(SkillProgramCondition condition, PlayerSnapshot self) => condition.Kind switch
+    {
+        SkillProgramConditionKind.Always or SkillProgramConditionKind.OwnTurn => true,
+        SkillProgramConditionKind.NotOwnTurn or SkillProgramConditionKind.ClassicIdentityMode => false,
+        SkillProgramConditionKind.Wounded => self.HpUndefined ? null : self.Hp < self.MaxHp,
+        SkillProgramConditionKind.HpAtLeast => self.HpUndefined ? null : self.Hp >= condition.Value,
+        SkillProgramConditionKind.HandCountAtLeast => self.HandCount >= condition.Value,
+        SkillProgramConditionKind.HandCountGreaterThanHp => self.HpUndefined ? null : self.HandCount > self.Hp,
+        SkillProgramConditionKind.Not => ShopDrawConditionApplies(condition.Children[0], self) is { } child ? !child : null,
+        SkillProgramConditionKind.All => condition.Children.Any(child => ShopDrawConditionApplies(child, self) == false) ? false :
+            condition.Children.All(child => ShopDrawConditionApplies(child, self) == true) ? true : null,
+        SkillProgramConditionKind.Any => condition.Children.Any(child => ShopDrawConditionApplies(child, self) == true) ? true :
+            condition.Children.All(child => ShopDrawConditionApplies(child, self) == false) ? false : null,
+        _ => null
+    };
 
     private static double ShopEffectsValue(IReadOnlyList<SkillProgramEffect> effects, PlayerSnapshot self,
         PlayerSnapshot? opponent, SkillProgram[] owned)
@@ -245,11 +332,11 @@ public sealed partial class SimpleAiBrain
             var owner = effect.Target == SkillProgramEffectTarget.Owner;
             var benefit = effect.Op switch
             {
-                SkillProgramEffectOp.Draw => owner ? amount * 7d : 0,
-                SkillProgramEffectOp.ObtainWushuangDeckCards => owner && effect.OutputKind is { } card
-                    ? amount * ShopCardValue(card, self, opponent, owned) : 0,
-                SkillProgramEffectOp.Recover => owner ? Math.Min(amount, Math.Max(0, self.MaxHp + maximumGain - self.Hp)) * ShopHealthValue(self) : 0,
-                SkillProgramEffectOp.RecoverToMaximum => owner ? Math.Max(0, self.MaxHp - self.Hp) * ShopHealthValue(self) : 0,
+                SkillProgramEffectOp.Draw or SkillProgramEffectOp.AdjustNormalDraw => owner ? amount * 7d : 0,
+                SkillProgramEffectOp.ObtainWushuangDeckCards => !owner ? 0 : effect.OutputKind is { } card
+                    ? amount * ShopCardValue(card, self, opponent, owned) : amount * 6d,
+                SkillProgramEffectOp.Recover => owner ? Math.Min(amount, Math.Max(0, self.MaxHp + maximumGain - self.Hp)) * (ShopHealthValue(self) + ShopBuildRecoveryBonus(owned)) : 0,
+                SkillProgramEffectOp.RecoverToMaximum => owner ? Math.Max(0, self.MaxHp - self.Hp) * (ShopHealthValue(self) + ShopBuildRecoveryBonus(owned)) : 0,
                 SkillProgramEffectOp.ChangeMaximumHp => owner ? effect.Amount * 4d : 0,
                 SkillProgramEffectOp.Damage or SkillProgramEffectOp.DamageParticipants => owner ? -amount * ShopHealthValue(self) : amount * 7d,
                 SkillProgramEffectOp.LoseHp => owner ? -amount * ShopHealthValue(self) : amount * 6d,
@@ -284,7 +371,9 @@ public sealed partial class SimpleAiBrain
             {
                 CardKind.Crossbow => 3 + Math.Max(0, self.Hand.Count(c => IsSlashCard(c.Kind)) - 1) * 5,
                 CardKind.BaguaFormation => (8 + (self.Hp <= 2 ? 4 : 0)) * defense,
-                CardKind.RenwangShield => 9 * defense, CardKind.SilverLion => 8 * defense,
+                CardKind.RenwangShield => 9 * defense,
+                CardKind.SilverLion => (8 + (opponent?.WushuangTacticIds?.Contains(2210) == true ? 0 :
+                    Math.Min(4, ShopBuildRecoveryBonus(owned) * .5))) * defense,
                 _ => EquipmentCatalog.Get(item).Slot == EquipmentSlot.Armor ? 7 * defense : 3
             };
             return EquipmentValue(kind) - current.Select(c => EquipmentValue(c.Kind)).DefaultIfEmpty(0).Min();
@@ -293,13 +382,16 @@ public sealed partial class SimpleAiBrain
         {
             var unlimited = self.Equipment.Any(c => c.Kind == CardKind.Crossbow) || owned.SelectMany(p => p.Modifiers)
                 .Any(m => m.Query == SkillRuleQuery.SlashLimit && m.Operation == SkillRuleOperation.Unlimited);
-            return copies == 0 || unlimited ? 7 : copies == 1 ? 2 : .4;
+            return (copies == 0 || unlimited ? 7 : copies == 1 ? 2 : .4) +
+                (copies == 0 || unlimited ? ShopSlashBuildBonus(self, opponent, owned) : 0);
         }
         return kind switch
         {
-            CardKind.Peach => copies == 0 ? self.Hp < self.MaxHp ? ShopHealthValue(self) * defense : 6 : copies == 1 ? 2 : .3,
+            CardKind.Peach => copies == 0 ? (self.Hp < self.MaxHp ? ShopHealthValue(self) * defense : 6) + ShopBuildRecoveryBonus(owned) : copies == 1 ? 2 : .3,
             CardKind.Dodge => copies == 0 ? (self.Hp <= 2 ? 13 : 8) * defense : copies == 1 ? 4 : 1,
-            CardKind.Alcohol => copies > 0 || self.HasAlcoholEffect ? 1 : self.Hp <= 1 ? 10 : self.Hand.Any(c => IsSlashCard(c.Kind)) ? 6 : 2,
+            CardKind.Alcohol => copies > 0 || self.HasAlcoholEffect ? 1 : self.Hp <= 1 ? 10 : self.Hand.Any(c => IsSlashCard(c.Kind))
+                ? ((self.WushuangTacticIds?.Contains(2210) == true || opponent?.IncomingDamageCap == 1) && self.WushuangTacticIds?.Contains(2001) != true
+                    ? 2 : 6 + ShopSlashBuildBonus(self, opponent, owned)) : 2,
             CardKind.DrawTwo => 13,
             CardKind.Dismantlement or CardKind.Snatch => opponent is not null && opponent.HandCount + opponent.Equipment.Count > 0 ? 8 : 0,
             CardKind.Duel => self.Hand.Count(c => IsSlashCard(c.Kind)) > 0 ? 7 : 3,

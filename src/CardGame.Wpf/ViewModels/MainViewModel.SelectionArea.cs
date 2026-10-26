@@ -20,6 +20,9 @@ public sealed partial class MainViewModel
             ShowPrimaryButtons = ShowPrimaryActionButtons,
             ConfirmCommand = ConfirmSelectedCommand,
             CancelCommand = CancelActionCommand,
+            ShowSelectAllHand = ShowSelectAllZhihengHand,
+            CanSelectAllHand = CanSelectAllZhihengHand,
+            SelectAllHandCommand = SelectAllZhihengHandCommand,
             Choices = DockSkillChoices,
             ChoiceCommand = DockSkillChoiceCommand,
             CatalogChoices = ExpandedSelectionChoices,
@@ -27,5 +30,6 @@ public sealed partial class MainViewModel
             CatalogTitle = CardNameSelectionTitle
         };
         RaisePropertyChanged(nameof(SelectionArea));
+        ((RelayCommand)SelectAllZhihengHandCommand).NotifyCanExecuteChanged();
     }
 }

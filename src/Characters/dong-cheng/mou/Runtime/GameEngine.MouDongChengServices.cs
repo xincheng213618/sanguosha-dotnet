@@ -32,7 +32,10 @@ public sealed partial class GameEngine
  {
   if(!HasMouDongCheng||CurrentDamageAttempt is not CardAttackHandle{IsProgramSkillDamage:false,IsProgramJudgmentDamage:false}a||a.EffectiveCardKind is null)return null;
   var u=LifecycleCardUse(a.ResolutionId);if(u?.Action is not{Type:CardActionType.Use}&& !a.IsDelayedJudgmentDamage)return null;
-  return MouDongCheng.ObserveDamage(++_resolutionSequence,a.ResolutionId,u?.Id??0,a.Card?.Id??0,a.TargetSeat);
+  // The native Use owns its appearance even when it has zero physical
+  // materials (for example Qizheng); such an appearance is not a zone entity.
+  var card=u?.CardId??_resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(j=>j.Id==a.ResolutionId)?.DelayedCardId??0;
+  return MouDongCheng.ObserveDamage(++_resolutionSequence,a.ResolutionId,u?.Id??0,card,a.TargetSeat);
  }
  private MouDcOccurrence? MouDcBefore(ProgramTriggerCandidate c,ProgramSkillWindowContext w)
  {

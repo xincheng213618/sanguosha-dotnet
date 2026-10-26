@@ -5,8 +5,9 @@ public sealed partial class GameEngine
     private bool TryContinuePaidVirtualSlashTargets(CardAttackHandle attack)
     {
         if (IsTargetScopedZixiEffectRound(attack.ResolutionId)) return false;
-        if (attack.Card is not null || !IsForeignPublicPileSlashUse(attack.ResolutionId)) return false;
-        var use = _resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == attack.ResolutionId);
+        if (!IsForeignPublicPileSlashUse(attack.ResolutionId) ||
+            LifecycleCardUse(attack.ResolutionId) is not { } use || !IsSlashCard(use.CardKind) ||
+            attack.Card is not null) return false;
         var next = use.TargetIndex + 1;
         while (next < use.TargetSeats.Count && !_players[use.TargetSeats[next]].IsAlive) next++;
         if (_winner != Winner.None || next >= use.TargetSeats.Count)

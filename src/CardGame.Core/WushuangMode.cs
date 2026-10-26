@@ -9,6 +9,8 @@ public static class WushuangMode
     public const int TimeLimitMilliseconds = 15 * 60 * 1000;
     public const int MaximumExtraSkills = 2;
     public const int StartingTokens = 0;
+    /// <summary>Normalized AI evaluation utility: victory 1, survival draw 0.2, defeat 0.</summary>
+    public const double DrawEvaluationScore = .2d;
 }
 
 public enum WushuangOfferKind { Skill, Draw, Recover, MaxHp, Tactic, Card }
@@ -75,6 +77,8 @@ public sealed record WushuangTacticAcquiredEvent(int Seat, int TacticId, bool Is
 public sealed record WushuangIntermissionFrame(long Id, bool Opening, int EndedSeat, bool Skipped, int SeatCursor = 0)
     : ResolutionFrame(Id, ResolutionFrameKind.WushuangIntermission, ResolutionFrameStep.ResolvingEffect)
 {
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public int AiShopActions { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public WushuangAcquisitionReceipt? Acquisition { get; init; }
 }

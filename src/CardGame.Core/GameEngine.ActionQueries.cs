@@ -15,7 +15,10 @@ public sealed partial class GameEngine
             IReadOnlyList<CardConversionSource>> Conversions = [];
         internal readonly Dictionary<(int Source, int Target, int? Excluded), RuleQueryEvaluation> Distances = [];
         internal readonly Dictionary<(int Seat, int? Excluded), RuleQueryEvaluation> AttackRanges = [];
+        internal readonly Dictionary<(int Seat, int? Excluded, EquipmentSlot? Slot), RuleQueryEvaluation> SlashUseLimits = [];
         internal readonly Dictionary<(int Seat, bool IgnoreSuitBan), IReadOnlyList<Card>> SlashCards = [];
+        internal bool HasActualDiscardRecoveryPhase;
+        internal ActualDiscardRecoveryPhaseKey? ActualDiscardRecoveryPhase;
     }
 
     private ActionQueryScope BeginActionQuery()
@@ -88,6 +91,16 @@ public sealed partial class GameEngine
         var key = (player.Seat, excludedEquipmentId);
         if (!query.AttackRanges.TryGetValue(key, out var result))
             query.AttackRanges[key] = result = CalculateAttackRange(player, excludedEquipmentId);
+        return result;
+    }
+
+    private RuleQueryEvaluation EvaluateSlashUseLimit(CharacterState player, int? excludedEquipmentId = null,
+        EquipmentSlot? excludedEquipmentSlot = null)
+    {
+        if (_actionQuery is not { } query) return CalculateSlashUseLimit(player, excludedEquipmentId, excludedEquipmentSlot);
+        var key = (player.Seat, excludedEquipmentId, excludedEquipmentSlot);
+        if (!query.SlashUseLimits.TryGetValue(key, out var result))
+            query.SlashUseLimits[key] = result = CalculateSlashUseLimit(player, excludedEquipmentId, excludedEquipmentSlot);
         return result;
     }
 

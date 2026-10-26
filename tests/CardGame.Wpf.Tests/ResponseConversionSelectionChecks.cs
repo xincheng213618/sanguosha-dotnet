@@ -62,21 +62,16 @@ internal static class ResponseConversionSelectionChecks
                         !model.HumanEquipmentSlots.Any(slot => slot.IsSelectable) && !model.CanConfirmSelected,
                         $"{kind}: an available conversion must wait on its skill rail without showing or preselecting costs.");
                     Click(root, model.ActivateHumanSkillCommand, skill);
-                    Program.Assert(model.HasSelection && model.HandResponseExtraChoices.Count == 2 &&
-                        model.HandResponseExtraChoices.All(choice => choice.Cards.Count == 0) &&
-                        model.Hand.All(card => !card.IsPlayable) && !model.CanConfirmSelected,
-                        "Longhun must choose one/two-card conversion before enabling materials.");
-                    var retired = model.HandResponseExtraChoices.Single(choice => choice.Description.StartsWith(count + "张"));
-                    Click(root, model.SelectHandResponseChoiceCommand, retired);
-                    Program.Assert(model.IsCardPaymentSelectionPending && !model.CanConfirmSelected && model.HandResponseExtraChoices.Count == 0,
-                        "The conversion mode must enter a reversible payment draft without a direct-submit alternative.");
+                    Program.Assert(model.HasSelection && model.IsCardPaymentSelectionPending &&
+                        model.HandResponseExtraChoices.Count == 0 && model.Hand.Any(card => card.IsPlayable) && !model.CanConfirmSelected,
+                        "Longhun must enable its published materials immediately, without choosing a card name or count.");
                     var equipment = model.HumanEquipmentSlots.Single(slot => slot.Card is not null);
-                    Program.Assert(equipment.IsSelectable, "Published equipment must be selectable only after choosing its conversion.");
+                    Program.Assert(equipment.IsSelectable, "Published equipment must be selectable after choosing the skill.");
                     Click(root, model.SelectEquipmentMaterialCommand, equipment);
                     var ids = new List<int> { equipment.Card!.Id };
                     if (count == 2)
                     {
-                        Program.Assert(!model.CanConfirmSelected, "One material cannot pay a two-card conversion.");
+                        Program.Assert(model.CanConfirmSelected, "One material must already offer the single-card conversion while a second remains optional.");
                         var card = model.Hand.First(item => item.IsPlayable);
                         ids.Add(card.Id);
                         Click(root, model.SelectCardCommand, card);
@@ -87,10 +82,9 @@ internal static class ResponseConversionSelectionChecks
                         model.Hand.All(card => physical[card.Id] == (card.Kind, card.Name, card.SuitGlyph, card.Rank)) &&
                         model.HumanEquipmentSlots.Single(slot => slot.Card is not null).IsSelected,
                         "Drafts must retain physical card faces and pay nothing before confirmation.");
-                    model.SelectHandResponseChoiceCommand.Execute(retired);
                     model.SelectHandResponseChoiceCommand.Execute(choice with { });
                     Program.Assert(game.Revision == revision && model.CanConfirmSelected,
-                        "Retired modes and copied raw responses cannot submit or replace a draft.");
+                        "Copied raw responses cannot submit or replace a draft.");
                     model.ClearSelectionCommand.Execute(null);
                     Program.Assert(!model.HasSelection && !model.CanConfirmSelected && model.HandResponseExtraChoices.Count == 0 &&
                         !model.HumanEquipmentSlots.Any(slot => slot.IsSelectable || slot.IsSelected) && game.Revision == revision,
@@ -101,8 +95,6 @@ internal static class ResponseConversionSelectionChecks
                         !model.CanConfirmSelected && game.Revision == revision,
                         "Reloading the pending response must require explicit skill selection again.");
                     Click(root, model.ActivateHumanSkillCommand, model.HumanSkillCards.Single(item => item.ContentId == Longhun));
-                    Click(root, model.SelectHandResponseChoiceCommand,
-                        model.HandResponseExtraChoices.Single(item => item.Description.StartsWith(count + "张")));
                     Click(root, model.SelectEquipmentMaterialCommand, model.HumanEquipmentSlots.Single(slot => slot.Card is not null));
                     if (count == 2) Click(root, model.SelectCardCommand, model.Hand.Single(card => card.Id == ids[1]));
                     var expected = GameReplay.Restore(checkpoint, registry);
@@ -142,9 +134,10 @@ internal static class ResponseConversionSelectionChecks
         }
     }
 
-    public static void PlayGroupsSingleAndMultipleCardConversions()
+    public static void PlayGroupsSingleAndMultipleCardConversions(string output)
     {
         var (setup, registry) = Create(null);
+        Equip(setup);
         foreach (var kind in new[] { CardKind.Peach, CardKind.FireSlash })
         foreach (var count in new[] { 1, 2 })
         {
@@ -156,25 +149,49 @@ internal static class ResponseConversionSelectionChecks
             {
                 var root = (FrameworkElement)window.Content;
                 Click(root, model.ActivateHumanSkillCommand, model.HumanSkillCards.Single(skill => skill.ContentId == Longhun));
-                Program.Assert(model.EquipmentPlayChoices.Count == 4 && model.Hand.All(card => !card.IsPlayable) &&
+                Program.Assert(model.EquipmentPlayChoices.Count == 0 && !model.HasCardNameSelection && model.Hand.Any(card => card.IsPlayable) &&
                     !model.SupplementalActiveSkillActions.Any(action => action.ProgramSkillId == Longhun),
-                    "The rail must group one/two-card Peach and Fire Slash before enabling materials: " +
+                    "The rail must enable conversion materials without a name/count chooser: " +
                     string.Join(" | ", model.EquipmentPlayChoices.Select(choice => choice.Description)) + "; hand=" +
                     string.Join(",", model.Hand.Select(card => card.SuitGlyph + card.Name)) + "; " + model.ActionHint);
-                var mode = model.EquipmentPlayChoices.Single(choice => choice.Parameters.GetValueOrDefault("played-kind") == kind.ToString() &&
-                    choice.Description.Contains(count + "张牌"));
-                Click(root, model.SelectEquipmentPlayChoiceCommand, mode);
-                var cards = model.Hand.Where(card => card.IsPlayable).Take(count).ToArray();
-                Program.Assert(cards.Length == count && !model.CanConfirmSelected, "A conversion mode must expose its own legal material set.");
+                var suit = kind == CardKind.Peach ? "♥" : "♦";
+                var equipment = model.HumanEquipmentSlots.FirstOrDefault(slot => slot.Card is { } card &&
+                    card.Suit == (kind == CardKind.Peach ? Suit.Heart : Suit.Diamond));
+                if (equipment is not null) Click(root, model.SelectActiveEquipmentCommand, equipment);
+                var cards = model.Hand.Where(card => card.IsPlayable && card.SuitGlyph == suit).Take(count - (equipment is null ? 0 : 1)).ToArray();
+                Program.Assert(cards.Length == count - (equipment is null ? 0 : 1), "The scene must have enough matching hand/equipment materials.");
                 foreach (var card in cards) Click(root, model.SelectCardCommand, card);
+                Program.Assert(model.Hand.Where(card => card.SuitGlyph != suit).All(card => !card.IsPlayable) &&
+                    model.PlayButtonText.Contains(CardCatalog.Get(kind).DisplayName) &&
+                    game.Revision == revision && !model.HasCardNameSelection,
+                    "The selected material suit must determine the output immediately and exclude mixed suits without paying early.");
+                var selectedIds = cards.Select(card => card.Id).Concat(equipment is null ? [] : new[] { equipment.Card!.Id }).ToHashSet();
+                var incompatible = model.Hand.First(card => card.SuitGlyph != suit);
+                model.SelectCardCommand.Execute(incompatible);
+                Program.Assert(model.Hand.Where(card => card.IsSelected).Select(card => card.Id)
+                    .Concat(model.HumanEquipmentSlots.Where(slot => slot.IsSelected).Select(slot => slot.Card!.Id)).ToHashSet().SetEquals(selectedIds),
+                    "Clicking an incompatible suit must leave the existing one/two-card draft intact.");
+                if (count == 2)
+                {
+                    Program.Assert(model.Hand.All(card => !card.IsPlayable || card.IsSelected), "Two materials must disable a third card.");
+                    var reverse = model.Hand.Single(card => card.Id == cards[^1].Id);
+                    Click(root, model.SelectCardCommand, reverse);
+                    Program.Assert(model.Hand.Count(card => card.IsSelected) + model.HumanEquipmentSlots.Count(slot => slot.IsSelected) == 1,
+                        "Removing the second material must return to the single-card conversion without restarting the skill.");
+                    Click(root, model.SelectCardCommand, model.Hand.Single(card => card.Id == reverse.Id));
+                }
                 if (kind == CardKind.FireSlash && !model.Seats.Any(seat => seat.IsSelectedTarget))
                     model.SelectTargetCommand.Execute(model.Seats.Single(seat => seat.Seat == 1));
                 Program.Assert(model.CanConfirmSelected && game.Revision == revision, "Selecting conversion materials/targets cannot pay early.");
+                Program.Render(root, 1120, 740, Path.Combine(output, $"longhun-material-{kind}-{count}.png"));
+                var moves = game.CardMovements.Count;
                 model.ConfirmSelectedCommand.Execute(null);
                 Program.Assert(game.Revision == revision + 1 && (count == 1
                     ? game.AcceptedCommands.Last() is PlayCardCommand played && played.ConversionSource?.SkillId == Longhun && played.PlayedCardKind == kind
                     : game.AcceptedCommands.Last() is UseProgramSkillCommand used && used.SkillId == Longhun && used.CardIds.Count == 2),
-                    "Each conversion mode must retain its native single-card or multi-card command identity.");
+                    "Material selection must retain the native single-card or multi-card command identity.");
+                Program.Assert(selectedIds.All(id => game.CardMovements.Skip(moves).Count(move => move.CardId == id && move.To == CardLocation.DiscardPile) == 1),
+                    "Confirmation must pay each selected hand/equipment entity exactly once.");
             }
             finally { window.Content = null; window.Close(); }
         }

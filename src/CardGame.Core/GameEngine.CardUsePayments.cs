@@ -46,6 +46,17 @@ public sealed partial class GameEngine
     private bool IsCardUsePaymentBatch(CardUseFrame use, CardMovementBatchContext batch) =>
         CardUsePayments.MatchesBatch(use, batch) || CardUsePaymentBatchMatchesReceipt(use, batch) && CardUsePaymentMaterialsMatch(use, batch);
 
+    private bool IsPaidDestroyedGeneralWeaponUseMaterial(long useId, int cardId) =>
+        cardId > 0 && _cardZones.GetLocation(cardId) == CardLocation.OutsideGame && GetAdvancedCard(cardId).IsGeneralWeapon &&
+        LifecycleCardUse(useId) is { Action: { Type: CardActionType.Use } action, PaymentMovementReceipt: { Batch: { } batch } receipt } use &&
+        receipt.OwnerFrameId == useId && receipt.ActionId == action.ActionId && CardUsePaymentBatchMatchesReceipt(use, batch) &&
+        CardUsePaymentMaterialsMatch(use, batch) && action.PhysicalCards.SingleOrDefault(c => c.CardId == cardId) is { } material &&
+        material.From == CardLocation.Equipment(action.ProviderSeat) &&
+        batch.Movements.SingleOrDefault(m => m.CardId == cardId) is { } movement && movement.From == material.From &&
+        movement.CardKind == material.CardKind && movement.To == CardLocation.OutsideGame && movement.Reason == CardMoveReasons.Use &&
+        movement.Sequence > receipt.SequenceBefore && movement.Sequence <= receipt.SequenceAfter &&
+        _cardMovements.SingleOrDefault(m => m.Sequence == movement.Sequence) == movement;
+
     private static bool CardUsePaymentBatchMatchesReceipt(CardUseFrame use, CardMovementBatchContext batch,
         CardUsePaymentMovementReceipt? issuedReceipt = null) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CardUsePayments.CardUsePaymentBatchMatchesReceipt(use,batch,issuedReceipt);

@@ -2,6 +2,31 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
+    private bool TryAdvanceMouLixianAiNullification()
+    {
+        // An after-damage Lixian trick retains the ancestral damage window.
+        // Its exact native AI response must run before that suspended ancestor.
+        if (!IsAiNullificationPending() || _resolutionStack.Count < 3 ||
+            _resolutionStack[^1] is not NullificationWindowFrame counterspell ||
+            _resolutionStack[^2] is not CardUseFrame { MouLixianOrigin: { } origin } use ||
+            _resolutionStack[^3] is not ProgramSkillFrame { MouLixian: { Stage: MouLixianStage.NativeUse, Paid: true } receipt } parent ||
+            origin.ProgramFrameId != parent.Id || receipt.UseId != use.Id || receipt.ActionId != use.Action?.ActionId ||
+            !MouHuangYueyingFirstChild(parent, use) || ActiveNullificationWindow?.Id != counterspell.Id || counterspell.ParentFrameId != use.Id ||
+            counterspell.SourceSeat != use.SourceSeat || counterspell.EffectCardId != use.CardId ||
+            counterspell.EffectCardKind != use.CardKind ||
+            counterspell.ActionKind != (use.CardKind switch
+            {
+                CardKind.DrawTwo => LegalActionKind.DrawTwo, CardKind.Snatch => LegalActionKind.Snatch,
+                CardKind.Dismantlement => LegalActionKind.Dismantlement, CardKind.IronChain => LegalActionKind.IronChain,
+                _ => (LegalActionKind?)null
+            }) ||
+            !(counterspell.TargetSeats.SequenceEqual(use.TargetSeats) ||
+                counterspell.TargetSeats is [var target] && use.TargetIndex >= 0 && use.TargetIndex < use.TargetSeats.Count &&
+                target == use.TargetSeats[use.TargetIndex])) return false;
+        ResolvePendingAiNullification();
+        return true;
+    }
+
     private bool MouLixianCardWindowEdge(int index)
     {
         if (_resolutionStack[index - 1] is CardUseFrame { CardKind: CardKind.IronChain } chained && IsIssuedMouLixianUse(chained) &&

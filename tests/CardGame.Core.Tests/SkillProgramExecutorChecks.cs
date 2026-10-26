@@ -652,7 +652,7 @@ internal static class SkillProgramExecutorChecks
             IReadOnlyList<SkillProgramCardCategory>? categories = null,
             IReadOnlyList<EquipmentSlot>? equipmentSlots = null,
             IReadOnlyList<CardKind>? cardKinds = null,
-            string? matchSuitOfBind = null) =>
+            string? matchSuitOfBind = null, bool availableAtSourceOnly = false) =>
             Calls.Add($"filter-bound:{sourceBind}:{resultBind}:{string.Join(',', suits)}");
 
         public SkillProgramStepOutcome SelectCardSubset(

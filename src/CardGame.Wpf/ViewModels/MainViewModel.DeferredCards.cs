@@ -85,7 +85,7 @@ public sealed partial class MainViewModel
         var choosingHandIds = _snapshot.PendingDecision?.Choices
             .Where(choice => choice.Parameters.GetValueOrDefault("program-action") == "private-hand-take")
             .SelectMany(choice => choice.Cards).ToHashSet() ?? [];
-        foreach (var card in (_snapshot.PrivateRevealedCards ?? []).Where(card => !IsDeckReorderPending && !choosingHandIds.Contains(card.Id)))
+        foreach (var card in (_snapshot.PrivateRevealedCards ?? []).Where(card => !IsDeckReorderPending && !IsCardExchangePending && !choosingHandIds.Contains(card.Id)))
             PrivatelyViewedCards.Add(CreateViewedCard(card, privateView: true));
         RaisePropertyChanged(nameof(HasPrivatelyViewedCards));
         RaisePropertyChanged(nameof(PrivateRevealTitle));

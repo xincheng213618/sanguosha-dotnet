@@ -43,8 +43,8 @@ internal sealed partial class WushuangModeFeature
                 (2156, SkillRuleQuery.SlashLimit) when _host.RoundNumber >= 3 => 1,
                 (2157, SkillRuleQuery.SlashLimit) when _host.RoundNumber >= 4 => 1,
                 (2158, SkillRuleQuery.SlashLimit) when _host.RoundNumber >= 7 => 1,
-                (2164, SkillRuleQuery.DrawCount) when owner.Hp <= 3 => 1,
-                (2165, SkillRuleQuery.DrawCount) when owner.Hp <= 5 => 1,
+                (2164, SkillRuleQuery.DrawCount) when owner.Hp is <= 3 => 1,
+                (2165, SkillRuleQuery.DrawCount) when owner.Hp is <= 5 => 1,
                 (2282, SkillRuleQuery.SlashLimit) when progress.Tokens >= 3 => 1,
                 (2283, SkillRuleQuery.DrawCount) when progress.Tokens >= 7 => 1,
                 (2284, SkillRuleQuery.HandLimit) when progress.Tokens >= 3 => 1,
@@ -71,8 +71,8 @@ internal sealed partial class WushuangModeFeature
         if (attack.IsSourceLess || attack.IsChainPropagation ||
             !_players.TryGetValue(attack.SourceSeat, out var source)) return 0;
         var hp = _host.Player(attack.SourceSeat).Hp;
-        var bonus = (source.Tactics.Contains(2162) && hp <= 2 ? 1 : 0) +
-            (source.Tactics.Contains(2163) && hp <= 3 ? 1 : 0);
+        var bonus = (source.Tactics.Contains(2162) && hp is <= 2 ? 1 : 0) +
+            (source.Tactics.Contains(2163) && hp is <= 3 ? 1 : 0);
         if (attack.CardUserSeat == attack.SourceSeat && attack.EffectiveCardKind is { } kind && _host.IsSlash(kind))
             bonus += (source.Tactics.Contains(2150) && _host.RoundNumber >= 3 ? 1 : 0) +
                 (source.Tactics.Contains(2151) && _host.RoundNumber >= 5 ? 1 : 0) +

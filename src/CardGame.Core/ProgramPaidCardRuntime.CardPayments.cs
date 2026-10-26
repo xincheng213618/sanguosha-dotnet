@@ -355,8 +355,8 @@ internal sealed partial class ProgramPaidCardRuntime
             _operations.Give(frame, ownerSeat, card, source, destination, reason, effect.Destination == SkillProgramCardDestination.SelectedTargetHand, disclosure);
         else if (effect.Destination == SkillProgramCardDestination.SelectedTargetHand)
         {
-            _operations.Move(card, source, CardLocation.Processing, reason, disclosure: disclosure);
-            _operations.Move(card, CardLocation.Processing, destination, reason, disclosure: disclosure);
+            if (_operations.MoveToProcessing(frame, card, source, reason, disclosure))
+                _operations.Move(card, CardLocation.Processing, destination, reason, disclosure: disclosure);
         }
         else _operations.Move(card, source, destination, reason, disclosure: disclosure);
         _operations.CompleteLogicalDiscard(discardInvocation);
@@ -493,8 +493,8 @@ internal sealed partial class ProgramPaidCardRuntime
             _operations.Give(frame, ownerSeat, card, source, destination, reason, effect.Destination == SkillProgramCardDestination.SelectedTargetHand, disclosure);
         else if (effect.Destination == SkillProgramCardDestination.SelectedTargetHand)
         {
-            _operations.Move(card, source, CardLocation.Processing, reason, disclosure: disclosure);
-            _operations.Move(card, CardLocation.Processing, destination, reason, disclosure: disclosure);
+            if (_operations.MoveToProcessing(frame, card, source, reason, disclosure))
+                _operations.Move(card, CardLocation.Processing, destination, reason, disclosure: disclosure);
         }
         else _operations.Move(card, source, destination, reason, disclosure: disclosure);
         _operations.CompleteLogicalDiscard(discardInvocation);

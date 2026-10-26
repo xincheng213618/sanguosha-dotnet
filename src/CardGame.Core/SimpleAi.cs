@@ -38,6 +38,7 @@ public sealed partial class SimpleAiBrain
     }
 
     public int Seat { get; }
+    internal int PolicyVersion => _policyVersion;
 
     public void ObserveRecast(int turnNumber, int cardId)
     {
@@ -318,6 +319,8 @@ public sealed partial class SimpleAiBrain
         var score = ScoreShortPlanAction(view, self, role, action, legalActions,
             ScoreDuelReadiness(view, self, action,
                 ScoreSkillAwareAction(view, self, action, baseline)), damagePrediction);
+        if (_policyVersion >= AiDecisionPolicy.WushuangStrategyVersion && view.Wushuang is not null)
+            return ScoreWushuangCombatAction(view, self, role, action, legalActions, score, damagePrediction);
         if (_policyVersion >= AiDecisionPolicy.RebelCoordinationVersion)
             return ScoreRebelCoordinationAction(view, self, role, action, legalActions, score, damagePrediction);
         if (_policyVersion >= AiDecisionPolicy.RebelPressureVersion && role == Role.Rebel)
@@ -349,8 +352,10 @@ public sealed partial class SimpleAiBrain
         }
 
         var self = view.Players.Single(player => player.Seat == Seat);
-        var selectableCards = GetActiveSkillSelectableCards(self, action);
+        var selectableCards = GetActiveSkillSelectableCards(view, self, action);
         double KeepValue(CardSnapshot card) => GetPolicyCardKeepValue(view, self, card);
+        if (action.SelectableCardGroupTargets is not null)
+            return ChoosePublishedCardGroup(view, action, selectableCards, KeepValue);
         if (action.ProgramAiHint?.ArbitraryOwnedRecastInput == true)
             return selectableCards.OrderBy(KeepValue).ThenBy(card => card.Id)
                 .Take(Math.Min(action.MaxCardCount, Math.Max(1, self.HandCount - self.Hp))).Select(card => card.Id).ToArray();
@@ -414,6 +419,7 @@ public sealed partial class SimpleAiBrain
             : CardCatalog.Get(card.Kind).HandKeepValue;
 
     private static IReadOnlyList<CardSnapshot> GetActiveSkillSelectableCards(
+        GameSnapshot view,
         PlayerSnapshot self,
         LegalAction action)
     {
@@ -423,11 +429,21 @@ public sealed partial class SimpleAiBrain
         }
 
         var selectable = action.SelectableCardIds.ToHashSet();
+        // Some published actions pay from the skill owner's public pile, such
+        // as removing another character's Xiansi cards. The acting seat does
+        // not own those entities, but their faces and exact issued IDs are public.
+        var source = action.ProgramSkillOwnerSeat is { } ownerSeat
+            ? view.Players.SingleOrDefault(player => player.Seat == ownerSeat) : self;
         return self.Hand
             .Concat(self.WoodenOxGrain ?? [])
             .Concat(self.Equipment)
             .Concat(self.AuthorityCards ?? [])
+            .Concat(source?.AuthorityCards ?? [])
+            .Concat(source?.ChunlaoCards ?? [])
+            .Concat(source?.PublicPersistentPileCards ?? [])
+            .Concat(source?.PublicPersistentPiles?.SelectMany(pile => pile.Cards) ?? [])
             .Where(card => selectable.Contains(card.Id))
+            .DistinctBy(card => card.Id)
             .ToArray();
     }
 
@@ -442,6 +458,7 @@ public sealed partial class SimpleAiBrain
         GameSnapshot view,
         LegalAction action)
         => ChooseActiveSkillTargets(view, action,
+            action.SelectableCardGroupTargets is not null ||
             _policyVersion >= AiDecisionPolicy.CorrelatedActiveSkillVersion && action.SelectableCardTargets is not null
                 ? ChooseActiveSkillCards(view, action) : []);
 
@@ -473,6 +490,15 @@ public sealed partial class SimpleAiBrain
 
         var self = view.Players.Single(player => player.Seat == Seat);
         var selfRole = self.Role ?? Role.Renegade;
+        if (action.SelectableCardGroupTargets is { } groups)
+        {
+            var ids = selectedCardIds.Order().ToArray();
+            var compatible = groups.Where(group => group.CardIds.Order().SequenceEqual(ids))
+                .Select(group => group.TargetSeat).ToHashSet();
+            candidates = candidates.Where(target => compatible.Contains(target.Seat)).ToArray();
+            if (candidates.Length < action.MinTargetCount)
+                throw new InvalidOperationException("The prepared material group has no published compatible target.");
+        }
         if (action.Kind == LegalActionKind.UseProgramSkill)
         {
             var hint = action.ProgramAiHint ?? throw new InvalidOperationException(
@@ -601,6 +627,8 @@ public sealed partial class SimpleAiBrain
             ? CardCatalog.Get(CardKind.BaguaFormation).AiPlayValue + 35d
             : CardCatalog.Get(CardKind.BaguaFormation).AiPlayValue + hpPressure * 8d;
         var passScore = critical ? -100d : 5d;
+        var injuryValue = WushuangSafeInjuryValue(view, self, attackerSeat, incomingPrediction, hasDodge);
+        if (!critical) passScore += injuryValue;
         if (!hasDodge)
         {
             useDodgeScore = double.NegativeInfinity;
@@ -644,7 +672,7 @@ public sealed partial class SimpleAiBrain
         candidates.Add(new AiCandidateScore(
             pseudoAction with { Description = "不出闪" },
             passScore,
-            "保留响应资源，接受这次伤害。"));
+            injuryValue > 0 ? "保留合法防御牌，以已知安全的一点普通伤害换取当前构筑的受伤收益。" : "保留响应资源，接受这次伤害。"));
 
         var thought = new AiThoughtRecord(
             thoughtSequence,
@@ -2191,7 +2219,7 @@ public sealed partial class SimpleAiBrain
 
         var correlatedInputs = _policyVersion >= AiDecisionPolicy.CorrelatedActiveSkillVersion &&
             (action.SelectableCardTargets is not null || action.SelectableTargetSequences is not null);
-        var selectableCards = GetActiveSkillSelectableCards(self, action);
+        var selectableCards = GetActiveSkillSelectableCards(view, self, action);
         var selectedCardIds = correlatedInputs || _policyVersion >= AiDecisionPolicy.TacticalPlanningVersion
             ? ChooseActiveSkillCards(view, action) : null;
         var selectedCards = selectedCardIds is not null
@@ -2250,7 +2278,8 @@ public sealed partial class SimpleAiBrain
         var harm = Math.Max(0, payment.HpLossAmount) * 24d + Math.Max(0, payment.ArmorAbsorbed) * 8d +
                    (payment.IsLethal && (payment.HpLossAmount > 0 || payment.MaximumHpLossAmount > 0) ? 32d : 0d);
         var give = hint.GivesSelected ? 6d : 0d;
-        return support * (benefit + give) / 25d + hostility * harm / 25d;
+        return ScoreWushuangDeferredPhaseTarget(view, target, hint) ??
+            (support * (benefit + give) / 25d + hostility * harm / 25d);
     }
 
     private void ResetProgramUseCounts(int turnNumber)
@@ -2271,7 +2300,8 @@ public sealed partial class SimpleAiBrain
         if (TryScoreWumiaoFlood(view, self, selfRole, action, out var floodScore)) return floodScore;
         if (TryScoreGuanduCard(view, self, selfRole, action, out var guanduScore)) return guanduScore;
         if (TryScoreDragonBoatCard(view, self, selfRole, action, out var dragonBoatScore)) return dragonBoatScore;
-        if (action.TieredRoundZeroUse is not null) return ScoreTieredRoundZeroAction(view, self, selfRole, action);
+        if (action.TieredRoundZeroUse is not null || action.RoundOnceCardlessBasicUse is not null)
+            return ScoreTieredRoundZeroAction(view, self, selfRole, action);
         if (action.ChainedStateBasicUse.HasValue) return ScoreChainedStateBasicAction(view, self, selfRole, action);
         if (action.DrawFundedDistinctBasicUse is not null) return ScoreDrawFundedDistinctBasicAction(view, self, selfRole, action);
         if (action.Kind == LegalActionKind.UseProgramSkill)
@@ -2284,8 +2314,11 @@ public sealed partial class SimpleAiBrain
         if (action.Kind == LegalActionKind.UseEquipmentEffect &&
             action.EquipmentKind == CardKind.ZhangbaSerpentSpear)
         {
+            var preparedIds = action.SelectableCardGroupTargets is not null ? ChooseActiveSkillCards(view, action) : null;
+            var preparedTargets = preparedIds is not null ? ChooseActiveSkillTargets(view, action, preparedIds) : null;
             var equipmentTarget = view.Players
-                .Where(player => player.IsAlive && action.SelectableTargetSeats.Contains(player.Seat))
+                .Where(player => player.IsAlive && action.SelectableTargetSeats.Contains(player.Seat) &&
+                    (preparedTargets is null || preparedTargets.Contains(player.Seat)))
                 .OrderByDescending(player => GetHostility(view, selfRole, player))
                 .ThenBy(player => player.Hp)
                 .ThenBy(player => player.Seat)
@@ -2296,9 +2329,9 @@ public sealed partial class SimpleAiBrain
             }
 
             var equipmentHostility = GetHostility(view, selfRole, equipmentTarget);
-            var spearCards = GetActiveSkillSelectableCards(self, action);
-            var spearPaymentIds = _policyVersion >= AiDecisionPolicy.TacticalPlanningVersion
-                ? ChooseActiveSkillCards(view, action) : null;
+            var spearCards = GetActiveSkillSelectableCards(view, self, action);
+            var spearPaymentIds = preparedIds ?? (_policyVersion >= AiDecisionPolicy.TacticalPlanningVersion
+                ? ChooseActiveSkillCards(view, action) : null);
             var spearPayments = spearPaymentIds is not null
                 ? spearCards.Where(card => spearPaymentIds.Contains(card.Id))
                 : spearCards.OrderBy(card => CardCatalog.Get(card.Kind).HandKeepValue)
@@ -2313,7 +2346,7 @@ public sealed partial class SimpleAiBrain
         if (action.Kind == LegalActionKind.UseEquipmentEffect &&
             action.EquipmentKind == CardKind.WoodenOx)
         {
-            var stored = GetActiveSkillSelectableCards(self, action)
+            var stored = GetActiveSkillSelectableCards(view, self, action)
                 .OrderBy(card => GetPolicyCardKeepValue(view, self, card))
                 .ThenBy(card => card.Id)
                 .FirstOrDefault();
@@ -2334,7 +2367,7 @@ public sealed partial class SimpleAiBrain
         var cardProfile = CardCatalog.Get(playedCardKind);
         if (TryScoreWenheCard(view, self, selfRole, action, cardProfile, out var wenheScore)) return wenheScore;
 
-        if (action.Kind == LegalActionKind.Slash && action.TargetSeats.Count > 1)
+        if (action.Kind == LegalActionKind.Slash && action.CardId is > 0 && action.TargetSeats.Count > 1)
         {
             return ScoreFangtianHalberdSlash(view, self, selfRole, action, damagePrediction);
         }

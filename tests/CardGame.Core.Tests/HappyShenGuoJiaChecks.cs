@@ -8,6 +8,31 @@ internal static class HappyShenGuoJiaChecks
 {
     private const string Hero = "happy:shen-guo-jia", Huishi = "happy:huishi", Gift = "happy:huishi-gift", Tianyi = "happy:tianyi", Zuoxing = "happy:zuoxing",
         Driver = "fixture:happy-guojia-driver", Quiet = "fixture:happy-guojia-quiet", Watch = "fixture:happy-guojia-watch", Peer = "fixture:happy-guojia-peer", Deck = "fixture:happy-guojia-deck";
+    public static void ZeroMaterialQizhengDamageKeepsNativeUseObserverIdentityCold()
+    {
+        var s = Scene.Start(observeMouDongCheng: true); s.Play();
+        for (var seat = 0; seat < 4; seat++) { s.Use(Driver, "hurt", [seat]); s.Play(); }
+        s.EndPlay();
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == Tianyi && s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "select-target"));
+        s.Answer(c => c.Targets.SequenceEqual([0])); s.Play();
+        s.Use(Zuoxing, "borrow-ordinary-trick"); s.Menu(Zuoxing, "use"); s.Card(CardKind.QizhengXiangsheng, 2);
+        s.Reach(() => s.G.ResolutionStack.OfType<CardUseFrame>().Any(u => u.Qizheng?.Stage == QizhengStage.Designation) && s.P?.PlayerSeat == 0);
+        s.Answer(c => c.Parameters.GetValueOrDefault("value") == "ambush");
+        s.Reach(() => s.G.ResolutionStack.OfType<CardUseFrame>().Any(u => u.Qizheng?.Stage == QizhengStage.Response));
+        var use = s.G.ResolutionStack.OfType<CardUseFrame>().Single(u => u.Qizheng is not null);
+        var hp = s.V(2).Hp;
+        s.Need(use.CardId == 0 && use.Action!.PhysicalCards.Count == 0 &&
+            s.G.CreateSnapshot(0).Players.All(p => p.GeneralId != "mou:dong-cheng"),
+            "The real Happy Zuoxing publishes a zero-material Qizheng while Mou Dong Cheng is loaded but absent from the table.");
+        s.Cold(); s.Play();
+        var seen = s.E<MouDcDamageSeenEvent>().Single(e => e.Occurrence.UseId == use.Id).Occurrence;
+        s.Need(s.V(2).Hp == hp - 1 && seen is { CardId: 0, Target: 2 } && seen.AttackId == use.Id &&
+            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == 0) == 1 &&
+            s.E<ShenGuoJiaNativeIssuedEvent>().Count(e => e.UseId == use.Id && e.Kind == CardKind.QizhengXiangsheng) == 1 &&
+            !s.G.CreateCardZoneDiagnostics().Any(c => c.CardId == 0),
+            "The global observer records the exact native use identity without inventing or looking up card zero; real damage and the parent return occur once.");
+        s.Cold(); s.Replay();
+    }
     public static void FiveSuitRevealStrictGiftAndTurnNamedNativeUsesCold()
     {
         var s = Scene.Start(); s.Play();
@@ -76,12 +101,18 @@ internal static class HappyShenGuoJiaChecks
         s.Need(s.HasCard(CardKind.DrawTwo) && s.HasCard(CardKind.Duel), "The card-name budget resets on the next actual turn.");
         s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "cancel"); s.Play(); s.Replay();
     }
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool observeMouDongCheng = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-happy-shen-guo-jia", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b, Hero);
+            if (observeMouDongCheng)
+            {
+                CharacterFixtureContent.Register(b, "mou:dong-cheng");
+                var q = CardCatalog.Get(CardKind.QizhengXiangsheng);
+                b.AddCard(new("fixture:happy-guojia-qizheng", q.DisplayName, q.CategoryName, q.Description, CardKind.QizhengXiangsheng));
+            }
             var rules = $$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
              {"id":"{{Driver}}","revision":1,"activations":[
@@ -102,7 +133,7 @@ internal static class HappyShenGuoJiaChecks
             var catalog = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, p) in catalog.Programs) b.AddSkill(new(id, id, catalog.Presentations[id].Description) { Program = p, ProgramPresentation = catalog.Presentations[id] });
             b.AddGeneral(new(Peer, "真实安静角色", "", Quiet, "wei", 6));
-            b.AddDeck(new(Deck, "固定真实展示牌", 0, 0, []) { PhysicalCards = Enumerable.Range(0, 64).Select(i => new ContentDeckPhysicalCard("standard:slash", new[] { Suit.Spade, Suit.Heart, Suit.Club, Suit.Diamond }[i % 4], i % 13 + 1)).ToArray() });
+            b.AddDeck(new(Deck, "固定真实展示牌", 0, 0, []) { PhysicalCards = Enumerable.Range(0, 64).Select(i => new ContentDeckPhysicalCard(observeMouDongCheng ? "standard:dodge" : "standard:slash", new[] { Suit.Spade, Suit.Heart, Suit.Club, Suit.Diamond }[i % 4], i % 13 + 1)).ToArray() });
             b.AddMode(new(ShanheBattleSetup.BattleModeId, "欢乐郭嘉本体小局", 4, 4, new Dictionary<string, int>(), Deck, GeneralPoolIds: [Hero, Peer], ModeKind: ContentModeKind.Team,
                 TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 2, [ShanheBattleSetup.EnemyTeamId] = 2 }));
         }
@@ -141,9 +172,9 @@ internal static class HappyShenGuoJiaChecks
         public void Replay() { var before = State(); G = GameReplay.Replay(G.CreateCheckpoint().Options, G.AcceptedCommands, registry); Need(before == State(), "Replay preserves actual five-card packets, maximum payments, granted instances and successful turn-name use facts."); }
         private void Accept(GameCommand c) { var r = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single()); Need(r.Accepted, r.Error?.Message ?? "Rejected Happy Guo Jia command."); }
         public void Need(bool ok, string message) { if (!ok) throw new InvalidOperationException(message + JsonSerializer.Serialize(new { G.State.TurnNumber, G.State.CurrentSeat, P, Facts = G.Events.TakeLast(6).Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())) })); }
-        public static Scene Start()
+        public static Scene Start(bool observeMouDongCheng = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(observeMouDongCheng));
             var setup = new ShanheBattleSetup(37, 1, "happy-guo-jia", Hero, 3, 0, 0, 0, 0, [Driver, Watch], [], [],
                 [new(Peer) { StartingHand = [] }, new(Peer) { StartingHand = [] }], [new(Peer) { StartingHand = [] }], new string('9', 64)) { DefaultGodFactionId = "wei" };
             var game = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,

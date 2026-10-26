@@ -16,13 +16,25 @@ public sealed partial class GameEngine
             return receipt.Branch==(receipt.Stage==HappyDingzhouStage.FieldGiftChildren?1:2)&&
                 paid.Count==(receipt.RequiredReturnCount??receipt.Amount)&&receipt.Chosen.Count==paid.Count&&
                 paid.Select(m=>m.CardId).Order().SequenceEqual(receipt.Chosen.Order())&&paid.All(m=>m.From.OwnerSeat==frame.OwnerSeat&&
-                    m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment&&m.To==CardLocation.Hand(receipt.TargetSeat));
+                    m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment&&HappyDingzhouHandDestination(m,receipt.TargetSeat));
         if(receipt.Stage==HappyDingzhouStage.HandGainChildren)
             return receipt.Branch==2&&paid.Count==receipt.Amount&&paid.Select(m=>m.CardId).Order().SequenceEqual(receipt.Obtained.Order())&&
-                paid.All(m=>m.From==CardLocation.Hand(receipt.TargetSeat)&&m.To==CardLocation.Hand(frame.OwnerSeat));
+                paid.All(m=>m.From==CardLocation.Hand(receipt.TargetSeat)&&HappyDingzhouHandDestination(m,frame.OwnerSeat));
         return receipt.Stage==HappyDingzhouStage.FieldGainChildren&&receipt.Branch==1&&paid.Select(m=>m.CardId).Order().SequenceEqual(receipt.Obtained.Order())&&
             paid.All(m=>m.From.OwnerSeat==receipt.TargetSeat&&m.From.Zone is CardZoneKind.Equipment or CardZoneKind.Judgment&&
-                m.To==(GetAdvancedCard(m.CardId).IsGeneralWeapon&&m.From.Zone==CardZoneKind.Equipment?CardLocation.OutsideGame:CardLocation.Hand(frame.OwnerSeat)));
+                HappyDingzhouHandDestination(m,frame.OwnerSeat,allowGeneralWeapon:true));
+    }
+    private bool HappyDingzhouHandDestination(ShenLuSuMoveInvoice invoice,int recipient,bool allowGeneralWeapon=false)
+    {
+        if(invoice.From.Zone==CardZoneKind.Equipment&&GetAdvancedCard(invoice.CardId).IsGeneralWeapon)
+            return allowGeneralWeapon&&invoice.To==CardLocation.OutsideGame;
+        if(invoice.To==CardLocation.Hand(recipient))return true;
+        // The exact paid record was already checked above. A generated field
+        // entity can pay this movement while its native departure destroys it.
+        // Require that producer's real destruction proof, never just OutsideGame.
+        return invoice.To==CardLocation.OutsideGame&&
+            _cardMovements.SingleOrDefault(m=>m.Sequence==invoice.Sequence&&m.CardId==invoice.CardId&&m.From==invoice.From&&m.To==invoice.To) is{}actual&&
+            IsEphemeralCardDestroyedMaterial(actual);
     }
     [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,41280)] private void AssertHappyDingzhou(ProgramSkillFrame frame)
     {

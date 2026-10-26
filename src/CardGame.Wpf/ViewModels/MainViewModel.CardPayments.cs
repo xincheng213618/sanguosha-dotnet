@@ -51,7 +51,9 @@ public sealed partial class MainViewModel
         }
     }
     private IReadOnlyList<PromptChoice> CardPaymentChoices => IsCardPaymentSelectionPending ? _cardPaymentChoices : [];
-    private bool IsCardPaymentMaterial(int? id) => IsCardPaymentSelectionPending && id is { } cardId && _paymentMaterialIds.Contains(cardId);
+    private bool IsCardPaymentMaterial(int? id) => IsCardPaymentSelectionPending && id is { } cardId && _paymentMaterialIds.Contains(cardId) &&
+        (_responseConversionSelection?.SelectByMaterials != true || _paymentCardIds.Contains(cardId) ||
+         CardPaymentChoices.Any(choice => choice.Cards.Contains(cardId) && _paymentCardIds.All(choice.Cards.Contains)));
     private PromptChoice? SelectedCardPaymentChoice
     {
         get
@@ -104,6 +106,7 @@ public sealed partial class MainViewModel
         foreach (var card in Hand) card.IsSelected = _paymentCardIds.Contains(card.Id);
         _paymentChoiceId = null;
         SelectedCardText = $"已选择 {_paymentCardIds.Count} 张牌";
+        if (_responseConversionSelection?.SelectByMaterials == true) { RefreshCurrentView(); return; }
         RefreshEquipmentMaterialSelection();
         RefreshSelectionHint();
     }

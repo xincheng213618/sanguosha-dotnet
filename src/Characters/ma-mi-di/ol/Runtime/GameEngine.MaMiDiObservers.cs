@@ -42,12 +42,22 @@ public sealed partial class GameEngine
             if (step.Index < 0 || step.Index >= r.Grants.Count * r.Targets.Count || step.GrantFrameId != r.Grants[step.Index / r.Targets.Count].FrameId || step.TargetSeat != r.Targets[step.Index % r.Targets.Count] ||
                 step.Before < 0 || step.After <= step.Before || step.After > _movementSequence || i > 0 && step.Before < r.Steps[i - 1].After ||
                 issued[i] != new MaMiDiDiscardIssuedEvent(f.Id, step.Index, step.GrantFrameId, step.TargetSeat, step.CardId, step.Kind, step.From, step.To, step.Before, step.After) ||
-                step.From.OwnerSeat != step.TargetSeat || step.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || step.To != (step.Kind == CardKind.GeneralWeapon && step.From.Zone == CardZoneKind.Equipment ? CardLocation.OutsideGame : CardLocation.DiscardPile) ||
+                step.From.OwnerSeat != step.TargetSeat || step.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) ||
+                step.To != (step.Kind == CardKind.GeneralWeapon && step.From.Zone == CardZoneKind.Equipment ? CardLocation.OutsideGame : CardLocation.DiscardPile) &&
+                    !IsMaMiDiShopEquipmentDiscard(f, step) ||
                 _cardMovements.Count(m => m.Sequence > step.Before && m.Sequence <= step.After && m.CardId == step.CardId && m.CardKind == step.Kind && m.From == step.From && m.To == step.To && m.Reason.Value == MaMiDiDiscardReason) != 1 ||
                 _cardMovements.Where(m => m.Sequence > step.Before && m.Sequence <= step.After).Any(m => !IsMaMiDiStepMovement(step, m)))
                 throw new InvalidOperationException("Bingjie lost a real target-owned HE discard or exact native Wooden Ox spill.");
         }
     }
+    private bool IsMaMiDiShopEquipmentDiscard(ProgramSkillFrame frame, MaMiDiDiscardStep step) =>
+        step.From == CardLocation.Equipment(step.TargetSeat) && step.To == CardLocation.OutsideGame &&
+        _cardMovements.Where(move => move.Sequence > step.Before && move.Sequence <= step.After &&
+            move.CardId == step.CardId && move.CardKind == step.Kind && move.From == step.From && move.To == step.To &&
+            move.Reason.Value == MaMiDiDiscardReason).ToArray() is [var movement] &&
+        IsWushuangShopDestroyedMaterial(movement) &&
+        ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Count(fact => fact.CardId == step.CardId &&
+            fact.MovementSequence == movement.Sequence && fact.ParentFrameId == frame.Id) == 1;
     private bool IsMaMiDiStepMovement(MaMiDiDiscardStep step, CardMovementRecord m) => _cardMovements.Contains(m) && m.Sequence > step.Before && m.Sequence <= step.After &&
         (m.CardId == step.CardId && m.CardKind == step.Kind && m.From == step.From && m.To == step.To && m.Reason.Value == MaMiDiDiscardReason ||
          step.Kind == CardKind.WoodenOx && step.From == CardLocation.Equipment(step.TargetSeat) && step.WoodenOxGrain.Contains(m.CardId) && m.From == CardLocation.WoodenOxGrain(step.TargetSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard);
