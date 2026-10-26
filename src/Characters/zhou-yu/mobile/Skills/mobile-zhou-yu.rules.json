@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:fanjian",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "guess-suit-and-take-gift",
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "condition": {
+            "kind": "handCountAtLeast",
+            "value": 1
+          },
+          "effects": [
+            {
+              "op": "chooseOption",
+              "target": "selectedTarget",
+              "resultBind": "guess",
+              "options": [
+                {
+                  "id": "spade"
+                },
+                {
+                  "id": "heart"
+                },
+                {
+                  "id": "club"
+                },
+                {
+                  "id": "diamond"
+                }
+              ]
+            },
+            {
+              "op": "transferRandomOwnedCard",
+              "target": "selectedTarget",
+              "resultBind": "shown",
+              "randomTransferRevealPolicy": "recipientAfterGain"
+            },
+            {
+              "op": "damage",
+              "target": "selectedTarget",
+              "amount": 1,
+              "condition": {
+                "kind": "boundCardSuitMatchesChoice",
+                "sourceBind": "shown",
+                "choiceBind": "guess",
+                "expectedValue": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

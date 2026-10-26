@@ -1,0 +1,41 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhou-yu",
+  "skills": [
+    {
+      "registrationOrder": 85800,
+      "programBundle": "mobile-zhou-yu",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:fanjian",
+        "name": "反间",
+        "description": "出牌阶段限一次，你可以令一名其他角色选择一种花色，然后该角色获得你的一张手牌并展示之；若花色不同，你对其造成1点伤害。",
+        "actionForms": "Active"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 85899,
+      "pools": {
+        "current": 85899
+      },
+      "definition": {
+        "id": "mobile:zhou-yu",
+        "name": "周瑜·移动版",
+        "portraitKey": "mobile-zhou-yu",
+        "skillId": "classic:yingzi",
+        "additionalSkillIds": [
+          "mobile:fanjian"
+        ],
+        "factionId": "wu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:zhou-yu",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

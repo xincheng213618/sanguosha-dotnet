@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:yiji", "revision": 1,
+      "triggers": [{
+        "id": "private-top-distribution", "window": "afterDamageApplied", "subject": "owner",
+        "damageOccurrence": "perDamagePoint", "optional": true,
+        "effects": [{ "op": "resolveWushuangOriginalYiji", "target": "owner" }]
+      }]
+    },
+    {
+      "id": "mobile:tiandu", "revision": 1,
+      "triggers": [{
+        "id": "claim-own-judgment", "window": "judgmentFinalized", "subject": "owner",
+        "suits": [ "spade", "club", "heart", "diamond" ], "minimumRank": 1, "maximumRank": 13,
+        "excludedReasons": [], "optional": true,
+        "effects": [{ "op": "claimJudgmentCard", "target": "owner" }]
+      }]
+    }
+  ]
+}

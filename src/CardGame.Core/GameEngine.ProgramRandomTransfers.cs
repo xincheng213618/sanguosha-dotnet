@@ -31,6 +31,10 @@ public sealed partial class GameEngine
         if (hand.Length == 0)
             throw new InvalidOperationException("A random card transfer requires an owner hand card.");
         var card = hand[_random.Next(hand.Length)];
+        var revealPolicy = RandomTransferRevealPolicy(active, resultBind);
+        if (revealPolicy == SkillProgramRandomTransferRevealPolicy.RecipientAfterGain)
+            return BeginRecipientRandomTransfer(active, targetSeat, resultBind, card);
+        if (revealPolicy is not null) throw new InvalidOperationException("Unknown random transfer reveal policy.");
         var snapshot = ToSnapshot(card);
         var reason = new CardMoveReason($"skill-program.{frame.SkillId}.transferRandomOwnedCard");
         ReplaceRuntimeTop(active with

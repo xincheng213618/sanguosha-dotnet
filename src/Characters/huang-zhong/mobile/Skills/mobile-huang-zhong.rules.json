@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:liegong",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "prohibit-designated-target-dodge",
+          "window": "cardUseTargetsFinalized",
+          "ownerRelation": "actor",
+          "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"],
+          "optional": true,
+          "priority": 1,
+          "condition": {
+            "kind": "all",
+            "children": [
+              { "kind": "cardActionActorIsCurrentTurn" },
+              { "kind": "cardActionPhaseIsPlay" },
+              {
+                "kind": "any",
+                "children": [
+                  { "kind": "compare", "left": { "kind": "eventTargetHandCount" }, "operator": "greaterThanOrEqual", "right": { "kind": "currentHp" } },
+                  { "kind": "compare", "left": { "kind": "eventTargetHandCount" }, "operator": "lessThanOrEqual", "right": { "kind": "currentAttackRange" } }
+                ]
+              }
+            ]
+          },
+          "effects": [
+            { "op": "prohibitCurrentResponse", "target": "owner" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -260,6 +260,8 @@ public sealed record SkillProgramChoiceOption(string Id, SkillProgramCondition C
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SkillProgramTargetKind? RequiredTargetKind { get; init; }
 }
+public enum SkillProgramRandomTransferRevealPolicy { RecipientAfterGain = 0 }
+
 public enum SkillProgramEffectOp
 {
     ResolveBoundaryManChongJunxing = 53000,
@@ -2991,6 +2993,8 @@ public sealed partial class SkillProgramEffect
     public bool? AvailableAtSourceOnly { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? SlashRedirectPostCostRange { get; internal init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public SkillProgramRandomTransferRevealPolicy? RandomTransferRevealPolicy { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? OwnerBind { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -5778,9 +5782,18 @@ public sealed class SkillProgramCatalog
         if (EnumerateTriggerValues(condition).Any(value => value.Kind == SkillProgramTriggerValueKind.CardUseDesignatedTargetCount) &&
             (!isCardActionWindow || window == SkillProgramTriggerWindow.CardResponseAccepted))
             Fail(path + ".condition", "cardUseDesignatedTargetCount requires a card-use trigger");
+        var finalTargetResponse = window == SkillProgramTriggerWindow.CardUseTargetsFinalized &&
+            ownerRelation == SkillProgramCardActionOwnerRelation.Actor && cardKinds.Count == 4 &&
+            cardKinds.Contains(CardKind.Slash) && cardKinds.Contains(CardKind.FireSlash) &&
+            cardKinds.Contains(CardKind.ThunderSlash) && cardKinds.Contains(CardKind.ColdSlash) &&
+            finalEffects.ValueKind == JsonValueKind.Array && finalEffects.EnumerateArray().Any(effect =>
+                effect.ValueKind == JsonValueKind.Object && effect.TryGetProperty("op", out var responseOp) &&
+                responseOp.ValueKind == JsonValueKind.String &&
+                string.Equals(responseOp.GetString(), "prohibitCurrentResponse", StringComparison.OrdinalIgnoreCase));
         if (EnumerateTriggerValues(condition).Any(value => value.Kind == SkillProgramTriggerValueKind.EventTargetHandCount) &&
-            window is not (SkillProgramTriggerWindow.SlashBeforeResponse or SkillProgramTriggerWindow.TurnEnding) && !finalTargetSlash)
-            Fail(path + ".condition", "target-hand comparison requires a Slash response or turn-ending boundary");
+            window is not (SkillProgramTriggerWindow.SlashBeforeResponse or SkillProgramTriggerWindow.TurnEnding) &&
+            !finalTargetSlash && !finalTargetResponse)
+            Fail(path + ".condition", "target-hand comparison requires a Slash response, finalized Slash response policy or turn-ending boundary");
         if (EnumerateTriggerValues(condition).Any(value => value.Kind == SkillProgramTriggerValueKind.CurrentAttackRange) &&
             window is not (SkillProgramTriggerWindow.SlashBeforeResponse or
                 SkillProgramTriggerWindow.CardUseCommitted or SkillProgramTriggerWindow.CardResponseAccepted or SkillProgramTriggerWindow.JudgmentPhaseStarting or

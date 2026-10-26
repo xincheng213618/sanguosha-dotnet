@@ -24189,6 +24189,91 @@
           "pixelHeight": 761
         }
       ]
+    },
+    {
+      "key": "mobile-guo-jia",
+      "characterName": "郭嘉",
+      "defaultSkinId": "2000",
+      "skins": [
+        {
+          "id": "2000",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-20.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/2000.jpg",
+          "sha256": "347611cfb8c215920896c726fb0fe2ec3c50d4a66f6bdc848c81b0bd45c8fb5a",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-guo-jia.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhou-yu",
+      "characterName": "周瑜",
+      "defaultSkinId": "1200",
+      "skins": [
+        {
+          "id": "1200",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-12.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/1200.jpg",
+          "sha256": "4c6f5ee76028a3d23ec123d0ebdb0bdf7a968142e0efd4068ec5597f978af50a",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhou-yu.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-huang-zhong",
+      "characterName": "黄忠",
+      "defaultSkinId": "2600",
+      "skins": [
+        {
+          "id": "2600",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-26.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/2600.jpg",
+          "sha256": "9bde705d9c16e0dd9af8a7e4fe77dd6a794a973d909fbb36fae2bff0517452b4",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-huang-zhong.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-pang-de",
+      "characterName": "庞德",
+      "defaultSkinId": "3900",
+      "skins": [
+        {
+          "id": "3900",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-39.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/3900.jpg",
+          "sha256": "b1b09d54b8b428f9c1337d5de74afd1358be847af60cf67f7c76d1b95ee7e549",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-pang-de.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-sun-jian",
+      "characterName": "孙坚",
+      "defaultSkinId": "4400",
+      "skins": [
+        {
+          "id": "4400",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-44.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/4400.jpg",
+          "sha256": "19aac5d69c771109cabb6711434a20d46e741a539cdf7822664555ac4e5f10f2",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-sun-jian.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

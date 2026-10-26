@@ -51,12 +51,14 @@ internal sealed class TransferRandomOwnedCardProgramOperationDescriptor : Progra
         static (effect, context) => context.TransferRandomOwnedCard(effect));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "resultBind", "condition");
+        r.AllowOnly("op", "target", "resultBind", "condition", "randomTransferRevealPolicy");
         var target = r.RequiredEnum<SkillProgramEffectTarget>("target");
         if (target != SkillProgramEffectTarget.SelectedTarget)
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: a random owned-card transfer requires one target.");
         var effect = new SkillProgramEffect(Op, target, 0, r.Condition(),
-            resultBind: r.RequiredIdentifier("resultBind"));
+            resultBind: r.RequiredIdentifier("resultBind"))
+        { RandomTransferRevealPolicy = r.Has("randomTransferRevealPolicy")
+            ? r.RequiredEnum<SkillProgramRandomTransferRevealPolicy>("randomTransferRevealPolicy") : null };
         RequireAlways(effect, r.Path);
         return effect;
     }

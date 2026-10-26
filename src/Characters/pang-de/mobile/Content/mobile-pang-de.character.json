@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:pang-de",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 86099,
+      "pools": { "current": 86099 },
+      "definition": {
+        "id": "mobile:pang-de",
+        "name": "庞德·移动版",
+        "portraitKey": "mobile-pang-de",
+        "skillId": "classic:mashu",
+        "additionalSkillIds": ["classic:mengjin"],
+        "factionId": "qun",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:pang-de",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}
