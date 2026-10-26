@@ -35,8 +35,12 @@ public sealed partial class MainViewModel
     public string ShanheMarketSurchargeNotice => IsShanheShopActive && _shanheSession!.CreateCheckpoint().Options.UseCodexRewardPool &&
         SelectedShanheMarketCategory is "战法" or "装备" or "卡牌" or "技能"
         ? $"每购买一次{SelectedShanheMarketCategory}，本店同类商品额外消耗铜币 +100" : "货品及价格以当前商店为准";
-    public string ShanheMarketRefreshText => $"刷新 · {_shanheSession?.Snapshot.ShopRefreshCost ?? 100} 铜币";
-    public string ShanheMarketRefreshRemaining => IsShanheShopActive ? $"剩余刷新次数：{_shanheSession!.Snapshot.ShopRefreshRemaining}" : "到达集市后可刷新货品";
+    public string ShanheMarketRefreshText => _shanheSession?.Snapshot.ShopFreeRefreshRemaining > 0 ? "免费刷新" :
+        _shanheSession?.Snapshot.ShopRefreshCost is int cost && cost > 0 ? $"刷新 · {cost} 铜币" : "刷新";
+    public string ShanheMarketFreeRefreshRemaining => $"免费刷新：{_shanheSession?.Snapshot.ShopFreeRefreshRemaining ?? 0} 次";
+    public string ShanheMarketPaidRefreshRemaining => $"付费刷新：{_shanheSession?.Snapshot.ShopPaidRefreshRemaining ?? 0} 次";
+    public string ShanheMarketRefreshRemaining => IsShanheShopActive
+        ? $"{ShanheMarketFreeRefreshRemaining} · {ShanheMarketPaidRefreshRemaining}" : "到达集市后可刷新货品";
     private RelayCommand? _refreshShanheMarketCommand;
     public ICommand RefreshShanheMarketCommand => _refreshShanheMarketCommand ??= new RelayCommand(() =>
     {
@@ -47,7 +51,8 @@ public sealed partial class MainViewModel
     private void RefreshShanheMarketPresentation()
     {
         foreach (var property in new[] { nameof(ShanheMarketGoods), nameof(ShanheMarketHasGoods), nameof(ShanheMarketCategoryNotice),
-            nameof(ShanheMarketSurchargeNotice), nameof(ShanheMarketRefreshText), nameof(ShanheMarketRefreshRemaining) }) RaisePropertyChanged(property);
+            nameof(ShanheMarketSurchargeNotice), nameof(ShanheMarketRefreshText), nameof(ShanheMarketRefreshRemaining),
+            nameof(ShanheMarketFreeRefreshRemaining), nameof(ShanheMarketPaidRefreshRemaining) }) RaisePropertyChanged(property);
         _refreshShanheMarketCommand?.NotifyCanExecuteChanged();
     }
 }

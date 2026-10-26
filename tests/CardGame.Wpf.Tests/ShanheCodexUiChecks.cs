@@ -11,7 +11,7 @@ using CardGame.Wpf.Controls;
 using CardGame.Wpf.Persistence;
 using CardGame.Wpf.ViewModels;
 
-internal static class ShanheCodexUiChecks
+internal static partial class ShanheCodexUiChecks
 {
     public static void UnlockEquipPersistAndMarket(string output)
     {
