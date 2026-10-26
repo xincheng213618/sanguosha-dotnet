@@ -11,7 +11,10 @@ internal static class ShanheCycleLoadoutChecks
             ("tactic-xuezhan-current-2265", StandardShanheRoundRecoveryPackage.Xuezhan2SkillId, 700, 2),
             ("build-skill-3128", "boundary:tishen", 300, 0),
             ("build-skill-3199", "boundary:zhaxiang", 600, 0),
-            ("build-skill-3291", StandardShanheDingcuoPackage.SkillId, 300, 0)
+            ("build-skill-3291", StandardShanheDingcuoPackage.SkillId, 300, 0),
+            ("build-skill-3076", StandardShanheGuanchaoPackage.SkillId, 600, 0),
+            ("build-skill-3153", "ol:luanzhan", 1000, 0),
+            ("build-skill-3092", "ol:guanwei", 600, 0)
         }) CheckLivePurchase(rewardId, skillId, price, maximumReduction);
     }
 

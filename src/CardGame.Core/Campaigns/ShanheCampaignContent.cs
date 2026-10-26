@@ -21,6 +21,7 @@ public static partial class ShanheCampaignContent
         Require(definition.Nodes!.All(n => n is not null) && definition.Rewards!.All(r => r is not null), "Content entries cannot be null.");
         UniqueIds(definition.Nodes.Select(n => n.Id), "node");
         UniqueIds(definition.Rewards.Select(r => r.Id), "reward");
+        ValidateSchools(definition);
         var nodeIds = definition.Nodes.Select(n => n.Id).ToHashSet(StringComparer.Ordinal);
         var rewardIds = definition.Rewards.Select(r => r.Id).ToHashSet(StringComparer.Ordinal);
         Require(definition.StartingNodeIds.All(nodeIds.Contains), "An entry references an unknown node.");

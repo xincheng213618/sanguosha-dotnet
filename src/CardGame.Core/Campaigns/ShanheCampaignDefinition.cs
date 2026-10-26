@@ -130,7 +130,7 @@ public sealed record ShanheEncounterDefinition(
     public ShanheBossTransition? BossTransition { get; init; }
 }
 
-public sealed record ShanheRewardDefinition(
+public sealed partial record ShanheRewardDefinition(
     string Id, string Name, int Gold = 0, int Heal = 0, ShanheTacticBonuses? Bonuses = null,
     string? SkillId = null, IReadOnlyList<ShanheStartingCard>? StartingCards = null,
     IReadOnlyList<ShanheStartingCard>? StartingEquipment = null, int AddSkillSlots = 0)
@@ -188,7 +188,7 @@ public sealed record ShanheNodeDefinition(
 }
 
 /// <summary>One named edition and difficulty. Sources and narrative belong to content, not the view model.</summary>
-public sealed record ShanheCampaignDefinition(
+public sealed partial record ShanheCampaignDefinition(
     string Id, string Name, IReadOnlyList<string> PlayerGeneralIds, IReadOnlyList<string> StartingNodeIds,
     IReadOnlyList<ShanheNodeDefinition> Nodes, IReadOnlyList<ShanheRewardDefinition> Rewards,
     int StartingGold = 0, int ExtraSkillSlots = 2, ShanheTacticBonuses? StartingBonuses = null)

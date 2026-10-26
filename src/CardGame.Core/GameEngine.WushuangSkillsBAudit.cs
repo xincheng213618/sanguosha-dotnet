@@ -6,7 +6,7 @@ public sealed record WushuangDiscardPhaseBoundaryEvent(int TurnNumber, int Actor
 public sealed partial class GameEngine
 {
     private const string BJiushi = "wushuang:skill-3269", BGuzheng = "wushuang:skill-3139", BFuqi = "wushuang:skill-3100",
-        BDuwu = "wushuang:skill-3062", BGuanchao = "wushuang:skill-3076", BLonghun = "wushuang:skill-3023";
+        BDuwu = "wushuang:skill-3062", BLonghun = "wushuang:skill-3023";
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 61201)]
     private void ObserveWushuangBAudit(IGameEvent payload)
@@ -83,12 +83,4 @@ public sealed partial class GameEngine
         AdvanceRuntimeProgram(f.Id); return true;
     }
 
-    private (bool Ascending, int PhaseEventIndex)? WushuangGuanchaoPattern(int owner)
-    {
-        var facts = CompleteProgramEventHistory().ToArray();
-        var turn = Array.FindLastIndex(facts, e => e is TurnStartedEvent);
-        var choice = facts.Skip(turn + 1).OfType<ProgramGuanchaoPatternChosenEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.SkillId == BGuanchao);
-        var phase = Array.FindLastIndex(facts, e => e is PhaseChangedEvent);
-        return choice is null || owner != _currentSeat ? null : (choice.Ascending, phase);
-    }
 }

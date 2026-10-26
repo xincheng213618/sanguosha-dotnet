@@ -28,7 +28,7 @@
               "zones": ["hand", "equipment"],
               "count": 1,
               "destination": "discardPile",
-              "skipIfNoCards": true
+              "awaitMovementTriggers": true
             },
             {
               "op": "draw",

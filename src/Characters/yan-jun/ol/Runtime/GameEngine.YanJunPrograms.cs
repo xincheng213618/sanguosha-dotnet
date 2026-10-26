@@ -5,7 +5,11 @@ namespace CardGame.Core;
 public sealed record ProgramGuanchaoPatternChosenEvent(long FrameId, string SkillId, string BindingId,
     int OwnerSeat, int PhaseEventIndex, bool Ascending) : IGameEvent;
 public sealed record ProgramGuanchaoRankDrawEvent(long FrameId, string SkillId, string BindingId,
-    int OwnerSeat, int TurnNumber, int Rank, bool Drew) : IGameEvent;
+    int OwnerSeat, int TurnNumber, int Rank, bool Drew) : IGameEvent
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public long CardActionId { get; init; }
+}
 
 // 逊贤 evidence: one scalar per used/played card that finished into the discard
 // pile, attributed while the acting use frame is still live; the gift itself is

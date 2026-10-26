@@ -50,8 +50,8 @@ public static partial class StandardShanheCampaignCatalog
     });
 
     public static ShanheCampaignDefinition CreateDefinition(int difficulty, string editionId) =>
-        WithStartingResourcesContract(WithChapterRewards(CreateCurrentBaseDefinition(difficulty, editionId)),
-            categorizeNormalRewards: editionId == Returning2026EditionId);
+        WithCurrentSchools(WithStartingResourcesContract(WithChapterRewards(CreateCurrentBaseDefinition(difficulty, editionId)),
+            categorizeNormalRewards: editionId == Returning2026EditionId));
 
     private static ShanheCampaignDefinition CreateCurrentBaseDefinition(int difficulty, string editionId) => editionId switch
     {

@@ -26,6 +26,7 @@ public sealed class GuanchaoChoosePatternHandler : ISkillProgramEffectHandler
 internal sealed class GuanchaoRankDrawDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.GuanchaoRankDraw;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
     public override ISkillProgramEffectHandler Handler { get; } = new GuanchaoRankDrawHandler();
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.AdjustNormalDraw,
         static (effect, context) => context.Draw(new(SkillProgramEffectOp.Draw, SkillProgramEffectTarget.Owner, 1, effect.Condition)));

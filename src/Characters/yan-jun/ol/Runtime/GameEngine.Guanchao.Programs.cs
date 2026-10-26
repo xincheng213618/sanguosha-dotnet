@@ -6,15 +6,34 @@ public sealed partial class GameEngine
     // The committed pattern is active only while its play-phase boundary is
     // still the owner's latest one; an extra play phase in the same turn never
     // inherits an earlier choice because every entry enqueues its own boundary.
-    private (bool Ascending, int PhaseEventIndex)? CurrentGuanchaoPattern(int ownerSeat)
+    private (bool Ascending, int PhaseEventIndex)? CurrentGuanchaoPattern(int ownerSeat, string skillId)
     {
         var facts = CompleteProgramEventHistory().ToArray();
         var phaseIndex = Array.FindLastIndex(facts, e => e is PhaseChangedEvent phase &&
             phase.Phase == TurnPhase.Play && phase.ActorSeat == ownerSeat);
         var choice = facts.OfType<ProgramGuanchaoPatternChosenEvent>().LastOrDefault(e =>
-            e.OwnerSeat == ownerSeat && e.PhaseEventIndex == phaseIndex);
+            e.OwnerSeat == ownerSeat && e.SkillId == skillId && e.PhaseEventIndex == phaseIndex);
         return choice is null ? null : (choice.Ascending, choice.PhaseEventIndex);
     }
+
+    private (bool Ascending, int PhaseEventIndex)? OwnTurnGuanchaoPattern(int ownerSeat, string skillId)
+    {
+        var facts = CompleteProgramEventHistory().ToArray();
+        var turn = Array.FindLastIndex(facts, e => e is TurnStartedEvent);
+        var choice = facts.Skip(turn + 1).OfType<ProgramGuanchaoPatternChosenEvent>()
+            .LastOrDefault(e => e.OwnerSeat == ownerSeat && e.SkillId == skillId);
+        var phase = Array.FindLastIndex(facts, e => e is PhaseChangedEvent);
+        return choice is null || ownerSeat != _currentSeat ? null : (choice.Ascending, phase);
+    }
+
+    // The loader verifies response-use declarations against an exact content
+    // contract. Their declared scope, rather than a particular game mode or
+    // skill-name whitelist, selects the full own-turn use ledger.
+    private bool UsesOwnTurnGuanchaoLedger(ProgramSkillFrame frame) => GetProgramTrigger(frame) is
+        { Window: SkillProgramTriggerWindow.CardUseCommitted, IncludeResponseUses: true,
+          OwnerRelation: SkillProgramCardActionOwnerRelation.Actor, Optional: false,
+          Condition.Kind: SkillProgramTriggerConditionKind.CardActionActorIsCurrentTurn,
+          Effects: [{ Op: SkillProgramEffectOp.GuanchaoRankDraw }] };
 
     // Prior uses of this phase, in order, deduplicated per accepted action; a
     // use without a rank (virtual declarations, multi-card conversions) stays
@@ -23,10 +42,18 @@ public sealed partial class GameEngine
     {
         var ranks = new List<int?>();
         var seen = new HashSet<long>();
-        foreach (var accepted in CompleteProgramEventHistory().Skip(phaseEventIndex + 1).OfType<CardActionAcceptedEvent>())
+        var responseUses = includeResponseUses ? ProgramEventHistory<ProgramGuanchaoRankDrawEvent>()
+            .Where(e => e.CardActionId > 0).Select(e => e.CardActionId).ToHashSet() : null;
+        foreach (var fact in CompleteProgramEventHistory().Skip(phaseEventIndex + 1))
         {
-            var action = accepted.Action;
-            if ((action.Type != CardActionType.Use && !(includeResponseUses && ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(e => e.CardActionId == action.ActionId))) || action.ActorSeat != ownerSeat || !seen.Add(action.ActionId) ||
+            var action = fact switch
+            {
+                CardActionAcceptedEvent accepted => accepted.Action,
+                CardUseAppearanceCapturedEvent appearance => appearance.Action,
+                _ => null
+            };
+            if (action is null) continue;
+            if ((action.Type != CardActionType.Use && responseUses?.Contains(action.ActionId) != true) || action.ActorSeat != ownerSeat || !seen.Add(action.ActionId) ||
                 action.ActionId == currentActionId)
                 continue;
             var rank = action.EffectiveRank ?? (action.PhysicalCards.Count == 1 ? GetAdvancedCard(action.PhysicalCards[0].CardId).Rank : (int?)null);
@@ -104,15 +131,16 @@ public sealed partial class GameEngine
         var active = GetActiveProgramFrame(frame.Id);
         var owner = _players[active.OwnerSeat];
         if (!owner.IsAlive || _winner != Winner.None) return SkillProgramStepOutcome.Continue;
-        var pattern = active.SkillId == BGuanchao ? WushuangGuanchaoPattern(owner.Seat) : CurrentGuanchaoPattern(owner.Seat);
+        var ownTurnLedger = UsesOwnTurnGuanchaoLedger(active);
+        var pattern = ownTurnLedger ? OwnTurnGuanchaoPattern(owner.Seat, active.SkillId) : CurrentGuanchaoPattern(owner.Seat, active.SkillId);
         if (pattern is null) return SkillProgramStepOutcome.Continue;
         var context = frame.WindowContext?.CardUse;
         var action = _resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault()?.Action ??
             _resolutionStack.OfType<CardUseFrame>().LastOrDefault(item => item.Action?.ActionId == context?.CardActionId)?.Action;
         if (action is null || action.ActorSeat != owner.Seat) return SkillProgramStepOutcome.Continue;
         var currentRank = action.EffectiveRank ?? (action.PhysicalCards.Count == 1 ? GetAdvancedCard(action.PhysicalCards[0].CardId).Rank : (int?)null);
-        if (active.SkillId == BGuanchao && currentRank is <= 0) currentRank = null;
-        var ranks = GuanchaoPhaseUseRanks(owner.Seat, pattern.Value.PhaseEventIndex, action.ActionId, active.SkillId == BGuanchao).Append(currentRank).ToArray();
+        if (ownTurnLedger && currentRank is <= 0) currentRank = null;
+        var ranks = GuanchaoPhaseUseRanks(owner.Seat, pattern.Value.PhaseEventIndex, action.ActionId, ownTurnLedger).Append(currentRank).ToArray();
         var drew = MatchesGuanchaoPattern(ranks, pattern.Value.Ascending);
         if (drew)
             DrawCards(owner, 1, true, new($"skill-program.{active.SkillId}.guanchao-draw"));
@@ -120,7 +148,8 @@ public sealed partial class GameEngine
             ? $"{owner.Name} 观潮：本阶段使用过的牌点数均符合所选规律，摸一张牌。"
             : $"{owner.Name} 观潮：本阶段使用过的牌点数不再符合所选规律。", owner.Seat);
         AdvanceEventRulesAndQueueFact(new ProgramGuanchaoRankDrawEvent(active.Id, active.SkillId,
-            GetProgramBindingId(active), owner.Seat, _turnNumber, currentRank ?? 0, drew));
+            GetProgramBindingId(active), owner.Seat, _turnNumber, currentRank ?? 0, drew)
+            { CardActionId = action.ActionId });
         if (drew && !TryBeginCardsMovedProgramWindow())
             AdvanceRuntimeProgram(active.Id);
         return drew ? SkillProgramStepOutcome.AwaitChild : SkillProgramStepOutcome.Continue;

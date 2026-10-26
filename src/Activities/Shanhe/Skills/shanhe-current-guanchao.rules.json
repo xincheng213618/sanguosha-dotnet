@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:guanchao-3076", "revision": 1,
+    "triggers": [
+      { "id": "guanchao-choose-pattern", "window": "playPhaseStarting", "subject": "owner", "optional": true,
+        "effects": [{ "op": "guanchaoChoosePattern", "target": "owner" }] },
+      { "id": "guanchao-rank-draw", "window": "cardUseCommitted", "ownerRelation": "actor", "optional": false,
+        "condition": { "kind": "cardActionActorIsCurrentTurn" }, "includeResponseUses": true,
+        "effects": [{ "op": "guanchaoRankDraw", "target": "owner" }] }
+    ]
+  }]
+}

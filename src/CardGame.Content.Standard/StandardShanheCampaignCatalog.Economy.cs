@@ -27,8 +27,6 @@ public static partial class StandardShanheCampaignCatalog
             "集市购买时降低20%铜币消耗。", new(ShopDiscountPercent: 20)),
         new(2107, "tactic-economy-2107", "会员Ⅱ", 3, 500,
             "你可以消耗100铜币刷新商店，可刷新5次。", new(ShopRefreshLimit: 5)),
-        new(2230, CurrentResourceSetRewardId, "资源流套装", 4, 9999,
-            "商店可无限刷新", new(UnlimitedPaidShopRefreshes: true)),
         new(2136, "tactic-economy-2136", "商品+1", 2, 300,
             "商店每类商品数量+1。", new(ExtraStockPerCategory: 1)),
         new(2137, "tactic-economy-2137", "商品+2", 3, 500,
