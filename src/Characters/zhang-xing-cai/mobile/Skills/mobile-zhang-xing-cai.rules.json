@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:shenxian",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "other-actual-turn-basic-discard",
+          "window": "discardPileReceived",
+          "subject": "owner",
+          "optional": true,
+          "movementOccurrence": "perBatch",
+          "movementDiscardOnly": true,
+          "discardOwnerScope": "other",
+          "effects": [
+            {
+              "op": "drawFromOtherActualBasicDiscard",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:qiangwu",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "judge-rank-slash-phase",
+          "minCards": 0,
+          "maxCards": 0,
+          "minTargets": 0,
+          "maxTargets": 0,
+          "targetKind": "anyLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "startJudgment",
+              "target": "owner",
+              "judgmentReason": "mobile:qiangwu",
+              "resultBind": "qiangwu-judgment",
+              "visibility": "public"
+            },
+            {
+              "op": "grantJudgedRankSplitSlashTurnPolicy",
+              "target": "owner",
+              "sourceBind": "qiangwu-judgment",
+              "expiry": "actualPlayPhase"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

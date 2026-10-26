@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:beige",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "pay-then-judge-slash-damage",
+          "window": "afterDamageApplied",
+          "subject": "any",
+          "optional": true,
+          "damageOccurrence": "perDamage",
+          "condition": {
+            "kind": "all",
+            "children": [
+              { "kind": "damageCardIsSlash" },
+              { "kind": "compare", "left": { "kind": "eventTargetHp" }, "operator": "greaterThan", "right": { "kind": "integerConstant", "value": 0 } }
+            ]
+          },
+          "effects": [
+            { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "owner" }, "zones": ["hand", "equipment"], "count": 1, "destination": "discardPile", "resultBind": "beige-cost", "awaitMovementTriggers": true },
+            { "op": "selectTarget", "target": "owner", "targetKind": "eventTarget" },
+            { "op": "startJudgment", "target": "selectedTarget", "judgmentReason": "skill.mobile.beige", "resultBind": "beige-card", "outcomeBind": "beige-result", "visibility": "public", "sourceRef": { "kind": "eventSource" } },
+            { "op": "recover", "target": "owner", "targetRef": { "kind": "eventTarget" }, "amount": 1, "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "beige-result", "suits": ["heart"] } },
+            { "op": "draw", "target": "owner", "targetRef": { "kind": "eventTarget" }, "amount": 2, "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "beige-result", "suits": ["diamond"] } },
+            { "op": "selectOwnedCards", "target": "owner", "targetRef": { "kind": "eventSource" }, "zones": ["hand", "equipment"], "amount": 2, "resultBind": "beige-source-discard", "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "beige-result", "suits": ["club"] } },
+            { "op": "moveBoundCards", "target": "owner", "sourceBind": "beige-source-discard", "destination": "discardPile", "awaitMovementTriggers": true, "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "beige-result", "suits": ["club"] } },
+            { "op": "turnOver", "target": "owner", "targetRef": { "kind": "eventSource" }, "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "beige-result", "suits": ["spade"] } },
+            { "op": "moveBoundCards", "target": "owner", "sourceBind": "beige-card", "destination": "discardPile" }
+          ]
+        }
+      ]
+    }
+  ]
+}

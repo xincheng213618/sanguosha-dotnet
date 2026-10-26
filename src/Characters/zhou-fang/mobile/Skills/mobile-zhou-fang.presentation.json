@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:duanfa": { "name": "断发", "description": "出牌阶段，弃置任意张黑色手牌或装备牌，摸等量牌；同一实际出牌阶段累计弃牌不超过体力上限。" },
+    "mobile:youdi": { "name": "诱敌", "description": "结束阶段，令其他角色弃置你的一张手牌：非黑色先摸1；非杀再由你获得其一张手牌或装备牌。" }
+  }
+}

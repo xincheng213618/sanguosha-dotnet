@@ -164,8 +164,12 @@ public sealed partial class GameEngine
             if (item.Source.OwnerSeat == player.Seat && Current(item.TurnNumber, item.TurnSeat))
                 Add(item.Source.SkillId, item.Source.OwnerSeat, $"{EffectSuitName(item.Suit)}【杀】无距离和次数限制。");
         foreach (var item in _turnCardUseEffects.JudgedRankSlashPolicies)
-            if (item.Source.OwnerSeat == player.Seat && Current(item.TurnNumber, item.TurnSeat))
-                Add(item.Source.SkillId, item.Source.OwnerSeat, $"点数小于{item.Rank}的【杀】无距离限制，点数大于{item.Rank}的【杀】无次数限制。");
+            if (item.Source.OwnerSeat == player.Seat && Current(item.TurnNumber, item.TurnSeat) &&
+                (item.PhaseInstanceId is null || _phase == TurnPhase.Play && item.PhaseInstanceId == _cardUseDebitPhaseInstanceId))
+                Add(item.Source.SkillId, item.Source.OwnerSeat, item.PhaseInstanceId is null
+                    ? $"点数小于{item.Rank}的【杀】无距离限制，点数大于{item.Rank}的【杀】无次数限制。"
+                    : $"本出牌阶段，点数小于{item.Rank}的【杀】无距离限制，点数大于{item.Rank}的【杀】不计入次数。",
+                    item.PhaseInstanceId is null ? ActivePlayerEffectExpiry.CurrentTurnEnd : ActivePlayerEffectExpiry.PlayPhaseEnd);
         foreach (var item in _turnCardUseEffects.TargetCardQuotaAllowances)
             if (item.TargetSeat == player.Seat && Current(item.TurnNumber, item.TurnSeat))
                 Add(item.Source.SkillId, item.Source.OwnerSeat, "使用牌无次数限制；其他使用条件仍适用。");

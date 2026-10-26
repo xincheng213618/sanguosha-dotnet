@@ -25,7 +25,10 @@ public sealed partial class GameEngine
     {
         if (batch.Id <= 0 || batch.TurnNumber != _turnNumber || batch.MovementTiming is not { } timing || !IsValidPlayerSeat(timing.ActualTurnOwnerSeat) ||
             timing.ActualTurnOwnerSeat != _turnProgression.OwnerSeat || timing.ActualTurnOwnerSeat == candidate.OwnerSeat ||
-            OtherActualBasicDiscardAlreadyIssued(candidate.OwnerSeat, candidate.SkillId)) return [];
+            OtherActualBasicDiscardAlreadyIssued(candidate.OwnerSeat, candidate.SkillId) &&
+                GetProgramTrigger(candidate).UsageScope == SkillUsageScope.Turn ||
+            ProgramEventHistory<OtherActualBasicDiscardDrawIssuedEvent>().Any(e =>
+                e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillId == candidate.SkillId && e.MovementBatchId == batch.Id)) return [];
         return batch.Movements.Select((m, index) => (m, index)).Where(p =>
             p.m.TurnNumber == _turnNumber && _cardMovements.Contains(p.m) &&
             GetProgramDiscardSource(p.m) is { OwnerSeat: var other } && other is { } seat && seat != candidate.OwnerSeat &&
@@ -69,7 +72,8 @@ public sealed partial class GameEngine
                 e.ParentResolutionId == frame.Id && e.TargetSeat == frame.OwnerSeat && e.Reason == reason) != 1)
             throw new InvalidOperationException("A rank-split Slash policy replaced its finalized physical result.");
         var grant = _turnCardUseEffects.GrantJudgedRankSlashPolicy(_turnNumber, _turnProgression.OwnerSeat, frame.Id, 1,
-            CreateProgramTurnEffectSource(frame), frame.GameplayHash, fact.ResolutionId, card, fact.Rank.Value);
+            CreateProgramTurnEffectSource(frame), frame.GameplayHash, fact.ResolutionId, card, fact.Rank.Value,
+            plan.Instructions[1].JudgedRankSlashExpiry == JudgedRankSlashPolicyExpiry.ActualPlayPhase ? _cardUseDebitPhaseInstanceId : null);
         if (CompleteProgramEventHistory().OfType<TurnJudgedRankSlashPolicyGrantedEvent>().Any(e => e.Policy.ParentFrameId == frame.Id))
             throw new InvalidOperationException("One completed judgment cannot issue its rank policy twice.");
         AdvanceEventRulesAndQueueFact(new TurnJudgedRankSlashPolicyGrantedEvent(grant));
@@ -81,7 +85,8 @@ public sealed partial class GameEngine
     private TurnJudgedRankSlashPolicy? CurrentJudgedRankSlashPolicy(int actor) =>
         !HasJudgedRankSlashCapability || _winner != Winner.None || !_players[actor].IsAlive || _phase is TurnPhase.NotStarted or TurnPhase.Finished ? null :
         _turnCardUseEffects.JudgedRankSlashPolicies.Where(g => g.TurnNumber == _turnNumber && g.TurnSeat == _turnProgression.OwnerSeat &&
-            g.Source.OwnerSeat == actor).OrderByDescending(g => g.GrantSequence).FirstOrDefault();
+            g.Source.OwnerSeat == actor && (g.PhaseInstanceId is null ||
+                _phase == TurnPhase.Play && _currentSeat == actor && g.PhaseInstanceId == _cardUseDebitPhaseInstanceId)).OrderByDescending(g => g.GrantSequence).FirstOrDefault();
     private bool HasJudgedRankSlashDistance(int actor, CardKind kind, int? rank, long? existingUseFrameId = null) =>
         IsSlashCard(kind) && (existingUseFrameId is { } id
             ? HasIssuedJudgedRankSlashDistance(id, actor)
@@ -137,6 +142,8 @@ public sealed partial class GameEngine
             var activation = program?.Activations.SingleOrDefault(a => a.Id == grant.Source.BindingId);
             if (program?.GameplayHash != grant.GameplayHash || activation?.Effects is not
                     [{ Op: SkillProgramEffectOp.StartJudgment }, { Op: SkillProgramEffectOp.GrantJudgedRankSplitSlashTurnPolicy }] ||
+                (activation.Effects[1].JudgedRankSlashExpiry == JudgedRankSlashPolicyExpiry.ActualPlayPhase
+                    ? grant.PhaseInstanceId is not > 0 : grant.PhaseInstanceId is not null) ||
                 grant.EffectIndex != 1 || !IsValidPlayerSeat(grant.Source.OwnerSeat) || !IsValidPlayerSeat(grant.TurnSeat) ||
                 ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == grant.ParentFrameId &&
                     e.OwnerSeat == grant.Source.OwnerSeat && e.SkillId == grant.Source.SkillId && e.ActivationId == grant.Source.BindingId) != 1 ||
@@ -147,9 +154,11 @@ public sealed partial class GameEngine
         }
         var issuedDraws = ProgramEventHistory<OtherActualBasicDiscardDrawIssuedEvent>();
         if (issuedDraws.Count == 0) return;
-        if (issuedDraws
-            .GroupBy(e => (e.Source.OwnerSeat, e.Source.SkillId, e.ActualTurnNumber, e.ActualTurnOwnerSeat)).Any(g => g.Count() != 1))
-            throw new InvalidOperationException("A basic discard benefit issued more than once in its actual turn.");
+        if (issuedDraws.Where(e => _contentRegistry.GetSkill(e.Source.SkillId).Program!.Triggers
+                .Single(t => t.Id == e.Source.BindingId).UsageScope == SkillUsageScope.Turn)
+            .GroupBy(e => (e.Source.OwnerSeat, e.Source.SkillId, e.ActualTurnNumber, e.ActualTurnOwnerSeat)).Any(g => g.Count() != 1) ||
+            issuedDraws.GroupBy(e => (e.Source.OwnerSeat, e.Source.SkillId, e.MovementBatchId)).Any(g => g.Count() != 1))
+            throw new InvalidOperationException("A basic discard benefit exceeded its declared actual-turn quota or repeated one physical discard batch.");
         foreach (var issued in issuedDraws)
         {
             var program = _contentRegistry.GetSkill(issued.Source.SkillId).Program;

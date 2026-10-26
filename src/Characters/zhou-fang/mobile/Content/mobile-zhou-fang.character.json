@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:zhou-fang",
+  "skills": [
+    { "registrationOrder": 82300, "programBundle": "mobile-zhou-fang", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:duanfa", "name": "断发", "description": "出牌阶段，你可以弃置任意张黑色牌，然后摸等量的牌（本阶段以此法弃置的牌的总数至多为你的体力上限）。", "executionForms": "State", "actionForms": "Active" } },
+    { "registrationOrder": 82301, "programBundle": "mobile-zhou-fang", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:youdi", "name": "诱敌", "description": "结束阶段，你可以令一名其他角色弃置你的一张手牌，若此牌：不为黑色牌，你摸一张牌；不为【杀】，你获得其一张牌。", "executionForms": "Trigger" } }
+  ],
+  "generals": [ { "registrationOrder": 82399, "pools": { "current": 82399 }, "definition": {
+    "id": "mobile:zhou-fang", "name": "周鲂·移动版", "portraitKey": "mobile-zhou-fang", "skillId": "mobile:duanfa", "additionalSkillIds": ["mobile:youdi"],
+    "factionId": "wu", "baseHp": 3, "gender": "Male", "characterId": "character:zhou-fang", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } } ]
+}

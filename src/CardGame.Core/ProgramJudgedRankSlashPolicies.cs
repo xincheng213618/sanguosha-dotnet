@@ -5,7 +5,18 @@ namespace CardGame.Core;
 // All fields are scalars or scalar-only source identities. The public view exposes only X and the actual turn.
 public sealed record TurnJudgedRankSlashPolicy(long GrantSequence, int TurnNumber, int TurnSeat,
     long ParentFrameId, int EffectIndex, CardUseEffectSource Source, string GameplayHash,
-    long JudgmentFrameId, int JudgmentCardId, int Rank);
+    long JudgmentFrameId, int JudgmentCardId, int Rank)
+{
+    // Null retains the original actual-turn lifetime. A phase grant freezes the issuing real Play.
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? PhaseInstanceId { get; init; }
+}
+public enum JudgedRankSlashPolicyExpiry { ActualPlayPhase = 0 }
+public sealed partial class SkillProgramEffect
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public JudgedRankSlashPolicyExpiry? JudgedRankSlashExpiry { get; internal init; }
+}
 public sealed record TurnJudgedRankSlashPolicyGrantedEvent(TurnJudgedRankSlashPolicy Policy) : IGameEvent;
 public sealed record JudgedRankSlashUseReceipt(long CardUseFrameId, long CardActionId, int ActorSeat,
     int? EffectiveRank, TurnJudgedRankSlashPolicy Policy, bool IgnoresDistance, bool IgnoresQuota);
@@ -33,9 +44,12 @@ internal sealed class GrantJudgedRankSplitSlashTurnPolicyDescriptor : ProgramOpe
         static (_, context) => context.PriceJudgedRankSplitSlash());
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "sourceBind", "condition");
+        r.AllowOnly("op", "target", "sourceBind", "condition", "expiry");
         var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0,
-            r.Condition(), sourceBind: r.RequiredIdentifier("sourceBind"));
+            r.Condition(), sourceBind: r.RequiredIdentifier("sourceBind"))
+        {
+            JudgedRankSlashExpiry = r.Has("expiry") ? r.RequiredEnum<JudgedRankSlashPolicyExpiry>("expiry") : null
+        };
         RequireAlways(effect, r.Path); return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
@@ -94,12 +108,13 @@ internal static class JudgedRankSlashComposition
                 throw new InvalidOperationException($"Invalid judged rank activation at {path}: one uncharged use per real Play phase is required.");
         foreach (var t in triggers.Where(t => t.Effects.Any(e => e.Op == SkillProgramEffectOp.DrawFromOtherActualBasicDiscard)))
             if (t.Window != SkillProgramTriggerWindow.DiscardPileReceived || t.Subject != SkillProgramTriggerSubject.Owner || !t.Optional ||
-                t.UsageScope != SkillUsageScope.Turn || t.UsageLimit != 1 || t.DynamicUsageLimit is not null ||
+                !((t.UsageScope == SkillUsageScope.Turn && t.UsageLimit == 1) ||
+                  (t.UsageScope is null && t.UsageLimit is null)) || t.DynamicUsageLimit is not null ||
                 t.MarkerCost is not null || t.ChoiceGroup is not null || t.Condition.Kind != SkillProgramTriggerConditionKind.Always ||
                 t.SourceZones.Count != 0 || t.CardKinds.Count != 0 || t.CardCategories.Count != 0 || t.Suits.Count != 0 ||
                 t.MovementReasons.Count != 0 || t.ExcludedMovementReasons.Count != 0 || !t.MovementDiscardOnly ||
                 t.DiscardOwnerScope != SkillProgramDiscardOwnerScope.Other || t.MovementOccurrence != SkillProgramMovementOccurrence.PerBatch)
-                throw new InvalidOperationException($"Invalid basic discard trigger at {path}: one optional unfiltered actual-turn quota observer is required.");
+                throw new InvalidOperationException($"Invalid basic discard trigger at {path}: one optional unfiltered actual-discard observer, unbounded or once per actual turn, is required.");
     }
 }
 

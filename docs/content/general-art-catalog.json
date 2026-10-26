@@ -23594,6 +23594,108 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-zhang-xing-cai",
+      "characterName": "张星彩",
+      "defaultSkinId": "12400",
+      "skins": [
+        {
+          "id": "12400",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-85.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/12400.jpg",
+          "sha256": "e84add479c667dcb533e77d27466785e2cc042fbbe217cb75924e246accf359f",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhang-xing-cai.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhou-fang",
+      "characterName": "周鲂",
+      "defaultSkinId": "45500",
+      "skins": [
+        {
+          "id": "45500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-286.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/45500.jpg",
+          "sha256": "621ccf0c7577adaf8acb2c6839bf4ac84ab5c5cac4386d422248e4f95bbed641",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhou-fang.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-cai-wen-ji",
+      "characterName": "蔡文姬",
+      "defaultSkinId": "5700",
+      "skins": [
+        {
+          "id": "5700",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-57.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/5700.jpg",
+          "sha256": "4ea732dda6071ebcef8555ba2aca06d4c1aa204ae509ab0d1cb01942e0e5ab62",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cai-wen-ji.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-xiahou-yuan",
+      "characterName": "夏侯渊",
+      "defaultSkinId": "2800",
+      "skins": [
+        {
+          "id": "2800",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-28.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/2800.jpg",
+          "sha256": "c6d5f84c54724047e71765b5985095c2a0b384b695fb81c3b5ad7f79bfa33330",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-xiahou-yuan.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-jiang-wei",
+      "characterName": "姜维",
+      "defaultSkinId": "5200",
+      "skins": [
+        {
+          "id": "5200",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-52.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/5200.jpg",
+          "sha256": "d6bf7497e2c0e62b2cd4e3f13c0e6f240e6aa55af15090ef130c7e1f2fd57ecd",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-jiang-wei.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhuge-zhan",
+      "characterName": "诸葛瞻",
+      "defaultSkinId": "45800",
+      "skins": [
+        {
+          "id": "45800",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-341.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/45800.jpg",
+          "sha256": "37f30dec3a41724ba01060aeb95c96acb1fe7f1857cf81bf99fc89b405f1a2d7",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhuge-zhan.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

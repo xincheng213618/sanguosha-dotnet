@@ -1,0 +1,52 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhang-xing-cai",
+  "skills": [
+    {
+      "registrationOrder": 82200,
+      "programBundle": "mobile-zhang-xing-cai",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:shenxian",
+        "name": "甚贤",
+        "description": "你的回合外，当其他角色因弃置而失去基本牌后，你可以摸一张牌。",
+        "executionForms": "Trigger"
+      }
+    },
+    {
+      "registrationOrder": 82201,
+      "programBundle": "mobile-zhang-xing-cai",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:qiangwu",
+        "name": "枪舞",
+        "description": "出牌阶段限一次，你可以进行一次判定，然后本阶段，你使用点数小于判定结果的【杀】无距离限制，点数大于判定结果的【杀】不计入次数。",
+        "actionForms": "Active"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 82299,
+      "pools": {
+        "current": 82299
+      },
+      "definition": {
+        "id": "mobile:zhang-xing-cai",
+        "name": "张星彩·移动版",
+        "portraitKey": "mobile-zhang-xing-cai",
+        "skillId": "mobile:shenxian",
+        "factionId": "shu",
+        "baseHp": 3,
+        "additionalSkillIds": [
+          "mobile:qiangwu"
+        ],
+        "gender": "Female",
+        "characterId": "character:zhang-xing-cai",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

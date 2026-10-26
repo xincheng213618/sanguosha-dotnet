@@ -1,0 +1,29 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:jiang-wei",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 82699,
+      "pools": {
+        "current": 82699
+      },
+      "definition": {
+        "id": "mobile:jiang-wei",
+        "name": "姜维·移动版",
+        "portraitKey": "mobile-jiang-wei",
+        "skillId": "classic:tiaoxin",
+        "factionId": "shu",
+        "baseHp": 4,
+        "additionalSkillIds": [
+          "classic:zhiji"
+        ],
+        "gender": "Male",
+        "characterId": "character:jiang-wei",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

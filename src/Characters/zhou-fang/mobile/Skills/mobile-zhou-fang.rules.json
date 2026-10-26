@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "mobile:duanfa", "revision": 1, "activations": [
+      { "id": "phase-black-recycle", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving", "usesPerTurn": null,
+        "effects": [{ "op": "resolveMobileDuanfa", "target": "owner" }] }
+    ] },
+    { "id": "mobile:youdi", "revision": 1, "triggers": [
+      { "id": "ending-discard-and-rewards", "window": "turnEnding", "subject": "owner", "optional": true,
+        "condition": { "kind": "compare", "left": { "kind": "currentHandCount" }, "operator": "greaterThanOrEqual", "right": { "kind": "integerConstant", "value": 1 } },
+        "effects": [
+          { "op": "selectTarget", "target": "owner", "targetKind": "otherLiving" },
+          { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "selectedTarget" }, "cardOwnerRef": { "kind": "owner" }, "zones": ["hand"], "count": 1,
+            "destination": "discardPile", "resultBind": "mobile-youdi-bait", "freezeMovedCardSuit": true, "awaitMovementTriggers": true },
+          { "op": "publishMobileYoudiBait", "target": "owner", "sourceBind": "mobile-youdi-bait" },
+          { "op": "draw", "target": "owner", "amount": 1, "condition": { "kind": "not", "children": [{ "kind": "boundCardsMatchSuits", "sourceBind": "mobile-youdi-bait", "suits": ["spade", "club"] }] } },
+          { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "selectedTarget" }, "zones": ["hand", "equipment"], "count": 1,
+            "destination": "selectedTargetHand", "targetRef": { "kind": "owner" }, "skipIfNoCards": true, "awaitMovementTriggers": true,
+            "condition": { "kind": "not", "children": [{ "kind": "boundCardsMatchKinds", "sourceBind": "mobile-youdi-bait", "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"] }] } }
+        ] }
+    ] }
+  ]
+}
