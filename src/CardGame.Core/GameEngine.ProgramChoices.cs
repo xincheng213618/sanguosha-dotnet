@@ -33,7 +33,7 @@ public sealed partial class GameEngine
         var alternating = plan.Instructions.Skip(frame.InstructionIndex).FirstOrDefault(e=>e.Op==SkillProgramEffectOp.ApplyAlternatingChoiceBenefit && e.SourceBind==effect.ResultBind);
         if(alternating is not null)
         {
-            var last=CompleteProgramEventHistory().OfType<AlternatingChoiceBenefitResolvedEvent>().LastOrDefault(e=>e.OwnerSeat==frame.OwnerSeat && e.SkillId==frame.SkillId && e.SkillInstanceId==frame.SkillInstanceId && e.StateId==alternating.StateId);
+            var last=GetAlternatingChoicePredecessor(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,alternating);
             var preferred=last?.PendingOptionId=="draw"?"targets":"draw";
             return decision.Choices.First(c=>c.Parameters.GetValueOrDefault("option-id")==preferred);
         }

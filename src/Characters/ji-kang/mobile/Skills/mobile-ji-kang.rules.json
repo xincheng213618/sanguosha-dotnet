@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "mobile:qingxian", "revision": 1, "activations": [ { "id": "equipment-comparison", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving", "usesPerTurn": null, "usesPerPhase": 1, "effects": [{ "op": "resolveMobileJiKangQingxian", "target": "owner" }] } ] },
+    { "id": "mobile:juexiang", "revision": 1, "triggers": [ { "id": "actual-death-bequest", "window": "ownerDied", "subject": "owner", "optional": false, "effects": [{ "op": "resolveMobileJiKangJuexiang", "target": "owner" }] } ] },
+    { "id": "mobile:canyun", "revision": 1, "activations": [ { "id": "equipment-comparison", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving", "usesPerTurn": null, "usesPerPhase": 1, "effects": [{ "op": "resolveMobileJiKangQingxian", "target": "owner" }] } ] }
+  ]
+}

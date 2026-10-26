@@ -1815,7 +1815,9 @@ public enum SkillProgramEffectOp
     DrawNianRenxingRecovery = 27905,
     DrawNianBaonuReplacement = 27906,
     ReviveNianAlly = 27930,
-    SelectRedJudgmentFireTarget = 27503
+    SelectRedJudgmentFireTarget = 27503,
+    ResolveMobileJiKangQingxian = 80900,
+    ResolveMobileJiKangJuexiang = 80901
 }
 public enum SkillProgramEffectTarget { Owner, Actor, SelectedTarget, SelectedTargets, HpPairHigher = 2000, HpPairLower = 2001, Activator = 2002 }
 public enum SkillProgramTurnPhase { Judgment, Draw, Play, Discard }

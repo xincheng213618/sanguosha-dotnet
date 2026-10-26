@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:fumian",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "choose-benefit",
+          "window": "turnStartBeforeNormalFlow",
+          "subject": "owner",
+          "optional": true,
+          "effects": [
+            {
+              "op": "chooseOption",
+              "target": "owner",
+              "resultBind": "benefit",
+              "options": [
+                {
+                  "id": "draw"
+                },
+                {
+                  "id": "targets"
+                }
+              ]
+            },
+            {
+              "op": "applyAlternatingChoiceBenefit",
+              "target": "owner",
+              "sourceBind": "benefit",
+              "stateId": "benefit-cycle",
+              "historyScope": "previousOwnerTurn",
+              "drawTiming": "nextDrawPhase",
+              "persistTargetsAfterSkillLoss": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

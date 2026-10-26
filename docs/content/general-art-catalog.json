@@ -23356,6 +23356,91 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-xue-zong",
+      "characterName": "薛综",
+      "defaultSkinId": "39400",
+      "skins": [
+        {
+          "id": "39400",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-231.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/39400.jpg",
+          "sha256": "b3984df91bac10c7e47f90bff6aac16f1571b18f5ce7a9e1f8b5dae6dc8f9c1b",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-xue-zong.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-ji-kang",
+      "characterName": "嵇康",
+      "defaultSkinId": "39200",
+      "skins": [
+        {
+          "id": "39200",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-229.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/39200.jpg",
+          "sha256": "d1a667af16efe7dad1750439cf7e68f5265a08ccf1ce2b59629acdfc55f201dd",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-ji-kang.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-wu-xian",
+      "characterName": "吴苋",
+      "defaultSkinId": "38900",
+      "skins": [
+        {
+          "id": "38900",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-226.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/38900.jpg",
+          "sha256": "3dbaaebe889e6c1efb967a1a2cfc44ce0d37d0b77a8f7bdba5a886ce9425a030",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-wu-xian.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-cai-yong",
+      "characterName": "蔡邕",
+      "defaultSkinId": "39500",
+      "skins": [
+        {
+          "id": "39500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-232.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/39500.jpg",
+          "sha256": "bd67cca3ef1786fff556010a066c7ebb34eaa1b1a7389473440bb2b629a85b90",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cai-yong.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-liu-qi",
+      "characterName": "刘琦",
+      "defaultSkinId": "42300",
+      "skins": [
+        {
+          "id": "42300",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-256.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/42300.jpg",
+          "sha256": "7e8d88e34edad2d5e493e46dec246ddbf9b557003f4f18a5209b6d7579db7b49",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-liu-qi.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

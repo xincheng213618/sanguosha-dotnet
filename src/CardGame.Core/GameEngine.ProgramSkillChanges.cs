@@ -62,7 +62,14 @@ public sealed partial class GameEngine
     }
 
     private void GrantProgramSkills(ProgramSkillFrame frame, IReadOnlyList<string> skillIds) =>
-        AcquireProgramSkillChange(PrepareProgramSkillChange(frame), skillIds, announceAwakening: true);
+        GrantProgramSkills(frame, frame.OwnerSeat, skillIds);
+
+    private void GrantProgramSkills(ProgramSkillFrame frame, int recipientSeat, IReadOnlyList<string> skillIds)
+    {
+        var context = PrepareProgramSkillChange(frame);
+        if (!IsValidPlayerSeat(recipientSeat)) throw new InvalidOperationException("A skill acquisition lost its actual recipient.");
+        AcquireProgramSkillChange(context with { Owner = _players[recipientSeat] }, skillIds, announceAwakening: true);
+    }
 
     // An issued acquisition owns one removable source even while another source
     // supplies the same capability. Sharing its active instance avoids duplicate
@@ -148,7 +155,7 @@ public sealed partial class GameEngine
         IReadOnlyList<string> skillIds, bool announceAwakening)
     {
         var frame = context.Frame;
-        var acquired = IsDyingOwnerReplacementBinding(frame)
+        var acquired = context.Owner.Seat == frame.OwnerSeat && IsDyingOwnerReplacementBinding(frame)
             ? AcquireDyingOwnerReplacementSkills(frame, skillIds)
             : AcquireRuntimeSkills(context.Owner, frame.SkillId, skillIds);
         if (announceAwakening && (_contentRegistry.GetSkill(frame.SkillId).Tags & SkillTag.Awakening) != 0)

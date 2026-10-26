@@ -1,0 +1,41 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:wu-xian",
+  "skills": [
+    {
+      "registrationOrder": 81000,
+      "programBundle": "mobile-wu-xian",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:fumian",
+        "name": "福绵",
+        "description": "准备阶段，你可以选择一项：本回合下一个摸牌阶段额定摸牌数+1；本回合限一次，使用红色基本牌或红色普通锦囊牌可以额外指定一个目标（无距离限制）。若与你上回合选择的选项不同，该选项数值+1并复原本技能。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 81099,
+      "pools": {
+        "current": 81099
+      },
+      "definition": {
+        "id": "mobile:wu-xian",
+        "name": "吴苋·移动版",
+        "portraitKey": "mobile-wu-xian",
+        "skillId": "mobile:fumian",
+        "factionId": "shu",
+        "baseHp": 3,
+        "additionalSkillIds": [
+          "classic:daiyan"
+        ],
+        "gender": "Female",
+        "characterId": "character:wu-xian",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

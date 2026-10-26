@@ -4348,6 +4348,14 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("The Nullification window cannot finish from its current frame.");
         }
 
+        if (_programPipelineHooks.BeforeNullificationFinished(frame))
+        {
+            if (_resolutionStack.LastOrDefault()?.Id == frame.Id)
+                throw new InvalidOperationException("A deferred counterspell completion must push a child on its original live window.");
+            return;
+        }
+
+        frame = _resolutionStack.OfType<NullificationWindowFrame>().Single(item => item.Id == frame.Id);
         pending = ReplaceNullificationWindowFrame(frame with { Step = ResolutionFrameStep.Completed });
         PopResolutionFrame(pending.Id, ResolutionFrameKind.NullificationWindow);
         AdvanceEventRulesAndQueueFact(new NullificationResolvedEvent(

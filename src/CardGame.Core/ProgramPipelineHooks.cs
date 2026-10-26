@@ -38,7 +38,8 @@ internal enum ProgramPipelinePhase
     CancelScheduledPhase,
     ParticipantPrompt,
     ParticipantHostState,
-    CollectMovementCandidates
+    CollectMovementCandidates,
+    BeforeNullificationFinished
 }
 
 // Register next to the owning implementation with an explicit order; orders are
@@ -136,6 +137,8 @@ internal sealed class ProgramPipelineHookCatalog
                 [typeof(ProgramActualPhaseSkipContext)], typeof(bool)),
             [ProgramPipelinePhase.LifecycleWindowCompleted] = (typeof(Func<ProgramLifecycleTriggerWindowFrame, bool>),
                 [typeof(ProgramLifecycleTriggerWindowFrame)], typeof(bool)),
+            [ProgramPipelinePhase.BeforeNullificationFinished] = (typeof(Func<NullificationWindowFrame, bool>),
+                [typeof(NullificationWindowFrame)], typeof(bool)),
             [ProgramPipelinePhase.AppendTurnEndingItems] = (typeof(Action<List<TurnEndingBoundaryItem>>),
                 [typeof(List<TurnEndingBoundaryItem>)], typeof(void)),
             [ProgramPipelinePhase.ResumeScheduledPhase] = (typeof(Func<bool>), [], typeof(bool)),
@@ -235,6 +238,7 @@ internal sealed class ProgramPipelineHooks
     private readonly ProgramRumoOriginClaim[] _rumoOrigin;
     private readonly Func<ProgramActualPhaseSkipContext, bool>[] _actualPhaseSkipped;
     private readonly Func<ProgramLifecycleTriggerWindowFrame, bool>[] _lifecycleWindowCompleted;
+    private readonly Func<NullificationWindowFrame, bool>[] _beforeNullificationFinished;
     private readonly Action<List<TurnEndingBoundaryItem>>[] _appendTurnEndingItems;
     private readonly Func<bool>[] _resumeScheduledPhase, _cancelScheduledPhase;
     private readonly ProgramVirtualEquipmentProvider[] _virtualEquipment;
@@ -271,6 +275,7 @@ internal sealed class ProgramPipelineHooks
         _rumoOrigin = Bind<ProgramRumoOriginClaim>(ProgramPipelinePhase.RumoOrigin);
         _actualPhaseSkipped = Bind<Func<ProgramActualPhaseSkipContext, bool>>(ProgramPipelinePhase.ActualPhaseSkipped);
         _lifecycleWindowCompleted = Bind<Func<ProgramLifecycleTriggerWindowFrame, bool>>(ProgramPipelinePhase.LifecycleWindowCompleted);
+        _beforeNullificationFinished = Bind<Func<NullificationWindowFrame, bool>>(ProgramPipelinePhase.BeforeNullificationFinished);
         _appendTurnEndingItems = Bind<Action<List<TurnEndingBoundaryItem>>>(ProgramPipelinePhase.AppendTurnEndingItems);
         _resumeScheduledPhase = Bind<Func<bool>>(ProgramPipelinePhase.ResumeScheduledPhase);
         _cancelScheduledPhase = Bind<Func<bool>>(ProgramPipelinePhase.CancelScheduledPhase);
@@ -433,6 +438,12 @@ internal sealed class ProgramPipelineHooks
     internal bool CancelScheduledPhase()
     {
         foreach (var hook in _cancelScheduledPhase) if (hook()) return true;
+        return false;
+    }
+
+    internal bool BeforeNullificationFinished(NullificationWindowFrame frame)
+    {
+        foreach (var hook in _beforeNullificationFinished) if (hook(frame)) return true;
         return false;
     }
 

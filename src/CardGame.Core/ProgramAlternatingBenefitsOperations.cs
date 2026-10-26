@@ -1,7 +1,18 @@
 namespace CardGame.Core;
+public enum SkillProgramAlternatingHistoryScope { PreviousOwnerTurn = 1 }
+public enum SkillProgramAlternatingDrawTiming { NextDrawPhase = 1 }
+public sealed partial class SkillProgramEffect
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SkillProgramAlternatingHistoryScope? AlternatingHistoryScope { get; internal init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SkillProgramAlternatingDrawTiming? AlternatingDrawTiming { get; internal init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public bool? PersistAlternatingTargetsAfterSkillLoss { get; internal init; }
+}
 internal interface IAlternatingBenefitsProgramHost
 {
-    void ApplyAlternatingChoiceBenefit(ProgramSkillFrame frame, string sourceBind, string stateId);
+    void ApplyAlternatingChoiceBenefit(ProgramSkillFrame frame, SkillProgramEffect effect);
     SkillProgramStepOutcome ObtainDeckCardWithConsecutiveTarget(ProgramSkillFrame frame, int targetSeat, SkillProgramEffect effect);
 }
 internal sealed record RequireOwnTurnBoundary : ProgramResourceOperation;
@@ -10,11 +21,17 @@ internal sealed class ApplyAlternatingChoiceBenefitDescriptor : ProgramOperation
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ApplyAlternatingChoiceBenefit;
     public override ISkillProgramEffectHandler Handler { get; } = new ApplyAlternatingChoiceBenefitHandler();
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GrantTurnRuleModifier, static (e,c)=>c.GrantTurnRuleModifier(e));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op","target","sourceBind","stateId","condition");
-        var effect=new SkillProgramEffect(Op,FilterBoundCardsProgramOperationDescriptor.Owner(r),0,r.Condition(),sourceBind:r.RequiredIdentifier("sourceBind"),stateId:r.RequiredIdentifier("stateId"));
+        r.AllowOnly("op","target","sourceBind","stateId","condition","historyScope","drawTiming","persistTargetsAfterSkillLoss");
+        var effect=new SkillProgramEffect(Op,FilterBoundCardsProgramOperationDescriptor.Owner(r),0,r.Condition(),sourceBind:r.RequiredIdentifier("sourceBind"),stateId:r.RequiredIdentifier("stateId"))
+        {
+            AlternatingHistoryScope = r.Has("historyScope") ? r.RequiredEnum<SkillProgramAlternatingHistoryScope>("historyScope") : null,
+            AlternatingDrawTiming = r.Has("drawTiming") ? r.RequiredEnum<SkillProgramAlternatingDrawTiming>("drawTiming") : null,
+            PersistAlternatingTargetsAfterSkillLoss = r.Has("persistTargetsAfterSkillLoss") ? r.RequiredBool("persistTargetsAfterSkillLoss") : null
+        };
         RequireAlways(effect,r.Path);return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new RequireTriggerWindow(SkillProgramTriggerWindow.TurnStartBeforeNormalFlow),new RequireChoiceOptions(e.SourceBind!,["draw","targets"])];
@@ -39,7 +56,7 @@ public sealed class ApplyAlternatingChoiceBenefitHandler : ISkillProgramEffectHa
 {
     public SkillProgramEffectOp Op=>SkillProgramEffectOp.ApplyAlternatingChoiceBenefit;
     public SkillProgramStepOutcome Execute(SkillProgramEffect e,ProgramSkillFrame f,int seat,ISkillProgramEffectHost host)
-    {host.GetCapability<IAlternatingBenefitsProgramHost>().ApplyAlternatingChoiceBenefit(f,e.SourceBind!,e.StateId!);return SkillProgramStepOutcome.Continue;}
+    {host.GetCapability<IAlternatingBenefitsProgramHost>().ApplyAlternatingChoiceBenefit(f,e);return SkillProgramStepOutcome.Continue;}
 }
 public sealed class ObtainDeckCardWithConsecutiveTargetHandler : ISkillProgramEffectHandler
 {

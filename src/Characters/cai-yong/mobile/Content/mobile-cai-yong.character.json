@@ -1,0 +1,52 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cai-yong",
+  "skills": [
+    {
+      "registrationOrder": 81100,
+      "programBundle": "mobile-cai-yong",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:bizhuan",
+        "name": "辟撰",
+        "description": "当你使用黑桃牌指定目标后，或成为其他角色使用黑桃牌的目标后，若“书”的数量小于4，你可以将牌堆顶的一张牌置于你的武将牌上，称为“书”（你的手牌上限增加“书”的数量）。",
+        "executionForms": "State, Trigger"
+      }
+    },
+    {
+      "registrationOrder": 81101,
+      "programBundle": "mobile-cai-yong",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:tongbo",
+        "name": "通博",
+        "description": "摸牌阶段结束时，你可以用任意张牌替换等量的“书”，然后若你的“书”包含四种花色，你将所有“书”交给任意名其他角色。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 81199,
+      "pools": {
+        "current": 81199
+      },
+      "definition": {
+        "id": "mobile:cai-yong",
+        "name": "蔡邕·移动版",
+        "portraitKey": "mobile-cai-yong",
+        "skillId": "mobile:bizhuan",
+        "factionId": "qun",
+        "baseHp": 3,
+        "additionalSkillIds": [
+          "mobile:tongbo"
+        ],
+        "gender": "Male",
+        "characterId": "character:cai-yong",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

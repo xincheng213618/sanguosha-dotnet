@@ -1,17 +1,22 @@
 namespace CardGame.Core;
-public sealed record RedAdditionalTargetsGrantedEvent(int OwnerSeat,CardConversionSource Source,int Maximum) : IGameEvent;
+public sealed record RedAdditionalTargetsGrantedEvent(int OwnerSeat,CardConversionSource Source,int Maximum) : IGameEvent
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public bool? PersistAfterSkillLoss { get; init; }
+}
 public sealed record RedAdditionalTargetsConsumedEvent(int OwnerSeat,CardConversionSource Source,IReadOnlyList<int> Targets) : IGameEvent;
 public sealed partial class GameEngine
 {
-    private readonly Dictionary<int,(CardConversionSource Source,int Maximum)> _redAdditionalTargetGrants=[];
+    private readonly Dictionary<int,(CardConversionSource Source,int Maximum,bool? PersistAfterSkillLoss)> _redAdditionalTargetGrants=[];
     private CardConversionSource? _selectedRedAdditionalTargetSource;
-    private void GrantRedAdditionalTargets(ProgramSkillFrame frame,int maximum)
+    private void GrantRedAdditionalTargets(ProgramSkillFrame frame,int maximum,bool? persistAfterSkillLoss = null)
     {
         var source=new CardConversionSource(frame.SkillId,"red-additional-targets",frame.OwnerSeat,frame.SkillInstanceId);
-        _redAdditionalTargetGrants[frame.OwnerSeat]=(source,maximum);
-        AdvanceEventRulesAndQueueFact(new RedAdditionalTargetsGrantedEvent(frame.OwnerSeat,source,maximum));
+        _redAdditionalTargetGrants[frame.OwnerSeat]=(source,maximum,persistAfterSkillLoss);
+        AdvanceEventRulesAndQueueFact(new RedAdditionalTargetsGrantedEvent(frame.OwnerSeat,source,maximum) { PersistAfterSkillLoss=persistAfterSkillLoss });
     }
-    private bool HasRedAdditionalTargets(CharacterState actor)=>_redAdditionalTargetGrants.TryGetValue(actor.Seat,out var g) && HasRuntimeSkillInstance(actor,g.Source.SkillId,g.Source.SkillInstanceId);
+    private bool HasRedAdditionalTargets(CharacterState actor)=>_redAdditionalTargetGrants.TryGetValue(actor.Seat,out var g) &&
+        (g.PersistAfterSkillLoss==true || HasRuntimeSkillInstance(actor,g.Source.SkillId,g.Source.SkillInstanceId));
     private bool HasNextCardTargetAdjustment(CharacterState actor)=>HasLegacyNextCardTargetAdjustment(actor)||HasRedAdditionalTargets(actor)||HasNextActualUseAdjustment(actor)||HasMouZyFireTargets(actor);
     private bool IsTargetAdjustmentAction(CharacterState actor,LegalAction action)=>action.ProgramActivationId=="next-card-target-adjustment" && HasLegacyNextCardTargetAdjustment(actor) || action.ProgramActivationId=="red-additional-targets" && HasRedAdditionalTargets(actor) || IsNextActualUseAdjustmentAction(actor,action) || IsMouZyTargetAction(actor,action) || IsShenZfAdjustmentAction(actor,action);
     private int GetAdditionalTargetAdjustmentLimit(CharacterState actor,LegalAction action)=>IsShenZfAdjustmentAction(actor,action)?_players.Count:IsMouZyTargetAction(actor,action)?MouZyTargetLimit(actor):action.ProgramActivationId=="red-additional-targets"?_redAdditionalTargetGrants[actor.Seat].Maximum:1;

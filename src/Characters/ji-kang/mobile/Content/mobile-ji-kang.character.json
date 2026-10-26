@@ -1,0 +1,17 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:ji-kang",
+  "skills": [
+    { "registrationOrder": 80900, "programBundle": "mobile-ji-kang", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:qingxian", "name": "清弦", "description": "出牌阶段限一次，你可以选择至多X名其他角色并弃置等量的牌（X为你的体力值），这些角色依次和你比较装备区里的牌数：小于你的角色回复1点体力；等于你的角色摸一张牌；大于你的角色失去1点体力。若你选择的目标数等于X，你摸一张牌。", "executionForms": "State", "actionForms": "Active" } },
+    { "registrationOrder": 80901, "programBundle": "mobile-ji-kang", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:juexiang", "name": "绝响", "description": "当你死亡时，杀死你的角色弃置其装备区里的所有牌并失去1点体力，然后你可以令一名其他角色获得“残韵”，之后其可以弃置场上一张梅花牌，若其如此做，其获得“绝响”。", "executionForms": "Trigger" } },
+    { "registrationOrder": 80902, "programBundle": "mobile-ji-kang", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:canyun", "name": "残韵", "description": "出牌阶段限一次，你可以选择至多X名其他角色并弃置等量的牌（X为你的体力值，每名角色每局游戏限一次），这些角色依次和你比较装备区里的牌数：小于你的角色回复1点体力；等于你的角色摸一张牌；大于你的角色失去1点体力。若你选择的目标数等于X，你摸一张牌。", "executionForms": "State", "actionForms": "Active" } }
+  ],
+  "generals": [ { "registrationOrder": 80999, "pools": { "current": 80999 }, "definition": {
+    "id": "mobile:ji-kang", "name": "嵇康·移动版", "portraitKey": "mobile-ji-kang", "skillId": "mobile:qingxian", "additionalSkillIds": ["mobile:juexiang"],
+    "factionId": "wei", "baseHp": 3, "gender": "Male", "characterId": "character:ji-kang", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } } ]
+}

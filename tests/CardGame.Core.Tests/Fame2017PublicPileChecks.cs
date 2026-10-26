@@ -63,6 +63,38 @@ internal static class Fame2017PublicPileChecks
         Settle(game); Require(Pile(game).Count == 0 && game.CardMovements.Count(m => m.Reason.Value == "skill-program.public-pile.distribute") == 4, "Every book must be distributed once without stranded cards."); Replay(game, registry);
     }
 
+    public static void MobileTargetTimingAndClassicCompletionRemainDistinctCold()
+    {
+        foreach (var mobile in new[] { true, false })
+        {
+            var registry = Registry(mobile ? "mobile-timing" : "classic-timing");
+            var game = Start(registry); var action = SpadeDraw(game);
+            var before = game.CreateSnapshot(0, true).Players[0].HandCount;
+            var skill = mobile ? "mobile:bizhuan" : "classic:bizhuan";
+            Play(game, action);
+            Reach(game, p => p.SkillPrompt?.SkillId == skill && p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
+            Require(Pile(game).Count == 0 && game.CreateSnapshot(0, true).Players[0].HandCount == before + (mobile ? -1 : 1),
+                "Mobile offers the real book before Draw Two's two-card effect; classic retains its completed-use timing.");
+            Replay(game, registry);
+            Answer(game, Prompt(game)!.Choices.Single(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
+            Settle(game); Replay(game, registry); Public(game);
+            Require(Pile(game).Count == 1 && game.CreateSnapshot(0, true).Players[0].HandCount == before + 1 &&
+                game.CreateCardZoneDiagnostics().Single(z => z.CardId == action.CardId).Location == CardLocation.DiscardPile &&
+                game.CardMovements.Count(m => m.Reason.Value == "skill-program.public-pile.store") == 1,
+                "The native draw, source card disposal and actual top-card deposit each complete once after cold continuation.");
+            var book = Pile(game).Single().Id;
+            NextExchange(game); Replay(game, registry);
+            var entering = Prompt(game)!.Choices.First(c => c.Cards.Count == 1);
+            var enteringId = entering.Cards.Single(); Answer(game, entering);
+            Require(Prompt(game)!.Choices.Any(c => c.Cards.SequenceEqual([book])),
+                "The consumer references the correct mobile or classic source's actual public book.");
+            Replay(game, registry); Answer(game, Prompt(game)!.Choices.Single(c => c.Cards.SequenceEqual([book])));
+            Settle(game); Replay(game, registry); Public(game);
+            Require(Pile(game).Single().Id == enteringId && game.CreateSnapshot(0, true).Players[0].Hand.Any(c => c.Id == book),
+                "Equal exchange moves the original book to hand and the selected real entity to the corresponding source pile.");
+        }
+    }
+
     private static readonly Dictionary<string, ContentRegistry> Registries = [];
     private static ContentRegistry Registry(string mode="")
     {
@@ -185,7 +217,7 @@ internal static class Fame2017PublicPileChecks
                 var freeze=SkillProgramCatalog.Load($$"""{"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"fixture:response-freeze","revision":1,"triggers":[{"id":"lose-suit-policy","window":"cardResponseAccepted","ownerRelation":"actor","cardKinds":["dodge"],"optional":false,"effects":[{"op":"suppressGeneralSkill","target":"owner"},{"op":"chooseOption","target":"owner","resultBind":"continue","options":[{"id":"continue"}]}]}]}]}""","""{"schemaVersion":3,"skills":{"fixture:response-freeze":{"name":"花色冻结观察","description":"响应支付后移除花色策略","optionLabels":{"continue":"继续"}}}}""");
                 b.AddSkill(new("fixture:response-freeze","花色冻结观察","响应支付后移除花色策略"){Program=freeze.Programs["fixture:response-freeze"]});
             }
-            b.AddGeneral(new("fixture:book-owner","公开堆测试将","supporter","classic:bizhuan","qun",mode is "dodge-response" or "response-freeze"?3:20,["classic:tongbo", ..(mode=="ai"?Array.Empty<string>():new[]{"fixture:book-driver"}), "fixture:book-observer", ..(mode=="response-freeze"?new[]{"classic:hongyan","fixture:response-freeze"}:Array.Empty<string>()), ..(mode is "normal" or "replacement-skip-play" or "skip-draw" ? new[]{"fixture:draw-boundary"}:Array.Empty<string>())]));
+            b.AddGeneral(new("fixture:book-owner","公开堆测试将","supporter",mode=="mobile-timing"?"mobile:bizhuan":"classic:bizhuan","qun",mode is "dodge-response" or "response-freeze"?3:20,[mode=="mobile-timing"?"mobile:tongbo":"classic:tongbo", ..(mode=="ai"?Array.Empty<string>():new[]{"fixture:book-driver"}), "fixture:book-observer", ..(mode=="response-freeze"?new[]{"classic:hongyan","fixture:response-freeze"}:Array.Empty<string>()), ..(mode is "normal" or "replacement-skip-play" or "skip-draw" ? new[]{"fixture:draw-boundary"}:Array.Empty<string>())]));
             for(var i=1;i<4;i++)b.AddGeneral(new($"fixture:book-{i}",$"目标{i}","supporter","fixture:book-observer","wei",20,mode is "ai" or "response" or "dodge-response" or "response-freeze" or "borrowed" ? ["classic:bizhuan","classic:tongbo"]:mode.Length == 0 ? ["fixture:book-idle"] : []));
             b.AddDeck(new("fixture:book-deck","公开堆牌堆",8,2,[]){PhysicalCards=Enumerable.Range(0,160).Select(i=>new ContentDeckPhysicalCard(mode=="response-freeze"?i%8==0?"classic:borrowed-sword":i%8==2?"standard:qinggang_sword":i%2==0?"standard:slash":"standard:dodge":mode=="borrowed"?i%3==0?"classic:borrowed-sword":i%3==1?"standard:qinggang_sword":"standard:dodge":mode=="null-response"?i%2==0?"standard:draw_two":"standard:nullification":mode is "dodge-response" or "response-freeze"?i%2==0?"standard:slash":"standard:dodge":mode=="response" ? i%8==0?"standard:duel":i%2==0?"standard:slash":"standard:dodge" : i%10==0?"standard:qinggang_sword":i%5==1?"standard:draw_two":"standard:dodge",mode=="response-freeze"?i%8==2?Suit.Club:Suit.Spade:mode=="borrowed"?i%3==1?Suit.Club:Suit.Spade:mode is "response" or "ai" or "dodge-response" or "response-freeze" or "null-response"?Suit.Spade:i%10==0?Suit.Club:i%5==1?Suit.Spade:(Suit)(i%4),i%13+1)).ToArray()});
             b.AddMode(new("identity:classic-public-pile-check","公开堆机制",4,4,new Dictionary<string,int>{{nameof(Role.Lord),1},{nameof(Role.Loyalist),1},{nameof(Role.Rebel),2}},"fixture:book-deck",GeneralCandidateCount:4,GeneralPoolIds:["fixture:book-owner","fixture:book-1","fixture:book-2","fixture:book-3"]));

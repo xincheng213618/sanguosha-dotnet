@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:qingxian": { "name": "清弦", "description": "出牌阶段限一次，选择至多体力值名其他角色，弃置等量的牌。依次比较装备区牌数：少于你回复1，相等摸1，多于你失去1体力；选满体力值名目标，你摸1。" },
+    "mobile:juexiang": { "name": "绝响", "description": "死亡时，杀手弃尽装备并失去1体力；然后你可令一名其他角色获得残韵，该角色可弃置场上一张梅花牌并获得绝响。" },
+    "mobile:canyun": { "name": "残韵", "description": "效果同清弦，但每名目标每局游戏限选择一次。" }
+  }
+}

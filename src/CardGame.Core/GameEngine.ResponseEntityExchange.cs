@@ -40,13 +40,13 @@ public sealed partial class GameEngine
         if (response.ParentActionId is not { } parentId) return null;
         return ResponseExchangeHistory().OfType<CardActionAcceptedEvent>().Select(e=>e.Action).LastOrDefault(a=>a.ActionId==parentId);
     }
-    private bool CanExchangeResponseEntities(int owner,string skill,string instance,string state,CardActionContext response)
+    private bool CanExchangeResponseEntities(int owner,string skill,string instance,SkillProgramEffect effect,CardActionContext response)
     {
         var original=ActualRespondedAction(response);
         if(original is null || original.ActorSeat!=owner || response.ActorSeat==owner ||
             original.Type!=CardActionType.Use && original.EffectiveKind!=CardKind.Nullification || response.PhysicalCards.Count==0 ||
             response.PhysicalCards.Any(c=>IsExchangedCardClaim(response.ActionId,c.CardId)||_cardZones.GetLocation(c.CardId).Zone is not(CardZoneKind.Processing or CardZoneKind.DiscardPile))) return false;
-        if(ResponseExchangeUpgraded(owner,skill,instance,state)) return true;
+        if(effect.ResponseExchangeMode == ProgramResponseExchangeMode.ClaimResponseOnly || ResponseExchangeUpgraded(owner,skill,instance,effect.StateId!)) return true;
         return _players[response.ActorSeat].IsAlive&&original.PhysicalCards.Count>0&&original.PhysicalCards.All(c=>!IsExchangedCardClaim(original.ActionId,c.CardId)&&_cardZones.GetLocation(c.CardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile);
     }
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 70)]
@@ -55,15 +55,15 @@ public sealed partial class GameEngine
         var effect=trigger.Effects.FirstOrDefault(e=>e.Op==SkillProgramEffectOp.ExchangeRespondedCardEntities);
         if(effect is null) return true;
         var response=ResponseExchangeHistory().OfType<CardActionAcceptedEvent>().Select(e=>e.Action).LastOrDefault(a=>a.ActionId==context.CardUse?.CardActionId);
-        return response is not null&&CanExchangeResponseEntities(candidate.OwnerSeat,candidate.SkillId,candidate.SkillInstanceId,effect.StateId!,response);
+        return response is not null&&CanExchangeResponseEntities(candidate.OwnerSeat,candidate.SkillId,candidate.SkillInstanceId,effect,response);
     }
-    private SkillProgramStepOutcome BeginResponseEntityExchange(ProgramSkillFrame frame,string state)
+    private SkillProgramStepOutcome BeginResponseEntityExchange(ProgramSkillFrame frame,SkillProgramEffect effect)
     {
         var window=_resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(w=>w.Id==frame.WindowContext!.ParentFrameId);
         var response=window.Action;var original=ActualRespondedAction(response);
-        if(original is null||!CanExchangeResponseEntities(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,state,response)) return SkillProgramStepOutcome.Continue;
-        var originals=ResponseExchangeUpgraded(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,state)?[]:original.PhysicalCards.Select(c=>c.CardId).ToArray();
-        ReplaceRuntimeTop(frame=frame with {ResponseEntityExchange=new(original.ActionId,response.ActionId,response.ActorSeat,originals,response.PhysicalCards.Select(c=>c.CardId).ToArray(),state,1)});
+        if(original is null||!CanExchangeResponseEntities(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,effect,response)) return SkillProgramStepOutcome.Continue;
+        var originals=effect.ResponseExchangeMode == ProgramResponseExchangeMode.ClaimResponseOnly || ResponseExchangeUpgraded(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,effect.StateId!)?[]:original.PhysicalCards.Select(c=>c.CardId).ToArray();
+        ReplaceRuntimeTop(frame=frame with {ResponseEntityExchange=new(original.ActionId,response.ActionId,response.ActorSeat,originals,response.PhysicalCards.Select(c=>c.CardId).ToArray(),effect.StateId!,1)});
         ClaimResponseEntities(frame,original.ActionId,response.ActorSeat,originals,true);
         if(AwaitProgramBoundCardMovements(frame.Id,frame.OwnerSeat)==SkillProgramStepOutcome.Continue) AdvanceRuntimeProgram(frame.Id);
         return SkillProgramStepOutcome.AwaitChild;
@@ -81,12 +81,39 @@ public sealed partial class GameEngine
         var target=frame.SelectedTargetSeats.Single();
         if(target==frame.OwnerSeat||!_players[target].IsAlive) return SkillProgramStepOutcome.Continue;
         var previous=ResponseExchangeHistory().OfType<ProgramEscalatingDiscardStartedEvent>().Count(e=>e.OwnerSeat==frame.OwnerSeat&&e.SkillId==frame.SkillId&&e.StateId==effect.StateId);
-        var draw=_players.Where(p=>p.IsAlive).Sum(p=>GetEquipment(p).Concat(GetJudgment(p)).Count(c=>EffectiveSuit(p,c)==effect.Suits.Single()));
+        if(effect.PublicSuitDiscardMode is not null)
+        {
+            ReplaceRuntimeTop(frame=frame with {PublicSuitDiscard=new(target,checked(previous+1),effect.StateId!,effect.SkillIds.Single())});
+            PublishPublicSuitChoice(frame); return SkillProgramStepOutcome.AwaitChild;
+        }
+        return StartPublicSuitDraw(frame,effect.Suits.Single(),previous,previous);
+    }
+    private SkillProgramStepOutcome StartPublicSuitDraw(ProgramSkillFrame frame,Suit suit,int previous,int required)
+    {
+        var effect=ProgramInstructionResolver.Default.Resolve(frame,_contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
+        var target=frame.SelectedTargetSeats.Single();
+        var draw=_players.Where(p=>p.IsAlive).Sum(p=>GetEquipment(p).Concat(GetJudgment(p)).Count(c=>EffectiveSuit(p,c)==suit));
+        if(effect.PublicSuitDiscardMode is not null) draw=Math.Min(5,draw);
         AdvanceEventRulesAndQueueFact(new ProgramEscalatingDiscardStartedEvent(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,effect.StateId!,previous,target,draw));
-        ReplaceRuntimeTop(frame=frame with {PublicSuitDiscard=new(target,previous,effect.StateId!,effect.SkillIds.Single(),1)});
+        ReplaceRuntimeTop(frame=frame with {PublicSuitDiscard=new(target,required,effect.StateId!,effect.SkillIds.Single(),1){ChosenSuit=effect.PublicSuitDiscardMode is null?null:suit,DrawCount=effect.PublicSuitDiscardMode is null?null:draw}});
         DrawCards(_players[target],draw,true,new CardMoveReason("skill-program.public-suit-escalating-draw"));
         if(AwaitProgramBoundCardMovements(frame.Id,frame.OwnerSeat)==SkillProgramStepOutcome.Continue) AdvanceRuntimeProgram(frame.Id);
         return SkillProgramStepOutcome.AwaitChild;
+    }
+    private void PublishPublicSuitChoice(ProgramSkillFrame frame)
+    {
+        var skill=_contentRegistry.GetSkill(frame.SkillId);
+        var choices=new[]{Suit.Spade,Suit.Heart,Suit.Club,Suit.Diamond}.Select(s=>new PromptChoice(new ChoiceId($"public-suit-choice.{frame.Id}.{s}"),GetSuitDisplayName(s),[],[],new Dictionary<string,string>{["program-action"]="public-suit-choice",["suit"]=s.ToString()})).ToArray();
+        _pendingDecision=new(DecisionKind.ProgramTrigger,frame.OwnerSeat,$"{skill.Name}：选择场上牌的花色。",[],[],frame.PublicSuitDiscard!.TargetSeat){PromptId=CreatePromptId(),IsPrivate=false,Choices=choices,SkillPrompt=new(frame.SkillId,skill.Name,skill.Name,skill.Description)};
+        _status=_players[frame.OwnerSeat].IsHuman?EngineStatus.AwaitingHumanResponse:EngineStatus.Running;
+    }
+    [ProgramAnswer("public-suit-choice")]
+    private void ResolvePublicSuitChoice(PromptChoice choice)
+    {
+        var frame=(ProgramSkillFrame)_resolutionStack[^1]; var draft=frame.PublicSuitDiscard!;
+        if(draft.Stage!=0 || !Enum.TryParse<Suit>(choice.Parameters.GetValueOrDefault("suit"),out var suit) || suit is not(Suit.Spade or Suit.Heart or Suit.Club or Suit.Diamond))
+            throw new InvalidOperationException("The public-suit choice lost its original escalating discard.");
+        ClearPendingDecision(); StartPublicSuitDraw(frame,suit,draft.Required-1,draft.Required);
     }
     [ProgramContinuation(ProgramContinuationKind.Resume, 990)]
     private bool TryResumeResponseEntityExchange(long id)
@@ -105,6 +132,7 @@ public sealed partial class GameEngine
         }
         if(frame.PublicSuitDiscard is {} discard)
         {
+            if(discard.Stage==0){PublishPublicSuitChoice(frame);return true;}
             if(discard.Stage==1)
             {
                 var cards=GetHand(_players[discard.TargetSeat]).Concat(GetEquipment(_players[discard.TargetSeat])).ToArray();
@@ -120,12 +148,15 @@ public sealed partial class GameEngine
     private void FinishPublicSuitDiscard(ProgramSkillFrame frame)
     {
         var draft=frame.PublicSuitDiscard!;
+        var policy=ProgramInstructionResolver.Default.Resolve(frame,_contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect.PublicSuitDiscardMode;
         if(draft.Exhausted)
         {
             var sourceIds=_players[frame.OwnerSeat].SkillGrants.Grants.Where(g=>g.SkillId==frame.SkillId&&g.SkillInstanceId==frame.SkillInstanceId).Select(g=>g.SourceId).ToHashSet();
             foreach(var grant in _players[frame.OwnerSeat].SkillGrants.Grants.Where(g=>g.SkillId==draft.UpgradeSkillId&&g.IsEnabled&&sourceIds.Contains(g.SourceId)))
-                AdvanceEventRulesAndQueueFact(new ProgramResponseExchangeUpgradedEvent(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,grant.SkillId,grant.SkillInstanceId,draft.StateId));
-            foreach(var grant in _players[frame.OwnerSeat].SkillGrants.Grants.Where(g=>g.SkillId==frame.SkillId&&g.SkillInstanceId==frame.SkillInstanceId)) _players[frame.OwnerSeat].SkillGrants.RemoveGrant(grant.GrantId);
+                if(policy is null || !ResponseExchangeUpgraded(frame.OwnerSeat,grant.SkillId,grant.SkillInstanceId,draft.StateId))
+                    CommitProgramSkillChangeFact(frame,new ProgramResponseExchangeUpgradedEvent(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,grant.SkillId,grant.SkillInstanceId,draft.StateId));
+            if(policy is null)
+                foreach(var grant in _players[frame.OwnerSeat].SkillGrants.Grants.Where(g=>g.SkillId==frame.SkillId&&g.SkillInstanceId==frame.SkillInstanceId)) _players[frame.OwnerSeat].SkillGrants.RemoveGrant(grant.GrantId);
         }
         ReplaceRuntimeTop(frame with {PublicSuitDiscard=null});AdvanceRuntimeProgram(frame.Id);
     }
@@ -145,7 +176,10 @@ public sealed partial class GameEngine
         if(!_players[draft.TargetSeat].IsAlive||available.All(c=>c.Id!=id)||draft.SelectedIds!.Contains(id)) throw new InvalidOperationException("The selected escalating discard is no longer owned.");
         ClearPendingDecision();var selected=draft.SelectedIds!.Append(id).ToArray();
         if(selected.Length<draft.Required){ReplaceRuntimeTop(frame with {PublicSuitDiscard=draft with {SelectedIds=selected}});PublishPublicSuitDiscard((ProgramSkillFrame)_resolutionStack[^1]);return;}
-        ReplaceRuntimeTop(frame=frame with {PublicSuitDiscard=draft with {Stage=3,SelectedIds=selected,Exhausted=selected.Length>0&&selected.Length==available.Length}});
+        var effect=ProgramInstructionResolver.Default.Resolve(frame,_contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
+        var hand=GetHand(_players[draft.TargetSeat]).Select(c=>c.Id).ToArray();
+        var exhausted=effect.PublicSuitDiscardMode is null?selected.Length>0&&selected.Length==available.Length:hand.Length>0&&hand.All(selected.Contains);
+        ReplaceRuntimeTop(frame=frame with {PublicSuitDiscard=draft with {Stage=3,SelectedIds=selected,Exhausted=exhausted,PaidHandIds=effect.PublicSuitDiscardMode is null?null:hand}});
         var logicalDiscard=CaptureNativeLogicalDiscardInvocation(frame.OwnerSeat,draft.TargetSeat,selected,new("skill-program.public-suit-escalating-discard"),frame.Id);
         foreach(var cardId in selected) MoveCard(EntityAtCurrentLocation(cardId),_cardZones.GetLocation(cardId),CardLocation.DiscardPile,new CardMoveReason("skill-program.public-suit-escalating-discard"));
         CompleteNativeLogicalDiscardInvocation(logicalDiscard);
@@ -183,13 +217,19 @@ public sealed partial class GameEngine
             var window=_resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w=>w.Id==frame.WindowContext?.ParentFrameId);
             var original=window is null?null:ActualRespondedAction(window.Action);
             if(paused.Op!=SkillProgramEffectOp.ExchangeRespondedCardEntities||exchange.StateId!=paused.StateId||exchange.Stage is not(1 or 2)||window is null||original is null||original.ActionId!=exchange.RespondedActionId||original.ActorSeat!=frame.OwnerSeat||window.Action.ActionId!=exchange.ResponseActionId||window.Action.ActorSeat!=exchange.RecipientSeat||
-                !window.Action.PhysicalCards.Select(c=>c.CardId).SequenceEqual(exchange.ResponseCardIds)||exchange.OriginalCardIds.Count>0&&!original.PhysicalCards.Select(c=>c.CardId).SequenceEqual(exchange.OriginalCardIds)||exchange.OriginalCardIds.Count==0&&!ResponseExchangeUpgraded(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,exchange.StateId))
+                !window.Action.PhysicalCards.Select(c=>c.CardId).SequenceEqual(exchange.ResponseCardIds)||exchange.OriginalCardIds.Count>0&&(!original.PhysicalCards.Select(c=>c.CardId).SequenceEqual(exchange.OriginalCardIds)||paused.ResponseExchangeMode is not null)||exchange.OriginalCardIds.Count==0&&paused.ResponseExchangeMode is null&&!ResponseExchangeUpgraded(frame.OwnerSeat,frame.SkillId,frame.SkillInstanceId,exchange.StateId))
                 throw new InvalidOperationException("An entity exchange lost its exact responded/response identity or upgrade source.");
         }
         if(frame.PublicSuitDiscard is {} discard)
         {
-            if(paused.Op!=SkillProgramEffectOp.DrawPublicSuitThenEscalatingDiscard||discard.StateId!=paused.StateId||discard.UpgradeSkillId!=paused.SkillIds.Single()||discard.TargetSeat==frame.OwnerSeat||!frame.SelectedTargetSeats.SequenceEqual([discard.TargetSeat])||discard.Required<0||discard.Stage is <1 or >3||discard.SelectedIds is {} selected&&(selected.Distinct().Count()!=selected.Count||selected.Count>discard.Required)||discard.Exhausted&&(discard.Stage!=3||discard.SelectedIds is not{Count:>0}))
+            if(paused.Op!=SkillProgramEffectOp.DrawPublicSuitThenEscalatingDiscard||discard.StateId!=paused.StateId||discard.UpgradeSkillId!=paused.SkillIds.Single()||discard.TargetSeat==frame.OwnerSeat||!frame.SelectedTargetSeats.SequenceEqual([discard.TargetSeat])||discard.Required<0||discard.Stage is <0 or >3||discard.Stage==0&&paused.PublicSuitDiscardMode is null||discard.SelectedIds is {} selected&&(selected.Distinct().Count()!=selected.Count||selected.Count>discard.Required)||discard.Exhausted&&(discard.Stage!=3||discard.SelectedIds is not{Count:>0})||
+                (paused.PublicSuitDiscardMode is null ? discard.ChosenSuit is not null||discard.DrawCount is not null||discard.PaidHandIds is not null :
+                    discard.Stage==0 ? discard.ChosenSuit is not null||discard.DrawCount is not null||discard.Required<1 :
+                    discard.ChosenSuit is not(Suit.Spade or Suit.Heart or Suit.Club or Suit.Diamond)||discard.DrawCount is null or <0 or >5||
+                    discard.Stage==3&&(discard.PaidHandIds is null||discard.PaidHandIds.Distinct().Count()!=discard.PaidHandIds.Count||discard.Exhausted!=(discard.PaidHandIds.Count>0&&discard.PaidHandIds.All(discard.SelectedIds!.Contains)))))
                 throw new InvalidOperationException("An escalating discard lost its real participant, source or paid set.");
+            if(discard.Stage==0&&ReferenceEquals(frame,_resolutionStack.LastOrDefault())&&(_pendingDecision is not{Kind:DecisionKind.ProgramTrigger,IsPrivate:false} suitPrompt||suitPrompt.PlayerSeat!=frame.OwnerSeat||suitPrompt.Choices.Count!=4||suitPrompt.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")!="public-suit-choice")))
+                throw new InvalidOperationException("An escalating discard lost its public suit choice.");
             if(discard.Stage==2&&ReferenceEquals(frame,_resolutionStack.LastOrDefault())&&(_pendingDecision is not{Kind:DecisionKind.ProgramTrigger,IsPrivate:true} prompt||prompt.PlayerSeat!=discard.TargetSeat||prompt.Choices.Count==0||prompt.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")!="public-suit-discard")))
                 throw new InvalidOperationException("An escalating discard lost its private payer choice.");
         }
@@ -197,7 +237,7 @@ public sealed partial class GameEngine
     [ProgramCapability]
     private sealed class ResponseExchangeProgramCapability(GameEngine engine) : IResponseExchangeProgramHost
     {
-        public SkillProgramStepOutcome ExchangeRespondedCardEntities(ProgramSkillFrame frame,string stateId)=>engine.BeginResponseEntityExchange(frame,stateId);
+        public SkillProgramStepOutcome ExchangeRespondedCardEntities(ProgramSkillFrame frame,SkillProgramEffect effect)=>engine.BeginResponseEntityExchange(frame,effect);
         public SkillProgramStepOutcome DrawPublicSuitThenEscalatingDiscard(ProgramSkillFrame frame,SkillProgramEffect effect)=>engine.BeginPublicSuitEscalatingDiscard(frame,effect);
     }
 }
