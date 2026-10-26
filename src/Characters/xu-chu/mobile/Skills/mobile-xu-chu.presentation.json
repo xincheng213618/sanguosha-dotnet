@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:luoyi": {
+      "name": "裸衣",
+      "description": "摸牌阶段，你可以少摸一张牌，然后本回合你为伤害来源的【杀】或【决斗】造成的基础伤害值+1。"
+    }
+  }
+}

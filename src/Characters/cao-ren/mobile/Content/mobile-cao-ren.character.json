@@ -1,0 +1,36 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:cao-ren",
+  "skills": [
+    {
+      "registrationOrder": 85000,
+      "programBundle": "mobile-cao-ren",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:jushou",
+        "name": "据守",
+        "description": "结束阶段，你可以摸三张牌，然后翻面。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 85099,
+      "pools": { "current": 85099 },
+      "definition": {
+        "id": "mobile:cao-ren",
+        "name": "曹仁·移动版",
+        "portraitKey": "mobile-cao-ren",
+        "skillId": "mobile:jushou",
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:cao-ren",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

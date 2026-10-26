@@ -1,0 +1,36 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhang-liao",
+  "skills": [
+    {
+      "registrationOrder": 84800,
+      "programBundle": "mobile-zhang-liao",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:tuxi",
+        "name": "突袭",
+        "description": "摸牌阶段，你可以改为获得至多两名其他角色的各一张手牌。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 84899,
+      "pools": { "current": 84899 },
+      "definition": {
+        "id": "mobile:zhang-liao",
+        "name": "张辽·移动版",
+        "portraitKey": "mobile-zhang-liao",
+        "skillId": "mobile:tuxi",
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:zhang-liao",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

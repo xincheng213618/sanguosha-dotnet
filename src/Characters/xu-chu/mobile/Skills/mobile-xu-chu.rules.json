@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:luoyi",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "reduce-draw-for-source-damage",
+          "window": "drawPhaseStarting",
+          "subject": "owner",
+          "optional": true,
+          "priority": 80,
+          "effects": [
+            { "op": "adjustNormalDraw", "target": "owner", "amount": -1 },
+            {
+              "op": "grantTurnCardDamageModifier",
+              "target": "owner",
+              "amount": 1,
+              "cardKinds": ["slash", "fireSlash", "thunderSlash", "duel"],
+              "expires": "currentTurnEnd",
+              "sourceScope": "damageSource"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

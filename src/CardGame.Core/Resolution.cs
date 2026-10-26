@@ -18,6 +18,7 @@ public static class JudgmentReasons
 
 public enum ResolutionFrameKind
 {
+    DiscardPhaseEntry = 84700,
     HappyQiaoHealthChoice = 42400,
     MobileSimaRenjie = 40425,
     KemingSkillEcho = 39700,

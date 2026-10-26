@@ -24019,6 +24019,74 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-lu-meng",
+      "characterName": "吕蒙",
+      "defaultSkinId": "1000",
+      "skins": [
+        {
+          "id": "1000",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-10.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/1000.jpg",
+          "sha256": "abfdc7b48a2e0189a9c105f4824ed780261f5e0f046e8e85556ea94fcaf54080",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-lu-meng.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhang-liao",
+      "characterName": "张辽",
+      "defaultSkinId": "1800",
+      "skins": [
+        {
+          "id": "1800",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-18.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/1800.jpg",
+          "sha256": "0d632cb774eaff7467626314fd29de71d07aeb6c67d1cad072aae81e7dc68c71",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhang-liao.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-xu-chu",
+      "characterName": "许褚",
+      "defaultSkinId": "1900",
+      "skins": [
+        {
+          "id": "1900",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-19.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/1900.jpg",
+          "sha256": "c4b8769f46ac5f94a8576c54bce24d404fe0d0c3a90e06bfce1545f24d120a89",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-xu-chu.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-cao-ren",
+      "characterName": "曹仁",
+      "defaultSkinId": "2900",
+      "skins": [
+        {
+          "id": "2900",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-29.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/2900.jpg",
+          "sha256": "d909a25d1c045d2271a9e17034fb3bcc125119aa6d08096e295f9048c1a0a943",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cao-ren.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

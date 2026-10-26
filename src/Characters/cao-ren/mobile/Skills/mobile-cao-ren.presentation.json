@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:jushou": {
+      "name": "据守",
+      "description": "结束阶段，你可以摸三张牌，然后翻面。"
+    }
+  }
+}

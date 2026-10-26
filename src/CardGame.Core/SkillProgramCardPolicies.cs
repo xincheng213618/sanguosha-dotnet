@@ -119,4 +119,6 @@ public sealed record SkillProgramCardPolicy(
     public bool? IncludeNonTargetResponders { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public SkillProgramPeachRecoveryScope? PeachRecoveryScope { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public bool? BeforePhaseEntry { get; init; }
 }

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:jushou",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "ending-draw-and-turn-over",
+          "window": "turnEnding",
+          "subject": "owner",
+          "optional": true,
+          "priority": 100,
+          "effects": [
+            { "op": "draw", "target": "owner", "amount": 3 },
+            { "op": "turnOver", "target": "owner" }
+          ]
+        }
+      ]
+    }
+  ]
+}

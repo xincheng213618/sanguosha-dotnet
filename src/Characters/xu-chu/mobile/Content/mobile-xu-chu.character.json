@@ -1,0 +1,36 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:xu-chu",
+  "skills": [
+    {
+      "registrationOrder": 84900,
+      "programBundle": "mobile-xu-chu",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:luoyi",
+        "name": "裸衣",
+        "description": "摸牌阶段，你可以少摸一张牌，然后本回合你为伤害来源的【杀】或【决斗】造成的基础伤害值+1。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 84999,
+      "pools": { "current": 84999 },
+      "definition": {
+        "id": "mobile:xu-chu",
+        "name": "许褚·移动版",
+        "portraitKey": "mobile-xu-chu",
+        "skillId": "mobile:luoyi",
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:xu-chu",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

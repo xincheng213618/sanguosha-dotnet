@@ -1,0 +1,36 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:lu-meng",
+  "skills": [
+    {
+      "registrationOrder": 84700,
+      "programBundle": "mobile-lu-meng",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:keji",
+        "name": "克己",
+        "description": "弃牌阶段开始前，若你未于本回合的出牌阶段内使用或打出过【杀】，你可以跳过此阶段。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 84799,
+      "pools": { "current": 84799 },
+      "definition": {
+        "id": "mobile:lu-meng",
+        "name": "吕蒙·移动版",
+        "portraitKey": "mobile-lu-meng",
+        "skillId": "mobile:keji",
+        "factionId": "wu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:lu-meng",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

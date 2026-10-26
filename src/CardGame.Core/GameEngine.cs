@@ -16207,12 +16207,13 @@ public sealed partial class GameEngine
         };
     }
 
-    private void BeginDiscardPhase()
+    private void BeginDiscardPhase(bool beforeEntryPolicyCompleted = false)
     {
         if ((HasCurrentIssuedPhaseHandDebt() || HasCurrentIssuedWeiluDebt(_players[_currentSeat])) && TryBeginPlayEndingProgramWindow(_players[_currentSeat])) return;
         ExpireCaoChunPlayDebt(_currentSeat, _cardUseDebitPhaseInstanceId);
         if (TrySkipQiaoZhouDiscardPhase(_players[_currentSeat])) { EndTurn(); return; }
         if (TrySkipDuXiDiscardPhase(_players[_currentSeat])) { EndTurn(); return; }
+        if (!beforeEntryPolicyCompleted && TryBeginPreEntryDiscardPolicy(_players[_currentSeat])) return;
         _phase = TurnPhase.Discard;
         StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind.Discard, _currentSeat);
         _fullDiscardPhaseSuitTurn = -1;
@@ -16241,7 +16242,7 @@ public sealed partial class GameEngine
             return;
         }
         if (!_usedOrPlayedSlashDuringPlayPhase &&
-            CardPolicies(current, SkillProgramCardPolicyKind.OfferSkipDiscard).Any())
+            CardPolicies(current, SkillProgramCardPolicyKind.OfferSkipDiscard).Any(item => item.Policy.BeforePhaseEntry != true))
         {
             BeginSkipDiscardPolicyChoice(current);
         }
@@ -16251,7 +16252,7 @@ public sealed partial class GameEngine
     private void BeginSkipDiscardPolicyChoice(CharacterState current)
     {
         var (source, policy) = CardPolicies(current,
-            SkillProgramCardPolicyKind.OfferSkipDiscard).First();
+            SkillProgramCardPolicyKind.OfferSkipDiscard).First(item => item.Policy.BeforePhaseEntry != true);
         var skillName = source.Definition.Name;
         _pendingDecision = new PendingDecision(
             DecisionKind.SkipDiscardPolicy,
@@ -16292,6 +16293,7 @@ public sealed partial class GameEngine
 
     private void ResolveSkipDiscardPolicyChoice(bool useSkill)
     {
+        if (TryResolvePreEntryDiscardPolicy(useSkill)) return;
         if (_pendingDecision is not { Kind: DecisionKind.SkipDiscardPolicy, PlayerSeat: var playerSeat } ||
             playerSeat != _currentSeat ||
             _phase != TurnPhase.Discard)
@@ -16304,7 +16306,7 @@ public sealed partial class GameEngine
         var skillId = metadata["skill-id"];
         var policyId = metadata["policy-id"];
         if (!CardPolicies(current, SkillProgramCardPolicyKind.OfferSkipDiscard).Any(item =>
-                item.Source.SkillId == skillId && item.Policy.Id == policyId) ||
+                item.Policy.BeforePhaseEntry != true && item.Source.SkillId == skillId && item.Policy.Id == policyId) ||
             _usedOrPlayedSlashDuringPlayPhase)
             throw new InvalidOperationException("The chosen discard policy is no longer enabled.");
         ClearPendingDecision();
@@ -18287,7 +18289,8 @@ public sealed partial class GameEngine
             }
         }
 
-        if (coreDecision is { Kind: DecisionKind.SkipDiscardPolicy } kejiDecision)
+        if (coreDecision is { Kind: DecisionKind.SkipDiscardPolicy } kejiDecision &&
+            !AssertPreEntryDiscardPolicyChoice(kejiDecision))
         {
             var validPolicy = kejiDecision.Choices.Count == 2 &&
                 kejiDecision.Choices[0].Parameters.TryGetValue("skill-id", out var skillId) &&
@@ -18297,7 +18300,7 @@ public sealed partial class GameEngine
                     choice.Parameters.GetValueOrDefault("policy-id") == policyId) &&
                 CardPolicies(_players[kejiDecision.PlayerSeat],
                     SkillProgramCardPolicyKind.OfferSkipDiscard).Any(item =>
-                    item.Source.SkillId == skillId && item.Policy.Id == policyId);
+                    item.Policy.BeforePhaseEntry != true && item.Source.SkillId == skillId && item.Policy.Id == policyId);
             if (_phase != TurnPhase.Discard ||
                 _currentSeat != kejiDecision.PlayerSeat ||
                 !_players[kejiDecision.PlayerSeat].IsAlive ||
@@ -18335,7 +18338,7 @@ public sealed partial class GameEngine
         }
 
         if (!hasActiveCardResolution && _resolutionStack.Count != 0 &&
-            !HasExactBoundarySkillInvocation() &&
+            !HasExactBoundarySkillInvocation() && !HasNativeDiscardEntryBoundary() &&
             !HasBeiMiHuTurnPreludeBoundary() && !HasQiaoZhouPreparationBoundaryFrame() && !HasForeignActualTurnStartBoundary() && !(HasActualPhaseEndBoundaryFrame() || HasRoundEndingBoundaryFrame()) && !HasProgramLifecycleBoundaryFrame() && !HasDrawPhaseObligationBoundaryFrame() && !HasManualDiscardBoundaryFrame() && !HasTurnEndingBoundaryFrame() && !HasDeferredTurnEndBoundaryFrame() &&
             !HasPlayPhaseStartingBoundaryFrame() && !HasEquipmentRecastNativeDrawBoundary() &&
             !HasCardsMovedProgramBoundaryFrame() && DrawFundedDistinctBasicObserverRoot() is null &&

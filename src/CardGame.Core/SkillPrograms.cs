@@ -3736,9 +3736,13 @@ public sealed class SkillProgramCatalog
         RequireObject(node, path);
         CheckProperties(node, path, "id", "kind", "cardKinds", "requiredCardKinds", "value",
             "inputSuit", "outputSuit", "condition", "factionId", "ownerRole", "discardCost", "providerDrawCount", "maximumRecoveryOrdinal",
-            "useIncomingResponseDistance", "includeNonTargetResponders", "peachRecoveryScope");
+            "useIncomingResponseDistance", "includeNonTargetResponders", "peachRecoveryScope", "beforePhaseEntry");
         var id = Identifier(node, "id", path);
         var kind = EnumValue<SkillProgramCardPolicyKind>(node, "kind", path);
+        bool? beforePhaseEntry = node.TryGetProperty("beforePhaseEntry", out _)
+            ? RequiredBool(node, "beforePhaseEntry", path) : null;
+        if (beforePhaseEntry is not null && kind != SkillProgramCardPolicyKind.OfferSkipDiscard)
+            Fail(path + ".beforePhaseEntry", "requires offerSkipDiscard");
         SkillProgramPeachRecoveryScope? peachRecoveryScope = node.TryGetProperty("peachRecoveryScope", out _)
             ? EnumValue<SkillProgramPeachRecoveryScope>(node, "peachRecoveryScope", path) : null;
         if (peachRecoveryScope is not null && kind != SkillProgramCardPolicyKind.RescueRecoveryBonus)
@@ -4046,7 +4050,7 @@ public sealed class SkillProgramCatalog
             inputSuit, outputSuit, OptionalCondition(node, path), factionId, ownerRole)
         { DiscardCost = discardCost, ProviderDrawCount = providerDrawCount,
           UseIncomingResponseDistance = useIncomingResponseDistance, IncludeNonTargetResponders = includeNonTargetResponders,
-          PeachRecoveryScope = peachRecoveryScope };
+          PeachRecoveryScope = peachRecoveryScope, BeforePhaseEntry = beforePhaseEntry };
         GameEngine.ValidateComparedBlackSlashPolicy(path, policy);
         return policy;
     }

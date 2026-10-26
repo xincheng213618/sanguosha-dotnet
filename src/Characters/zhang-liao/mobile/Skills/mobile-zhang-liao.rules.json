@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:tuxi",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "replace-draw-with-opponent-hands",
+          "window": "drawPhaseStarting",
+          "subject": "owner",
+          "optional": true,
+          "priority": 100,
+          "drawPhaseMode": "replacement",
+          "effects": [
+            { "op": "selectTargets", "target": "owner", "targetKind": "otherLivingWithHand", "minimumTargets": 0, "maximumTargets": 2, "targetAiOrder": "hostileThenHandCount" },
+            { "op": "takeRandomHandCardFromSelectedTargets", "target": "owner", "amount": 1, "awaitMovementTriggers": true }
+          ]
+        }
+      ]
+    }
+  ]
+}
