@@ -4616,6 +4616,18 @@ public sealed partial class GameEngine
         if (trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.PeekTurnQuotaTop))
             return CreateAttributedPaymentAiContext(owner,trigger) with { TurnCriterionQuota = ComputeTurnCriterionQuota(owner.Seat) };
         if (trigger.Window == SkillProgramTriggerWindow.AfterDamageApplied &&
+            ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.ReflectAppliedDamage) &&
+            ActiveDamageTrigger is { } reflectionWindow)
+        {
+            var attack = GetDamageTriggerAttack(reflectionWindow);
+            return CreateAttributedPaymentAiContext(owner, trigger) with
+            {
+                AfterDamageAmount = attack.DamageWasApplied ? attack.DamageAmount : 0,
+                SelectedTarget = !attack.IsSourceLess && IsValidPlayerSeat(attack.SourceSeat) && _players[attack.SourceSeat].IsAlive
+                    ? CreateAiSkillContext(_players[attack.SourceSeat], ownerSeat) : null
+            };
+        }
+        if (trigger.Window == SkillProgramTriggerWindow.AfterDamageApplied &&
             trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.Recover &&
                 effect.NumberExpression == SkillProgramNumberExpression.AfterDamageAmount) &&
             ActiveDamageTrigger is { } afterDamage)

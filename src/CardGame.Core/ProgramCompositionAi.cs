@@ -1012,6 +1012,14 @@ internal sealed partial class ProgramAiEstimateContext
         _targetAdjustment -= 12d;
     }
     internal void DamageAppearanceDraw() { /* The mandatory actual receipt chooses its recipient, not a speculative AI reward. */ }
+    internal void ReflectAppliedDamage()
+    {
+        if (_publicContext.SelectedTarget is not { } source || _publicContext.AfterDamageAmount is not > 0)
+            return;
+        Damage(new(SkillProgramEffectOp.Damage,
+            source.Seat == _player.Seat ? SkillProgramEffectTarget.Owner : SkillProgramEffectTarget.SelectedTarget,
+            _publicContext.AfterDamageAmount.Value, new(SkillProgramConditionKind.Always, 0, [])));
+    }
     internal void Damage(SkillProgramEffect effect)
     {
         var amount = effect.Condition.Kind == SkillProgramConditionKind.BoundCardSuitMatchesChoice

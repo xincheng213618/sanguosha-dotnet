@@ -157,6 +157,8 @@ public static partial class StandardShanheCampaignCatalog
             "你使用【杀】后可以重铸至多2张牌", RewardIdOverride: "tactic-zhudao-current-2040"),
         new ReactionTacticSource(2128, "及时雨", StandardShanheRecastTacticsPackage.JishiyuSkillId, 200, 1, 29,
             "回合外失去最后一张手牌后，摸两张牌", RewardIdOverride: "tactic-jishiyu-current-2128"),
+        new ReactionTacticSource(2131, "破釜沉舟", StandardShanheAppliedDamageReflectionPackage.PofuChenzhouSkillId, 300, 2, null,
+            "回合外受到伤害一次大于等于3点时，对伤害来源造成等量同属性伤害。", RewardIdOverride: "tactic-pofu-chenzhou-current-2131"),
     });
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentReactionTacticShopMetadata =>
