@@ -24342,6 +24342,125 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-xu-huang",
+      "characterName": "徐晃",
+      "defaultSkinId": "4200",
+      "skins": [
+        {
+          "id": "4200",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-42.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/4200.jpg",
+          "sha256": "9e35ca386e3e259b97d1c6e24c5aa74690a58729505dac95f7649de5f4ad227e",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-xu-huang.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-dong-zhuo",
+      "characterName": "董卓",
+      "defaultSkinId": "4500",
+      "skins": [
+        {
+          "id": "4500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-45.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/4500.jpg",
+          "sha256": "b31431e467d59802029f1a12e4416b12e8a35a3f0c3f99e2ab4eb6e6881fb501",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-dong-zhuo.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-sun-ce",
+      "characterName": "孙策",
+      "defaultSkinId": "5400",
+      "skins": [
+        {
+          "id": "5400",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-54.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/5400.jpg",
+          "sha256": "431f93e2964c875da78bf714386bcf2a48390cf18bd4e37e53d7c5f3a97ba6f8",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-sun-ce.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-xun-yu",
+      "characterName": "荀彧",
+      "defaultSkinId": "3500",
+      "skins": [
+        {
+          "id": "3500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-35.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/3500.jpg",
+          "sha256": "3370e579789795495d25024ad33c82fe90cbb11592af336d377044dd5a315b9a",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-xun-yu.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhong-hui",
+      "characterName": "钟会",
+      "defaultSkinId": "17300",
+      "skins": [
+        {
+          "id": "17300",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-122.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/17300.jpg",
+          "sha256": "9bd8198189fbc37f192586e34411599a58ceb6c64091bd9b6d8f8138809ba038",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhong-hui.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-pang-tong",
+      "characterName": "庞统",
+      "defaultSkinId": "3600",
+      "skins": [
+        {
+          "id": "3600",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-36.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/3600.jpg",
+          "sha256": "9df3455779a354209c91d90e0dc849b18ae3a1fae82acea28c70c7e842bd7d49",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-pang-tong.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-liu-shan",
+      "characterName": "刘禅",
+      "defaultSkinId": "5300",
+      "skins": [
+        {
+          "id": "5300",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-53.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/5300.jpg",
+          "sha256": "2de2ec2908a269b78e2765346c02c425aef79842f38e036f22dfbdbb9e201f4e",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-liu-shan.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

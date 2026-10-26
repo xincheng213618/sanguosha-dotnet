@@ -47,12 +47,12 @@ public sealed partial class GameEngine
         var context = active.WindowContext;
         if (context is not
             {
-                Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects,
+                Window: SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.CardUseBeforeTargetEffects,
                 CardUse: { } cardUse,
                 TargetSeat: var targetSeat
             } || targetSeat != active.OwnerSeat)
             throw new InvalidOperationException(
-                "Current card-effect nullification requires the target owner's before-target-effects context.");
+                "Current card-effect nullification requires the target owner's finalized-target or before-target-effects context.");
 
         var cardUseIndex = _resolutionStack.FindLastIndex(item =>
             item.Id == cardUse.ParentCardUseFrameId && item is CardUseFrame);

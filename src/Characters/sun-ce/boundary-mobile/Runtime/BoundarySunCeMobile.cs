@@ -18,8 +18,26 @@ internal sealed class ResolveBoundarySunCeZhibaDescriptor : ProgramOperationDesc
     public override ISkillProgramEffectHandler Handler { get; } = new BoundarySunCeChallengeHandler();
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.Pindian, static (_, c) => c.PublicControlValue(1));
-    public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);
+    public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
+    {
+        r.AllowOnly("op", "target", "condition", "skillIds");
+        var skills = r.Has("skillIds") ? r.RequiredIdentifierArray("skillIds") : [];
+        if (skills.Count > 1) throw new InvalidOperationException(r.Path + ": Zhiba accepts at most one awakening skill.");
+        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(), skillIds: skills);
+        RequireAlways(effect, r.Path); return effect;
+    }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new ReadSelectedTarget()];
+
+    [ProgramCatalogValidation(86800)]
+    internal static void Validate(string path, SkillProgram program)
+    {
+        if (program.Triggers.Any(t => t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveBoundarySunCeZhiba)))
+            throw new InvalidOperationException(path + ": Zhiba is supplied only through another Wu player's Play-phase activation.");
+        foreach (var activation in program.Activations.Where(a => ProgramInstructionResolver.Default.Features(a).HasOperation(SkillProgramEffectOp.ResolveBoundarySunCeZhiba)))
+            if (activation is not { MinCards: 0, MaxCards: 0, MinTargets: 1, MaxTargets: 1, TargetKind: SkillProgramTargetKind.OtherLivingWithHand,
+                Effects: [{ Op: SkillProgramEffectOp.ResolveBoundarySunCeZhiba, Target: SkillProgramEffectTarget.Owner }] })
+                throw new InvalidOperationException(path + ": Zhiba requires its single native challenge instruction and one other hand-bearing target.");
+    }
 }
 internal sealed class BoundarySunCeChallengeHandler : ISkillProgramEffectHandler
 {
@@ -35,35 +53,40 @@ internal sealed class BoundarySunCeOwnChallengeUnavailable : IProgramSelectionCa
 }
 public sealed partial class GameEngine
 {
-    private const string BoundarySunCeMobileZhiba = "boundary:zhiba-mobile", BoundarySunCeMobileHunzi = "boundary:hunzi-mobile", BoundarySunCeMobileChallenge = "accept-wu-challenge";
-    private bool BoundarySunCeLordQualified(CharacterState lord) => lord.IsAlive &&
-        EnabledSkillPrograms(lord).Any(p => p.Id == BoundarySunCeMobileZhiba) &&
-        HasSkillRoleQualification(lord, BoundarySunCeMobileZhiba, GetRuntimeSkillInstanceId(lord, BoundarySunCeMobileZhiba), Role.Lord);
+    private const string BoundarySunCeMobileHunzi = "boundary:hunzi-mobile";
+    private bool BoundarySunCeLordQualified(CharacterState lord, string skillId) => lord.IsAlive &&
+        EnabledSkillPrograms(lord).Any(p => p.Id == skillId) &&
+        HasSkillRoleQualification(lord, skillId, GetRuntimeSkillInstanceId(lord, skillId), Role.Lord);
     [ProgramActionSource(ProgramActionSourcePhase.ProgramTail, 66300)]
     private IEnumerable<LegalAction> BuildBoundarySunCeMobileChallenges(CharacterState provider)
     {
         if (GetEffectiveFactionId(provider) != "wu" || GetHand(provider).Count == 0) yield break;
-        foreach (var lord in _players.Where(p => p.Seat != provider.Seat && BoundarySunCeLordQualified(p) && CanBePindianTarget(provider.Seat, p.Seat)))
+        foreach (var lord in _players.Where(p => p.Seat != provider.Seat && CanBePindianTarget(provider.Seat, p.Seat)))
+        foreach (var program in EnabledSkillPrograms(lord))
+        foreach (var activation in program.Activations.Where(a => ProgramInstructionResolver.Default.Features(a).HasOperation(SkillProgramEffectOp.ResolveBoundarySunCeZhiba)))
         {
-            if (_programContributionUses.GetValueOrDefault((provider.Seat, lord.Seat, BoundarySunCeMobileZhiba, BoundarySunCeMobileChallenge)) != 0) continue;
+            if (!BoundarySunCeLordQualified(lord, program.Id) ||
+                _programContributionUses.GetValueOrDefault((provider.Seat, lord.Seat, program.Id, activation.Id)) != 0) continue;
             yield return new(LegalActionKind.UseProgramSkill, null, lord.Seat, $"制霸：与主公 {lord.Name} 拼点。", MinCardCount: 1, MaxCardCount: 1, MinTargetCount: 1, MaxTargetCount: 1)
-            { ProgramSkillId = BoundarySunCeMobileZhiba, ProgramActivationId = BoundarySunCeMobileChallenge, ProgramSkillOwnerSeat = lord.Seat,
+            { ProgramSkillId = program.Id, ProgramActivationId = activation.Id, ProgramSkillOwnerSeat = lord.Seat,
                 SelectableCardIds = GetHand(provider).Select(c => c.Id).ToArray(), SelectableTargetSeats = [lord.Seat], ProgramAiHint = new(1, 0, 0, 0, 0, 0, true, false) };
         }
     }
     [ProgramActionHandler(ProgramActionHandlerKind.Contribution, 66300)]
     private bool ExecuteBoundarySunCeMobileChallenge(CharacterState provider, CharacterState lord, LegalAction a, int card)
     {
-        if (a.ProgramSkillId != BoundarySunCeMobileZhiba) return false;
-        var key = (provider.Seat, lord.Seat, BoundarySunCeMobileZhiba, BoundarySunCeMobileChallenge);
-        if (a.ProgramActivationId != BoundarySunCeMobileChallenge || !BoundarySunCeLordQualified(lord) ||
+        var p = EnabledSkillPrograms(lord).SingleOrDefault(p => p.Id == a.ProgramSkillId);
+        var plan = p is null ? null : ProgramInstructionResolver.Default.Find(p, ProgramInstructionSourceKind.Activation, a.ProgramActivationId);
+        if (plan?.Features.HasOperation(SkillProgramEffectOp.ResolveBoundarySunCeZhiba) != true) return false;
+        var key = (provider.Seat, lord.Seat, p!.Id, plan.BindingId);
+        if (!BoundarySunCeLordQualified(lord, p.Id) ||
             provider.Seat == lord.Seat || GetEffectiveFactionId(provider) != "wu" || !CanBePindianTarget(provider.Seat, lord.Seat) ||
             !GetHand(provider).Any(c => c.Id == card) || _programContributionUses.GetValueOrDefault(key) != 0)
             throw new InvalidOperationException("Mobile Zhiba requires another Wu player's unused native Play-phase challenge and actual hand card.");
-        var p = GetEnabledSkillProgram(lord, BoundarySunCeMobileZhiba);
-        var awake = ProgramEventHistory<ProgramBindingResolvedEvent>().Any(e => e.OwnerSeat == lord.Seat && e.SkillId == BoundarySunCeMobileHunzi && e.Activated && e.Completed);
+        var awakening = plan.Instructions[0].SkillIds.SingleOrDefault() ?? BoundarySunCeMobileHunzi;
+        var awake = ProgramEventHistory<ProgramBindingResolvedEvent>().Any(e => e.OwnerSeat == lord.Seat && e.SkillId == awakening && e.Activated && e.Completed);
         _programContributionUses[key] = 1;
-        var f = new ProgramSkillFrame(++_resolutionSequence, lord.Seat, p.Id, BoundarySunCeMobileChallenge, p.GameplayHash, 0, [], [provider.Seat])
+        var f = new ProgramSkillFrame(++_resolutionSequence, lord.Seat, p.Id, plan.BindingId, p.GameplayHash, 0, [], [provider.Seat])
         { SkillInstanceId = GetRuntimeSkillInstanceId(lord, p.Id), BoundarySunCeChallenge = new(provider.Seat, card, awake, "request") };
         PushRuntimeFrame(f);
         AdvanceEventRulesAndQueueFact(new ProgramSkillStartedEvent(f.Id, lord.Seat, p.Id, f.ActivationId));
@@ -100,7 +123,7 @@ public sealed partial class GameEngine
     private void BeginBoundarySunCeMobileContest(ProgramSkillFrame f)
     {
         var r = f.BoundarySunCeChallenge!;
-        if (!BoundarySunCeLordQualified(_players[f.OwnerSeat]) || !_players[r.ProviderSeat].IsAlive ||
+        if (!BoundarySunCeLordQualified(_players[f.OwnerSeat], f.SkillId) || !_players[r.ProviderSeat].IsAlive ||
             !GetHand(_players[r.ProviderSeat]).Any(c => c.Id == r.ProviderCardId) || !CanBePindianTarget(r.ProviderSeat, f.OwnerSeat))
         { FinishProgramSkill(f, false); return; }
         ReplaceRuntimeTop(f = f with { BoundarySunCeChallenge = r with { Stage = "contest" } });
@@ -113,9 +136,9 @@ public sealed partial class GameEngine
     // challenger as source. A tie is a non-win and also permits the Lord's claim.
     private bool TryBeginBoundarySunCeZhibaClaim(PindianFrame pair)
     {
-        if (pair.SkillId != BoundarySunCeMobileZhiba || pair.ClaimSeats is not null || pair.Result is not { SourceWon: false } result ||
+        if (pair.ClaimSeats is not null || pair.Result is not { SourceWon: false } result ||
             _resolutionStack.Count < 2 || _resolutionStack[^2] is not ProgramSkillFrame { BoundarySunCeChallenge: { Stage: "contest" } r } f ||
-            r.PindianFrameId != pair.Id || pair.ParentFrameId != f.Id || result.SourceSeat != r.ProviderSeat || result.OpponentSeat != f.OwnerSeat || !_players[f.OwnerSeat].IsAlive) return false;
+            pair.SkillId != f.SkillId || r.PindianFrameId != pair.Id || pair.ParentFrameId != f.Id || result.SourceSeat != r.ProviderSeat || result.OpponentSeat != f.OwnerSeat || !_players[f.OwnerSeat].IsAlive) return false;
         var ids = AvailablePindianCards(result); if (ids.Length == 0) return false;
         pair = pair with { ClaimSeats = new[] { f.OwnerSeat }, ClaimIndex = 0, PindianStep = PindianStep.ClaimResult };
         ReplaceRuntimeTop(pair);
@@ -125,8 +148,9 @@ public sealed partial class GameEngine
         SetPindianPrompt(pair, f.OwnerSeat, DecisionKind.SkillModule, "制霸：对方没赢，是否获得拼点牌？", choices, ids, [], pair.Presentation); return true;
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 66300)]
-    private bool KeepBoundarySunCeMobileContest(ProgramSkillFrame f) => f.SkillId == BoundarySunCeMobileZhiba && f.BoundarySunCeChallenge is { Stage: "contest" } &&
-        ProgramEventHistory<BoundarySunCeChallengeStartedEvent>().Count(e => e.FrameId == f.Id && e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillInstanceId == f.SkillInstanceId) == 1;
+    private bool KeepBoundarySunCeMobileContest(ProgramSkillFrame f) => f.BoundarySunCeChallenge is { Stage: "contest" } &&
+        ProgramEventHistory<BoundarySunCeChallengeStartedEvent>().Count(e => e.FrameId == f.Id && e.Source.SkillId == f.SkillId &&
+            e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillInstanceId == f.SkillInstanceId && e.GameplayHash == f.GameplayHash) == 1;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundarySunCeZhiba)]
     private static PromptChoice BoundarySunCeChallengeAi(ProgramSkillFrame f) => BoundarySunCeChallengeChoices(f).First();
 }

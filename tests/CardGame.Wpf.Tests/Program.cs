@@ -170,6 +170,8 @@ internal static class Program
             Check("Mobile Yuan Shao UI: effective-suit pair confirms native Arrow", MobileYuanShaoUiChecks.EffectiveSuitPairEnablesNativeConfirmation);
             Check("Mobile standard batch 86 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
                 new HashSet<string>(StringComparer.Ordinal) { "mobile:cao-pi", "mobile:yuan-shao", "mobile:meng-huo", "mobile:zhu-rong" }));
+            Check("Mobile standard batch 87 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
+                new HashSet<string>(StringComparer.Ordinal) { "mobile:xu-huang", "mobile:dong-zhuo", "mobile:sun-ce", "mobile:zhong-hui", "mobile:pang-tong", "mobile:xun-yu", "mobile:liu-shan" }));
             Check("Mobile standard batch 85 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
                 new HashSet<string>(StringComparer.Ordinal) { "mobile:guo-jia", "mobile:zhou-yu", "mobile:huang-zhong", "mobile:pang-de", "mobile:sun-jian" }));
             Check("Mobile standard batch 84 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,

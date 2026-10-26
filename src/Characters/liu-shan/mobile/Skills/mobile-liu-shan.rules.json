@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:ruoyu",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "awaken-and-gain-current-mobile-jijiang",
+          "window": "turnStartBeforeNormalFlow",
+          "subject": "owner",
+          "optional": false,
+          "usageScope": "game",
+          "usageLimit": 1,
+          "condition": {
+            "kind": "compare",
+            "left": { "kind": "currentHp" },
+            "operator": "lessThanOrEqual",
+            "right": { "kind": "livingPlayersMinHp" }
+          },
+          "effects": [
+            { "op": "changeMaximumHp", "target": "owner", "amount": 1 },
+            { "op": "recover", "target": "owner", "amount": 1 },
+            { "op": "grantSkills", "target": "owner", "skillIds": ["boundary:jijiang-mobile"] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:xiangle",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "finalized-target-actor-basic-payment-or-ineffective",
+          "window": "cardUseTargetsFinalized",
+          "ownerRelation": "target",
+          "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"],
+          "optional": false,
+          "effects": [
+            {
+              "op": "chooseOption",
+              "target": "actor",
+              "resultBind": "xiangle-answer",
+              "options": [
+                { "id": "pay", "condition": { "kind": "hasOwnedCardCategory", "zones": ["hand"], "cardCategories": ["basic"] } },
+                { "id": "decline" }
+              ]
+            },
+            {
+              "op": "selectAndMoveOwnedCard",
+              "target": "owner",
+              "chooserRef": { "kind": "actor" },
+              "cardOwnerRef": { "kind": "actor" },
+              "zones": ["hand"],
+              "cardCategories": ["basic"],
+              "count": 1,
+              "destination": "discardPile",
+              "awaitMovementTriggers": true,
+              "condition": { "kind": "choiceIs", "sourceBind": "xiangle-answer", "optionId": "pay" }
+            },
+            {
+              "op": "nullifyCurrentCardEffect",
+              "target": "owner",
+              "condition": { "kind": "choiceIs", "sourceBind": "xiangle-answer", "optionId": "decline" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

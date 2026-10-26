@@ -740,6 +740,10 @@ public sealed partial class ContentRegistry
                     if (!_skills.TryGetValue(given, out var poison) || poison.ImplementationStatus != SkillImplementationStatus.Complete ||
                         poison.Program is null || !poison.Program.Triggers.Any(ResolvePrepPoisonOutcomeByRoundDescriptor.IsTrigger))
                         throw new InvalidOperationException($"Skill '{skill.Id}' grants an unavailable preparation-poison program '{given}'.");
+                foreach (var awakeningSkillId in skill.Program!.Activations.SelectMany(a => a.Effects)
+                             .Where(e => e.Op == SkillProgramEffectOp.ResolveBoundarySunCeZhiba).SelectMany(e => e.SkillIds))
+                    if (!_skills.TryGetValue(awakeningSkillId, out var awakeningSkill) || !awakeningSkill.Tags.HasFlag(SkillTag.Awakening))
+                        throw new InvalidOperationException($"Skill '{skill.Id}' references an unavailable awakening skill '{awakeningSkillId}'.");
                 foreach (var grantedSkillId in skill.Program!.Triggers
                              .SelectMany(trigger => trigger.Effects)
                              .Where(effect => effect.Op is SkillProgramEffectOp.DyingRecipientChooseReplaceOrGrantThenRecover or SkillProgramEffectOp.DrawAfterOtherDeathThenChooseMissingSkill or SkillProgramEffectOp.DeathRecipientChooseSkill or SkillProgramEffectOp.GrantOtherPlayUseRestriction or SkillProgramEffectOp.AwakenAfterGameActivations or SkillProgramEffectOp.DiscardHandToNamedTurnCount or SkillProgramEffectOp.GrantSkills or SkillProgramEffectOp.GrantPlayPhaseSkills or SkillProgramEffectOp.GrantRandomSkillAndSuitShield or SkillProgramEffectOp.ExchangePublicPileHand or SkillProgramEffectOp.ObtainPublicPileCard or SkillProgramEffectOp.ExchangePublicPile or SkillProgramEffectOp.DistributePublicPileIfAllSuits or SkillProgramEffectOp.DrawPublicSuitThenEscalatingDiscard)

@@ -1,0 +1,48 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:pang-tong",
+  "skills": [
+    {
+      "registrationOrder": 87000,
+      "programBundle": "mobile-pang-tong",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:lianhuan",
+        "name": "连环",
+        "description": "出牌阶段，你可以将一张梅花手牌当【铁索连环】使用或重铸。"
+      }
+    },
+    {
+      "registrationOrder": 87001,
+      "programBundle": "mobile-pang-tong",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:niepan",
+        "name": "涅槃",
+        "description": "限定技，当你处于濒死状态时，你可以弃置你区域里的所有牌，复原武将牌，摸三张牌，将体力回复至3点。",
+        "tags": "Limited",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 87099,
+      "pools": { "current": 87099 },
+      "definition": {
+        "id": "mobile:pang-tong",
+        "name": "庞统·移动版",
+        "portraitKey": "mobile-pang-tong",
+        "skillId": "mobile:lianhuan",
+        "additionalSkillIds": ["mobile:niepan"],
+        "factionId": "shu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:pang-tong",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

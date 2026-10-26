@@ -82,6 +82,13 @@ public static class GeneralGalleryCatalog
     {
         var groups = new Dictionary<string, string>(StringComparer.Ordinal);
         groups.Add("mobile:cao-pi", "myth-forest");
+        groups.Add("mobile:xu-huang", "myth-forest");
+        groups.Add("mobile:dong-zhuo", "myth-forest");
+        groups.Add("mobile:sun-ce", "myth-mountain");
+        groups.Add("mobile:liu-shan", "myth-mountain");
+        groups.Add("mobile:zhong-hui", "fame-2");
+        groups.Add("mobile:pang-tong", "myth-fire");
+        groups.Add("mobile:xun-yu", "myth-fire");
         groups.Add("mobile:yuan-shao", "myth-fire");
         groups.Add("mobile:meng-huo", "myth-forest");
         groups.Add("mobile:zhu-rong", "myth-forest");

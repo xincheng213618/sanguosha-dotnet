@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhong-hui",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 86999,
+      "pools": { "current": 86999 },
+      "definition": {
+        "id": "mobile:zhong-hui",
+        "name": "钟会·移动版",
+        "portraitKey": "mobile-zhong-hui",
+        "skillId": "classic:quanji",
+        "additionalSkillIds": ["boundary:zili-mobile"],
+        "factionId": "wei",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:zhong-hui",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

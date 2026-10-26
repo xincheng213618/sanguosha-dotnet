@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:quhu",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "contest",
+          "minCards": 1,
+          "maxCards": 1,
+          "sourceZones": ["hand"],
+          "minTargets": 1,
+          "maxTargets": 1,
+          "targetKind": "otherLivingWithHandHpGreaterThanOwner",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            { "op": "pindian", "target": "selectedTarget", "amount": 1 },
+            {
+              "op": "selectTarget",
+              "target": "owner",
+              "targetKind": "otherLivingInBoundParticipantAttackRange",
+              "actorRef": { "kind": "resultOpponent", "resultBind": "__active-pindian-result" },
+              "skipIfNoTarget": true,
+              "condition": { "kind": "pindianWon", "sourceBind": "__active-pindian-result" }
+            },
+            {
+              "op": "damage",
+              "target": "selectedTarget",
+              "sourceRef": { "kind": "resultOpponent", "resultBind": "__active-pindian-result" },
+              "amount": 1,
+              "skipIfNoTarget": true,
+              "condition": { "kind": "pindianWon", "sourceBind": "__active-pindian-result" }
+            },
+            {
+              "op": "damage",
+              "target": "owner",
+              "sourceRef": { "kind": "resultOpponent", "resultBind": "__active-pindian-result" },
+              "amount": 1,
+              "condition": { "kind": "pindianNotWon", "sourceBind": "__active-pindian-result" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:jieming",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "draw-to-minimum-of-five-and-max-hp-per-damage-point",
+          "window": "afterDamageApplied",
+          "subject": "owner",
+          "damageOccurrence": "perDamagePoint",
+          "optional": true,
+          "effects": [
+            { "op": "selectTarget", "target": "owner", "targetKind": "anyLiving" },
+            { "op": "drawToHandCount", "target": "selectedTarget", "amount": 5, "capAtTargetMaxHp": true }
+          ]
+        }
+      ]
+    }
+  ]
+}

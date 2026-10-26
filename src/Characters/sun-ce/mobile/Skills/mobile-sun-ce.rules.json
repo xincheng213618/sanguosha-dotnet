@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:jiang", "revision": 1,
+      "triggers": [
+        { "id": "draw-on-using-duel", "window": "cardUseTargetsFinalized", "ownerRelation": "actor", "cardKinds": [ "duel" ],
+          "optional": true, "effects": [ { "op": "draw", "target": "owner", "amount": 1 } ] },
+        { "id": "draw-on-using-red-slash", "window": "cardUseTargetsFinalized", "ownerRelation": "actor", "cardKinds": [ "slash", "fireSlash", "thunderSlash", "coldSlash" ],
+          "optional": true, "condition": { "kind": "cardActionCardIsRed" }, "effects": [ { "op": "draw", "target": "owner", "amount": 1 } ] },
+        { "id": "draw-on-targeted-by-duel", "window": "cardUseTargetsFinalized", "ownerRelation": "target", "cardKinds": [ "duel" ],
+          "optional": true, "effects": [ { "op": "draw", "target": "owner", "amount": 1 } ] },
+        { "id": "draw-on-targeted-by-red-slash", "window": "cardUseTargetsFinalized", "ownerRelation": "target", "cardKinds": [ "slash", "fireSlash", "thunderSlash", "coldSlash" ],
+          "optional": true, "condition": { "kind": "cardActionCardIsRed" }, "effects": [ { "op": "draw", "target": "owner", "amount": 1 } ] }
+      ]
+    },
+    {
+      "id": "mobile:zhiba", "revision": 1,
+      "activations": [
+        {
+          "id": "accept-wu-challenge", "minCards": 0, "maxCards": 0, "minTargets": 1, "maxTargets": 1,
+          "targetKind": "otherLivingWithHand", "usesPerTurn": null,
+          "effects": [ { "op": "resolveBoundarySunCeZhiba", "target": "owner", "skillIds": [ "classic:hunzi" ] } ]
+        }
+      ]
+    }
+  ]
+}

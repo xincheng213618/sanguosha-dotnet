@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:ruoyu": {
+      "name": "若愚",
+      "description": "主公技，觉醒技，准备阶段，若你是体力值最小的角色，你加1点体力上限并回复1点体力，然后获得技能“激将”。"
+    },
+    "mobile:xiangle": {
+      "name": "享乐",
+      "description": "锁定技，当你成为一名角色使用【杀】的目标后，该角色选择一项：1.弃置一张基本牌；2.令此【杀】对你无效。",
+      "optionLabels": { "pay": "弃置一张基本牌", "decline": "令此杀对刘禅无效" }
+    }
+  }
+}

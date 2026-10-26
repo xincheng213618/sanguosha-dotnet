@@ -1,0 +1,50 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:liu-shan",
+  "skills": [
+    {
+      "registrationOrder": 87200,
+      "programBundle": "mobile-liu-shan",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:ruoyu",
+        "name": "若愚",
+        "description": "主公技，觉醒技，准备阶段，若你是体力值最小的角色，你加1点体力上限并回复1点体力，然后获得技能“激将”。",
+        "tags": "Lord, Awakening",
+        "executionForms": "Trigger"
+      }
+    },
+    {
+      "registrationOrder": 87201,
+      "programBundle": "mobile-liu-shan",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:xiangle",
+        "name": "享乐",
+        "description": "锁定技，当你成为一名角色使用【杀】的目标后，该角色选择一项：1.弃置一张基本牌；2.令此【杀】对你无效。",
+        "tags": "Locked",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 87299,
+      "pools": { "current": 87299 },
+      "definition": {
+        "id": "mobile:liu-shan",
+        "name": "刘禅·移动版",
+        "portraitKey": "mobile-liu-shan",
+        "skillId": "mobile:xiangle",
+        "additionalSkillIds": ["classic:fangquan", "mobile:ruoyu"],
+        "factionId": "shu",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:liu-shan",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

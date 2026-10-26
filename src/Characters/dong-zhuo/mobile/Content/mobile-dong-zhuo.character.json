@@ -1,0 +1,25 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:dong-zhuo",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 86799,
+      "pools": { "current": 86799 },
+      "definition": {
+        "id": "mobile:dong-zhuo",
+        "name": "董卓·移动版",
+        "portraitKey": "mobile-dong-zhuo",
+        "skillId": "classic:jiuchi",
+        "additionalSkillIds": ["classic:roulin", "classic:benghuai", "classic:baonve"],
+        "factionId": "qun",
+        "baseHp": 8,
+        "gender": "Male",
+        "characterId": "character:dong-zhuo",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}
