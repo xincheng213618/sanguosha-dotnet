@@ -340,13 +340,17 @@ public sealed partial class ShanheCampaignSession
         // not fall through to ordinary battle loot after its boss bundle is gone.
         if (node.NextNodeIds.Count == 0 && node.ChapterNumber >= 3) return FinishNode(state);
         state = state with { PendingBonusRewardGroups = BuildBonusRewardGroups(state, node) };
-        if (node.BossRewards is not null) return BeginBossRewards(state, node);
+        if (node.BossRewards is not null) return PromoteBattlePrimaryRewards(BeginBossRewards(state, node), node);
         var rewards = (node.RewardIds ?? []).Where(id => CanReceiveReward(state, _rewards[id])).ToList();
         if (rewards.Count == 0) return BeginPendingBonusRewardsOrFinish(state);
-        if (node.CategorizedRewards) return BeginCategorizedRewards(state, node, rewards);
+        if (node.CategorizedRewards) return PromoteBattlePrimaryRewards(BeginCategorizedRewards(state, node, rewards), node);
         var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, node.Id + ":rewards", state.EncounterOrdinal));
         random.Shuffle(rewards);
-        return state with { Phase = ShanheCampaignPhase.Reward, RewardOfferIds = ShanheCampaignContent.Freeze(rewards.Take(node.RewardChoiceCount)) };
+        return PromoteBattlePrimaryRewards(state with
+        {
+            Phase = ShanheCampaignPhase.Reward,
+            RewardOfferIds = ShanheCampaignContent.Freeze(rewards.Take(node.RewardChoiceCount))
+        }, node);
     }
 
     private RunState ChooseReward(ChooseShanheRewardCommand command)

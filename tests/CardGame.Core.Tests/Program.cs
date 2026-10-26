@@ -362,6 +362,8 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe reward categories: skip once and next battle cleanup", ShanheRewardCategoryChecks.CategorySkippingPaysOnceAndClearsBeforeNextBattle),
     ("Shanhe bonus rewards: elite ownership primary claim and no duplication", ShanheBonusRewardTacticChecks.EliteVictoryFreezesOwnedRareBonusAfterPrimaryRewardOnlyOnce),
     ("Shanhe bonus rewards: boss epic replacement exhaustion and final settlement", ShanheBonusRewardTacticChecks.BossEpicBonusUsesEarnedSkillReplacementAndExhaustionBeforeFinalSettlement),
+    ("Shanhe battle quality: ordinary category mixed research claims", ShanheBattleQualityChecks.RealOrdinaryWinsPromoteFrozenCategoryAndMixedOffersWithoutWideningResearch),
+    ("Shanhe battle quality: boss exact bonus terminal actual twenty percent", ShanheBattleQualityChecks.RealBossAndTwentyPercentWinsPreserveExactBonusTerminalAndOwnershipFreeze),
     ("Shanhe boss opening: typed battle kinds and actual initial entities", ShanheBossOpeningTacticChecks.OwnedSourcesUseBattleKindAndNativePhysicalDeal),
     ("Shanhe boss opening: native second phase preserves dealt hand", ShanheBossOpeningTacticChecks.NativeSecondFormKeepsTheAlreadyDealtPlayerHand),
     ("Shanhe cycle loadout: real catalogue and registered native programs", ShanheCycleLoadoutChecks.CurrentSixTacticLoadoutStartsWithRegisteredNativePrograms),

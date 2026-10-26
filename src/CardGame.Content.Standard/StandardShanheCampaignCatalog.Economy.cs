@@ -71,7 +71,9 @@ public static partial class StandardShanheCampaignCatalog
         new(2214, "tactic-economy-2214", "决斗店铺", 1, 200,
             "商店有20%几率刷新出更高品质的技能", new(ShopSkillPromotionPercent: 20)),
         new(2215, "tactic-economy-2215", "物资店铺", 1, 200,
-            "商店有20%几率刷新出更高品质的卡牌和装备", new(ShopMaterialPromotionPercent: 20))
+            "商店有20%几率刷新出更高品质的卡牌和装备", new(ShopMaterialPromotionPercent: 20)),
+        new(2216, "tactic-economy-2216", "蒸蒸日上", 2, 300,
+            "通过战斗关卡时，有20%几率获得更高品质的战法和技能奖励", new(BattlePrimaryPromotionPercent: 20))
     });
 
     private static ShanheCampaignDefinition WithCurrentEconomyTactics(ShanheCampaignDefinition definition)
