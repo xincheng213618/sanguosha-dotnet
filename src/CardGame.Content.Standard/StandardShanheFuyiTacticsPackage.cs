@@ -13,6 +13,8 @@ public sealed class StandardShanheFuyiTacticsPackage : IGameContentPackage
     public const string FuyiDuelSkillId = "shanhe:current-fuyiqu-2097";
     public const string FuyiIronChainSkillId = "shanhe:current-fuyiqu-2098";
     public const string FuyiFireAttackSkillId = "shanhe:current-fuyiqu-2099";
+    public const string FuyiArrowBarrageSkillId = "shanhe:current-fuyiqu-2256";
+    public const string FuyiBarbarianAssaultSkillId = "shanhe:current-fuyiqu-2257";
 
     public static readonly Version CurrentVersion = new(1, 0, 0);
     public PackageManifest Manifest { get; } = new("shanhe-current-fuyi-tactics", CurrentVersion,
@@ -44,7 +46,13 @@ public sealed class StandardShanheFuyiTacticsPackage : IGameContentPackage
              "effects":[{"op":"obtainDeckCards","target":"owner","amount":1,"cardKinds":["ironChain"]}]}]},
           {"id":"{{{FuyiFireAttackSkillId}}}","revision":1,
            "triggers":[{"id":"own-turn-start-deck-supply","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,
-             "effects":[{"op":"obtainDeckCards","target":"owner","amount":1,"cardKinds":["fireAttack"]}]}]}
+             "effects":[{"op":"obtainDeckCards","target":"owner","amount":1,"cardKinds":["fireAttack"]}]}]},
+          {"id":"{{{FuyiArrowBarrageSkillId}}}","revision":1,
+           "triggers":[{"id":"own-turn-start-deck-supply","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,
+             "effects":[{"op":"obtainDeckCards","target":"owner","amount":1,"cardKinds":["arrowBarrage"]}]}]},
+          {"id":"{{{FuyiBarbarianAssaultSkillId}}}","revision":1,
+           "triggers":[{"id":"own-turn-start-deck-supply","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,
+             "effects":[{"op":"obtainDeckCards","target":"owner","amount":1,"cardKinds":["barbarianAssault"]}]}]}
         ]}
         """,
         $$$"""
@@ -56,7 +64,9 @@ public sealed class StandardShanheFuyiTacticsPackage : IGameContentPackage
           "{{{FuyiStealSkillId}}}":{"name":"拂衣去·顺","description":"回合开始时，你获得1张【顺手牵羊】。"},
           "{{{FuyiDuelSkillId}}}":{"name":"拂衣去·决","description":"回合开始时，你获得1张【决斗】。"},
           "{{{FuyiIronChainSkillId}}}":{"name":"拂衣去·锁","description":"回合开始时，你获得1张【铁索连环】。"},
-          "{{{FuyiFireAttackSkillId}}}":{"name":"拂衣去·火","description":"回合开始时，你获得1张【火攻】。"}
+          "{{{FuyiFireAttackSkillId}}}":{"name":"拂衣去·火","description":"回合开始时，你获得1张【火攻】。"},
+          "{{{FuyiArrowBarrageSkillId}}}":{"name":"拂衣去·万箭","description":"回合开始时，你获得1张【万箭齐发】。"},
+          "{{{FuyiBarbarianAssaultSkillId}}}":{"name":"拂衣去·南蛮","description":"回合开始时，你获得1张【南蛮入侵】。"}
         }}
         """));
 
