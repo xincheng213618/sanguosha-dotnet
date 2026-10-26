@@ -144,16 +144,24 @@ public sealed partial class MainViewModel
             RefreshGeneralGallery();
         });
 
-        foreach (var general in _contentRegistry.Generals.Values.Where(general => GeneralGalleryCatalog.IsVisible(general.Id)))
+        RebuildGeneralGallery();
+    }
+
+    private void RebuildGeneralGallery()
+    {
+        _allGeneralGalleryEntries.Clear();
+        SelectedGeneralGalleryEntry = null;
+        var registry = _nextGameRegistry ?? _contentRegistry;
+        foreach (var general in registry.Generals.Values.Where(general => GeneralGalleryCatalog.IsVisible(general.Id)))
         {
-            var skills = general.SkillIds.Select(_contentRegistry.GetSkill).ToArray();
+            var skills = general.SkillIds.Select(registry.GetSkill).ToArray();
             var group = GeneralGalleryCatalog.Classify(general.Id);
             var factionId = general.FactionId ?? (group.SeriesId == "god" ? "god" : string.Empty);
             _allGeneralGalleryEntries.Add(new GeneralGalleryEntryViewModel
             {
                 GeneralId = general.Id,
-                IsPlayable = _contentRegistry.IsGeneralPlayable(general.Id),
-                Portrait = GetGeneralPortrait(general.Id),
+                IsPlayable = registry.IsGeneralPlayable(general.Id),
+                Portrait = GetGeneralPortraitForRegistry(general.Id, registry),
                 Skills = skills.Select(skill => new GeneralGallerySkill(skill.Name, GetVisibleSkillDescription(skill), general.Id)).ToArray(),
                 SeriesId = group.SeriesId,
                 SeriesName = GeneralGallerySeries.First(option => option.Id == group.SeriesId).Name,
@@ -170,6 +178,7 @@ public sealed partial class MainViewModel
                 SkillDescription = string.Join("\n\n", skills.Select(skill => $"{skill.Name}：{GetVisibleSkillDescription(skill)}"))
             });
         }
+        RefreshGeneralGallery();
     }
 
     private void RefreshGeneralGallery()

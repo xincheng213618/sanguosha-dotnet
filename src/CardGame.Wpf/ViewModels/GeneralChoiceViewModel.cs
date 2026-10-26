@@ -47,7 +47,7 @@ public sealed class GeneralGalleryEntryViewModel
     public IReadOnlyList<GeneralGallerySkill> Skills { get; init; } = [];
     public bool IsPlayable { get; init; } = true;
     public string AvailabilityText => IsPlayable ? "技能完整" : "技能完善中 · 暂未加入对局";
-    public IReadOnlyList<GeneralSkin> Skins => GeneralArt.GetSkins(GeneralId);
+    public IReadOnlyList<GeneralSkin> Skins => GeneralArt.GetSkins(Portrait.ArtworkId);
     public required string GeneralId { get; init; }
     public required string SeriesId { get; init; }
     public required string SeriesName { get; init; }
@@ -68,7 +68,7 @@ public sealed class GeneralGalleryEntryViewModel
     public string AccessibilityText => $"{Name}，{Kingdom}，{GroupName}，{HealthText}，{SkillName}";
     public string FactionImage => $"pack://application:,,,/CardGame.Wpf;component/Assets/gallery-faction-{(FactionId == "god" ? "shen" : FactionId is "wei" or "shu" or "wu" or "jin" ? FactionId : "qun")}.png";
     public IReadOnlyList<string> HealthImages { get; init; } = [];
-    public bool HasPortrait => GeneralArt.HasPortrait(GeneralId);
+    public bool HasPortrait => GeneralArt.HasPortrait(Portrait.ArtworkId);
     public Brush FactionBrush => FactionId switch
     {
         "wei" => Brushes.LightSkyBlue,

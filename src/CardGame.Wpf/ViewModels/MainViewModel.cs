@@ -69,7 +69,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         IGameExceptionReportStore? exceptionReportStore = null,
         IShanheCampaignSaveStore? shanheSaveStore = null,
         IShanheCodexStore? shanheCodexStore = null,
-        IGameSaveStore? wushuangSaveStore = null)
+        IGameSaveStore? wushuangSaveStore = null,
+        ICustomGeneralLibraryStore? customGeneralStore = null)
     {
         NewGameCommand = new RelayCommand(() => { if (!IsTutorialActive) OpenGameSetup(); }, () => !IsTutorialActive);
         StepAiCommand = new RelayCommand(StepAi, () => CanStepAi);
@@ -103,6 +104,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             (useExpandedContent
                 ? ComposedSkillContentRegistry.CreateShowcase(includeActivities: true, includeBossActivities: true, includeHulaoActivities: true, includeShenwuActivities: true, includeNianActivities: true, includeHellActivities: true, includeWenheActivities: true, includeDragonBoatActivities: true, includeGuanduActivities: true)
                 : StandardContentRegistry.CreateWithTeamModes());
+        InitializeCustomGenerals(customGeneralStore, contentRegistry is not null);
         TableModes = useExpandedContent
             ? [
                 new TableModeOption(8, "八人经典身份", "1 主公 · 2 忠臣\n4 反贼 · 1 内奸", "identity:classic-8"),
@@ -392,6 +394,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         // A predictable seed would let a modified client reconstruct every hidden
         // role and card. Tests inject fixed seeds; ordinary local games use entropy.
         var seed = _seedOverride ?? RandomNumberGenerator.GetInt32(100_000_000, 1_000_000_000);
+        var selectedRegistry = SelectedModeRegistry;
+        var nextRegistry = ReferenceEquals(selectedRegistry, _contentRegistry) ? _nextGameRegistry : selectedRegistry;
+        var nextCustomGenerals = HasCustomGenerals(nextRegistry)
+            ? ReferenceEquals(nextRegistry, _nextGameRegistry) ? _customGeneralLibrary : _activeCustomGenerals
+            : CustomGeneralLibrary.Empty;
         var game = GameEngine.CreateStandard(
             IsWushuangModeSelection ? StandardWushuangContentRegistry.CreateOptions(seed) with
             {
@@ -416,8 +423,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 AiPolicyVersion = AiDecisionPolicy.CurrentVersion,
                 AdvanceAfterHumanCommands = false
             },
-            SelectedModeRegistry);
+            nextRegistry);
         ReplaceEngine(game);
+        _activeCustomGenerals = nextCustomGenerals;
         var started = false;
         ExecuteSafely(() =>
         {
@@ -856,7 +864,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 PrivateReserveCount = player.PrivateReserveCount,
                 TurnHandHoldCount = (player.PrivateTurnHolds ?? []).Where(hold => hold.OwnerSeat == player.Seat).Sum(hold => hold.Count),
                 TurnHandHoldName = string.Join(" / ", (player.PrivateTurnHolds ?? []).Where(hold => hold.OwnerSeat == player.Seat)
-                    .Select(hold => _contentRegistry.Skills.GetValueOrDefault(hold.SkillId)?.Name ?? "暂存").Distinct()),
+                    .Select(hold => CurrentPresentationRegistry.Skills.GetValueOrDefault(hold.SkillId)?.Name ?? "暂存").Distinct()),
                 HasGale = player.Markers?.Any(marker => marker.Kind == PlayerMarkerKind.Gale && marker.Count > 0) == true,
                 HasMist = player.Markers?.Any(marker => marker.Kind == PlayerMarkerKind.Mist && marker.Count > 0) == true,
                 DeferredPileTooltip = PublicStateTooltip(player),
@@ -2358,7 +2366,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             : $"{skill.Description}\n\n【{(skill.ImplementationStatus == SkillImplementationStatus.Partial ? "部分已实现" : "待实现")}】{skill.PendingImplementation}";
 
     private string GetKingdom(string generalId) =>
-        _contentRegistry.Generals.TryGetValue(generalId, out var general)
+        CurrentPresentationRegistry.Generals.TryGetValue(generalId, out var general)
             ? general.FactionId == "god" ? "神" : FactionName(general.FactionId)
             : GetLegacyKingdom(generalId);
 

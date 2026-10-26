@@ -137,7 +137,8 @@ public sealed partial class MainViewModel
             FlushNianClock();
             var save = new GameSaveFile(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow,
                 IsAutoAdvance, _game.CreateCheckpoint())
-            { PlaybackSpeedId = SelectedPlaybackSpeed.Id };
+            { PlaybackSpeedId = SelectedPlaybackSpeed.Id,
+                CustomGenerals = HasCustomGenerals(_game.ContentRegistry) ? _activeCustomGenerals : null };
             (IsWushuangTable ? _wushuangSaveStore! : _saveStore).Write(slot, save);
             if (slot == GameSaveSlot.Automatic) _autoSavePending = false;
             RefreshSaveSlots();
@@ -181,7 +182,7 @@ public sealed partial class MainViewModel
                 throw new InvalidDataException("这个存档不属于当前本地玩家座位。");
             var playbackSpeed = save.PlaybackSpeedId is null ? PlaybackSpeed.Normal
                 : PlaybackSpeed.Find(save.PlaybackSpeedId) ?? throw new InvalidDataException("存档中的对局速度设置无效。");
-            var registry = RegistryForCheckpoint(save.Checkpoint);
+            var registry = RegistryForSave(save);
             var registeredMode = registry.Modes.TryGetValue(save.Checkpoint.ModeId, out var checkpointMode)
                 ? checkpointMode
                 : throw new InvalidDataException("存档的模式不在内容注册表中。");
@@ -206,6 +207,7 @@ public sealed partial class MainViewModel
             _saveTimer?.Stop();
             _autoSavePending = false;
             ReplaceEngine(restored);
+            _activeCustomGenerals = save.CustomGenerals is { } custom ? CustomGeneralContent.Snapshot(custom) : CustomGeneralLibrary.Empty;
             SelectedTableMode = mode;
             SelectedStartingRole = StartingRoles[0];
             if (registeredMode.WenheActivity is not null)

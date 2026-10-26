@@ -64,6 +64,7 @@ Windows 用户也可以双击 [Play.cmd](Play.cmd)：源码目录会构建并启
 | 保存与继续 | [本地存档与恢复](docs/SAVE_AND_RESUME.md) |
 | 设置与反馈 | [本机偏好](docs/PLAYER_PREFERENCES.md)、[战斗反馈](docs/BATTLE_FEEDBACK.md)、[音频](docs/BATTLE_AUDIO.md) |
 | 战绩与观战 | [战绩](docs/MATCH_HISTORY.md)、[对局速度与观战](docs/PLAYBACK_AND_SPECTATING.md) |
+| 创建自己的武将 | [自定义武将与可视化技能编辑](docs/CUSTOM_GENERALS.md) |
 | 武将与素材 | [武将图鉴](docs/GENERAL_GALLERY.md)、[素材目录](docs/RESOURCE_CATALOG_DESIGN.md) |
 
 ## 开发入口

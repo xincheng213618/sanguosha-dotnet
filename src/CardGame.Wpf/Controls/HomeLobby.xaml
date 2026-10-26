@@ -116,6 +116,9 @@
                     <Button x:Name="LobbyGalleryButton" Style="{StaticResource UtilityButton}" Command="{Binding OpenGeneralGalleryCommand}" ToolTip="浏览武将与技能" AutomationProperties.Name="武将图鉴" TabIndex="8" Margin="3,0,3,18">
                         <StackPanel><TextBlock Text="&#xE77B;" Style="{StaticResource UtilityIcon}" /><TextBlock Text="武将图鉴" Style="{StaticResource UtilityLabel}" /></StackPanel>
                     </Button>
+                    <Button x:Name="LobbyCustomGeneralButton" Style="{StaticResource UtilityButton}" Click="OpenCustomGenerals" ToolTip="{Binding CustomGeneralLibraryStatus}" AutomationProperties.Name="创建自定义武将" TabIndex="9" Margin="3,0,3,18">
+                        <StackPanel><TextBlock Text="&#xE710;" Style="{StaticResource UtilityIcon}" /><TextBlock Text="自定义武将" Style="{StaticResource UtilityLabel}" /></StackPanel>
+                    </Button>
                     <Button x:Name="SetupHistoryButton" Style="{StaticResource UtilityButton}" Command="{Binding OpenHistoryCommand}" ToolTip="查看历史对局" AutomationProperties.Name="历史战绩" TabIndex="9" Margin="3,0,3,18">
                         <StackPanel><TextBlock Text="&#xE81C;" Style="{StaticResource UtilityIcon}" /><TextBlock Text="历史战绩" Style="{StaticResource UtilityLabel}" /></StackPanel>
                     </Button>

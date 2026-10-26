@@ -1084,7 +1084,7 @@ public sealed partial class ContentRegistry
             }
         }
 
-        public ContentRegistry Freeze(IReadOnlyList<PackageManifest> packages) => new(
+        public ContentRegistry Freeze(IReadOnlyList<PackageManifest> packages) => CaptureExtensionProvenance(new(
             Array.AsReadOnly(packages.Select(NormalizeManifest).ToArray()),
             FreezeMutableDictionary(_cards),
             FreezeMutableDictionary(_skills),
@@ -1092,7 +1092,8 @@ public sealed partial class ContentRegistry
             FreezeMutableDictionary(_decks),
             FreezeMutableDictionary(_modes),
             Array.AsReadOnly(EquipmentRegistrations.OrderBy(registration => registration.Package.Id, StringComparer.Ordinal).ToArray()),
-            Array.AsReadOnly(_modeFeatureFactories.Values.OrderBy(factory => factory.Id, StringComparer.Ordinal).ToArray()));
+            Array.AsReadOnly(_modeFeatureFactories.Values.OrderBy(factory => factory.Id, StringComparer.Ordinal).ToArray())),
+            _skillPackageOwners, EquipmentRegistrations);
 
         private void Add<T>(
             IDictionary<string, T> target,

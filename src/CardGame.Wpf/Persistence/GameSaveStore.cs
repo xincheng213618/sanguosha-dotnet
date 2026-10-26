@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Wpf.Presentation;
 
@@ -12,6 +13,15 @@ public sealed record GameSaveFile(int FormatVersion, DateTimeOffset SavedAtUtc, 
 {
     public const int CurrentFormatVersion = 1;
     public string? PlaybackSpeedId { get; init; }
+    private CustomGeneralLibrary? _customGenerals;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonConverter(typeof(CustomGeneralLibrarySnapshotConverter))]
+    public CustomGeneralLibrary? CustomGenerals
+    {
+        get => _customGenerals;
+        // Construction and deserialization share the same detached, validated snapshot.
+        init => _customGenerals = value is null ? null : CustomGeneralLibraryStorage.Snapshot(value);
+    }
 }
 
 public interface IGameSaveStore

@@ -26,11 +26,17 @@ public sealed partial class MainViewModel
     public ICommand PreviousGeneralDetailsCommand { get; private set; } = null!;
     public ICommand NextGeneralDetailsCommand { get; private set; } = null!;
 
-    private GeneralPortraitViewModel GetGeneralPortrait(string id)
+    private GeneralPortraitViewModel GetGeneralPortrait(string id) =>
+        GetGeneralPortraitForRegistry(id, CurrentPresentationRegistry);
+
+    private GeneralPortraitViewModel GetGeneralPortraitForRegistry(string id, CardGame.Core.ContentRegistry registry)
     {
-        var key = GeneralArt.NormalizeKey(id);
+        var generalKey = GeneralArt.NormalizeKey(id);
+        var artworkId = id.StartsWith("custom:", StringComparison.Ordinal) && registry.Generals.TryGetValue(id, out var general)
+            ? general.PortraitKey : id;
+        var key = id.StartsWith("custom:", StringComparison.Ordinal) ? generalKey + "|" + artworkId : generalKey;
         if (!_generalPortraits.TryGetValue(key, out var portrait))
-            _generalPortraits[key] = portrait = new(id, _generalSkinPreferences.GetValueOrDefault(key));
+            _generalPortraits[key] = portrait = new(id, _generalSkinPreferences.GetValueOrDefault(generalKey), artworkId);
         return portrait;
     }
 
@@ -45,9 +51,9 @@ public sealed partial class MainViewModel
         {
             if (SelectedGeneralGalleryEntry is not { } entry || !entry.Skins.Contains(skin)) return;
             var key = GeneralArt.NormalizeKey(entry.GeneralId);
-            if (skin.Id == GeneralArt.GetSkin(entry.GeneralId)?.Id) _generalSkinPreferences.Remove(key);
+            if (skin.Id == GeneralArt.GetSkin(entry.Portrait.ArtworkId)?.Id) _generalSkinPreferences.Remove(key);
             else _generalSkinPreferences[key] = skin.Id;
-            GetGeneralPortrait(entry.GeneralId).SelectSkin(skin.Id);
+            entry.Portrait.SelectSkin(skin.Id);
             RefreshGeneralVoices();
             QueuePreferencesSave();
         });
@@ -69,6 +75,6 @@ public sealed partial class MainViewModel
             foreach (var (key, id) in preferences)
                 if (GeneralArt.GetSkins(key).Any(skin => skin.Id == id)) _generalSkinPreferences[key] = id;
         foreach (var (key, portrait) in _generalPortraits)
-            portrait.SelectSkin(_generalSkinPreferences.GetValueOrDefault(key));
+            portrait.SelectSkin(_generalSkinPreferences.GetValueOrDefault(GeneralArt.NormalizeKey(portrait.GeneralId)));
     }
 }

@@ -28,6 +28,11 @@ public partial class HomeLobby : UserControl
     internal Button WushuangSaveAccessFocusTarget => ContinueWushuangButton.IsVisible && ContinueWushuangButton.IsEnabled
         ? ContinueWushuangButton : WushuangBattleButton;
 
+    private void OpenCustomGenerals(object sender, RoutedEventArgs e)
+    {
+        if (Window.GetWindow(this) is MainWindow owner) owner.OpenCustomGeneralEditor();
+    }
+
     private void OpenLanRooms(object sender, System.Windows.RoutedEventArgs e)
     {
         var owner = System.Windows.Window.GetWindow(this);

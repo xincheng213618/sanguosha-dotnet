@@ -76,7 +76,7 @@ public sealed partial class MainViewModel
         var options = _game.CreateCheckpoint().Options with { HumanRole = option.Role };
         ExecuteSafely(() =>
         {
-            ReplaceEngine(GameEngine.CreateStandard(options, _contentRegistry));
+            ReplaceEngine(GameEngine.CreateStandard(options, CurrentPresentationRegistry));
             var result = SubmitCommand(new StartGameCommand());
             RefreshCommandResult(result.State);
             IsIdentityRevealOpen = reveal;

@@ -5,7 +5,7 @@ public static class GeneralRosterCatalog
 {
     public static IReadOnlyList<GeneralRosterCategory> Categories { get; } = Array.AsReadOnly<GeneralRosterCategory>(
     [
-        new("all", "全部"), new("boundary", "界"), new("mou", "谋"),
+        new("all", "全部"), new("custom", "自定义"), new("boundary", "界"), new("mou", "谋"),
         new("magic", "魔"), new("god", "神"), new("le", "乐"),
         new("wumiao", "武庙"), new("friend", "友"), new("shi", "势"), new("sp", "SP"),
         new("standard", "标准"), new("myth", "神话再临"), new("fame", "一将成名"),
@@ -15,7 +15,7 @@ public static class GeneralRosterCatalog
     public static string Classify(string generalId)
     {
         var prefix = generalId.Split(':', 2)[0];
-        if (prefix is "standard" or "boundary" or "mou" or "magic" or "le" or "wumiao" or "friend" or "national")
+        if (prefix is "custom" or "standard" or "boundary" or "mou" or "magic" or "le" or "wumiao" or "friend" or "national")
             return prefix;
         var series = GeneralGalleryCatalog.Classify(generalId).SeriesId;
         return series switch

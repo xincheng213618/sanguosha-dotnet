@@ -10,7 +10,7 @@ public sealed record GeneralSlotViewModel(string SlotLabel, string GeneralId, st
     public string StateText => IsRevealed ? "明置" : "暗置";
     public string SlotState => $"{SlotLabel} · {StateText}";
     public string DetailText => $"{SlotLabel}将 · {Name} · {StateText}\n{SkillDescription}\n{SkillStateText}";
-    public bool HasPortrait => GeneralArt.HasPortrait(GeneralId);
+    public bool HasPortrait => GeneralArt.HasPortrait(Portrait.ArtworkId);
     public GeneralPortraitViewModel Portrait { get; init; } = new(GeneralId);
     public Brush PortraitBrush => Portrait.Brush;
     public Brush StateBrush => IsRevealed ? new SolidColorBrush(Color.FromRgb(158, 197, 161)) : new SolidColorBrush(Color.FromRgb(184, 165, 134));

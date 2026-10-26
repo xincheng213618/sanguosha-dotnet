@@ -84,7 +84,7 @@ public sealed partial class SeatViewModel : ObservableObject
     public bool ShowPortraitWushuangTactics => HasWushuangTactics && !IsHuman;
     private bool _statusBadgesOnLeft;
     public bool StatusBadgesOnLeft { get => _statusBadgesOnLeft; set => SetProperty(ref _statusBadgesOnLeft, value); }
-    public bool HasPortrait => GeneralArt.HasPortrait(GeneralId);
+    public bool HasPortrait => GeneralArt.HasPortrait(Portrait.ArtworkId);
     private GeneralPortraitViewModel? _portrait;
     public GeneralPortraitViewModel Portrait { get => _portrait ??= new(GeneralId); set => _portrait = value; }
     public Brush PortraitBrush => Portrait.Brush;

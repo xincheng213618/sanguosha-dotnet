@@ -105,6 +105,10 @@ internal static class Program
             Check("custom general roster opens searches and previews with bounded presentation cost", () => GeneralRosterPerformanceChecks.OpenSearchAndPreview(output));
             Check("custom general roster categories search within eligible series and reset across modes", () => GeneralRosterCategoryChecks.SeriesSearchAndModeBoundaries(output));
             Check("god rules deduplication merges skins and labels gameplay differences", () => GeneralRosterCategoryChecks.GodRulesMergeSkinsAndDistinguishVersions(output));
+            Check("custom general editor: visual rules save reopen and visible errors", () => CustomGeneralEditorChecks.VisualRulesSaveReopenAndErrorsKeepDraft(output));
+            Check("custom general sessions: editor next-game isolation and strict saved snapshot", CustomGeneralSessionChecks.EditorChangesAffectNextGameWhileSavedCustomMatchRestoresExactly);
+            Check("custom general persistence: atomic library and validation", () => CustomGeneralPersistenceChecks.LibraryRoundTripsAndFailedWritesPreserveOriginal(output));
+            Check("custom general persistence: saved content snapshot and actual cold restore", () => CustomGeneralPersistenceChecks.SaveSnapshotRestoresAfterCurrentLibraryChanges(output));
             Check("ordinary rules deduplication removes duplicate entries and preserves skins", () => GeneralRosterCategoryChecks.OrdinaryRulesHaveSingleEntriesAndRetainSkins(output));
             Check("Bagua response UI: armor choice judgment then hand Dodge", () => BaguaResponseUiChecks.ArmorChoicePrecedesJudgmentAndHandDodge(output));
             Check("filtered presentation batches log and guide results without losing entries", FilteredPresentationChecks.BatchFiltersPreserveEntries);

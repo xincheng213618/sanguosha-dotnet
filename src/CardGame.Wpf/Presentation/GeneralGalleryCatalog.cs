@@ -7,6 +7,7 @@ public static class GeneralGalleryCatalog
     public static IReadOnlyList<GallerySeries> Series { get; } = Array.AsReadOnly<GallerySeries>(
     [
         new("all", "全部", "浏览全部武将"),
+        new("custom", "自定义", "自己创建的武将与技能"),
         new("standard", "标准", "标准版武将"),
         new("myth", "神话再临", "风 · 火 · 林 · 山 · 阴 · 雷"),
         new("fame", "一将成名", "一将成名 · 一至七"),
@@ -25,6 +26,7 @@ public static class GeneralGalleryCatalog
 
     public static IReadOnlyList<GalleryGroup> Groups { get; } =
     [
+        new("custom", "custom", "自定义", "自定义武将"),
         new("standard", "standard", "标准", "标准版"),
         new("myth-wind", "myth", "风", "神话再临 · 风"),
         new("myth-fire", "myth", "火", "神话再临 · 火"),
@@ -66,6 +68,7 @@ public static class GeneralGalleryCatalog
         {
             groupId = generalId.Split(':', 2)[0] switch
             {
+                "custom" => "custom",
                 "sp" => "sp",
                 "mou" => "mou",
                 "friend" => "friend",

@@ -349,6 +349,7 @@
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                         <Button Content="新手演练" Command="{Binding StartTutorialCommand}" ToolTip="在四段真实牌局中练习基础操作" Style="{StaticResource QuietButton}" Padding="10,8" />
                         <Button Content="武将" Command="{Binding OpenGeneralGalleryCommand}" ToolTip="浏览经典身份武将、体力与技能" Style="{StaticResource QuietButton}" Padding="10,8" />
+                        <Button x:Name="CustomGeneralEditorButton" Content="自定义" Click="OpenCustomGenerals" ToolTip="{Binding CustomGeneralLibraryStatus}" AutomationProperties.Name="创建与编辑自定义武将" Style="{StaticResource QuietButton}" Padding="10,8" />
                         <Button Content="指南" Command="{Binding ToggleHelpCommand}" ToolTip="当前操作与卡牌图鉴 · F1" Style="{StaticResource QuietButton}" Padding="10,8" />
                         <Button Content="战报 / 存档" Command="{Binding ToggleLogCommand}" Style="{StaticResource QuietButton}" Padding="10,8" />
                         <Button x:Name="HistoryButton" Content="战绩" Command="{Binding OpenHistoryCommand}" Style="{StaticResource QuietButton}" Padding="10,8" />
