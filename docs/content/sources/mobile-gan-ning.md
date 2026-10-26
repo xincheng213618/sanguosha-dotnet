@@ -1,5 +1,7 @@
 # 甘宁·移动版
 
+> 此版本与 `classic:gan-ning` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。当前普通移动身份，吴、男、4体力，标准包；完整引用现有 `classic:qixi`，没有复制技能定义或运行时。
 
 来源：[移动官网9](https://www.sanguosha.cn/pc/hero-detail-9.html)、[移动BWIKI人物35671](https://wiki.biligame.com/msgs/index.php?title=甘宁&oldid=35671)（2026-01-08）、[普通奇袭39419](https://wiki.biligame.com/msgs/index.php?title=奇袭/甘宁&oldid=39419)（2026-07-03）。本次直接读取以上当前MediaWiki修订；普通经典栏给出17级等级奖励，属于实际已上线的普通标准身份。技能页当前经典正文仍为出牌阶段以一张黑色牌作过河拆桥，没有另加国战或界版条件。

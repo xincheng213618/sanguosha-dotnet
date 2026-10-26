@@ -1,5 +1,7 @@
 # 黄盖·移动版
 
+> 此版本与 `classic:huang-gai` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。普通移动身份，吴、男、4体力，标准包；完整引用已注册的苦肉技能 `classic:kujin`，保持现有ID拼写，不另设同义技能。
 
 来源：[移动官网11](https://www.sanguosha.cn/pc/hero-detail-11.html)、[移动BWIKI人物固定版本35810](https://wiki.biligame.com/msgs/index.php?title=黄盖&oldid=35810)（2026-01-10）、[普通苦肉固定版本20229](https://wiki.biligame.com/msgs/index.php?title=苦肉/黄盖&oldid=20229)（2022-12-07）。普通经典栏列出新建账号升级获得，不混用界版的弃牌费用、阶段限次或诈降。

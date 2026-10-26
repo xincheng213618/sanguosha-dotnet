@@ -1,8 +1,0 @@
-{
-  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:liu-biao",
-  "skills": [],
-  "generals": [{ "registrationOrder": 73500, "pools": { "current": 73500 }, "definition": {
-    "id": "mobile:liu-biao", "name": "刘表·移动版", "portraitKey": "mobile-liu-biao", "skillId": "classic:zishou", "additionalSkillIds": ["classic:zongshi"],
-    "factionId": "qun", "baseHp": 3, "gender": "Male", "characterId": "character:liu-biao", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
-  } }]
-}

@@ -1,4 +1,4 @@
-﻿using CardGame.Content.Standard;
+using CardGame.Content.Standard;
 using CardGame.Core;
 using System.Text.Json;
 
@@ -181,9 +181,9 @@ internal static class BorrowedSwordScenario
                 "ol:shen-lu-xun",
                 "ol:shen-gan-ning",
                 "ol:shen-zhang-liao",
-                "ol:shen-zhou-yu",
-                "ol:shen-zhuge-liang",
-                "ol:shen-lu-bu",
+                "classic:shen-zhou-yu",
+                "mobile:shen-zhuge-liang",
+                "classic:shen-lu-bu",
                 "ol:shen-zhao-yun",
                 "ol:shen-sun-quan",
                 "ol:shen-zhang-jiao",

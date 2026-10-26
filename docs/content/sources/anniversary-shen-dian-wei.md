@@ -1,5 +1,7 @@
 # 神典韦（一将成名／原十周年）
 
+> 此版本与 `ol:shen-dian-wei` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 - 内容：`anniversary:shen-dian-wei`，`rulesetId=sanguosha-anniversary`，`variantId=anniversary-god`。神势力，男，基础体力四。
 - [当前官方武将页](https://x.sanguosha.com/hero/218.html)，核读于 2026-10-22。页面原始 HTML 包含完整技能，武将列表中的 `gid=218`、`resource=121801` 与详情页对应。
 - [正式上线公告](https://x.sanguosha.com/news/20251204_8422_1517.html)，页面发布日期 2025-12-05；“周年庆福利拿不停”列出神典韦于 2025-12-06 正式上线，表格注明神、男、四体力、身份模式及欢乐成双，并有完整技能正文。

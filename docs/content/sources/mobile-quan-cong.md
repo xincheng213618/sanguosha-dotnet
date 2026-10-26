@@ -1,5 +1,7 @@
 # 全琮·移动版
 
+> 此版本与 `classic:quan-cong` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。产品线：三国杀移动版，独立 `mobile:quan-cong` 身份，进入移动版选将与图鉴。
 
 规则来源：[移动版官网武将页](https://www.sanguosha.cn/pc/hero-detail-193.html)。基础属性与现有同名经典资料核对：4体力、wu势力、男性。

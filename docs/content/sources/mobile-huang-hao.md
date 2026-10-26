@@ -1,5 +1,7 @@
 # 移动版黄皓
 
+> 此版本与 `classic:huang-hao` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。正式身份 `mobile:huang-hao`，蜀、男性、三体力，版本 `mobile`，规则集 `sanguosha-mobile`，画像键 `mobile-huang-hao`。
 
 [移动版官网黄皓223](https://www.sanguosha.cn/pc/hero-detail-223.html)完整HTML含贿生正文；与[移动版Wiki黄皓](https://wiki.biligame.com/msgs/黄皓)当前身份规则一致。寝情在结束阶段对任意名攻击范围内包含主公的角色逐一弃牌，再依次摸一张，最后按其中手牌比主公多的人数摸牌。贿生在他人伤害前，私下展示自选牌，由伤害来源选择拿一张且防止本次伤害并封禁该来源对，或弃置等量牌。

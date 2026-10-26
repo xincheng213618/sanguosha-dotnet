@@ -1,5 +1,7 @@
 # 张鲁·移动版
 
+> 此版本与 `ol:zhang-lu` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。独立 `mobile:zhang-lu` 身份，群势力、男性、3体力。
 
 [移动版官网196](https://www.sanguosha.cn/pc/hero-detail-196.html)与[移动版BWIKI身份正文（oldid=27970）](https://wiki.biligame.com/msgs/index.php?title=张鲁&oldid=27970)交叉核对。采用身份版义舍、布施、米道，不采用国战同名技能。

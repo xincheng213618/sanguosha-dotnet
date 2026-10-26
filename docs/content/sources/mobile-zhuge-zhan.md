@@ -1,5 +1,7 @@
 # 诸葛瞻·移动版
 
+> 此版本与 `classic:zhuge-zhan` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。普通移动身份，蜀、男、3体力；完整引用既有经典技能，不复制定义、状态或执行器。
 
 来源：[移动官网341](https://www.sanguosha.cn/pc/hero-detail-341.html)、[移动人物38211](https://wiki.biligame.com/msgs/index.php?title=诸葛瞻&oldid=38211)、[罪论35531](https://wiki.biligame.com/msgs/index.php?title=罪论&oldid=35531)、[父荫38999](https://wiki.biligame.com/msgs/index.php?title=父荫&oldid=38999)。普通身份与国战、界版及其他版本分别核查。

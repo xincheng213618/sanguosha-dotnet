@@ -1,8 +1,0 @@
-{
-  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:liao-hua",
-  "skills": [],
-  "generals": [{ "registrationOrder": 72800, "pools": { "current": 72800 }, "definition": {
-    "id": "mobile:liao-hua", "name": "廖化·移动版", "portraitKey": "mobile-liao-hua", "skillId": "classic:dangxian", "additionalSkillIds": ["classic:fuli"],
-    "factionId": "shu", "baseHp": 4, "gender": "Male", "characterId": "character:liao-hua", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
-  } }]
-}

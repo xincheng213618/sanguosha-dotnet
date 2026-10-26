@@ -1,5 +1,7 @@
 # 步骘·移动版
 
+> 此版本与 `ol:bu-zhi` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。产品线：三国杀移动版，独立 `mobile:bu-zhi` 身份。
 
 [移动版官网武将页](https://www.sanguosha.cn/pc/hero-detail-205.html)为主要规则来源。同名OL、界或势版本保持各自身份与规则。

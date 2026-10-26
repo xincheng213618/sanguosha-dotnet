@@ -1,5 +1,7 @@
 # 简雍（移动版）
 
+> 此版本与 `classic:jian-yong` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-25。普通移动身份 `mobile:jian-yong`，蜀、男性、3体力，完整复用 `classic:qiaoshui`、`classic:zongshi-pindian`。
 
 - [移动官网武将127](https://www.sanguosha.cn/index.php/pc/hero-detail-127.html)：已读取完整HTML中的巧说及隐藏纵适。巧说在出牌阶段开始时发起拼点；赢后本回合下一张基本牌或普通锦囊可以增减一个目标，未赢则本回合不能使用锦囊。纵适在自己参与的拼点结束后，赢时可取得较小点数的原拼点牌，否则可收回自己的原拼点牌。

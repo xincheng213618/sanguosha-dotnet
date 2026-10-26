@@ -4,27 +4,40 @@ using CardGame.Core;
 
 internal static class IdentityGeneralPoolChecks
 {
-    public static void EquivalentGodRulesUseOneRosterEntry()
+    public static void EquivalentRulesUseOneRosterEntry()
     {
         var registry = StandardWushuangContentRegistry.Create();
-        foreach (var (alias, canonical) in GodGeneralRulesCatalog.Aliases)
+        foreach (var (alias, canonical) in GeneralRulesCatalog.Aliases)
         {
-            Need(registry.Generals.ContainsKey(alias) && registry.Generals.ContainsKey(canonical) &&
-                GodGeneralRulesCatalog.IsCanonical(canonical),
-                "Historical god definitions remain registered while each reviewed alias has a direct canonical target.");
+            Need(!registry.Generals.ContainsKey(alias) && registry.Generals.ContainsKey(canonical) &&
+                GeneralRulesCatalog.IsCanonical(canonical),
+                "Redundant definitions are removed and each artwork mapping has a surviving target.");
             foreach (var modeId in new[] { "identity:classic-8", "identity:classic-dual-8", WushuangMode.ModeId })
             {
                 var mode = registry.Modes[modeId];
                 var modePool = mode.GeneralPoolIds!;
-                Need(modePool.Contains(canonical) && !modePool.Contains(alias) &&
+                Need((modeId == WushuangMode.ModeId || modePool.Contains(canonical)) && !modePool.Contains(alias) &&
                     (mode.GeneralSelectionPoolIds is null || !mode.GeneralSelectionPoolIds.Contains(alias)) &&
                     (mode.GeneralVariantGroups is null || !mode.GeneralVariantGroups.Values.Any(ids => ids.Contains(alias))),
-                    "Equivalent rules have only one entry in random drafts, full rosters and edition families.");
+                    $"Equivalent rules have only one entry in random drafts, full rosters and edition families: {alias} -> {canonical} in {modeId}.");
             }
         }
-        var pool = registry.Modes[WushuangMode.ModeId].GeneralPoolIds!;
+        var activities = ComposedSkillContentRegistry.CreateShowcase(includeActivities: true, includeBossActivities: true,
+            includeHulaoActivities: true, includeShenwuActivities: true, includeNianActivities: true,
+            includeHellActivities: true, includeWenheActivities: true, includeDragonBoatActivities: true,
+            includeGuanduActivities: true);
+        foreach (var mode in registry.Modes.Values.Concat(activities.Modes.Values))
+            Need((mode.GeneralPoolIds is null || mode.GeneralPoolIds.All(GeneralRulesCatalog.IsCanonical)) &&
+                (mode.GeneralSelectionPoolIds is null || mode.GeneralSelectionPoolIds.All(GeneralRulesCatalog.IsCanonical)) &&
+                (mode.GeneralVariantGroups is null || mode.GeneralVariantGroups.Values.SelectMany(ids => ids).All(GeneralRulesCatalog.IsCanonical)),
+                $"Mode '{mode.Id}' must not reintroduce a merged edition through activity pools or version buttons.");
+        var pool = registry.Modes["identity:classic-8"].GeneralPoolIds!;
         foreach (var ids in new[]
         {
+            new[] { "classic:sun-ce", "mobile:sun-ce" },
+            new[] { "classic:pang-tong", "mobile:pang-tong" },
+            new[] { "classic:xun-yu", "mobile:xun-yu" },
+            new[] { "classic:liu-shan", "mobile:liu-shan" },
             new[] { "classic:shen-cao-cao", "mobile:shen-cao-cao" },
             new[] { "classic:shen-guan-yu", "ol:shen-guan-yu" },
             new[] { "classic:shen-lu-bu", "mobile:shen-lu-bu" },
@@ -34,7 +47,7 @@ internal static class IdentityGeneralPoolChecks
             new[] { "ol:shen-lu-xun", "mobile:shen-lu-xun" },
             new[] { "classic:shen-zhao-yun", "ol:shen-zhao-yun", "mobile:shen-zhao-yun" }
         })
-            Need(ids.All(pool.Contains), "Actual timing, payment, duration and response differences retain their distinct playable rules.");
+            Need(ids.All(pool.Contains), "Actual timing, payment, duration and response differences retain their distinct playable rules: " + string.Join(", ", ids));
     }
 
     public static void ModePoolsAndSelectionBoundaries()

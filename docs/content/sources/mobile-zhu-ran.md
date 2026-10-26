@@ -1,5 +1,7 @@
 # 朱然（移动版）
 
+> 此版本与 `classic:zhu-ran` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-25。普通移动身份 `mobile:zhu-ran`，吴、男性、4体力，完整复用 `classic:danshou`。
 
 - [移动官网武将131](https://www.sanguosha.cn/index.php/pc/hero-detail-131.html)：已读取完整HTML。当前胆守是出牌阶段内按发动序数支付递增张数的牌，选择攻击范围内其他角色；第一档弃对方一牌，第二档由对方交一牌，第三档造成一点伤害，之后各档自己与目标各摸两张。玩法也逐项说明这四种收益。

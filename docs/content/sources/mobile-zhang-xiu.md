@@ -1,5 +1,7 @@
 # 张绣·移动版
 
+> 此版本与 `classic:zhang-xiu` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。普通移动身份，群、男、4体力，神话再临雷包；完整引用 `classic:xiongluan` 与 `classic:congjian`，不复制技能定义或运行时。
 
 来源：[移动官网344](https://www.sanguosha.cn/pc/hero-detail-344.html)、[移动BWIKI人物固定版本39172](https://wiki.biligame.com/msgs/index.php?title=张绣&oldid=39172)、[雄乱固定版本20865](https://wiki.biligame.com/msgs/index.php?title=雄乱&oldid=20865)。人物经典栏为12888元宝限时秒杀，国战栏的附敌和同名增伤从谏另列，不能混用。

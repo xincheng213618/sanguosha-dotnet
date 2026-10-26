@@ -105,6 +105,7 @@ internal static class Program
             Check("custom general roster opens searches and previews with bounded presentation cost", () => GeneralRosterPerformanceChecks.OpenSearchAndPreview(output));
             Check("custom general roster categories search within eligible series and reset across modes", () => GeneralRosterCategoryChecks.SeriesSearchAndModeBoundaries(output));
             Check("god rules deduplication merges skins and labels gameplay differences", () => GeneralRosterCategoryChecks.GodRulesMergeSkinsAndDistinguishVersions(output));
+            Check("ordinary rules deduplication removes duplicate entries and preserves skins", () => GeneralRosterCategoryChecks.OrdinaryRulesHaveSingleEntriesAndRetainSkins(output));
             Check("Bagua response UI: armor choice judgment then hand Dodge", () => BaguaResponseUiChecks.ArmorChoicePrecedesJudgmentAndHandDodge(output));
             Check("filtered presentation batches log and guide results without losing entries", FilteredPresentationChecks.BatchFiltersPreserveEntries);
             Check("Battle log UI: compact seat filters named colored history and styled scrolling", () => BattleLogUiChecks.SeatsFilterNamedHistoryAndKeepStyledScrolling(output));

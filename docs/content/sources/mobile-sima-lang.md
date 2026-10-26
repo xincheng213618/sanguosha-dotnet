@@ -1,5 +1,7 @@
 # 移动版司马朗
 
+> 此版本与 `ol:sima-lang` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。身份 `mobile:sima-lang`，人物 `character:sima-lang`，魏、男、3 体力。
 
 来源：[官网武将页 202](https://www.sanguosha.cn/pc/hero-detail-202.html)与[移动版 BWIKI 当前身份正文（oldid=35830）](https://wiki.biligame.com/msgs/index.php?title=司马朗&oldid=35830)。郡兵为一名角色结束阶段手牌少于两张时，由该角色决定是否摸一张并把所有手牌交给司马朗，再由司马朗交还等量的牌；其包括司马朗本人。去疾为每个出牌阶段限一次，弃置等于已损失体力的牌，令至多等量角色各回复一点，弃牌含黑色则自己失去一点体力。

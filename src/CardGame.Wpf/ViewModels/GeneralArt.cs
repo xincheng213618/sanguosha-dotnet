@@ -677,11 +677,11 @@ public static partial class GeneralArt
     });
     private static readonly Dictionary<string, WeakReference<BitmapImage>> Images = new(StringComparer.Ordinal);
 
-    private static readonly Lazy<IReadOnlyDictionary<string, IReadOnlyList<GeneralSkin>>> MergedGodSkins = new(() =>
-        CardGame.Content.Standard.GodGeneralRulesCatalog.Aliases.GroupBy(pair => pair.Value, StringComparer.Ordinal)
+    private static readonly Lazy<IReadOnlyDictionary<string, IReadOnlyList<GeneralSkin>>> MergedRuleSkins = new(() =>
+        CardGame.Content.Standard.GeneralRulesCatalog.Aliases.GroupBy(pair => pair.Value, StringComparer.Ordinal)
             .ToDictionary(group => NormalizeKey(group.Key), group =>
             {
-                var skins = OwnSkins(NormalizeKey(group.Key)).ToList();
+                var skins = OwnSkins(NormalizeKey(group.Key)).DistinctBy(skin => skin.LocalPath, StringComparer.OrdinalIgnoreCase).ToList();
                 var paths = skins.Select(skin => skin.LocalPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
                 foreach (var alias in group)
                     foreach (var skin in OwnSkins(NormalizeKey(alias.Key)))
@@ -689,8 +689,16 @@ public static partial class GeneralArt
                             skins.Add(skin with
                             {
                                 Id = NormalizeKey(alias.Key) + "/" + skin.Id,
-                                Name = (alias.Key.StartsWith("mobile:", StringComparison.Ordinal) ? "移动版" :
-                                    alias.Key.StartsWith("anniversary:", StringComparison.Ordinal) ? "十周年" : "OL") + " · " + skin.Name
+                                Name = (alias.Key.Split(':', 2)[0] switch
+                                {
+                                    "mobile" => "移动版",
+                                    "anniversary" => "十周年",
+                                    "boundary" => "界限突破",
+                                    "classic" => "经典",
+                                    "standard" => "标准",
+                                    "ol" => "OL",
+                                    var edition => edition
+                                }) + " · " + skin.Name
                             });
                 return (IReadOnlyList<GeneralSkin>)skins.AsReadOnly();
             }, StringComparer.Ordinal));
@@ -698,7 +706,7 @@ public static partial class GeneralArt
     public static IReadOnlyList<GeneralSkin> GetSkins(string id)
     {
         var key = NormalizeKey(id);
-        return MergedGodSkins.Value.TryGetValue(key, out var skins) ? skins : OwnSkins(key);
+        return MergedRuleSkins.Value.TryGetValue(key, out var skins) ? skins : OwnSkins(key);
     }
 
     private static IReadOnlyList<GeneralSkin> OwnSkins(string key)

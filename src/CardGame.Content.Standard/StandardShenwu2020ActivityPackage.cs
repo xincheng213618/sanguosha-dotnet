@@ -31,7 +31,7 @@ public sealed class StandardShenwu2020ActivityPackage : IGameContentPackage
             .Where(g => g.FactionId != "god" && !banned.Any(id => g.CharacterId == $"character:{id}" || g.Id.EndsWith($":{id}", StringComparison.Ordinal)) &&
                 g.Id is not ("standard:yuan-shu" or "classic:yuan-shu" or "ol:sp-jia-xu" or "sp:guan-yu"))
             .Select(g => g.Id).ToArray();
-        string[] gods = ["classic:shen-guan-yu", "classic:shen-lu-meng", "classic:shen-zhou-yu", "ol:shen-zhuge-liang",
+        string[] gods = ["classic:shen-guan-yu", "classic:shen-lu-meng", "classic:shen-zhou-yu", "mobile:shen-zhuge-liang",
             "classic:shen-cao-cao", "classic:shen-lu-bu", "classic:shen-sima-yi", "ol:shen-zhao-yun"];
         string[] leaders = ["shenwu2020:hundun", "shenwu2020:qiongqi", "shenwu2020:taowu", "shenwu2020:taotie",
             "shenwu2020:xiangliu", "shenwu2020:zhuyan", "shenwu2020:bifang", "shenwu2020:yingzhao"];

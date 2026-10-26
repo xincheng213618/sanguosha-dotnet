@@ -1,5 +1,7 @@
 # 董卓·移动版
 
+> 此版本与 `classic:dong-zhuo` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。普通移动身份，群、男、8体力、神话再临林包。完整引用 `classic:jiuchi`、`classic:roulin`、`classic:benghuai`、`classic:baonve`；最后一个ID保留本库既有拼写。只增加人物内容，不复制技能或运行时。
 
 来源：[移动官网45](https://www.sanguosha.cn/pc/hero-detail-45.html)、[移动BWIKI人物34832](https://wiki.biligame.com/msgs/index.php?title=董卓&oldid=34832)、[酒池20644](https://wiki.biligame.com/msgs/index.php?title=酒池/董卓&oldid=20644)、[肉林27707](https://wiki.biligame.com/msgs/index.php?title=肉林/董卓&oldid=27707)、[崩坏40255](https://wiki.biligame.com/msgs/index.php?title=崩坏/董卓&oldid=40255)、[暴虐26590](https://wiki.biligame.com/msgs/index.php?title=暴虐/董卓&oldid=26590)。本次重读当前原始API修订：人物2025-12-05，四技能分别2023-01-04、2024-07-17、2026-08-27、2024-03-28，oldid保持上述版本。普通栏为林包、220将魂兑换或招募获取；官网45列出全部四技能但只呈现酒池完整正文，另外三项以当前普通移动技能页补足，不从缺段推断没有技能。

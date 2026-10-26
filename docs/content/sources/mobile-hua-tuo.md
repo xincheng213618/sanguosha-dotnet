@@ -1,5 +1,7 @@
 # 华佗·移动版
 
+> 此版本与 `classic:hua-tuo` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。当前普通移动身份，群、男、3体力，标准包；完整引用现有 `classic:qingnang`、`classic:jijiu`，没有复制技能定义或运行时。
 
 来源：[移动官网22](https://www.sanguosha.cn/pc/hero-detail-22.html)、[移动BWIKI人物34803](https://wiki.biligame.com/msgs/index.php?title=华佗&oldid=34803)（2025-12-05）、[普通青囊28185](https://wiki.biligame.com/msgs/index.php?title=青囊/华佗&oldid=28185)（2024-08-14）、[普通急救20504](https://wiki.biligame.com/msgs/index.php?title=急救/华佗&oldid=20504)（2023-01-03）。本次直接读取当前原始修订；普通经典栏给出41级获取，属于已上线标准身份。

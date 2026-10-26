@@ -7,7 +7,7 @@ namespace CardGame.Core.Tests;
 
 internal static class BoundarySimaYiMobileChecks
 {
-    private const string Hero = "boundary:sima-yi-mobile", Feedback = "boundary:feedback",
+    private const string Hero = "boundary:sima-yi", Feedback = "boundary:feedback",
         Quiet = "fixture:mobile-smy-quiet", Driver = "fixture:mobile-smy-driver", Paid = "fixture:mobile-smy-paid",
         Peer = "fixture:mobile-smy-peer", ObtainReason = "skill-program." + Feedback + ".MoveBoundCards";
 

@@ -26,27 +26,5 @@
       }
     }
   ],
-  "generals": [
-    {
-      "registrationOrder": 40452,
-      "pools": {
-        "current": 40452
-      },
-      "definition": {
-        "id": "mobile:shen-lu-meng",
-        "name": "神吕蒙",
-        "portraitKey": "mobile-shen-lu-meng",
-        "skillId": "mobile:shelie",
-        "factionId": "god",
-        "baseHp": 3,
-        "additionalSkillIds": [
-          "mobile:gongxin"
-        ],
-        "gender": "Male",
-        "characterId": "character:lu-meng",
-        "variantId": "mobile-god",
-        "rulesetId": "sanguosha-mobile"
-      }
-    }
-  ]
+  "generals": []
 }

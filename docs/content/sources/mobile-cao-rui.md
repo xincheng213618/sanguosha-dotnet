@@ -1,5 +1,7 @@
 # 曹叡（移动版）
 
+> 此版本与 `classic:cao-rui` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。独立移动身份 `mobile:cao-rui`，魏、男性、3体力。
 
 采用[移动版官网185](https://www.sanguosha.cn/pc/hero-detail-185.html)，与[移动版 BWIKI 曹叡](https://wiki.biligame.com/msgs/曹叡)普通身份核对。三个完整规则复用 `classic:huituo`、`classic:mingjian`、`classic:xingshuai`，不复制同规则技能。

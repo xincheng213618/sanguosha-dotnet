@@ -59,7 +59,7 @@ public sealed class StandardShenwuActivityPackage : IGameContentPackage
             .Select(general => general.Id).ToArray();
         string[] gods =
         [
-            "classic:shen-guan-yu", "classic:shen-lu-meng", "classic:shen-zhou-yu", "ol:shen-zhuge-liang",
+            "classic:shen-guan-yu", "classic:shen-lu-meng", "classic:shen-zhou-yu", "mobile:shen-zhuge-liang",
             "classic:shen-cao-cao", "classic:shen-lu-bu", "classic:shen-sima-yi", "ol:shen-zhao-yun"
         ];
         string[] leaders = ["shenwu:hundun", "shenwu:qiongqi", "shenwu:taowu", "shenwu:taotie"];

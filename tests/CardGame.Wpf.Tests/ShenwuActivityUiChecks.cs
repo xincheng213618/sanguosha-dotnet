@@ -43,7 +43,7 @@ internal static partial class ShenwuActivityUiChecks
                 "The actual draft must show five ordinary candidates and three shared, still-god candidates.");
             Program.Render(root, 1440, 880, Path.Combine(output, "160-shenwu-selection.png"));
             // Avoid a seven-stars setup exchange; all choices remain real engine offers.
-            var chosen = shared.First(choice => choice.GeneralId != "ol:shen-zhuge-liang");
+            var chosen = shared.First(choice => choice.GeneralId != "mobile:shen-zhuge-liang");
             vm.PreviewGeneralChoiceCommand.Execute(chosen);
             vm.ConfirmGeneralChoiceCommand.Execute(null);
             if (vm.RunToHumanCommand.CanExecute(null)) vm.RunToHumanCommand.Execute(null);

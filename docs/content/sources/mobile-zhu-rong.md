@@ -1,5 +1,7 @@
 # 祝融·移动版
 
+> 此版本与 `classic:zhu-rong` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。普通移动身份，蜀、女、4体力、神话再临林包。完整引用 `classic:juxiang` 与 `classic:lieren`，不复制技能或增加运行时。
 
 来源：[移动官网46](https://www.sanguosha.cn/pc/hero-detail-46.html)、[移动BWIKI人物39023](https://wiki.biligame.com/msgs/index.php?title=祝融&oldid=39023)、[巨象20612](https://wiki.biligame.com/msgs/index.php?title=巨象/祝融&oldid=20612)、[烈刃38993](https://wiki.biligame.com/msgs/index.php?title=烈刃/祝融&oldid=38993)。原始 revisions API 核实人物/烈刃为2026-06-11、巨象为2023-01-03；经典栏为林包、开服上线、160将魂/招募获取。官网巨象正文与Wiki一致，但缺烈刃正文，后者以当前普通技能修订补足。

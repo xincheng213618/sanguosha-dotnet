@@ -1,5 +1,7 @@
 # 神关羽（移动版）
 
+> 此版本与 `classic:shen-guan-yu` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 - 内容：`mobile:shen-guan-yu`；`rulesetId=sanguosha-mobile`，`variantId=mobile-god`。神势力，男，基础体力五。
 - [移动版当前官方详情页](https://www.sanguosha.cn/index.php/pc/hero-detail-139.html)，核读于 2026-10-22，身份正式武将。原始 HTML 的 `ul.skill-info` 第一项为武神、第二个带 `hide` 类的列表项为完整武魂正文，两项均实际读取。详情编号 139，列表及皮肤资源编号 201。
 - [2018-08-16 七夕正式活动公告](https://www.sanguosha.cn/pc/news-detail-448.html)明确九月银币兑换为 77777 银币获得神关羽（永久）；[2025-07-25 热夏正式公告](https://www.sanguosha.cn/pc/news-detail-2111.html)仍列永久武将的银币兑换。与当前详情相互印证，不属于仅体验、测试稿或活动 NPC；不把这两个运营时间冒称初次上线日期。

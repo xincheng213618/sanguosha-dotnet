@@ -55,7 +55,7 @@ public static class GeneralGalleryCatalog
     private static readonly IReadOnlyDictionary<string, string> GeneralGroups = BuildGeneralGroups();
 
     public static bool IsVisible(string generalId) =>
-        CardGame.Content.Standard.GodGeneralRulesCatalog.IsCanonical(generalId) &&
+        CardGame.Content.Standard.GeneralRulesCatalog.IsCanonical(generalId) &&
         !generalId.StartsWith("standard:", StringComparison.Ordinal) &&
         !generalId.StartsWith("composed:", StringComparison.Ordinal) &&
         !generalId.StartsWith("national:", StringComparison.Ordinal);

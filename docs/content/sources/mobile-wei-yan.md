@@ -1,5 +1,7 @@
 # 魏延·移动版
 
+> 此版本与 `classic:wei-yan` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。普通移动身份，蜀、男、4体力，神话再临风包；完整引用现有 `classic:kuanggu`，没有复制技能或运行时。
 
 来源：[移动官网27](https://www.sanguosha.cn/pc/hero-detail-27.html)、[移动BWIKI人物固定版本34841](https://wiki.biligame.com/msgs/index.php?title=魏延&oldid=34841)（2025-10-21）、[普通狂骨固定版本20548](https://wiki.biligame.com/msgs/index.php?title=狂骨/魏延&oldid=20548)（2023-01-03）。人物普通经典栏列出44级获得，属于实际已上线的普通身份版本。

@@ -1,5 +1,7 @@
 # 移动版郝昭
 
+> 此版本与 `classic:hao-zhao` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。正式身份 `mobile:hao-zhao`，魏、男性、基础四体力，人物 `character:hao-zhao`，版本 `mobile`、规则集 `sanguosha-mobile`、画像键 `mobile-hao-zhao`；注册与当前将池顺序均为80399。移动Wiki归入神话再临雷包，图库使用 `myth-thunder`。
 
 [移动官网345](https://www.sanguosha.cn/pc/hero-detail-345.html)与[移动Wiki当前郝昭](https://wiki.biligame.com/msgs/郝昭)（人物固定版本oldid31304，2025-06-29更新）的经典身份镇骨规则一致：自己的结束阶段可选择一名其他角色，在自己当前回合结束与该角色下个回合结束两个时点，分别按郝昭届时手牌数调整该角色手牌。补牌最多使其达到五张；弃牌仍应弃至郝昭手牌数，不能误作统一将目标值截成五张。人物页列有合成获取方式，属于正式普通移动身份；本次核对未发现已上线的移动重制与上述正文冲突。

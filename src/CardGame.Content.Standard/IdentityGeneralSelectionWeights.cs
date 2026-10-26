@@ -21,9 +21,9 @@ internal static class IdentityGeneralSelectionWeights
             "boundary:xun-yu", "boundary:huang-gai", "boundary:huang-yueying", "boundary:zhang-song",
             "boundary:gan-ning", "boundary:bu-lian-shi", "boundary:zhang-zhao-zhang-hong",
             "ol:bao-san-niang", "ol:guan-suo", "classic:wang-ji", "classic:qu-yi", "boundary:xu-sheng",
-            "mou:guan-yu-ol", "friend:zhuge-liang", "ol:shen-zhuge-liang", "ol:shen-zhou-yu");
+            "mou:guan-yu-ol", "friend:zhuge-liang", "mobile:shen-zhuge-liang", "classic:shen-zhou-yu");
         return new ReadOnlyDictionary<string, int>(weights
-            .GroupBy(pair => GodGeneralRulesCatalog.CanonicalId(pair.Key), StringComparer.Ordinal)
+            .GroupBy(pair => GeneralRulesCatalog.CanonicalId(pair.Key), StringComparer.Ordinal)
             .ToDictionary(group => group.Key, group => group.Max(pair => pair.Value), StringComparer.Ordinal));
 
         void Add(int weight, params string[] ids)

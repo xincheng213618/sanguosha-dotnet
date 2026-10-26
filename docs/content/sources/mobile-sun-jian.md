@@ -1,5 +1,7 @@
 # 普通移动版孙坚
 
+> 此版本与 `classic:sun-jian` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。吴、男、4体力、神话再临林包，仅英魂；不混入国战5体力、1V1固定对手或界版武烈/破虏。
 
 来源：[移动官网44](https://www.sanguosha.cn/index.php/pc/hero-detail-44.html)、[人物34810](https://wiki.biligame.com/msgs/index.php?title=孙坚&oldid=34810)、[英魂20633](https://wiki.biligame.com/msgs/index.php?title=英魂/孙坚&oldid=20633)。本批审阅已通过MediaWiki revisions API实际读取当前原始修订，分别为2025-12-05和2023-01-04。正式获取表列80级、160将魂或招募；上线日期栏为空，不推断具体上线日期。

@@ -10,6 +10,72 @@ using CardGame.Wpf.ViewModels;
 
 internal static class GeneralRosterCategoryChecks
 {
+    public static void OrdinaryRulesHaveSingleEntriesAndRetainSkins(string output)
+    {
+        var registry = StandardContentRegistry.CreateWithClassicGenerals();
+        Program.Assert(GeneralRulesCatalog.Aliases.All(pair => !registry.Generals.ContainsKey(pair.Key) &&
+            registry.Generals.ContainsKey(pair.Value) && GeneralRulesCatalog.IsCanonical(pair.Value)),
+            "Removed duplicate general IDs are absent from the real registry and each retained rule set has one direct registered target.");
+        using var model = new MainViewModel(false, 31, true, new MemorySaveStore(), useExpandedContent: true,
+            historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore(), contentRegistry: registry)
+        { IsMotionEnabled = false, IsMusicEnabled = false, IsSoundEnabled = false };
+        model.SelectedStartingRole = model.StartingRoles.Single(role => role.Role == Role.Lord);
+        foreach (var modeId in new[] { "identity:classic-5", "identity:classic-8" })
+        {
+            model.SelectedTableMode = model.TableModes.Single(mode => mode.ModeId == modeId);
+            model.StartNewGameCommand.Execute(null);
+            model.ContinueFromIdentityRevealCommand.Execute(null);
+            model.ToggleGeneralRosterCommand.Execute(null);
+            model.SelectCustomGeneralCategoryCommand.Execute("all");
+            var game = Program.Engine(model); var prompt = game.CreateSnapshot(0).PendingDecision!;
+            var revision = game.Revision; var commands = game.AcceptedCommands.Count;
+            Program.Assert(model.CustomGeneralChoices.Count > 0 && prompt.ValidContentIds.All(GeneralRulesCatalog.IsCanonical) &&
+                prompt.Choices.SelectMany(choice => choice.ContentIds).All(GeneralRulesCatalog.IsCanonical) &&
+                model.CustomGeneralChoices.All(choice => GeneralRulesCatalog.IsCanonical(choice.GeneralId)),
+                "The genuine five/eight-player full roster and its published selectable choices contain only retained general IDs.");
+            foreach (var choice in model.CustomGeneralChoices.Take(3).ToArray())
+            {
+                model.PreviewGeneralChoiceCommand.Execute(choice);
+                Program.Assert(model.SelectedGeneralVariants.All(version => GeneralRulesCatalog.IsCanonical(version.GeneralId)),
+                    "Removed duplicates cannot return through a real family version selector.");
+            }
+            if (modeId == "identity:classic-8")
+                foreach (var different in new[] { "mobile:sun-ce", "mobile:pang-tong" })
+                {
+                    var published = prompt.Choices.Single(choice => choice.ContentIds.SequenceEqual([different]));
+                    var candidate = published.Parameters.GetValueOrDefault("candidate-general-id", different);
+                    var row = model.CustomGeneralChoices.Single(choice => choice.GeneralId == different);
+                    Program.Assert(row.CandidateGeneralId == candidate,
+                        "The visible retained edition belongs to the actual published candidate family.");
+                    model.PreviewGeneralChoiceCommand.Execute(row);
+                    Program.Assert(model.SelectedGeneralVariants.Any(version => version.GeneralId == different) &&
+                        model.SelectedGeneralVariants.All(version => GeneralRulesCatalog.IsCanonical(version.GeneralId)),
+                        "Actual mobile Sun Ce and Pang Tong rule differences remain reachable in the real version buttons.");
+                }
+            Program.Assert(game.Revision == revision && game.AcceptedCommands.Count == commands,
+                "Browsing retained versions does not issue a selection or change the published match.");
+        }
+        model.OpenGeneralGalleryCommand.Execute(null);
+        Program.Assert(model.GeneralGalleryEntries.All(entry => GeneralRulesCatalog.IsCanonical(entry.GeneralId)),
+            "The real gallery contains no removed duplicate entries.");
+        foreach (var (removed, retained) in GeneralRulesCatalog.Aliases)
+        {
+            Program.Assert(model.GeneralGalleryEntries.Count(entry => entry.GeneralId == retained) == 1 &&
+                model.GeneralGalleryEntries.All(entry => entry.GeneralId != removed),
+                "Each removed edition has exactly one retained gallery entry.");
+            var skins = GeneralArt.GetSkins(retained);
+            var paths = skins.Select(skin => skin.LocalPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            Program.Assert(skins.Select(skin => skin.Id).Distinct(StringComparer.Ordinal).Count() == skins.Count &&
+                paths.Count == skins.Count && GeneralArt.GetSkins(removed).All(skin => paths.Contains(skin.LocalPath)),
+                "All removed-edition artwork stays available as retained skins with unique stable IDs and image paths.");
+        }
+        var entry = model.GeneralGalleryEntries.Single(entry => entry.GeneralId == GeneralRulesCatalog.CanonicalId("mobile:zhao-yun"));
+        model.SelectGeneralGalleryEntryCommand.Execute(entry);
+        var panel = new CardGame.Wpf.Controls.GeneralGalleryPanel { DataContext = model };
+        try { Program.Render(panel, 1120, 760, Path.Combine(output, "ordinary-rules-single-entry-skins.png")); }
+        finally { panel.DataContext = null; }
+    }
+
     public static void GodRulesMergeSkinsAndDistinguishVersions(string output)
     {
         using var model = new MainViewModel(false, 31, true, new MemorySaveStore(), useExpandedContent: true,

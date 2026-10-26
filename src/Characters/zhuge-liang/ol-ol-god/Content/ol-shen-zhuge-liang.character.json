@@ -37,28 +37,5 @@
       }
     }
   ],
-  "generals": [
-    {
-      "registrationOrder": 369,
-      "pools": {
-        "current": 120
-      },
-      "definition": {
-        "id": "ol:shen-zhuge-liang",
-        "name": "神诸葛亮",
-        "portraitKey": "ol_shen_zhuge_liang",
-        "skillId": "ol:qixing",
-        "factionId": "god",
-        "baseHp": 3,
-        "additionalSkillIds": [
-          "ol:kuangfeng",
-          "ol:dawu"
-        ],
-        "gender": "Male",
-        "characterId": "character:zhuge-liang",
-        "variantId": "ol-god",
-        "rulesetId": "sanguosha-ol"
-      }
-    }
-  ]
+  "generals": []
 }

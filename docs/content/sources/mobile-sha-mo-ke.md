@@ -1,5 +1,7 @@
 # 移动版沙摩柯
 
+> 此版本与 `classic:sha-mo-ke` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。身份 `mobile:sha-mo-ke`，人物 `character:sha-mo-ke`，蜀、男、4 体力，SP 武将组9。
 
 来源：[移动版官网武将页293](https://www.sanguosha.cn/pc/hero-detail-293.html)、[移动版 BWIKI 人物正文（oldid=37555，页面更新2026-03-17）](https://wiki.biligame.com/msgs/index.php?title=沙摩柯&oldid=37555)。官网包含身份版，BWIKI 当前经典身份列明将魂或活动兑换的获取方式，属于正式已上线人物。本身份采用普通移动版，不将其与国战权限或其他产品的图鉴分类混淆。

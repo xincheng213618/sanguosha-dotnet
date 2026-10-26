@@ -1,5 +1,7 @@
 # 移动版陈宫
 
+> 此版本与 `classic:chen-gong` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-25。正式身份 `mobile:chen-gong`，群、男性、三体力，版本 `mobile`，规则集 `sanguosha-mobile`，画像键 `mobile-chen-gong`。
 
 - [移动版官网陈宫103](https://www.sanguosha.cn/index.php/pc/hero-detail-103.html)：完整HTML包含明策和默认隐藏的智迟；[官网武将目录](https://www.sanguosha.cn/index.php/pc/hero-list.html)分别列标准陈宫与谋陈宫。

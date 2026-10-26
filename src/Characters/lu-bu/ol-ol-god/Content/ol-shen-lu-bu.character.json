@@ -50,29 +50,5 @@
       }
     }
   ],
-  "generals": [
-    {
-      "registrationOrder": 370,
-      "pools": {
-        "current": 121
-      },
-      "definition": {
-        "id": "ol:shen-lu-bu",
-        "name": "神吕布",
-        "portraitKey": "ol_shen_lu_bu",
-        "skillId": "ol:kuangbao",
-        "factionId": "god",
-        "baseHp": 5,
-        "additionalSkillIds": [
-          "ol:wumou",
-          "ol:wuqian",
-          "ol:shenfen"
-        ],
-        "gender": "Male",
-        "characterId": "character:lu-bu",
-        "variantId": "ol-god",
-        "rulesetId": "sanguosha-ol"
-      }
-    }
-  ]
+  "generals": []
 }

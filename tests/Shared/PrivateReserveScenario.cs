@@ -17,7 +17,7 @@ internal static class PrivateReserveScenario
             AdvanceAfterHumanCommands = false, UseInteractiveDiscard = false, MaxTurns = 16
         }, registry);
         Accept(game.Submit(new StartGameCommand()));
-        Accept(game.Submit(new SelectGeneralCommand(0, "ol:shen-zhuge-liang", game.Revision, game.PendingDecision!.PromptId)));
+        Accept(game.Submit(new SelectGeneralCommand(0, "mobile:shen-zhuge-liang", game.Revision, game.PendingDecision!.PromptId)));
         Reach(game, g => IsQixingOffer(g));
         return game;
     }
@@ -58,7 +58,7 @@ internal static class PrivateReserveScenario
         public PackageManifest Manifest { get; } = new("private-reserve-ui-fixture", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder builder)
         {
-            CharacterFixtureContent.Register(builder, "ol:shen-zhuge-liang");
+            CharacterFixtureContent.Register(builder, "mobile:shen-zhuge-liang");
             var others = Enumerable.Range(1, 3).Select(index => "private-reserve:other-" + index).ToArray();
             foreach (var id in others) builder.AddGeneral(new(id, "陪测", "cao_cao", "standard:none", "wei", 8));
             builder.AddDeck(new("private-reserve:deck", "固定牌堆", 4, 2, [])
@@ -68,7 +68,7 @@ internal static class PrivateReserveScenario
             });
             builder.AddMode(new("identity:private-reserve-ui", "七星交互", 4, 4,
                 new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Loyalist)] = 1, [nameof(Role.Rebel)] = 1, [nameof(Role.Renegade)] = 1 },
-                "private-reserve:deck", GeneralCandidateCount: 4, GeneralPoolIds: ["ol:shen-zhuge-liang", .. others]));
+                "private-reserve:deck", GeneralCandidateCount: 4, GeneralPoolIds: ["mobile:shen-zhuge-liang", .. others]));
         }
     }
 }

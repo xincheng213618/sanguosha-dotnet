@@ -1,5 +1,7 @@
 # 移动版诸葛诞
 
+> 此版本与 `classic:zhuge-dan` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。正式身份 `mobile:zhuge-dan`，魏、男性、四体力，版本 `mobile`，规则集 `sanguosha-mobile`，画像键 `mobile-zhuge-dan`。
 
 [移动版官网诸葛诞90](https://www.sanguosha.cn/pc/hero-detail-90.html)与[移动版Wiki诸葛诞](https://wiki.biligame.com/msgs/诸葛诞)当前身份文本一致：其他角色死亡后功獒加上限并回复一点；举义在准备阶段已受伤且体力上限大于全场角色数时觉醒，摸至体力上限并获得崩坏、威重；威重在上限变化后摸一张。

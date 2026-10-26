@@ -28,27 +28,5 @@
       }
     }
   ],
-  "generals": [
-    {
-      "registrationOrder": 40352,
-      "pools": {
-        "current": 40352
-      },
-      "definition": {
-        "id": "mobile:shen-zhou-yu",
-        "name": "神周瑜",
-        "portraitKey": "mobile-shen-zhou-yu",
-        "skillId": "mobile:qinyin",
-        "factionId": "god",
-        "baseHp": 4,
-        "additionalSkillIds": [
-          "mobile:yeyan"
-        ],
-        "gender": "Male",
-        "characterId": "character:zhou-yu",
-        "variantId": "mobile-god",
-        "rulesetId": "sanguosha-mobile"
-      }
-    }
-  ]
+  "generals": []
 }

@@ -1,5 +1,7 @@
 # 夏侯霸·移动版
 
+> 此版本与 `ol:xiahou-ba` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。独立身份 `mobile:xiahou-ba`，蜀势力，男性，4体力，SP武将组1。经典形象画师熊猫探员。
 
 规则来源：[移动官网78](https://www.sanguosha.cn/pc/hero-detail-78.html)、[移动版BWIKI夏侯霸](https://wiki.biligame.com/msgs/夏侯霸)（当前页面 oldid=35875，2026-01-11 更新）。BWIKI经典身份栏注明300将魂合成或招募获得，另将势夏侯霸列为独立歧义入口。本实现采用已公开普通身份规则，不混用势版本、国战豹烈、1V1或十周年永久获得技能的版本。

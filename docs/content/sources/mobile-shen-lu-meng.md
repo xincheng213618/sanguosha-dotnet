@@ -1,5 +1,7 @@
 # 移动版神吕蒙
 
+> 此版本与 `classic:shen-lu-meng` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 - 内容标识：`mobile:shen-lu-meng`；产品 `sanguosha-mobile`；版本 `mobile-god`；技能为 `mobile:shelie`、`mobile:gongxin`。
 - 现行规则主来源：[移动版官方神吕蒙详情（gid 140）](https://www.sanguosha.cn/pc/hero-detail-140.html)，核对于 2026-10-22。直接核对原 HTML 的 `skill-info`，共两个技能条目；攻心正文位于 `class="hide"` 的第二个 `li`，已完整读取。页面明确列为神势力身份武将。
 - 官方辅助说明：[2020-06-30《神吕蒙》攻略](https://www.sanguosha.cn/pc/guide-info-124.html)同样给出涉猎、攻心正文，并说明涉猎每花色各取一张、最多四张，以及神吕蒙为三体力角色。此攻略用于辅助解释，与现行详情一致，不代替现行正文。

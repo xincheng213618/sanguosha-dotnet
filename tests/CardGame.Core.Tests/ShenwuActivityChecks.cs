@@ -64,7 +64,7 @@ internal static class ShenwuActivityChecks
             Require(prompt.ValidContentIds.All(id => activity.PlayerPoolIds.Contains(id) || shared.Contains(id)) &&
                 prompt.ValidContentIds.Where(activity.GodPoolIds.Contains).Order().SequenceEqual(shared.Order()),
                 "The expanded ordinary roster must not reveal or allow the five unshared gods or any beast.");
-            var chosen = shared.First(id => id != "ol:shen-zhuge-liang");
+            var chosen = shared.First(id => id != "mobile:shen-zhuge-liang");
             Accept(game, new SelectGeneralCommand(human, chosen, game.Revision, prompt.PromptId));
             Reach(game, () => game.CreateSnapshot(human, revealAll: true).Players.All(player => player.HandCount > 0));
             var after = game.CreateSnapshot(human, revealAll: true);
@@ -198,7 +198,7 @@ internal static class ShenwuActivityChecks
         "classic:shen-guan-yu" => (CardKind.GhostDragonCrescentBlade, CardKind.QinglongCrescentBlade),
         "classic:shen-lu-meng" => (CardKind.NationalStyleRobe, null),
         "classic:shen-zhou-yu" => (CardKind.CrimsonSoulZither, CardKind.ZhuqueFan),
-        "ol:shen-zhuge-liang" => (CardKind.QimenEightTrigrams, CardKind.BaguaFormation),
+        "mobile:shen-zhuge-liang" => (CardKind.QimenEightTrigrams, CardKind.BaguaFormation),
         "classic:shen-cao-cao" => (CardKind.DustlessGoldenSpear, CardKind.DefensiveHorse),
         "classic:shen-lu-bu" => (CardKind.ShuraInfernoHalberd, CardKind.FangtianHalberd),
         "classic:shen-sima-yi" => (CardKind.DelusionCrown, null),

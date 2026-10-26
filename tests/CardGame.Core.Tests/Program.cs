@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Reflection;
 using CardGame.Content.Standard;
 using CardGame.Core;
@@ -2149,7 +2149,7 @@ var tests = new (string Name, Action Body)[]
     ("identity draft AI evaluates ordinary roster rules without legacy edition priors", GeneralDraftAiChecks.OrdinaryRosterRuleCoverage),
     ("identity draft AI prices Lord benefit recipients costs and awakening", GeneralDraftAiChecks.LordBenefitRecipientsAndCosts),
     ("identity draft separates five and eight player exact edition selection rosters", IdentityGeneralPoolChecks.ModePoolsAndSelectionBoundaries),
-    ("god rules deduplication keeps one roster entry and historical definitions", IdentityGeneralPoolChecks.EquivalentGodRulesUseOneRosterEntry),
+    ("general rules deduplication removes redundant definitions and keeps distinct rules", IdentityGeneralPoolChecks.EquivalentRulesUseOneRosterEntry),
     ("Mou Cao Pi song limits paid benefits and exact cold replay", MouCaoPiChecks.SongAndXingshangCostsBenefitsAndColdReplay),
     ("Mou Cao Pi Fangzhu actual target turn expiry and permanent Songwei", MouCaoPiChecks.FangzhuDurationAndPermanentSongweiSkills),
     ("Mou Cao Pi printed corpse inheritance and original skill loss", MouCaoPiChecks.InheritanceLosesOwnThreeSkillsAndKeepsNonLordPrintedSkills),

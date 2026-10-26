@@ -1,5 +1,7 @@
 # 移动版曹冲
 
+> 此版本与 `classic:cao-chong` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-25。正式身份 `mobile:cao-chong`，魏、男性、三体力，版本 `mobile`，规则集 `sanguosha-mobile`，画像键 `mobile-cao-chong`。
 
 - [移动版官网曹冲123](https://www.sanguosha.cn/index.php/pc/hero-detail-123.html)：完整HTML同时列出称象及默认隐藏的仁心；[官网武将目录](https://www.sanguosha.cn/index.php/pc/hero-list.html)收录名称为曹冲。

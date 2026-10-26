@@ -1,5 +1,7 @@
 # 移动版曹彰
 
+> 此版本与 `classic:cao-zhang` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-25。正式身份 `mobile:cao-zhang`，魏、男性、四体力，版本 `mobile`，规则集 `sanguosha-mobile`，画像键 `mobile-cao-zhang`。
 
 - [移动版官网曹彰111](https://www.sanguosha.cn/index.php/pc/hero-detail-111.html)：读取完整技能HTML；将驰在摸牌阶段选择多摸一张并于本回合禁用、禁打出杀，或少摸一张并于本回合获得杀无距离与额外一次额度。
@@ -9,4 +11,4 @@
 
 本次仅新增人物身份配置，不复制 Runtime 或人物夹具。既有 `CaoZhangChecks.DrawMoreBlocksSlashUseAndResponse` 等将驰真实用牌、打出和摸牌政策检查承接能力验证，技能来源和实际回合租约继续由原生机制维护。
 
-独立画像为官网首张[经典形象51300](https://www.sanguosha.cn/storage/uploads/images/skins/51300.jpg)，原始530×750 JPEG，未裁剪或改色，本地 `src/CardGame.Wpf/Assets/official-mobile-cao-zhang.jpg`。
+独立画像为官网首张[经典形象51300](https://www.sanguosha.cn/storage/uploads/images/skins/51300.jpg)，原始530×750 JPEG，未裁剪或改色，本地 `src/CardGame.Wpf/Assets/official-boundary-cao-zhang-mobile.jpg`。

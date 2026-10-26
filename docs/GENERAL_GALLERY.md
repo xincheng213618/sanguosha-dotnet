@@ -17,7 +17,7 @@
 
 `GeneralGalleryCatalog` 按完整武将 ID 指定归属，并通过 `IsVisible` 筛选展示条目。正式版本独立归类；合成占位与机制、国战试验条目不进入图鉴和搜索总数。不能仅凭 `classic:` 或 `standard:` 前缀判断所属系列。
 
-神将按实际规则去重，不按平台数重复计数。已核对等价的版本在选将池和图鉴中只保留一个武将，其他立绘归入其皮肤；历史内容 ID、技能定义和素材来源继续保留。有实际玩法差异的版本分别显示规则标签，详情解释差异。映射与逐组核对记录见 [`content/GOD_GENERAL_RULES.md`](content/GOD_GENERAL_RULES.md)，不能只凭姓名或技能名自动合并。
+神将按实际规则去重，不按平台数重复计数。已核对等价的版本在选将池和图鉴中只保留一个武将，其他立绘归入其皮肤；重复武将定义直接删除；有独立立绘时并入保留武将的皮肤，素材来源继续保留。本项目尚未发布，不保留重复武将编号的存档兼容。有实际玩法差异的版本分别显示规则标签，详情解释差异。映射与逐组核对记录见 [`content/GOD_GENERAL_RULES.md`](content/GOD_GENERAL_RULES.md)，不能只凭姓名或技能名自动合并。
 
 系列、子分类、势力与武将名／技能搜索叠加生效。具体系列保留空分组并提示暂无武将，「全部」跳过空分组；搜索无结果时可以清除筛选。类别入口不表示其中所有版本均已注册，当前名单以注册表和 `GeneralGalleryCatalog` 为准。
 
@@ -44,3 +44,5 @@
 - `tools/sync_general_art.py` 同步并校验立绘，`tools/extract_gallery_ui_assets.py` 提取图鉴界面素材。
 
 素材归属与绑定边界见 [`RESOURCE_CATALOG_DESIGN.md`](RESOURCE_CATALOG_DESIGN.md)。图鉴浏览只读取展示数据，模态打开时暂停牌局推进。
+
+普通武将同样按完整技能效果去重。只有名称、平台、编号或立绘不同的版本不单列；数值、次数、触发时机、代价或结算效果不同的版本保留。完整处理名单见 [`content/GENERAL_RULES_EQUIVALENCE.md`](content/GENERAL_RULES_EQUIVALENCE.md)。

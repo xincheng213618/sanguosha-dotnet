@@ -1,5 +1,7 @@
 # 夏侯惇·移动版
 
+> 此版本与 `classic:xiahou-dun` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。普通移动身份，魏、男、4体力、标准包。新增人物资料，完整引用 `classic:ganglie`，不新增技能副本、运行时或 opcode。
 
 来源：[移动官网17](https://www.sanguosha.cn/pc/hero-detail-17.html)、[移动BWIKI人物35870](https://wiki.biligame.com/msgs/index.php?title=夏侯惇&oldid=35870)（2026-01-11）、[普通刚烈20131](https://wiki.biligame.com/msgs/index.php?title=刚烈/夏侯惇&oldid=20131)（2022-12-01）。已通过 MediaWiki revisions API 读取原始 wikitext，人物修订确认普通经典标准包、开服上线、13级获取；技能修订的经典栏与当前官网同品普通身份正文一致。

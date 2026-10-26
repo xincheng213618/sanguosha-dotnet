@@ -1,5 +1,7 @@
 # 潘璋马忠（移动版）
 
+> 此版本与 `classic:pan-zhang-ma-zhong` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-25。普通移动身份 `mobile:pan-zhang-ma-zhong`，吴、男性、4体力，完整复用 `classic:duodao`、`classic:anjian`。
 
 - [移动官网武将129](https://www.sanguosha.cn/index.php/pc/hero-detail-129.html)：已读取完整HTML。夺刀限受到杀伤害后，先自弃一张牌，再取得实际来源装备区的武器；隐藏暗箭正文是在杀实际造成伤害时检查自己是否在目标攻击范围内，圈外则伤害加一。

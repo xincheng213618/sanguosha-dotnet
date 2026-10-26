@@ -1,5 +1,7 @@
 # 移动版刘表
 
+> 此版本与 `classic:liu-biao` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-25。正式身份 `mobile:liu-biao`，群、男性、三体力，版本 `mobile`，规则集 `sanguosha-mobile`，画像键 `mobile-liu-biao`。
 
 - [移动版官网刘表121](https://www.sanguosha.cn/index.php/pc/hero-detail-121.html)：完整HTML同时读取自守及默认隐藏的宗室。自守按现存势力数额外摸牌，本回合使用牌不能选择其他角色为目标；宗室按现存势力数增加手牌上限。
@@ -11,4 +13,4 @@
 
 未采用最初按已损失体力摸牌并跳过出牌阶段的旧自守，也未加入其他版本的额外伤害限制、手牌花色交换或杀次数政策。现有原生额外摸牌和回合目标政策已表达完整现行规则，因此仅新增身份配置、来源和独立画像；不新增 Runtime、共享端口或重复人物夹具。
 
-独立画像为官网首张[经典形象51600](https://www.sanguosha.cn/storage/uploads/images/skins/51600.jpg)，原始530×750 JPEG，未裁剪或改色，本地 `src/CardGame.Wpf/Assets/official-mobile-liu-biao.jpg`。
+独立画像为官网首张[经典形象51600](https://www.sanguosha.cn/storage/uploads/images/skins/51600.jpg)，原始530×750 JPEG，未裁剪或改色，本地 `src/CardGame.Wpf/Assets/official-boundary-liu-biao-mobile.jpg`。

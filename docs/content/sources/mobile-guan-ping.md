@@ -1,5 +1,7 @@
 # 移动版关平
 
+> 此版本与 `classic:guan-ping` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-25。正式身份 `mobile:guan-ping`，蜀、男性、四体力，版本 `mobile`，规则集 `sanguosha-mobile`，画像键 `mobile-guan-ping`。
 
 - [移动版官网关平126](https://www.sanguosha.cn/index.php/pc/hero-detail-126.html)：读取完整技能HTML，龙吟在一名角色于其出牌阶段内使用杀时可弃一张牌，使该杀不计入使用次数；红杀另令关平摸一张。

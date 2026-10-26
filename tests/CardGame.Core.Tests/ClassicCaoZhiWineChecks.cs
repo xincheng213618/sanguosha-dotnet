@@ -69,7 +69,7 @@ internal static class ClassicCaoZhiWineChecks
         public PackageManifest Manifest { get; } = new("fixture-classic-cao-zhi-wine", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
-            CharacterFixtureContent.Register(b, "mobile:cao-zhi", "classic:cao-zhi");
+            CharacterFixtureContent.Register(b, "classic:cao-zhi", "classic:cao-zhi");
             var catalog = SkillProgramCatalog.Load($$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{Watch}}","revision":1,"triggers":[
               {"id":"native-paid-face-child","window":"characterTurnedOver","subject":"owner","optional":false,

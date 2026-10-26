@@ -27,27 +27,5 @@
       }
     }
   ],
-  "generals": [
-    {
-      "registrationOrder": 368,
-      "pools": {
-        "current": 119
-      },
-      "definition": {
-        "id": "ol:shen-zhou-yu",
-        "name": "神周瑜",
-        "portraitKey": "ol_shen_zhou_yu",
-        "skillId": "ol:qinyin",
-        "factionId": "god",
-        "baseHp": 4,
-        "additionalSkillIds": [
-          "ol:yeyan"
-        ],
-        "gender": "Male",
-        "characterId": "character:zhou-yu",
-        "variantId": "ol-god",
-        "rulesetId": "sanguosha-ol"
-      }
-    }
-  ]
+  "generals": []
 }

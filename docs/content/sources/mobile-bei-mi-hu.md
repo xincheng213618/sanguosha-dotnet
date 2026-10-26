@@ -1,5 +1,7 @@
 # 卑弥呼·移动版
 
+> 此版本与 `ol:bei-mi-hu` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。当前普通移动身份，群、女、3体力，SP武将组8。完整引用已注册的 `ol:zongkui`、`ol:guju`、`ol:baijia`；觉醒后沿用既有授予的 `ol:canshi`，没有复制技能定义或人物运行时。
 
 来源：[移动官网281](https://www.sanguosha.cn/pc/hero-detail-281.html)、[移动BWIKI人物固定版本8452](https://wiki.biligame.com/msgs/index.php?title=卑弥呼&oldid=8452)（2022-06-08T10:49:41Z）。本次通过MediaWiki revisions再次确认8452仍是人物页当前版本；普通经典栏给出SP武将组8及6666将魂/冬至盒子获取方式，属于已上线身份。

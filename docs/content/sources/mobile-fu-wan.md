@@ -1,5 +1,7 @@
 # 移动版伏完
 
+> 此版本与 `ol:fu-wan` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。正式身份 `mobile:fu-wan`，群、男性、基础四体力，人物 `character:fu-wan`，版本 `mobile`、规则集 `sanguosha-mobile`、画像键 `mobile-fu-wan`；注册与当前将池顺序均为79899。移动Wiki归入SP武将组1，图库使用 `sp`。
 
 [移动官网60](https://www.sanguosha.cn/pc/hero-detail-60.html)、[移动Wiki当前伏完](https://wiki.biligame.com/msgs/伏完)（人物固定版本oldid38597，2026-06-04更新）与[移动Wiki谋溃](https://wiki.biligame.com/msgs/谋溃)的普通身份规则一致：使用杀指定一名角色为目标后，可以选择摸一张牌或弃置该目标一张牌；选择后，只有该角色用闪抵消这次杀，才由该角色弃置伏完一张牌。多目标杀逐目标处理，不能将其他目标的闪或另一张杀移接到本次收益。

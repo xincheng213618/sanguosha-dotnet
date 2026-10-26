@@ -1,5 +1,7 @@
 # 荀攸·移动版（普通身份）
 
+> 此版本与 `classic:xun-you` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-25。
 
 - [移动版官网荀攸完整图鉴（113）](https://www.sanguosha.cn/pc/hero-detail-113.html)：魏、男、3体力；隐藏的智愚全文也已读取。

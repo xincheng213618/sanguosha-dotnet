@@ -22075,7 +22075,7 @@
           "name": "经典形象",
           "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-119.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/51000.jpg",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-han-dang.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-han-dang-mobile.jpg",
           "sha256": "a1b9133f44dd8bf9552c30878ec014fec09edc8a54891698a83708065459c97e",
           "pixelWidth": 530,
           "pixelHeight": 750
@@ -22092,7 +22092,7 @@
           "name": "经典形象",
           "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-111.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/51300.jpg",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cao-zhang.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-cao-zhang-mobile.jpg",
           "sha256": "5fb60bb777442cdb991ddbdbbd6cb25900821d2c0e3ad9459ac0f6c67c8897c9",
           "pixelWidth": 530,
           "pixelHeight": 750
@@ -22109,7 +22109,7 @@
           "name": "经典形象",
           "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-115.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/51400.jpg",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-liao-hua.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-liao-hua-mobile.jpg",
           "sha256": "078c1cd8e3fcfe0b1b78c8a7fc619bf518393947ec525e9c9261d8b8dce2bfd9",
           "pixelWidth": 530,
           "pixelHeight": 750
@@ -22211,7 +22211,7 @@
           "name": "经典形象",
           "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-130.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/53400.jpg",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-yu-fan.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-yu-fan-mobile.jpg",
           "sha256": "dc391663e5f280ff1c55d911dd5405b8732e2dd6b3deae2a4ff1aabcbc6d1d6e",
           "pixelWidth": 530,
           "pixelHeight": 750
@@ -22228,7 +22228,7 @@
           "name": "经典形象",
           "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-121.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/51600.jpg",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-liu-biao.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-liu-biao-mobile.jpg",
           "sha256": "0e2bee83a1fb98ece105786787985d35c27f2bfa182fd052a5ccacb5481cfeaa",
           "pixelWidth": 530,
           "pixelHeight": 750
@@ -22245,7 +22245,7 @@
           "name": "经典形象",
           "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-125.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/53200.jpg",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-man-chong.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-man-chong-mobile.jpg",
           "sha256": "5657ced81c85b56d1231aba1fe77ea3dd1c5dac95f83fdccda1eba45fcd23d71",
           "pixelWidth": 530,
           "pixelHeight": 750
@@ -22262,7 +22262,7 @@
           "name": "经典形象",
           "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-127.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/53300.jpg",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-jian-yong.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-jian-yong-mobile.jpg",
           "sha256": "ef4a7f940b49396ef4a27dae9c0cb3dcb309eac229b775faea44e5f4512ba082",
           "pixelWidth": 530,
           "pixelHeight": 750
@@ -22279,7 +22279,7 @@
           "name": "经典形象",
           "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-129.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/54200.jpg",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-pan-zhang-ma-zhong.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-pan-zhang-ma-zhong-mobile.jpg",
           "sha256": "2849235090259c3f332e36836a240eacf5ad99754cc7435ecfefdd98a6d13a66",
           "pixelWidth": 530,
           "pixelHeight": 750
@@ -22347,7 +22347,7 @@
           "name": "经典形象",
           "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-131.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/53700.jpg",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhu-ran.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-zhu-ran-mobile.jpg",
           "sha256": "f55ac7acbb0a118f22d4f6ec617ab0b51e11acbe0a45231ac8a96ea27552855a",
           "pixelWidth": 530,
           "pixelHeight": 750
@@ -23657,7 +23657,7 @@
           "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-28.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/2800.jpg",
           "sha256": "c6d5f84c54724047e71765b5985095c2a0b384b695fb81c3b5ad7f79bfa33330",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-xiahou-yuan.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-xiahou-yuan-mobile.jpg",
           "pixelWidth": 530,
           "pixelHeight": 750
         }
@@ -23793,7 +23793,7 @@
           "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-27.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/2700.jpg",
           "sha256": "2250a7fd00a03c22708b3d67788d8f5caff8e45317734762a99e98e141e5d301",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-wei-yan.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-wei-yan-mobile.jpg",
           "pixelWidth": 530,
           "pixelHeight": 750
         }
@@ -23844,7 +23844,7 @@
           "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-7.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/700.jpg",
           "sha256": "45662df33e0a2e447b87ae81bb133647a859e4b1a4e6792e560a99bd7cae31bf",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-huang-yueying.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-huang-yueying-mobile.jpg",
           "pixelWidth": 530,
           "pixelHeight": 750
         }
@@ -24371,7 +24371,7 @@
           "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-45.html",
           "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/4500.jpg",
           "sha256": "b31431e467d59802029f1a12e4416b12e8a35a3f0c3f99e2ab4eb6e6881fb501",
-          "localPath": "src/CardGame.Wpf/Assets/official-mobile-dong-zhuo.jpg",
+          "localPath": "src/CardGame.Wpf/Assets/official-boundary-dong-zhuo-mobile.jpg",
           "pixelWidth": 530,
           "pixelHeight": 750
         }

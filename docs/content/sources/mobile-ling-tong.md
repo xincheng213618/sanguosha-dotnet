@@ -1,5 +1,7 @@
 # 凌统（移动版）
 
+> 此版本与 `classic:ling-tong` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。独立移动身份 `mobile:ling-tong`，吴、男性、4体力。
 
 采用[移动版官网105](https://www.sanguosha.cn/pc/hero-detail-105.html)，与[移动版 BWIKI 凌统](https://wiki.biligame.com/msgs/凌统)普通身份核对。旋风完整引用当前 `classic:xuanfeng`：实际失去装备区牌的一批移动可发动一次；本人的实际弃牌阶段结束时，弃置累计至少两张手牌可发动；发动后依次选择其他角色的手牌或装备牌，合计至多两张。

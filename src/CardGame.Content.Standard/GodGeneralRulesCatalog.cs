@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 
 namespace CardGame.Content.Standard;
 
-/// <summary>Reviewed rule-equivalent god editions. Historical definitions remain registered for replay.</summary>
+/// <summary>God rule differences and artwork ownership of removed equivalent editions.</summary>
 public static class GodGeneralRulesCatalog
 {
     // Deliberately explicit: matching names or skill text is not proof of identical gameplay.

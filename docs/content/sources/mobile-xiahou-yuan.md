@@ -1,5 +1,7 @@
 # 夏侯渊·移动版
 
+> 此版本与 `classic:xiahou-yuan` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。普通移动身份，魏、男、4体力，神话再临风；47级获得。完整引用 `classic:shensu`，不复制技能定义或运行时。
 
 来源：[移动官网28](https://www.sanguosha.cn/pc/hero-detail-28.html)、[普通神速固定版本39416](https://wiki.biligame.com/msgs/index.php?title=神速/夏侯渊&oldid=39416)（2026-07-03）、[人物固定版本35867](https://wiki.biligame.com/msgs/index.php?title=夏侯渊&oldid=35867)。当前普通身份仍为两项：跳过判定与摸牌；或者跳过出牌并弃一张装备。每项均为原生无距离普通杀。国战新版本的第二项已删除弃装备成本，不能套到本普通身份；界版的第三项也不属于本人物。

@@ -1,5 +1,7 @@
 # 移动版王基
 
+> 此版本与 `classic:wang-ji` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。身份 `mobile:wang-ji`，人物 `character:wang-ji`，魏、男、3 体力。
 
 来源：[官网武将页 204](https://www.sanguosha.cn/pc/hero-detail-204.html)与[移动版 BWIKI 身份版正文（oldid=36288）](https://wiki.biligame.com/msgs/index.php?title=王基&oldid=36288)。奇制为自己回合内非装备牌指定目标后，弃置一名非此牌目标角色的一张牌，再令其摸一张；可以选择不属于原目标的自己。进趋结束阶段摸两张，再将手牌弃至本回合实际发动奇制的次数。

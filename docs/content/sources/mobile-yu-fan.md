@@ -1,5 +1,7 @@
 # 移动版虞翻
 
+> 此版本与 `classic:yu-fan` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-25。正式身份 `mobile:yu-fan`，吴、男性、三体力，版本 `mobile`，规则集 `sanguosha-mobile`，画像键 `mobile-yu-fan`。
 
 - [移动版官网虞翻130](https://www.sanguosha.cn/index.php/pc/hero-detail-130.html)：完整HTML同时读取纵玄及默认隐藏的直言。纵玄把本人因弃置进入弃牌堆的任意张牌置于牌堆顶；直言在结束阶段令一名角色摸一张并展示，装备则真实使用，然后回复一点体力。
@@ -11,4 +13,4 @@
 
 本次仅增加移动身份配置，保持两个旧技能ID，不新增 Runtime、枚举、共享端口或相同能力的人物夹具。已有弃置来源检查与原生装备、回复机制承接验证。
 
-独立画像为官网首张[经典形象53400](https://www.sanguosha.cn/storage/uploads/images/skins/53400.jpg)，原始530×750 JPEG，未裁剪或改色，本地 `src/CardGame.Wpf/Assets/official-mobile-yu-fan.jpg`。
+独立画像为官网首张[经典形象53400](https://www.sanguosha.cn/storage/uploads/images/skins/53400.jpg)，原始530×750 JPEG，未裁剪或改色，本地 `src/CardGame.Wpf/Assets/official-boundary-yu-fan-mobile.jpg`。

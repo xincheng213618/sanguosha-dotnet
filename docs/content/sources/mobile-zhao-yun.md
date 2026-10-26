@@ -1,5 +1,7 @@
 # 赵云·移动版
 
+> 此版本与 `classic:zhao-yun` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。普通移动身份，蜀、男、4体力，标准包；完整引用已注册的 `classic:longdan`，没有复制技能或运行时。
 
 来源：[移动官网5](https://www.sanguosha.cn/pc/hero-detail-5.html)、[移动BWIKI人物固定版本34836](https://wiki.biligame.com/msgs/index.php?title=赵云&oldid=34836)（2025-12-05）、[普通龙胆固定版本19859](https://wiki.biligame.com/msgs/index.php?title=龙胆/赵云&oldid=19859)（2022-11-28）。人物普通经典栏列出5级奖励，实际开服普通武将；不采用SP或界版额外技能。

@@ -39,23 +39,5 @@
       }
     }
   ],
-  "generals": [
-    {
-      "registrationOrder": 39503,
-      "pools": { "current": 39503 },
-      "definition": {
-        "id": "anniversary:shen-dian-wei",
-        "name": "神典韦",
-        "portraitKey": "anniversary-shen-dian-wei",
-        "skillId": "anniversary:juanjia",
-        "additionalSkillIds": ["anniversary:qiexie", "anniversary:cuijue"],
-        "factionId": "god",
-        "gender": "Male",
-        "baseHp": 4,
-        "characterId": "character:dian-wei",
-        "variantId": "anniversary-god",
-        "rulesetId": "sanguosha-anniversary"
-      }
-    }
-  ]
+  "generals": []
 }

@@ -1,5 +1,7 @@
 # 王平·移动版
 
+> 此版本与 `classic:wang-ping` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。普通移动身份，蜀、男、4体力，神话再临阴；完整引用已注册的 `classic:feijun` 与 `classic:binglue`，没有复制技能、目标账本或运行时。
 
 来源：[移动官网250](https://www.sanguosha.cn/pc/hero-detail-250.html)、[移动BWIKI王平固定版本39178](https://wiki.biligame.com/msgs/index.php?title=王平&oldid=39178)（2026-06-18）、[飞军固定版本20784](https://wiki.biligame.com/msgs/index.php?title=飞军&oldid=20784)、[兵略固定版本20785](https://wiki.biligame.com/msgs/index.php?title=兵略&oldid=20785)。普通经典人物栏列出4000将魂合成/招募获得；其国战栏仍标注未开放权限，本次不接国战军令技能。

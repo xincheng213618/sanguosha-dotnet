@@ -1,5 +1,7 @@
 # 移动版乐进
 
+> 此版本与 `ol:yue-jin` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。身份 `mobile:yue-jin`，人物 `character:yue-jin`，魏、男、4 体力，SP 武将组2。
 
 来源：[移动版官网武将页82](https://www.sanguosha.cn/pc/hero-detail-82.html)、[移动版 BWIKI 人物正文（oldid=33699）](https://wiki.biligame.com/msgs/index.php?title=乐进&oldid=33699)及[骁果技能页（oldid=33209）](https://wiki.biligame.com/msgs/index.php?title=骁果&oldid=33209)。BWIKI 当前经典身份注明可通过将魂合成或招募获得，属于正式已上线人物；不采用同页的骥乐进身份。

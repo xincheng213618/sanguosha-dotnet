@@ -1,5 +1,7 @@
 # 满宠（移动版）
 
+> 此版本与 `classic:man-chong` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-25。普通移动身份 `mobile:man-chong`，魏、男性、3体力，完整复用 `classic:junxing`、`classic:yuce`。
 
 - [移动官网武将125](https://www.sanguosha.cn/index.php/pc/hero-detail-125.html)：已读取包含隐藏御策的完整HTML。峻刑以任意非空手牌为代价，对方可以交出类别均异的一张手牌，否则翻面并摸原代价数量；御策是受伤后展示手牌，伤害来源弃异类别手牌或持有者回复一点。

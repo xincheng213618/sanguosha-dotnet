@@ -1,5 +1,7 @@
 # 曹植（移动版）
 
+> 此版本与 `classic:cao-zhi` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核对日期：2026-10-26。独立移动身份 `mobile:cao-zhi`，魏、男性、3体力。
 
 采用[移动版官网101](https://www.sanguosha.cn/pc/hero-detail-101.html)，并与[移动版 BWIKI 曹植](https://wiki.biligame.com/msgs/曹植)的普通身份核对。落英完整引用 `classic:luoying`：其他角色的梅花牌因弃置或判定进入弃牌堆时可获得；不引入界版落英实体标记、距离和响应特效。

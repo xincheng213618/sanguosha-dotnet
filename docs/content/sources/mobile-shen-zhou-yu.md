@@ -1,5 +1,7 @@
 # 移动版神周瑜
 
+> 此版本与 `classic:shen-zhou-yu` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 - 内容标识：`mobile:shen-zhou-yu`；产品 `sanguosha-mobile`；版本 `mobile-god`；技能为 `mobile:qinyin`、`mobile:yeyan`。
 - 当前规则主来源：[移动版官方神周瑜详情（gid 141）](https://www.sanguosha.cn/pc/hero-detail-141.html)，核对于 2026-10-22。该页明确列为神势力身份武将，列出完整琴音、业炎正文。没有采用欢乐杀、测试服或活动专属设计。
 - 正式可用证据：[2018-08-16《七夕节活动》](https://www.sanguosha.cn/pc/news-detail-448.html)的正式武将奖励及史诗宝珠兑换包含神周瑜；[2021-07-23《7月24日悦享夏日活动》](https://www.sanguosha.cn/pc/news-detail-1045.html)列出 500 将魂兑换神周瑜。这些公告用于证明正式产品归属及可获得性，不将它们误称为首次上线公告。

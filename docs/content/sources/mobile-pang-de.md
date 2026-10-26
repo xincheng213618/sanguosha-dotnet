@@ -1,5 +1,7 @@
 # 庞德·移动版
 
+> 此版本与 `classic:pang-de` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。普通移动身份，群、男、4体力、神话再临火包，完整引用 `classic:mashu` 与 `classic:mengjin`。没有新增技能JSON、运行时或重复人物快照。
 
 来源：[移动官网39](https://www.sanguosha.cn/pc/hero-detail-39.html)、[移动BWIKI人物35418](https://wiki.biligame.com/msgs/index.php?title=庞德&oldid=35418)、[马术/庞德10199](https://wiki.biligame.com/msgs/index.php?title=马术/庞德&oldid=10199)、[猛进39003](https://wiki.biligame.com/msgs/index.php?title=猛进&oldid=39003)。原始MediaWiki revisions API核实时间分别为2025-12-30、2022-09-14、2026-06-11；当前经典人物为火包、80将魂或招募获得。`猛进/庞德` 不是当前技能页，不能拿不存在的页面引用；实际页面名就是 `猛进`。官网39列出两个技能名但漏猛进正文，使用当前移动Wiki明确经典栏补足。

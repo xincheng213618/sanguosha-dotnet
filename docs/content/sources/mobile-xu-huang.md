@@ -1,5 +1,7 @@
 # 徐晃·移动版
 
+> 此版本与 `classic:xu-huang` 技能规则等价，独立武将定义已删除。本文保留规则和素材来源；处理名单见 [武将技能去重](../GENERAL_RULES_EQUIVALENCE.md)。
+
 核查日期：2026-10-26。普通移动身份，魏、男、4体力、神话再临林包。完整引用已有 `classic:duanliang`，只增加人物内容，不复制技能定义或运行时。
 
 来源：[移动官网42](https://www.sanguosha.cn/pc/hero-detail-42.html)、[移动BWIKI人物34819](https://wiki.biligame.com/msgs/index.php?title=徐晃&oldid=34819)、[断粮20620](https://wiki.biligame.com/msgs/index.php?title=断粮/徐晃&oldid=20620)。本次通过MediaWiki revisions API重读当前原始修订：人物2025-12-05、技能2023-01-04，仍分别为34819/20620；普通栏为林包、160将魂合成或招募获取。当前技能页同时列出国战及历史版本，本文只采用“经典”身份规则。

@@ -1,8 +1,0 @@
-{
-  "formatVersion": 1, "packageId": "standard-classic-generals", "characterId": "character:cao-zhang",
-  "skills": [],
-  "generals": [{ "registrationOrder": 72700, "pools": { "current": 72700 }, "definition": {
-    "id": "mobile:cao-zhang", "name": "曹彰·移动版", "portraitKey": "mobile-cao-zhang", "skillId": "classic:jiangchi",
-    "factionId": "wei", "baseHp": 4, "gender": "Male", "characterId": "character:cao-zhang", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
-  } }]
-}
