@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:jiuyuan": {
+      "name": "救援",
+      "description": "主公技，锁定技，当其他吴势力角色对你使用【桃】时，此牌对你的回复值+1。"
+    }
+  }
+}

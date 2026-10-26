@@ -95,6 +95,8 @@ public enum SkillProgramCardPolicyKind
     OtherWuTreatedWoundedForCanshi = 80400
 }
 
+public enum SkillProgramPeachRecoveryScope { NativePeach = 0 }
+
 public sealed record SkillProgramCardPolicy(
     string Id,
     SkillProgramCardPolicyKind Kind,
@@ -115,4 +117,6 @@ public sealed record SkillProgramCardPolicy(
     public bool? UseIncomingResponseDistance { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public bool? IncludeNonTargetResponders { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SkillProgramPeachRecoveryScope? PeachRecoveryScope { get; init; }
 }

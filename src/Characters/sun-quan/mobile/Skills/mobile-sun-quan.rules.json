@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:jiuyuan",
+      "revision": 1,
+      "cardPolicies": [
+        { "id": "other-wu-native-peach", "kind": "rescueRecoveryBonus", "cardKinds": ["peach"], "factionId": "wu", "value": 1, "ownerRole": "lord", "peachRecoveryScope": "nativePeach" }
+      ]
+    }
+  ]
+}

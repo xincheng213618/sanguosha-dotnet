@@ -13766,6 +13766,7 @@ public sealed partial class GameEngine
             FinishCardUse(resolutionId, card, playedCardKind);
             return;
         }
+        ApplyNativePeachRecoveryScope(resolutionId, source, target, playedCardKind, ref recoveryAmount, ref recoveryPolicySources);
         recoveryAmount = ApplyIssuedCardRecoveryModifiers(resolutionId, source.Seat, target.Seat, recoveryAmount);
         if (TryQueueRecoveryReplacement(resolutionId, source.Seat, target.Seat, recoveryAmount,
             new(RecoveryAttemptProducer.CardUse, CardId: card.Id, CardKind: playedCardKind, Policies: recoveryPolicySources)))

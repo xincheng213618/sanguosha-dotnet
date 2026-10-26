@@ -3736,9 +3736,13 @@ public sealed class SkillProgramCatalog
         RequireObject(node, path);
         CheckProperties(node, path, "id", "kind", "cardKinds", "requiredCardKinds", "value",
             "inputSuit", "outputSuit", "condition", "factionId", "ownerRole", "discardCost", "providerDrawCount", "maximumRecoveryOrdinal",
-            "useIncomingResponseDistance", "includeNonTargetResponders");
+            "useIncomingResponseDistance", "includeNonTargetResponders", "peachRecoveryScope");
         var id = Identifier(node, "id", path);
         var kind = EnumValue<SkillProgramCardPolicyKind>(node, "kind", path);
+        SkillProgramPeachRecoveryScope? peachRecoveryScope = node.TryGetProperty("peachRecoveryScope", out _)
+            ? EnumValue<SkillProgramPeachRecoveryScope>(node, "peachRecoveryScope", path) : null;
+        if (peachRecoveryScope is not null && kind != SkillProgramCardPolicyKind.RescueRecoveryBonus)
+            Fail(path + ".peachRecoveryScope", "requires rescueRecoveryBonus");
         bool? useIncomingResponseDistance = node.TryGetProperty("useIncomingResponseDistance", out _)
             ? RequiredBool(node, "useIncomingResponseDistance", path) : null;
         bool? includeNonTargetResponders = node.TryGetProperty("includeNonTargetResponders", out _)
@@ -3930,6 +3934,10 @@ public sealed class SkillProgramCatalog
         {
             if (requiredKinds.Count != 0 || value is < 1 or > 20)
                 Fail(path, "a recovery bonus requires value 1..20 and no response kinds");
+            if (peachRecoveryScope is not null &&
+                (!cardKinds.SequenceEqual([CardKind.Peach]) || factionId is null || ownerRole != Role.Lord ||
+                 inputSuit is not null || outputSuit is not null || OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
+                Fail(path + ".peachRecoveryScope", "native Peach recovery requires an unconditional lord faction policy for exactly Peach");
         }
         else if (kind == SkillProgramCardPolicyKind.RedirectOwnTurnFactionRecovery)
         {
@@ -4037,7 +4045,8 @@ public sealed class SkillProgramCatalog
         var policy = new SkillProgramCardPolicy(id, kind, cardKinds, requiredKinds, value,
             inputSuit, outputSuit, OptionalCondition(node, path), factionId, ownerRole)
         { DiscardCost = discardCost, ProviderDrawCount = providerDrawCount,
-          UseIncomingResponseDistance = useIncomingResponseDistance, IncludeNonTargetResponders = includeNonTargetResponders };
+          UseIncomingResponseDistance = useIncomingResponseDistance, IncludeNonTargetResponders = includeNonTargetResponders,
+          PeachRecoveryScope = peachRecoveryScope };
         GameEngine.ValidateComparedBlackSlashPolicy(path, policy);
         return policy;
     }

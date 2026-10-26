@@ -71,7 +71,7 @@ internal sealed class RepeatJudgmentProgramOperationDescriptor : ProgramOperatio
         {
             // The new free black-repeat claim uses a public two-suit prior: one expected card.
             // The old nullable policy retains its existing inert estimate.
-            if (effect.ClaimHandLimitExemption == SkillProgramClaimHandLimitExemption.ActualTurn)
+            if (effect.ClaimHandLimitExemption is not null)
                 context.Draw(new SkillProgramEffect(SkillProgramEffectOp.Draw, SkillProgramEffectTarget.Owner, 1, effect.Condition));
         });
 

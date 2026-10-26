@@ -1,0 +1,38 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:sun-quan",
+  "skills": [
+    {
+      "registrationOrder": 84400,
+      "programBundle": "mobile-sun-quan",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:jiuyuan",
+        "name": "救援",
+        "description": "主公技，锁定技，当其他吴势力角色对你使用【桃】时，此牌对你的回复值+1。",
+        "tags": "Lord, Locked",
+        "executionForms": "State"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 84499,
+      "pools": { "current": 84499 },
+      "definition": {
+        "id": "mobile:sun-quan",
+        "name": "孙权·移动版",
+        "portraitKey": "mobile-sun-quan",
+        "skillId": "classic:zhiheng",
+        "additionalSkillIds": ["mobile:jiuyuan"],
+        "factionId": "wu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:sun-quan",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

@@ -1660,6 +1660,8 @@ var tests = new (string Name, Action Body)[]
     ("response use completion Dodge dying rescue exact parent", ResponseUseCompletionChecks.DodgeCompletionDyingRescueRetainsExactParent),
     ("response use completion excludes group response and wrong loader window", ResponseUseCompletionChecks.GroupDodgeStaysResponseOnlyAndLoaderRejectsWrongWindow),
     ("Fame 2017 Xu Shi foreign equipment AI replay", Fame2017XuShiChecks.ForeignEquipmentGiftAndAiReplay),
+    ("Mobile Zhen Ji: frozen black claim paid cold ordinary hand limit", MobileZhenJiChecks.FrozenBlackClaimPaidColdAndOrdinaryHandLimit),
+    ("Mobile Sun Quan: non-dying added Peach actual Wu scope cold", MobileSunQuanChecks.NonDyingAddedPeachTargetUsesActualWuSourceAndPolicyScopeCold),
     ("Mobile Cao Ying: phase quota original card no refund temporary skills", MobileCaoYingChecks.PhaseQuotaOriginalCardOnlyNoRefundAndNativeTemporarySkills),
     ("Mobile Cao Ying: ending minimum random subset private cold", MobileCaoYingChecks.EndingMinimumRandomSubsetPrivateCold),
     ("Mobile Ma Chao: actual three-target Slash red black decline before effects cold", MobileMaChaoChecks.ActualThreeTargetSlashJudgesRedBlackAndDeclineBeforeEffectsCold),

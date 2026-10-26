@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:feedback",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "take-source-card",
+          "window": "afterDamageApplied",
+          "subject": "owner",
+          "damageOccurrence": "perDamage",
+          "optional": true,
+          "effects": [
+            {
+              "op": "selectSourceCard",
+              "target": "owner",
+              "zones": ["hand", "equipment"],
+              "allowSameSource": true,
+              "resultBind": "selected"
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "selected",
+              "destination": "ownerHand"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

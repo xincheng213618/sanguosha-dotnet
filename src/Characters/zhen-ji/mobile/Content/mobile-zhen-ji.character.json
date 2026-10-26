@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhen-ji",
+  "skills": [
+    {
+      "registrationOrder": 84300,
+      "programBundle": "mobile-zhen-ji",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:luoshen",
+        "name": "洛神",
+        "description": "准备阶段，你可以进行一次判定，若结果为黑色，你获得此牌并可以重复此流程。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 84399,
+      "pools": { "current": 84399 },
+      "definition": {
+        "id": "mobile:zhen-ji",
+        "name": "甄姬·移动版",
+        "portraitKey": "mobile-zhen-ji",
+        "skillId": "mobile:luoshen",
+        "additionalSkillIds": [ "classic:qingguo" ],
+        "factionId": "wei",
+        "baseHp": 3,
+        "gender": "Female",
+        "characterId": "character:zhen-ji",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

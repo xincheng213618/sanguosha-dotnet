@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:sima-yi",
+  "skills": [
+    {
+      "registrationOrder": 84500,
+      "programBundle": "mobile-sima-yi",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:feedback",
+        "name": "反馈",
+        "description": "当你受到伤害后，你可以获得伤害来源的一张牌。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 84599,
+      "pools": { "current": 84599 },
+      "definition": {
+        "id": "mobile:sima-yi",
+        "name": "司马懿·移动版",
+        "portraitKey": "mobile-sima-yi",
+        "skillId": "mobile:feedback",
+        "additionalSkillIds": ["classic:guicai"],
+        "factionId": "wei",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:sima-yi",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

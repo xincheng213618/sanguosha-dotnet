@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:feedback": {
+      "name": "反馈",
+      "description": "当你受到伤害后，你可以获得伤害来源的一张牌。"
+    }
+  }
+}

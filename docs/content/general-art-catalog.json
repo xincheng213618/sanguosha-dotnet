@@ -23951,6 +23951,74 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-zhen-ji",
+      "characterName": "甄姬",
+      "defaultSkinId": "2100",
+      "skins": [
+        {
+          "id": "2100",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-21.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/2100.jpg",
+          "sha256": "30a732dcdfe49705f7e626166de89e6ff554e6940aa5ffe7bd06f801591b0b01",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhen-ji.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-sun-quan",
+      "characterName": "孙权",
+      "defaultSkinId": "800",
+      "skins": [
+        {
+          "id": "800",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-8.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/800.jpg",
+          "sha256": "8820390c9ce21535610b7a7984e096952e61a6d9ea3a63e154ae5c093a53487e",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-sun-quan.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-sima-yi",
+      "characterName": "司马懿",
+      "defaultSkinId": "1600",
+      "skins": [
+        {
+          "id": "1600",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-16.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/1600.jpg",
+          "sha256": "de2137e698d09e38b7df235afe70e77c79923ee0260ea711118bdd7dfdd4f173",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-sima-yi.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-hua-tuo",
+      "characterName": "华佗",
+      "defaultSkinId": "2200",
+      "skins": [
+        {
+          "id": "2200",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-22.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/2200.jpg",
+          "sha256": "23f549b5dcee7b0b03eb11a5ae71c8358c9ad8bf2d15aa8924e258ca0484e924",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-hua-tuo.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

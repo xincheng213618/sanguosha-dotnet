@@ -14,7 +14,8 @@ public sealed partial class GameEngine
         string bind, IReadOnlyList<Suit> suits, SkillProgramClaimHandLimitExemption policy)
     {
         var active = GetActiveProgramFrame(frame.Id);
-        if (policy != SkillProgramClaimHandLimitExemption.ActualTurn || active.RepeatedJudgment is not null || suits.Count == 0 ||
+        if (policy is not (SkillProgramClaimHandLimitExemption.ActualTurn or SkillProgramClaimHandLimitExemption.None) ||
+            active.RepeatedJudgment is not null || suits.Count == 0 ||
             frame.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || frame.OwnerSeat != _currentSeat ||
             frame.OwnerSeat != _turnProgression.OwnerSeat || _turnProgression.TurnNumber != _turnNumber || !_players[frame.OwnerSeat].IsAlive)
             throw new InvalidOperationException("Exact repeated judgment requires its actual owner preparation turn.");
@@ -74,14 +75,16 @@ public sealed partial class GameEngine
                 var turn = next.ClaimTurn!;
                 if (actual.TurnNumber != turn.TurnNumber || turn.TurnNumber != _turnNumber || turn.TurnOwnerSeat != _turnProgression.OwnerSeat)
                     throw new InvalidOperationException("An exact judgment receipt changed its actual turn.");
-                var grant = _turnCardUseEffects.GrantHandLimitExemptCard(turn.TurnNumber, turn.TurnOwnerSeat, frame.Id,
-                    frame.InstructionIndex - 1, judgment.Id, CreateProgramTurnEffectSource(frame), frame.OwnerSeat, card.Id, actual.Sequence);
+                var grant = next.ClaimHandLimitExemption == SkillProgramClaimHandLimitExemption.ActualTurn
+                    ? _turnCardUseEffects.GrantHandLimitExemptCard(turn.TurnNumber, turn.TurnOwnerSeat, frame.Id,
+                        frame.InstructionIndex - 1, judgment.Id, CreateProgramTurnEffectSource(frame), frame.OwnerSeat, card.Id, actual.Sequence)
+                    : null;
                 var active = GetActiveProgramFrame(frame.Id);
                 ReplaceRuntimeTop(active with { RepeatedJudgment = active.RepeatedJudgment! with
                 { LastClaimReceipt = new(frame.InstructionIndex - 1, judgment.Id, card.Id, actual.Sequence, actual.From, actual.To,
-                    turn.TurnNumber, turn.TurnOwnerSeat, grant.GrantSequence) } });
+                    turn.TurnNumber, turn.TurnOwnerSeat, grant?.GrantSequence) } });
                 AdvanceEventRulesAndQueueFact(new ProgramJudgmentCardClaimedEvent(judgment.Id, frame.SkillId, frame.OwnerSeat, card.Id, card.Kind));
-                AdvanceEventRulesAndQueueFact(new TurnHandLimitExemptCardGrantedEvent(grant));
+                if (grant is not null) AdvanceEventRulesAndQueueFact(new TurnHandLimitExemptCardGrantedEvent(grant));
             });
         if (!TryBeginCardsMovedProgramWindow()) ReturnRuntimeProgramMovement(frame.Id);
     }
@@ -103,7 +106,8 @@ public sealed partial class GameEngine
             candidate.GameplayHash != child.GameplayHash) return false;
         var owner = _resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == judgment.ParentFrameId);
         if (owner is not { InstructionIndex: > 0, RepeatedJudgment:
-            { ClaimHandLimitExemption: SkillProgramClaimHandLimitExemption.ActualTurn, FinalOutcome: { } outcome } state } ||
+            { ClaimHandLimitExemption: SkillProgramClaimHandLimitExemption.ActualTurn or SkillProgramClaimHandLimitExemption.None,
+                FinalOutcome: { } outcome } state } ||
             owner.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow ||
             judgment.TargetSeat != owner.OwnerSeat || window.Judgment.SubjectSeat != owner.OwnerSeat ||
             outcome.JudgmentFrameId != judgment.Id || outcome.JudgmentFrameId != window.Judgment.JudgmentFrameId ||
@@ -115,7 +119,7 @@ public sealed partial class GameEngine
         if (owner.InstructionIndex > plan.Instructions.Count) return false;
         var effect = plan.Instructions[owner.InstructionIndex - 1];
         return effect.Op == SkillProgramEffectOp.RepeatJudgment &&
-            effect.ClaimHandLimitExemption == SkillProgramClaimHandLimitExemption.ActualTurn &&
+            effect.ClaimHandLimitExemption == state.ClaimHandLimitExemption &&
             effect.JudgmentReason == state.Reason && effect.ResultBind == state.ResultBind &&
             effect.Suits.SequenceEqual(state.SuccessSuits);
     }
@@ -140,7 +144,8 @@ public sealed partial class GameEngine
         if (frame.RepeatedJudgment is not { ClaimHandLimitExemption: not null } state) return;
         var index = frame.InstructionIndex - 1;
         if (index < 0 || index >= instructions.Count || instructions[index] is not
-            { Op: SkillProgramEffectOp.RepeatJudgment, ClaimHandLimitExemption: SkillProgramClaimHandLimitExemption.ActualTurn } effect ||
+            { Op: SkillProgramEffectOp.RepeatJudgment,
+                ClaimHandLimitExemption: SkillProgramClaimHandLimitExemption.ActualTurn or SkillProgramClaimHandLimitExemption.None } effect ||
             state.ClaimHandLimitExemption != effect.ClaimHandLimitExemption || state.Reason != effect.JudgmentReason ||
             state.ResultBind != effect.ResultBind || !state.SuccessSuits.SequenceEqual(effect.Suits) ||
             frame.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow ||
@@ -150,14 +155,23 @@ public sealed partial class GameEngine
             !Enum.IsDefined(outcome.FinalSuit) || outcome.Matched != state.SuccessSuits.Contains(outcome.FinalSuit)))
             throw new InvalidOperationException("Exact repeated judgment has an invalid final outcome.");
         if (state.LastClaimReceipt is not { } receipt) return;
-        var grant = _turnCardUseEffects.HandLimitExemptCards.SingleOrDefault(g => g.GrantSequence == receipt.GrantSequence);
         if (state.FinalOutcome is not { Matched: true } final || state.LastMatched != true || receipt.InstructionIndex != index ||
             final.JudgmentFrameId != receipt.JudgmentFrameId || final.CardId != receipt.CardId ||
             receipt.From != CardLocation.Judgment(frame.OwnerSeat) || receipt.To != CardLocation.Hand(frame.OwnerSeat) ||
             receipt.TurnNumber != turn.TurnNumber || receipt.TurnOwnerSeat != turn.TurnOwnerSeat ||
             !_cardMovements.Any(m => m.Sequence == receipt.MovementSequence && m.CardId == receipt.CardId && m.CardKind == final.CardKind &&
-                m.From == receipt.From && m.To == receipt.To && m.TurnNumber == receipt.TurnNumber) || grant is null ||
-            grant.ParentFrameId != frame.Id || grant.EffectIndex != index || grant.JudgmentFrameId != final.JudgmentFrameId ||
+                m.From == receipt.From && m.To == receipt.To && m.TurnNumber == receipt.TurnNumber))
+            throw new InvalidOperationException("Exact repeated judgment receipt differs from its actual movement.");
+        if (state.ClaimHandLimitExemption == SkillProgramClaimHandLimitExemption.None)
+        {
+            if (receipt.GrantSequence is not null || _turnCardUseEffects.HandLimitExemptCards.Any(g =>
+                g.ParentFrameId == frame.Id && g.EffectIndex == index && g.JudgmentFrameId == final.JudgmentFrameId))
+                throw new InvalidOperationException("An exact judgment without exemption acquired a hand-limit grant.");
+            return;
+        }
+        var grant = receipt.GrantSequence is { } sequence
+            ? _turnCardUseEffects.HandLimitExemptCards.SingleOrDefault(g => g.GrantSequence == sequence) : null;
+        if (grant is null || grant.ParentFrameId != frame.Id || grant.EffectIndex != index || grant.JudgmentFrameId != final.JudgmentFrameId ||
             grant.CardId != final.CardId || grant.MovementSequence != receipt.MovementSequence || grant.BeneficiarySeat != frame.OwnerSeat ||
             grant.TurnNumber != turn.TurnNumber || grant.TurnSeat != turn.TurnOwnerSeat || grant.Source != CreateProgramTurnEffectSource(frame))
             throw new InvalidOperationException("Exact repeated judgment receipt differs from its actual movement or grant.");
