@@ -22,8 +22,8 @@ public sealed partial class MainViewModel
     public string ShanheBossRewardTitle => IsShanheBonusRewardOnly ? "追 加 奖 励" :
         (_shanheSession?.Snapshot.BossRewardSummary?.Title ?? "章节首领") + " · 奖 励";
     public string ShanheBossRewardNotice => IsShanheBonusRewardOnly
-        ? "战法效果已触发。领取下列追加奖励，确认后继续行军。"
-        : "铜币与技能槽已领取。请完成各组奖励选择，再踏下一程。";
+        ? "领取追加奖励，继续行军。"
+        : "各组选一项，确认后继续。";
     public string ShanheBossFixedGoldText => $"铜币 +{_shanheSession?.Snapshot.BossRewardSummary?.FixedGold ?? 0}";
     public string ShanheBossSkillSlotsText => $"技能槽 +{_shanheSession?.Snapshot.BossRewardSummary?.SkillSlots ?? 0}";
     public string ShanheBossRewardContinueText => IsShanheBonusRewardOnly ? "继 续 行 军" :

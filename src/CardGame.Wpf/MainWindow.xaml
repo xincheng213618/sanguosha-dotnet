@@ -1,4 +1,4 @@
-<Window x:Class="CardGame.Wpf.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="clr-namespace:CardGame.Wpf.Controls" controls:InteractionMotion.MotionEnabled="{Binding IsMotionEnabled}" Title="{Binding WindowTitle}" Width="1440" Height="920" MinWidth="1120" MinHeight="780" WindowStartupLocation="CenterScreen" Background="{StaticResource TableDeepBrush}" PreviewKeyDown="Window_PreviewKeyDown" Closed="Window_Closed" Loaded="Window_Loaded" Closing="Window_Closing">
+<Window x:Class="CardGame.Wpf.MainWindow" x:Name="MainWindowRoot" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="clr-namespace:CardGame.Wpf.Controls" controls:InteractionMotion.MotionEnabled="{Binding IsMotionEnabled}" Title="{Binding WindowTitle}" Width="1440" Height="920" MinWidth="1120" MinHeight="780" WindowStartupLocation="CenterScreen" Background="{StaticResource TableDeepBrush}" PreviewKeyDown="Window_PreviewKeyDown" Closed="Window_Closed" Loaded="Window_Loaded" Closing="Window_Closing">
     <Window.Resources>
         <Style x:Key="BattleLogScrollPage" TargetType="RepeatButton">
             <Setter Property="Focusable" Value="False" />
@@ -354,6 +354,7 @@
                         <Button Content="战报 / 存档" Command="{Binding ToggleLogCommand}" Style="{StaticResource QuietButton}" Padding="10,8" />
                         <Button x:Name="HistoryButton" Content="战绩" Command="{Binding OpenHistoryCommand}" Style="{StaticResource QuietButton}" Padding="10,8" />
                         <Button Content="山河图" Command="{Binding OpenShanheCommand}" Style="{StaticResource QuietButton}" Padding="10,8" />
+                        <Button x:Name="ShanheMarketButton" Content="集市" Command="{Binding OpenShanheMarketCommand}" Style="{StaticResource QuietButton}" Padding="10,8" />
                         <Button Content="设置" Command="{Binding OpenSettingsCommand}" Style="{StaticResource QuietButton}" Padding="10,8" />
                         <Button Content="保存" Command="{Binding SaveGameCommand}" ToolTip="保存到手动存档 · F5" Style="{StaticResource QuietButton}" />
                         <Button Content="新对局" Command="{Binding NewGameCommand}" Style="{StaticResource ToolbarButton}" Margin="12,0,0,0" Padding="15,8" />
@@ -1878,7 +1879,11 @@
             </Border>
         </Border>
         <Border x:Name="ShanheOverlay" Background="#F00B1519" Panel.ZIndex="300" Visibility="{Binding IsShanheOpen, Converter={StaticResource BoolToVisibility}}" KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle" FocusManager.IsFocusScope="True" IsVisibleChanged="TableOverlay_IsVisibleChanged">
-            <Viewbox Stretch="Uniform" StretchDirection="DownOnly"><controls:ShanheCampaignPanel x:Name="ShanhePanel" /></Viewbox>
+            <controls:ShanheCampaignPanel x:Name="ShanhePanel" />
+        </Border>
+        <Border x:Name="ShanheMarketOverlay" Panel.ZIndex="320" KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle" FocusManager.IsFocusScope="True" IsVisibleChanged="TableOverlay_IsVisibleChanged">
+            <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding IsShanheMarketOpen}" Value="True"/><Condition Binding="{Binding IsShanheWindowDetached, ElementName=MainWindowRoot}" Value="False"/></MultiDataTrigger.Conditions><Setter Property="Visibility" Value="Visible"/></MultiDataTrigger></Style.Triggers></Style></Border.Style>
+            <controls:ShanheMarketOverlay x:Name="ShanheMarketHost" />
         </Border>
         <Border x:Name="WushuangShopOverlay" Background="#9A120D08" Panel.ZIndex="310" Visibility="{Binding IsWushuangShopOpen, Converter={StaticResource BoolToVisibility}}" KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle" FocusManager.IsFocusScope="True" IsVisibleChanged="TableOverlay_IsVisibleChanged">
             <Grid>

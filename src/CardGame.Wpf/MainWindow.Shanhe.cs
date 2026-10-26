@@ -9,6 +9,13 @@ public partial class MainWindow
     private MainViewModel? _shanheWindowViewModel;
     private ShanheCampaignWindow? _shanheWindow;
     private Visibility _embeddedShanheVisibility;
+    public static readonly DependencyProperty IsShanheWindowDetachedProperty = DependencyProperty.Register(
+        nameof(IsShanheWindowDetached), typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
+    public bool IsShanheWindowDetached
+    {
+        get => (bool)GetValue(IsShanheWindowDetachedProperty);
+        private set => SetValue(IsShanheWindowDetachedProperty, value);
+    }
 
     private void InitializeShanheWindowHost(MainViewModel viewModel)
     {
@@ -29,6 +36,7 @@ public partial class MainWindow
 
         var window = new ShanheCampaignWindow(viewModel) { Owner = this };
         _shanheWindow = window;
+        IsShanheWindowDetached = true;
         _embeddedShanheVisibility = ShanhePanel.Visibility;
         ShanhePanel.SetCurrentValue(VisibilityProperty, Visibility.Collapsed);
         window.Closed += ShanheWindow_Closed;
@@ -55,6 +63,7 @@ public partial class MainWindow
         if (sender is not ShanheCampaignWindow window || !ReferenceEquals(window, _shanheWindow)) return;
         window.Closed -= ShanheWindow_Closed;
         _shanheWindow = null;
+        IsShanheWindowDetached = false;
         ShanhePanel.SetCurrentValue(VisibilityProperty, _embeddedShanheVisibility);
     }
 
@@ -66,6 +75,7 @@ public partial class MainWindow
         if (_shanheWindow is not { } window) return;
         window.Closed -= ShanheWindow_Closed;
         _shanheWindow = null;
+        IsShanheWindowDetached = false;
         window.Close();
         ShanhePanel.SetCurrentValue(VisibilityProperty, _embeddedShanheVisibility);
     }

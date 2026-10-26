@@ -22,48 +22,50 @@ public sealed partial class MainViewModel
     public bool ShanheMarketHasGoods => ShanheMarketGoods.Any();
     public string ShanheMarketCategoryNotice => SelectedShanheMarketCategory switch
     {
-        "技能" => "习得技能占用额外技能槽；槽位已满时选择替换。",
-        "装备" => ShanheStartingResourcesExpireOnUse
-            ? "装备在今后每场战斗开始时加入手牌，需自行使用；购入同槽位装备会替换构筑中的旧装备。"
-            : "装备在下场战斗开始时装备，同槽位的新装备会替换旧装备。",
-        "卡牌" => ShanheStartingResourcesExpireOnUse
-            ? "随身牌每战加入手牌；使用或响应后本应进入弃牌堆时移出本局，被技能提前取得则保留。"
-            : "随身牌在今后每场战斗开始时获得。",
-        "补给" => "补充军资与体力，继续征程。",
-        _ => "购买战法加入本次征程，不占六个初始战法位。"
+        "技能" => CurrentShanheMarketState is { } state
+            ? $"额外技能 {state.ExtraSkillIds.Count}/{state.ExtraSkillSlots} · 满槽可替换" : "额外技能 · 满槽可替换",
+        "装备" => IsShanheBattleActive ? "购买即加入手牌" : ShanheStartingResourcesExpireOnUse
+            ? "每战开局获得装备牌" : "每战开局装备",
+        "卡牌" => IsShanheBattleActive ? "购买即加入手牌" : "每战开局获得随身牌",
+        "补给" => "补充军资与体力",
+        _ => "战法持续本次征程，不占技能槽"
     };
     public string ShanheMarketSurchargeNotice
     {
         get
         {
+            var noIncrease = CurrentShanheMarketState?.TacticIds.Any(id => _shanheSession!.Definition.Rewards
+                .Any(reward => reward.Id == id && reward.CampaignEconomy?.SuppressShopPriceEscalation == true)) == true;
             var priceNotice = IsShanheShopActive && _shanheSession!.CreateCheckpoint().Options.UseCodexRewardPool &&
                 SelectedShanheMarketCategory is "战法" or "装备" or "卡牌" or "技能"
-                ? $"每购买一次{SelectedShanheMarketCategory}，本店同类商品额外消耗铜币 +100" : "货品及价格以当前商店为准";
-            return _shanheSession?.Snapshot.ShopRestockOnPurchase == true
-                ? priceNotice + "\n购买后原位补入同类商品；无货可补时保留已购灰位，不消耗刷新次数。"
+                ? noIncrease ? "同类商品不再加价" : $"每购买一次{SelectedShanheMarketCategory}，同类价格 +100 铜币" : "";
+            return CurrentShanheMarketState?.ShopRestockOnPurchase == true
+                ? priceNotice + " · 购买后补货"
                 : priceNotice;
         }
     }
-    public string ShanheMarketRefreshText => _shanheSession?.Snapshot.ShopFreeRefreshRemaining > 0 ? "免费刷新" :
-        _shanheSession?.Snapshot.ShopRefreshCost is int cost && cost > 0 ? $"刷新 · {cost} 铜币" : "刷新";
-    public string ShanheMarketFreeRefreshRemaining => $"免费刷新：{_shanheSession?.Snapshot.ShopFreeRefreshRemaining ?? 0} 次";
-    public string ShanheMarketPaidRefreshRemaining => _shanheSession?.Snapshot.ShopPaidRefreshUnlimited == true
-        ? "付费刷新：无限" : $"付费刷新：{_shanheSession?.Snapshot.ShopPaidRefreshRemaining ?? 0} 次";
+    public string ShanheMarketRefreshText => CurrentShanheMarketState?.ShopFreeRefreshRemaining > 0 ? "免费刷新" :
+        CurrentShanheMarketState?.ShopRefreshCost is int cost && cost > 0 ? $"刷新 · {cost} 铜币" : "刷新";
+    public string ShanheMarketFreeRefreshRemaining => $"免费刷新：{CurrentShanheMarketState?.ShopFreeRefreshRemaining ?? 0} 次";
+    public string ShanheMarketPaidRefreshRemaining => CurrentShanheMarketState?.ShopPaidRefreshUnlimited == true
+        ? "付费刷新：无限" : $"付费刷新：{CurrentShanheMarketState?.ShopPaidRefreshRemaining ?? 0} 次";
     public string ShanheMarketRefreshRemaining => IsShanheShopActive
-        ? $"{ShanheMarketFreeRefreshRemaining} · {ShanheMarketPaidRefreshRemaining}" : "到达集市后可刷新货品";
+        ? $"{ShanheMarketFreeRefreshRemaining} · {ShanheMarketPaidRefreshRemaining}" : "开始征程后可打开集市";
     private RelayCommand? _refreshShanheMarketCommand;
     public ICommand RefreshShanheMarketCommand => _refreshShanheMarketCommand ??= new RelayCommand(() =>
     {
         if (_shanheSession is not { } session || !RefreshShanheMarketCommand.CanExecute(null)) return;
-        ApplyShanheCommand(new RefreshShanheShopCommand(session.Revision));
-    }, () => IsShanheShopActive &&
-        (_shanheSession!.Snapshot.ShopPaidRefreshUnlimited || _shanheSession.Snapshot.ShopRefreshRemaining > 0) &&
-        _shanheSession.Snapshot.Gold >= _shanheSession.Snapshot.ShopRefreshCost && !IsTutorialActive);
+        if (IsShanheBattleActive) ApplyShanheBattleMarketCommand(new CardGame.Core.RefreshShanheMarketCommand(0, ShanheMarketActionRevision));
+        else ApplyShanheCommand(new RefreshShanheShopCommand(session.Revision));
+    }, () => IsShanheShopActive && _shanheBattleGame?.HasPendingShanheMarketPurchase != true &&
+        (CurrentShanheMarketState!.ShopPaidRefreshUnlimited || CurrentShanheMarketState.ShopRefreshRemaining > 0) &&
+        CurrentShanheMarketState.Gold >= CurrentShanheMarketState.ShopRefreshCost && !IsTutorialActive);
     private void RefreshShanheMarketPresentation()
     {
         foreach (var property in new[] { nameof(ShanheMarketGoods), nameof(ShanheMarketHasGoods), nameof(ShanheMarketCategoryNotice),
             nameof(ShanheMarketSurchargeNotice), nameof(ShanheMarketRefreshText), nameof(ShanheMarketRefreshRemaining),
             nameof(ShanheMarketFreeRefreshRemaining), nameof(ShanheMarketPaidRefreshRemaining) }) RaisePropertyChanged(property);
         _refreshShanheMarketCommand?.NotifyCanExecuteChanged();
+        RefreshShanheLiveMarketPresentation();
     }
 }

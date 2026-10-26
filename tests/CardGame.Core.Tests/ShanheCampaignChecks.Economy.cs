@@ -137,8 +137,8 @@ internal static partial class ShanheCampaignChecks
         var plain = ShanheCampaignSession.Create(definition, basicOptions, Registry);
         Accept(plain, new MoveShanheNodeCommand("shop", plain.Revision));
         var ordinaryCount = plain.Snapshot.ShopItems.Count;
-        Require(plain.Snapshot.ShopRefreshRemaining == 1 && ordinaryCount is 3 or 4,
-            "A player who owns no economy tactics keeps the ordinary three-or-four goods and one refresh.");
+        Require(plain.Snapshot.ShopRefreshRemaining == 1 && ordinaryCount == 5,
+            "A player who owns no economy tactics keeps five ordinary goods and one refresh.");
         Accept(plain, new RefreshShanheShopCommand(plain.Revision));
         var before = Snapshot(plain);
         Require(!plain.Submit(new RefreshShanheShopCommand(plain.Revision)).Accepted && Snapshot(plain) == before,

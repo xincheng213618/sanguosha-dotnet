@@ -18,6 +18,7 @@ public static class JudgmentReasons
 
 public enum ResolutionFrameKind
 {
+    ShanheMarketPurchase = 62030,
     DiscardPhaseEntry = 84700,
     HappyQiaoHealthChoice = 42400,
     MobileSimaRenjie = 40425,
@@ -98,6 +99,7 @@ internal interface IProgramChildResolutionFrame
 /// can inspect and later persist the stack without coupling it to the UI.
 /// </summary>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+[JsonDerivedType(typeof(ShanheMarketPurchaseFrame), "shanhe-market-purchase")]
 [JsonDerivedType(typeof(PublicHandRevealWindowFrame), "public-hand-reveal-window")]
 [JsonDerivedType(typeof(WushuangIntermissionFrame), "wushuang-intermission")]
 [JsonDerivedType(typeof(NativeDrawAttemptFrame), "native-draw-attempt")]

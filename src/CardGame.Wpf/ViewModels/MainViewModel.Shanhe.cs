@@ -22,7 +22,7 @@ public sealed partial class MainViewModel
     private bool _isShanheOpen;
     private bool _shanheWasAutoAdvance;
     private bool _hasShanheProgress;
-    private string _shanheStatusText = "征程保存在本机，普通对局存档独立保留。";
+    private string _shanheStatusText = "准备出征";
     private ShanheDifficultyOption _selectedShanheDifficulty = null!;
     private ShanheGeneralOption? _selectedShanheGeneral;
     private ShanheScenarioOption? _selectedShanheScenario;
@@ -95,8 +95,8 @@ public sealed partial class MainViewModel
     public string SelectedShanheScenarioDescription => SelectedShanheScenario.Id switch
     {
         StandardShanheCampaignCatalog.Returning2026EditionId =>
-            "携2026战法迎战专属首领，沿三章路线积累行装。地图、抽选与三档难度为本地编排；完整技能与来源说明见「玩法说明」。",
-        _ => "采用已核实的2024战法和技能版本。择路交锋、收取战利品，逐步构筑本次征程；剧情、地图与难度为本地编排。"
+            "沿三章路线征战，收集战法、技能与装备，挑战关底首领。",
+        _ => "选择路线，击败敌军，组合战法与技能，抵达洛阳。"
     };
     public string ShanheScenarioDetails => IsShanheRunInProgress && _shanheSession is { } session ? session.Definition.IntroText :
         StandardShanheCampaignCatalog.CreateCodexDefinition(SelectedShanheDifficulty?.Value ?? 1, SelectedShanheScenario.Id).IntroText;
@@ -113,9 +113,7 @@ public sealed partial class MainViewModel
     }
     public bool HasShanheProgress { get => _hasShanheProgress; private set => SetProperty(ref _hasShanheProgress, value); }
     public string ShanheStatusText { get => _shanheStatusText; private set => SetProperty(ref _shanheStatusText, value); }
-    public string ShanheEditionNotice => "有剧情的单机征程 · 本地起步版 · " +
-        (IsShanheRunInProgress && _shanheSession is { } session ? session.Definition.Description :
-            StandardShanheCampaignCatalog.Editions.Single(edition => edition.Id == SelectedShanheScenario.Id).Description);
+    public string ShanheEditionNotice => "单机征程 · " + SelectedShanheScenario.Name;
     public string ShanheCampaignTitle => _shanheSession?.Snapshot.CampaignName ?? "诸侯伐董 · 征途将启";
     public bool IsShanheBattleActive => _shanheSession?.Snapshot.Phase == ShanheCampaignPhase.Battle;
     public bool IsShanheBattleSession => _shanheTableGame is not null && ReferenceEquals(_game, _shanheTableGame);
@@ -134,27 +132,26 @@ public sealed partial class MainViewModel
             return $"{ShanheGeneralName(session.Snapshot.PlayerGeneralId)}   体力 {live?.Hp ?? session.Snapshot.Hp}/{live?.MaxHp ?? session.Snapshot.MaxHp}";
         }
     }
-    public string ShanheGoldText => $"铜币   {_shanheSession?.Snapshot.Gold ?? 0}";
-    public string ShanheTacticsText => _shanheSession is { } session
-        ? $"{ShanheRankStatusText}\n基础整备：体力上限 +{session.Snapshot.Bonuses.MaxHp} · 起手 +{session.Snapshot.Bonuses.InitialHand} · 摸牌 +{session.Snapshot.Bonuses.Draw} · 出杀 +{session.Snapshot.Bonuses.Slash}\n战法 {session.Snapshot.TacticIds.Count} 项 · 可在「战法构筑」查看完整效果"
+    public string ShanheGoldText => $"铜币   {CurrentShanheBuildState?.Gold ?? 0}";
+    public string ShanheTacticsText => CurrentShanheBuildState is { } state
+        ? $"{ShanheRankStatusText}\n体力上限 +{state.Bonuses.MaxHp} · 起手 +{state.Bonuses.InitialHand} · 摸牌 +{state.Bonuses.Draw} · 出杀 +{state.Bonuses.Slash}\n战法 {state.TacticIds.Count} 项"
         : "战法：征途中获得的成长会带入后续战斗。";
     public string ShanheBuildTabTitle => $"战法构筑 · {ShanheTacticCards.Count}";
-    public string ShanheTacticEmptyText => ShanheTacticCards.Count == 0 ? "尚未获得战法。前往奇遇、战后奖励和行商，选择适合自己的组合。" : "战法在每场战斗中作为技能获得，由牌局规则处理触发、费用、次数与失效。";
-    public string ShanheStartingLoadoutText => _shanheSession is { } session
-        ? "随身牌：" + (session.Snapshot.StartingCards.Count == 0 ? "无" :
-            string.Join("、", session.Snapshot.StartingCards.Select(card => CardCatalog.Get(card.Kind).DisplayName))) +
-            "\n随身装备：" + (session.Snapshot.StartingEquipment.Count == 0 ? "无" :
-                string.Join("、", session.Snapshot.StartingEquipment.Select(card => CardCatalog.Get(card.Kind).DisplayName))) +
-            "\n" + ShanheStartingResourceNotice + "普通手牌与装备不会直接跨战继承。"
+    public string ShanheTacticEmptyText => ShanheTacticCards.Count == 0 ? "尚无战法，可从奖励或集市获取。" : "当前战法";
+    public string ShanheStartingLoadoutText => CurrentShanheBuildState is { } state
+        ? "随身牌：" + (state.StartingCards.Count == 0 ? "无" :
+            string.Join("、", state.StartingCards.Select(card => CardCatalog.Get(card.Kind).DisplayName))) +
+            "\n随身装备：" + (state.StartingEquipment.Count == 0 ? "无" :
+                string.Join("、", state.StartingEquipment.Select(card => CardCatalog.Get(card.Kind).DisplayName)))
         : "在征途中获取随身牌和装备，每战加入手牌，完善你的构筑。";
     private bool ShanheStartingResourcesExpireOnUse => _shanheSession?.Definition.StartingResourcesExpireOnUse ?? true;
     private string ShanheStartingResourceNotice => ShanheStartingResourcesExpireOnUse
         ? "随身牌和装备每战加入手牌；使用或响应后本应进入弃牌堆时移出本局，被技能提前取得则保留。"
         : "随身牌每战加入手牌，初始装备每战直接装备。";
-    public string ShanheSkillsText => _shanheSession is { } session
-        ? $"额外技能 {session.Snapshot.ExtraSkillIds.Count}/{session.Snapshot.ExtraSkillSlots}：" +
-            (session.Snapshot.ExtraSkillIds.Count == 0 ? "尚未习得" : string.Join("、", session.Snapshot.ExtraSkillIds.Select(ShanheSkillName))) +
-            $"\n随身牌 {session.Snapshot.StartingCards.Count} · 初始装备 {session.Snapshot.StartingEquipment.Count}"
+    public string ShanheSkillsText => CurrentShanheBuildState is { } state
+        ? $"额外技能 {state.ExtraSkillIds.Count}/{state.ExtraSkillSlots}：" +
+            (state.ExtraSkillIds.Count == 0 ? "尚未习得" : string.Join("、", state.ExtraSkillIds.Select(ShanheSkillName))) +
+            $"\n随身牌 {state.StartingCards.Count} · 随身装备 {state.StartingEquipment.Count}"
         : "额外技能：在战后奖励、奇遇与行商中寻找新的组合。";
     private string ShanheCurrentNodeName => _shanheSession?.Snapshot.CurrentNodeId is { } id
         ? _shanheSession.Definition.Nodes.FirstOrDefault(node => node.Id == id)?.Name ?? id : "起点";
@@ -181,7 +178,7 @@ public sealed partial class MainViewModel
     {
         get
         {
-            if (_shanheSession is not { } session) return StandardShanheCampaignCatalog.CreateCodexDefinition(SelectedShanheDifficulty?.Value ?? 1, SelectedShanheScenario.Id).IntroText;
+            if (_shanheSession is not { } session) return SelectedShanheScenarioDescription;
             var state = session.Snapshot;
             if (state.Phase is ShanheCampaignPhase.Won or ShanheCampaignPhase.Lost) return state.EndingText;
             return state.StoryText + (state.BossRewardSummary is { IsBonusOnly: true } ? "\n\n领取本次胜利的追加奖励，确认后继续行军。"
@@ -238,7 +235,8 @@ public sealed partial class MainViewModel
             var definition = StandardShanheCampaignCatalog.CreateCodexDefinition(difficulty, SelectedShanheScenario.Id);
             var session = ShanheCampaignSession.Create(definition,
                 CreateCodexCampaignOptions(_seedOverride ?? RandomNumberGenerator.GetInt32(1, int.MaxValue), general.Id, definition)
-                    with { PlayerRank = SelectedShanheRank.Value == 1 ? null : SelectedShanheRank.Value },
+                    with { PlayerRank = SelectedShanheRank.Value == 1 ? null : SelectedShanheRank.Value,
+                        PersistentMarket = SelectedShanheScenario.Id == StandardShanheCampaignCatalog.Returning2026EditionId },
                 StandardShanheCampaignCatalog.CreateBattleRegistry);
             _shanheSession = session;
             _shanheResumeFailed = false;
@@ -365,6 +363,7 @@ public sealed partial class MainViewModel
             _shanheBattleGame is not { } battle || !ReferenceEquals(_game, battle) || battle.State.Status != EngineStatus.Completed) return;
         var result = session.CompleteBattle(battle, session.Revision);
         if (!result.Accepted) { ShanheStatusText = $"战斗结算未完成：{result.Error}"; return; }
+        SettleShanheCodexReward();
         IsShanheOpen = true;
         RefreshShanhePresentation();
         SaveShanheProgress();
@@ -390,7 +389,7 @@ public sealed partial class MainViewModel
                 DateTimeOffset.UtcNow, _shanheRunDifficulty, session.CreateCheckpoint(), checkpoint));
             SettleShanheCodexReward();
             HasShanheProgress = true;
-            ShanheStatusText = $"山河图已保存 · {DateTime.Now:HH:mm:ss} · 普通对局存档独立保留。";
+            ShanheStatusText = $"已保存 · {DateTime.Now:HH:mm:ss}";
             if (IsShanheBattleSession)
             {
                 _autoSavePending = false;
@@ -417,6 +416,9 @@ public sealed partial class MainViewModel
     {
         if (_selectedShanheDifficulty is null) return;
         var definition = _shanheSession?.Definition ?? StandardShanheCampaignCatalog.CreateCodexDefinition(SelectedShanheDifficulty.Value, SelectedShanheScenario.Id);
+        if (_shanheSession is { HasPersistentMarket: true } marketSession)
+            definition = definition with { Nodes = marketSession.VisibleMapNodes,
+                StartingNodeIds = marketSession.ResolveVisibleNodeIds(definition.StartingNodeIds) };
         RefreshShanheGeneralRoster();
         var state = _shanheSession?.Snapshot;
         var available = state?.AvailableNodes.Select(node => node.Id).ToHashSet(StringComparer.Ordinal) ?? [];
@@ -446,9 +448,9 @@ public sealed partial class MainViewModel
         ShanheChoices.Clear();
         ShanheTacticCards.Clear();
         ShanheExtraSkillCards.Clear();
-        if (state is not null)
+        if (CurrentShanheBuildState is { } buildState)
         {
-            foreach (var id in state.TacticIds)
+            foreach (var id in buildState.TacticIds)
             {
                 var tactic = definition.Rewards.Single(reward => reward.Id == id);
                 var ruleText = tactic.TacticSkillId is { } skillId && CurrentPresentationRegistry.Skills.TryGetValue(skillId, out var skill)
@@ -457,7 +459,7 @@ public sealed partial class MainViewModel
                     tactic.OpeningSkillRewardIds is not null ? "初始战法 · 出征时触发一次 · 获得的技能占额外技能槽"
                         : "战法 · 本次征程持续 · 每战作为技能获得 · 不占额外技能槽"));
             }
-            foreach (var id in state.ExtraSkillIds)
+            foreach (var id in buildState.ExtraSkillIds)
             {
                 var skill = CurrentPresentationRegistry.Skills.GetValueOrDefault(id);
                 ShanheExtraSkillCards.Add(new(id, skill?.Name ?? id, skill?.Description ?? "当前获得的额外技能。",
@@ -602,7 +604,9 @@ public sealed record ShanheJourneyLink(Geometry Route, bool IsCompleted, bool Is
 public sealed record ShanheBuildCard(string Id, string Name, string Description, string RuleDescription, string SourceText)
 {
     public bool HasRuleDescription => !string.IsNullOrWhiteSpace(RuleDescription) && RuleDescription != Description;
-    public string AccessibleText => $"{Name}。{Description}。{SourceText}";
+    public string AccessibleText => $"{Name}。{Summary}";
+    public string Summary => ShanheDisplayText.Effect(ShanheDisplayText.Rule(Description, RuleDescription));
+    public string RuleTooltip => ShanheDisplayText.Rule(Description, RuleDescription);
 }
 public sealed record ShanheCampaignNode(string Id, string Name, string KindLabel, string Description,
     string StatusLabel, bool IsAvailable, long Revision)

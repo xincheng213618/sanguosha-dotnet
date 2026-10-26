@@ -267,6 +267,7 @@ public enum SkillProgramRandomTransferRevealPolicy { RecipientAfterGain = 0 }
 
 public enum SkillProgramEffectOp
 {
+    ApplyShanheMarketPurchase = 62030,
     ResolveBoundaryManChongJunxing = 53000,
     PrepareBoundaryWuYiBenxi = 53100,
     ArmBoundaryWuYiBenxi = 53101,

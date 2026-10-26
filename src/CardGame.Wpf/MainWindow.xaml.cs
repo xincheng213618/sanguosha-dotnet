@@ -131,7 +131,7 @@ public partial class MainWindow : Window
     }
 
     private static bool IsNavigationOverlayOpen(MainViewModel vm) => vm.IsNewGameSetupOpen || vm.IsHelpOpen ||
-        vm.IsHistoryOpen || vm.IsGeneralGalleryOpen || vm.IsSettingsOpen || vm.IsShanheOpen || vm.IsWushuangShopOpen;
+        vm.IsHistoryOpen || vm.IsGeneralGalleryOpen || vm.IsSettingsOpen || vm.IsShanheOpen || vm.IsShanheMarketOpen || vm.IsWushuangShopOpen;
 
     // Root navigation panels cover both startup overlays; the log and result
     // panels also cover the opening cards inside the table surface.
@@ -327,7 +327,7 @@ public partial class MainWindow : Window
         QueueOverlayFocus(overlay, ref previous);
     }
 
-    private FrameworkElement CurrentFocusSurface(MainViewModel viewModel) => viewModel.IsWushuangShopOpen ? WushuangShopOverlay : viewModel.IsShanheOpen ? ShanheOverlay :
+    private FrameworkElement CurrentFocusSurface(MainViewModel viewModel) => viewModel.IsShanheMarketOpen ? ShanheMarketOverlay : viewModel.IsWushuangShopOpen ? WushuangShopOverlay : viewModel.IsShanheOpen ? ShanheOverlay :
             viewModel.IsSettingsOpen ? SettingsOverlay :
             viewModel.IsHistoryOpen ? HistoryOverlay :
             viewModel.IsGeneralGalleryOpen ? GeneralGalleryOverlay :
@@ -415,7 +415,7 @@ public partial class MainWindow : Window
 
     private void FocusCurrentSurface(MainViewModel viewModel, IInputElement? previous)
     {
-        if (viewModel.IsShanheOpen && FocusDetachedShanheWindow()) return;
+        if ((viewModel.IsShanheOpen || viewModel.IsShanheMarketOpen) && FocusDetachedShanheWindow()) return;
         var surface = CurrentFocusSurface(viewModel);
         if (!surface.IsVisible || !surface.IsEnabled) return;
         if (previous is UIElement { IsVisible: true, IsEnabled: true, Focusable: true } target &&
@@ -424,7 +424,8 @@ public partial class MainWindow : Window
             target.Focus();
             return;
         }
-        if (ReferenceEquals(surface, WushuangShopOverlay)) surface.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+        if (ReferenceEquals(surface, ShanheMarketOverlay)) ShanheMarketHost.FocusMarket();
+        else if (ReferenceEquals(surface, WushuangShopOverlay)) surface.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
         else if (ReferenceEquals(surface, ShanheOverlay)) surface.MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
         else if (ReferenceEquals(surface, SettingsOverlay)) SettingsSoundToggle.Focus();
         else if (ReferenceEquals(surface, HistoryOverlay)) HistoryPanel.FocusHistory();
@@ -553,6 +554,11 @@ public partial class MainWindow : Window
         // Repeats have already been consumed, so holding it cannot close both.
         if (key == Key.Escape && modifiers == ModifierKeys.None && ShanheCampaignWindow.HasOpenDropDown(surface))
             return false;
+        if (ReferenceEquals(surface, ShanheMarketOverlay))
+        {
+            if (key == Key.Escape && modifiers == ModifierKeys.None) { ShanheMarketHost.HandleEscape(); return true; }
+            return key == Key.Enter && modifiers == ModifierKeys.Control;
+        }
         if (ReferenceEquals(surface, WushuangShopOverlay))
         {
             if (key == Key.Escape && modifiers == ModifierKeys.None) { viewModel.CloseWushuangShopCommand.Execute(null); return true; }

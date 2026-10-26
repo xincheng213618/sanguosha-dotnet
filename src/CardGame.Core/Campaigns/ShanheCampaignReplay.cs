@@ -21,6 +21,10 @@ public sealed record ShanheCampaignOptions(int Seed, string PlayerGeneralId)
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool UseCodexRewardPool { get; init; }
 
+    /// <summary>New expeditions share one market shelf throughout each chapter.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool PersistentMarket { get; init; }
+
     /// <summary>Null preserves unrestricted reward access for expeditions saved before the codex.</summary>
     public IReadOnlyList<string>? UnlockedRewardIds
     {
@@ -45,6 +49,7 @@ public sealed record ShanheCampaignOptions(int Seed, string PlayerGeneralId)
 [JsonDerivedType(typeof(ConfirmShanheBossRewardCommand), "confirm-boss-reward")]
 [JsonDerivedType(typeof(SkipShanheRewardCommand), "skip-reward")]
 [JsonDerivedType(typeof(RefreshShanheShopCommand), "refresh-shop")]
+[JsonDerivedType(typeof(BuyShanheMarketItemCommand), "buy-market-item")]
 [JsonDerivedType(typeof(ChooseShanheNodeOptionCommand), "choose-option")]
 [JsonDerivedType(typeof(CompleteShanheBattleCommand), "complete-battle")]
 public abstract record ShanheCampaignCommand(long ExpectedRevision);
@@ -57,6 +62,7 @@ public sealed record ChooseShanheBossRewardCommand(string GroupId, string Reward
 public sealed record ConfirmShanheBossRewardCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record SkipShanheRewardCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record RefreshShanheShopCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
+public sealed record BuyShanheMarketItemCommand(string ChoiceId, string? ReplaceSkillId, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record ChooseShanheNodeOptionCommand(string ChoiceId, string? ReplaceSkillId, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 
 /// <summary>A trusted-host battle journal, rather than a caller-supplied success flag.</summary>
@@ -118,6 +124,7 @@ public sealed record ShanheCampaignSnapshot(
     /// <summary>Paid refreshes have no shop quota; every use still requires the published copper cost.</summary>
     public bool ShopPaidRefreshUnlimited { get; init; }
     public int ShopRefreshCost { get; init; }
+    public int MarketChapterNumber { get; init; }
     /// <summary>A held tactic replaces purchased products in this active random shop.</summary>
     public bool ShopRestockOnPurchase { get; init; }
     /// <summary>Exact compensation for the currently published reward offer; zero outside it.</summary>

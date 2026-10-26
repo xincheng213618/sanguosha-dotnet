@@ -107,7 +107,7 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("A DiscardPhaseEnded lifecycle frame must remain in its Discard phase.");
         if (frame.Window != SkillProgramTriggerWindow.DrawPhaseStarting && frame.NormalDrawAdjustment != 0)
             throw new InvalidOperationException("Only a DrawPhaseStarting lifecycle frame may adjust normal draws.");
-        if (frame.Window == SkillProgramTriggerWindow.GameStarting && _phase != TurnPhase.NotStarted && !IsExactHellAppearanceWindow(frame))
+        if (frame.Window == SkillProgramTriggerWindow.GameStarting && _phase != TurnPhase.NotStarted && !IsExactHellAppearanceWindow(frame) && !IsExactShanheMarketOpeningWindow(frame))
             throw new InvalidOperationException("A game-starting lifecycle frame must precede the first turn.");
         if (frame.Window == SkillProgramTriggerWindow.RoundStarting &&
             (frame.Continuation != ProgramLifecycleContinuation.RoundProgramsTurnStart || _roundNumber <= 0 ||
@@ -2435,7 +2435,7 @@ public sealed partial class GameEngine
             SkillProgramTriggerWindow.GameStarting =>
                 _resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>()
                     .Any(frame => frame.Id == context.ParentFrameId && frame.Window == SkillProgramTriggerWindow.GameStarting &&
-                        (_phase == TurnPhase.NotStarted || IsExactHellAppearanceWindow(frame))),
+                        (_phase == TurnPhase.NotStarted || IsExactHellAppearanceWindow(frame) || IsExactShanheMarketOpeningWindow(frame))),
             SkillProgramTriggerWindow.DrawPhaseSkipped => IsActualSkippedDrawContext(context),
             SkillProgramTriggerWindow.AfterNormalDraw or SkillProgramTriggerWindow.DrawPhaseEnded =>
                 owner.Seat == _currentSeat && context.SourceSeat == owner.Seat && _phase == TurnPhase.Draw ||

@@ -75,6 +75,9 @@ public sealed record ShanheBattleSetup(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ShanheBossTransition? BossTransition { get; init; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ShanheBattleMarketSetup? MarketSetup { get; init; }
+
     public int BattleSeed => DeriveSeed(RunSeed, NodeId, EncounterOrdinal);
 
     public static bool ValueEquals(ShanheBattleSetup? left, ShanheBattleSetup? right) =>
@@ -106,7 +109,8 @@ public sealed record ShanheBattleSetup(
             StartingEquipment = ShanheCampaignContent.Freeze(setup.StartingEquipment),
             TacticSkillIds = ShanheCampaignContent.Freeze(setup.TacticSkillIds),
             EnemyRoster = ShanheCampaignContent.Freeze(setup.EnemyRoster.Select(ShanheCampaignContent.FreezeCombatant)),
-            AllyRoster = ShanheCampaignContent.Freeze(setup.AllyRoster.Select(ShanheCampaignContent.FreezeCombatant))
+            AllyRoster = ShanheCampaignContent.Freeze(setup.AllyRoster.Select(ShanheCampaignContent.FreezeCombatant)),
+            MarketSetup = setup.MarketSetup is null ? null : ShanheBattleMarketSetup.Freeze(setup.MarketSetup)
         };
     }
 

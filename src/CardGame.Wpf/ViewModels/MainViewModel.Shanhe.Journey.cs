@@ -25,13 +25,13 @@ public sealed partial class MainViewModel
     public bool CanPrepareShanheExpedition => !IsTutorialActive && !IsShanheRunInProgress &&
         (!HasShanheProgress || _shanheSession is not null || _shanheResumeFailed);
     public string ShanhePreparationHint => IsShanheRunInProgress
-        ? "征程进行中，武将与初始战法已锁定。战后选择奖励，沿路线前进至征程结束。"
+        ? "征程中，武将与初始战法固定。"
         : HasShanheProgress && _shanheSession is null && !_shanheResumeFailed
             ? "本机有未读取的征程，请先继续征程。"
-            : "选择出征武将，编辑山河册中的初始战法，再开启一段新征程。";
+            : "选择武将与初始战法，开始征程。";
     public string ShanheCodexPhaseText => IsShanheRunInProgress
-        ? "征程中仅可查看山河册；征程结束后可解锁和编辑初始战法。"
-        : CanPrepareShanheExpedition ? "出征前可解锁和编辑初始战法，开始后本次配置固定。" : ShanhePreparationHint;
+        ? "征程中仅可查看，结束后可编辑初始战法。"
+        : CanPrepareShanheExpedition ? "出征前可编辑初始战法" : ShanhePreparationHint;
     public string ShanheChapterTitle => _shanheChapterHeading;
     public string ShanheChapterProgressText => $"本章已过 {_shanheChapterCompleted} 处 · 难度 {_shanheRunDifficulty}";
     public string ShanheChapterObjectiveText => _shanheSession?.Snapshot.Phase switch

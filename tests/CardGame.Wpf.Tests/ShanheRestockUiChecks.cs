@@ -20,12 +20,11 @@ internal static partial class ShanheCodexUiChecks
             var free = (TextBlock)panel.FindName("MarketFreeRefreshRemaining");
             var paid = (TextBlock)panel.FindName("MarketPaidRefreshRemaining");
             Program.Assert(session.Snapshot is { ShopRestockOnPurchase: true, ShopFreeRefreshRemaining: 2, ShopPaidRefreshRemaining: 5 } &&
-                notice.Text == vm.ShanheMarketSurchargeNotice && notice.Text.Contains("购买后原位补入同类商品") &&
-                notice.Text.Contains("无货可补时保留已购灰位") && notice.Text.Contains("不消耗刷新次数") &&
-                notice.Text.Contains("同类商品额外消耗铜币 +100") &&
+                notice.Text == vm.ShanheMarketSurchargeNotice && notice.Text.Contains("购买后补货") &&
+                notice.Text.Contains("同类价格 +100 铜币") &&
                 notice.ActualHeight > 0 && notice.DesiredSize.Height <= 49 &&
                 notice.TranslatePoint(new Point(0, notice.ActualHeight), panel).Y <= panel.ActualHeight,
-                "An actually equipped Restock shows its same-slot replacement, exhausted-pool gray-slot fallback and separate refresh policy beside the unchanged category surcharge, within the existing merchant footer.");
+                "An actually equipped Restock shows a concise replenishment and category-price notice within the merchant footer.");
 
             const int slot = 0;
             Program.Assert(session.Snapshot.ShopItems.Count >= 3 && vm.ShanheMarketGoods.All(item => item.Price == 100),
@@ -73,7 +72,7 @@ internal static partial class ShanheCodexUiChecks
             session = CreateRestockShopSession(false);
             Attach(vm, session); Layout(panel);
             Program.Assert(!session.Snapshot.ShopRestockOnPurchase &&
-                notice.Text == "每购买一次战法，本店同类商品额外消耗铜币 +100",
+                notice.Text == "每购买一次战法，同类价格 +100 铜币",
                 "A merchant without Restock keeps its existing purchase notice and does not advertise an unearned replacement effect.");
         }
         finally { panel.DataContext = null; }

@@ -33,6 +33,7 @@ public sealed partial class GameEngine
 
     private bool IsShanheStartingResource(int id)
     {
+        if (IsShanheMarketResource(id)) return true;
         if (_options.ShanheBattle is not { StartingResourcesExpireOnUse: true } setup || !_generatedPhysicalCardIds.Contains(id) ||
             ProgramEventHistory<ShanheStartingResourceCreatedEvent>().Where(e => e.CardId == id).ToArray() is not [var origin]) return false;
         var recipe = origin.EquipmentResource ? setup.StartingEquipment : setup.StartingCards;
@@ -43,7 +44,8 @@ public sealed partial class GameEngine
 
     private bool ShanheStartingResourceWasAcquired(int id, int before = int.MaxValue) => _cardMovements.Any(m =>
         m.CardId == id && m.Sequence < before && m.To.Zone == CardZoneKind.Hand && m.From != m.To &&
-        m.Reason != CardMoveReasons.InitialDeal && m.Reason != CardMoveReasons.Draw && m.Reason != CardMoveReasons.RecastDraw);
+        m.Reason != CardMoveReasons.InitialDeal && m.Reason != CardMoveReasons.Draw && m.Reason != CardMoveReasons.RecastDraw &&
+        m.Reason != ShanheMarketCardGain);
 
     private void CaptureShanheClaimedDeclarationUse(DeclaredCardPayment paid)
     {

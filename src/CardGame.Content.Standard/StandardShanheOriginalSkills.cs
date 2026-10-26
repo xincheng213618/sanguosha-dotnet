@@ -45,5 +45,13 @@ public static class StandardShanheOriginalSkills
 
     public static IReadOnlyList<string> RewardIds { get; } = Array.AsReadOnly(Rewards.Select(reward => reward.Id).ToArray());
 
+    // These five source skills have fixed S5 research bindings (4/7/26/79/87).
+    // The remaining verified source rows have no tree binding and need local stock
+    // availability, otherwise their existing rewards can never reach a new shop.
+    public static IReadOnlyList<string> DefaultStockRewardIds { get; } = Array.AsReadOnly(RewardIds.Except(new[]
+    {
+        "original-shizhan", "original-jueqing", "original-sanyao", "original-qingxian", "original-huituo"
+    }, StringComparer.Ordinal).ToArray());
+
     public static IReadOnlyList<ShanheRewardDefinition> CreateRewards() => Rewards;
 }

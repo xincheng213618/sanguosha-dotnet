@@ -16,7 +16,7 @@ public sealed partial class MainViewModel
     public string ShanheSettlementTitle => _shanheSession?.Snapshot.Phase == ShanheCampaignPhase.Won ? "胜 利" : "征 程 结 束";
     public string ShanheSettlementSubtitle => _shanheSession?.Snapshot.EndingText ?? "";
     public string ShanheSettlementBookText => _shanheSession is { } session ? $"× {ShanheCodexSettlement.ConfirmedBookAmount(session, _shanheRunDifficulty)}" : "";
-    public string ShanheSettlementRewardRule => "本地征程通关底奖：三档均为10册；未通关保留记录，不发图册。";
+    public string ShanheSettlementRewardRule => "通关获得10册图册";
     public IReadOnlyList<ShanheRunRecordView> ShanheRunRecords => _shanheCodexProfile.RunRecords
         .Select(record => new ShanheRunRecordView(record)).ToArray();
     public bool HasShanheRunRecords => _shanheCodexProfile.RunRecords.Length > 0;
@@ -24,9 +24,9 @@ public sealed partial class MainViewModel
         ? $"最近 {_shanheCodexProfile.RunRecords.Length} 次征程 · {_shanheCodexProfile.RunRecords.Count(r => r.Won)} 次通关 · 最多保留100次"
         : "尚无征程记录，完成一段征程后会在这里留存。";
     public string ShanheSettlementReceipt => _shanheSettlementError ?? (_shanheSession is { } session && ShanheCodexSettlement.HasClaimed(_shanheCodexProfile, session)
-        ? HasShanheBookReward ? "图册已存入山河册 · 征程记录已保存 · 可用于研习初始战法、技能与装备"
-            : "本次征程记录已保存，可返回山河册重新整备。"
-        : IsShanheSettlementPending ? "图册与征程记录等待保存，请点击重试结算。" : "本次征程暂无图册结算，可返回山河册重新整备。");
+        ? HasShanheBookReward ? "图册已入账 · 征程记录已保存"
+            : "征程记录已保存"
+        : IsShanheSettlementPending ? "结算未保存，请重试。" : "可重新整备出征");
     private RelayCommand? _closeShanheSettlementCommand;
     public ICommand CloseShanheSettlementCommand => _closeShanheSettlementCommand ??= new RelayCommand(() =>
     {
@@ -34,10 +34,10 @@ public sealed partial class MainViewModel
         RefreshShanheSettlement();
     }, () => IsShanheSettlementOpen);
     private RelayCommand? _retryShanheSettlementCommand;
-    public ICommand RetryShanheSettlementCommand => _retryShanheSettlementCommand ??= new RelayCommand(() => SaveShanheProgress(),
+    public ICommand RetryShanheSettlementCommand => _retryShanheSettlementCommand ??= new RelayCommand(SettleShanheCodexReward,
         () => IsShanheSettlementPending);
 
-    // Save the expedition journal first. A cold restore can safely retry an unpaid receipt.
+    // The account receipt commits independently of the expedition journal and prevents duplicate credit.
     private void SettleShanheCodexReward()
     {
         if (_shanheSession is not { } session) return;

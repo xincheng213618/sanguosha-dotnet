@@ -259,10 +259,12 @@ internal static class Program
             Check("Shanhe campaign UI: eight-seat boss stages and final settlement preview", () => ShanheCampaignUiChecks.EightSeatBossStagesAndFinalSettlementPreview(output));
             Check("Shanhe campaign UI: published boss portraits render on actual seats", () => ShanheBossPortraitChecks.PublishedS5BossAliasesDecodeAndRenderOnRealSeats(output));
             Check("Shanhe campaign UI: inheritance before map and cold restore", () => ShanheCampaignUiChecks.InheritanceOffersBeforeFirstMapAndSurvivesColdRestore(output));
-            Check("Shanhe campaign UI: shop purchase states and codex navigation", () => ShanheModulesUiChecks.ShopPurchaseAndCodexNavigation(output));
+            Check("Shanhe campaign UI: pre-run catalogue and collection navigation", () => ShanheModulesUiChecks.PreRunCatalogAndCollectionNavigation(output));
             Check("Shanhe codex UI: unlock equip persist and market", () => ShanheCodexUiChecks.UnlockEquipPersistAndMarket(output));
             Check("Shanhe market UI: free refresh clicks paid allowance and zero wallet", () => ShanheCodexUiChecks.FreeRefreshClicksKeepPaidAllowancePricesAndZeroWalletState(output));
             Check("Shanhe market UI: unlimited paid refresh wallet and free priority", () => ShanheCodexUiChecks.UnlimitedPaidRefreshLabelAndButtonFollowTheActualWallet(output));
+            Check("Shanhe responsive UI: campaign fills both client areas", () => ShanheResponsiveMarketUiChecks.CampaignFillsEmbeddedAndIndependentClientAreas(output));
+            Check("Shanhe responsive UI: floating market pages and returns", () => ShanheResponsiveMarketUiChecks.FloatingMarketPagesToFifthGoodsAndReturnsToItsOriginalSurface(output));
             Check("Shanhe market UI: restock purchase same slot prices and refresh allowances", () => ShanheCodexUiChecks.RestockPurchaseClicksReplaceOneSlotAndKeepPricesAndRefreshAllowances(output));
             Check("Shanhe codex UI: failed profile write preserves progress", ShanheCodexUiChecks.FailedProfileWritePreservesProgress);
             Check("Shanhe loadout plans: legacy JSON and detached operations", ShanheCodexLoadoutPersistenceChecks.LegacyJsonAndLoadoutOperationsStayDetached);
@@ -271,11 +273,12 @@ internal static class Program
             Check("Shanhe loadout plans: failed reads and writes preserve current plan and books", ShanheCodexLoadoutUiChecks.FailedReadsAndWritesKeepTheCurrentPlanAndBooks);
             Check("Shanhe Dong Ji UI: dynamic exact card confirmation and locked gift", () => ShanheDongJiUiChecks.DynamicRecipientCountConfirmsExactCardsAndExcludesLockedGift(output));
             Check("Shanhe codex settlement: actual victory one-time books and rejected outcomes", () => ShanheCodexSettlementChecks.ActualCompletedVictoryCreditsOnceAndRejectsOtherOutcomes(output));
+            Check("Shanhe codex settlement: books independent of expedition autosave", ShanheCodexSettlementChecks.CompletedVictoryCreditsIndependentlyOfExpeditionAutosave);
             Check("Shanhe run records: real history tab keeps completed runs and credited books", () => ShanheRunRecordUiChecks.CompletedRunsRemainVisibleInTheRealHistoryTab(output));
             Check("Shanhe reward UI: real victory cards confirmation skip skill and replacement", () => ShanheRewardUiChecks.RealVictoryRewardCardsConfirmSkipSkillAndReplacement(output));
             Check("Shanhe reward UI: boss bundles advance through three chapters", () => ShanheRewardUiChecks.BossBundlesRequireEachGroupThenAdvanceThreeChapters(output));
             Check("Shanhe reward UI: categories four choices bonus-only and three boss groups", () => ShanheRewardUiChecks.CategoriesFourChoicesBonusOnlyAndThreeBossGroups(output));
-            Check("Shanhe reward UI: shop skill replacement confirms before payment", () => ShanheRewardUiChecks.ShopSkillsUseReplacementModalAndChargeOnlyOnConfirmation(output));
+            Check("Shanhe reward UI: persistent market skill replacement confirms before payment", () => ShanheRewardUiChecks.PersistentMarketSkillsReplaceOnlyOnConfirmation(output));
             Check("Boss activity UI: real coalition setup stage and cross-mode restore", () => BossActivityUiChecks.RealSetupAndCrossModeRestore(output));
             Check("Hulao activity UI: forms shuffle counters and cross-mode restore", () => HulaoActivityUiChecks.SetupFormCounterAndCrossModeRestore(output));
             Check("Shenwu activity UI: shared god draft six seats and restore", () => ShenwuActivityUiChecks.SharedGodDraftSixSeatsAndRestore(output));

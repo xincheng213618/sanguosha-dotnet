@@ -104,6 +104,7 @@ public sealed partial class GameEngine
                 $"equipment:{card.Id}:draw-count",
                 EquipmentRules.Get(card.Kind).DrawCountBonus)));
         var contributions = CollectNumericRuleContributions(player, SkillRuleQuery.DrawCount).ToList();
+        AddFiniteContribution(contributions, $"campaign:{player.Seat}:market:draw", ShanheMarketRuleBonus(player.Seat, SkillRuleQuery.DrawCount));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:mobile-duliang:draw", MobileLiYanNextDrawBonus(player));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:alternating-next-draw", AlternatingNextDrawPhaseBonus(player));
         AddFiniteContribution(contributions, $"state:{player.Seat}:cao-xi:gangshu:draw", CaoXiGangshuBonus(player, SkillRuleQuery.DrawCount));
@@ -133,6 +134,7 @@ public sealed partial class GameEngine
                 GetCurrentTurnDefaultStat(player.Seat, SkillRuleQuery.SlashLimit) ?? 1)
         };
         var contributions = CollectNumericRuleContributions(player, SkillRuleQuery.SlashLimit).ToList();
+        AddFiniteContribution(contributions, $"campaign:{player.Seat}:market:slash", ShanheMarketRuleBonus(player.Seat, SkillRuleQuery.SlashLimit));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:mobile:shi-kuanggu:slash-limit", MobileShiWeiYanPhaseSlashBonus(player.Seat));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:mobile:shi-cujun:slash-limit", ShiHcCujunSlashBonus(player.Seat));
         AddFiniteContribution(contributions, $"issued:{player.Seat}:mobile:shi-xiezhi:slash-limit", ShiZhHuiOverflowCount(player.Seat));

@@ -7,13 +7,14 @@
    <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button"><Border x:Name="Frame" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Padding="2"><Border BorderBrush="#655327" BorderThickness="1" Padding="{TemplateBinding Padding}"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></Border><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Frame" Property="Background" Value="#AA4433"/><Setter TargetName="Frame" Property="BorderBrush" Value="#F4D68E"/></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="#FFEBC1"/></Trigger><Trigger Property="IsEnabled" Value="False"><Setter TargetName="Frame" Property="Background" Value="#514536"/><Setter TargetName="Frame" Property="Opacity" Value="0.65"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
   </Style>
   <Style TargetType="ScrollBar">
-   <Setter Property="Height" Value="9"/>
-   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ScrollBar"><Grid Background="#32271D"><Track x:Name="PART_Track" Orientation="{TemplateBinding Orientation}" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" Value="{TemplateBinding Value}" ViewportSize="{TemplateBinding ViewportSize}"><Track.Thumb><Thumb MinWidth="35"><Thumb.Template><ControlTemplate TargetType="Thumb"><Border Background="#977644" CornerRadius="2" Margin="1"/></ControlTemplate></Thumb.Template></Thumb></Track.Thumb></Track></Grid></ControlTemplate></Setter.Value></Setter>
+   <Setter Property="Width" Value="9"/>
+   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ScrollBar"><Grid Background="#32271D"><Track x:Name="PART_Track" Orientation="{TemplateBinding Orientation}" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" Value="{TemplateBinding Value}" ViewportSize="{TemplateBinding ViewportSize}"><Track.Thumb><Thumb MinWidth="9" MinHeight="9"><Thumb.Template><ControlTemplate TargetType="Thumb"><Border Background="#977644" CornerRadius="2" Margin="1"/></ControlTemplate></Thumb.Template></Thumb></Track.Thumb></Track></Grid><ControlTemplate.Triggers><Trigger Property="Orientation" Value="Vertical"><Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="True"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
+   <Style.Triggers><Trigger Property="Orientation" Value="Horizontal"><Setter Property="Width" Value="Auto"/><Setter Property="Height" Value="9"/></Trigger></Style.Triggers>
   </Style>
  </UserControl.Resources>
- <Viewbox Stretch="Uniform"><Grid Width="1050" Height="535" ClipToBounds="True">
-  <Image Source="pack://siteoforigin:,,,/Assets/shanhe-desk.png" Stretch="Fill"/>
-  <Border Background="#E61D1A15" BorderBrush="#9F7F4A" BorderThickness="1"/>
+ <Grid x:Name="MarketSurface" ClipToBounds="True">
+  <Image Source="pack://siteoforigin:,,,/Assets/shanhe-desk.png" Stretch="Fill" Opacity="0.14" IsHitTestVisible="False"/>
+  <Border Background="#9A1D1A15" BorderBrush="#9F7F4A" BorderThickness="1" IsHitTestVisible="False"/>
   <Grid Margin="18,16,18,12"><Grid.ColumnDefinitions><ColumnDefinition Width="132"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
    <Grid><Grid.RowDefinitions><RowDefinition Height="139"/><RowDefinition Height="*"/><RowDefinition Height="80"/></Grid.RowDefinitions>
     <TextBlock Text="集&#x0a;市" FontFamily="KaiTi" Foreground="#EAC777" FontSize="49" LineHeight="59" TextAlignment="Center" Margin="0,4,6,0"><TextBlock.Effect><DropShadowEffect Color="#A58138" ShadowDepth="0" BlurRadius="12" Opacity="0.3"/></TextBlock.Effect></TextBlock>
@@ -22,15 +23,21 @@
     </ListBox>
     <StackPanel Grid.Row="2" VerticalAlignment="Bottom" Margin="0,0,10,0"><TextBlock x:Name="MarketFreeRefreshRemaining" Text="{Binding ShanheMarketFreeRefreshRemaining}" Foreground="#BBA370" FontSize="10" TextAlignment="Center" Margin="0,0,0,3"/><TextBlock x:Name="MarketPaidRefreshRemaining" Text="{Binding ShanheMarketPaidRefreshRemaining}" Foreground="#BBA370" FontSize="10" TextAlignment="Center" Margin="0,0,0,6"/><Button x:Name="MarketRefreshButton" Content="{Binding ShanheMarketRefreshText}" Command="{Binding RefreshShanheMarketCommand}" Style="{StaticResource TradeButton}" FontSize="10" Padding="2,6" Background="#3A3023" AutomationProperties.Name="{Binding ShanheMarketRefreshText}"/></StackPanel>
    </Grid>
-   <Grid Grid.Column="1"><Grid.RowDefinitions><RowDefinition Height="58"/><RowDefinition Height="*"/><RowDefinition Height="49"/></Grid.RowDefinitions>
-    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="178"/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="{Binding ShanheMarketCategoryNotice}" Foreground="#CDBB8F" FontSize="12" TextWrapping="Wrap" Margin="0,0,10,7"/><TextBlock Text="{Binding ShanheShopNotice}" Foreground="#9E8C6C" FontSize="10" TextTrimming="CharacterEllipsis" Margin="0,0,10,0"/></StackPanel><Border Grid.Column="1" Background="#171612" BorderBrush="#786542" BorderThickness="1" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="12,6"><TextBlock Text="{Binding ShanheGoldText}" Foreground="#E8C77D" FontSize="16"/></Border></Grid>
+   <Grid Grid.Column="1"><Grid.RowDefinitions><RowDefinition Height="Auto" MinHeight="76"/><RowDefinition Height="*"/><RowDefinition Height="Auto" MinHeight="49"/></Grid.RowDefinitions>
+    <Grid Margin="0,0,0,10"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="178"/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+     <TextBlock x:Name="MarketEquipmentSummary" Text="{Binding ShanheMarketEquipmentText}" Foreground="#D9C190" FontSize="12" TextWrapping="Wrap" Margin="0,3,12,8" VerticalAlignment="Center"/>
+     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"><Border Background="#171612" BorderBrush="#786542" BorderThickness="1" Padding="10,5"><TextBlock x:Name="MarketGold" Text="{Binding ShanheMarketGoldText}" Foreground="#E8C77D" FontSize="16"/></Border><Button x:Name="MarketCloseButton" Content="×" Command="{Binding CloseShanheMarketCommand}" Style="{StaticResource TradeButton}" FontSize="23" Padding="7,0" Margin="8,0,0,0" AutomationProperties.Name="关闭集市，返回原地图或牌桌"/></StackPanel>
+     <StackPanel Grid.Row="1" Grid.ColumnSpan="2"><TextBlock Text="{Binding ShanheMarketCategoryNotice}" Foreground="#CDBB8F" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,4"/><TextBlock Text="{Binding ShanheShopNotice}" Foreground="#9E8C6C" FontSize="10" TextTrimming="CharacterEllipsis"/></StackPanel>
+    </Grid>
     <Border Grid.Row="1" BorderBrush="#9E7B43" BorderThickness="1,2,1,2" Background="#352A2119" Padding="11,12,7,9">
-     <Grid>
-      <TextBlock Text="此分类暂无货品，可切换分类或刷新集市。" Foreground="#B8A17A" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding ShanheMarketHasGoods}" Value="False"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
-      <ScrollViewer x:Name="MarketCardsScroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" PanningMode="HorizontalOnly">
+     <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="28"/><ColumnDefinition Width="*"/><ColumnDefinition Width="28"/></Grid.ColumnDefinitions>
+      <TextBlock Grid.Column="1" Text="此分类暂无货品，可切换分类或刷新集市。" Foreground="#B8A17A" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding ShanheMarketHasGoods}" Value="False"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+      <Button x:Name="MarketPreviousPageButton" Content="‹" Style="{StaticResource TradeButton}" Click="PreviousPage" FontSize="32" Padding="0" Height="70" VerticalAlignment="Center" AutomationProperties.Name="查看上一页货品"/>
+      <ScrollViewer x:Name="MarketCardsScroll" Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" PanningMode="Both" CanContentScroll="False" AutomationProperties.Name="商店货品，横向滚动查看全部">
        <ItemsControl ItemsSource="{Binding ShanheMarketGoods}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate>
-        <Grid Width="258" Margin="0,0,18,4"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="60"/></Grid.RowDefinitions>
-         <Border Background="{StaticResource Parchment}" BorderBrush="{Binding Accent}" BorderThickness="4" Margin="0,7,0,0" Padding="10,12,10,10">
+        <Grid Width="258" Height="{Binding ViewportHeight, RelativeSource={RelativeSource AncestorType=ScrollViewer}}" MinHeight="370" Margin="0,0,18,0"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="60"/></Grid.RowDefinitions>
+         <Border Background="{StaticResource Parchment}" BorderBrush="{Binding Accent}" BorderThickness="4" Margin="0,7,0,0" Padding="10,12,10,10" ToolTipService.ShowDuration="60000" AutomationProperties.HelpText="{Binding ShopTooltip}">
+          <Border.ToolTip><ToolTip ContentTemplate="{x:Null}" MaxWidth="460" Background="#F3E4C7" Foreground="#4A3727" BorderBrush="#A98A56" Padding="12" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}"><ScrollViewer MaxHeight="480" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><TextBlock Text="{Binding ShopTooltip}" TextWrapping="Wrap" FontSize="13" LineHeight="22"/></ScrollViewer></ToolTip></Border.ToolTip>
           <Grid><Grid.RowDefinitions><RowDefinition Height="24"/><RowDefinition Height="116"/><RowDefinition Height="38"/><RowDefinition Height="*"/></Grid.RowDefinitions>
            <Border Background="{Binding Accent}" BorderBrush="#D9BC86" BorderThickness="1" Margin="12,-24,12,3" Padding="4,4"><TextBlock Text="{Binding MarketCategory}" Foreground="#FFF1CE" FontFamily="KaiTi" FontWeight="Bold" FontSize="20" TextAlignment="Center"/></Border>
            <Grid Grid.Row="1">
@@ -40,7 +47,7 @@
             <Viewbox Width="72" Height="104" Stretch="Fill" Visibility="{Binding HasCardImage, Converter={StaticResource VisibleWhen}}"><Grid Width="186" Height="260"><Image Source="{Binding CardImage}" Stretch="Fill"/><StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="3,7,0,0"><Image Source="{Binding RankArtwork}" Width="34" Height="31" Stretch="Uniform"/><Image Source="{Binding SuitArtwork}" Width="34" Height="31" Stretch="Uniform"/></StackPanel></Grid></Viewbox>
            </Grid>
            <Border Grid.Row="2" Background="{Binding Accent}" BorderBrush="#D8BD8D" BorderThickness="1" Margin="4,5,4,5" Padding="2"><TextBlock Text="{Binding DisplayName}" FontFamily="KaiTi" FontSize="20" TextAlignment="Center" Foreground="#F8E6BC" TextTrimming="CharacterEllipsis"/></Border>
-           <TextBlock Grid.Row="3" Text="{Binding Description}" Foreground="#75573A" FontSize="12" LineHeight="20" TextWrapping="Wrap" Margin="11,8" ToolTip="{Binding RuleDescription}"/>
+           <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="11,8" PanningMode="VerticalOnly" AutomationProperties.Name="货品效果摘要"><TextBlock Text="{Binding ShopSummary}" Foreground="#75573A" FontSize="13" LineHeight="22" TextWrapping="Wrap"/></ScrollViewer>
           </Grid>
          </Border>
          <Button Grid.Row="1" Style="{StaticResource TradeButton}" IsEnabled="{Binding CanBuy}" Command="{Binding DataContext.RequestShanheShopPurchaseCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" AutomationProperties.Name="{Binding Name}" HorizontalAlignment="Center" MinWidth="153" Margin="0,7,0,0" Padding="15,3">
@@ -49,10 +56,11 @@
         </Grid>
        </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
       </ScrollViewer>
+      <Button x:Name="MarketNextPageButton" Grid.Column="2" Content="›" Style="{StaticResource TradeButton}" Click="NextPage" FontSize="32" Padding="0" Height="70" VerticalAlignment="Center" AutomationProperties.Name="查看下一页货品"/>
      </Grid>
     </Border>
-    <Grid Grid.Row="2"><TextBlock x:Name="MarketPurchaseNotice" Text="{Binding ShanheMarketSurchargeNotice}" Foreground="#B39A6F" FontSize="11" VerticalAlignment="Center" MaxWidth="610" TextWrapping="Wrap" HorizontalAlignment="Left"/><ItemsControl ItemsSource="{Binding ShanheShopActions}" HorizontalAlignment="Right" VerticalAlignment="Center"><ItemsControl.ItemTemplate><DataTemplate><Button Content="{Binding Name}" Command="{Binding DataContext.ChooseShanheOptionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Style="{StaticResource TradeButton}" Padding="12,5"/></DataTemplate></ItemsControl.ItemTemplate></ItemsControl></Grid>
+    <TextBlock Grid.Row="2" x:Name="MarketPurchaseNotice" Text="{Binding ShanheMarketSurchargeNotice}" Foreground="#B39A6F" FontSize="11" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,10,0,0"/>
    </Grid>
   </Grid>
- </Grid></Viewbox>
+ </Grid>
 </UserControl>

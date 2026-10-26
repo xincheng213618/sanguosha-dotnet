@@ -7,7 +7,9 @@
         controls:InteractionMotion.MotionEnabled="{Binding IsMotionEnabled}"
         PreviewKeyDown="Window_PreviewKeyDown"
         KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle">
-    <Viewbox Stretch="Uniform" Margin="6">
+    <Grid>
         <controls:ShanheCampaignPanel x:Name="CampaignPanelHost" />
-    </Viewbox>
+        <controls:ShanheMarketOverlay x:Name="MarketPanelHost"
+            Visibility="{Binding IsShanheMarketOpen, Converter={StaticResource BoolToVisibility}}" />
+    </Grid>
 </Window>

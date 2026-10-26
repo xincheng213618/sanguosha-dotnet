@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Windows.Media;
+using CardGame.Core;
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Wpf.ViewModels;
@@ -22,14 +23,14 @@ public sealed partial class MainViewModel
         { "tactics" => "战 法 选 择", "cards" => "卡 牌 选 择", _ => group.Name + " · 选择" } :
         _shanheSession?.Snapshot.RewardOffers is { Count: > 0 } offers && offers.All(reward => reward.SkillId is not null)
             ? "技 能 选 择" : "战 利 品 选 择";
-    public string ShanheRewardNotice => IsShanheOpeningSkillDraft ? "传承已触发。从三个随机稀有技能中选择一项，获得后开始征程。" :
-        _shanheSession?.Snapshot.RewardCategories.Count > 0 ? "先选择一类奖励，再从该类候选中领取一项。类别确认后不能更换。" :
+    public string ShanheRewardNotice => IsShanheOpeningSkillDraft ? "从3项稀有技能中选择1项" :
+        _shanheSession?.Snapshot.RewardCategories.Count > 0 ? "选择奖励类别，确认后不可更换。" :
         ActiveShanheBossRewardGroup is { } group ? IsShanheBonusRewardOnly
-            ? $"从 {group.Offers.Count} 项追加候选中选择一项，领取后返回追加奖励总览。各组分别领取。"
-            : $"从本组 {group.Offers.Count} 项候选中选择一项，领取后返回奖励总览。各组分别领取。" :
+            ? $"从 {group.Offers.Count} 项追加奖励中选择1项"
+            : $"本组 {group.Offers.Count} 项奖励，选择1项" :
         _shanheSession?.Snapshot is { CanSkipReward: true } state
-        ? $"通关奖励已结算。选择一项收获，或放弃本次战利品，额外获得 {state.RewardSkipGold} 铜币。"
-        : "通关奖励已结算。选择一项收获，带着新的力量继续前行。";
+        ? $"选择1项奖励，或放弃换取 {state.RewardSkipGold} 铜币"
+        : "选择1项奖励";
     public ShanheRewardCard? SelectedShanheRewardCard => _selectedShanheRewardCard;
     public bool ShanheRewardNeedsReplacement => SelectedShanheRewardReplacements.Count > 0;
     public string ShanheRewardConfirmText => _selectedShanheRewardCard?.IsSkip == true ? "领 取 铜 币" :
@@ -143,7 +144,9 @@ public sealed partial class MainViewModel
                 ShanheRewardCards.Add(new(reward.Id, reward.Name.Replace("传习·", ""), showSkillRule ? rule : reward.Description,
                     showSkillRule ? string.Empty : rule, RewardCategory(reward), false, "", state.Revision,
                     CurrentShanheRewardChoices.Any(choice => choice.IsReward && choice.Id == reward.Id && choice.IsEnabled))
-                { CardImage = (reward.StartingCards ?? []).Concat(reward.StartingEquipment ?? []).FirstOrDefault() is { } card ? CardArt.Get(card.Kind) : null });
+                { CardImage = (reward.StartingCards ?? []).Concat(reward.StartingEquipment ?? []).FirstOrDefault() is { } card ? CardArt.Get(card.Kind) : null,
+                  CardRuleDescription = (reward.StartingCards ?? []).Concat(reward.StartingEquipment ?? []).FirstOrDefault() is { } ruleCard
+                      ? CardCatalog.Get(ruleCard.Kind).Description : string.Empty });
             }
             if (state.CanSkipReward && state.BossRewardSummary is null)
                 ShanheRewardCards.Add(new("reward:skip", "放弃", "放弃本次战利品，将这份收获折为行军盘缠。",
@@ -172,6 +175,7 @@ public sealed class ShanheRewardCard(string id, string name, string description,
     public string Category { get; } = category;
     public string CategoryText => Category;
     public ImageSource? CardImage { get; init; }
+    public string CardRuleDescription { get; init; } = string.Empty;
     public ShanheRewardCategory? RewardCategoryChoice { get; init; }
     public bool HasCardImage => CardImage is not null;
     public bool IsSkip { get; } = isSkip;
@@ -179,5 +183,9 @@ public sealed class ShanheRewardCard(string id, string name, string description,
     public long Revision { get; } = revision;
     public bool IsEnabled { get; } = isEnabled;
     public bool IsSelected { get => _isSelected; internal set => SetProperty(ref _isSelected, value); }
-    public string AccessibleText => $"{Name}，{Category}，{Description}，{BonusText}";
+    public string AccessibleText => $"{Name}，{Category}，{Summary}，{BonusText}";
+    public string Summary => IsSkip ? "不领取本次战利品" : HasCardImage ? "获得卡牌" : RewardCategoryChoice is not null
+        ? "从本类候选中选择1项" : ShanheDisplayText.Effect(ShanheDisplayText.Rule(Description, RuleDescription));
+    public string RuleTooltip => !string.IsNullOrWhiteSpace(CardRuleDescription) ? CardRuleDescription :
+        ShanheDisplayText.Rule(Description, RuleDescription);
 }

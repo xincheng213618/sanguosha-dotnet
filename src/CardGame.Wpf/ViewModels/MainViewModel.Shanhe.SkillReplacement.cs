@@ -39,14 +39,16 @@ public sealed partial class MainViewModel
         RequestShanheShopPurchaseCommand = new RelayCommand<ShanheShopItem>(item =>
         {
             if (!CanRequestShanheShopPurchase(item) || item.Choice is not { } choice) return;
-            if (choice.ReplaceSkillId is null) { ChooseShanheOption(choice); return; }
-            OpenShanheSkillReplacement(item.Name, ShanheChoices.Where(option => option.Id == choice.Id &&
-                option.ReplaceSkillId is not null && option.IsEnabled).ToArray(), ChooseShanheOption, IsCurrentShanheChoice);
+            if (choice.ReplaceSkillId is null) { BuyShanheMarketChoice(choice); return; }
+            OpenShanheSkillReplacement(item.Name, CurrentShanheMarketChoices.Where(option => option.Id == choice.Id &&
+                option.ReplaceSkillId is not null && option.IsEnabled).ToArray(), BuyShanheMarketChoice, IsCurrentShanheMarketChoice);
         }, CanRequestShanheShopPurchase);
     }
 
     private bool CanRequestShanheShopPurchase(ShanheShopItem item) => !IsTutorialActive && !IsShanheSkillReplacementOpen &&
-        ShanheShopItems.Contains(item) && item.CanBuy && item.Choice is { } choice && IsCurrentShanheChoice(choice);
+        _shanheBattleGame?.HasPendingShanheMarketPurchase != true &&
+        ShanheShopItems.Any(current => ReferenceEquals(current, item)) && item.CanBuy &&
+        item.Choice is { } choice && IsCurrentShanheMarketChoice(choice);
     private bool CanSelectShanheReplacement(ShanheSkillReplacementOption option) => !IsTutorialActive && IsShanheSkillReplacementOpen &&
         ShanheSkillReplacementOptions.Contains(option) && option.Choice is { } choice && _shanheReplacementIsCurrent?.Invoke(choice) == true;
     private bool CanConfirmShanheReplacement() => _selectedShanheReplacement is { } selected && CanSelectShanheReplacement(selected);

@@ -13,11 +13,17 @@ public partial class ShanheCampaignPanel : UserControl
     private IInputElement? _focusBeforeReplacement;
     private IInputElement? _focusBeforeCodexPicker;
     private MainViewModel? _observedModel;
-    private bool _wasShopActive;
 
     public ShanheCampaignPanel()
     {
         InitializeComponent();
+        ShanheJourneyTabs.SelectionChanged += (_, args) =>
+        {
+            if (!ReferenceEquals(args.Source, ShanheJourneyTabs) || ShanheJourneyTabs.SelectedIndex != 2) return;
+            ShanheJourneyTabs.SelectedIndex = 0;
+            if (DataContext is MainViewModel model && model.OpenShanheMarketCommand.CanExecute(null))
+                model.OpenShanheMarketCommand.Execute(null);
+        };
         ShanheSettlementHost.OpenCodexRequested += (_, _) =>
         {
             if (DataContext is MainViewModel model) model.CloseShanheSettlementCommand.Execute(null);
@@ -43,8 +49,6 @@ public partial class ShanheCampaignPanel : UserControl
         _observedModel = DataContext as MainViewModel;
         if (_observedModel is null) return;
         _observedModel.PropertyChanged += CampaignPropertyChanged;
-        _wasShopActive = _observedModel.IsShanheShopActive;
-        if (_wasShopActive) ShanheJourneyTabs.SelectedIndex = 2;
     }
 
     private void StopObservingModel()
@@ -106,11 +110,6 @@ public partial class ShanheCampaignPanel : UserControl
         }
         if (e.PropertyName == nameof(MainViewModel.IsShanheRunInProgress) && _observedModel.IsShanheRunInProgress)
             ShanheSetupOverlay.Visibility = Visibility.Collapsed;
-        if (e.PropertyName != nameof(MainViewModel.IsShanheShopActive)) return;
-        var active = _observedModel.IsShanheShopActive;
-        if (active && !_wasShopActive) ShanheJourneyTabs.SelectedIndex = 2;
-        else if (!active && _wasShopActive && ShanheJourneyTabs.SelectedIndex == 2) ShanheJourneyTabs.SelectedIndex = 0;
-        _wasShopActive = active;
     }
 
     public bool ShowDetachButton
@@ -207,7 +206,7 @@ public partial class ShanheCampaignPanel : UserControl
     {
         Dispatcher.BeginInvoke(() =>
         {
-            ShanheJourneyTabs.SelectedIndex = _observedModel?.IsShanheShopActive == true ? 2 : 0;
+            ShanheJourneyTabs.SelectedIndex = 0;
             if (DataContext is not MainViewModel { HasShanheSession: true } model) return;
             if (model.IsShanheSkillReplacementOpen || model.IsShanheRewardOpen || model.IsShanheBossRewardOpen || model.IsShanheEncounterPreviewOpen) { FocusCampaign(); return; }
             var command = model.ShanheChoices.Count > 0 ? model.ChooseShanheOptionCommand : model.PreviewShanheNodeCommand;

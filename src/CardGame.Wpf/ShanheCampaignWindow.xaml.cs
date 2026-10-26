@@ -18,6 +18,7 @@ public partial class ShanheCampaignWindow : Window
         InitializeComponent();
         DataContext = viewModel;
         CampaignPanel.ShowDetachButton = false;
+        viewModel.PropertyChanged += MarketVisibilityChanged;
         Loaded += (_, _) => FocusCampaign();
     }
 
@@ -25,8 +26,21 @@ public partial class ShanheCampaignWindow : Window
 
     public void FocusCampaign()
     {
-        if (!IsVisible || !IsEnabled || CampaignPanel.IsKeyboardFocusWithin) return;
-        CampaignPanel.FocusCampaign();
+        if (!IsVisible || !IsEnabled || (_viewModel.IsShanheMarketOpen
+                ? MarketPanelHost.IsKeyboardFocusWithin : CampaignPanel.IsKeyboardFocusWithin)) return;
+        if (_viewModel.IsShanheMarketOpen) MarketPanelHost.FocusMarket();
+        else CampaignPanel.FocusCampaign();
+    }
+
+    private void MarketVisibilityChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(MainViewModel.IsShanheMarketOpen)) return;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (!IsVisible) return;
+            if (_viewModel.IsShanheMarketOpen) MarketPanelHost.FocusMarket();
+            else CampaignPanel.FocusCampaign();
+        }, System.Windows.Threading.DispatcherPriority.Input);
     }
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -41,6 +55,12 @@ public partial class ShanheCampaignWindow : Window
         }
         if (key == Key.Escape && modifiers == ModifierKeys.None)
         {
+            if (_viewModel.IsShanheMarketOpen)
+            {
+                e.Handled = true;
+                MarketPanelHost.HandleEscape();
+                return;
+            }
             // Let the open selector consume Escape before dismissing its page.
             if (HasOpenDropDown(CampaignPanel)) return;
             e.Handled = true;
@@ -69,6 +89,7 @@ public partial class ShanheCampaignWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        _viewModel.PropertyChanged -= MarketVisibilityChanged;
         // Release the owner's reference before changing the shared navigation
         // state, which can synchronously ask the owner to close this window.
         base.OnClosed(e);

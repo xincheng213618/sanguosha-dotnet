@@ -162,41 +162,49 @@ internal static partial class ShanheRewardUiChecks
         finally { panel.DataContext = null; }
     }
 
-    public static void ShopSkillsUseReplacementModalAndChargeOnlyOnConfirmation(string output)
+    public static void PersistentMarketSkillsReplaceOnlyOnConfirmation(string output)
     {
         using var vm = new MainViewModel(false, 270018, true, new MemorySaveStore(),
             contentRegistry: FixtureRegistry.Value, shanheSaveStore: new MemoryShanheCampaignSaveStore(),
             shanheCodexStore: new MemoryShanheCodexStore());
-        var panel = new ShanheCampaignPanel { DataContext = vm };
+        var panel = new ShanheMarketOverlay { DataContext = vm };
+        var replacement = (ShanheCampaignPanel)panel.FindName("ReplacementHost");
         try
         {
-            var session = CreateSkillShopSession(fillSkillSlot: true);
+            var session = CreateSkillMarketSession(fillSkillSlot: true);
             Attach(vm, session);
+            vm.OpenShanheMarketCommand.Execute(null);
             vm.SelectedShanheMarketCategory = "技能";
             Layout(panel);
             var ordinaryRevision = Program.Engine(vm).Revision;
-            var item = vm.ShanheShopItems.Single(product => product.Id == "learn");
+            var item = SkillMarketProduct(vm, session, "learned");
             var buy = Bound(panel, vm.RequestShanheShopPurchaseCommand, item);
             var beforePurchase = Snapshot(session);
             var gold = session.Snapshot.Gold;
             var revision = session.Revision;
-            Program.Assert(vm.IsShanheShopActive && vm.ShanheShopItems.Count == 1 && vm.ShanheMarketGoods.Single() == item &&
+            var alreadyOwned = SkillMarketProduct(vm, session, "guard");
+            var alreadyOwnedButton = Bound(panel, vm.RequestShanheShopPurchaseCommand, alreadyOwned);
+            Program.Assert(vm.IsShanheMarketOpen && vm.IsShanheShopActive && vm.ShanheShopItems.Count == 2 &&
+                vm.ShanheMarketGoods.Count(product => ReferenceEquals(product, item)) == 1 &&
                 Program.Find<Button>(panel).Count(button => ReferenceEquals(button.CommandParameter, item)) == 1 &&
-                item.CanBuy && item.Price == 25 && buy.IsEnabled,
+                item.CanBuy && item.Price == 25 && buy.IsEnabled &&
+                alreadyOwned is { State: ShanheShopItemState.AlreadyOwned, Status: "已拥有", CanBuy: false } &&
+                !alreadyOwnedButton.IsEnabled && Program.Find<TextBlock>(alreadyOwnedButton).Any(text => text.Text == "已拥有"),
                 "A full-slot skill product must appear as one bound purchasable card rather than one card per replacement target.");
             Click(buy, panel);
-            var replacementConfirm = (Button)panel.FindName("ShanheConfirmSkillReplacementButton");
-            var replacementCancel = (Button)panel.FindName("ShanheCancelSkillReplacementButton");
+            var replacementConfirm = (Button)replacement.FindName("ShanheConfirmSkillReplacementButton");
+            var replacementCancel = (Button)replacement.FindName("ShanheCancelSkillReplacementButton");
             var locked = vm.ShanheSkillReplacementOptions.Single(option => option.SkillId == Force);
             var oldOption = vm.ShanheSkillReplacementOptions.Single(option => option.SkillId == Guard);
             var oldOptionButton = Bound(panel, vm.SelectShanheSkillReplacementCommand, oldOption);
-            Program.Assert(vm.IsShanheSkillReplacementOpen && !vm.IsShanheRewardOpen && !buy.IsEnabled &&
+            Program.Assert(vm.IsShanheSkillReplacementOpen && replacement.Visibility == Visibility.Visible &&
+                !vm.IsShanheRewardOpen && !buy.IsEnabled &&
                 locked.IsLocked && !vm.SelectShanheSkillReplacementCommand.CanExecute(locked) &&
                 !replacementConfirm.IsEnabled && Snapshot(session) == beforePurchase,
                 "Requesting a full-slot shop skill must open the shared modal and preserve its price and resources until confirmation.");
             Click(oldOptionButton, panel);
             Click(replacementCancel, panel);
-            Program.Assert(!vm.IsShanheSkillReplacementOpen && buy.IsEnabled && Snapshot(session) == beforePurchase,
+            Program.Assert(!vm.IsShanheSkillReplacementOpen && vm.IsShanheMarketOpen && buy.IsEnabled && Snapshot(session) == beforePurchase,
                 "Canceling a selected shop replacement must spend no coins, consume no stock, and remove no skill.");
             Click(buy, panel);
             RawClick(oldOptionButton);
@@ -204,13 +212,16 @@ internal static partial class ShanheRewardUiChecks
             vm.ConfirmShanheSkillReplacementCommand.Execute(null);
             Layout(panel);
             Program.Assert(vm.IsShanheSkillReplacementOpen && !replacementConfirm.IsEnabled &&
-                vm.ShanheSkillReplacementOptions.All(option => !option.IsSelected) && Snapshot(session) == beforePurchase &&
-                panel.HandleEscape() && !vm.IsShanheSkillReplacementOpen && Snapshot(session) == beforePurchase,
-                "A canceled modal's option must not select a new shop dialog, and Escape must return without charging the original price.");
+                vm.ShanheSkillReplacementOptions.All(option => !option.IsSelected) && Snapshot(session) == beforePurchase,
+                "A canceled modal's retired option cannot select or confirm the next market dialog.");
+            panel.HandleEscape(); Layout(panel);
+            Program.Assert(!vm.IsShanheSkillReplacementOpen && vm.IsShanheMarketOpen && Snapshot(session) == beforePurchase,
+                "Escape cancels only the replacement and returns to the same market without charging its original price.");
 
             var previousItem = item;
-            session = CreateSkillShopSession(fillSkillSlot: true);
+            session = CreateSkillMarketSession(fillSkillSlot: true);
             Attach(vm, session);
+            vm.OpenShanheMarketCommand.Execute(null);
             Layout(panel);
             Program.Assert(session.Revision == revision && !vm.RequestShanheShopPurchaseCommand.CanExecute(previousItem),
                 "A previous expedition's same-id, same-revision product must not act on the new shop.");
@@ -221,7 +232,7 @@ internal static partial class ShanheRewardUiChecks
             vm.ConfirmShanheSkillReplacementCommand.Execute(null);
             Program.Assert(!vm.IsShanheSkillReplacementOpen && Snapshot(session) == beforePurchase,
                 "Retired shop and replacement objects cannot spend money or open a modal in a replacement expedition.");
-            item = vm.ShanheShopItems.Single(product => product.Id == "learn");
+            item = SkillMarketProduct(vm, session, "learned");
             buy = Bound(panel, vm.RequestShanheShopPurchaseCommand, item);
             Click(buy, panel);
             var option = vm.ShanheSkillReplacementOptions.Single(entry => entry.SkillId == Guard);
@@ -230,10 +241,13 @@ internal static partial class ShanheRewardUiChecks
                 "The chosen shop replacement remains uncommitted until the modal's own confirmation.");
             Program.Render(panel, 1440, 880, Path.Combine(output, "shanhe-shop-skill-replacement.png"));
             Click(replacementConfirm, panel);
+            var purchased = SkillMarketProduct(vm, session, "learned");
+            var purchasedButton = Bound(panel, vm.RequestShanheShopPurchaseCommand, purchased);
             Program.Assert(!vm.IsShanheSkillReplacementOpen && session.Revision == revision + 1 &&
                 session.Snapshot.Gold == gold - 25 && session.Snapshot.ExtraSkillIds.SequenceEqual([Learned]) &&
-                session.Snapshot.ExtraSkillSlots == 1 && session.Snapshot.Phase == ShanheCampaignPhase.NodeChoice &&
-                vm.ShanheShopItems.Single(product => product.Id == "learn") is { State: ShanheShopItemState.Purchased, CanBuy: false } &&
+                session.Snapshot.ExtraSkillSlots == 1 && session.Snapshot.Phase == ShanheCampaignPhase.Map &&
+                purchased is { State: ShanheShopItemState.Purchased, Status: "已购", CanBuy: false } && !purchasedButton.IsEnabled &&
+                Program.Find<TextBlock>(purchasedButton).Any(text => text.Text == "已购") &&
                 Program.Engine(vm).Revision == ordinaryRevision,
                 "Confirming the shared shop modal must debit the unchanged price once, replace one acquired skill, and mark only that product purchased.");
             var afterPurchase = Snapshot(session);
@@ -246,10 +260,11 @@ internal static partial class ShanheRewardUiChecks
             Program.Assert(Snapshot(session) == afterPurchase,
                 "Repeated shop or modal confirmations must not charge twice or repeat a completed replacement.");
 
-            session = CreateSkillShopSession(fillSkillSlot: false);
+            session = CreateSkillMarketSession(fillSkillSlot: false);
             Attach(vm, session);
+            vm.OpenShanheMarketCommand.Execute(null);
             Layout(panel);
-            item = vm.ShanheShopItems.Single(product => product.Id == "learn");
+            item = SkillMarketProduct(vm, session, "learned");
             gold = session.Snapshot.Gold;
             revision = session.Revision;
             Click(Bound(panel, vm.RequestShanheShopPurchaseCommand, item), panel);
@@ -260,24 +275,33 @@ internal static partial class ShanheRewardUiChecks
         finally { panel.DataContext = null; }
     }
 
-    private static ShanheCampaignSession CreateSkillShopSession(bool fillSkillSlot)
+    private static ShanheShopItem SkillMarketProduct(MainViewModel vm, ShanheCampaignSession session, string rewardId)
+    {
+        var id = session.Snapshot.ShopItems.Single(product => product.Reward?.Id == rewardId).ChoiceId;
+        return vm.ShanheShopItems.Single(product => product.Id == id);
+    }
+
+    private static ShanheCampaignSession CreateSkillMarketSession(bool fillSkillSlot)
     {
         var definition = new ShanheCampaignDefinition("fixture:shanhe-ui-skill-shop", "渡口集市", [Player], ["prepare"],
         [
             new("prepare", "营前整备", ShanheNodeKind.Event, ["shop"],
                 Choices: [new("ready", "整备出发", RewardId: fillSkillSlot ? "guard" : null)]),
             new("shop", "渡口集市", ShanheNodeKind.Shop, ["battle"],
-                Choices: [new("learn", "传习·振奋", GoldCost: 25, RewardId: "learned", LeavesNode: false)]),
+                Choices: [new("learn", "传习·振奋", GoldCost: 25, RewardId: "learned", LeavesNode: false),
+                    new("known", "既有守御", GoldCost: 25, RewardId: "guard", LeavesNode: false)]),
             new("battle", "渡口守军", ShanheNodeKind.Battle, [], [new("gate", "守军", [new(Enemy)])])
         ],
         [
             new("guard", "既有守御", SkillId: Guard) { Description = "已有额外技能，占用一个槽。" },
             new("learned", "传习·振奋", SkillId: Learned) { Description = "习得振奋，占用一个槽。" }
         ], StartingGold: 80, ExtraSkillSlots: 1);
-        var session = ShanheCampaignSession.Create(definition, new(71, Player), _ => FixtureRegistry.Value);
+        var session = ShanheCampaignSession.Create(definition, new(71, Player)
+            { UseCodexRewardPool = true, PersistentMarket = true }, _ => FixtureRegistry.Value);
         Accept(session, new MoveShanheNodeCommand("prepare", session.Revision));
         Accept(session, new ChooseShanheNodeOptionCommand("ready", null, session.Revision));
-        Accept(session, new MoveShanheNodeCommand("shop", session.Revision));
+        Program.Assert(session.HasPersistentMarket && session.Snapshot.Phase == ShanheCampaignPhase.Map &&
+            session.Snapshot.ShopItems.Count == 2, "The fixture's current permanent shelf retains both original skill positions after the map preparation event.");
         return session;
     }
 

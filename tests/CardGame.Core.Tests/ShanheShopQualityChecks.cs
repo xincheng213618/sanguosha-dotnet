@@ -9,16 +9,56 @@ internal static class ShanheShopQualityChecks
     private const string Tactic100 = "quality-tactic-100", Skill100 = "quality-skill-100", Material100 = "quality-material-100", All100 = "quality-all-100";
     private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(new StandardContentPackage(), new Fixture()));
 
+    public static void BaseFiveSlotsAndOwnedExpansionUseRealCategoryStock()
+    {
+        foreach (var (perks, count) in new (string[] Perks, int Count)[]
+        {
+            ([], 5), (["tactic-economy-2136"], 6), (["tactic-economy-2137"], 7),
+            (["tactic-economy-2136", "tactic-economy-2137"], 8)
+        })
+        {
+            var session = Enter(71, perks);
+            CountCategories(session, count, count, count, count);
+            DistinctStock(session);
+            Need(session.Snapshot.ShopItems.Count(item => item.Reward?.SkillId == SkillId(5)) <= 1,
+                "Extra shelf positions cannot duplicate two catalogue aliases of the same acquired skill identity.");
+            Accept(session, new RefreshShanheShopCommand(session.Revision));
+            CountCategories(session, count, count, count, count);
+            DistinctStock(session);
+            Need(session.Snapshot.Gold == 9900 && session.Snapshot.ShopItems.Where(item => item.Reward?.Id != "supply")
+                .All(item => item.ChoiceId.StartsWith("$shop:1:", StringComparison.Ordinal)),
+                "The real paid whole-shop refresh preserves the fixed category capacity while advancing every sampled choice generation.");
+        }
+        var definition = Definition();
+        var sparse = definition with { Nodes = definition.Nodes.Select(node => node.Id == "shop"
+            ? node with { Choices = node.Choices!.Where(choice => choice.RewardId is
+                "supply" or "t1" or "t2" or "s5" or "s5-alias" or "e1" or "e2" or "c1" or "c2").ToArray() }
+            : node).ToArray() };
+        var shortShelf = Enter(71, ["tactic-economy-2136", "tactic-economy-2137"], definition: sparse);
+        CountCategories(shortShelf, 2, 1, 2, 2);
+        DistinctStock(shortShelf);
+        Need(shortShelf.Snapshot.ShopItems.Count == 8 && shortShelf.Snapshot.ShopItems.Count(item => item.Reward?.SkillId == SkillId(5)) == 1,
+            "Insufficient real supply leaves fewer positions, keeps fixed supplies, and never invents filler or duplicates the only skill identity.");
+
+        static void CountCategories(ShanheCampaignSession session, int tactics, int skills, int equipment, int cards)
+        {
+            var expected = new[] { ('t', tactics), ('s', skills), ('e', equipment), ('c', cards) };
+            foreach (var (category, count) in expected)
+                Need(session.Snapshot.ShopItems.Count(item => item.Reward?.Id is { } id && id != "supply" && id[0] == category) == count,
+                    "Each available category must use exactly five base positions plus the held source expansion, bounded by distinct real supply.");
+        }
+    }
+
     public static void ZeroAndForcedPromotionsKeepBaselineCategoryIsolationNearestTierAndAliases()
     {
         var baseline = Enter(71, []);
-        var expected = new[] { "supply", "t2", "t6", "t7", "t3", "s6", "s8", "s1", "e2", "e4", "e5", "e8", "c1", "c8", "c4", "c2" };
+        var expected = new[] { "supply", "t2", "t6", "t7", "t3", "t1", "s3", "s7", "s5", "s2", "s8", "e2", "e8", "e4", "e6", "e7", "c5", "c1", "c3", "c2", "c8" };
         Need(Ids(baseline).SequenceEqual(expected), "Zero promotion retains the established mixed-category sampler at the fixed seed.", Ids(baseline));
         var cases = new[]
         {
-            (Perk: Tactic100, Kinds: "t", Expected: new[] { "supply", "t5", "t6", "t7", "t3", "s6", "s8", "s1", "e2", "e4", "e5", "e8", "c1", "c8", "c4", "c2" }),
-            (Perk: Skill100, Kinds: "s", Expected: new[] { "supply", "t2", "t6", "t7", "t3", "s5-alias", "s8", "s6", "e2", "e4", "e5", "e8", "c1", "c8", "c4", "c2" }),
-            (Perk: Material100, Kinds: "ec", Expected: new[] { "supply", "t2", "t6", "t7", "t3", "s6", "s8", "s1", "e6", "e7", "e5", "e8", "c5", "c8", "c6", "c7" })
+            (Perk: Tactic100, Kinds: "t", Expected: new[] { "supply", "t5", "t6", "t7", "t3", "t1", "s3", "s7", "s5", "s2", "s8", "e2", "e8", "e4", "e6", "e7", "c5", "c1", "c3", "c2", "c8" }),
+            (Perk: Skill100, Kinds: "s", Expected: new[] { "supply", "t2", "t6", "t7", "t3", "t1", "s6", "s7", "s5", "s2", "s8", "e2", "e8", "e4", "e6", "e7", "c5", "c1", "c3", "c2", "c8" }),
+            (Perk: Material100, Kinds: "ec", Expected: new[] { "supply", "t2", "t6", "t7", "t3", "t1", "s3", "s7", "s5", "s2", "s8", "e5", "e8", "e4", "e6", "e7", "c7", "c6", "c5", "c2", "c8" })
         };
         foreach (var item in cases)
         {
@@ -88,7 +128,7 @@ internal static class ShanheShopQualityChecks
                 Enumerable.Range(0, before.ShopItems.Count).Where(slot => slot != index)
                     .All(slot => before.ShopItems[slot].ChoiceId == after.ShopItems[slot].ChoiceId) &&
                 after.ShopFreeRefreshRemaining == 2 && after.ShopPaidRefreshRemaining == 1,
-                "A real purchase replenishes only that slot: the fixed restock baseline common t4 promotes back to eligible epic t5, pays its own base plus the current category surcharge before discount, and never spends a refresh.",
+                "A real purchase replenishes only that slot: its common restock baseline promotes back to eligible epic t5, pays its own base plus the current category surcharge before discount, and never spends a refresh.",
                 new { purchase, bought, replacement, after.Gold, after.ShopFreeRefreshRemaining, after.ShopPaidRefreshRemaining });
             DistinctStock(session);
             RejectUnchanged(session, new ChooseShanheNodeOptionCommand(bought.ChoiceId, null, session.Revision));
@@ -96,7 +136,7 @@ internal static class ShanheShopQualityChecks
         Need(shelf.ShopItems[index].GoldCost == 391 && shelf.Gold == 10_000,
             "A previously published promoted quote remains frozen through subsequent purchases and same-position quality replacements.");
 
-        string[][] promotedTactics = [["t8", "t6", "t5", "t7"], ["t5", "t6", "t7", "t4"], ["t8", "t5", "t6"]];
+        string[][] promotedTactics = [["t8", "t5", "t2", "t7", "t6"], ["t5", "t7", "t4", "t2", "t6"], ["t8", "t5", "t6", "t4", "t7"]];
         for (var generation = 1; generation <= 3; generation++)
         {
             var before = session.Snapshot;
@@ -121,8 +161,8 @@ internal static class ShanheShopQualityChecks
         Need(perks.Length == 3, "The command fixture holds all three actual current-season twenty-percent source effects.");
         var expected = new[]
         {
-            (Seed: 71, Ids: new[] { "supply", "t2", "t6", "t7", "t5", "s6", "s8", "s1", "e2", "e4", "e5", "e8", "c1", "c8", "c4", "c2" }),
-            (Seed: 83, Ids: new[] { "supply", "t2", "t7", "t1", "t6", "s6", "s8", "s7", "s5", "e4", "e5", "e6", "c5", "c4", "c8", "c1" })
+            (Seed: 71, Ids: new[] { "supply", "t2", "t6", "t7", "t5", "t1", "s3", "s7", "s5", "s2", "s8", "e2", "e8", "e4", "e6", "e7", "c5", "c1", "c3", "c2", "c8" }),
+            (Seed: 83, Ids: new[] { "supply", "t2", "t7", "t1", "t6", "t8", "s2", "s5", "s6", "s7", "s1", "e6", "e7", "e4", "e1", "e3", "c6", "c8", "c3", "c4", "c2" })
         };
         foreach (var item in expected)
         {
@@ -194,7 +234,7 @@ internal static class ShanheShopQualityChecks
             Model(Material100, new(ShopMaterialPromotionPercent: 100)),
             Model(All100, new(ShopTacticPromotionPercent: 100, ShopSkillPromotionPercent: 100, ShopMaterialPromotionPercent: 100))
         };
-        var sources = Sources(2213, 2214, 2215, 2252, 2291, 2091);
+        var sources = Sources(2213, 2214, 2215, 2252, 2291, 2091, 2136, 2137);
         // Baseline identity deduplication sees the low skill first. Promotion candidates
         // deliberately encounter its r4 alias before the same identity's authored r2.
         var choices = new[] { Choice(supply, 35), Choice(alias, 911) }.Concat(goods.Select(reward => Choice(reward,

@@ -193,6 +193,19 @@ public static partial class StandardShanheCampaignCatalog
         var requirements = setup.BossTransition is { } second
             ? setup with { EnemyRoster = Array.AsReadOnly(setup.EnemyRoster.Append(new ShanheCombatantDefinition(second.GeneralId)).ToArray()) }
             : setup;
+        if (setup.MarketSetup is { } market)
+        {
+            var rewards = market.Definition.Rewards;
+            // Dependency discovery includes future purchases without granting them.
+            requirements = requirements with
+            {
+                ExtraSkillIds = Array.AsReadOnly(requirements.ExtraSkillIds.Concat(rewards.Select(reward => reward.SkillId)
+                    .OfType<string>()).Distinct(StringComparer.Ordinal).ToArray()),
+                TacticSkillIds = Array.AsReadOnly(requirements.TacticSkillIds.Concat(rewards.SelectMany(reward =>
+                    new[] { reward.TacticSkillId, reward.CampaignEconomy?.BattleSkillId }.OfType<string>()))
+                    .Distinct(StringComparer.Ordinal).ToArray())
+            };
+        }
         var ids = new[] { requirements.PlayerGeneralId }.Concat(requirements.AllyRoster.Select(m => m.GeneralId))
             .Concat(requirements.EnemyRoster.Select(m => m.GeneralId)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal);
         var localTroops = ids.Any(id => id is StandardShanheLocalTroopPackage.FootmanId or
@@ -357,10 +370,12 @@ public static partial class StandardShanheCampaignCatalog
             (s5Xingtian ? "/s5-xingtian-20766" : "") +
             (s5Zhangliao ? "/s5-zhangliao-722" : "") +
             (s5Zaiqi ? "/s5-zaiqi-887" : "") +
-            (setup.RebirthAvailable ? "/rank-five-rebirth" : "");
+            (setup.RebirthAvailable ? "/rank-five-rebirth" : "") +
+            (setup.MarketSetup is { } marketCache ? "/market-" + ShanheCampaignContent.GetContentHash(marketCache.Definition) : "");
         return BattleRegistries.GetOrAdd(key, _ => new Lazy<ContentRegistry>(() =>
         {
             var packages = new List<IGameContentPackage> { new StandardShanheBossPackage() };
+            if (setup.MarketSetup is not null) packages.Add(new StandardShanheMarketPackage());
             if (localTroops) packages.Add(new StandardShanheLocalTroopPackage());
             if (currentLegendaryTactics) packages.Add(new StandardShanheLegendaryTacticsPackage());
             if (buildTactics) packages.Add(new StandardShanheBuildTacticsPackage());
@@ -456,7 +471,7 @@ public static partial class StandardShanheCampaignCatalog
                 packages.Add(new StandardShanheS5XujingXuqiuPackage());
             if (s5Chengxiong) packages.Add(new StandardShanheS5ChengxiongPackage());
             if (setup.RebirthAvailable) packages.Add(new StandardShanheRankPrivilegePackage());
-            packages.Add(new ShanheEncounterPackage(setup));
+            packages.Add(new ShanheEncounterPackage(setup, requirements));
             if (codexEquipment) packages.Add(new ShanheCodexEquipmentPackage());
             if (wealthTactics) packages.Add(new StandardShanheWealthPackage());
             if (reactionTactics)
@@ -475,6 +490,8 @@ public static partial class StandardShanheCampaignCatalog
                 packages.Add(new StandardShanheAppliedDamageReflectionPackage());
                 packages.Add(new StandardShanheDrawThresholdPackage());
                 packages.Add(new StandardShanheLowHpDamagePackage());
+                packages.Add(new StandardShanheRoundRecoveryPackage());
+                packages.Add(new StandardShanheIncomingReductionPackage());
             }
             return ComposedSkillContentRegistry.CreateShowcase(additionalPackages: packages);
         })).Value;
@@ -524,7 +541,7 @@ public static partial class StandardShanheCampaignCatalog
         AiPolicyVersion = AiDecisionPolicy.CurrentVersion
     }, CreateBattleRegistry(setup));
 
-    private sealed class ShanheEncounterPackage(ShanheBattleSetup setup) : IGameContentPackage
+    private sealed class ShanheEncounterPackage(ShanheBattleSetup setup, ShanheBattleSetup requirements) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("shanhe-campaign", new Version(1, 0, 0),
             [new("standard-classic-generals", StandardClassicGeneralPackage.CurrentVersion)]);
@@ -536,33 +553,33 @@ public static partial class StandardShanheCampaignCatalog
             EmbeddedSkillProgramCatalog.RegisterBundle(builder, "shanhe-replacements", skill => skill with { Tags = SkillTag.Locked });
             // Import current source content only when this exact recipe owns it;
             // historical expeditions without this tactic retain their registry.
-            if (RequiresCurrentFarStrikeRegistry(setup))
+            if (RequiresCurrentFarStrikeRegistry(requirements))
                 EmbeddedSkillProgramCatalog.RegisterBundle(builder, "shanhe-current-yuanji", skill => skill with
                 {
                     Tags = SkillTag.Locked,
                     CampaignTacticAcquisition = new(skill.Id, Repeatable: false)
                 });
-            if (RequiresS5ZaiqiRegistry(setup) && !RequiresFengyiBossRegistry(setup))
+            if (RequiresS5ZaiqiRegistry(requirements) && !RequiresFengyiBossRegistry(requirements))
                 EmbeddedSkillProgramCatalog.RegisterBundle(builder, "shanhe-s5-zaiqi");
-            if (RequiresCurrentJinnangJiRegistry(setup))
+            if (RequiresCurrentJinnangJiRegistry(requirements))
                 EmbeddedSkillProgramCatalog.RegisterBundle(builder, "shanhe-current-jinnangji", skill => skill with
                 {
                     Tags = SkillTag.Locked,
                     CampaignTacticAcquisition = new(skill.Id, Repeatable: false)
                 });
-            if (RequiresCurrentDuoduoYishanRegistry(setup))
+            if (RequiresCurrentDuoduoYishanRegistry(requirements))
                 EmbeddedSkillProgramCatalog.RegisterBundle(builder, "shanhe-current-duoduo-yishan", skill => skill with
                 {
                     Tags = SkillTag.Locked,
                     CampaignTacticAcquisition = new(skill.Id, Repeatable: false)
                 });
-            if (RequiresCurrentYaoliRegistry(setup))
+            if (RequiresCurrentYaoliRegistry(requirements))
                 EmbeddedSkillProgramCatalog.RegisterBundle(builder, "shanhe-current-yaoli", skill => skill with
                 {
                     Tags = SkillTag.Locked,
                     CampaignTacticAcquisition = new(skill.Id, Repeatable: false)
                 });
-            if (RequiresCurrentSlashTacticsRegistry(setup))
+            if (RequiresCurrentSlashTacticsRegistry(requirements))
                 EmbeddedSkillProgramCatalog.RegisterBundle(builder, "shanhe-current-slash-tactics", skill => skill with
                 {
                     Tags = SkillTag.Locked,

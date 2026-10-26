@@ -82,7 +82,7 @@ internal static class ShanheShopRestockChecks
 
     public static void BuyingRestockAndReplacingSkillsAreAtomicAndHonorUniqueStock()
     {
-        var tactics = Sources(2252, 2091, 2107, 2136, 2012);
+        var tactics = Sources(2252, 2091, 2107, 2136, 2012, 2291, 2292);
         var guard = new ShanheRewardDefinition("guard", "守御", SkillId: Guard);
         var alias = new ShanheRewardDefinition("guard-alias", "守御别名", SkillId: Guard);
         var raid = new ShanheRewardDefinition("raid", "突袭", SkillId: Raid);

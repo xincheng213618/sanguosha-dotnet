@@ -98,13 +98,13 @@ internal static class ShanheUnlimitedRefreshChecks
     public static void ExactPriceEconomyStockParticipatesInRestockAndQualityPromotion()
     {
         var source = Source(2230);
-        // Eight tactic identities at the existing verified seed 71 sample positions 2,6,7,3.
-        // The first source is therefore absent until a real quality roll or replenishment selects it.
+        // Five slots at seed 71 sample catalogue positions 2,6,7,3,1.
+        // Keep the source at position four so a real quality roll or replenishment must select it.
         var fillers = Enumerable.Range(1, 7).Select(index => new ShanheRewardDefinition("stock-" + index, "经济货品" + index)
             { Rarity = 1, CampaignEconomy = new(FreeShopRefreshes: 1) }).ToArray();
         var quality = new ShanheRewardDefinition("forced-quality", "定向品质检查")
             { CampaignEconomy = new(ShopTacticPromotionPercent: 100) };
-        var goods = new[] { source }.Concat(fillers).ToArray();
+        var goods = fillers.Take(3).Append(source).Concat(fillers.Skip(3)).ToArray();
         var definition = ShopDefinition(goods.Concat([Source(2252), quality]).ToArray(), goods.Select(reward =>
             new ShanheNodeChoiceDefinition("buy-" + reward.Id, reward.Name, reward.Id == Unlimited ? 9999 : 100,
                 RewardId: reward.Id, LeavesNode: false)).ToArray(), 50_000);

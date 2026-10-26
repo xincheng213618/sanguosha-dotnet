@@ -19,7 +19,7 @@ internal static class ShanheMarketChecks
         Require(published.ShopRefreshRemaining == 1 && published.ShopRefreshCost == 100,
             "A new codex shop must publish one refresh costing exactly 100 copper coins.");
         foreach (var category in new[] { "t", "s", "e", "c" })
-            Require(Items(session, category).Length is 3 or 4, "A sufficiently populated category must publish three or four real items.");
+            Require(Items(session, category).Length == 5, "A sufficiently populated category must publish five real items.");
         Require(published.ShopItems.All(item => item.Reward?.Id is not ("t0" or "s-locked" or "e-locked" or "c-unpriced" or "c-bundle")) &&
             published.ShopItems.Select(item => item.ChoiceId).Distinct(StringComparer.Ordinal).Count() == published.ShopItems.Count,
             "Owned tactics, locked skills and locked equipment must stay outside unique current stock.");

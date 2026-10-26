@@ -103,7 +103,17 @@ public sealed record CommandError(CommandErrorCode Code, string Message);
 [JsonDerivedType(typeof(UpgradeWushuangShopCommand), "wushuang-upgrade")]
 [JsonDerivedType(typeof(FinishWushuangShopCommand), "wushuang-finish")]
 [JsonDerivedType(typeof(ToggleWushuangShopLockCommand), "wushuang-lock")]
+[JsonDerivedType(typeof(BuyShanheMarketItemCommand), "shanhe-market-buy")]
+[JsonDerivedType(typeof(RefreshShanheMarketCommand), "shanhe-market-refresh")]
 public abstract record GameCommand(int ActorSeat, long ExpectedRevision);
+
+/// <summary>Buys one currently quoted expedition offer through the live battle journal.</summary>
+public sealed record BuyShanheMarketItemCommand(int ActorSeat, string ChoiceId, string? ReplaceSkillId,
+    long ExpectedRevision) : GameCommand(ActorSeat, ExpectedRevision);
+
+/// <summary>Refreshes the live expedition market without advancing the suspended battle.</summary>
+public sealed record RefreshShanheMarketCommand(int ActorSeat, long ExpectedRevision)
+    : GameCommand(ActorSeat, ExpectedRevision);
 
 /// <summary>Starts an unstarted match. ActorSeat is the trusted host (-1).</summary>
 public sealed record StartGameCommand(long ExpectedRevision = 0) : GameCommand(-1, ExpectedRevision);

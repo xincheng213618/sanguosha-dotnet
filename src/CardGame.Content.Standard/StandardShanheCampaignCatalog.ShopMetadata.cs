@@ -35,6 +35,7 @@ public static partial class StandardShanheCampaignCatalog
             .Concat(CurrentEconomyTactics.Where(source => source.RewardId != CurrentInterest2RewardId).Select(source => source.RewardId))
             .Concat([CurrentMuniuLiumaRewardId, CurrentSougua3RewardId, CurrentFenjinRewardId])
             .Concat(CurrentBuildSkillDefaultUnlockedRewardIds)
+            .Concat(StandardShanheOriginalSkills.DefaultStockRewardIds)
             .Concat(CurrentReactionTacticDefaultUnlockedRewardIds)
             .Concat(CurrentShopCardSources.Where(source => source.CodexNodeId is null).Select(source => source.RewardId))
             .Where(available.Contains).ToArray());

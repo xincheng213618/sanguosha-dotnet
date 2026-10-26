@@ -68,6 +68,7 @@ public sealed partial class ShanheCampaignSession
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(battleRegistryFactory);
+        Require(!options.PersistentMarket || options.UseCodexRewardPool, "Persistent markets require the current catalogue reward pool.");
         var rankBonuses = ShanheGeneralRanks.GetBonuses(options.PlayerRank ?? 1);
         Definition = ShanheCampaignContent.FreezeAndValidate(definition);
         ContentHash = ShanheCampaignContent.GetContentHash(Definition);
@@ -152,6 +153,8 @@ public sealed partial class ShanheCampaignSession
         };
         foreach (var id in _options.EquippedTacticIds) _state = ApplyReward(_state, _rewards[id], null, atExpeditionStart: true);
         _state = BeginOpeningSkillDraft(_state);
+        if (_options.PersistentMarket)
+            _state = EnsurePersistentMarket(_state with { AvailableNodeIds = ResolveVisibleNodeIds(_state.AvailableNodeIds) });
         _snapshot = CreateSnapshot(_state, 0);
     }
 
@@ -225,10 +228,12 @@ public sealed partial class ShanheCampaignSession
                 ConfirmShanheBossRewardCommand => ConfirmBossReward(),
                 SkipShanheRewardCommand => SkipReward(),
                 ChooseShanheNodeOptionCommand choice => ChooseOption(choice),
-                RefreshShanheShopCommand => RefreshShop(),
+                BuyShanheMarketItemCommand purchase => PreparePersistentMarketPurchase(_state, purchase.ChoiceId, purchase.ReplaceSkillId),
+                RefreshShanheShopCommand => HasPersistentMarket ? RefreshPersistentMarket(_state) : RefreshShop(_state),
                 CompleteShanheBattleCommand battle => CompleteBattle(battle),
                 _ => throw new ArgumentException("Unsupported campaign command.")
             };
+            next = EnsurePersistentMarket(next);
             var snapshot = CreateSnapshot(next, checked(Revision + 1));
             // The command records contain only primitive values and immutable checkpoint text.
             // All potentially failing validation, battle replay and projection precede commit.
@@ -252,9 +257,11 @@ public sealed partial class ShanheCampaignSession
         var node = _nodes[command.NodeId];
         var state = ClearPrimaryRewardState(_state) with
         {
-            CurrentNodeId = node.Id, AvailableNodeIds = [], PurchasedChoiceIds = [], BossRewardGroups = [],
+            CurrentNodeId = node.Id, AvailableNodeIds = [],
+            PurchasedChoiceIds = _options.PersistentMarket ? _state.PurchasedChoiceIds : [], BossRewardGroups = [],
             PendingBonusRewardGroups = []
         };
+        state = EnsurePersistentMarket(state, Math.Max(1, node.ChapterNumber));
         if (!ShanheCampaignContent.IsBattle(node.Kind))
         {
             state = state with { Phase = ShanheCampaignPhase.NodeChoice };
@@ -284,7 +291,8 @@ public sealed partial class ShanheCampaignSession
             PlayerRank = _options.PlayerRank,
             RebirthAvailable = rebirthAvailable,
             StartingResourcesExpireOnUse = Definition.StartingResourcesExpireOnUse,
-            BossTransition = encounter.BossTransition
+            BossTransition = encounter.BossTransition,
+            MarketSetup = _options.PersistentMarket ? CreateMarketSetup(state) : null
         });
         return state with { Phase = ShanheCampaignPhase.Battle, EncounterOrdinal = ordinal, EncounterId = encounter.Id, BattleSetup = setup };
     }
@@ -311,15 +319,22 @@ public sealed partial class ShanheCampaignSession
             result.ProcessingCardCount == 0 && battle.ResolutionStack.Count == 0, "The battle has not finished all of its resolutions.");
         var player = result.Players.Single(p => p.IsHuman && p.Seat == 0);
         Require(player.GeneralId == setup.PlayerGeneralId, "The completed player does not match this campaign setup.");
+        var completedMarket = _state;
+        if (setup.MarketSetup is not null)
+        {
+            var transfer = battle.CreateShanheMarketTransfer();
+            Require(transfer is not null, "The independently replayed battle lost its persistent market.");
+            completedMarket = ReadMarketTransfer(_state, transfer!);
+        }
         // Character skills may change maximum health within this battle. Only campaign
         // tactic bonuses persist between encounters; remaining health is capped at that
         // persistent maximum rather than adding the battle's growth a second time.
         var rebirthUsed = _state.RebirthUsed || setup.RebirthAvailable && battle.Events.Select(e => e.Payload)
             .OfType<SkillUsageConsumedEvent>().Any(e => e.SkillOwnerSeat == 0 && e.SkillId == ShanheGeneralRanks.RebirthSkillId &&
                 e.Scope == SkillUsageScope.Game && e.Count > 0);
-        var state = _state with
+        var state = completedMarket with
         {
-            Hp = Math.Max(0, Math.Min(player.Hp, _baseMaxHp + _state.Bonuses.MaxHp)), BattleSetup = null,
+            Hp = Math.Max(0, Math.Min(player.Hp, _baseMaxHp + completedMarket.Bonuses.MaxHp)), BattleSetup = null,
             RebirthUsed = rebirthUsed
         };
         if (result.WinnerTeamId != ShanheBattleSetup.PlayerTeamId || !player.IsAlive || player.Hp <= 0)
@@ -376,20 +391,20 @@ public sealed partial class ShanheCampaignSession
         return RestockPurchasedShopItem(state, command.ChoiceId);
     }
 
-    private RunState RefreshShop()
+    private RunState RefreshShop(RunState current)
     {
-        Require(_options.UseCodexRewardPool && _state.Phase == ShanheCampaignPhase.NodeChoice &&
-            _state.CurrentNodeId is { } id && _nodes[id].Kind == ShanheNodeKind.Shop, "There is no refreshable shop.");
-        var free = ShopFreeRefreshRemaining(_state) > 0;
-        Require(free || HasUnlimitedPaidShopRefreshes(_state) || ShopPaidRefreshRemaining(_state) > 0,
+        Require(_options.UseCodexRewardPool && current.Phase == ShanheCampaignPhase.NodeChoice &&
+            current.CurrentNodeId is { } id && _nodes[id].Kind == ShanheNodeKind.Shop, "There is no refreshable shop.");
+        var free = ShopFreeRefreshRemaining(current) > 0;
+        Require(free || HasUnlimitedPaidShopRefreshes(current) || ShopPaidRefreshRemaining(current) > 0,
             "This shop has no refreshes remaining.");
         var cost = free ? 0 : 100;
-        Require(_state.Gold >= cost, "Refreshing this shop costs 100 copper coins.");
-        var next = _state with
+        Require(current.Gold >= cost, "Refreshing this shop costs 100 copper coins.");
+        var next = current with
         {
-            Gold = checked(_state.Gold - cost), ShopRefreshCount = checked(_state.ShopRefreshCount + 1),
-            ShopFreeRefreshCount = checked(_state.ShopFreeRefreshCount + (free ? 1 : 0)),
-            ShopPaidRefreshCount = checked(_state.ShopPaidRefreshCount + (free ? 0 : 1))
+            Gold = checked(current.Gold - cost), ShopRefreshCount = checked(current.ShopRefreshCount + 1),
+            ShopFreeRefreshCount = checked(current.ShopFreeRefreshCount + (free ? 1 : 0)),
+            ShopPaidRefreshCount = checked(current.ShopPaidRefreshCount + (free ? 0 : 1))
         };
         return next with { ShopStock = CreateShopStock(next, _nodes[next.CurrentNodeId!]) };
     }
@@ -407,7 +422,7 @@ public sealed partial class ShanheCampaignSession
         Require(choice is not null && !current.PurchasedChoiceIds.Contains(choiceId, StringComparer.Ordinal), "Choose an available node option.");
         choice = WithShopPrice(current, node, choice!);
         Require(choice!.RewardId is not { } offeredId || CanReceiveReward(current, _rewards[offeredId]), "The general already has this skill; no gold, health or extra slot was spent.");
-        Require(current.Gold >= choice!.GoldCost && current.Hp > choice.HpCost, "The choice costs more gold or health than you can pay.");
+        Require(current.Gold >= choice!.GoldCost && (choice.HpCost == 0 || current.Hp > choice.HpCost), "The choice costs more gold or health than you can pay.");
         var state = current with { Gold = checked(current.Gold - choice.GoldCost), Hp = checked(current.Hp - choice.HpCost) };
         if (choice.RewardId is { } rewardId) state = ApplyReward(state, _rewards[rewardId], replaceSkillId);
         else Require(replaceSkillId is null, "This choice grants no skill to replace.");
@@ -466,7 +481,7 @@ public sealed partial class ShanheCampaignSession
         }
         return state with
         {
-            Hp = Math.Min(_baseMaxHp + bonuses.MaxHp, checked(state.Hp + reward.Heal)),
+            Hp = Math.Min(MarketMaximumHp(state with { Bonuses = bonuses }), checked(state.Hp + reward.Heal)),
             Gold = checked(state.Gold + reward.Gold + (atExpeditionStart ? reward.CampaignEconomy?.StartingGold ?? 0 : 0) +
                 EconomyEquipmentRefund(state, reward.StartingEquipment)), Bonuses = bonuses, ExtraSkillSlots = slots,
             TacticIds = reward.TacticSkillId is null && reward.OpeningSkillRewardIds is null && reward.CampaignEconomy is null ? state.TacticIds : ShanheCampaignContent.Freeze(state.TacticIds.Append(reward.Id)),
@@ -478,10 +493,11 @@ public sealed partial class ShanheCampaignSession
     private RunState FinishNode(RunState state)
     {
         var node = _nodes[state.CurrentNodeId!];
+        var nextNodes = ResolveVisibleNodeIds(node.NextNodeIds);
         return ClearPrimaryRewardState(state) with
         {
-            Phase = node.NextNodeIds.Count == 0 ? ShanheCampaignPhase.Won : ShanheCampaignPhase.Map,
-            AvailableNodeIds = node.NextNodeIds, BossRewardGroups = [], PendingBonusRewardGroups = [], BattleSetup = null,
+            Phase = nextNodes.Count == 0 ? ShanheCampaignPhase.Won : ShanheCampaignPhase.Map,
+            AvailableNodeIds = nextNodes, BossRewardGroups = [], PendingBonusRewardGroups = [], BattleSetup = null,
             CompletedNodeIds = ShanheCampaignContent.Freeze(state.CompletedNodeIds.Append(node.Id))
         };
     }
@@ -492,12 +508,14 @@ public sealed partial class ShanheCampaignSession
             AvailableChoices(state, _nodes[state.CurrentNodeId!]);
         if (state.Phase == ShanheCampaignPhase.NodeChoice && (choices.Length == 0 || _nodes[state.CurrentNodeId!].Kind == ShanheNodeKind.Shop))
             choices = [.. choices, new("$leave", _nodes[state.CurrentNodeId!].Kind == ShanheNodeKind.Shop ? "离开商店" : "继续行军")];
-        var randomShop = IsRandomShop(state);
-        var freeRefreshes = randomShop ? ShopFreeRefreshRemaining(state) : 0;
-        var paidRefreshes = randomShop ? ShopPaidRefreshRemaining(state) : 0;
+        var marketState = CanTradePersistentMarket(state) ? MarketTradeState(state) : state;
+        var randomShop = IsRandomShop(marketState);
+        var freeRefreshes = randomShop ? ShopFreeRefreshRemaining(marketState) : 0;
+        var paidRefreshes = randomShop ? ShopPaidRefreshRemaining(marketState) : 0;
         return new(Definition.Id, Definition.Name, state.Phase, revision, state.CurrentNodeId,
-            state.Hp, checked(_baseMaxHp + state.Bonuses.MaxHp), state.Gold, state.ExtraSkillSlots, state.Bonuses,
-            state.ExtraSkillIds, ShanheCampaignContent.Freeze(state.AvailableNodeIds.Select(id => _nodes[id])),
+            state.Hp, MarketMaximumHp(state), state.Gold, state.ExtraSkillSlots, state.Bonuses,
+            state.ExtraSkillIds, ShanheCampaignContent.Freeze(state.AvailableNodeIds.Select(id => _options.PersistentMarket
+                ? _nodes[id] with { NextNodeIds = ResolveVisibleNodeIds(_nodes[id].NextNodeIds) } : _nodes[id])),
             ShanheCampaignContent.Freeze(state.RewardOfferIds.Select(id => _rewards[id])), ShanheCampaignContent.Freeze(choices),
             state.CompletedNodeIds, state.BattleSetup,
             state.CurrentNodeId is { } current ? _nodes[current].StoryText : Definition.IntroText,
@@ -514,13 +532,14 @@ public sealed partial class ShanheCampaignSession
             RewardCategories = state.Phase == ShanheCampaignPhase.Reward && state.SelectedRewardCategory is null
                 ? ShanheCampaignContent.Freeze(state.CategoryRewardGroups.Select(group => group.Category)) : [],
             OpeningSkillOffers = ShanheCampaignContent.Freeze(state.OpeningSkillOfferIds.Select(id => _rewards[id])),
-            ShopItems = CreateShopItems(state, revision),
+            ShopItems = CreateShopItems(marketState, revision),
+            MarketChapterNumber = state.MarketChapterNumber,
             ShopFreeRefreshRemaining = freeRefreshes,
             ShopPaidRefreshRemaining = paidRefreshes,
-            ShopPaidRefreshUnlimited = randomShop && HasUnlimitedPaidShopRefreshes(state),
+            ShopPaidRefreshUnlimited = randomShop && HasUnlimitedPaidShopRefreshes(marketState),
             ShopRefreshRemaining = checked(freeRefreshes + paidRefreshes),
             ShopRefreshCost = randomShop && freeRefreshes == 0 ? 100 : 0,
-            ShopRestockOnPurchase = randomShop && RestocksShopOnPurchase(state),
+            ShopRestockOnPurchase = randomShop && RestocksShopOnPurchase(marketState),
             RewardSkipGold = HasPrimaryReward(state)
                 ? _nodes[state.CurrentNodeId!].RewardSkipGold : 0
         };
@@ -537,7 +556,7 @@ public sealed partial class ShanheCampaignSession
             var reward = choice.RewardId is { } id ? _rewards[id] : null;
             var purchased = state.PurchasedChoiceIds.Contains(choice.Id, StringComparer.Ordinal);
             var owned = reward is not null && !CanReceiveReward(state, reward);
-            var affordable = state.Gold >= choice.GoldCost && state.Hp > choice.HpCost;
+            var affordable = state.Gold >= choice.GoldCost && (choice.HpCost == 0 || state.Hp > choice.HpCost);
             var replacement = reward?.SkillId is not null && !owned &&
                 state.ExtraSkillIds.Count >= state.ExtraSkillSlots + reward.AddSkillSlots;
             var replacements = new List<string>();
@@ -620,7 +639,8 @@ public sealed partial class ShanheCampaignSession
 
     private IReadOnlyList<ShanheNodeChoiceDefinition> CreateShopStock(RunState state, ShanheNodeDefinition node)
     {
-        var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, node.Id + ":shop", state.ShopRefreshCount));
+        var stockSeed = state.MarketChapterNumber > 0 ? node.Id + ":market:" + state.MarketChapterNumber + ":shop" : node.Id + ":shop";
+        var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, stockSeed, state.ShopRefreshCount));
         // Preserve current supply positions and their replacement identities on whole-shop refreshes.
         var stock = RetainedShopSupplyChoices(state, node).ToList();
         var previous = state.ShopStock.Select(choice => choice.RewardId).OfType<string>().ToHashSet(StringComparer.Ordinal);
@@ -634,7 +654,7 @@ public sealed partial class ShanheCampaignSession
             random.Shuffle(candidates);
             // Prefer new faces on refresh when the real catalogue has enough stock.
             if (state.ShopRefreshCount > 0) candidates = candidates.OrderBy(reward => previous.Contains(reward.Id)).ToList();
-            foreach (var reward in candidates.Take(checked(3 + random.Next(2) + ExtraShopStock(state))))
+            foreach (var reward in candidates.Take(checked(5 + ExtraShopStock(state))))
             {
                 var authored = node.Choices!.First(choice => choice.RewardId == reward.Id && HasShopStockPrice(choice));
                 stock.Add(new($"$shop:{state.ShopRefreshCount}:{reward.Id}", reward.Name, authored.GoldCost,

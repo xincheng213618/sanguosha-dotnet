@@ -19,6 +19,83 @@ internal static class ShanheCodexSettlementChecks
     private const string Force = "fixture:shanhe-settlement-force";
     private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(new StandardContentPackage(), new StandardTeamModePackage(), new SettlementBattlePackage()));
 
+    public static void CompletedVictoryCreditsIndependentlyOfExpeditionAutosave()
+    {
+        var definition = new ShanheCampaignDefinition("fixture:shanhe-settlement", "归来", [Player], ["battle"],
+            [new("battle", "渡口守军", ShanheNodeKind.Battle, [], [new("guard", "守军", [new(Enemy)])])], []);
+        foreach (var accountInitiallyUnavailable in new[] { false, true })
+        {
+            var options = new ShanheCampaignOptions(71, Player)
+                { UseCodexRewardPool = true, ExpeditionId = Guid.NewGuid().ToString("N") };
+            var session = ShanheCampaignSession.Create(definition, options, _ => Registry.Value);
+            var progress = new FailingCampaignStore();
+            var account = new FailingCodexStore();
+            account.Write(new());
+            using var vm = new MainViewModel(false, 71, true, new MemorySaveStore(), contentRegistry: Registry.Value,
+                shanheSaveStore: progress, shanheCodexStore: account);
+            Attach(vm, session);
+            vm.RetryShanheSettlementCommand.Execute(null);
+            Program.Assert(!vm.RetryShanheSettlementCommand.CanExecute(null) && account.Read().Books == 0 &&
+                account.Read().RunRecords.Length == 0 && progress.WriteAttempts == 0,
+                "An unfinished expedition must not grant books or a terminal record, even when its settlement command is invoked directly.");
+            account.FailWrites = accountInitiallyUnavailable;
+            Accept(session, new MoveShanheNodeCommand("battle", session.Revision));
+            var battle = CreateCompletedBattle(session, "victory");
+            var balanceNotifications = 0;
+            vm.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName == nameof(MainViewModel.ShanheBookBalance)) balanceNotifications++;
+            };
+            CaptureCompletedBattle(vm, session, battle);
+            Program.Assert(session.Snapshot.Phase == ShanheCampaignPhase.Won && progress.WriteAttempts > 0 && !progress.Exists,
+                "The native victory must pass campaign finalization while its independently failing expedition journal remains unwritten.");
+            var journalAttempts = progress.WriteAttempts;
+            if (accountInitiallyUnavailable)
+            {
+                Program.Assert(vm.IsShanheSettlementPending && vm.RetryShanheSettlementCommand.CanExecute(null) &&
+                    vm.ShanheBookBalance == 0 && vm.ShanheRunRecords.Count == 0 && account.Read().ClaimedRewards.Length == 0,
+                    "A failed account write must leave its ten books and run record pending without publishing an unpaid balance.");
+                account.FailWrites = false;
+                vm.RetryShanheSettlementCommand.Execute(null);
+            }
+            var credited = account.Read();
+            Program.Assert(vm.ShanheBookBalance == 10 && credited.Books == 10 && balanceNotifications > 0 &&
+                credited.ClaimedRewards.SequenceEqual([ShanheCodexSettlement.GetSettlementKey(session)!]) &&
+                credited.RunRecords is [{ Won: true, BooksEarned: 10, Battles: 1 }] &&
+                vm.ShanheRunRecords is [{ Record.Won: true, Record.BooksEarned: 10 }] &&
+                vm.HasShanheRunRecords && !vm.IsShanheSettlementPending && !vm.RetryShanheSettlementCommand.CanExecute(null) &&
+                progress.WriteAttempts == journalAttempts,
+                "Completion or an account-only retry must persist ten books and one visible real victory record despite an unavailable expedition store.");
+            vm.RetryShanheSettlementCommand.Execute(null);
+            Program.Assert(account.Read().Books == 10 && account.Read().ClaimedRewards.Length == 1 &&
+                account.Read().RunRecords.Length == 1 && progress.WriteAttempts == journalAttempts,
+                "Repeated receipt attempts must neither duplicate the account reward nor retry the unrelated expedition journal.");
+        }
+
+        var unidentified = ShanheCampaignSession.Create(definition,
+            new ShanheCampaignOptions(71, Player) { UseCodexRewardPool = true }, _ => Registry.Value);
+        Accept(unidentified, new MoveShanheNodeCommand("battle", unidentified.Revision));
+        var unidentifiedBattle = CreateCompletedBattle(unidentified, "victory");
+        var unidentifiedAccount = new MemoryShanheCodexStore();
+        unidentifiedAccount.Write(new());
+        using var unidentifiedVm = new MainViewModel(false, 71, true, new MemorySaveStore(), contentRegistry: Registry.Value,
+            shanheSaveStore: new FailingCampaignStore(), shanheCodexStore: unidentifiedAccount);
+        CaptureCompletedBattle(unidentifiedVm, unidentified, unidentifiedBattle);
+        unidentifiedVm.RetryShanheSettlementCommand.Execute(null);
+        Program.Assert(unidentified.Snapshot.Phase == ShanheCampaignPhase.Won && unidentifiedVm.ShanheBookBalance == 0 &&
+            unidentifiedAccount.Read().Books == 0 && unidentifiedAccount.Read().ClaimedRewards.Length == 0 &&
+            unidentifiedVm.ShanheRunRecords.Count == 0 && !unidentifiedVm.IsShanheSettlementPending,
+            "Even a native victory cannot create an account receipt without the expedition identity required to prevent forged or duplicate credit.");
+    }
+
+    private static void CaptureCompletedBattle(MainViewModel vm, ShanheCampaignSession session, GameEngine battle)
+    {
+        Attach(vm, session);
+        typeof(MainViewModel).GetField("_shanheBattleGame", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(vm, battle);
+        typeof(MainViewModel).GetMethod("ReplaceEngine", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(vm, [battle]);
+        typeof(MainViewModel).GetMethod("CaptureShanheBattleResult", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(vm, null);
+    }
+
     public static void ActualCompletedVictoryCreditsOnceAndRejectsOtherOutcomes(string output)
     {
         var expeditionId = Guid.ParseExact("5fcd86829f1d44149baedee006708289", "N");
@@ -262,6 +339,13 @@ internal static class ShanheCodexSettlementChecks
 
     private static void CompleteBattle(ShanheCampaignSession session, string action)
     {
+        var battle = CreateCompletedBattle(session, action);
+        Program.Assert(session.CompleteBattle(battle, session.Revision).Accepted,
+            "Settlement fixture outcomes must pass ordinary battle finalization and independent campaign replay validation.");
+    }
+
+    private static GameEngine CreateCompletedBattle(ShanheCampaignSession session, string action)
+    {
         var setup = session.PendingBattleSetup!;
         var battle = GameEngine.CreateStandard(new()
         {
@@ -277,8 +361,8 @@ internal static class ShanheCodexSettlementChecks
         Accept(battle, new UseProgramSkillCommand(0, Force, action, [], action == "victory" ? [1] : [], battle.Revision, battle.PendingDecision!.PromptId));
         for (var step = 0; step < 40 && battle.State.Status != EngineStatus.Completed; step++)
             Accept(battle, new AdvanceOneStepCommand(battle.Revision));
-        Program.Assert(battle.State.Status == EngineStatus.Completed && session.CompleteBattle(battle, session.Revision).Accepted,
-            "Settlement fixture outcomes must pass ordinary battle finalization and independent campaign replay validation.");
+        Program.Assert(battle.State.Status == EngineStatus.Completed, "The bounded settlement fixture must reach its native battle outcome.");
+        return battle;
     }
     private static void Accept(ShanheCampaignSession session, ShanheCampaignCommand command)
     {

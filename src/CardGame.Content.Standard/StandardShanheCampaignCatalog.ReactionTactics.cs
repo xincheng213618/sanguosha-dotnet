@@ -167,6 +167,14 @@ public static partial class StandardShanheCampaignCatalog
             "体力值小于等于2时，你造成的伤害+1", RewardIdOverride: "tactic-kuangbao-current-2162"),
         new ReactionTacticSource(2163, "狂暴Ⅱ", StandardShanheLowHpDamagePackage.Kuangbao2SkillId, 500, 3, null,
             "体力值小于等于3时，你造成的伤害+1", RewardIdOverride: "tactic-kuangbao-current-2163"),
+        new ReactionTacticSource(2265, "血战Ⅱ", StandardShanheRoundRecoveryPackage.Xuezhan2SkillId, 700, 4, null,
+            "体力上限-2（最低为1），每轮开始时回复2点体力", RewardIdOverride: "tactic-xuezhan-current-2265"),
+        new ReactionTacticSource(2266, "血战Ⅲ", StandardShanheRoundRecoveryPackage.Xuezhan3SkillId, 700, 4, null,
+            "体力上限-3（最低为1），每轮开始时回复3点体力", RewardIdOverride: "tactic-xuezhan-current-2266"),
+        new ReactionTacticSource(2196, "厚实Ⅰ", StandardShanheIncomingReductionPackage.Houshi1SkillId, 300, 2, null,
+            "每轮你前2次受到的伤害-1", RewardIdOverride: "tactic-houshi-current-2196"),
+        new ReactionTacticSource(2197, "厚实Ⅱ", StandardShanheIncomingReductionPackage.Houshi2SkillId, 500, 3, 83,
+            "每轮你前3次受到的伤害-2", RewardIdOverride: "tactic-houshi-current-2197"),
     });
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentReactionTacticShopMetadata =>

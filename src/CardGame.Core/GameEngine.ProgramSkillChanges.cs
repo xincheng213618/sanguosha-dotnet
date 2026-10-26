@@ -208,4 +208,39 @@ public sealed partial class GameEngine
         PrepareProgramSkillChange(frame);
         AdvanceEventRulesAndQueueFact(fact);
     }
+
+    // Native paid rules provide their exact removable grant IDs and source.
+    // Qualification, lifetime and payment remain at the native caller.
+    private SkillGrant CommitProgramExplicitSkillSource(ProgramSkillFrame frame, SkillGrant grant,
+        IReadOnlyList<string>? revokedGrantIds = null)
+    {
+        var context = PrepareProgramSkillChange(frame);
+        _ = _contentRegistry.GetSkill(grant.SkillId);
+        if (!context.Owner.IsAlive) throw new InvalidOperationException("A skill source needs its living original owner.");
+        var revoked = (revokedGrantIds ?? []).Select(id => context.Owner.SkillGrants.Grants.SingleOrDefault(g => g.GrantId == id))
+            .OfType<SkillGrant>().ToArray();
+        if (revoked.Any(g => g.IsModeRule)) throw new InvalidOperationException("A native source replacement cannot remove a mode rule.");
+        foreach (var owner in _players) _observedSkillGrantRevisions.TryAdd(owner.Seat, owner.SkillGrants.Revision);
+        var acquired = !EnabledContentSkillIds(context.Owner).Contains(grant.SkillId, StringComparer.Ordinal);
+        foreach (var prior in revoked) context.Owner.SkillGrants.RemoveGrant(prior.GrantId);
+        if (context.Owner.SkillGrants.Grants.SingleOrDefault(g => g.GrantId == grant.GrantId) is { } existing)
+            return existing == grant ? existing : throw new InvalidOperationException("A native skill source changed its paid identity.");
+        context.Owner.SkillGrants.Grant(grant);
+        _skillBindingIndex.Invalidate(context.Owner.Seat);
+        RegisterTaggedConversionSkill(context.Owner, grant.SkillId);
+        if (acquired) AdvanceEventRulesAndQueueFact(new SkillsAcquiredEvent(context.Owner.Seat, frame.SkillId,
+            Array.AsReadOnly(new[] { grant.SkillId })));
+        return grant;
+    }
+
+    private void RemoveProgramExplicitSkillSources(ProgramSkillFrame frame, IReadOnlyList<string> grantIds)
+    {
+        var context = PrepareProgramSkillChange(frame);
+        var ids = grantIds.ToHashSet(StringComparer.Ordinal);
+        var grants = context.Owner.SkillGrants.Grants.Where(g => ids.Contains(g.GrantId)).ToArray();
+        if (grants.Any(g => g.IsModeRule)) throw new InvalidOperationException("A native source removal cannot remove a mode rule.");
+        foreach (var owner in _players) _observedSkillGrantRevisions.TryAdd(owner.Seat, owner.SkillGrants.Revision);
+        foreach (var grant in grants) context.Owner.SkillGrants.RemoveGrant(grant.GrantId);
+        _skillBindingIndex.Invalidate(context.Owner.Seat);
+    }
 }

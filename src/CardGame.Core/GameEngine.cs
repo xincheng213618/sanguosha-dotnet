@@ -360,6 +360,7 @@ public sealed partial class GameEngine
         _initialHandSize = deckDefinition.InitialHandSize;
         _drawPerTurn = deckDefinition.DrawPerTurn;
         SetupPlayers();
+        InitializeShanheBattleMarket();
         if(HasPrivateGeneralLibraryCapability)foreach(var player in _players)player.GeneralLibraryGenderQuery=GetPrivateGeneralLibraryGender;
         SetupDeck();
         _currentSeat = GetStartingSeat();
@@ -704,6 +705,8 @@ public sealed partial class GameEngine
                 RecastCardCommand recast => SubmitRecast(recast),
                 UseProgramSkillCommand program => SubmitUseProgramSkill(program),
                 UseEquipmentEffectCommand equipment => SubmitUseEquipmentEffect(equipment),
+                BuyShanheMarketItemCommand market => SubmitBuyShanheMarketItem(market),
+                RefreshShanheMarketCommand refreshMarket => SubmitRefreshShanheMarket(refreshMarket),
                 EndPlayPhaseCommand end => SubmitEndPlay(end),
                 DiscardCardsCommand discard => SubmitDiscardCards(discard),
                 AnswerPromptCommand answer => SubmitPromptAnswer(
@@ -18343,7 +18346,7 @@ public sealed partial class GameEngine
             !HasBeiMiHuTurnPreludeBoundary() && !HasQiaoZhouPreparationBoundaryFrame() && !HasForeignActualTurnStartBoundary() && !(HasActualPhaseEndBoundaryFrame() || HasRoundEndingBoundaryFrame()) && !HasProgramLifecycleBoundaryFrame() && !HasDrawPhaseObligationBoundaryFrame() && !HasManualDiscardBoundaryFrame() && !HasTurnEndingBoundaryFrame() && !HasDeferredTurnEndBoundaryFrame() &&
             !HasPlayPhaseStartingBoundaryFrame() && !HasEquipmentRecastNativeDrawBoundary() &&
             !HasCardsMovedProgramBoundaryFrame() && DrawFundedDistinctBasicObserverRoot() is null &&
-            !HasWushuangIntermissionBoundary())
+            !HasWushuangIntermissionBoundary() && !HasShanheMarketBoundary())
         {
             throw new InvalidOperationException($"A completed card resolution left frames on the stack: {string.Join(", ", _resolutionStack.Select(frame => $"{frame.Id}/{frame.Kind}/{frame.Step}"))}.");
         }
