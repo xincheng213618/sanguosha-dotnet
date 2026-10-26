@@ -582,10 +582,13 @@ public sealed partial class GameEngine
             outerWindow.Id == frame.WindowContext.ParentFrameId;
         var recoveryNested = TryDescribeRecoveryDamage(frame, targetSeat, amount, sourceReference,
             nature, sourceLess, explicitSourceSeat, out var recoveryOrigin, out var recoveryDamageWindowId);
-        if (CurrentDamageAttempt is not null && !judgmentNested && !damageWindowNested && !recoveryNested &&
+        NativeDrawThresholdDyingOrigin? drawDyingOrigin = null;
+        var drawDyingNested = frame.AttackAttempt is null && TryDescribeNativeDrawThresholdDyingDamage(frame,
+            targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat, out drawDyingOrigin);
+        if (CurrentDamageAttempt is not null && !judgmentNested && !damageWindowNested && !recoveryNested && !drawDyingNested &&
             !RuntimeHooks.AllowsNestedDamage(ProgramNestedDamageProofPhase.BeforeFactionDebts, frame, targetSeat, amount, sourceReference, nature, sourceLess) &&
             frame.FactionRecoveryDraft?.SettlingDebts != true && !RuntimeHooks.AllowsNestedDamage(ProgramNestedDamageProofPhase.AfterFactionDebts, frame, targetSeat, amount, sourceReference, nature, sourceLess) ||
-            ActiveDying is not null && !recoveryNested && !IsMobileJwShenpeiDamage(frame, targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat) ||
+            ActiveDying is not null && !recoveryNested && !drawDyingNested && !IsMobileJwShenpeiDamage(frame, targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat) ||
             _resolutionStack.LastOrDefault() is not ProgramSkillFrame current || current.Id != frame.Id ||
             amount <= 0 || !IsValidPlayerSeat(targetSeat) || !_players[targetSeat].IsAlive)
             throw new InvalidOperationException("A program damage effect requires one active program and living target.");
@@ -598,7 +601,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(current with { AttackAttempt = state,
             AttackReturn = new(parentAttackId, damageWindowNested ? frame.WindowContext!.ParentFrameId : recoveryDamageWindowId,
                 judgmentNested ? frame.WindowContext!.Judgment!.JudgmentFrameId : null)
-                { RecoveryOrigin = recoveryOrigin } });
+                { RecoveryOrigin = recoveryOrigin, NativeDrawDyingOrigin = drawDyingOrigin } });
         IDamageAttempt attack = new ProgramAttackHandle(this, frame.Id);
         if (frame.WindowContext?.Judgment is { } judgment)
         {
@@ -1295,7 +1298,8 @@ public sealed partial class GameEngine
                     !HasExactHappyGongxinParticipantSelection(frame) && !HasExactHappyHuaTuoParticipantSelection(frame) &&
                     !HasExactHappyDianWeiElaiSelection(frame) && !HasExactAnniversaryYangBiaoParticipantSelection(frame) &&
                     !HasExactAnniversaryZhangXunFollowupSelection(frame) && !HasExactMobileShiTanfengParticipantSelection(frame) &&
-                    !HasExactBoundaryAnguoRescueTarget(frame) && !HasExactShiZrFuanStrikeTarget(frame))
+                    !HasExactBoundaryAnguoRescueTarget(frame) && !HasExactShiZrFuanStrikeTarget(frame) &&
+                    !HasExactNativeDrawThresholdSelection(frame))
                     throw new InvalidOperationException("An active trigger program has an invalid cursor or context.");
                 continue;
             }

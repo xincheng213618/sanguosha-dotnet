@@ -514,6 +514,8 @@ public sealed record ProgramAttackReturn(long? ParentAttackOwnerFrameId,
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public RecoveryDamageOrigin? RecoveryOrigin { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public NativeDrawThresholdDyingOrigin? NativeDrawDyingOrigin { get; init; }
 }
 
 public sealed record RecoveryDamageOrigin(long HpWindowId, int InstructionIndex,

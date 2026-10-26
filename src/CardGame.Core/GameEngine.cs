@@ -254,7 +254,8 @@ public sealed partial class GameEngine
                     !IsOriginalDyingSuspendedByHappyGuardElai(frame) &&
                     !IsOriginalDyingSuspendedByDeathGrowth(frame) && !IsOriginalDyingSuspendedByHeJinYanhuo(frame) &&
                     !IsOriginalDyingSuspendedByHellKing(frame) && !IsOriginalDyingSuspendedByWenhePoison(frame) &&
-                    !IsOriginalDyingSuspendedByRecoveryDamage(frame) && !IsOriginalDyingSuspendedByMobileJwShenpei(frame) && !IsOriginalDyingSuspendedByDiou(frame) &&
+                    !IsOriginalDyingSuspendedByRecoveryDamage(frame) && !IsOriginalDyingSuspendedByNativeDrawThresholdDamage(frame) &&
+                    !IsOriginalDyingSuspendedByMobileJwShenpei(frame) && !IsOriginalDyingSuspendedByDiou(frame) &&
                     !IsOriginalDyingSuspendedByWuZishengMovement(frame) && !MouXiaoQiaoOl.PublicRevealSuspends(frame.Id)) return frame;
             return null;
         }

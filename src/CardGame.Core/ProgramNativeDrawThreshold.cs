@@ -13,6 +13,8 @@ public sealed record NativeDrawThresholdProgressedEvent(long InvocationId, int O
     int ActualCount, int Crossings, int RemainderAfter) : IGameEvent;
 public sealed record NativeDrawThresholdTargetChosenEvent(long ProgramFrameId, long InvocationId,
     int OccurrenceIndex, CardConversionSource Source, int TargetSeat) : IGameEvent;
+public sealed record NativeDrawThresholdDyingOrigin(long DyingFrameId, long ProducerFrameId,
+    long InvocationId, int InstructionIndex, int TargetSeat, int Amount);
 
 public sealed partial record NativeDrawInvocationProof
 {

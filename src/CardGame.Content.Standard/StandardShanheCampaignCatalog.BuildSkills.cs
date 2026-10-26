@@ -86,6 +86,8 @@ public static partial class StandardShanheCampaignCatalog
             "当你使用非转化锦囊牌时，你可以摸一张牌，若此牌是基本牌，你可以弃置此牌令你本回合手牌上限+1。"),
         new CurrentBuildSkillSource(3262, "补益", "classic:buyi", 600, 3, 62,
             "当一名角色进入濒死状态时，你可以展示其一张手牌，若为非基本牌，其弃置之并回复1点体力。"),
+        new CurrentBuildSkillSource(3136, "据守", "mobile:jushou", 100, 1, null,
+            "结束阶段开始时，你可以摸三张牌并翻面。"),
         new CurrentBuildSkillSource(3049, "青囊", "classic:qingnang", 100, 1, null,
             "出牌阶段限一次，你可以弃置一张手牌令一名角色回复1点体力。"),
         new CurrentBuildSkillSource(3052, "刚烈", "classic:ganglie", 300, 2, 43,

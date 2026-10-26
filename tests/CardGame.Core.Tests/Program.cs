@@ -370,6 +370,7 @@ var tests = new (string Name, Action Body)[]
     ("Native draw threshold: mandatory owner hand gain definition", NativeDrawThresholdDefinitionChecks.ThresholdRequiresMandatoryOwnerHandGainAndPositiveCount),
     ("Shanhe draw threshold: actual materials turns gains and late grant", ShanheDrawThresholdChecks.ActualDrawMaterialsCarryAcrossTurnsWithoutCountingGainsOrEarlierDraws),
     ("Shanhe draw threshold: large damage-triggered draw returns separate hits", ShanheDrawThresholdChecks.LargeDamageTriggeredDrawIssuesSeparateHitsAndReturnsToItsNativeParent),
+    ("Shanhe draw threshold: Niepan dying draw returns to original damage", ShanheDrawThresholdChecks.NiepanDyingDrawCrossesOneThresholdAndResumesOriginalDamage),
     ("Shanhe native rule repair: acquired Longdan play healing and dying rescue", ShanheLongdanRuleChecks.AcquiredAlcoholPeachHealsDuringPlayAndStillRescuesDying),
     ("Shanhe native rule repair: acquired Weimu black self tricks and red uses", ShanheWeimuRuleChecks.AcquiredWeimuCoversBlackSelfTricksWithoutBlockingRedCardsOrOtherTargets),
     ("Shanhe recast tactics: paid HE group returns after recovery child", ShanheRecastTacticChecks.CompletedSlashRecastsHandAndEquipmentAfterNativeRecoveryChild),

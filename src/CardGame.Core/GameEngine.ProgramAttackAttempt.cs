@@ -260,6 +260,7 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("Program damage lost its owner continuation.");
         var receipt = program.AttackReturn;
         AssertRecoveryDamageOrigin(program);
+        AssertNativeDrawThresholdDyingOrigin(program);
         CaptureSuitPreventionDamageCompleted(program, attack.DamageWasApplied);
         program = CaptureDynamicDiscardDamageCompleted(program);
         program = CaptureYintianProgramDamageCompleted(program, attack);

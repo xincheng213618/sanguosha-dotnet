@@ -6,6 +6,7 @@ using CardGame.Core.Campaigns;
 internal static class ShanheDrawThresholdChecks
 {
     private const string Tactic = "shanhe:current-shenlong-baiwei-2104", Tuxi = "classic:tuxi";
+    private const string Niepan = StandardShanheS5YuduPackage.NiepanId;
     private const string Owner = "fixture:draw-threshold-owner", Peer = "fixture:draw-threshold-peer";
     private const string Driver = "fixture:draw-threshold-driver", Quiet = "fixture:draw-threshold-quiet";
     private const string Deck = "fixture:draw-threshold-deck";
@@ -95,9 +96,50 @@ internal static class ShanheDrawThresholdChecks
         s.AssertActualMaterials();
     }
 
+    public static void NiepanDyingDrawCrossesOneThresholdAndResumesOriginalDamage()
+    {
+        foreach (var nestedVictimDies in new[] { false, true })
+        {
+            var s = Scene.Start(Profile.Niepan, nestedVictimDies);
+            Need(s.View() is { Hp: 1, MaxHp: 30 } && s.View().Skills!.Any(skill => skill.ContentId == Niepan) &&
+                s.View().Skills!.Any(skill => skill.ContentId == Tactic) &&
+                s.OwnerInvoices().Select(item => item.ActualCount).SequenceEqual([4, 2]) && s.Hits().Length == 0,
+                "The unrelated acquired owner starts with production Niepan and Shenlong Baiwei, six actual drawn materials and one real remaining HP.", s.Details());
+            Need(s.View(2).Hp == (nestedVictimDies ? 1 : 30) && s.View(3).Hp == (nestedVictimDies ? 1 : 30),
+                "Both genuine enemies have the scenario's legal initial HP, so every seeded target of the inner hit either survives or genuinely enters dying without selecting a convenient seed.");
+            var originalParent = s.HitThroughNiepan();
+            var draw = s.OwnerInvoices().Single(item => item.Reason.Value == $"skill-program.{Niepan}.{SkillProgramEffectOp.Draw}");
+            var rescue = s.Events<ProgramBindingResolvedEvent>().Single(item => item.SkillId == Niepan);
+            var hit = s.Hits();
+            Need(s.OwnerInvoices().Select(item => item.ActualCount).SequenceEqual([4, 2, 3]) &&
+                draw.ActualCount == 3 && draw.ParentFrameId == rescue.FrameId &&
+                s.Events<NativeDrawThresholdProgressedEvent>().Single(item => item.OwnerSeat == 0 && item.InvocationId == draw.InvocationId) is
+                    { RemainderBefore: 6, ActualCount: 3, Crossings: 1, RemainderAfter: 0 } &&
+                hit is [{ SourceSeat: 0, TargetSeat: 2 or 3, Amount: 1, Nature: DamageNature.Normal, SourceCardUseResolutionId: null }] &&
+                s.Events<DamageAppliedEvent>().Single(item => item.TargetSeat == 0) is { SourceSeat: 2, Amount: 1 } &&
+                s.View() is { Hp: 3, IsAlive: true, HandCount: 3 } && s.View(1).Hp == 30 &&
+                s.Events<RecoveryAppliedEvent>() is [{ SourceSeat: 0, TargetSeat: 0, Amount: 3, RemainingHp: 3 }],
+                "The real enemy-sourced lethal damage enters dying; production Niepan discards, truly draws three, recovers to three, and its ninth drawn entity produces one ordinary enemy-only threshold damage rather than dropping the opportunity during rescue.", s.Details());
+            Need(rescue is { OwnerSeat: 0, Window: SkillProgramTriggerWindow.SelfDyingResponse, Activated: true, Completed: true } &&
+                s.Events<ProgramBindingResolvedEvent>().Where(item => item.SkillId == Tactic).ToArray() is [{ Activated: true, Completed: true }] &&
+                s.Events<DyingResolvedEvent>().Count(item => item.VictimSeat == 0 && item.Survived) == 1 &&
+                (nestedVictimDies
+                    ? s.Events<DyingResolvedEvent>() is [{ VictimSeat: 2 or 3, Survived: false }, { VictimSeat: 0, Survived: true }] &&
+                        s.Events<PlayerDiedEvent>() is [{ KillerSeat: 0 }] &&
+                        s.Events<PlayerDiedEvent>()[0].VictimSeat == hit[0].TargetSeat && !s.View(hit[0].TargetSeat).IsAlive &&
+                        s.View(hit[0].TargetSeat == 2 ? 3 : 2) is { Hp: 1, IsAlive: true } && s.Game.State.Winner == Winner.None
+                    : s.Events<DyingResolvedEvent>() is [{ VictimSeat: 0, Survived: true }] && s.Events<PlayerDiedEvent>().Length == 0) &&
+                s.Events<SkillUsageConsumedEvent>().Where(item => item.SkillId == Niepan).ToArray() is [{ SkillOwnerSeat: 0, Scope: SkillUsageScope.Game, Count: 1 }] &&
+                s.Events<ProgramSkillResolvedEvent>().Single(item => item.SkillId == Driver && item.ActivationId == "hit-me") is { Completed: true } parent &&
+                parent.FrameId == originalParent && s.Game.ResolutionStack.All(frame => frame is not ProgramSkillFrame and not DyingFrame and not DamageFrame),
+                "Exactly one limited Niepan and one threshold candidate complete. When the enemy starts at one HP, its own genuine inner dying and death finish before the suspended original dying survives; another enemy remains alive. The original lethal command returns once with no rescue, damage or program frame left behind.", s.Details());
+            s.AssertActualMaterials();
+        }
+    }
+
     private static void Need(bool value, string message, object? details = null)
     { if (!value) throw new InvalidOperationException(details is null ? message : message + " " + JsonSerializer.Serialize(details)); }
-    private enum Profile { Mixed, Large, Late }
+    private enum Profile { Mixed, Large, Late, Niepan }
 
     private sealed class Scene(GameEngine game)
     {
@@ -120,13 +162,18 @@ internal static class ShanheDrawThresholdChecks
                 if (Prompt is { PlayerSeat: 0, Choices.Count: > 0 } prompt)
                 {
                     Need(prompt.Kind != DecisionKind.PlayCard, "Unexpected ordinary Play while a native draw-threshold child is pending.");
-                    var choice = prompt.Choices.FirstOrDefault(item => item.Parameters.GetValueOrDefault("program-action") ==
+                    var choice = prompt.Kind == DecisionKind.RescueDying
+                        ? prompt.Choices.SingleOrDefault(item => item.Parameters.GetValueOrDefault("response") == "let-die")
+                        : prompt.Choices.FirstOrDefault(item => item.Parameters.GetValueOrDefault("program-action") ==
                             (ReplaceNextNormalDraw ? "activate" : "decline"))
                         ?? prompt.Choices.FirstOrDefault(item => item.Parameters.GetValueOrDefault("program-action") == "select-targets" && item.Targets.SequenceEqual([2, 3]))
                         ?? prompt.Choices.FirstOrDefault(item => item.Parameters.GetValueOrDefault("response") is "pass" or "no-nullification" or "take-damage" or "take-duel-damage")
                         ?? prompt.Choices.FirstOrDefault(item => item.Cards.Count == 1)
                         ?? prompt.Choices[0];
-                    Accept(new AnswerPromptCommand(0, prompt.PromptId, choice.Id, Game.Revision));
+                    if (prompt.Kind == DecisionKind.RescueDying)
+                        Need(Game.ResolutionStack.OfType<DyingFrame>().LastOrDefault()?.VictimSeat is 2 or 3 && choice is not null,
+                            "The human explicitly declines rescue only for the real inner enemy dying window; the original owner Niepan prompt is chosen separately.", Details());
+                    Accept(new AnswerPromptCommand(0, prompt.PromptId, choice!.Id, Game.Revision));
                 }
                 else Accept(new AdvanceOneStepCommand(Game.Revision));
             }
@@ -135,6 +182,20 @@ internal static class ShanheDrawThresholdChecks
         private void Play() => Reach(() => Prompt is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
         public void Use(string activation, int[]? targets = null)
         { Accept(new UseProgramSkillCommand(0, Driver, activation, [], targets ?? [], Game.Revision, Prompt!.PromptId)); Play(); }
+        public long HitThroughNiepan()
+        {
+            Accept(new UseProgramSkillCommand(0, Driver, "hit-me", [], [2], Game.Revision, Prompt!.PromptId));
+            Reach(() => Prompt?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("response") == "program-trigger" &&
+                choice.Parameters.GetValueOrDefault("skill-id") == Niepan) == true);
+            Need(View().Hp == 0 && Game.ResolutionStack.OfType<DyingFrame>().Any(frame => frame.VictimSeat == 0),
+                "A real sourced one-point damage reaches the native dying prompt before Niepan is chosen.", Details());
+            var parent = Game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Driver && frame.ActivationId == "hit-me").Id;
+            var choice = Prompt!.Choices.Single(item => item.Parameters.GetValueOrDefault("response") == "program-trigger" &&
+                item.Parameters.GetValueOrDefault("skill-id") == Niepan);
+            Accept(new AnswerPromptCommand(0, Prompt.PromptId, choice.Id, Game.Revision));
+            Play();
+            return parent;
+        }
         public void NextOwnPlay()
         {
             var turn = Game.State.TurnNumber;
@@ -150,12 +211,17 @@ internal static class ShanheDrawThresholdChecks
                     .Select(move => move.CardId).Distinct().Count() == item.ActualCount),
                 "Every counted invoice occurs once and its ActualCount equals distinct real DrawPile-to-owner material movements.", Details());
         }
-        public static Scene Start(Profile profile)
+        public static Scene Start(Profile profile, bool nestedVictimDies = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new StandardShanheDrawThresholdPackage(), new Fixture(profile));
-            var setup = new ShanheBattleSetup(83, 1, "fixture:draw-threshold", Owner, 30, 0, 0, 0, 0,
-                profile == Profile.Mixed ? [Tuxi] : [], [new(CardKind.Peach, Suit.Heart, 7)], [],
-                [new(Peer) { StartingHand = [] }, new(Peer) { StartingHand = [] }], [new(Peer) { StartingHand = [] }], new string('9', 64))
+            var registry = profile == Profile.Niepan
+                ? ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(includeJijiu: true),
+                    new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(),
+                    new StandardShanheS5YuduPackage(), new StandardShanheDrawThresholdPackage(), new Fixture(profile))
+                : ContentRegistry.Build(new StandardContentPackage(), new StandardShanheDrawThresholdPackage(), new Fixture(profile));
+            var setup = new ShanheBattleSetup(83, 1, "fixture:draw-threshold", Owner, profile == Profile.Niepan ? 1 : 30, 0, 0, 0, 0,
+                profile == Profile.Mixed ? [Tuxi] : profile == Profile.Niepan ? [Niepan] : [], [new(CardKind.Peach, Suit.Heart, 7)], [],
+                [new(Peer, Hp: nestedVictimDies ? 1 : null) { StartingHand = [] }, new(Peer, Hp: nestedVictimDies ? 1 : null) { StartingHand = [] }],
+                [new(Peer) { StartingHand = [] }], new string('9', 64))
                 { TacticSkillIds = profile == Profile.Late ? [] : [Tactic] };
             var scene = new Scene(GameEngine.CreateStandard(new()
             {
@@ -172,7 +238,7 @@ internal static class ShanheDrawThresholdChecks
         public PackageManifest Manifest { get; } = new("fixture-shanhe-draw-threshold", new(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
-            CharacterFixtureContent.Register(builder, "classic:zhang-liao");
+            if (profile != Profile.Niepan) CharacterFixtureContent.Register(builder, "classic:zhang-liao");
             var afterDamage = profile == Profile.Large ? "," + """
                 {"id":"draw-after-damage","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamage","optional":false,"usageScope":"game","usageLimit":1,
                  "effects":[{"op":"draw","target":"owner","amount":20}]}
@@ -188,7 +254,7 @@ internal static class ShanheDrawThresholdChecks
                     {"id":"obtain-one","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"revealTopCards","target":"owner","amount":1,"resultBind":"ordinary-gain","visibility":"public"},{"op":"moveBoundCards","target":"owner","sourceBind":"ordinary-gain","destination":"ownerHand"}]},
                     {"id":"recast-one","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"selectOwnedCards","target":"owner","minimumCards":1,"maximumCards":1,"zones":["hand"],"resultBind":"recast"},{"op":"recastBoundCards","target":"owner","sourceBind":"recast"}]},
                     {"id":"hit-me","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"owner","sourceRef":{"kind":"selectedTarget"},"amount":1}]}],
-                   "triggers":[{"id":"opening-real-draw","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"draw","target":"owner","amount":{{{(profile == Profile.Large ? 6 : 3)}}}}]}{{{afterDamage}}}]},
+                   "triggers":[{"id":"opening-real-draw","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"draw","target":"owner","amount":{{{(profile == Profile.Large ? 6 : profile == Profile.Niepan ? 4 : 3)}}}}]}{{{afterDamage}}}]},
                   {"id":"{{{Quiet}}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}
                 ]}
                 """;

@@ -131,6 +131,22 @@ public sealed partial class GameEngine
         return BeginProgramSkillDamage(active, target, amount);
     }
 
+    private bool HasExactNativeDrawThresholdSelection(ProgramSkillFrame frame)
+    {
+        if (frame.TriggerId is null || frame.InstructionIndex != 1 || frame.SelectedTargetSeats is not [var target] ||
+            frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained,
+                MovementBatch: { NativeDrawInvocation: { } proof } batch } context ||
+            !UsesNativeDrawThreshold(GetProgramTrigger(frame)) ||
+            _resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(item => item.Id == context.ParentFrameId) is not { } movement ||
+            movement.Batch != batch || movement.CandidateIndex < 0 || movement.CandidateIndex >= movement.Candidates.Count ||
+            !MountObserverCandidateMatches(frame, movement.Candidates[movement.CandidateIndex]) ||
+            MatchingNativeDrawThresholdProgress(batch, movement.Candidates[movement.CandidateIndex]) is not { } progress)
+            return false;
+        return ProgramEventHistory<NativeDrawThresholdTargetChosenEvent>().Where(item => item.ProgramFrameId == frame.Id).ToArray()
+            is [var chosen] && chosen.InvocationId == proof.InvocationId && chosen.OccurrenceIndex == context.OccurrenceIndex &&
+            chosen.Source == progress.Source && chosen.TargetSeat == target;
+    }
+
     private bool NativeDrawThresholdProgramProducerMatches(ProgramSkillFrame producer,
         CardsMovedTriggerWindowFrame movement, NativeDrawInvocationProof proof)
     {
