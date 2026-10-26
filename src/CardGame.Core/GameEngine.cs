@@ -15912,6 +15912,7 @@ public sealed partial class GameEngine
                   (item.modifier.Condition switch
                   {
                       SkillProgramDamageModifierCondition.Always => true,
+                      SkillProgramDamageModifierCondition.OwnerUsedFromRound => _roundNumber >= item.modifier.MinimumRound,
                       SkillProgramDamageModifierCondition.SourceOutsideTargetAttackRange =>
                           !IsWithinAttackRange(attack.TargetSeat, attack.SourceSeat),
                       SkillProgramDamageModifierCondition.SourceNotFewerHandAndEquipmentThanTarget =>
@@ -15930,8 +15931,9 @@ public sealed partial class GameEngine
                           !attack.IsSourceLess && MatchesSlashUseOrdinalModifier(item.modifier, attack, attack.CardUserSeat, kind),
                       _ => false
                   }))))
+            .Where(item => ProgramDamageModifierAmount(item.modifier) != 0)
             .SelectMany(item => Enumerable.Repeat((new CardUseEffectSource(item.instance.SkillId, item.modifier.Id,
-                item.seat, item.instance.SkillInstanceId), ShanheS5JiaoziModifierAmount(item.modifier)),
+                item.seat, item.instance.SkillInstanceId), ProgramDamageModifierAmount(item.modifier)),
                 ClassicJiaoziDamageOccurrences(item.modifier, attack.SourceSeat, attack.TargetSeat, attack.IsSourceLess)))
             .ToArray();
     }

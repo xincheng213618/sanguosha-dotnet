@@ -8,6 +8,9 @@ public static partial class StandardShanheCampaignCatalog
     public static IReadOnlyList<ShanheSchoolDefinition> CurrentSchools => SchoolMetadata.Definitions;
     public static IReadOnlyDictionary<int, ShanheTacticSchoolMembership> CurrentTacticSchoolMembershipBySourceId => SchoolMetadata.Members;
 
+    private static ShanheCampaignDefinition WithRemainingSchoolComponents(ShanheCampaignDefinition definition) =>
+        WithCurrentTeamHealthTactic(WithCurrentLateRoundTactics(definition));
+
     private static ShanheCampaignDefinition WithCurrentSchools(ShanheCampaignDefinition definition)
     {
         if (!definition.Id.StartsWith("shanhe:zhuhou-2026-", StringComparison.Ordinal)) return definition;

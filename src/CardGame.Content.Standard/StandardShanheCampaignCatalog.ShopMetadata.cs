@@ -36,6 +36,8 @@ public static partial class StandardShanheCampaignCatalog
             .Concat([CurrentMuniuLiumaRewardId, CurrentSougua3RewardId, CurrentFenjinRewardId, CurrentSanbanfuRewardId])
             .Concat(CurrentBuildSkillDefaultUnlockedRewardIds)
             .Concat(CurrentMiaoshouDefaultUnlockedRewardIds)
+            .Concat(CurrentLateRoundTacticDefaultUnlockedRewardIds)
+            .Append("tactic-duijia-2026")
             .Concat(StandardShanheOriginalSkills.DefaultStockRewardIds)
             .Concat(CurrentReactionTacticDefaultUnlockedRewardIds)
             .Concat(CurrentShopCardSources.Where(source => source.CodexNodeId is null).Select(source => source.RewardId))
@@ -131,6 +133,7 @@ public static partial class StandardShanheCampaignCatalog
                 ["tactic-mouming"] = new(2301, 300, 2, "战法"),
                 ["tactic-xiaoming"] = new(2300, 500, 3, "战法"),
                 ["tactic-duichu-2026"] = new(2202, 200, 1, "战法"),
+                ["tactic-duijia-2026"] = new(2200, 300, 2, "战法"),
                 ["tactic-duisha-2026"] = new(2329, 200, 1, "战法"),
                 [CurrentFarStrikeRewardId] = new(2129, 200, 1, "战法"),
                 ["tactic-jiban-2026"] = new(2204, 300, 2, "战法"),
@@ -166,6 +169,8 @@ public static partial class StandardShanheCampaignCatalog
                 ["codex-card-4107"] = new(4107, 200, 2, "牌", CardKind.Lightning, Suit.Heart, 1)
             }.Concat(CurrentBuildSkillShopMetadata)
                 .Concat(CurrentMiaoshouShopMetadata)
+                .Concat(CurrentLateRoundTacticShopMetadata)
+                .Concat(CurrentTeamHealthShopMetadata)
                 .Concat(CurrentReactionTacticShopMetadata)
                 .Concat(CurrentShopCardMetadata)
                 .Concat(CurrentEconomyTactics.Select(source => new KeyValuePair<string, ShanheShopMetadata>(source.RewardId,

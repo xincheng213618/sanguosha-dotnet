@@ -18,7 +18,8 @@ internal sealed class ShanheBattleFeature(ShanheBattleSetup setup, IStandardBatt
             setup.EnemyRoster[seat - setup.AllyRoster.Count - 1];
         var bonus = query switch
         {
-            SkillRuleQuery.InitialHandSize => member.InitialHandBonus,
+            SkillRuleQuery.InitialHandSize => member.InitialHandBonus +
+                (seat > 0 && seat <= setup.AllyRoster.Count ? ShanheTeamRankPrograms.EntryBonuses(setup).InitialHand : 0),
             SkillRuleQuery.DrawCount => member.DrawBonus,
             SkillRuleQuery.SlashLimit => member.SlashBonus,
             _ => 0

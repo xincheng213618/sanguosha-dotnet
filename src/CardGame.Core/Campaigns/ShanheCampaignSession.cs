@@ -332,8 +332,7 @@ public sealed partial class ShanheCampaignSession
         // tactic bonuses persist between encounters; remaining health is capped at that
         // persistent maximum rather than adding the battle's growth a second time.
         var rebirthUsed = _state.RebirthUsed || setup.RebirthAvailable && battle.Events.Select(e => e.Payload)
-            .OfType<SkillUsageConsumedEvent>().Any(e => e.SkillOwnerSeat == 0 && e.SkillId == ShanheGeneralRanks.RebirthSkillId &&
-                e.Scope == SkillUsageScope.Game && e.Count > 0);
+            .OfType<SkillUsageConsumedEvent>().Any(e => ShanheTeamRankPrograms.IsExpeditionRebirthUsage(setup, e));
         var state = completedMarket with
         {
             Hp = Math.Max(0, Math.Min(player.Hp, _baseMaxHp + completedMarket.Bonuses.MaxHp)), BattleSetup = null,

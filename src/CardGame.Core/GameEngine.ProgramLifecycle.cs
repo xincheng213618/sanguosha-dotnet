@@ -524,6 +524,9 @@ public sealed partial class GameEngine
     }
 
     private void ChangeProgramMaximumHp(ProgramSkillFrame frame, int amount, string? sourceSkillId = null)
+        => ChangeProgramParticipantMaximumHp(frame, frame.OwnerSeat, amount, sourceSkillId);
+
+    private void ChangeProgramParticipantMaximumHp(ProgramSkillFrame frame, int recipientSeat, int amount, string? sourceSkillId = null)
     {
         var active = GetActiveProgramFrame(frame.Id);
         if (active.OwnerSeat != frame.OwnerSeat || active.SkillId != frame.SkillId ||
@@ -532,7 +535,7 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("Maximum-HP mutation requires the active program binding.");
         }
 
-        var owner = _players[frame.OwnerSeat];
+        var owner = _players[recipientSeat];
         var previous = owner.MaxHp;
         if (sourceSkillId is not null && sourceSkillId != frame.SkillId &&
             !HasRuntimeSkillInstance(owner, sourceSkillId, GetRuntimeSkillInstanceId(owner, sourceSkillId)))

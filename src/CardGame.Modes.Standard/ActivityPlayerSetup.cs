@@ -150,6 +150,7 @@ internal sealed partial class StandardModeSetupFeature
         {
             var member = members[seat];
             var general = GeneralPool.Single(g => g.Id == member.GeneralId);
+            var sharedHp = seat > 0 && seat <= setup.AllyRoster.Count ? ShanheTeamRankPrograms.EntryBonuses(setup).MaxHp : 0;
             var team = seat <= setup.AllyRoster.Count ? ShanheBattleSetup.PlayerTeamId : ShanheBattleSetup.EnemyTeamId;
             var grants = new List<ModeSetupSkillGrant>();
             foreach (var id in member.ExtraSkillIds ?? [])
@@ -170,8 +171,8 @@ internal sealed partial class StandardModeSetupFeature
                 }
             }
             players.Add(new(seat, seat == 0 ? "你" : $"{(team == ShanheBattleSetup.PlayerTeamId ? "同行" : "敌军")} · {general.Name}",
-                seat == _options.HumanSeat, TeamRole(team), general.Id, general.BaseHp + member.MaxHpBonus,
-                member.Hp ?? general.InitialHp ?? general.BaseHp + member.MaxHpBonus)
+                seat == _options.HumanSeat, TeamRole(team), general.Id, general.BaseHp + member.MaxHpBonus + sharedHp,
+                (member.Hp ?? general.InitialHp ?? general.BaseHp + member.MaxHpBonus) + sharedHp)
             { TeamId = team, TeamRevealed = true, RoleRevealed = true, GeneralSelected = true, GeneralRevealed = true, SkillGrants = grants });
         }
         return new(players, [], []);

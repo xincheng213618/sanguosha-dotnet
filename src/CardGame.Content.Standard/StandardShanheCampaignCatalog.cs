@@ -221,6 +221,8 @@ public static partial class StandardShanheCampaignCatalog
         var reactionTactics = RequiresReactionTacticsRegistry(requirements);
         var thirdSlashTactics = RequiresCurrentThirdSlashRegistry(requirements);
         var miaoshouTactic = RequiresCurrentMiaoshouRegistry(requirements);
+        var lateRoundTactics = RequiresCurrentLateRoundTacticsRegistry(requirements);
+        var teamHealthTactic = RequiresCurrentTeamHealthRegistry(requirements);
         var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
@@ -334,6 +336,8 @@ public static partial class StandardShanheCampaignCatalog
             (reactionTactics ? "/current-reaction-tactics" : "") +
             (thirdSlashTactics ? "/current-third-slash-tactics" : "") +
             (miaoshouTactic ? "/current-miaoshou" : "") +
+            (lateRoundTactics ? "/current-late-round-tactics" : "") +
+            (teamHealthTactic ? "/current-team-health" : "") +
             (wealthTactics ? "/current-wealth-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
@@ -392,6 +396,8 @@ public static partial class StandardShanheCampaignCatalog
                 packages.Add(new StandardShanheSchoolDrawPackage());
                 packages.Add(new StandardShanheSchoolVitalPackage());
                 packages.Add(new StandardShanheSchoolTrickPackage());
+                packages.Add(new StandardShanheSchoolLatePackage());
+                packages.Add(new StandardShanheSchoolTeamPackage());
             }
             if (setup.MarketSetup is not null) packages.Add(new StandardShanheMarketPackage());
             if (currentDingcuo) packages.Add(new StandardShanheDingcuoPackage());
@@ -401,6 +407,8 @@ public static partial class StandardShanheCampaignCatalog
             if (buildTactics) packages.Add(new StandardShanheBuildTacticsPackage());
             if (thirdSlashTactics) packages.Add(new StandardShanheThirdSlashPackage());
             if (miaoshouTactic) packages.Add(new StandardShanheMiaoshouPackage());
+            if (lateRoundTactics) packages.Add(new StandardShanheLateRoundTacticsPackage());
+            if (teamHealthTactic) packages.Add(new StandardShanheTeamHealthPackage());
             if (reactionTactics)
             {
                 packages.Add(new StandardShanheArmorTacticsPackage());

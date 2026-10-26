@@ -217,6 +217,7 @@ public enum SkillProgramDiscardOwnerScope { Other = 0, Own = 1 }
 public enum SkillProgramDamageModifierExpiration { CurrentTurnEnd = 0, NextOwnerTurnStart = 1 }
 public enum SkillProgramDamageModifierSourceScope { OwnerUsed = 0, DamageSource = 1, DamageParticipant = 2, AllLivingSkillOwners = 3 }
 public enum SkillProgramDamageLayer { AdditionalDamage = 0, CardDamage = 1 }
+public enum SkillProgramDamageAmountExpression { Literal = 0, CompletedRoundCount = 1 }
 public enum SkillProgramDamageModifierCondition
 {
     Always = 0,
@@ -239,7 +240,8 @@ public enum SkillProgramDamageModifierCondition
     SourceRoundIsEven = 1040,
     DirectSkillDamage = 1041,
     SourceHpAtMost = 1042,
-    OwnerGameSlashUseOrdinalMultipleOfThree = 1043
+    OwnerGameSlashUseOrdinalMultipleOfThree = 1043,
+    OwnerUsedFromRound = 1044
 }
 public sealed record SkillProgramDamageModifier(
     string Id, IReadOnlyList<CardKind> CardKinds, int Amount,
@@ -257,6 +259,10 @@ public sealed record SkillProgramDamageModifier(
     public int? DistanceThreshold { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaximumHp { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public SkillProgramDamageAmountExpression AmountExpression { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? MinimumRound { get; init; }
 }
 public sealed record SkillProgramChoiceOption(string Id, SkillProgramCondition Condition)
 {
@@ -936,6 +942,8 @@ public enum SkillProgramEffectOp
     DamageRandomEnemyAtDrawThreshold = 62022,
     SetShanheSchoolHpToMaximum = 62023,
     RepeatCurrentDamageTrick = 62024,
+    ApplyShanheSchoolTeamRank = 62025,
+    ApplyShanheAlliedHealthBonus = 62026,
     RecastBoundCard = 3100,
     PayHpToGrantOneUseDamageShield = 3000,
     DrawThenDiscardHandToMaximumHp = 2900,
@@ -2709,6 +2717,8 @@ public sealed class SkillProgramModifier
     public PlayerMarkerKind? ValueMarker { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? ValueMultiplier { get; internal init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? MinimumRound { get; internal init; }
     [JsonIgnore]
     public IReadOnlyList<SkillRuleQueryDependency> QueryDependencies => ValueExpression == SkillRuleValueExpression.OwnerMarkerCount
         ? [SkillRuleQueryDependency.MarkerState] : [];
@@ -4074,7 +4084,7 @@ public sealed class SkillProgramCatalog
     private static SkillProgramDamageModifier ParseDamageModifier(JsonElement node, string path)
     {
         RequireObject(node, path);
-        CheckProperties(node, path, "id", "cardKinds", "amount", "condition", "sourceScope", "capsToAmount", "damageLayer", "maximumUseOrdinal", "sourceHandCountLimit", "distanceThreshold", "maximumHp");
+        CheckProperties(node, path, "id", "cardKinds", "amount", "condition", "sourceScope", "capsToAmount", "damageLayer", "maximumUseOrdinal", "sourceHandCountLimit", "distanceThreshold", "maximumHp", "amountExpression", "minimumRound");
         var condition = EnumValue<SkillProgramDamageModifierCondition>(node, "condition", path);
         var scope = node.TryGetProperty("sourceScope", out _)
             ? EnumValue<SkillProgramDamageModifierSourceScope>(node, "sourceScope", path)
@@ -4200,6 +4210,16 @@ public sealed class SkillProgramCatalog
             Fail(path + ".sourceScope", "card damage modifiers require ownerUsed");
         var damageLayer = node.TryGetProperty("damageLayer", out _)
             ? EnumValue<SkillProgramDamageLayer>(node, "damageLayer", path) : SkillProgramDamageLayer.AdditionalDamage;
+        var minimumRound = node.TryGetProperty("minimumRound", out _)
+            ? PositiveInt(node, "minimumRound", path) : (int?)null;
+        if (condition == SkillProgramDamageModifierCondition.OwnerUsedFromRound)
+        {
+            if (minimumRound is not (>= 1 and <= 1000) || scope != SkillProgramDamageModifierSourceScope.OwnerUsed ||
+                damageLayer != SkillProgramDamageLayer.CardDamage || !ProgramCardKindMatch.IsFullSlashFamily(kinds) || capsToAmount)
+                Fail(path, "round-gated Slash damage requires ownerUsed, cardDamage, the full Slash family and minimumRound between 1 and 1000");
+        }
+        else if (minimumRound is not null)
+            Fail(path + ".minimumRound", "requires ownerUsedFromRound damage");
         if (condition == SkillProgramDamageModifierCondition.OwnerMaximumHandCurrentRound &&
             (amount != 1 || capsToAmount || damageLayer != SkillProgramDamageLayer.AdditionalDamage))
             Fail(path, "maximum-hand round damage requires amount 1, additionalDamage and no cap");
@@ -4214,16 +4234,23 @@ public sealed class SkillProgramCatalog
                 SkillProgramDamageModifierCondition.OwnerGameSlashUseOrdinalMultipleOfThree) &&
             damageLayer != SkillProgramDamageLayer.CardDamage)
             Fail(path + ".damageLayer", "Slash-use ordinal modifiers require cardDamage");
+        var amountExpression = node.TryGetProperty("amountExpression", out _)
+            ? EnumValue<SkillProgramDamageAmountExpression>(node, "amountExpression", path)
+            : SkillProgramDamageAmountExpression.Literal;
+        if (amountExpression == SkillProgramDamageAmountExpression.CompletedRoundCount &&
+            (condition != SkillProgramDamageModifierCondition.OwnerRoundSlashUseOrdinalWithinLimit || maximumUseOrdinal != 1 ||
+             scope != SkillProgramDamageModifierSourceScope.OwnerUsed || damageLayer != SkillProgramDamageLayer.CardDamage || capsToAmount))
+            Fail(path + ".amountExpression", "completed-round damage requires the first native Slash of a round and the card-damage layer");
         return new SkillProgramDamageModifier(Identifier(node, "id", path), kinds, amount, condition, scope, capsToAmount)
             { DamageLayer = damageLayer, MaximumUseOrdinal = maximumUseOrdinal, SourceHandCountLimit = sourceHandCountLimit,
-              DistanceThreshold = distanceThreshold, MaximumHp = maximumHp };
+              DistanceThreshold = distanceThreshold, MaximumHp = maximumHp, AmountExpression = amountExpression, MinimumRound = minimumRound };
     }
 
     private static SkillProgramModifier ParseModifier(JsonElement node, string path)
     {
         RequireObject(node, path);
         CheckProperties(node, path, "id", "query", "operation", "value", "valueExpression", "valueZone", "valueMarker", "valueMultiplier", "recipientScope",
-            "priority", "sourceCardIdentityId", "cardKinds", "condition");
+            "priority", "sourceCardIdentityId", "cardKinds", "condition", "minimumRound");
         var id = Identifier(node, "id", path);
         var query = EnumValue<SkillRuleQuery>(node, "query", path);
         var operation = EnumValue<SkillRuleOperation>(node, "operation", path);
@@ -4358,9 +4385,15 @@ public sealed class SkillProgramCatalog
              valueExpression is not null || priority != 0 || condition.Kind != SkillProgramConditionKind.Always ||
              sourceCardIdentityId is not null || node.TryGetProperty("cardKinds", out _)))
             Fail(path + ".recipientScope", "otherPublicTeamAllies requires an unconditional positive fixed additive drawCount or slashLimit modifier");
+        var minimumRound = node.TryGetProperty("minimumRound", out _)
+            ? PositiveInt(node, "minimumRound", path) : (int?)null;
+        if (minimumRound is not null && (minimumRound is < 1 or > 1000 || query != SkillRuleQuery.SlashLimit ||
+            operation != SkillRuleOperation.Add || recipientScope != SkillRuleRecipientScope.Owner || valueExpression is not null ||
+            value is < 1 or > 20 || sourceCardIdentityId is not null))
+            Fail(path + ".minimumRound", "round-gated modifiers require a fixed positive owner Slash-limit addition and a round between 1 and 1000");
         return new SkillProgramModifier(id, query, operation, value, valueExpression, valueZone, priority,
             sourceCardIdentityId, cardKinds, condition)
-            { ValueMarker = valueMarker, ValueMultiplier = valueMultiplier, RecipientScope = recipientScope };
+            { ValueMarker = valueMarker, ValueMultiplier = valueMultiplier, RecipientScope = recipientScope, MinimumRound = minimumRound };
     }
 
     private static SkillProgramCardIdentity ParseCardIdentity(JsonElement node, string path)

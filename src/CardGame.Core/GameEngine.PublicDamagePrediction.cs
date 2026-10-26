@@ -150,6 +150,7 @@ public sealed partial class GameEngine
                         kind is { } effective && ProgramCardKindMatch.MatchesDamageModifier(modifier, effective) && (modifier.Condition switch
                         {
                             SkillProgramDamageModifierCondition.Always => true,
+                            SkillProgramDamageModifierCondition.OwnerUsedFromRound => _roundNumber >= modifier.MinimumRound,
                             SkillProgramDamageModifierCondition.SourceHandBelowLimit =>
                                 Math.Max(0, source.HandCount - paidHandCards) < modifier.SourceHandCountLimit,
                             SkillProgramDamageModifierCondition.SourceNotFewerHandAndEquipmentThanTarget =>
@@ -165,8 +166,8 @@ public sealed partial class GameEngine
                         });
                 if (!eligible) continue;
                 if (cardUse && modifier.DamageLayer == SkillProgramDamageLayer.CardDamage)
-                    cardLayer = checked(cardLayer + modifier.Amount);
-                else additional = checked(additional + modifier.Amount);
+                    cardLayer = checked(cardLayer + ProgramDamageModifierAmount(modifier));
+                else additional = checked(additional + ProgramDamageModifierAmount(modifier));
             }
         }
         if (!finalized && issuedAttack is { } originalAttack)
