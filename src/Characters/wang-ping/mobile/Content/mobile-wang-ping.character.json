@@ -1,0 +1,29 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:wang-ping",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 82199,
+      "pools": {
+        "current": 82199
+      },
+      "definition": {
+        "id": "mobile:wang-ping",
+        "name": "王平·移动版",
+        "portraitKey": "mobile-wang-ping",
+        "skillId": "classic:feijun",
+        "additionalSkillIds": [
+          "classic:binglue"
+        ],
+        "factionId": "shu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:wang-ping",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

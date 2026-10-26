@@ -1,0 +1,15 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhuge-guo",
+  "skills": [
+    { "registrationOrder": 81800, "programBundle": "mobile-zhuge-guo", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:qirang", "name": "祈禳", "description": "有装备牌进入你的装备区后，你可以从牌堆中获得一张锦囊牌；你使用以此法获得的锦囊牌无距离限制并摸一张牌。", "executionForms": "Trigger" } },
+    { "registrationOrder": 81801, "programBundle": "mobile-zhuge-guo", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:yuhua", "name": "羽化", "description": "锁定技，你的非基本牌不计入你的手牌上限。结束阶段，若你的手牌数大于体力值，你观看牌堆顶的X张牌（X为你的手牌类别数），将其中任意数量的牌置于牌堆顶，然后将其余的牌置于牌堆底。", "tags": "Locked", "executionForms": "Trigger" } }
+  ],
+  "generals": [ { "registrationOrder": 81899, "pools": { "current": 81899 }, "definition": {
+    "id": "mobile:zhuge-guo", "name": "诸葛果·移动版", "portraitKey": "mobile-zhuge-guo", "skillId": "mobile:qirang", "additionalSkillIds": ["mobile:yuhua"],
+    "factionId": "shu", "baseHp": 3, "gender": "Female", "characterId": "character:zhuge-guo", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } } ]
+}

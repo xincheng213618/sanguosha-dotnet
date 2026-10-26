@@ -1819,7 +1819,9 @@ public enum SkillProgramEffectOp
     ResolveMobileJiKangQingxian = 80900,
     ResolveMobileJiKangJuexiang = 80901,
     TransferMobileWangCanXi = 81500,
-    ResolveMobileWangCanXiRecovery = 81501
+    ResolveMobileWangCanXiRecovery = 81501,
+    ObtainMobileQirangTrick = 81800,
+    InspectMobileYuhuaTop = 81801
 }
 public enum SkillProgramEffectTarget { Owner, Actor, SelectedTarget, SelectedTargets, HpPairHigher = 2000, HpPairLower = 2001, Activator = 2002 }
 public enum SkillProgramTurnPhase { Judgment, Draw, Play, Discard }

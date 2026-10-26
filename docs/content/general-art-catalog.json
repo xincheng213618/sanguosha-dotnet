@@ -23509,6 +23509,91 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-guo-huanghou",
+      "characterName": "郭皇后",
+      "defaultSkinId": "38000",
+      "skins": [
+        {
+          "id": "38000",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-217.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/38000.jpg",
+          "sha256": "62a6d792faaaa74b1a850cd577c777b279e6a27b748b148f9d59dddd0e296706",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-guo-huanghou.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhuge-guo",
+      "characterName": "诸葛果",
+      "defaultSkinId": "3000101",
+      "skins": [
+        {
+          "id": "3000101",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-302.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/3000101.jpg",
+          "sha256": "10635fd1b3eea837b2b1ab94e9f9575a7bd4fec0abfbf4d06aff0a13882d8706",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhuge-guo.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-yan-yan",
+      "characterName": "严颜",
+      "defaultSkinId": "41600",
+      "skins": [
+        {
+          "id": "41600",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-249.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/41600.jpg",
+          "sha256": "eace93b2d90bc2d2c1cbf6f0e34076861db2a1c06e68cfd313054d05ef4bce23",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-yan-yan.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhang-xiu",
+      "characterName": "张绣",
+      "defaultSkinId": "46500",
+      "skins": [
+        {
+          "id": "46500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-344.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/46500.jpg",
+          "sha256": "902d26fe95ea48e922343ea40c4114ffed42577704c35ca1c3f02ddb9c902fbd",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhang-xiu.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-wang-ping",
+      "characterName": "王平",
+      "defaultSkinId": "41700",
+      "skins": [
+        {
+          "id": "41700",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-250.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/41700.jpg",
+          "sha256": "18b6f32f8c3d35c757c0738d8dab226ddbba50f52468a8fc639cfc037e4efefa",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-wang-ping.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

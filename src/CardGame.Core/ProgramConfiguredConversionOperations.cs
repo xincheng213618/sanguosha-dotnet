@@ -1,4 +1,9 @@
 namespace CardGame.Core;
+public sealed partial class SkillProgramEffect
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public int? SelfDeclarationFromTier { get; internal init; }
+}
 
 internal interface IConfiguredConversionProgramHost
 {
@@ -14,11 +19,13 @@ internal sealed class DeclareBoundCardNameUntilTurnEndProgramDescriptor : Progra
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.ChooseOption, static (_, _) => { });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "sourceBind", "stateId", "condition");
+        r.AllowOnly("op", "target", "sourceBind", "stateId", "selfDeclarationFromTier", "condition");
         if (r.RequiredEnum<SkillProgramEffectTarget>("target") != SkillProgramEffectTarget.Owner)
             throw new InvalidOperationException("A declared conversion requires its owner.");
+        var selfTier=r.Has("selfDeclarationFromTier")?r.RequiredInt("selfDeclarationFromTier"):(int?)null;
+        if(selfTier is not null and not 2)throw new InvalidOperationException("Self declaration requires the configured final tier two.");
         var effect = new SkillProgramEffect(Op, SkillProgramEffectTarget.Owner, 0, r.Condition(),
-            sourceBind: r.RequiredIdentifier("sourceBind"), stateId: r.RequiredIdentifier("stateId"));
+            sourceBind: r.RequiredIdentifier("sourceBind"), stateId: r.RequiredIdentifier("stateId")){SelfDeclarationFromTier=selfTier};
         RequireAlways(effect, r.Path);
         return effect;
     }

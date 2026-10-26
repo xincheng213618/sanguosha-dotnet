@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:qirang": { "name": "祈禳", "description": "装备进入你的装备区后可获得牌堆中的一张锦囊；使用该实体锦囊无距离限制并摸一张牌。" },
+    "mobile:yuhua": { "name": "羽化", "description": "非基本牌不计入手牌上限；结束阶段，若手牌数大于体力值，按当前手牌类别数观看牌堆顶并自由置顶、置底。" }
+  }
+}

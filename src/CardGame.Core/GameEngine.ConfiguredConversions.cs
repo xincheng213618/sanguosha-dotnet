@@ -40,12 +40,18 @@ public sealed partial class GameEngine
             binding.SourceLocations.Single() != CardLocation.Hand(frame.OwnerSeat) ||
             _cardZones.GetLocation(binding.CardIds[0]) != CardLocation.Hand(frame.OwnerSeat))
             throw new InvalidOperationException("Declaring requires the publicly revealed real owner hand card.");
+        var effect=ProgramInstructionResolver.Default.Resolve(frame,_contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
+        var tier = _configuredConversionTiers.GetValueOrDefault((frame.OwnerSeat, state));
+        if(effect.SelfDeclarationFromTier is{} selfTier&&tier>=selfTier)
+        {
+            ReplaceRuntimeTop(frame=frame with{CardDeclarationDraft=new(state,bind,binding.CardIds[0],tier,frame.OwnerSeat){NearestSeats=[frame.OwnerSeat]}});
+            PublishConfiguredCardDeclaration(frame);return SkillProgramStepOutcome.AwaitChoice;
+        }
         var others = _players.Where(player => player.IsAlive && player.Seat != frame.OwnerSeat).ToArray();
         if (others.Length == 0) return SkillProgramStepOutcome.Continue;
         var distance = others.Min(player => GetCombatDistance(frame.OwnerSeat, player.Seat));
         var nearest = others.Where(player => GetCombatDistance(frame.OwnerSeat, player.Seat) == distance)
             .Select(player => player.Seat).Order().ToArray();
-        var tier = _configuredConversionTiers.GetValueOrDefault((frame.OwnerSeat, state));
         if (tier >= 2) throw new InvalidOperationException("The direct tier does not reveal or declare a card.");
         ReplaceRuntimeTop(frame = frame with
         { CardDeclarationDraft = new(state, bind, binding.CardIds[0], tier) { NearestSeats = nearest } });
@@ -115,9 +121,12 @@ public sealed partial class GameEngine
     private void AssertConfiguredCardDeclaration(ProgramSkillFrame frame, SkillProgramEffect paused)
     {
         if (frame.CardDeclarationDraft is not { } draft) return;
+        var selfDeclaration=paused.SelfDeclarationFromTier is{} selfTier&&draft.Tier>=selfTier;
         if (paused.Op != SkillProgramEffectOp.DeclareBoundCardNameUntilTurnEnd ||
             paused.StateId != draft.StateId || paused.SourceBind != draft.Bind ||
-            draft.NearestSeats.Count == 0 || draft.NearestSeats.Contains(frame.OwnerSeat) ||
+            draft.Tier is <0 or >2 ||
+            (selfDeclaration ? draft.DeclarerSeat!=frame.OwnerSeat||!draft.NearestSeats.SequenceEqual(new[]{frame.OwnerSeat}) :
+                draft.NearestSeats.Count==0||draft.NearestSeats.Contains(frame.OwnerSeat)) ||
             draft.DeclarerSeat is { } declaredSeat && !draft.NearestSeats.Contains(declaredSeat) ||
             _cardZones.GetLocation(draft.CardId) != CardLocation.Hand(frame.OwnerSeat) ||
             _pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt ||

@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:qirang",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "equipment-entry",
+          "window": "cardsGained",
+          "subject": "owner",
+          "destinationZones": [
+            "equipment"
+          ],
+          "movementOccurrence": "perCard",
+          "optional": true,
+          "effects": [
+            {
+              "target": "owner",
+              "op": "obtainMobileQirangTrick"
+            }
+          ]
+        },
+        {
+          "id": "acquired-trick-use",
+          "window": "cardUseCommitted",
+          "ownerRelation": "actor",
+          "cardCategories": [
+            "trick"
+          ],
+          "includeResponseUses": true,
+          "singleActionInstance": true,
+          "optional": false,
+          "effects": [
+            {
+              "amount": 1,
+              "target": "owner",
+              "op": "draw"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:yuhua",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "ending-category-top",
+          "window": "turnEnding",
+          "subject": "owner",
+          "turnOwnerScope": "own",
+          "optional": false,
+          "effects": [
+            {
+              "target": "owner",
+              "op": "inspectMobileYuhuaTop"
+            }
+          ]
+        },
+        {
+          "id": "nonbasic-handlimit-exemption",
+          "window": "discardPhaseStarting",
+          "subject": "owner",
+          "turnOwnerScope": "own",
+          "optional": false,
+          "effects": [
+            {
+              "op": "grantTurnHandLimitCardKindExemption",
+              "target": "owner",
+              "cardKinds": [
+                "duel",
+                "drawTwo",
+                "barbarianAssault",
+                "arrowBarrage",
+                "peachGarden",
+                "fiveGrains",
+                "dismantlement",
+                "snatch",
+                "fireAttack",
+                "crossbow",
+                "baguaFormation",
+                "renwangShield",
+                "offensiveHorse",
+                "defensiveHorse",
+                "jadeSeal",
+                "qinggangSword",
+                "nullification",
+                "ironChain",
+                "indulgence",
+                "supplyShortage",
+                "lightning",
+                "borrowedSword",
+                "stoneAxe",
+                "zhangbaSerpentSpear",
+                "cixiongDoubleSwords",
+                "qinglongCrescentBlade",
+                "iceSword",
+                "qilinBow",
+                "fangtianHalberd",
+                "gudingBlade",
+                "zhuqueFan",
+                "tengjia",
+                "silverLion",
+                "woodenOx",
+                "dawan",
+                "zixing",
+                "dilu",
+                "zhaohuangfeidian",
+                "hualiu",
+                "ghostDragonCrescentBlade",
+                "scarletBloodSword",
+                "xingtianAxe",
+                "redBloodBlade",
+                "generalWeapon",
+                "unexpectedAssault",
+                "xuanjian"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
