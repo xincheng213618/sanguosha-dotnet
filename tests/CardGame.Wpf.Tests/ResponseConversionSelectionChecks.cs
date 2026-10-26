@@ -15,6 +15,10 @@ using CardGame.Wpf.ViewModels;
 internal static class ResponseConversionSelectionChecks
 {
     private const string Longhun = "wushuang:skill-3023";
+    private const string Longdan = "classic:longdan";
+    private static readonly Lazy<ContentSkillDefinition> LongdanDefinition = new(() => ContentRegistry.Build(
+        new StandardContentPackage(), new StandardActiveSkillExpansionPackage(), new StandardRescueSkillExpansionPackage(),
+        new StandardClassicGeneralPackage()).GetSkill(Longdan));
     private static readonly Lazy<ContentSkillDefinition> Definition = new(() =>
     {
         var assembly = typeof(StandardContentPackage).Assembly;
@@ -197,9 +201,121 @@ internal static class ResponseConversionSelectionChecks
         }
     }
 
-    private static (GameEngine, ContentRegistry) Create(Suit? suit)
+    public static void ZhangbaUsesWeaponSlotAndExactPair(string output)
     {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(suit));
+        foreach (var incoming in new[] { CardKind.Duel, CardKind.BarbarianAssault })
+        {
+            var (setup, registry) = Create(Suit.Diamond, incoming);
+            var spear = setup.GetHumanLegalActions().First(action => action.Kind == LegalActionKind.Equip &&
+                setup.CreateSnapshot(0).Players[0].Hand.Single(card => card.Id == action.CardId).Kind == CardKind.ZhangbaSerpentSpear);
+            Accept(setup, new PlayCardCommand(0, spear.CardId!.Value, [], setup.Revision, setup.PendingDecision!.PromptId));
+            Reach(setup, DecisionKind.PlayCard);
+            Accept(setup, new EndPlayPhaseCommand(0, setup.Revision, setup.PendingDecision!.PromptId));
+            Reach(setup, DecisionKind.RespondSlash);
+            Program.Assert(setup.PendingDecision!.IncomingCard == incoming, "The regression must reach its real native incoming card.");
+            var checkpoint = setup.CreateCheckpoint();
+            foreach (var response in new[] { "native", "longdan", "zhangba", "decline" })
+            {
+                using var model = Restore(checkpoint, registry);
+                var game = Program.Engine(model);
+                var prompt = model.ChoiceSnapshot.PendingDecision!;
+                var revision = game.Revision;
+                var commands = game.AcceptedCommands.Count;
+                var movements = game.CardMovements.Count;
+                var window = new MainWindow(model);
+                try
+                {
+                    var root = (FrameworkElement)window.Content;
+                    EquipmentSlotViewModel Weapon() => model.HumanEquipmentSlots.Single(slot => slot.Card?.Kind == CardKind.ZhangbaSerpentSpear);
+                    HumanSkillViewModel Skill() => model.HumanSkillCards.Single(skill => skill.ContentId == Longdan);
+                    void WeaponClick() => Click(root, model.SelectEquipmentMaterialCommand, Weapon());
+                    Program.Assert(model.HandResponseExtraChoices.Count == 0 && !model.HasCenterChoices &&
+                        Weapon().IsSelectable && !Weapon().IsSelected && Skill().IsAvailable && !model.CanConfirmSelected &&
+                        model.Hand.Any(card => card.Kind == CardKind.Slash && card.IsPlayable) &&
+                        model.Hand.Where(card => card.Kind == CardKind.Dodge).All(card => !card.IsPlayable),
+                        $"{incoming}/{response}: native Slash, Longdan and weapon must be separate entries; extras={model.HandResponseExtraChoices.Count}, " +
+                        $"center={model.HasCenterChoices}, weapon={Weapon().IsSelectable}/{Weapon().IsSelected}, longdan={Skill().IsAvailable}, confirm={model.CanConfirmSelected}, " +
+                        "hand=" + string.Join(",", model.Hand.Select(card => $"{card.Id}:{card.Kind}:{card.IsPlayable}")) +
+                        "; choices=" + string.Join("|", prompt.Choices.Select(item => item.Description)));
+                    PromptChoice choice;
+                    if (response == "native")
+                    {
+                        var card = model.Hand.First(card => card.Kind == CardKind.Slash && card.IsPlayable);
+                        Click(root, model.SelectCardCommand, card);
+                        choice = prompt.Choices.Single(item => item.Cards.SequenceEqual([card.Id]) &&
+                            item.Parameters.GetValueOrDefault("conversion-skill-id") is null);
+                    }
+                    else
+                    {
+                        WeaponClick();
+                        var material = model.Hand.First(card => card.Kind == CardKind.Dodge && card.IsPlayable);
+                        Click(root, model.SelectCardCommand, material);
+                        Program.Assert(Weapon().IsSelected && !model.CanConfirmSelected && model.HandResponseExtraChoices.Count == 0,
+                            "One Zhangba material must remain an unpaid, incomplete draft.");
+                        Click(root, model.ActivateHumanSkillCommand, Skill());
+                        Program.Assert(!Weapon().IsSelected && !model.Hand.Any(card => card.IsSelected) &&
+                            model.Hand.Where(card => card.Kind == CardKind.Slash).All(card => !card.IsPlayable) &&
+                            model.Hand.Any(card => card.Kind == CardKind.Dodge && card.IsPlayable),
+                            "Switching to Longdan must discard the Zhangba draft and offer only its legal Dodge material.");
+                        if (response == "longdan")
+                        {
+                            var card = model.Hand.First(card => card.Kind == CardKind.Dodge && card.IsPlayable);
+                            Click(root, model.SelectCardCommand, card);
+                            choice = prompt.Choices.Single(item => item.Cards.SequenceEqual([card.Id]) &&
+                                item.Parameters.GetValueOrDefault("conversion-skill-id") == Longdan);
+                        }
+                        else
+                        {
+                            WeaponClick();
+                            WeaponClick();
+                            Program.Assert(!model.HasSelection && !Weapon().IsSelected && !model.IsCardPaymentSelectionPending,
+                                "Re-clicking the selected weapon must return to ordinary Slash selection.");
+                            WeaponClick();
+                            model.LoadManualGameCommand.Execute(null);
+                            game = Program.Engine(model);
+                            Program.Assert(!model.HasSelection && !Weapon().IsSelected && model.HandResponseExtraChoices.Count == 0,
+                                "Reloading a pending response must not restore an uncommitted equipment draft.");
+                            WeaponClick();
+                            var pair = model.ChoiceSnapshot.PendingDecision!.Choices.First(item => item.Parameters.GetValueOrDefault("response") == "zhangba-slash");
+                            foreach (var id in pair.Cards) Click(root, model.SelectCardCommand, model.Hand.Single(card => card.Id == id));
+                            choice = response == "decline" ? model.ChoiceSnapshot.PendingDecision!.Choices.Single(item =>
+                                item.Parameters.GetValueOrDefault("response") == "take-damage") : pair;
+                            Program.Assert(model.Hand.Count(card => card.IsSelected) == 2 && model.CanConfirmSelected &&
+                                model.PlayButtonText == "打出杀" && model.Hand.Where(card => !pair.Cards.Contains(card.Id)).All(card => !card.IsPlayable) &&
+                                Weapon().IsSelected && model.HandResponseExtraChoices.Count == 0,
+                                "Exactly two published materials must enable the bottom Slash button without exposing pair combinations.");
+                            if (incoming == CardKind.Duel && response == "zhangba")
+                                Program.Render(root, 1120, 740, Path.Combine(output, "zhangba-response-selected.png"));
+                        }
+                    }
+                    Program.Assert(game.Revision == revision && game.AcceptedCommands.Count == commands && game.CardMovements.Count == movements,
+                        "Choosing or switching response entries must not consume cards or answer the prompt.");
+                    var expected = GameReplay.Restore(checkpoint, registry);
+                    Accept(expected, new AnswerPromptCommand(0, expected.PendingDecision!.PromptId, choice.Id, expected.Revision));
+                    if (response == "decline") model.CancelActionCommand.Execute(null);
+                    else model.ConfirmSelectedCommand.Execute(null);
+                    Program.Assert(game.AcceptedCommands.Count == commands + 1 && game.AcceptedCommands.Last() is AnswerPromptCommand answer &&
+                        answer.Choice == choice.Id && game.CardMovements.SequenceEqual(expected.CardMovements) &&
+                        SnapshotJson.Serialize(game.CreateSnapshot(0)) == SnapshotJson.Serialize(expected.CreateSnapshot(0)) && !model.HasSelection,
+                        "Each response must submit the exact native choice once and clear its draft for the next response.");
+                    var after = game.Revision;
+                    model.ConfirmSelectedCommand.Execute(null);
+                    Program.Assert(game.Revision == after, "Repeated confirmation must not consume another pair.");
+                    if (response == "zhangba")
+                    {
+                        var cold = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+                        Program.Assert(SnapshotJson.Serialize(cold.CreateSnapshot(0)) == SnapshotJson.Serialize(game.CreateSnapshot(0)),
+                            "The selected Zhangba pair must retain its native replay contract.");
+                    }
+                }
+                finally { window.Content = null; window.Close(); }
+            }
+        }
+    }
+
+    private static (GameEngine, ContentRegistry) Create(Suit? suit, CardKind? incoming = null)
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(suit, incoming));
         var game = GameEngine.CreateStandard(new GameOptions { Seed = 31, PlayerCount = 4, HumanSeat = 0,
             HumanRole = Role.Lord, ModeId = Fixture.Mode, UseInteractiveSetup = true, UseInteractiveDiscard = false,
             AdvanceAfterHumanCommands = false, MaxTurns = 4 }, registry);
@@ -227,13 +343,15 @@ internal static class ResponseConversionSelectionChecks
         return model;
     }
 
-    private sealed class Fixture(Suit? suit) : IGameContentPackage
+    private sealed class Fixture(Suit? suit, CardKind? incoming = null) : IGameContentPackage
     {
         internal const string Mode = "identity:classic-response-conversion-ui", Owner = "fixture:response-conversion-owner", Driver = "fixture:response-conversion-driver";
         public PackageManifest Manifest { get; } = new("fixture-response-conversion-ui", new(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
-            builder.AddSkill(Definition.Value);
+            builder.AddSkill(incoming is null ? Definition.Value : LongdanDefinition.Value);
+            if (incoming is not null) builder.AddCard(new("fixture:response-spear", "丈八蛇矛", "装备牌", "两张手牌当杀", CardKind.ZhangbaSerpentSpear,
+                AiTags: new Dictionary<string, string> { ["slot"] = "weapon", ["conversion"] = "two-hand-cards-as-slash" }));
             var rules = """
                 {"schemaVersion":$SCHEMA$,"skills":[
                 {"id":"fixture:response-conversion-driver","revision":1,"activations":[
@@ -241,7 +359,9 @@ internal static class ResponseConversionSelectionChecks
                 {"id":"fixture:response-conversion-attack","revision":1,"triggers":[{"id":"attack","window":"$WINDOW$","subject":"owner","optional":false,"effects":[{"op":"selectTarget","target":"owner","targetKind":"anyWounded"},$USE$]}]}]}
                 """.Replace("$SCHEMA$", SkillProgramCatalog.RulesSchemaVersion.ToString())
                 .Replace("$WINDOW$", suit is Suit.Diamond or Suit.Spade ? "turnStartBeforeNormalFlow" : "afterNormalDraw")
-                .Replace("$USE$", suit is Suit.Diamond or Suit.Spade
+                .Replace("$USE$", incoming == CardKind.BarbarianAssault
+                    ? """{"op":"useVirtualOrdinaryTrick","target":"owner","actorRef":{"kind":"owner"},"targetRef":{"kind":"owner"},"outputKind":"barbarianAssault"}"""
+                    : suit is Suit.Diamond or Suit.Spade
                     ? """{"op":"useVirtualOrdinaryTrick","target":"owner","actorRef":{"kind":"owner"},"targetRef":{"kind":"selectedTarget"},"outputKind":"duel"}"""
                     : """{"op":"useVirtualCard","target":"selectedTarget","outputKind":"slash","targetRestriction":"distanceUnlimitedAgainstTarget","useCardActionWindows":true}""");
             var catalog = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
@@ -249,11 +369,14 @@ internal static class ResponseConversionSelectionChecks
                     ["fixture:response-conversion-attack"] = new { name = "来袭", description = "原生来袭" } } }));
             foreach (var (id, program) in catalog.Programs) builder.AddSkill(new(id, catalog.Presentations[id].Name, "规则夹具")
                 { Program = program, ProgramPresentation = catalog.Presentations[id] });
-            builder.AddGeneral(new(Owner, "龙魂选牌", "supporter", Longhun, "qun", 4, AdditionalSkillIds: [Driver]) { InitialHp = 2 });
+            builder.AddGeneral(new(Owner, "转化选牌", "supporter", incoming is null ? Longhun : Longdan, "qun", incoming is null ? 4 : 12,
+                AdditionalSkillIds: [Driver]) { InitialHp = incoming is null ? 2 : 10 });
             var peers = Enumerable.Range(1, 3).Select(seat => $"fixture:response-conversion-peer-{seat}").ToArray();
             foreach (var peer in peers) builder.AddGeneral(new(peer, "来袭者", "supporter", "fixture:response-conversion-attack", "wei", 6));
             builder.AddDeck(new("fixture:response-conversion-deck", "材料", 8, 0, []) { PhysicalCards = Enumerable.Range(0, 80)
-                .Select(index => new ContentDeckPhysicalCard("standard:crossbow", suit ?? (index % 2 == 0 ? Suit.Heart : Suit.Diamond), index % 13 + 1)).ToArray() });
+                .Select(index => new ContentDeckPhysicalCard(incoming is null ? "standard:crossbow" : (index % 3) switch
+                    { 0 => "fixture:response-spear", 1 => "standard:slash", _ => "standard:dodge" },
+                    suit ?? (index % 2 == 0 ? Suit.Heart : Suit.Diamond), index % 13 + 1)).ToArray() });
             builder.AddMode(new(Mode, "龙魂选牌", 4, 4, new Dictionary<string, int>
                 { [nameof(Role.Lord)] = 1, [nameof(Role.Loyalist)] = 1, [nameof(Role.Rebel)] = 2 },
                 "fixture:response-conversion-deck", 4, [Owner, .. peers]));

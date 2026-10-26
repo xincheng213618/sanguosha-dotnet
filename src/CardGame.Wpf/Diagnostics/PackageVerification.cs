@@ -10,6 +10,7 @@ using CardGame.Core;
 using CardGame.Wpf.Audio;
 using CardGame.Wpf.Persistence;
 using CardGame.Wpf.ViewModels;
+using CardGame.Wpf.Resources;
 
 namespace CardGame.Wpf.Diagnostics;
 
@@ -28,7 +29,7 @@ internal static class PackageVerification
             try
             {
                 if (GeneralArt.GetPortrait("cao-cao") is not ImageBrush { ImageSource: BitmapSource { PixelWidth: > 0 } })
-                    throw new InvalidDataException("Embedded general artwork did not load.");
+                    throw new InvalidDataException("Local general artwork did not load.");
                 using var artStream = typeof(GeneralArt).Assembly.GetManifestResourceStream("CardGame.GeneralArtCatalog.json")
                     ?? throw new InvalidDataException("General artwork catalog did not ship.");
                 using var artCatalog = JsonDocument.Parse(artStream);
@@ -39,7 +40,7 @@ internal static class PackageVerification
                     .Distinct().ToArray();
                 foreach (var localPath in skinFiles)
                 {
-                    var path = Path.Combine(AppContext.BaseDirectory, localPath["src/CardGame.Wpf/".Length..]);
+                    var path = AssetFiles.GetPath(localPath);
                     using var reader = new BinaryReader(File.OpenRead(path));
                     if (!reader.ReadBytes(8).SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }))
                         throw new InvalidDataException($"Missing or invalid skin: {localPath}");
@@ -57,7 +58,7 @@ internal static class PackageVerification
                     var kind = Enum.Parse<CardKind>(entry.GetProperty("kind").GetString()!);
                     if (!cardKinds.Add(kind) || entry.GetProperty("file").GetString() != $"{kind}.png")
                         throw new InvalidDataException($"Invalid card artwork mapping: {kind}");
-                    using var file = File.OpenRead(Path.Combine(AppContext.BaseDirectory, "Assets", "Cards", $"{kind}.png"));
+                    using var file = File.OpenRead(AssetFiles.GetPath($"Assets/Cards/{kind}.png"));
                     if (!Convert.ToHexString(SHA256.HashData(file)).Equals(entry.GetProperty("sha256").GetString(), StringComparison.OrdinalIgnoreCase) ||
                         CardArt.Get(kind) is not BitmapSource { PixelWidth: 186, PixelHeight: 260 })
                         throw new InvalidDataException($"Missing or invalid card artwork: {kind}");
@@ -69,7 +70,7 @@ internal static class PackageVerification
                 {
                     var name = component.GetProperty("file").GetString()!;
                     if (Path.GetFileName(name) != name) throw new InvalidDataException("Invalid component file name.");
-                    using var file = File.OpenRead(Path.Combine(AppContext.BaseDirectory, "Assets", "Cards", name));
+                    using var file = File.OpenRead(AssetFiles.GetPath("Assets/Cards/" + name));
                     if (!Convert.ToHexString(SHA256.HashData(file)).Equals(component.GetProperty("sha256").GetString(), StringComparison.OrdinalIgnoreCase))
                         throw new InvalidDataException($"Invalid rank, suit or equipment asset: {name}");
                 }
@@ -80,10 +81,9 @@ internal static class PackageVerification
                 foreach (var entry in tableAssets)
                 {
                     var name = entry.GetProperty("file").GetString()!;
-                    using var resource = Application.GetResourceStream(new Uri($"pack://application:,,,/CardGame.Wpf;component/Assets/Table/{name}"))?.Stream
-                        ?? throw new InvalidDataException($"Missing embedded table asset: {name}");
+                    using var resource = File.OpenRead(AssetFiles.GetPath("Assets/Table/" + name));
                     if (!Convert.ToHexString(SHA256.HashData(resource)).Equals(entry.GetProperty("sha256").GetString(), StringComparison.OrdinalIgnoreCase))
-                        throw new InvalidDataException($"Invalid embedded table asset: {name}");
+                        throw new InvalidDataException($"Invalid local table asset: {name}");
                 }
                 foreach (var asset in GameAudioCatalog.Assets)
                 {
@@ -93,7 +93,7 @@ internal static class PackageVerification
                 }
                 foreach (var sound in sounds)
                 {
-                    var path = Path.Combine(AppContext.BaseDirectory, "Assets", "Audio", $"{sound.ToString().ToLowerInvariant()}.wav");
+                    var path = AssetFiles.GetPath($"Assets/Audio/{sound.ToString().ToLowerInvariant()}.wav");
                     using var reader = new BinaryReader(File.OpenRead(path));
                     if (reader.BaseStream.Length <= 44 || new string(reader.ReadChars(4)) != "RIFF")
                         throw new InvalidDataException($"Invalid audio asset: {sound}");

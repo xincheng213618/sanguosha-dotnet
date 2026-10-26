@@ -6,6 +6,16 @@ public sealed partial class MainViewModel
 
     private void RefreshSelectionArea()
     {
+        if (IsZhuqueFanSelectionPending)
+        {
+            SelectionArea = new()
+            {
+                Title = "朱雀羽扇", Hint = ZhuqueFanHint,
+                Choices = _zhuqueFanSelection!.Choices, ChoiceCommand = ChooseZhuqueFanCommand
+            };
+            RaisePropertyChanged(nameof(SelectionArea));
+            return;
+        }
         SelectionArea = new()
         {
             Title = IsActiveSkillSelectionPending ? $"发动{HumanActiveSkillName}"

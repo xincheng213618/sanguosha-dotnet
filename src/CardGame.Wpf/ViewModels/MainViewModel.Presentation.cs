@@ -522,12 +522,12 @@ public sealed partial class MainViewModel
                 : $"{action.Description}（已选{BuildActiveSkillSelectionSummary()}）";
         }
     }
-    public bool CanConfirmSelected => IsCardExchangePending ? SelectedCardExchangeChoice is not null : IsDeckReorderPending ? CanConfirmDeckReorder : IsRevealedSubsetSelectionPending ? SelectedRevealedSubsetChoice is not null : IsMobileShiZhuangshiSelectionPending ? MobileShiZhuangshiPayChoice is not null : IsCardDistributionPending ? CanConfirmDistribution : IsDiscardSelectionPending ? SelectedDiscardCount > 0 && SelectedDiscardCount <= RequiredDiscardCount
+    public bool CanConfirmSelected => !IsZhuqueFanSelectionPending && (IsCardExchangePending ? SelectedCardExchangeChoice is not null : IsDeckReorderPending ? CanConfirmDeckReorder : IsRevealedSubsetSelectionPending ? SelectedRevealedSubsetChoice is not null : IsMobileShiZhuangshiSelectionPending ? MobileShiZhuangshiPayChoice is not null : IsCardDistributionPending ? CanConfirmDistribution : IsDiscardSelectionPending ? SelectedDiscardCount > 0 && SelectedDiscardCount <= RequiredDiscardCount
         : IsOwnedCardSelectionPending ? CanConfirmOwnedCardSelection
         : IsSkillTargetSelectionPending ? SelectedSkillTargetChoice is not null
         : IsCardPaymentSelectionPending ? SelectedCardPaymentChoice is not null
         : IsHandResponsePending ? IsBaguaActivationPending || SelectedHandResponse is not null && Hand.Any(card => card.Id == _selectedCardId && card.IsPlayable)
-        : IsActiveSkillSelectionPending ? CanConfirmActiveSkill : CanPlaySelected || CanPlaySelectedAsSlash;
+        : IsActiveSkillSelectionPending ? CanConfirmActiveSkill : CanPlaySelected || CanPlaySelectedAsSlash);
     public bool CanActFromHand => IsCardExchangePending || IsDeckReorderPending || IsRevealedSubsetSelectionPending || IsMobileShiZhuangshiSelectionPending || IsCardDistributionPending || CanEndTurn || IsDiscardSelectionPending || IsHandResponsePending || IsSkillTargetSelectionPending || IsOwnedCardSelectionPending;
     public bool HasAlternateSlash => CanPlaySelected && CanPlaySelectedAsSlash;
     public string AlternatePlayText => SelectedConversionAction() is { } conversion
@@ -753,6 +753,7 @@ public sealed partial class MainViewModel
         var selectedName = card is not null ? PlayCardName(card) : equipment is not null ? PlayCardName(equipment) : null;
         var target = Seats.FirstOrDefault(item => item.Seat == _selectedTargetSeat);
         ActionHint = HasGameOver ? "对局结束 · 点击「新对局」再战一局"
+            : IsZhuqueFanSelectionPending ? ZhuqueFanHint
             : IsSpectating ? SpectatorHint
             : IsCardExchangePending ? CardExchangeHint
             : IsDeckReorderPending ? DeckReorderHint
@@ -832,6 +833,7 @@ public sealed partial class MainViewModel
         RaisePropertyChanged(nameof(HasAlternateSlash));
         RaisePropertyChanged(nameof(AlternatePlayText));
         ((RelayCommand)ConfirmSelectedCommand).NotifyCanExecuteChanged();
+        ((RelayCommand)EndTurnCommand).NotifyCanExecuteChanged();
         ((RelayCommand)UseActiveSkillCommand).NotifyCanExecuteChanged();
         RaisePropertyChanged(nameof(HasSelection));
         RefreshTargetCardPicker();

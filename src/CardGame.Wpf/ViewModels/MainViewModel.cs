@@ -93,7 +93,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         PlaySelectedAsSlashCommand = new RelayCommand(PlaySelectedAsSlash, () => CanPlaySelectedAsSlash);
         UseActiveSkillCommand = new RelayCommand(UseActiveSkill, () => CanUseActiveSkill);
         SelectActiveSkillCommand = new RelayCommand<LegalAction>(UseActiveSkill);
-        EndTurnCommand = new RelayCommand(EndTurn, () => CanEndTurn);
+        EndTurnCommand = new RelayCommand(EndTurn, () => CanEndTurn && !IsZhuqueFanSelectionPending);
         RespondDodgeCommand = new RelayCommand(() => RespondToSlash(true), () => CanRespondDodge);
         DeclineResponseCommand = new RelayCommand(() => RespondToSlash(false), () => CanDeclineResponse);
 
@@ -575,6 +575,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private void Refresh(GameSnapshot snapshot)
     {
         _automaticTableSnapshot = null;
+        if (_zhuqueFanSelection is { } fan && (!ReferenceEquals(fan.Game, _game) || fan.Revision != snapshot.Revision ||
+                fan.PromptId != snapshot.PendingDecision?.PromptId)) _zhuqueFanSelection = null;
         if (_snapshot?.PendingDecision?.PromptId != snapshot.PendingDecision?.PromptId)
         {
             _paymentCardIds.Clear();
@@ -1081,6 +1083,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private void SelectCard(CardViewModel card)
     {
         if (!Hand.Contains(card)) return;
+        _zhuqueFanSelection = null;
 
         if (IsMobileShiZhuangshiSelectionPending)
         {
@@ -1235,6 +1238,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private void SelectRegionalPlayCard(CardSnapshot regionalCard)
     {
+        _zhuqueFanSelection = null;
         if (KeepForcedHandSelection()) return;
         var cardId = regionalCard.Id;
         _selectedCardId = _selectedCardId == cardId ? null : cardId;
@@ -1381,6 +1385,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private void SelectTarget(SeatViewModel seat)
     {
         if (!Seats.Contains(seat)) return;
+        _zhuqueFanSelection = null;
 
         if (IsCardDistributionPending)
         {
@@ -1764,9 +1769,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         SubmitSelectedPlayAction(cardId, action, prompt.PromptId);
     }
 
-    private void SubmitSelectedPlayAction(int cardId, LegalAction action, PromptId promptId, string? rejectionPrefix = null, int? targetHandSlot = null)
+    private void SubmitSelectedPlayAction(int cardId, LegalAction action, PromptId promptId, string? rejectionPrefix = null, int? targetHandSlot = null,
+        bool chooseZhuqueFan = true)
     {
+        if (chooseZhuqueFan && TryBeginZhuqueFanChoice(action, promptId)) return;
         var wasSelectingPlayConversion = IsPlayConversionSelectionPending;
+        var wasSelectingMaterials = IsMaterialPlayConversionPending;
         ExecuteSafely(() =>
         {
             var result = SubmitCommand(CreatePlayCommand(_snapshot.HumanSeat, cardId, action,
@@ -1774,10 +1782,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             if (!result.Accepted)
             {
                 if (rejectionPrefix is not null) PromptText = $"{rejectionPrefix}：{result.Error?.Message}";
+                RefreshSelectionHint();
                 return;
             }
 
-            ResetPlayCardSelection();
+            if (wasSelectingMaterials) ClearSelection();
+            else ResetPlayCardSelection();
             _humanSkillSnapshot = null;
             SelectedCardText = "未选择手牌";
             if (wasSelectingPlayConversion) RefreshCurrentView();
@@ -1789,6 +1799,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     // separate active-skill, response, and discard selection lifecycles.
     private void ResetPlayCardSelection()
     {
+        _zhuqueFanSelection = null;
         _selectedCardId = null;
         _selectedConversionSource = null;
         _playConversionSelection = null;
@@ -2009,6 +2020,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private void EndTurn()
     {
+        if (IsZhuqueFanSelectionPending) return;
         ExecuteSafely(() =>
         {
             var result = SubmitCommand(new EndPlayPhaseCommand(_snapshot.HumanSeat, _snapshot.Revision, _snapshot.PendingDecision?.PromptId));

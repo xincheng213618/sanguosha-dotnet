@@ -173,7 +173,7 @@ public sealed partial class MainViewModel
                 Kingdom = factionId == "god" ? "神" : FactionName(factionId),
                 HealthText = general.InitialHp is { } initialHp
                     ? $"{initialHp}/{general.BaseHp} 体力" : $"{general.BaseHp} 体力",
-                HealthImages = Enumerable.Repeat($"pack://application:,,,/CardGame.Wpf;component/Assets/gallery-hp-{(factionId is "wei" or "shu" or "wu" or "jin" ? factionId : "qun")}.png", Math.Clamp(general.BaseHp, 0, 12)).ToArray(),
+                HealthImages = Enumerable.Repeat($"pack://siteoforigin:,,,/Assets/gallery-hp-{(factionId is "wei" or "shu" or "wu" or "jin" ? factionId : "qun")}.png", Math.Clamp(general.BaseHp, 0, 12)).ToArray(),
                 SkillName = string.Join(" / ", skills.Select(skill => skill.Name)),
                 SkillDescription = string.Join("\n\n", skills.Select(skill => $"{skill.Name}：{GetVisibleSkillDescription(skill)}"))
             });

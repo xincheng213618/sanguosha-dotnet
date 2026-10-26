@@ -7,7 +7,7 @@ namespace CardGame.Core;
 public sealed class HumanActionView
 {
     internal HumanActionView(long revision, IReadOnlyList<LegalAction> actions, IReadOnlyList<HandCardGuidance> handGuidance,
-        WushuangJinzhiMaterialSelection? jinzhiMaterials = null)
+        WushuangJinzhiMaterialSelection? jinzhiMaterials = null, bool canInvokeZhuqueFan = false)
     {
         Revision = revision;
         LegalActions = Array.AsReadOnly(actions.Select(action => action with
@@ -29,10 +29,13 @@ public sealed class HumanActionView
         HandGuidance = Array.AsReadOnly(handGuidance.ToArray());
         JinzhiMaterials = jinzhiMaterials is null ? null : jinzhiMaterials with
         { CardIds = Array.AsReadOnly(jinzhiMaterials.CardIds.ToArray()) };
+        CanInvokeZhuqueFan = canInvokeZhuqueFan;
     }
 
     public long Revision { get; }
     public IReadOnlyList<LegalAction> LegalActions { get; }
     public IReadOnlyList<HandCardGuidance> HandGuidance { get; }
     public WushuangJinzhiMaterialSelection? JinzhiMaterials { get; }
+    /// <summary>Effective weapon ability for presentation; legal actions and commands still determine permitted uses.</summary>
+    public bool CanInvokeZhuqueFan { get; }
 }

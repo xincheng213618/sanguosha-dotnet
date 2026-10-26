@@ -1,5 +1,6 @@
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using CardGame.Wpf.Resources;
 
 namespace CardGame.Wpf.ViewModels;
 
@@ -675,7 +676,6 @@ public static partial class GeneralArt
             new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
         return catalog.Entries.ToDictionary(entry => entry.Key, StringComparer.Ordinal);
     });
-    private static readonly Dictionary<string, WeakReference<BitmapImage>> Images = new(StringComparer.Ordinal);
 
     private static readonly Lazy<IReadOnlyDictionary<string, IReadOnlyList<GeneralSkin>>> MergedRuleSkins = new(() =>
         CardGame.Content.Standard.GeneralRulesCatalog.Aliases.GroupBy(pair => pair.Value, StringComparer.Ordinal)
@@ -728,8 +728,9 @@ public static partial class GeneralArt
 
     public static Brush GetPortrait(string id, string? skinId = null, int decodeWidth = 0)
     {
-        if (GetSkin(id, skinId) is not { } skin) return Brushes.Transparent;
-        var brush = new ImageBrush(LoadImage(skin.LocalPath, decodeWidth))
+        if (GetSkin(id, skinId) is not { } skin || AssetImages.Load(skin.LocalPath, decodeWidth) is not { } image)
+            return Brushes.Transparent;
+        var brush = new ImageBrush(image)
         {
             Stretch = Stretch.UniformToFill,
             AlignmentY = AlignmentY.Top
@@ -745,28 +746,6 @@ public static partial class GeneralArt
         }
         brush.Freeze();
         return brush;
-    }
-
-    internal static BitmapImage LoadImage(string localPath, int decodeWidth = 0)
-    {
-        const string prefix = "src/CardGame.Wpf/";
-        var relative = localPath.StartsWith(prefix, StringComparison.Ordinal) ? localPath[prefix.Length..] : localPath;
-        if (!relative.StartsWith("Assets/", StringComparison.Ordinal) || relative.Contains("..", StringComparison.Ordinal))
-            throw new InvalidOperationException("Artwork must be a local asset.");
-        var cacheKey = relative + "#" + decodeWidth;
-        if (Images.TryGetValue(cacheKey, out var weak) && weak.TryGetTarget(out var cached)) return cached;
-        var uri = relative.StartsWith("Assets/Skins/", StringComparison.Ordinal)
-            ? new Uri(System.IO.Path.Combine(AppContext.BaseDirectory, relative))
-            : new Uri("pack://application:,,,/CardGame.Wpf;component/" + relative);
-        var image = new BitmapImage();
-        image.BeginInit();
-        image.CacheOption = BitmapCacheOption.OnLoad;
-        image.UriSource = uri;
-        if (decodeWidth > 0) image.DecodePixelWidth = decodeWidth;
-        image.EndInit();
-        image.Freeze();
-        Images[cacheKey] = new(image);
-        return image;
     }
 
     public static string NormalizeKey(string id)

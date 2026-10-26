@@ -121,7 +121,9 @@ public sealed partial class MainViewModel
     }
 
     private PromptChoice? SelectedHandResponse => IsCardPaymentSelectionPending ? SelectedCardPaymentChoice : HandResponseChoice(_selectedCardId);
-    private string HandResponseButtonText => IsBaguaActivationPending ? "发动八卦" : IsStoneAxeSelectionPending ? "是" : IsCardPaymentSelectionPending ? "确 定" : _snapshot.PendingDecision?.Kind switch
+    private string HandResponseButtonText => IsBaguaActivationPending ? "发动八卦" : IsStoneAxeSelectionPending ? "是" :
+        _responseConversionSelection?.EquipmentKind == CardKind.ZhangbaSerpentSpear ? "打出杀" :
+        IsCardPaymentSelectionPending ? "确 定" : _snapshot.PendingDecision?.Kind switch
     {
         DecisionKind.RespondDodge => IsSelectedResponseConversion(CardKind.Dodge) ? "当作闪打出" : "打出闪",
         DecisionKind.RespondSlash => IsSelectedResponseConversion(CardKind.Slash) ? "当作杀打出" : "打出杀",
@@ -153,6 +155,7 @@ public sealed partial class MainViewModel
             : "当前没有可直接选择的手牌。") +
           (HandResponseExtraChoices.Count > 0 ? HasDockSkillChoices || HasExpandedSelection ? "其他响应方式在下方选择区。" : "其他技能、装备或响应方式在中央。" : string.Empty)) +
           (ResponseConversionModes.Count > 0 && !IsResponseConversionSelectionPending ? "点击下方技能选择转化响应。" : string.Empty) +
+          (ZhangbaResponseChoiceIds.Count > 0 && !IsResponseConversionSelectionPending ? "点击装备区【丈八蛇矛】选择两张手牌当杀。" : string.Empty) +
           (HandResponseDeclineChoice is not null ? $"点击「{ActionDockCancelText}」放弃本次响应。" : string.Empty);
 
     private string HandResponseUnavailableHint(int cardId) => IsBaguaActivationPending

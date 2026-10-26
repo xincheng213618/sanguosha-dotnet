@@ -60,10 +60,11 @@ public sealed partial class MainViewModel
                 var card = slot.Card;
                 return slot with
                 {
-                    IsSelected = !slot.IsAbolished && card is not null && (IsCardPaymentSelectionPending ? _paymentCardIds.Contains(card.Id) :
+                    IsSelected = !slot.IsAbolished && card is not null && (IsSelectedResponseEquipment(card) ||
+                        (IsCardPaymentSelectionPending ? _paymentCardIds.Contains(card.Id) :
                             IsOwnedCardSelectionPending ? IsOwnedSelectionCardSelected(card.Id) :
                             _selectedActiveSkillCardIds.Contains(card.Id) || IsSelectedEquipmentActivation(card) ||
-                            IsPlayConversionSelectionPending && _selectedCardId == card.Id),
+                            IsPlayConversionSelectionPending && _selectedCardId == card.Id)),
                     IsSelectable = !slot.IsAbolished && (IsOwnedSelectionMaterial(card?.Id) || IsCardPaymentMaterial(card?.Id) || CanSelectActiveEquipment(card))
                 };
             }).ToArray();

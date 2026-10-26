@@ -361,7 +361,7 @@
                 </Grid>
             </Border>
             <Grid Grid.Row="1" x:Name="GameArea" SizeChanged="GameArea_SizeChanged">
-                <Grid.Background><ImageBrush ImageSource="pack://application:,,,/CardGame.Wpf;component/Assets/Table/Board.jpg" Stretch="UniformToFill" /></Grid.Background>
+                <Grid.Background><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/Table/Board.jpg" Stretch="UniformToFill" /></Grid.Background>
                 <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="300" /></Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -742,7 +742,7 @@
                     </Grid>
                 </Grid>
                 <Border x:Name="TableSidebar" Grid.Column="1" Grid.RowSpan="2" BorderBrush="#81735E" BorderThickness="1,0,0,1">
-                    <Border.Background><ImageBrush ImageSource="pack://application:,,,/CardGame.Wpf;component/Assets/Table/gameBase__game_right_top_bg.png" Stretch="Fill" /></Border.Background>
+                    <Border.Background><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/Table/gameBase__game_right_top_bg.png" Stretch="Fill" /></Border.Background>
                     <Grid>
                         <Grid.RowDefinitions><RowDefinition Height="38" /><RowDefinition Height="Auto" /><RowDefinition /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                         <DockPanel Margin="10,5">
@@ -983,7 +983,7 @@
                             </ItemsControl>
                           </StackPanel>
                         </Viewbox>
-                        <Image x:Name="PlayPhaseMarker" Grid.Row="3" Source="pack://application:,,,/CardGame.Wpf;component/Assets/Table/seat__SeatRoundState_4.png" Width="140" Height="14" HorizontalAlignment="Left" Margin="146,0,0,0" Stretch="Fill" Visibility="{Binding CanEndTurn, Converter={StaticResource BoolToVisibility}}" IsHitTestVisible="False" />
+                        <Image x:Name="PlayPhaseMarker" Grid.Row="3" Source="pack://siteoforigin:,,,/Assets/Table/seat__SeatRoundState_4.png" Width="140" Height="14" HorizontalAlignment="Left" Margin="146,0,0,0" Stretch="Fill" Visibility="{Binding CanEndTurn, Converter={StaticResource BoolToVisibility}}" IsHitTestVisible="False" />
                         <Border x:Name="OpeningHandControls" Grid.RowSpan="4" Background="#2C2117" Padding="8,3" Visibility="{Binding CanRerollOpeningHand, Converter={StaticResource BoolToVisibility}}" IsVisibleChanged="TableOverlay_IsVisibleChanged">
                             <StackPanel VerticalAlignment="Center">
                                 <DockPanel LastChildFill="True">
@@ -1007,7 +1007,7 @@
                 </Border>
                 <Border x:Name="HandDock" Grid.Row="2" Grid.ColumnSpan="2" Background="#2C2117" BorderBrush="#84725B" BorderThickness="0,1,0,0" Padding="8,6">
                     <Grid>
-                        <Grid.Background><ImageBrush ImageSource="pack://application:,,,/CardGame.Wpf;component/Assets/Table/seatbottom__grade_cover_4.png" Stretch="Fill" /></Grid.Background>
+                        <Grid.Background><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/Table/seatbottom__grade_cover_4.png" Stretch="Fill" /></Grid.Background>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition x:Name="EquipmentRailColumn" Width="154" />
                             <ColumnDefinition Width="*" />

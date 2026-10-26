@@ -328,7 +328,7 @@
         <Setter Property="FontFamily" Value="Microsoft YaHei UI" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="FontSize" Value="16" />
-        <Setter Property="Background"><Setter.Value><ImageBrush ImageSource="pack://application:,,,/CardGame.Wpf;component/Assets/Table/selfseat__selfSeatOkBtn_normal.png" Stretch="Fill" /></Setter.Value></Setter>
+        <Setter Property="Background"><Setter.Value><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/Table/selfseat__selfSeatOkBtn_normal.png" Stretch="Fill" /></Setter.Value></Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -365,15 +365,15 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background"><Setter.Value><ImageBrush ImageSource="pack://application:,,,/CardGame.Wpf;component/Assets/Table/selfseat__selfSeatOkBtn_disabled.png" Stretch="Fill" /></Setter.Value></Setter>
+                <Setter Property="Background"><Setter.Value><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/Table/selfseat__selfSeatOkBtn_disabled.png" Stretch="Fill" /></Setter.Value></Setter>
             </Trigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="TableSecondaryButton" TargetType="Button" BasedOn="{StaticResource TablePrimaryButton}">
-        <Setter Property="Background"><Setter.Value><ImageBrush ImageSource="pack://application:,,,/CardGame.Wpf;component/Assets/Table/selfseat__selfSeatCancelBtn_normal.png" Stretch="Fill" /></Setter.Value></Setter>
+        <Setter Property="Background"><Setter.Value><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/Table/selfseat__selfSeatCancelBtn_normal.png" Stretch="Fill" /></Setter.Value></Setter>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background"><Setter.Value><ImageBrush ImageSource="pack://application:,,,/CardGame.Wpf;component/Assets/Table/selfseat__selfSeatCancelBtn_disabled.png" Stretch="Fill" /></Setter.Value></Setter>
+                <Setter Property="Background"><Setter.Value><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/Table/selfseat__selfSeatCancelBtn_disabled.png" Stretch="Fill" /></Setter.Value></Setter>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -381,11 +381,11 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Padding" Value="9,3" />
-        <Setter Property="Background"><Setter.Value><ImageBrush ImageSource="pack://application:,,,/CardGame.Wpf;component/Assets/Table/selfseat__selfSeatResetBtn_normal.png" Stretch="Fill" /></Setter.Value></Setter>
+        <Setter Property="Background"><Setter.Value><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/Table/selfseat__selfSeatResetBtn_normal.png" Stretch="Fill" /></Setter.Value></Setter>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.55" />
-                <Setter Property="Background"><Setter.Value><ImageBrush ImageSource="pack://application:,,,/CardGame.Wpf;component/Assets/Table/selfseat__selfSeatResetBtn_normal.png" Stretch="Fill" /></Setter.Value></Setter>
+                <Setter Property="Background"><Setter.Value><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/Table/selfseat__selfSeatResetBtn_normal.png" Stretch="Fill" /></Setter.Value></Setter>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -401,7 +401,7 @@
     </DrawingBrush>
     <DataTemplate x:Key="EquipmentSlotTemplate">
         <Grid Width="142" Height="27" Margin="0,1" ToolTip="{Binding Tooltip}" AutomationProperties.Name="{Binding Tooltip}">
-            <Grid.Background><ImageBrush ImageSource="pack://application:,,,/CardGame.Wpf;component/Assets/Table/seatbottom__self_seat_bg.png" ViewboxUnits="Absolute" Viewbox="0,0,298,68" Stretch="Fill" /></Grid.Background>
+            <Grid.Background><ImageBrush ImageSource="pack://siteoforigin:,,,/Assets/Table/seatbottom__self_seat_bg.png" ViewboxUnits="Absolute" Viewbox="0,0,298,68" Stretch="Fill" /></Grid.Background>
             <TextBlock x:Name="EmptySlotText" Text="{Binding SlotName}" Foreground="#928779" FontFamily="KaiTi" FontSize="11" VerticalAlignment="Center" HorizontalAlignment="Center" />
             <Image Source="{Binding Artwork}" Stretch="Fill" />
             <TextBlock x:Name="EquipmentRuntimeName" Text="{Binding Name}" Foreground="#4D3923" FontFamily="KaiTi" FontSize="11"
@@ -644,7 +644,7 @@
                                                 <Image x:Name="EmptyHealthPip" Source="{Binding}" Stretch="Uniform" Visibility="Collapsed" />
                                             </Grid>
                                             <DataTemplate.Triggers>
-                                                <DataTrigger Binding="{Binding}" Value="pack://application:,,,/CardGame.Wpf;component/Assets/gallery-hp-empty.png">
+                                                <DataTrigger Binding="{Binding}" Value="pack://siteoforigin:,,,/Assets/gallery-hp-empty.png">
                                                     <Setter TargetName="FilledHealthPip" Property="Visibility" Value="Collapsed" />
                                                     <Setter TargetName="EmptyHealthPip" Property="Visibility" Value="Visible" />
                                                 </DataTrigger>
@@ -1024,7 +1024,7 @@
                 <Grid>
                     <Rectangle Fill="{Binding Portrait.ThumbnailBrush}" />
                     <Rectangle Fill="{StaticResource PortraitShade}" />
-                    <Image Source="/CardGame.Wpf;component/Assets/gallery-portrait-frame.png" Stretch="Fill" IsHitTestVisible="False" />
+                    <Image Source="pack://siteoforigin:,,,/Assets/gallery-portrait-frame.png" Stretch="Fill" IsHitTestVisible="False" />
                     <Border HorizontalAlignment="Left" VerticalAlignment="Top" Background="#D13C3528" Padding="6,2" Margin="7,7,0,0">
                         <TextBlock Text="{Binding Kingdom}" FontFamily="KaiTi" FontSize="18" Foreground="#F2E4C3" />
                     </Border>

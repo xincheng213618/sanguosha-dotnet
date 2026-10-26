@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text.Json;
 using CardGame.Wpf.ViewModels;
+using CardGame.Wpf.Resources;
 
 namespace CardGame.Wpf.Audio;
 
@@ -39,10 +40,7 @@ public sealed record GameAudioAsset
         {
             const string prefix = "src/CardGame.Wpf/Assets/Audio/Official/";
             if (!LocalPath.StartsWith(prefix, StringComparison.Ordinal)) throw new InvalidDataException("Invalid audio path.");
-            var root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "Assets", "Audio", "Official")) + Path.DirectorySeparatorChar;
-            var path = Path.GetFullPath(Path.Combine(root, LocalPath[prefix.Length..]));
-            if (!path.StartsWith(root, StringComparison.OrdinalIgnoreCase)) throw new InvalidDataException("Audio path escapes assets.");
-            return path;
+            return AssetFiles.GetPath(LocalPath);
         }
     }
 }

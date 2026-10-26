@@ -136,8 +136,8 @@ public sealed partial class SeatViewModel : ObservableObject
                 _healthIconCount = count;
                 _filledHealthIcons = filled;
                 _healthImages = Array.AsReadOnly(Enumerable.Range(0, count).Select(index => index >= count - filled
-                    ? "pack://application:,,,/CardGame.Wpf;component/Assets/gallery-hp-wu.png"
-                    : "pack://application:,,,/CardGame.Wpf;component/Assets/gallery-hp-empty.png").ToArray());
+                    ? "pack://siteoforigin:,,,/Assets/gallery-hp-wu.png"
+                    : "pack://siteoforigin:,,,/Assets/gallery-hp-empty.png").ToArray());
             }
             return _healthImages;
         }

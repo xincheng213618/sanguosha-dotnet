@@ -66,7 +66,7 @@ public sealed class GeneralGalleryEntryViewModel
     public bool HasRulesLabel => RulesLabel.Length > 0;
     public string VerticalName => string.Join("\n", CardName.Replace("SP", string.Empty, StringComparison.Ordinal).Trim().ToCharArray());
     public string AccessibilityText => $"{Name}，{Kingdom}，{GroupName}，{HealthText}，{SkillName}";
-    public string FactionImage => $"pack://application:,,,/CardGame.Wpf;component/Assets/gallery-faction-{(FactionId == "god" ? "shen" : FactionId is "wei" or "shu" or "wu" or "jin" ? FactionId : "qun")}.png";
+    public string FactionImage => $"pack://siteoforigin:,,,/Assets/gallery-faction-{(FactionId == "god" ? "shen" : FactionId is "wei" or "shu" or "wu" or "jin" ? FactionId : "qun")}.png";
     public IReadOnlyList<string> HealthImages { get; init; } = [];
     public bool HasPortrait => GeneralArt.HasPortrait(Portrait.ArtworkId);
     public Brush FactionBrush => FactionId switch

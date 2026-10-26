@@ -24,8 +24,8 @@
  </UserControl.Resources>
  <Grid>
   <Grid IsHitTestVisible="False"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-   <Image Source="/CardGame.Wpf;component/Assets/Wushuang/roguelike1v1_bg_l.png" Stretch="Fill"/>
-   <Image Grid.Column="1" Source="/CardGame.Wpf;component/Assets/Wushuang/roguelike1v1_bg_r.png" Stretch="Fill"/>
+   <Image Source="pack://siteoforigin:,,,/Assets/Wushuang/roguelike1v1_bg_l.png" Stretch="Fill"/>
+   <Image Grid.Column="1" Source="pack://siteoforigin:,,,/Assets/Wushuang/roguelike1v1_bg_r.png" Stretch="Fill"/>
   </Grid>
   <Grid Margin="24,0">
    <Grid.RowDefinitions><RowDefinition Height="88"/><RowDefinition Height="460"/><RowDefinition Height="102"/></Grid.RowDefinitions>
@@ -34,12 +34,12 @@
      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
       <Image Source="{Binding WushuangShopTitleImage}" Width="148" Stretch="Uniform"/>
       <Button Command="{Binding CloseWushuangShopCommand}" Style="{StaticResource ImageButton}" Width="40" Height="36" Margin="10,0,0,0" ToolTip="结束购买 · Esc">
-       <Image Source="/CardGame.Wpf;component/Assets/Wushuang/roguelike1v1_hide.png" Width="38"/>
+       <Image Source="pack://siteoforigin:,,,/Assets/Wushuang/roguelike1v1_hide.png" Width="38"/>
       </Button>
      </StackPanel>
     </Border>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,4,0" VerticalAlignment="Top" ToolTip="本局虎符">
-     <Image Source="/CardGame.Wpf;component/Assets/Wushuang/roguelike1v1_hufu_icon.png" Width="32" Height="30"/>
+     <Image Source="pack://siteoforigin:,,,/Assets/Wushuang/roguelike1v1_hufu_icon.png" Width="32" Height="30"/>
      <TextBlock Text="{Binding WushuangProgressText}" FontSize="24" Foreground="#E8D5A3" VerticalAlignment="Center" Margin="8,0,0,0"/>
     </StackPanel>
    </Grid>
@@ -63,7 +63,7 @@
          <Image Source="{Binding Artwork}" Width="90" Height="90" Stretch="Uniform"/>
         </Grid>
         <Grid x:Name="WushuangSkillNamePlate" Width="128" Height="38" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,65,0,0" Visibility="{Binding IsSkill, Converter={StaticResource VisibleWhen}}">
-         <Image Source="/CardGame.Wpf;component/Assets/Wushuang/rogue1v1_skill_bg.png" Stretch="Fill" Opacity="0.72"/>
+         <Image Source="pack://siteoforigin:,,,/Assets/Wushuang/rogue1v1_skill_bg.png" Stretch="Fill" Opacity="0.72"/>
          <TextBlock Text="{Binding DisplayName}" FontSize="27" FontWeight="Bold" Foreground="#FFE3B4" HorizontalAlignment="Center" VerticalAlignment="Center"><TextBlock.Effect><DropShadowEffect Color="#663A21" BlurRadius="2" ShadowDepth="0" Opacity="1"/></TextBlock.Effect></TextBlock>
         </Grid>
         <Grid Height="26" VerticalAlignment="Top" Margin="0,188,0,0" Visibility="{Binding IsTactic, Converter={StaticResource VisibleWhen}}">
@@ -77,7 +77,7 @@
          </Style.Triggers></Style></TextBlock.Style>
         </TextBlock>
        </Grid>
-       <Image Source="/CardGame.Wpf;component/Assets/Wushuang/rg1v1_full_replace.png" Width="112" Height="28" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,-9" Visibility="{Binding RequiresReplacement, Converter={StaticResource VisibleWhen}}" ToolTip="已满替换：选择要替换的额外技能后才扣除虎符"/>
+       <Image Source="pack://siteoforigin:,,,/Assets/Wushuang/rg1v1_full_replace.png" Width="112" Height="28" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,-9" Visibility="{Binding RequiresReplacement, Converter={StaticResource VisibleWhen}}" ToolTip="已满替换：选择要替换的额外技能后才扣除虎符"/>
       </Grid>
       <Grid x:Name="WushuangPriceSlot" Grid.Row="2" Width="212" Height="52" HorizontalAlignment="Center">
        <Button Command="{Binding DataContext.BuyWushuangOfferCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" IsEnabled="{Binding IsEnabled}" Opacity="1" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{Binding DisplayName}">
@@ -85,13 +85,13 @@
          <Image Source="{Binding PurchaseButtonImage}" Stretch="Fill"/>
          <Border BorderBrush="#A4A5A3" BorderThickness="1" Margin="1" Visibility="{Binding IsReadOnly, Converter={StaticResource VisibleWhen}}"><Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0,1"><GradientStop Color="#DA777B7D" Offset="0"/><GradientStop Color="#ED303236" Offset="1"/></LinearGradientBrush></Border.Background></Border>
          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-          <Image Source="/CardGame.Wpf;component/Assets/Wushuang/roguelike1v1_hufu_icon.png" Width="30" Height="27" Margin="0,0,13,0" Visibility="{Binding ShowsPriceIcon, Converter={StaticResource VisibleWhen}}"/>
+          <Image Source="pack://siteoforigin:,,,/Assets/Wushuang/roguelike1v1_hufu_icon.png" Width="30" Height="27" Margin="0,0,13,0" Visibility="{Binding ShowsPriceIcon, Converter={StaticResource VisibleWhen}}"/>
           <TextBlock Text="{Binding PriceText}" FontSize="28" Foreground="{Binding PriceForeground}" FontWeight="Bold" VerticalAlignment="Center"/>
          </StackPanel>
         </Grid>
         <Button.Style><Style TargetType="Button" BasedOn="{StaticResource ImageButton}"><Setter Property="Visibility" Value="Visible"/><Style.Triggers><DataTrigger Binding="{Binding IsPurchased}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></Button.Style>
        </Button>
-       <Image Source="/CardGame.Wpf;component/Assets/Wushuang/rogue1v1_had_buy.png" Width="100" Height="48" Stretch="Uniform" Visibility="{Binding IsPurchased, Converter={StaticResource VisibleWhen}}"/>
+       <Image Source="pack://siteoforigin:,,,/Assets/Wushuang/rogue1v1_had_buy.png" Width="100" Height="48" Stretch="Uniform" Visibility="{Binding IsPurchased, Converter={StaticResource VisibleWhen}}"/>
       </Grid>
      </Grid>
     </DataTemplate></ItemsControl.ItemTemplate>
@@ -99,7 +99,7 @@
    <Grid Grid.Row="2">
     <Button x:Name="WushuangCloseShopButton" Command="{Binding CloseWushuangShopCommand}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0,0,0,16" ToolTip="返回牌桌 · Esc">
      <Button.Style><Style TargetType="Button" BasedOn="{StaticResource FooterAction}"><Style.Triggers><DataTrigger Binding="{Binding IsWushuangOpening}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></Button.Style>
-     <Grid Width="62" Height="74"><Grid.RowDefinitions><RowDefinition Height="48"/><RowDefinition Height="26"/></Grid.RowDefinitions><Image x:Name="WushuangEndIcon" Source="/CardGame.Wpf;component/Assets/Wushuang/rg1v1_exit0.png" Width="48" Height="48"/><TextBlock Grid.Row="1" Text="{Binding WushuangCloseText}" FontSize="24" Foreground="#EAD69B" HorizontalAlignment="Center" VerticalAlignment="Center"/></Grid>
+     <Grid Width="62" Height="74"><Grid.RowDefinitions><RowDefinition Height="48"/><RowDefinition Height="26"/></Grid.RowDefinitions><Image x:Name="WushuangEndIcon" Source="pack://siteoforigin:,,,/Assets/Wushuang/rg1v1_exit0.png" Width="48" Height="48"/><TextBlock Grid.Row="1" Text="{Binding WushuangCloseText}" FontSize="24" Foreground="#EAD69B" HorizontalAlignment="Center" VerticalAlignment="Center"/></Grid>
     </Button>
     <Grid Width="730" Height="32" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,37">
      <ProgressBar Minimum="0" Maximum="{Binding WushuangShopWindowSeconds, Mode=OneWay}" Value="{Binding WushuangShopSecondsRemaining, Mode=OneWay}" Visibility="{Binding IsWushuangShopInteractive, Converter={StaticResource VisibleWhen}}" Height="10">
@@ -114,8 +114,8 @@
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,16" Style="{StaticResource AfterOpening}">
      <Button x:Name="WushuangLockButton" Command="{Binding ToggleWushuangShopLockCommand}" Style="{StaticResource FooterAction}" ToolTip="{Binding WushuangLockText}"><Grid Width="62" Height="74"><Grid.RowDefinitions><RowDefinition Height="48"/><RowDefinition Height="26"/></Grid.RowDefinitions><Image x:Name="WushuangLockIcon" Source="{Binding WushuangLockImage}" Width="48" Height="48"/></Grid></Button>
      <Button x:Name="WushuangRerollButton" Command="{Binding RerollWushuangShopCommand}" Style="{StaticResource FooterAction}" ToolTip="{Binding WushuangRerollText}">
-      <Grid Width="62" Height="74"><Grid.RowDefinitions><RowDefinition Height="48"/><RowDefinition Height="26"/></Grid.RowDefinitions><Image x:Name="WushuangRefreshIcon" Source="/CardGame.Wpf;component/Assets/Wushuang/roguelike1v1_shop_refresh.png" Width="48" Height="48"/>
-       <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"><Image Source="/CardGame.Wpf;component/Assets/Wushuang/roguelike1v1_hufu_icon.png" Width="23" Height="20" Visibility="{Binding WushuangRerollShowsToken, Converter={StaticResource VisibleWhen}}"/><TextBlock Text="{Binding WushuangRerollPriceText}" Foreground="#EBD49C" FontSize="23" Margin="5,0,0,0"/></StackPanel>
+      <Grid Width="62" Height="74"><Grid.RowDefinitions><RowDefinition Height="48"/><RowDefinition Height="26"/></Grid.RowDefinitions><Image x:Name="WushuangRefreshIcon" Source="pack://siteoforigin:,,,/Assets/Wushuang/roguelike1v1_shop_refresh.png" Width="48" Height="48"/>
+       <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"><Image Source="pack://siteoforigin:,,,/Assets/Wushuang/roguelike1v1_hufu_icon.png" Width="23" Height="20" Visibility="{Binding WushuangRerollShowsToken, Converter={StaticResource VisibleWhen}}"/><TextBlock Text="{Binding WushuangRerollPriceText}" Foreground="#EBD49C" FontSize="23" Margin="5,0,0,0"/></StackPanel>
       </Grid>
      </Button>
     </StackPanel>

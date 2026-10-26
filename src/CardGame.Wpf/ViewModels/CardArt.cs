@@ -1,15 +1,12 @@
-using System.IO;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using CardGame.Core;
+using CardGame.Wpf.Resources;
 
 namespace CardGame.Wpf.ViewModels;
 
 /// <summary>Presentation assets keyed by CardKind; rank, suit and rules remain independent.</summary>
 public static class CardArt
 {
-    private static readonly Dictionary<string, ImageSource?> Cache = [];
-
     public static bool NeedsRuntimeNameOverlay(CardKind? kind) =>
         kind is CardKind.GeneralWeapon or CardKind.ScarletBloodSword or CardKind.Xuanjian or CardKind.ColdSlash or
             CardKind.AnqiFeiren or CardKind.YaodaoChitong or CardKind.ShanheXingtianAxe or CardKind.Leizhen or CardKind.MantianGuohai;
@@ -33,30 +30,5 @@ public static class CardArt
     public static ImageSource? GetEquipment(CardKind kind) =>
         EquipmentCatalog.IsEquipment(kind) ? Load($"equip-{(kind is CardKind.Xuanjian or CardKind.ShanheXingtianAxe or CardKind.Leizhen ? CardKind.GeneralWeapon : kind)}.png") : null;
 
-    private static ImageSource? Load(string key)
-    {
-        lock (Cache)
-        {
-            if (Cache.TryGetValue(key, out var cached)) return cached;
-            var path = Path.Combine(AppContext.BaseDirectory, "Assets", "Cards", key);
-            ImageSource? image = null;
-            try
-            {
-                using var stream = File.OpenRead(path);
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.StreamSource = stream;
-                bitmap.EndInit();
-                bitmap.Freeze();
-                image = bitmap;
-            }
-            catch (Exception exception) when (exception is IOException or FileFormatException or UnauthorizedAccessException or NotSupportedException)
-            {
-                // A missing or unreadable optional face must not prevent playing the card.
-            }
-            Cache[key] = image;
-            return image;
-        }
-    }
+    private static ImageSource? Load(string key) => AssetImages.Load("Assets/Cards/" + key);
 }

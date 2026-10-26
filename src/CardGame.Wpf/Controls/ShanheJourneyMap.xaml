@@ -5,7 +5,7 @@
              Width="1040" Height="500" Background="Transparent"
              AutomationProperties.Name="山河图征途路线" KeyboardNavigation.TabNavigation="Continue">
     <UserControl.Resources>
-        <DataTemplate x:Key="GateEmblem"><Image Source="/CardGame.Wpf;component/Assets/shanhe-gate.png" Width="78" Height="59" Stretch="Uniform"/></DataTemplate>
+        <DataTemplate x:Key="GateEmblem"><Image Source="pack://siteoforigin:,,,/Assets/shanhe-gate.png" Width="78" Height="59" Stretch="Uniform"/></DataTemplate>
         <DataTemplate x:Key="EventEmblem"><Grid Width="58" Height="56">
             <Ellipse Width="48" Height="48" Fill="#EDB08035" Stroke="#FFE4A0" StrokeThickness="2"/>
             <Ellipse Width="40" Height="40" Stroke="#8D5929" StrokeThickness="1"/>
@@ -111,7 +111,7 @@
         </Style>
     </UserControl.Resources>
     <Grid ClipToBounds="False">
-        <Image Source="/CardGame.Wpf;component/Assets/shanhe-map.png" Stretch="Fill" IsHitTestVisible="False"/>
+        <Image Source="pack://siteoforigin:,,,/Assets/shanhe-map.png" Stretch="Fill" IsHitTestVisible="False"/>
         <Border BorderBrush="#987548" BorderThickness="1" IsHitTestVisible="False"/>
         <ItemsControl ItemsSource="{Binding ShanheMapLinks}" IsHitTestVisible="False" Focusable="False">
             <ItemsControl.ItemsPanel><ItemsPanelTemplate><Canvas /></ItemsPanelTemplate></ItemsControl.ItemsPanel>

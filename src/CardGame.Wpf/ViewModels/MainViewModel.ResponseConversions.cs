@@ -10,7 +10,8 @@ public sealed partial class MainViewModel
             TryReadConversionSource(choice.Parameters, out var source) && source == Source;
     }
 
-    private sealed record ResponseConversionDraft(string SkillId, ResponseConversionMode? Mode, bool SelectByMaterials = false);
+    private sealed record ResponseConversionDraft(string? SkillId, ResponseConversionMode? Mode, bool SelectByMaterials = false,
+        CardKind? EquipmentKind = null);
     private ResponseConversionDraft? _responseConversionSelection;
     private IReadOnlyList<ResponseConversionMode> _responseConversionOfferedModes = [];
     private IReadOnlyList<PromptChoice> _responseConversionModeChoices = [];
@@ -54,10 +55,12 @@ public sealed partial class MainViewModel
 
     private IEnumerable<PromptChoice> AvailableHandResponseChoices => _snapshot.PendingDecision!.Choices.Where(choice =>
         IsResponseConversionSelectionPending
-            ? choice.Cards.Count == 0 || (_responseConversionSelection!.SelectByMaterials
+            ? choice.Cards.Count == 0 || (_responseConversionSelection!.EquipmentKind is not null
+                ? ZhangbaResponseChoiceIds.Contains(choice.Id)
+                : _responseConversionSelection.SelectByMaterials
                 ? ResponseConversionModes.Any(mode => mode.Source.SkillId == _responseConversionSelection.SkillId && mode.Matches(choice))
                 : _responseConversionSelection.Mode?.Matches(choice) == true)
-            : ResponseConversionRule(choice) is null);
+            : ResponseConversionRule(choice) is null && !ZhangbaResponseChoiceIds.Contains(choice.Id));
 
     private bool TrySelectResponseConversion(HumanSkillViewModel skill)
     {
@@ -110,7 +113,9 @@ public sealed partial class MainViewModel
     }
 
     private string ResponseConversionSelectionText => _responseConversionSelection is { } draft
-        ? $"已选择【{CurrentPresentationRegistry.GetSkill(draft.SkillId).Name}】· " + (draft.SelectByMaterials
+        ? draft.EquipmentKind is { } equipment
+            ? $"已选择【{CardCatalog.Get(equipment).DisplayName}】· 选择两张合法手牌当【杀】，确认后打出"
+        : $"已选择【{CurrentPresentationRegistry.GetSkill(draft.SkillId!).Name}】· " + (draft.SelectByMaterials
             ? "直接选择合法材料牌，按所选牌确定效果；确认后发动"
             : draft.Mode is { } mode
             ? $"选择{mode.Count}张合法牌当【{CardCatalog.Get(mode.Kind).DisplayName}】；确认后发动"
@@ -127,6 +132,7 @@ public sealed partial class MainViewModel
     private void SyncResponseConversionSelection()
     {
         if (_responseConversionSelection is not { } draft) return;
+        if (draft.EquipmentKind is not null && ZhangbaResponseChoiceIds.Count > 0) return;
         var modes = ResponseConversionModes.Where(mode => mode.Source.SkillId == draft.SkillId).ToArray();
         if (modes.Length == 0 || draft.Mode is { } selected && !modes.Contains(selected))
         {

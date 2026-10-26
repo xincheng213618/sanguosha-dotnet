@@ -1,4 +1,5 @@
 using System.Windows.Media;
+using CardGame.Wpf.Resources;
 
 namespace CardGame.Wpf.ViewModels;
 
@@ -48,7 +49,7 @@ public sealed class GeneralPortraitViewModel(string generalId, string? skinId = 
 
 public sealed record GeneralSkin(string Id, string Name, string LocalPath)
 {
-    public ImageSource Thumbnail => GeneralArt.LoadImage(LocalPath, 180);
+    public ImageSource? Thumbnail => AssetImages.Load(LocalPath, 180);
 }
 
 public sealed record GeneralGallerySkill(string Name, string Description, string GeneralId = "")

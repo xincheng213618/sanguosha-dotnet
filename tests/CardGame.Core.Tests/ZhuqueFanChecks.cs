@@ -19,6 +19,8 @@ internal static class ZhuqueFanChecks
         var source = before.Players[boundary.SourceSeat];
         var primary = before.Players[boundary.PrimaryTargetSeat];
         var chained = before.Players[boundary.ChainedTargetSeat];
+        Require(game.GetHumanActionView().CanInvokeZhuqueFan,
+            "The human action view must expose the effective Zhuque Fan ability for its later UI choice.");
         Require(source.Equipment.Any(card =>
                     card.Id == boundary.WeaponCardId && card.Kind == CardKind.ZhuqueFan) &&
                 primary.IsChained && chained.IsChained,

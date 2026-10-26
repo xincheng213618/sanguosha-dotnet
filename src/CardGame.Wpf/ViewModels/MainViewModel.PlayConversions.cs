@@ -53,6 +53,7 @@ public sealed partial class MainViewModel
             var bySkill = new Dictionary<string, List<PlayConversionMode>>(StringComparer.Ordinal);
             foreach (var action in actions)
             {
+                if (ZhuqueFanAlternatives.Contains(action)) continue;
                 if (PlayConversionActivation(action) is { } rule)
                 {
                     var id = action.ProgramSkillId!;
@@ -77,7 +78,7 @@ public sealed partial class MainViewModel
         PlayConversionModesBySkill.GetValueOrDefault(skillId) ?? [];
 
     private bool MatchesSelectedPlayConversion(LegalAction action) =>
-        action.ConversionSource == _selectedConversionSource &&
+        !ZhuqueFanAlternatives.Contains(action) && action.ConversionSource == _selectedConversionSource &&
         (IsPlayConversionSelectionPending ? _playConversionSelection!.Mode?.Matches(action) == true
             : !PlayConversionSources(action).Any());
 
