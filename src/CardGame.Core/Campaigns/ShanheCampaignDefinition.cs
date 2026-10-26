@@ -59,6 +59,7 @@ public sealed record ShanheBattleSetup(
     public const string PlayerTeamId = "team:shanhe-player";
     public const string EnemyTeamId = "team:shanhe-enemy";
     public IReadOnlyList<string> TacticSkillIds { get; init; } = Array.Empty<string>();
+    public IReadOnlyList<int> ActiveSchoolIds { get; init; } = Array.Empty<int>();
     /// <summary>Fallback for a printed God general with no chosen or native effective faction.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? DefaultGodFactionId { get; init; }
@@ -97,6 +98,10 @@ public sealed record ShanheBattleSetup(
         ArgumentNullException.ThrowIfNull(setup.EnemyRoster);
         ArgumentNullException.ThrowIfNull(setup.AllyRoster);
         ArgumentNullException.ThrowIfNull(setup.TacticSkillIds);
+        ArgumentNullException.ThrowIfNull(setup.ActiveSchoolIds);
+        if (setup.ActiveSchoolIds.Any(id => id is < 1 or > 9) ||
+            setup.ActiveSchoolIds.Distinct().Count() != setup.ActiveSchoolIds.Count)
+            throw new ArgumentException("A campaign school must be distinct and belong to the nine-school catalogue.", nameof(setup));
         if (setup.EnemyRoster.Any(value => value is null) || setup.AllyRoster.Any(value => value is null))
             throw new ArgumentException("A campaign roster cannot contain null combatants.", nameof(setup));
         if (setup.StartingCards.Any(value => value is null) || setup.StartingEquipment.Any(value => value is null))
@@ -108,6 +113,7 @@ public sealed record ShanheBattleSetup(
             StartingCards = ShanheCampaignContent.Freeze(setup.StartingCards),
             StartingEquipment = ShanheCampaignContent.Freeze(setup.StartingEquipment),
             TacticSkillIds = ShanheCampaignContent.Freeze(setup.TacticSkillIds),
+            ActiveSchoolIds = ShanheCampaignContent.Freeze(setup.ActiveSchoolIds),
             EnemyRoster = ShanheCampaignContent.Freeze(setup.EnemyRoster.Select(ShanheCampaignContent.FreezeCombatant)),
             AllyRoster = ShanheCampaignContent.Freeze(setup.AllyRoster.Select(ShanheCampaignContent.FreezeCombatant)),
             MarketSetup = setup.MarketSetup is null ? null : ShanheBattleMarketSetup.Freeze(setup.MarketSetup)

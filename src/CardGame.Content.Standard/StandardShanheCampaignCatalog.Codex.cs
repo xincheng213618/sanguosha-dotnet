@@ -78,6 +78,7 @@ public static partial class StandardShanheCampaignCatalog
             .Append(new(141, CurrentPianzhuanjiaRewardId))
             .Append(new(147, CurrentTouxiRewardId))
             .Append(new(78, CurrentCuixue2RewardId))
+            .Append(new(106, CurrentSanbanfu2RewardId))
             .Append(new(91, CurrentYuanzhu3RewardId))
             .Append(new(74, "chapter-skill-3020"))
             .Append(new(93, "chapter-skill-3017"))

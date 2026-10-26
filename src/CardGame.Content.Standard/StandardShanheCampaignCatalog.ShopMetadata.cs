@@ -33,8 +33,9 @@ public static partial class StandardShanheCampaignCatalog
                 CurrentLeihuoRewardId, CurrentLianjiRewardId, CurrentErlianjiRewardId,
                 CurrentTiebushan4RewardId, CurrentJingjijiaRewardId, "codex-card-4059"])
             .Concat(CurrentEconomyTactics.Where(source => source.RewardId != CurrentInterest2RewardId).Select(source => source.RewardId))
-            .Concat([CurrentMuniuLiumaRewardId, CurrentSougua3RewardId, CurrentFenjinRewardId])
+            .Concat([CurrentMuniuLiumaRewardId, CurrentSougua3RewardId, CurrentFenjinRewardId, CurrentSanbanfuRewardId])
             .Concat(CurrentBuildSkillDefaultUnlockedRewardIds)
+            .Concat(CurrentMiaoshouDefaultUnlockedRewardIds)
             .Concat(StandardShanheOriginalSkills.DefaultStockRewardIds)
             .Concat(CurrentReactionTacticDefaultUnlockedRewardIds)
             .Concat(CurrentShopCardSources.Where(source => source.CodexNodeId is null).Select(source => source.RewardId))
@@ -80,6 +81,8 @@ public static partial class StandardShanheCampaignCatalog
                 [CurrentMuniuLiumaRewardId] = new(2088, 500, 3, "战法"),
                 [CurrentSougua3RewardId] = new(2170, 500, 3, "战法"),
                 [CurrentFenjinRewardId] = new(2228, 200, 1, "战法"),
+                [CurrentSanbanfuRewardId] = new(2042, 500, 3, "战法"),
+                [CurrentSanbanfu2RewardId] = new(2043, 700, 4, "战法"),
                 [CurrentYaoliRewardId] = new(2319, 200, 1, "战法"),
                 [CurrentYaoli2RewardId] = new(2320, 300, 2, "战法"),
                 [CurrentYaoli3RewardId] = new(2321, 500, 3, "战法"),
@@ -162,6 +165,7 @@ public static partial class StandardShanheCampaignCatalog
                 ["codex-card-4092"] = new(4092, 150, 1, "牌", CardKind.FiveGrains, Suit.Club, 5),
                 ["codex-card-4107"] = new(4107, 200, 2, "牌", CardKind.Lightning, Suit.Heart, 1)
             }.Concat(CurrentBuildSkillShopMetadata)
+                .Concat(CurrentMiaoshouShopMetadata)
                 .Concat(CurrentReactionTacticShopMetadata)
                 .Concat(CurrentShopCardMetadata)
                 .Concat(CurrentEconomyTactics.Select(source => new KeyValuePair<string, ShanheShopMetadata>(source.RewardId,

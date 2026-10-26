@@ -59,6 +59,8 @@ internal sealed class SkillProgramDependencies
             modifier.Condition == SkillProgramDamageModifierCondition.OwnerRoundSlashUseOrdinalWithinLimit));
         HasActualTurnElementalSlashUseDamageModifiers = programs.Any(program => program.DamageModifiers.Any(modifier =>
             modifier.Condition == SkillProgramDamageModifierCondition.OwnerActualTurnElementalSlashUseOrdinalWithinLimit));
+        HasGameSlashUseDamageModifiers = programs.Any(program => program.DamageModifiers.Any(modifier =>
+            modifier.Condition == SkillProgramDamageModifierCondition.OwnerGameSlashUseOrdinalMultipleOfThree));
         TracksCurrentRoundActualUses = UsesLeiluanBasicUse || HasRoundSlashUseDamageModifiers || programs.Any(program => program.Modifiers.Any(modifier =>
             modifier.ValueExpression == SkillRuleValueExpression.NegatedCurrentRoundActualUseCount));
         HasWholeActualTurnTrickDamageModifiers = programs.Any(program => program.DamageModifiers.Any(modifier =>
@@ -80,7 +82,7 @@ internal sealed class SkillProgramDependencies
             modifier.CapsToAmount && modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageParticipant &&
             modifier.Condition == SkillProgramDamageModifierCondition.Always));
         TracksEffectiveUseNames = triggers.Any(trigger => trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ResolveLeCaiYongFeibai));
-        TracksWholeActualTurnUseOrdinal = RequiresFact(ProgramTrackedFact.WholeActualUseDeclaration) || TracksEffectiveUseNames || programs.Any(program => program.CardPolicies.Any(policy => policy.Kind == SkillProgramCardPolicyKind.OwnTurnFirstLostHpUses)) || HasWholeActualTurnTrickDamageModifiers || HasActualTurnElementalSlashUseDamageModifiers || triggers.Any(trigger => trigger.Effects.Any(effect =>
+        TracksWholeActualTurnUseOrdinal = RequiresFact(ProgramTrackedFact.WholeActualUseDeclaration) || TracksEffectiveUseNames || programs.Any(program => program.CardPolicies.Any(policy => policy.Kind == SkillProgramCardPolicyKind.OwnTurnFirstLostHpUses)) || HasWholeActualTurnTrickDamageModifiers || HasActualTurnElementalSlashUseDamageModifiers || HasGameSlashUseDamageModifiers || triggers.Any(trigger => trigger.Effects.Any(effect =>
             effect.Op is SkillProgramEffectOp.ResolveBingzhongExtraTargets or SkillProgramEffectOp.ResolveMouHuangYueyingBingcai or SkillProgramEffectOp.CaptureWushuangWangongUse));
         TracksCurrentTurnUseKinds = UsesLeiluanBasicUse || TracksActualTurnUseOrdinal || TracksCurrentRoundActualUses || TracksWholeActualTurnUseOrdinal || programs.Any(program =>
             program.Modifiers.Any(modifier => modifier.ValueExpression == SkillRuleValueExpression.CurrentTurnUsedHandSuitCount) ||
@@ -184,7 +186,8 @@ internal sealed class SkillProgramDependencies
     internal bool HasWholeActualTurnTrickDamageModifiers { get; }
     internal bool HasRoundSlashUseDamageModifiers { get; }
     internal bool HasActualTurnElementalSlashUseDamageModifiers { get; }
-    internal bool TracksSlashDamageUseOrdinals => HasRoundSlashUseDamageModifiers || HasActualTurnElementalSlashUseDamageModifiers;
+    internal bool HasGameSlashUseDamageModifiers { get; }
+    internal bool TracksSlashDamageUseOrdinals => HasRoundSlashUseDamageModifiers || HasActualTurnElementalSlashUseDamageModifiers || HasGameSlashUseDamageModifiers;
     internal bool HasPublicEnemyParticipantDamageModifiers { get; }
     internal bool HasSourceDistanceDamageModifiers { get; }
     internal bool HasSourceHpDamageModifiers { get; }

@@ -137,6 +137,8 @@ public sealed partial class GameEngine
             .SelectMany(r => new[] { !r.BossBattleOnly || boss ? r.TacticSkillId : null,
                 r.CampaignEconomy is { BattleSkillId: { } battleSkill, GoldAbove: { } threshold } &&
                 _options.ShanheBattle.MarketSetup.State.Gold > threshold ? battleSkill : null }.OfType<string>())
+            .Concat(_shanheMarket.GetSchoolProgress().Where(progress => progress.IsComplete)
+                .Select(progress => ShanheSchoolEffects.SkillId(progress.School)).OfType<string>())
             .GroupBy(id => id, StringComparer.Ordinal).ToDictionary(g => g.Key, g => g.Count(), StringComparer.Ordinal);
         var existing = owner.SkillGrants.Grants.Where(g => g.SourceId == "campaign:shanhe-tactic")
             .GroupBy(g => g.SkillId).ToDictionary(g => g.Key, g => g.OrderBy(x => x.GrantId, StringComparer.Ordinal).ToArray(), StringComparer.Ordinal);

@@ -56,8 +56,8 @@ public static partial class StandardShanheCampaignCatalog
     private static ShanheCampaignDefinition CreateCurrentBaseDefinition(int difficulty, string editionId) => editionId switch
     {
         LocalEditionId => CreateLegacyLocalDefinition(difficulty),
-        Returning2026EditionId => WithChapterProgression(WithCurrentReactionTactics(WithCurrentBuildSkills(WithBuildTactics(WithCurrentEconomyTactics(
-            WithCurrentLegendaryTactics(WithS5SpecialistGroupEncounters(CreateS5VanguardDefinition(difficulty))))))), difficulty),
+        Returning2026EditionId => WithCurrentMiaoshouTactic(WithCurrentThirdSlashTactics(WithChapterProgression(WithCurrentReactionTactics(WithCurrentBuildSkills(WithBuildTactics(WithCurrentEconomyTactics(
+            WithCurrentLegendaryTactics(WithS5SpecialistGroupEncounters(CreateS5VanguardDefinition(difficulty))))))), difficulty))),
         _ => throw new ArgumentException("Unknown Shanhe campaign edition.", nameof(editionId))
     };
 

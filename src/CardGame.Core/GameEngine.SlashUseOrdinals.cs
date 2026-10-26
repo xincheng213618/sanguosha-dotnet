@@ -9,10 +9,12 @@ public sealed partial class GameEngine
     {
         var elemental = modifier.Condition ==
             SkillProgramDamageModifierCondition.OwnerActualTurnElementalSlashUseOrdinalWithinLimit;
+        var wholeGame = modifier.Condition ==
+            SkillProgramDamageModifierCondition.OwnerGameSlashUseOrdinalMultipleOfThree;
         if (!IsSlashCard(effectiveKind) || elemental && effectiveKind == CardKind.Slash ||
             !IsValidPlayerSeat(actorSeat)) return false;
         var dependencies = _contentRegistry.ProgramDependencies;
-        if (elemental ? !dependencies.HasActualTurnElementalSlashUseDamageModifiers :
+        if (wholeGame ? !dependencies.HasGameSlashUseDamageModifiers : elemental ? !dependencies.HasActualTurnElementalSlashUseDamageModifiers :
             !dependencies.HasRoundSlashUseDamageModifiers) return false;
 
         var history = CompleteProgramEventHistory().ToArray();
@@ -39,16 +41,16 @@ public sealed partial class GameEngine
             if (SlashUseKindAtPrefix(issued, history, end, current) != effectiveKind || effectiveKind != use.CardKind)
                 throw new InvalidOperationException("Slash damage lost its exact native effective-kind evolution.");
         }
-        else if (elemental ? !HasOngoingWholeActualUseTurn : _roundNumber < 1)
+        else if (wholeGame ? _turnNumber < 1 : elemental ? !HasOngoingWholeActualUseTurn : _roundNumber < 1)
             return false;
 
         var boundary = -1;
-        for (var index = end - 1; index >= 0; index--)
+        for (var index = end - 1; !wholeGame && index >= 0; index--)
         {
             if (elemental ? history[index] is TurnStartedEvent : history[index] is RoundStartedEvent)
             { boundary = index; break; }
         }
-        if (boundary < 0) return false;
+        if (!wholeGame && boundary < 0) return false;
         if (elemental)
         {
             var turn = (TurnStartedEvent)history[boundary];
@@ -57,12 +59,12 @@ public sealed partial class GameEngine
                 history.Skip(boundary + 1).Take(end - boundary - 1)
                     .OfType<ActualTurnCursorReturnedEvent>().Any()) return false;
         }
-        else if (((RoundStartedEvent)history[boundary]).RoundNumber < 1) return false;
+        else if (!wholeGame && ((RoundStartedEvent)history[boundary]).RoundNumber < 1) return false;
 
         var count = CountSlashUsePrefix(history, boundary + 1, end, actorSeat, elemental, current);
         // A preview represents the next real declaration, never consumes a use.
         var ordinal = current is null ? checked(count + 1) : count;
-        return ordinal > 0 && ordinal <= modifier.MaximumUseOrdinal;
+        return ordinal > 0 && (wholeGame ? ordinal % 3 == 0 : ordinal <= modifier.MaximumUseOrdinal);
     }
 
     private int CountSlashUsePrefix(IReadOnlyList<IGameEvent> history, int start, int end,

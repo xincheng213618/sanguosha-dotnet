@@ -203,6 +203,7 @@ public static partial class StandardShanheCampaignCatalog
                     .OfType<string>()).Distinct(StringComparer.Ordinal).ToArray()),
                 TacticSkillIds = Array.AsReadOnly(requirements.TacticSkillIds.Concat(rewards.SelectMany(reward =>
                     new[] { reward.TacticSkillId, reward.CampaignEconomy?.BattleSkillId }.OfType<string>()))
+                    .Concat((market.Definition.Schools ?? []).Select(ShanheSchoolEffects.SkillId).OfType<string>())
                     .Distinct(StringComparer.Ordinal).ToArray())
             };
         }
@@ -218,9 +219,12 @@ public static partial class StandardShanheCampaignCatalog
         var currentLegendaryTactics = RequiresCurrentLegendaryTacticsRegistry(requirements);
         var buildTactics = RequiresBuildTacticsRegistry(requirements);
         var reactionTactics = RequiresReactionTacticsRegistry(requirements);
+        var thirdSlashTactics = RequiresCurrentThirdSlashRegistry(requirements);
+        var miaoshouTactic = RequiresCurrentMiaoshouRegistry(requirements);
         var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
+        var schoolEffects = extraSkills.Any(id => ShanheSchoolEffects.SchoolId(id) is not null);
         var currentFuqi = extraSkills.Contains(StandardShanheFuqiPackage.SkillId);
         var currentWangong = extraSkills.Contains(StandardShanheWangongPackage.SkillId);
         var currentLonghun = extraSkills.Contains(StandardShanheLonghunPackage.SkillId);
@@ -328,6 +332,8 @@ public static partial class StandardShanheCampaignCatalog
             (currentLegendaryTactics ? "/current-legendary-tactics" : "") +
             (buildTactics ? "/current-build-tactics" : "") +
             (reactionTactics ? "/current-reaction-tactics" : "") +
+            (thirdSlashTactics ? "/current-third-slash-tactics" : "") +
+            (miaoshouTactic ? "/current-miaoshou" : "") +
             (wealthTactics ? "/current-wealth-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
@@ -375,16 +381,26 @@ public static partial class StandardShanheCampaignCatalog
             (s5Zhangliao ? "/s5-zhangliao-722" : "") +
             (s5Zaiqi ? "/s5-zaiqi-887" : "") +
             (setup.RebirthAvailable ? "/rank-five-rebirth" : "") +
+            (schoolEffects ? "/school-effects" : "") +
             (setup.MarketSetup is { } marketCache ? "/market-" + ShanheCampaignContent.GetContentHash(marketCache.Definition) : "");
         return BattleRegistries.GetOrAdd(key, _ => new Lazy<ContentRegistry>(() =>
         {
             var packages = new List<IGameContentPackage> { new StandardShanheBossPackage() };
+            if (schoolEffects)
+            {
+                packages.Add(new StandardShanheSchoolBattlePackage());
+                packages.Add(new StandardShanheSchoolDrawPackage());
+                packages.Add(new StandardShanheSchoolVitalPackage());
+                packages.Add(new StandardShanheSchoolTrickPackage());
+            }
             if (setup.MarketSetup is not null) packages.Add(new StandardShanheMarketPackage());
             if (currentDingcuo) packages.Add(new StandardShanheDingcuoPackage());
             if (currentGuanchao) packages.Add(new StandardShanheGuanchaoPackage());
             if (localTroops) packages.Add(new StandardShanheLocalTroopPackage());
             if (currentLegendaryTactics) packages.Add(new StandardShanheLegendaryTacticsPackage());
             if (buildTactics) packages.Add(new StandardShanheBuildTacticsPackage());
+            if (thirdSlashTactics) packages.Add(new StandardShanheThirdSlashPackage());
+            if (miaoshouTactic) packages.Add(new StandardShanheMiaoshouPackage());
             if (reactionTactics)
             {
                 packages.Add(new StandardShanheArmorTacticsPackage());

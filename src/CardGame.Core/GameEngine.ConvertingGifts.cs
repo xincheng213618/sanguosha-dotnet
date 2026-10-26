@@ -1,6 +1,7 @@
 namespace CardGame.Core;
 public sealed partial class GameEngine
 {
+    private static readonly CardMoveReason HandCountDrawReason = new("skill-program.hand-count.draw");
     private readonly List<GiftHandRetentionObligation> _giftHandRetentionObligations = [];
     private long _giftHandRetentionSequence;
     [ProgramCapability]
@@ -33,8 +34,32 @@ public sealed partial class GameEngine
             { CancelProgramBindingAndCleanup(f, "体力值未定义，无法计算此效果。"); return SkillProgramStepOutcome.Continue; }
             limit = Math.Min(limit, _players[seat].MaxHp);
         }
-        DrawProgramCards(f.Id,seat,Math.Max(0,limit-GetHand(_players[seat]).Count),null,null,SkillProgramCardSetVisibility.Private,new("skill-program.hand-count.draw"));
-        return AwaitProgramBoundCardMovements(f.Id,f.OwnerSeat);
+        var count = Math.Max(0, limit - GetHand(_players[seat]).Count);
+        return count == 0 ? SkillProgramStepOutcome.Continue :
+            BeginOperationProgramDraw(f, seat, count, HandCountDrawReason);
+    }
+
+    [ProgramNativeDrawReturn(SkillProgramEffectOp.DrawToHandCount)]
+    private void ReturnHandCountDraw(ProgramSkillFrame supplied, NativeDrawOutcome outcome)
+    {
+        var frame = GetActiveProgramFrame(supplied.Id);
+        var instruction = ProgramInstructionResolver.Default.Resolve(frame,
+            _contentRegistry.GetSkill(frame.SkillId).Program!).Instructions[frame.InstructionIndex - 1];
+        var recipient = instruction.Target == SkillProgramEffectTarget.Owner ? frame.OwnerSeat :
+            frame.SelectedTargetSeats.Count == 1 ? frame.SelectedTargetSeats[0] : -1;
+        if (frame.NativeDraw is not null || instruction.Op != SkillProgramEffectOp.DrawToHandCount ||
+            recipient != outcome.RecipientSeat || outcome.RequestedCount is < 1 or > 16 ||
+            outcome.SequenceBefore > outcome.SequenceAfter || outcome.SequenceAfter != _movementSequence ||
+            outcome.ActualDrawIds.Count > outcome.RequestedCount ||
+            outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 ||
+            !_cardMovements.Where(move => move.Sequence > outcome.SequenceBefore && move.Sequence <= outcome.SequenceAfter &&
+                move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(recipient) && move.Reason == HandCountDrawReason)
+                .OrderBy(move => move.Sequence).Select(move => move.CardId).SequenceEqual(outcome.ActualDrawIds))
+            throw new InvalidOperationException("A hand-count refill lost its original recipient or native draw-material return.");
+        CompleteProgramDrawCards(frame.Id, recipient, null, SkillProgramCardSetVisibility.Private,
+            HandCountDrawReason, 0, outcome.ActualDrawIds);
+        if (AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
+            AdvanceRuntimeProgram(frame.Id);
     }
     private SkillProgramStepOutcome BeginConvertingGiftDamage(ProgramSkillFrame f,int limit)
     {

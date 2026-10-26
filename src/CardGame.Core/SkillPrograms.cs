@@ -238,7 +238,8 @@ public enum SkillProgramDamageModifierCondition
     SourceRoundIsOdd = 1039,
     SourceRoundIsEven = 1040,
     DirectSkillDamage = 1041,
-    SourceHpAtMost = 1042
+    SourceHpAtMost = 1042,
+    OwnerGameSlashUseOrdinalMultipleOfThree = 1043
 }
 public sealed record SkillProgramDamageModifier(
     string Id, IReadOnlyList<CardKind> CardKinds, int Amount,
@@ -933,6 +934,8 @@ public enum SkillProgramEffectOp
     RecastBoundCards = 62020,
     ReflectAppliedDamage = 62021,
     DamageRandomEnemyAtDrawThreshold = 62022,
+    SetShanheSchoolHpToMaximum = 62023,
+    RepeatCurrentDamageTrick = 62024,
     RecastBoundCard = 3100,
     PayHpToGrantOneUseDamageShield = 3000,
     DrawThenDiscardHandToMaximumHp = 2900,
@@ -4123,6 +4126,9 @@ public sealed class SkillProgramCatalog
         }
         else if (maximumUseOrdinal is not null)
             Fail(path + ".maximumUseOrdinal", "requires an owner card-use ordinal condition");
+        if (condition == SkillProgramDamageModifierCondition.OwnerGameSlashUseOrdinalMultipleOfThree &&
+            (scope != SkillProgramDamageModifierSourceScope.OwnerUsed || !ProgramCardKindMatch.IsFullSlashFamily(kinds) || capsToAmount))
+            Fail(path, "Every-third Slash requires ownerUsed and the complete Slash family without a cap");
         var sourceHandCountLimit = node.TryGetProperty("sourceHandCountLimit", out _)
             ? PositiveInt(node, "sourceHandCountLimit", path) : (int?)null;
         if (condition == SkillProgramDamageModifierCondition.SourceHandBelowLimit)
@@ -4204,7 +4210,8 @@ public sealed class SkillProgramCatalog
             damageLayer != SkillProgramDamageLayer.AdditionalDamage)
             Fail(path + ".damageLayer", "public enemy and trick-use ordinal modifiers require additionalDamage");
         if ((condition is SkillProgramDamageModifierCondition.OwnerRoundSlashUseOrdinalWithinLimit or
-                SkillProgramDamageModifierCondition.OwnerActualTurnElementalSlashUseOrdinalWithinLimit) &&
+                SkillProgramDamageModifierCondition.OwnerActualTurnElementalSlashUseOrdinalWithinLimit or
+                SkillProgramDamageModifierCondition.OwnerGameSlashUseOrdinalMultipleOfThree) &&
             damageLayer != SkillProgramDamageLayer.CardDamage)
             Fail(path + ".damageLayer", "Slash-use ordinal modifiers require cardDamage");
         return new SkillProgramDamageModifier(Identifier(node, "id", path), kinds, amount, condition, scope, capsToAmount)

@@ -116,6 +116,7 @@ public sealed partial class ShanheCampaignSession
             // programs imported only by recipes that reference them. No engine
             // is created and no unearned skill is granted to a battle player.
             TacticSkillIds = ShanheCampaignContent.Freeze(Definition.Rewards.SelectMany(PotentialBattleTacticSkills)
+                .Concat((Definition.Schools ?? []).Select(ShanheSchoolEffects.SkillId).OfType<string>())
                 .Distinct(StringComparer.Ordinal))
         });
         var registry = battleRegistryFactory(probe) ?? throw new ArgumentException("The battle registry factory returned null.", nameof(battleRegistryFactory));
@@ -287,6 +288,7 @@ public sealed partial class ShanheCampaignSession
             state.StartingCards, state.StartingEquipment, encounter.Enemies, encounter.Allies ?? [], ContentHash)
         {
             TacticSkillIds = BattleTacticSkills(state, node.Kind),
+            ActiveSchoolIds = ShanheCampaignContent.Freeze(SchoolProgress(state).Where(p => p.IsComplete).Select(p => p.School.Id)),
             DefaultGodFactionId = Definition.DefaultGodFactionId,
             PlayerRank = _options.PlayerRank,
             RebirthAvailable = rebirthAvailable,

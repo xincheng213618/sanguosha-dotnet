@@ -14,5 +14,7 @@ public sealed partial class ShanheCampaignSession
             return economy?.BattleSkillId is { } skill && economy.GoldAbove is { } threshold && state.Gold > threshold
                 ? new[] { skill }
                 : new[] { reward.TacticSkillId }.OfType<string>();
-        }).Distinct(StringComparer.Ordinal));
+        }).Concat(SchoolProgress(state).Where(progress => progress.IsComplete)
+            .Select(progress => ShanheSchoolEffects.SkillId(progress.School)).OfType<string>())
+        .Distinct(StringComparer.Ordinal));
 }

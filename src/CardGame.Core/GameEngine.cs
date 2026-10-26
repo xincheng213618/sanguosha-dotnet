@@ -15865,6 +15865,7 @@ public sealed partial class GameEngine
             ? _players.Where(player => player.IsAlive).Select(player => player.Seat) : sourceAndTarget;
         return owners
             .SelectMany(seat => GetSkillBindingShard(_players[seat]).ProgramInstances
+                .Where(instance => IsShanheSchoolSkillQualified(seat, instance.SkillId))
                 .SelectMany(instance => instance.Program.DamageModifiers.Select(modifier =>
                     (seat, instance, modifier))))
             .Where(item => !item.modifier.CapsToAmount && (!cardDamageOnly || item.modifier.DamageLayer == SkillProgramDamageLayer.CardDamage) && (
@@ -15924,7 +15925,8 @@ public sealed partial class GameEngine
                           !attack.IsSourceLess && CapturedWholeActualTurnTrickUseOrdinal(attack) is { } ordinal &&
                           ordinal <= item.modifier.MaximumUseOrdinal,
                       SkillProgramDamageModifierCondition.OwnerRoundSlashUseOrdinalWithinLimit or
-                      SkillProgramDamageModifierCondition.OwnerActualTurnElementalSlashUseOrdinalWithinLimit =>
+                      SkillProgramDamageModifierCondition.OwnerActualTurnElementalSlashUseOrdinalWithinLimit or
+                      SkillProgramDamageModifierCondition.OwnerGameSlashUseOrdinalMultipleOfThree =>
                           !attack.IsSourceLess && MatchesSlashUseOrdinalModifier(item.modifier, attack, attack.CardUserSeat, kind),
                       _ => false
                   }))))

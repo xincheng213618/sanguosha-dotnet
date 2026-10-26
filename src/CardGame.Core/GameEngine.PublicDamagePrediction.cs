@@ -134,7 +134,8 @@ public sealed partial class GameEngine
             if (cardUse && !chain && kind is { } card)
                 cardLayer = checked(cardLayer + _turnCardUseEffects.GetDamageModifiers(_turnNumber, _currentSeat,
                     sourceSeat, sourceSeat, card, false).Sum(modifier => modifier.Amount));
-            foreach (var instance in GetSkillBindingShard(sourceState).ProgramInstances.Where(instance => sourceVisible.Contains(instance.SkillId)))
+            foreach (var instance in GetSkillBindingShard(sourceState).ProgramInstances.Where(instance =>
+                         sourceVisible.Contains(instance.SkillId) && IsShanheSchoolSkillQualified(sourceSeat, instance.SkillId)))
             foreach (var modifier in instance.Program.DamageModifiers)
             {
                 if (modifier.CapsToAmount) continue;
@@ -157,7 +158,8 @@ public sealed partial class GameEngine
                             SkillProgramDamageModifierCondition.SourceOutsideTargetAttackRange =>
                                 !IsWithinAttackRange(targetSeat, sourceSeat),
                             SkillProgramDamageModifierCondition.OwnerRoundSlashUseOrdinalWithinLimit or
-                            SkillProgramDamageModifierCondition.OwnerActualTurnElementalSlashUseOrdinalWithinLimit =>
+                            SkillProgramDamageModifierCondition.OwnerActualTurnElementalSlashUseOrdinalWithinLimit or
+                            SkillProgramDamageModifierCondition.OwnerGameSlashUseOrdinalMultipleOfThree =>
                                 MatchesSlashUseOrdinalModifier(modifier, issuedAttack, sourceSeat, effective),
                             _ => false
                         });

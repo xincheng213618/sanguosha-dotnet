@@ -258,6 +258,7 @@ public sealed partial class GameEngine
         CardKind? effectiveCardKind = null)
     {
         var bindings = GetSkillBindingShard(player).GetNumericModifiers(query)
+            .Where(binding => IsShanheSchoolSkillQualified(player.Seat, binding.Source.SkillId))
             .Where(binding => binding.Modifier.RecipientScope == SkillRuleRecipientScope.Owner)
             .Where(binding => binding.Modifier.ValueExpression != SkillRuleValueExpression.OwnerMarkerCount ||
                 !_contentRegistry.GetSkill(binding.Source.SkillId).Tags.HasFlag(SkillTag.Lord) ||
