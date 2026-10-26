@@ -577,6 +577,8 @@ var tests = new (string Name, Action Body)[]
     ("OL SP Liu Bei 664 forward: dying brew materials and later price", OlSpLiuBei664Checks.DyingBrewUsesRealMaterialsAndRaisesSubsequentWinePriceForward),
     ("Shanhe source routes: explicit graph potential pools and immutable identities", ShanheSourceRouteCatalogChecks.ExplicitSourceGraphAndPotentialPoolsStayImmutable),
     ("Shanhe source campaign: branches known stages and local identities", ShanheSource2026Checks.SourceBranchesKnownStagesAndLocalBodiesKeepTheirIdentities),
+    ("Shanhe battle: NPC opening equipment native entities and skills", ShanheBattleChecks.NpcOpeningEquipmentInstallsEntitiesAndRunsNativeSkills),
+    ("Shanhe source boss tiers: native forms enemy-scaled Shenwei and own-play Shenji", ShanheSourceBossTierChecks.Source2644NativeFormsCountPublicEnemiesAndRestrictShenjiToOwnPlay),
     ("Shanhe source campaign: three chapters native stages city receipts and cold", ShanheSource2026Checks.ThreeSourceChaptersNativeStagesCityReceiptsAndColdRecovery),
     ("Shanhe guide tasks: typed source evidence bounded progress and cold", ShanheGuideTaskProgressChecks.TypedSourceEvidenceAccumulatesWithoutLocalDifficultyOrDuplicateCredit),
     ("Shanhe campaign: independent tactic grants alias rejection and cold setup", ShanheCampaignChecks.TacticsUseIndependentGrantsAndRejectAliases),

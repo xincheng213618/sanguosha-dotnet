@@ -49,6 +49,7 @@ public sealed record ShanheCombatantDefinition(
     }
     private readonly IReadOnlyList<ShanheStartingCard>? _startingHand;
     private readonly IReadOnlyList<ShanheStartingCard>? _startingCards;
+    private readonly IReadOnlyList<ShanheStartingCard>? _startingEquipment;
     private readonly IReadOnlyList<string>? _qualifiedPrintedLordSkillIds;
     /// <summary>Explicit scenario qualification for these original primary-general Lord skills only.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -70,6 +71,13 @@ public sealed record ShanheCombatantDefinition(
     {
         get => _startingCards;
         init => _startingCards = value is null ? null : Array.AsReadOnly(value.ToArray());
+    }
+    /// <summary>Opening NPC equipment installed after the hand is dealt. Reserved forms use ShanheBossTransition.StartingEquipment instead.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<ShanheStartingCard>? StartingEquipment
+    {
+        get => _startingEquipment;
+        init => _startingEquipment = value is null ? null : Array.AsReadOnly(value.ToArray());
     }
 }
 

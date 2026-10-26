@@ -15,6 +15,22 @@
     {
       "id": "shanhe:fengxian-mashu", "revision": 1,
       "cardPolicies": [{ "id": "outgoing-one", "kind": "outgoingDistanceOne" }]
+    },
+    {
+      "id": "shanhe:fengxian-shenwei-14130", "revision": 1,
+      "modifiers": [
+        { "id": "enemies-extra-draw", "query": "drawCount", "operation": "add", "valueExpression": "publicTeamEnemyCount", "priority": 0 },
+        { "id": "enemies-extra-hand", "query": "handLimit", "operation": "add", "valueExpression": "publicTeamEnemyCount", "priority": 0 }
+      ]
+    },
+    {
+      "id": "shanhe:fengxian-shenji-14131", "revision": 1,
+      "modifiers": [
+        { "id": "play-unlimited-slashes", "query": "slashLimit", "operation": "unlimited", "value": 0, "priority": 0,
+          "condition": { "kind": "ownPlayPhase" } },
+        { "id": "play-extra-targets", "query": "cardTargetCount", "operation": "add", "value": 2, "priority": 0,
+          "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"], "condition": { "kind": "ownPlayPhase" } }
+      ]
     }
   ]
 }

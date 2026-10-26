@@ -148,7 +148,8 @@ public static partial class ShanheCampaignContent
         QualifiedPrintedLordSkillIds = value.QualifiedPrintedLordSkillIds is null ? null :
             Freeze(value.QualifiedPrintedLordSkillIds.Order(StringComparer.Ordinal)),
         StartingHand = value.StartingHand is null ? null : Freeze(value.StartingHand),
-        StartingCards = value.StartingCards is null ? null : Freeze(value.StartingCards)
+        StartingCards = value.StartingCards is null ? null : Freeze(value.StartingCards),
+        StartingEquipment = value.StartingEquipment is null ? null : Freeze(value.StartingEquipment)
     };
     internal static ShanheRewardDefinition FreezeReward(ShanheRewardDefinition value) => value with
     {
@@ -167,6 +168,7 @@ public static partial class ShanheCampaignContent
         if (transition.Combatant is { } combatant)
         {
             Require(combatant.GeneralId == transition.GeneralId, "A boss stage numeric recipe requires the same general.");
+            Require(combatant.StartingEquipment is not { Count: > 0 }, "A reserved form must declare equipment on the boss transition, not its numeric combatant.");
             ValidateCombatant(combatant);
         }
         ValidateCards(transition.StartingEquipment, equipmentOnly: true);
@@ -207,6 +209,7 @@ public static partial class ShanheCampaignContent
         UniqueIds(npc.QualifiedPrintedLordSkillIds ?? [], "qualified printed Lord skill");
         ValidateCards(npc.StartingHand, equipmentOnly: false);
         ValidateCards(npc.StartingCards, equipmentOnly: false);
+        ValidateCards(npc.StartingEquipment, equipmentOnly: true);
     }
     private static void ValidateCards(IReadOnlyList<ShanheStartingCard>? cards, bool equipmentOnly)
     {

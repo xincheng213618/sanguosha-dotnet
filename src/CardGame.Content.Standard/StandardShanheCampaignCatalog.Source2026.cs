@@ -226,15 +226,22 @@ public static partial class StandardShanheCampaignCatalog
 
     private static ShanheBossTransition? Source2026BossTransition(int battleId, int difficulty) => difficulty < 3 ? null : battleId switch
     {
-        2644 => new(0, StandardShanheFengxianBossPackage.RageId, 5, 5)
-        {
-            DrawCards = 4, Combatant = Source2026StageCombatant(264401, StandardShanheFengxianBossPackage.RageId),
-            StartingEquipment = [new(CardKind.WushuangHalberd, Suit.Heart, 12)]
-        },
+        2644 => Source2026RageTransition(difficulty),
         2645 => new(0, "classic:lu-bu", 3, 3, 4) { Combatant = Source2026StageCombatant(264501, "classic:lu-bu") },
         2670 => new(0, "ol:niu-fu", 5, 5, 4) { Combatant = Source2026StageCombatant(267001, "ol:niu-fu") },
         2671 => new(0, StandardShanheS5BossPackage.DongMinBaseId, 5, 5, 4)
         { Combatant = Source2026StageCombatant(267101, StandardShanheS5BossPackage.DongMinBaseId) },
         _ => null
     };
+
+    private static ShanheBossTransition Source2026RageTransition(int difficulty)
+    {
+        var generalId = difficulty >= 21 ? StandardShanheFengxianBossPackage.SourceRageHellId :
+            difficulty >= 11 ? StandardShanheFengxianBossPackage.SourceRageHardId : StandardShanheFengxianBossPackage.RageId;
+        return new(0, generalId, 5, 5)
+        {
+            DrawCards = 4, Combatant = Source2026StageCombatant(264401, generalId),
+            StartingEquipment = [new(CardKind.WushuangHalberd, Suit.Heart, 12)]
+        };
+    }
 }

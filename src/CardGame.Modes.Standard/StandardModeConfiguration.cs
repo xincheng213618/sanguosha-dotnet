@@ -185,6 +185,7 @@ public static class StandardModeConfigurationRules
         if (setup.BossTransition is { Combatant: { } stage } sourceTransition)
         {
             if (stage.GeneralId != sourceTransition.GeneralId) throw new ArgumentException("The source second-form numeric recipe has a different general.");
+            if (stage.StartingEquipment is { Count: > 0 }) throw new ArgumentException("A reserved form must declare equipment on the boss transition, not its numeric combatant.");
             ValidateMember(stage);
         }
         foreach (var card in setup.StartingCards.Concat(setup.StartingEquipment))
@@ -213,11 +214,15 @@ public static class StandardModeConfigurationRules
                     skill.ImplementationStatus != SkillImplementationStatus.Complete))
                 throw new ArgumentException("A Shanhe combatant has invalid general, health, bonuses or skills.");
             ValidateShanhePrintedLordQualifications(member, general, registry);
-            foreach (var cards in new[] { member.StartingHand, member.StartingCards })
+            foreach (var cards in new[] { member.StartingHand, member.StartingCards, member.StartingEquipment })
                 if (cards is { } hand && (hand.Count > 24 || hand.Any(card => card is null ||
                         !Enum.IsDefined(card.Kind) || !Enum.IsDefined(card.Suit) || card.Suit == Suit.None ||
                         card.Rank is < 1 or > 13 || !registry.Cards.Values.Any(c => c.LegacyKind == card.Kind))))
                     throw new ArgumentException("A Shanhe combatant has invalid fixed physical opening cards.");
+            if (member.StartingEquipment is { } equipment && (equipment.Count > 5 ||
+                equipment.Any(card => !EquipmentCatalog.IsEquipment(card.Kind)) ||
+                equipment.Select(card => EquipmentCatalog.Get(card.Kind).Slot).Distinct().Count() != equipment.Count))
+                throw new ArgumentException("Shanhe combatant starting equipment needs one registered card per equipment slot.");
         }
     }
 

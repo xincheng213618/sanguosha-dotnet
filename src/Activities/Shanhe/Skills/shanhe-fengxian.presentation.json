@@ -2,6 +2,8 @@
   "schemaVersion": 3,
   "skills": {
     "shanhe:fengxian-xiuluo": { "name": "修罗", "description": "准备阶段，你可以弃置一张牌，然后弃置你判定区里所有牌。" },
-    "shanhe:fengxian-mashu": { "name": "马术", "description": "锁定技，你计算与其他角色的距离都为1。" }
+    "shanhe:fengxian-mashu": { "name": "马术", "description": "锁定技，你计算与其他角色的距离都为1。" },
+    "shanhe:fengxian-shenwei-14130": { "name": "神威", "description": "锁定技，摸牌阶段，你多摸X张牌，你的手牌上限+X（X为存活的敌方角色数）。" },
+    "shanhe:fengxian-shenji-14131": { "name": "神戟", "description": "你出牌阶段使用【杀】无次数限制，且可以多指定两个目标。" }
   }
 }

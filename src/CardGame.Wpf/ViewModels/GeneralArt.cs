@@ -24,6 +24,8 @@ public static partial class GeneralArt
             ["shanhe:lvbu-shengui-2026"] = "shen-lu-bu",
             ["shanhe:lvbu-fengxian-first"] = "boundary-lu-bu",
             ["shanhe:lvbu-fengxian-rage"] = "shen-lu-bu",
+            ["shanhe:lvbu-fengxian-source-hard-264401"] = "shen-lu-bu",
+            ["shanhe:lvbu-fengxian-source-hell-264401"] = "shen-lu-bu",
             ["shanhe:confident-lvbu"] = "shen-lu-bu",
             ["shanhe:elite-huang-gai"] = "boundary-huang-gai",
             ["shanhe:elite-han-dang"] = "han-dang",

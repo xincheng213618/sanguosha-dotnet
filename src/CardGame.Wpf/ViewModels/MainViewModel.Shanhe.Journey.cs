@@ -128,7 +128,7 @@ public sealed partial class MainViewModel
             var skills = general.SkillIds.Concat(enemy.ExtraSkillIds ?? []).Distinct(StringComparer.Ordinal)
                 .Select(registry.GetSkill).Select(skill => new ShanheEncounterSkill(skill.Name, GetVisibleSkillDescription(skill))).ToArray();
             return new ShanheEncounterEnemyCard(general.Name, GeneralArt.GetPortrait(enemy.GeneralId, decodeWidth: 360),
-                $"体力 {enemy.Hp ?? general.InitialHp ?? maximum}/{maximum} · 起手 {hand}\n摸牌阶段 {2 + enemy.DrawBonus} · 出杀次数 {1 + enemy.SlashBonus}" + ShanheSourceCombatantStats(enemy),
+                $"体力 {enemy.Hp ?? general.InitialHp ?? maximum}/{maximum} · 起手 {hand}\n摸牌阶段 {2 + enemy.DrawBonus} · 出杀次数 {1 + enemy.SlashBonus}" + ShanheSourceCombatantStats(enemy) + ShanheNpcEquipmentText(enemy),
                 Array.AsReadOnly(skills));
         }).ToArray());
         // Ask the same immutable opening rule used by the actual mode. A future
@@ -164,7 +164,7 @@ public sealed partial class MainViewModel
                         })) : string.Empty;
                     return $"{general.Name}  体力 {enemy.Hp ?? general.InitialHp ?? maxHp}/{maxHp}\n" +
                         $"起手 {hand} · 摸牌阶段基础 {2 + enemy.DrawBonus} · 出杀基础 {1 + enemy.SlashBonus}\n" +
-                        string.Join(" · ", skillIds.Select(id => registry.GetSkill(id).Name)) + ShanheSourceCombatantStats(enemy) + fixedCards;
+                        string.Join(" · ", skillIds.Select(id => registry.GetSkill(id).Name)) + ShanheSourceCombatantStats(enemy) + fixedCards + ShanheNpcEquipmentText(enemy);
                 }));
                 var stage = string.Empty;
                 if (encounter.BossTransition is { } transition)
@@ -267,6 +267,11 @@ public sealed partial class MainViewModel
         foreach (var command in new[] { StartShanheCommand, UnlockCodexNodeCommand, EquipCodexTacticCommand, RemoveCodexTacticCommand })
             (command as RelayCommand)?.NotifyCanExecuteChanged();
     }
+
+    private static string ShanheNpcEquipmentText(ShanheCombatantDefinition combatant) =>
+        combatant.StartingEquipment is { Count: > 0 } equipment
+            ? "\n初始装备：" + string.Join(" · ", equipment.Select(card => $"【{CardCatalog.Get(card.Kind).DisplayName}】"))
+            : string.Empty;
 
     private static string ShanheSourceCombatantStats(ShanheCombatantDefinition combatant)
     {

@@ -77,6 +77,7 @@ internal sealed class ShanheBattleFeature :
             var member = seat <= setup.AllyRoster.Count ? setup.AllyRoster[seat - 1] :
                 setup.EnemyRoster[seat - setup.AllyRoster.Count - 1];
             foreach (var card in member.StartingCards ?? []) host.PlaceStartingCard(card, seat, equipment: false);
+            foreach (var card in member.StartingEquipment ?? []) host.PlaceStartingCard(card, seat, equipment: true);
         }
         if (host.Started) host.PublishShanheStartingResourceOrigins();
     }

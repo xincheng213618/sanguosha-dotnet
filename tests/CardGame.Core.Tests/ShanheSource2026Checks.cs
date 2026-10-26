@@ -37,10 +37,13 @@ internal static class ShanheSource2026Checks
                 all.All(encounter => difficulty >= 11 || encounter.TerrainSkillId is null),
                 "Local troop bodies carry their genuinely chosen city but never an invented source battle, and terrain keeps its separate tier gate.");
             var fengxian = all.Single(encounter => encounter.SourceBattleId == 2644);
+            var rageId = difficulty >= 21 ? StandardShanheFengxianBossPackage.SourceRageHellId :
+                difficulty >= 11 ? StandardShanheFengxianBossPackage.SourceRageHardId : StandardShanheFengxianBossPackage.RageId;
             Need((fengxian.BossTransition is not null) == (difficulty >= 3) &&
-                (difficulty < 3 || fengxian.BossTransition is { GeneralId: StandardShanheFengxianBossPackage.RageId, MaxHp: 5, Hp: 5,
+                (difficulty < 3 || fengxian.BossTransition is { MaxHp: 5, Hp: 5,
                     Combatant.SourceDifficultyAttributes: not null } && fengxian.BossTransition.StartingEquipment!.Single() is
-                    { Kind: CardKind.WushuangHalberd, Suit: Suit.Heart, Rank: 12 }),
+                    { Kind: CardKind.WushuangHalberd, Suit: Suit.Heart, Rank: 12 } &&
+                    fengxian.BossTransition.GeneralId == rageId && fengxian.BossTransition.Combatant.GeneralId == rageId),
                 "Fengxian's real known second form begins only at ordinary three, with its own base data and verified halberd.");
             Need(all.Where(encounter => encounter.SourceBattleId == 2397).Count() == 7 &&
                 all.Where(encounter => encounter.SourceBattleId == 2397).All(encounter => encounter.SourceVisibleEnemyCount == 1 && encounter.Enemies.Count == 5),

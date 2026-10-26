@@ -186,7 +186,11 @@ public static partial class StandardShanheCampaignCatalog
                 Id = encounter.Id + ":shengui-2026",
                 Name = "神鬼无前 · 专属形态",
                 Enemies = encounter.Enemies.Select((enemy, index) => index == 0
-                    ? enemy with { GeneralId = StandardShanheBossPackage.ShenguiLvbuId } : enemy).ToArray(),
+                    ? enemy with
+                    {
+                        GeneralId = StandardShanheBossPackage.ShenguiLvbuId,
+                        StartingEquipment = [new(CardKind.WushuangHalberd, Suit.Diamond, 12), new(CardKind.PurpleGoldCrown, Suit.Diamond, 1)]
+                    } : enemy).ToArray(),
                 Allies = [new(StandardShanheBossPackage.FenghuangId)
                 {
                     StartingHand = [new(CardKind.Slash, Suit.Heart, 5), new(CardKind.Dodge, Suit.Heart, 13),

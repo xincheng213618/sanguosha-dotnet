@@ -251,8 +251,10 @@ public static partial class StandardShanheCampaignCatalog
         var currentYiji = extraSkills.Contains(StandardShanheYijiPackage.SkillId);
         var currentCappedRefill = extraSkills.Contains(StandardShanheCappedRefillSkillsPackage.SkillId);
         var currentBeige = extraSkills.Contains(StandardShanheBeigeSkillsPackage.SkillId);
-        var fengxianBoss = ids.Any(id => id is StandardShanheFengxianBossPackage.FirstId or StandardShanheFengxianBossPackage.RageId) ||
-            extraSkills.Contains(StandardShanheFengxianBossPackage.XiuluoId) || extraSkills.Contains(StandardShanheFengxianBossPackage.MashuId);
+        var fengxianBoss = ids.Any(id => id is StandardShanheFengxianBossPackage.FirstId or StandardShanheFengxianBossPackage.RageId or
+            StandardShanheFengxianBossPackage.SourceRageHardId or StandardShanheFengxianBossPackage.SourceRageHellId) ||
+            extraSkills.Contains(StandardShanheFengxianBossPackage.XiuluoId) || extraSkills.Contains(StandardShanheFengxianBossPackage.MashuId) ||
+            extraSkills.Contains(StandardShanheFengxianBossPackage.ShenweiId) || extraSkills.Contains(StandardShanheFengxianBossPackage.ShenjiId);
         var confidentLvbu = ids.Contains(StandardShanheConfidentLvbuPackage.LvbuId, StringComparer.Ordinal) ||
             extraSkills.Contains(StandardShanheConfidentLvbuPackage.XiaoruiId);
         var eliteDongwu = ids.Any(id => id is StandardShanheEliteDongwuPackage.HuangGaiId or StandardShanheEliteDongwuPackage.ChengPuId) ||

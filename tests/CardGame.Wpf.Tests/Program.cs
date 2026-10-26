@@ -266,6 +266,7 @@ internal static class Program
             Check("Shanhe campaign UI: preparation locks and encounter preview", () => ShanheCampaignUiChecks.PreparationLocksAndEncounterPreview(output));
             Check("Shanhe campaign UI: public fixed NPC cards read-only preview", () => ShanheCampaignUiChecks.PublishedFixedNpcCardsAreReadOnlyInEncounterPreview(output));
             Check("Shanhe campaign UI: eight-seat boss stages and final settlement preview", () => ShanheCampaignUiChecks.EightSeatBossStagesAndFinalSettlementPreview(output));
+            Check("Shanhe Fengxian UI: initial NPC equipment cards and roster preview", () => ShanheFengxianPreviewUiChecks.InitialNpcEquipmentAppearsInCardsAndRosterWithoutStartingBattle(output));
             Check("Shanhe Fengxian UI: second-form skills and automatic equipment preview", ShanheFengxianPreviewUiChecks.SecondFormSkillsAndAutomaticEquipmentAppearBeforeChallenge);
             Check("Shanhe third chapter elite: complete roster preview and onward rewards", ShanheThirdChapterEliteUiChecks.OptionalElitePreviewsCompleteRosterAndRewardsWithoutFinalSettlement);
             Check("Shanhe campaign UI: published boss portraits render on actual seats", () => ShanheBossPortraitChecks.PublishedS5BossAliasesDecodeAndRenderOnRealSeats(output));

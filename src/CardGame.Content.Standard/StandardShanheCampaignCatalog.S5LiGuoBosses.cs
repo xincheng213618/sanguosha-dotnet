@@ -40,7 +40,7 @@ public static partial class StandardShanheCampaignCatalog
     private static IEnumerable<ShanheStartingCard> ShanheRecipeCards(ShanheBattleSetup setup) =>
         setup.StartingCards.Concat(setup.StartingEquipment).Concat(setup.BossTransition?.StartingEquipment ?? [])
             .Concat(setup.AllyRoster.Concat(setup.EnemyRoster)
-            .SelectMany(member => (member.StartingHand ?? []).Concat(member.StartingCards ?? [])))
+            .SelectMany(member => (member.StartingHand ?? []).Concat(member.StartingCards ?? []).Concat(member.StartingEquipment ?? [])))
             .Concat(setup.MarketSetup?.Definition.Rewards.SelectMany(reward =>
                 (reward.StartingCards ?? []).Concat(reward.StartingEquipment ?? [])) ?? []);
 }

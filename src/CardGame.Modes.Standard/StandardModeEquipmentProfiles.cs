@@ -23,7 +23,8 @@ public static class StandardModeEquipmentProfiles
         {
             required.UnionWith(setup.StartingCards.Concat(setup.StartingEquipment).Select(card => card.Kind));
             foreach (var member in setup.AllyRoster.Concat(setup.EnemyRoster))
-                required.UnionWith((member.StartingHand ?? []).Concat(member.StartingCards ?? []).Select(card => card.Kind));
+                required.UnionWith((member.StartingHand ?? []).Concat(member.StartingCards ?? [])
+                    .Concat(member.StartingEquipment ?? []).Select(card => card.Kind));
         }
         var wushuang = mode.Id == WushuangMode.ModeId;
         if (wushuang)
