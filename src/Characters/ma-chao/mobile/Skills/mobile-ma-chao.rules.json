@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:tieqi",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "red-judgment-prohibits-target-dodge",
+          "window": "cardUseTargetsFinalized",
+          "ownerRelation": "actor",
+          "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"],
+          "optional": true,
+          "effects": [
+            { "op": "startJudgment", "target": "owner", "judgmentReason": "skill.mobile.tieqi", "resultBind": "tieqi-card", "outcomeBind": "tieqi-outcome", "visibility": "public" },
+            { "op": "prohibitCurrentResponse", "target": "owner", "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "tieqi-outcome", "suits": ["heart", "diamond"] } },
+            { "op": "moveBoundCards", "target": "owner", "sourceBind": "tieqi-card", "destination": "discardPile", "awaitMovementTriggers": true }
+          ]
+        }
+      ]
+    }
+  ]
+}

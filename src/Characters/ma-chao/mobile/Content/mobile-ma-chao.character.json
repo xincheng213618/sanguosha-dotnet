@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:ma-chao",
+  "skills": [
+    {
+      "registrationOrder": 83700,
+      "programBundle": "mobile-ma-chao",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:tieqi",
+        "name": "铁骑",
+        "description": "当你使用【杀】指定一名角色为目标后，你可以进行判定，若结果为红色，该角色不能使用【闪】响应此【杀】。",
+        "executionForms": "Trigger"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 83799,
+      "pools": { "current": 83799 },
+      "definition": {
+        "id": "mobile:ma-chao",
+        "name": "马超·移动版",
+        "portraitKey": "mobile-ma-chao",
+        "skillId": "mobile:tieqi",
+        "additionalSkillIds": ["classic:mashu"],
+        "factionId": "shu",
+        "baseHp": 4,
+        "gender": "Male",
+        "characterId": "character:ma-chao",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

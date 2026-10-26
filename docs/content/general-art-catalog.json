@@ -23832,6 +23832,125 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-huang-yueying",
+      "characterName": "黄月英",
+      "defaultSkinId": "700",
+      "skins": [
+        {
+          "id": "700",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-7.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/700.jpg",
+          "sha256": "45662df33e0a2e447b87ae81bb133647a859e4b1a4e6792e560a99bd7cae31bf",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-huang-yueying.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-lu-xun",
+      "characterName": "陆逊",
+      "defaultSkinId": "1400",
+      "skins": [
+        {
+          "id": "1400",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-14.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/1400.jpg",
+          "sha256": "06289f4e713a9a3af4a821fbebd3d1810734d481f946d938e2fcff5b5df96ffc",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-lu-xun.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-bei-mi-hu",
+      "characterName": "卑弥呼",
+      "defaultSkinId": "44900",
+      "skins": [
+        {
+          "id": "44900",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-281.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/44900.jpg",
+          "sha256": "6b2eef5f3f5c534e3574c623b0b21f2fbe5b6e2f03495977f93e5cb013681364",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-bei-mi-hu.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-ma-chao",
+      "characterName": "马超",
+      "defaultSkinId": "600",
+      "skins": [
+        {
+          "id": "600",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-6.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/600.jpg",
+          "sha256": "e3d25acfcd35be129edd9c1d6077f38bf3d0ac4d4bbcb810099cce4b15258ce5",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-ma-chao.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-cao-ying",
+      "characterName": "曹婴",
+      "defaultSkinId": "46100",
+      "skins": [
+        {
+          "id": "46100",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-288.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/46100.jpg",
+          "sha256": "67fbb93504daf4aa1ff33e2421d75e79a2d746fed25073c4fdae20d910253f8a",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cao-ying.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-cao-cao",
+      "characterName": "曹操",
+      "defaultSkinId": "1500",
+      "skins": [
+        {
+          "id": "1500",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-15.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/1500.jpg",
+          "sha256": "9eb794fb35a730c8e3a5ed9756d01a19539a4788974b087ca06d22223cee3147",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-cao-cao.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-gan-ning",
+      "characterName": "甘宁",
+      "defaultSkinId": "900",
+      "skins": [
+        {
+          "id": "900",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/index.php/pc/hero-detail-9.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/900.jpg",
+          "sha256": "1ea946956acf926ca2dc97427cfc1e93477de473a277a42b13a4ed38a0d5da09",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-gan-ning.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

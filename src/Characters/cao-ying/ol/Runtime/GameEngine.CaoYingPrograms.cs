@@ -3,12 +3,15 @@ namespace CardGame.Core;
 public sealed partial class GameEngine
 {
     private CardConversionSource CaoYingSource(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
+    private bool IsMobileCaoYing(ProgramSkillFrame frame) => GetPausedPrivateOfferEffect(frame)?.CaoYingPolicy == CaoYingRulePolicy.MobileOrdinary;
     private bool CaoYingSourceCurrent(ProgramSkillFrame f) => _players[f.OwnerSeat].IsAlive && HasRuntimeSkillInstance(_players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 330)]
     private bool CanOfferCaoYing(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext c)
     {
         if (trigger.Effects is not [{ Op: SkillProgramEffectOp.GuessTargetCategoriesAndArmTurnDamage }]) return true;
         var use = c.CardUse is { } action ? LifecycleCardUse(action.ParentCardUseFrameId) : null;
+        if (trigger.Effects[0].CaoYingPolicy == CaoYingRulePolicy.MobileOrdinary &&
+            (_phase != TurnPhase.Play || _currentSeat != candidate.OwnerSeat)) return false;
         return use is { Action: { Type: CardActionType.Use } a } && a.ActorSeat == candidate.OwnerSeat &&
             a.ActionId == c.CardUse!.CardActionId && CaoYingDamageKind(a.EffectiveKind) && use.TargetSeats.Any(t => _players[t].IsAlive);
     }
@@ -20,17 +23,32 @@ public sealed partial class GameEngine
         {
             if (!CanOfferCaoYing(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, GetProgramTrigger(f).Priority), GetProgramTrigger(f), context)) throw new InvalidOperationException("Lingren lost its real finalized actor use.");
             var use = LifecycleCardUse(context.CardUse!.ParentCardUseFrameId)!;
-            ReplaceRuntimeTop(f = f with { CaoYing = new(f.InstructionIndex, context.ParentFrameId, use.Id, use.Action!.ActionId, _turnNumber, _currentSeat, CaoYingStage.Target) { Source = CaoYingSource(f), GameplayHash = f.GameplayHash } });
+            ReplaceRuntimeTop(f = f with { CaoYing = new(f.InstructionIndex, context.ParentFrameId, use.Id, use.Action!.ActionId, _turnNumber,
+                effect.CaoYingPolicy == CaoYingRulePolicy.MobileOrdinary ? _turnProgression.OwnerSeat : _currentSeat, CaoYingStage.Target) { Source = CaoYingSource(f), GameplayHash = f.GameplayHash,
+                Policy = effect.CaoYingPolicy, PhaseInstanceId = effect.CaoYingPolicy is null ? null : _cardUseDebitPhaseInstanceId } });
         }
         else
         {
             if (context.Window is not (SkillProgramTriggerWindow.TurnStartBeforeNormalFlow or SkillProgramTriggerWindow.TurnEnding) || f.OwnerSeat != _currentSeat) throw new InvalidOperationException("Fujian requires its own preparation or ending.");
-            var living = _players.Where(p => p.IsAlive).ToArray(); var maximum = living.Max(p => GetHand(p).Count);
+            var living = _players.Where(p => p.IsAlive).ToArray();
+            var mobile = effect.CaoYingPolicy == CaoYingRulePolicy.MobileOrdinary;
+            var minimum = living.Min(p => GetHand(p).Count);
+            if (mobile && minimum == 0) return SkillProgramStepOutcome.Continue;
+            var maximum = living.Max(p => GetHand(p).Count);
             var uniqueMaximum = living.Count(p => GetHand(p).Count == maximum) == 1;
-            var candidates = living.Where(p => p.Seat != f.OwnerSeat && (!uniqueMaximum || GetHand(p).Count != maximum)).ToArray();
+            var candidates = living.Where(p => p.Seat != f.OwnerSeat && (mobile || !uniqueMaximum || GetHand(p).Count != maximum)).ToArray();
             if (candidates.Length == 0) return SkillProgramStepOutcome.Continue;
             var target = candidates[_random.Next(candidates.Length)];
-            ReplaceRuntimeTop(f = f with { CaoYing = new(f.InstructionIndex, context.ParentFrameId, null, null, _turnNumber, _currentSeat, CaoYingStage.Inspection, target.Seat) { Cards = GetHand(target).Select(ToSnapshot).ToArray(), Source = CaoYingSource(f), GameplayHash = f.GameplayHash } });
+            var cards = GetHand(target).ToArray();
+            if (mobile)
+                for (var index = 0; index < minimum; index++)
+                {
+                    var picked = index + _random.Next(cards.Length - index);
+                    (cards[index], cards[picked]) = (cards[picked], cards[index]);
+                }
+            ReplaceRuntimeTop(f = f with { CaoYing = new(f.InstructionIndex, context.ParentFrameId, null, null, _turnNumber, _currentSeat, CaoYingStage.Inspection, target.Seat)
+                { Cards = (mobile ? cards.Take(minimum) : cards).Select(ToSnapshot).ToArray(), Source = CaoYingSource(f), GameplayHash = f.GameplayHash,
+                    Policy = effect.CaoYingPolicy, InspectionMinimum = mobile ? minimum : null } });
             AdvanceEventRulesAndQueueFact(new CaoYingInspectionIssuedEvent(f.Id, f.OwnerSeat, target.Seat, f.CaoYing.Cards.Count));
         }
         PublishCaoYingChoice(f); return SkillProgramStepOutcome.AwaitChoice;
@@ -48,7 +66,7 @@ public sealed partial class GameEngine
     {
         var choices = CaoYingChoices(f); if (choices.Count == 0) { FinishCaoYing(f); return; }
         ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.AwaitingResponse }); var skill = _contentRegistry.GetSkill(f.SkillId);
-        _pendingDecision = new(DecisionKind.ProgramTrigger, f.OwnerSeat, f.CaoYing!.Stage == CaoYingStage.Inspection ? "观看随机角色的全部手牌。" : "请选择目标及三类手牌的有无。", [], choices.SelectMany(c => c.Targets).Distinct().ToArray(), f.OwnerSeat)
+        _pendingDecision = new(DecisionKind.ProgramTrigger, f.OwnerSeat, f.CaoYing!.Stage == CaoYingStage.Inspection ? (IsMobileCaoYing(f) ? $"观看随机角色的{f.CaoYing.Cards.Count}张手牌。" : "观看随机角色的全部手牌。") : "请选择目标及三类手牌的有无。", [], choices.SelectMany(c => c.Targets).Distinct().ToArray(), f.OwnerSeat)
         { PromptId = CreatePromptId(), IsPrivate = true, TargetSeat = f.CaoYing.Target, Choices = choices, SkillPrompt = new(f.SkillId, skill.Name, skill.Name, skill.Description) };
         _status = _players[f.OwnerSeat].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }
@@ -68,48 +86,88 @@ public sealed partial class GameEngine
         }
         var guess = int.Parse(choice.Parameters["branch"][6..], CultureInfo.InvariantCulture); var correct = 3 - System.Numerics.BitOperations.PopCount((uint)(guess ^ r.FrozenCategories));
         ConsumeProgramTriggerUsage(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, GetProgramTrigger(f).Priority));
-        ReplaceRuntimeTop(f = f with { CaoYing = r with { Guess = guess, Correct = correct, Stage = CaoYingStage.DrawChildren, MovementBefore = _movementSequence, MovementAfter = _movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
-        AdvanceEventRulesAndQueueFact(new CaoYingGuessResolvedEvent(f.Id, CaoYingSource(f), r.TurnNumber, r.TurnOwner, r.UseId!.Value, r.ActionId, r.Target!.Value, correct));
-        if (correct >= 2) RefundProgramCardUseDebit(f);
-        if (correct >= 3) AcquireRuntimeSkills(_players[f.OwnerSeat], $"cao-ying:{f.OwnerSeat}:{f.SkillInstanceId}:{r.TurnNumber}:{f.Id}", GetProgramTrigger(f).Effects.Single().SkillIds);
+        var mobileRules = IsMobileCaoYing(f);
+        ReplaceRuntimeTop(f = f with { CaoYing = r with { Guess = guess, Correct = correct,
+            Stage = CaoYingStage.DrawChildren,
+            MovementBefore = _movementSequence, MovementAfter = _movementSequence },
+            PendingMovementContinuation = new(f.OwnerSeat, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
+        AdvanceEventRulesAndQueueFact(new CaoYingGuessResolvedEvent(f.Id, CaoYingSource(f), r.TurnNumber, r.TurnOwner, r.UseId!.Value, r.ActionId, r.Target!.Value, correct)
+            { Policy = r.Policy, PhaseInstanceId = r.PhaseInstanceId });
+        if (correct >= 2 && !mobileRules) RefundProgramCardUseDebit(f);
+        // The original OL policy grants before drawing. Mobile grants only after its draw children return.
+        if (correct >= 3 && !mobileRules)
+            AcquireRuntimeSkills(_players[f.OwnerSeat], $"cao-ying:{f.OwnerSeat}:{f.SkillInstanceId}:{r.TurnNumber}:{f.Id}", GetProgramTrigger(f).Effects.Single().SkillIds);
         var drawn = correct >= 2 && _players[f.OwnerSeat].IsAlive ? DrawCards(_players[f.OwnerSeat], 2, true, new("skill-program.cao-ying.draw")).Count : 0;
         f = GetActiveProgramFrame(f.Id); ReplaceRuntimeTop(f = f with { CaoYing = f.CaoYing! with { MovementAfter = _movementSequence, DrawCount = drawn } });
         if (!DrainCaoYingChildren(f)) FinishCaoYing(GetActiveProgramFrame(f.Id));
     }
     private bool DrainCaoYingChildren(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
-    private void FinishCaoYing(ProgramSkillFrame f) { ReplaceRuntimeTop(f = f with { CaoYing = null, PendingMovementContinuation = null }); FinishProgramSkill(f, true); }
+    private void FinishCaoYing(ProgramSkillFrame f)
+    {
+        if (f.CaoYing is { Stage: CaoYingStage.DrawChildren, Policy: CaoYingRulePolicy.MobileOrdinary, Correct: 3 } r && _players[f.OwnerSeat].IsAlive)
+        {
+            RequireCaoYing(f);
+            // All original draw, HP, movement and skill-change children have drained before this tail.
+            // Advancing the owning stage before mutation prevents a resumed grant child from granting twice.
+            ReplaceRuntimeTop(f = f with { CaoYing = r with { Stage = CaoYingStage.GrantSkills }, PendingMovementContinuation = null });
+            CommitProgramParticipantSkillGrants(f, f.OwnerSeat, GetProgramTrigger(f).Effects.Single().SkillIds,
+                $"turn:{r.TurnNumber}:{r.TurnOwner}:mobile-cao-ying:{f.OwnerSeat}:{f.SkillInstanceId}:frame:{f.Id}", null,
+                new SkillGrantNextActualTurnStartExpiry(r.TurnNumber, r.TurnOwner, f.OwnerSeat));
+            f = GetActiveProgramFrame(f.Id);
+            ReplaceRuntimeTop(f = f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+            if (DrainCaoYingChildren(f)) return;
+        }
+        ReplaceRuntimeTop(f = f with { CaoYing = null, PendingMovementContinuation = null }); FinishProgramSkill(f, true);
+    }
     [ProgramContinuation(ProgramContinuationKind.Resume, 21800)]
     private bool ResumeCaoYing(long id)
     {
-        if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { CaoYing: { Stage: CaoYingStage.DrawChildren } } f || f.Id != id) return false;
+        if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { CaoYing: { Stage: CaoYingStage.DrawChildren or CaoYingStage.GrantSkills } } f || f.Id != id) return false;
         RequireCaoYing(f); if (!DrainCaoYingChildren(f)) FinishCaoYing(f); return true;
     }
     [ProgramContinuation(ProgramContinuationKind.Movement, 21800)]
     private bool ReturnCaoYingMovement(ProgramSkillFrame f)
-    { if (f.CaoYing?.Stage != CaoYingStage.DrawChildren) return false; RequireCaoYing(f); if (!DrainCaoYingChildren(f)) FinishCaoYing(f); return true; }
+    { if (f.CaoYing?.Stage is not (CaoYingStage.DrawChildren or CaoYingStage.GrantSkills)) return false; RequireCaoYing(f); if (!DrainCaoYingChildren(f)) FinishCaoYing(f); return true; }
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 70)]
     private bool IsCaoYingMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => CanContinueCaoYing(f) && e?.Op == SkillProgramEffectOp.GuessTargetCategoriesAndArmTurnDamage && p.SubjectSeat == f.OwnerSeat && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 50)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 50)]
-    private bool CanContinueCaoYing(ProgramSkillFrame f) => f.CaoYing is { Stage: CaoYingStage.DrawChildren, Correct: >= 0 } && ValidCaoYing(f);
+    private bool CanContinueCaoYing(ProgramSkillFrame f) => f.CaoYing is { Stage: CaoYingStage.DrawChildren or CaoYingStage.GrantSkills, Correct: >= 0 } && ValidCaoYing(f);
     private bool ValidCaoYing(ProgramSkillFrame f)
     {
         var r = f.CaoYing!;
         return r.Source == CaoYingSource(f) && r.GameplayHash == f.GameplayHash && r.InstructionIndex == f.InstructionIndex &&
             r.WindowId == f.WindowContext?.ParentFrameId && r.UseId == f.WindowContext?.CardUse?.ParentCardUseFrameId && r.ActionId == f.WindowContext?.CardUse?.CardActionId &&
-            GetPausedPrivateOfferEffect(f)?.Op == SkillProgramEffectOp.GuessTargetCategoriesAndArmTurnDamage && r.TurnNumber == _turnNumber && r.TurnOwner == _currentSeat &&
-            f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } pending && pending.SubjectSeat == f.OwnerSeat &&
+            GetPausedPrivateOfferEffect(f)?.Op == SkillProgramEffectOp.GuessTargetCategoriesAndArmTurnDamage && r.TurnNumber == _turnNumber && r.TurnOwner == (r.Policy == CaoYingRulePolicy.MobileOrdinary ? _turnProgression.OwnerSeat : _currentSeat) &&
+            (r.Stage == CaoYingStage.GrantSkills
+                ? r.Policy == CaoYingRulePolicy.MobileOrdinary && r.Correct == 3 &&
+                    (f.PendingMovementContinuation is null || f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } granted && granted.SubjectSeat == f.OwnerSeat) &&
+                    ValidMobileCaoYingGrantTail(f)
+                : f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } pending && pending.SubjectSeat == f.OwnerSeat) &&
             LifecycleCardUse(r.UseId!.Value) is { Action: { } action } use && action.ActionId == r.ActionId && action.ActorSeat == f.OwnerSeat && use.TargetSeats.Contains(r.Target!.Value) &&
             r.MovementBefore <= r.MovementAfter && r.MovementAfter <= _movementSequence && r.DrawCount is >= 0 and <= 2 &&
-            CompleteProgramEventHistory().OfType<CaoYingGuessResolvedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.TurnNumber == r.TurnNumber && e.TurnOwner == r.TurnOwner && e.UseId == r.UseId && e.ActionId == r.ActionId && e.TargetSeat == r.Target && e.CorrectCount == r.Correct) == 1 &&
+            CompleteProgramEventHistory().OfType<CaoYingGuessResolvedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.TurnNumber == r.TurnNumber && e.TurnOwner == r.TurnOwner && e.UseId == r.UseId && e.ActionId == r.ActionId && e.TargetSeat == r.Target && e.CorrectCount == r.Correct && e.Policy == r.Policy && e.PhaseInstanceId == r.PhaseInstanceId) == 1 &&
             _cardMovements.Count(m => m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter && m.Reason.Value == "skill-program.cao-ying.draw" && m.To == CardLocation.Hand(f.OwnerSeat)) == r.DrawCount;
+    }
+    private bool ValidMobileCaoYingGrantTail(ProgramSkillFrame f)
+    {
+        var r = f.CaoYing!;
+        var grants = ProgramEventHistory<ProgramTurnSkillsGrantedEvent>().Where(e => e.FrameId == f.Id && e.SkillId == f.SkillId).ToArray();
+        return (f.PendingMovementContinuation is null ? grants.Length <= 1 : grants.Length == 1) && grants.All(grant =>
+            grant.OwnerSeat == f.OwnerSeat && grant.RecipientSeat == f.OwnerSeat && grant.BindingId == f.TriggerId &&
+            grant.GrantSourceId == $"turn:{r.TurnNumber}:{r.TurnOwner}:mobile-cao-ying:{f.OwnerSeat}:{f.SkillInstanceId}:frame:{f.Id}" && grant.TurnExpiry is null &&
+            grant.NextActualTurnStartExpiry == new SkillGrantNextActualTurnStartExpiry(r.TurnNumber, r.TurnOwner, f.OwnerSeat) &&
+            grant.GrantedSkillIds.SequenceEqual(GetProgramTrigger(f).Effects.Single().SkillIds));
     }
     private void RequireCaoYing(ProgramSkillFrame f)
     {
         if (f.CaoYing is not { } r || r.Source != CaoYingSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || f.TriggerId is null || r.WindowId != f.WindowContext?.ParentFrameId || r.FrozenCategories is < 0 or > 7 ||
-            r.Stage == CaoYingStage.DrawChildren && !ValidCaoYing(f) ||
-            (r.Stage == CaoYingStage.DrawChildren ? r.Guess is < 0 or > 7 || r.Correct != 3 - System.Numerics.BitOperations.PopCount((uint)(r.Guess ^ r.FrozenCategories)) : r.Guess != -1 || r.Correct != -1) ||
-            (r.Stage == CaoYingStage.Inspection ? r.Target is null || r.Target == f.OwnerSeat || r.UseId is not null : r.UseId != f.WindowContext?.CardUse?.ParentCardUseFrameId || r.ActionId != f.WindowContext?.CardUse?.CardActionId))
+            r.Policy != GetPausedPrivateOfferEffect(f)?.CaoYingPolicy ||
+            r.Policy == CaoYingRulePolicy.MobileOrdinary && r.Stage != CaoYingStage.Inspection && r.PhaseInstanceId is not > 0 ||
+            r.Stage is (CaoYingStage.DrawChildren or CaoYingStage.GrantSkills) && !ValidCaoYing(f) ||
+            (r.Stage is CaoYingStage.DrawChildren or CaoYingStage.GrantSkills ? r.Guess is < 0 or > 7 || r.Correct != 3 - System.Numerics.BitOperations.PopCount((uint)(r.Guess ^ r.FrozenCategories)) : r.Guess != -1 || r.Correct != -1) ||
+            (r.Stage == CaoYingStage.Inspection ? r.Target is null || r.Target == f.OwnerSeat || r.UseId is not null ||
+                r.Policy == CaoYingRulePolicy.MobileOrdinary && (r.InspectionMinimum is not > 0 || r.Cards.Count != r.InspectionMinimum || r.Cards.Select(c => c.Id).Distinct().Count() != r.Cards.Count) : r.UseId != f.WindowContext?.CardUse?.ParentCardUseFrameId || r.ActionId != f.WindowContext?.CardUse?.CardActionId))
             throw new InvalidOperationException("Cao Ying receipt lost its frozen instruction, action or private category decision.");
     }
 

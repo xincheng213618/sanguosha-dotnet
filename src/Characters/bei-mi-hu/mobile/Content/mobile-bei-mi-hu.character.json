@@ -1,0 +1,28 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:bei-mi-hu",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 83899,
+      "pools": { "current": 83899 },
+      "definition": {
+        "id": "mobile:bei-mi-hu",
+        "name": "卑弥呼·移动版",
+        "portraitKey": "mobile-bei-mi-hu",
+        "skillId": "ol:zongkui",
+        "factionId": "qun",
+        "baseHp": 3,
+        "additionalSkillIds": [
+          "ol:guju",
+          "ol:baijia"
+        ],
+        "gender": "Female",
+        "characterId": "character:bei-mi-hu",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

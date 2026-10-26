@@ -5867,8 +5867,11 @@ public sealed class SkillProgramCatalog
             window != SkillProgramTriggerWindow.CardUseBeforeTargetEffects)
             Fail(path + ".effects", "current target selection requires a finalized or before-effect use; nullification requires before-effect use");
         if (effects.Any(effect => effect.Op == SkillProgramEffectOp.ProhibitCurrentResponse) &&
-            window != SkillProgramTriggerWindow.SlashBeforeResponse)
-            Fail(path + ".effects", "response prohibition requires the Slash-before-response boundary");
+            window != SkillProgramTriggerWindow.SlashBeforeResponse &&
+            !(window == SkillProgramTriggerWindow.CardUseTargetsFinalized && ownerRelation == SkillProgramCardActionOwnerRelation.Actor &&
+              cardKinds is { Count: 4 } && cardKinds.Contains(CardKind.Slash) && cardKinds.Contains(CardKind.FireSlash) &&
+              cardKinds.Contains(CardKind.ThunderSlash) && cardKinds.Contains(CardKind.ColdSlash)))
+            Fail(path + ".effects", "response prohibition requires Slash-before-response or the actual actor's finalized complete Slash family");
         if (effects.Any(effect => effect.Op == SkillProgramEffectOp.RedirectCurrentAttack ||
                 effect.TargetKind == SkillProgramTargetKind.SlashRedirectable) &&
             window != SkillProgramTriggerWindow.SlashTargetRedirecting)

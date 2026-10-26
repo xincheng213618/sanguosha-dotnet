@@ -85,7 +85,9 @@ public sealed partial class GameEngine
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 920)]
     private bool CanOfferFinalTargetSlash(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext window)
     {
-        if (!HasFinalTargetSlashEffects(trigger.Effects)) return true;
+        if (!HasFinalTargetSlashEffects(trigger.Effects) ||
+            trigger.Window == SkillProgramTriggerWindow.SlashBeforeResponse &&
+            trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ProhibitCurrentResponse)) return true;
         return window is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, TargetSeat: { } target, CardUse: { } context, Facts: not null } &&
             IsValidPlayerSeat(target) && _players[target].IsAlive &&
             _resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Id == context.ParentCardUseFrameId)?.Action is { Type: CardActionType.Use } action &&

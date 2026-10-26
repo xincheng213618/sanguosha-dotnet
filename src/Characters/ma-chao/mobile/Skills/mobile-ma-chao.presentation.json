@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:tieqi": {
+      "name": "铁骑",
+      "description": "当你使用【杀】指定一名角色为目标后，你可以进行判定，若结果为红色，该角色不能使用【闪】响应此【杀】。"
+    }
+  }
+}

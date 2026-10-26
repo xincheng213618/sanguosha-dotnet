@@ -1,6 +1,12 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
-public enum CaoYingStage { Target, Guess, DrawChildren, Inspection }
+public enum CaoYingStage { Target, Guess, DrawChildren, Inspection, GrantSkills = 4 }
+public enum CaoYingRulePolicy { MobileOrdinary = 0 }
+public sealed partial class SkillProgramEffect
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public CaoYingRulePolicy? CaoYingPolicy { get; internal init; }
+}
 public sealed record CaoYingReceipt(int InstructionIndex, long WindowId, long? UseId, long? ActionId,
     int TurnNumber, int TurnOwner, CaoYingStage Stage, int? Target = null, int FrozenCategories = 0,
     int Guess = -1, int Correct = -1)
@@ -12,6 +18,9 @@ public sealed record CaoYingReceipt(int InstructionIndex, long WindowId, long? U
     public long MovementBefore { get; init; }
     public long MovementAfter { get; init; }
     public int DrawCount { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public CaoYingRulePolicy? Policy { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public int? PhaseInstanceId { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public int? InspectionMinimum { get; init; }
 }
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public CaoYingReceipt? CaoYing { get; init; } }
@@ -24,10 +33,14 @@ internal abstract class CaoYingDescriptor : ProgramOperationDescriptorBase
     public override ISkillProgramEffectHandler Handler => new CaoYingHandler(Op);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        if (Op != SkillProgramEffectOp.GuessTargetCategoriesAndArmTurnDamage) return ParseOwnerAlways(r);
-        r.AllowOnly("op", "target", "condition", "skillIds"); var ids = r.RequiredIdentifierArray("skillIds");
-        if (ids.Count != 2 || ids.Distinct(StringComparer.Ordinal).Count() != 2) throw new InvalidOperationException($"{r.Path}: Lingren requires exactly two distinct executable linked skills.");
-        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(), skillIds: ids); RequireAlways(effect, r.Path); return effect;
+        var guess = Op == SkillProgramEffectOp.GuessTargetCategoriesAndArmTurnDamage;
+        if (guess) r.AllowOnly("op", "target", "condition", "skillIds", "policy");
+        else r.AllowOnly("op", "target", "condition", "policy");
+        var ids = guess ? r.RequiredIdentifierArray("skillIds") : [];
+        if (guess && (ids.Count != 2 || ids.Distinct(StringComparer.Ordinal).Count() != 2)) throw new InvalidOperationException($"{r.Path}: Lingren requires exactly two distinct executable linked skills.");
+        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(), skillIds: ids)
+        { CaoYingPolicy = r.Has("policy") ? r.RequiredEnum<CaoYingRulePolicy>("policy") : null };
+        RequireAlways(effect, r.Path); return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         Op == SkillProgramEffectOp.GuessTargetCategoriesAndArmTurnDamage ? [new RequireTriggerWindow(SkillProgramTriggerWindow.CardUseTargetsFinalized)] : [];
@@ -47,7 +60,10 @@ internal static class CaoYingContract
             if (effect.SkillIds.Count != 2 || effect.SkillIds.Any(id => !skills.TryGetValue(id, out var linked) || linked.Program is null || linked.Program.Triggers.Count == 0))
                 throw new InvalidOperationException($"Skill '{skill.Id}' requires two registered executable linked damage/death skills.");
             var damage = skills[effect.SkillIds[0]].Program!; var death = skills[effect.SkillIds[1]].Program!;
-            if (!damage.Triggers.Any(t => t.Window == SkillProgramTriggerWindow.AfterDamageApplied && t.Optional && t.Effects is [{ Op: SkillProgramEffectOp.Draw, Amount: 1 }, { Op: SkillProgramEffectOp.AwaitOwnedCardMovement }, { Op: SkillProgramEffectOp.ClaimDamageCards }]) ||
+            var mobile = effect.CaoYingPolicy == CaoYingRulePolicy.MobileOrdinary;
+            if (!damage.Triggers.Any(t => t.Window == SkillProgramTriggerWindow.AfterDamageApplied && t.Optional &&
+                    (mobile ? t.Effects is [{ Op: SkillProgramEffectOp.ClaimDamageCards }]
+                        : t.Effects is [{ Op: SkillProgramEffectOp.Draw, Amount: 1 }, { Op: SkillProgramEffectOp.AwaitOwnedCardMovement }, { Op: SkillProgramEffectOp.ClaimDamageCards }])) ||
                 !death.Triggers.Any(t => t.Window == SkillProgramTriggerWindow.CharacterDied && t.Effects.Any(e => e.Op == SkillProgramEffectOp.ClaimDeathCleanupCards)))
                 throw new InvalidOperationException($"Skill '{skill.Id}' requires a linked native damage-card recovery skill followed by a native death-card skill.");
         }
@@ -58,8 +74,8 @@ internal static class CaoYingContract
         if (t.Effects is not [var e] || e.Target != SkillProgramEffectTarget.Owner || e.Condition.Kind != SkillProgramConditionKind.Always ||
             t.Condition.Kind != SkillProgramTriggerConditionKind.Always || t.CardKinds.Count != 0 || t.CardCategories.Count != 0 || t.IncludeResponseUses ||
             (e.Op == SkillProgramEffectOp.GuessTargetCategoriesAndArmTurnDamage
-                ? t.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || t.OwnerRelation != SkillProgramCardActionOwnerRelation.Actor || !t.Optional || t.UsageScope != SkillUsageScope.Turn || t.UsageLimit != 1
-                : t.Window is not (SkillProgramTriggerWindow.TurnStartBeforeNormalFlow or SkillProgramTriggerWindow.TurnEnding) || t.Subject != SkillProgramTriggerSubject.Owner || t.Optional))
-            throw new InvalidOperationException($"{path}: Cao Ying requires its exact current OL actor-use or own preparation/ending boundary.");
+                ? t.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || t.OwnerRelation != SkillProgramCardActionOwnerRelation.Actor || !t.Optional || t.UsageScope != (e.CaoYingPolicy == CaoYingRulePolicy.MobileOrdinary ? SkillUsageScope.Phase : SkillUsageScope.Turn) || t.UsageLimit != 1
+                : (e.CaoYingPolicy == CaoYingRulePolicy.MobileOrdinary ? t.Window != SkillProgramTriggerWindow.TurnEnding : t.Window is not (SkillProgramTriggerWindow.TurnStartBeforeNormalFlow or SkillProgramTriggerWindow.TurnEnding)) || t.Subject != SkillProgramTriggerSubject.Owner || t.Optional))
+            throw new InvalidOperationException($"{path}: Cao Ying requires its exact declared actor-use quota and own inspection boundary.");
     }
 }

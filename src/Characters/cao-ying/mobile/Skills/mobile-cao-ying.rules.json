@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "mobile:lingren",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "guess-real-target",
+          "window": "cardUseTargetsFinalized",
+          "ownerRelation": "actor",
+          "optional": true,
+          "usageScope": "phase",
+          "usageLimit": 1,
+          "priority": -1000,
+          "effects": [
+            {
+              "op": "guessTargetCategoriesAndArmTurnDamage",
+              "target": "owner",
+              "policy": "mobileOrdinary",
+              "skillIds": [
+                "classic:jianxiong",
+                "classic:xingshang"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mobile:fujian",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "ending-inspect",
+          "window": "turnEnding",
+          "subject": "owner",
+          "optional": false,
+          "effects": [
+            {
+              "op": "randomEligibleOtherHandInspection",
+              "target": "owner",
+              "policy": "mobileOrdinary"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

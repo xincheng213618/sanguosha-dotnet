@@ -20,6 +20,36 @@ public sealed partial class GameEngine
 
     private void ProhibitCurrentProgramResponse(ProgramSkillFrame frame)
     {
+        if (frame.WindowContext is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized,
+                CardUse: { } context, TargetSeat: { } target })
+        {
+            var use = _resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == context.ParentCardUseFrameId);
+            if (use is not { Action: { Type: CardActionType.Use } action } || !IsSlashCard(action.EffectiveKind) ||
+                action.ActionId != context.CardActionId || action.ActorSeat != frame.OwnerSeat || context.ActorSeat != frame.OwnerSeat ||
+                !action.EffectiveDesignatedTargetSeats.Contains(target) || !IsValidPlayerSeat(target))
+                throw new InvalidOperationException("A final-target response prohibition lost its original Slash and exact designated target.");
+            if (!_players[target].IsAlive) return;
+            var name = _contentRegistry.GetSkill(frame.SkillId).Name;
+            CardAttackState Prohibit(CardAttackState state) => state with
+            {
+                ProhibitsDodge = true,
+                ResponseProhibitingSkillNames = state.ResponseProhibitingSkillNames.Contains(name, StringComparer.Ordinal)
+                    ? state.ResponseProhibitingSkillNames : Array.AsReadOnly(state.ResponseProhibitingSkillNames.Append(name).ToArray())
+            };
+            // The target-specific attack objects were already frozen during
+            // native target preparation. The ordinary Fangtian continuation
+            // restores these same states for each subsequent target.
+            var current = use.CardAttack;
+            var prepared = use.PreparedTargetAttacks;
+            if (current?.TargetSeat != target && prepared?.Any(state => state.TargetSeat == target) != true)
+                throw new InvalidOperationException("A final-target response prohibition lost its prepared native attack.");
+            ReplaceRuntimeFrame(use.Id, use with
+            {
+                CardAttack = current is { } active && active.TargetSeat == target ? Prohibit(active) : current,
+                PreparedTargetAttacks = prepared is null ? null : Array.AsReadOnly(prepared.Select(state => state.TargetSeat == target ? Prohibit(state) : state).ToArray())
+            });
+            return;
+        }
         var attack = ProgramCardAttack ?? throw new InvalidOperationException(
             "A response prohibition requires the active Slash.");
         if (frame.WindowContext?.Window != SkillProgramTriggerWindow.SlashBeforeResponse ||
