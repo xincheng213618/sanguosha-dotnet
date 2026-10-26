@@ -9,7 +9,9 @@ public sealed partial class ShanheCampaignSession
         OwnedEconomy(state).Select(e => e.ShopRefreshLimit).DefaultIfEmpty(0).Max());
     private int ShopFreeRefreshRemaining(RunState state) => Math.Max(0,
         OwnedEconomy(state).Sum(effect => effect.FreeShopRefreshes) - state.ShopFreeRefreshCount);
-    private int ShopPaidRefreshRemaining(RunState state) => Math.Max(0,
+    private bool HasUnlimitedPaidShopRefreshes(RunState state) =>
+        OwnedEconomy(state).Any(effect => effect.UnlimitedPaidShopRefreshes);
+    private int ShopPaidRefreshRemaining(RunState state) => HasUnlimitedPaidShopRefreshes(state) ? 0 : Math.Max(0,
         ShopRefreshLimit(state) - state.ShopPaidRefreshCount);
     private int ExtraShopStock(RunState state) => OwnedEconomy(state).Sum(e => e.ExtraStockPerCategory);
     private bool RestocksShopOnPurchase(RunState state) => OwnedEconomy(state).Any(effect => effect.RestockOnPurchase);

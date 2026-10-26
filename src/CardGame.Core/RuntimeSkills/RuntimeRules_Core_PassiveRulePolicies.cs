@@ -10,6 +10,8 @@ internal static class RuntimeRules_Core_PassiveRulePolicies
     {
         SkillProgramDamageModifierCondition.Always => true,
         SkillProgramDamageModifierCondition.SourceHandBelowHp => sourceHasHp && sourceHandCount < sourceHp,
+        SkillProgramDamageModifierCondition.SourceHpAtMost =>
+            sourceHasHp && modifier.MaximumHp is { } maximumHp && sourceHp <= maximumHp,
         SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan =>
             modifier.DistanceThreshold is { } threshold && sourceToTargetDistance > threshold,
         SkillProgramDamageModifierCondition.SourceRoundIsOdd => roundNumber > 0 && roundNumber % 2 == 1,

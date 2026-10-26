@@ -237,7 +237,8 @@ public enum SkillProgramDamageModifierCondition
     OwnerActualTurnElementalSlashUseOrdinalWithinLimit = 1038,
     SourceRoundIsOdd = 1039,
     SourceRoundIsEven = 1040,
-    DirectSkillDamage = 1041
+    DirectSkillDamage = 1041,
+    SourceHpAtMost = 1042
 }
 public sealed record SkillProgramDamageModifier(
     string Id, IReadOnlyList<CardKind> CardKinds, int Amount,
@@ -253,6 +254,8 @@ public sealed record SkillProgramDamageModifier(
     public int? SourceHandCountLimit { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? DistanceThreshold { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? MaximumHp { get; init; }
 }
 public sealed record SkillProgramChoiceOption(string Id, SkillProgramCondition Condition)
 {
@@ -4067,7 +4070,7 @@ public sealed class SkillProgramCatalog
     private static SkillProgramDamageModifier ParseDamageModifier(JsonElement node, string path)
     {
         RequireObject(node, path);
-        CheckProperties(node, path, "id", "cardKinds", "amount", "condition", "sourceScope", "capsToAmount", "damageLayer", "maximumUseOrdinal", "sourceHandCountLimit", "distanceThreshold");
+        CheckProperties(node, path, "id", "cardKinds", "amount", "condition", "sourceScope", "capsToAmount", "damageLayer", "maximumUseOrdinal", "sourceHandCountLimit", "distanceThreshold", "maximumHp");
         var condition = EnumValue<SkillProgramDamageModifierCondition>(node, "condition", path);
         var scope = node.TryGetProperty("sourceScope", out _)
             ? EnumValue<SkillProgramDamageModifierSourceScope>(node, "sourceScope", path)
@@ -4088,6 +4091,7 @@ public sealed class SkillProgramCatalog
                     or SkillProgramDamageModifierCondition.DamageSourceAttackRangeBelowThree
                     or SkillProgramDamageModifierCondition.DamageSourceAttackRangeAboveThree
                     or SkillProgramDamageModifierCondition.SourceHandBelowHp
+                    or SkillProgramDamageModifierCondition.SourceHpAtMost
                     or SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan
                     or SkillProgramDamageModifierCondition.SourceRoundIsOdd
                     or SkillProgramDamageModifierCondition.SourceRoundIsEven
@@ -4136,6 +4140,15 @@ public sealed class SkillProgramCatalog
         }
         else if (distanceThreshold is not null)
             Fail(path + ".distanceThreshold", "requires the source-to-target distance condition");
+        var maximumHp = node.TryGetProperty("maximumHp", out _)
+            ? PositiveInt(node, "maximumHp", path) : (int?)null;
+        if (condition == SkillProgramDamageModifierCondition.SourceHpAtMost)
+        {
+            if (maximumHp is null || scope != SkillProgramDamageModifierSourceScope.DamageSource || kinds.Count != 0)
+                Fail(path, "source HP at most requires damageSource, every damage kind and a positive maximumHp");
+        }
+        else if (maximumHp is not null)
+            Fail(path + ".maximumHp", "requires the source HP at most condition");
         if (condition is SkillProgramDamageModifierCondition.DamageSourceAttackRangeBelowThree or
             SkillProgramDamageModifierCondition.DamageSourceAttackRangeAboveThree)
         {
@@ -4155,6 +4168,7 @@ public sealed class SkillProgramCatalog
                 Fail(path, "public enemy participants require allLivingSkillOwners and every damage kind");
         }
         else if (condition is SkillProgramDamageModifierCondition.SourceHandBelowHp or
+                 SkillProgramDamageModifierCondition.SourceHpAtMost or
                  SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan or
                  SkillProgramDamageModifierCondition.SourceRoundIsOdd or
                  SkillProgramDamageModifierCondition.SourceRoundIsEven or
@@ -4194,7 +4208,7 @@ public sealed class SkillProgramCatalog
             Fail(path + ".damageLayer", "Slash-use ordinal modifiers require cardDamage");
         return new SkillProgramDamageModifier(Identifier(node, "id", path), kinds, amount, condition, scope, capsToAmount)
             { DamageLayer = damageLayer, MaximumUseOrdinal = maximumUseOrdinal, SourceHandCountLimit = sourceHandCountLimit,
-              DistanceThreshold = distanceThreshold };
+              DistanceThreshold = distanceThreshold, MaximumHp = maximumHp };
     }
 
     private static SkillProgramModifier ParseModifier(JsonElement node, string path)

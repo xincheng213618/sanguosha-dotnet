@@ -70,6 +70,9 @@ internal sealed class SkillProgramDependencies
         HasSourceDistanceDamageModifiers = programs.Any(program => program.DamageModifiers.Any(modifier =>
             modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource &&
             modifier.Condition == SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan));
+        HasSourceHpDamageModifiers = programs.Any(program => program.DamageModifiers.Any(modifier =>
+            modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource &&
+            modifier.Condition == SkillProgramDamageModifierCondition.SourceHpAtMost));
         HasSourceRoundDamageModifiers = programs.Any(program => program.DamageModifiers.Any(modifier =>
             modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource &&
             modifier.Condition is SkillProgramDamageModifierCondition.SourceRoundIsOdd or SkillProgramDamageModifierCondition.SourceRoundIsEven));
@@ -184,6 +187,7 @@ internal sealed class SkillProgramDependencies
     internal bool TracksSlashDamageUseOrdinals => HasRoundSlashUseDamageModifiers || HasActualTurnElementalSlashUseDamageModifiers;
     internal bool HasPublicEnemyParticipantDamageModifiers { get; }
     internal bool HasSourceDistanceDamageModifiers { get; }
+    internal bool HasSourceHpDamageModifiers { get; }
     internal bool HasSourceRoundDamageModifiers { get; }
     internal bool HasMaximumHandRoundDamageModifiers { get; }
     internal bool HasFixedTargetDamageCaps { get; }
