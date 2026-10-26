@@ -1,0 +1,15 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:wang-can",
+  "skills": [
+    { "registrationOrder": 81500, "programBundle": "mobile-wang-can", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:qiai", "name": "七哀", "description": "出牌阶段限一次，你可以交给一名其他角色一张非基本牌，令其选择一项：1.令你回复1点体力；2.令你摸两张牌。", "executionForms": "State", "actionForms": "Active" } },
+    { "registrationOrder": 81501, "programBundle": "mobile-wang-can", "includeProgramPresentation": true,
+      "definition": { "id": "mobile:shanxi-wang-can", "name": "善檄", "description": "①出牌阶段开始时，你可以令一名没有“檄”标记的其他角色获得“檄”标记（若场上已有“檄”标记，改为移动给其）；②当拥有“檄”标记的角色回复体力后，若其未处于濒死状态，其选择一项：1.交给你两张牌；2.失去1点体力。", "executionForms": "Trigger" } }
+  ],
+  "generals": [ { "registrationOrder": 81599, "pools": { "current": 81599 }, "definition": {
+    "id": "mobile:wang-can", "name": "王粲·移动版", "portraitKey": "mobile-wang-can", "skillId": "mobile:qiai", "additionalSkillIds": ["mobile:shanxi-wang-can"],
+    "factionId": "wei", "baseHp": 3, "gender": "Male", "characterId": "character:wang-can", "variantId": "mobile", "rulesetId": "sanguosha-mobile"
+  } } ]
+}

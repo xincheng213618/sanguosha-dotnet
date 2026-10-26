@@ -23441,6 +23441,74 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "mobile-xu-shi",
+      "characterName": "徐氏",
+      "defaultSkinId": "39000",
+      "skins": [
+        {
+          "id": "39000",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-227.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/39000.jpg",
+          "sha256": "4fcdf34cfcb6f467a0e7824320b867a2d22950773c2680c788d137d8766ab7c3",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-xu-shi.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-lu-zhi",
+      "characterName": "卢植",
+      "defaultSkinId": "42200",
+      "skins": [
+        {
+          "id": "42200",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-255.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/42200.jpg",
+          "sha256": "4650b5ca024f65d6381ad18c2fc0fafa5ed586f583c9119a0605b6fb0dc3c1e6",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-lu-zhi.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-wang-can",
+      "characterName": "王粲",
+      "defaultSkinId": "54400",
+      "skins": [
+        {
+          "id": "54400",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-395.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/54400.jpg",
+          "sha256": "98f1aed8f00acd5e667f13dbda1354f293c4cc11fe147a87cc91cde0bc8a68bd",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-wang-can.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
+    },
+    {
+      "key": "mobile-zhang-rang",
+      "characterName": "张让",
+      "defaultSkinId": "38700",
+      "skins": [
+        {
+          "id": "38700",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.cn/pc/hero-detail-224.html",
+          "imageUrl": "https://www.sanguosha.cn/storage/uploads/images/skins/38700.jpg",
+          "sha256": "9ba7b2cdecc84dbd6a0e8e4fe5401ebad391402707b8ded3e0cc12ac41becfa2",
+          "localPath": "src/CardGame.Wpf/Assets/official-mobile-zhang-rang.jpg",
+          "pixelWidth": 530,
+          "pixelHeight": 750
+        }
+      ]
     }
   ]
 }

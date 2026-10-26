@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "mobile:qiai", "revision": 1, "activations": [
+      { "id": "nonbasic-gift", "minCards": 1, "maxCards": 1, "sourceZones": ["hand", "equipment"], "cardCategories": ["trick", "equipment"],
+        "minTargets": 1, "maxTargets": 1, "targetKind": "otherLiving", "usesPerTurn": null, "usesPerPhase": 1,
+        "effects": [
+          { "op": "giveSelected", "target": "selectedTarget", "amount": 1 },
+          { "op": "chooseOption", "target": "selectedTarget", "resultBind": "qiai-answer", "options": [{ "id": "recover" }, { "id": "draw" }] },
+          { "op": "recover", "target": "owner", "amount": 1, "condition": { "kind": "choiceIs", "sourceBind": "qiai-answer", "optionId": "recover" } },
+          { "op": "draw", "target": "owner", "amount": 2, "condition": { "kind": "choiceIs", "sourceBind": "qiai-answer", "optionId": "draw" } }
+        ] }
+    ] },
+    { "id": "mobile:shanxi-wang-can", "revision": 1, "triggers": [
+      { "id": "move-xi", "window": "playPhaseStarting", "subject": "owner", "optional": true,
+        "effects": [{ "op": "transferMobileWangCanXi", "target": "owner" }] },
+      { "id": "marked-recovery", "window": "afterHpRecovered", "subject": "owner", "optional": false, "hpChangeOccurrence": "perEvent",
+        "effects": [{ "op": "resolveMobileWangCanXiRecovery", "target": "owner" }] }
+    ] }
+  ]
+}

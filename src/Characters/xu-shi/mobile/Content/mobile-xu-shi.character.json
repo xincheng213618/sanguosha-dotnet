@@ -1,0 +1,29 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:xu-shi",
+  "skills": [],
+  "generals": [
+    {
+      "registrationOrder": 81399,
+      "pools": {
+        "current": 81399
+      },
+      "definition": {
+        "id": "mobile:xu-shi",
+        "name": "徐氏·移动版",
+        "portraitKey": "mobile-xu-shi",
+        "skillId": "classic:wengua",
+        "factionId": "wu",
+        "baseHp": 3,
+        "additionalSkillIds": [
+          "classic:fuzhu"
+        ],
+        "gender": "Female",
+        "characterId": "character:xu-shi",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

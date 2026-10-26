@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "mobile:qiai": { "name": "七哀", "description": "出牌阶段限一次，交给其他角色一张非基本牌，由其选择令你回复1点体力或摸两张牌。", "optionLabels": { "recover": "令王粲回复1点体力", "draw": "令王粲摸两张牌" } },
+    "mobile:shanxi-wang-can": { "name": "善檄", "description": "出牌阶段开始时可把檄移给没有檄的其他角色；其回复体力且不再濒死后，交给你两张牌或失去1点体力。" }
+  }
+}

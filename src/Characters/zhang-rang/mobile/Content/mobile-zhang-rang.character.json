@@ -1,0 +1,39 @@
+{
+  "formatVersion": 1,
+  "packageId": "standard-classic-generals",
+  "characterId": "character:zhang-rang",
+  "skills": [
+    {
+      "registrationOrder": 81600,
+      "programBundle": "mobile-zhang-rang",
+      "includeProgramPresentation": true,
+      "definition": {
+        "id": "mobile:taoluan",
+        "name": "滔乱",
+        "description": "你可以将一张牌当任意基本牌或普通锦囊牌使用（每种牌名每局限一次，且场上无人处于濒死状态）。此牌结算结束后，令一名其他角色选择一项：交给你一张与声明牌类别不同的牌；你失去1点体力，然后本回合滔乱失效。",
+        "executionForms": "State, Trigger",
+        "actionForms": "Active"
+      }
+    }
+  ],
+  "generals": [
+    {
+      "registrationOrder": 81699,
+      "pools": {
+        "current": 81699
+      },
+      "definition": {
+        "id": "mobile:zhang-rang",
+        "name": "张让·移动版",
+        "portraitKey": "mobile-zhang-rang",
+        "skillId": "mobile:taoluan",
+        "factionId": "qun",
+        "baseHp": 3,
+        "gender": "Male",
+        "characterId": "character:zhang-rang",
+        "variantId": "mobile",
+        "rulesetId": "sanguosha-mobile"
+      }
+    }
+  ]
+}

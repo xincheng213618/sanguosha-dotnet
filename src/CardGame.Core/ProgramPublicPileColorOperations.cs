@@ -1,4 +1,10 @@
 namespace CardGame.Core;
+public enum PublicPileColorDamageCostPolicy { HpDifferenceAtLeastOne = 0 }
+public sealed partial class SkillProgramEffect
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public PublicPileColorDamageCostPolicy? PublicPileDamageCostPolicy { get; internal init; }
+}
 internal interface IPublicPileColorHost { SkillProgramStepOutcome ExecutePublicPileColor(SkillProgramEffect effect, ProgramSkillFrame frame); }
 internal sealed record ConsumePublicPileCardSet(string Name):ProgramResourceOperation;
 internal sealed record RequirePublicPileExchangeBoundary : ProgramResourceOperation;
@@ -10,12 +16,14 @@ internal abstract class PublicPileColorDescriptor : ProgramOperationDescriptorBa
         static (e,c) => { if(e.Op==SkillProgramEffectOp.PublicPileColorDamage) c.Damage(new(SkillProgramEffectOp.Damage,SkillProgramEffectTarget.SelectedTarget,1,e.Condition)); else c.Draw(new(SkillProgramEffectOp.Draw,SkillProgramEffectTarget.Owner,1,e.Condition)); });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op","target","sourceBind","skillIds","condition");
+        r.AllowOnly("op","target","sourceBind","skillIds","costPolicy","condition");
+        if(r.Has("costPolicy")&&Op!=SkillProgramEffectOp.PublicPileColorDamage)throw new InvalidOperationException("Only public-pile damage declares an optional discard cost policy.");
         var skills=r.Has("skillIds")?r.RequiredIdentifierArray("skillIds"):[];
         if(Op==SkillProgramEffectOp.StoreBoundHandInPublicPile ? skills.Count!=0 : skills.Count!=1) throw new InvalidOperationException("Color public pile requires exactly one referenced source skill.");
         var bind=r.Has("sourceBind")?r.RequiredIdentifier("sourceBind"):null;
         if((Op==SkillProgramEffectOp.StoreBoundHandInPublicPile)!=(bind is not null)) throw new InvalidOperationException("Only hand storage requires an owned card binding.");
-        var e=new SkillProgramEffect(Op,FilterBoundCardsProgramOperationDescriptor.Owner(r),1,r.Condition(),sourceBind:bind,skillIds:skills);RequireAlways(e,r.Path);return e;
+        var e=new SkillProgramEffect(Op,FilterBoundCardsProgramOperationDescriptor.Owner(r),1,r.Condition(),sourceBind:bind,skillIds:skills)
+        {PublicPileDamageCostPolicy=r.Has("costPolicy")?r.RequiredEnum<PublicPileColorDamageCostPolicy>("costPolicy"):null};RequireAlways(e,r.Path);return e;
     }
 }
 internal sealed class StoreBoundHandInPublicPileDescriptor : PublicPileColorDescriptor

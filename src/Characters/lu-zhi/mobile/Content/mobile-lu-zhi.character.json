@@ -1,0 +1,8 @@
+{
+ "formatVersion":1,"packageId":"standard-classic-generals","characterId":"character:lu-zhi",
+ "skills":[
+  {"registrationOrder":81400,"programBundle":"mobile-lu-zhi","includeProgramPresentation":true,"definition":{"id":"mobile:mingren","name":"明任","description":"游戏开始时，你摸一张牌，然后将你的一张手牌置于你的武将牌上，称为“任”。结束阶段，你可以用手牌替换“任”。","executionForms":"Trigger"}},
+  {"registrationOrder":81401,"programBundle":"mobile-lu-zhi","includeProgramPresentation":true,"definition":{"id":"mobile:zhenliang","name":"贞良","description":"转换技，阳：出牌阶段限一次，你可以选择一名攻击范围内的其他角色并弃置X张与“任”颜色相同的牌，然后对其造成1点伤害（X为你与其体力值之差且至少为1）。阴：你的回合外，当你使用或打出的牌结算结束后，若此牌与“任”类别相同，你可以令一名角色摸一张牌。","tags":"Conversion","executionForms":"State, Trigger"}}
+ ],
+ "generals":[{"registrationOrder":81499,"pools":{"current":81499},"definition":{"id":"mobile:lu-zhi","name":"卢植·移动版","portraitKey":"mobile-lu-zhi","skillId":"mobile:mingren","additionalSkillIds":["mobile:zhenliang"],"factionId":"qun","baseHp":3,"gender":"Male","characterId":"character:lu-zhi","variantId":"mobile","rulesetId":"sanguosha-mobile"}}]
+}

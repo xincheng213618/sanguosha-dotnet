@@ -17,7 +17,10 @@ public sealed partial class GameEngine
     {
         if(!features.HasOperation(SkillProgramEffectOp.PublicPileColorDamage))return true;
         if(GetProgramConversionPolarity(owner.Seat,skill)!=SkillPolarity.Yang)return false;
-        return GetSkillBindingShard(owner).ProgramInstances.Where(i=>i.SkillId==skill).Any(i=>ColorDamageChoices(0,owner.Seat,skill,i.SkillInstanceId,features.First(SkillProgramEffectOp.PublicPileColorDamage)!).Count>0);
+        var effect=features.First(SkillProgramEffectOp.PublicPileColorDamage)!;
+        return GetSkillBindingShard(owner).ProgramInstances.Where(i=>i.SkillId==skill).Any(i=>effect.PublicPileDamageCostPolicy is not null
+            ? HpDifferencePileDamageTargets(owner.Seat,skill,i.SkillInstanceId,effect).Count>0
+            : ColorDamageChoices(0,owner.Seat,skill,i.SkillInstanceId,effect).Count>0);
     }
     private IReadOnlyList<PromptChoice> ColorDamageChoices(long frameId,int owner,string skill,string instance,SkillProgramEffect e)
     {
@@ -45,6 +48,7 @@ public sealed partial class GameEngine
     private SkillProgramStepOutcome ExecutePublicPileColor(SkillProgramEffect e,ProgramSkillFrame frame)
     {
         if(!_players[frame.OwnerSeat].IsAlive)return SkillProgramStepOutcome.Continue;
+        if(e.Op==SkillProgramEffectOp.PublicPileColorDamage&&e.PublicPileDamageCostPolicy is not null)return StartHpDifferencePileDamage(frame,e);
         if(e.Op==SkillProgramEffectOp.StoreBoundHandInPublicPile)
         {
             var cards=GetProgramCardSet(frame,e.SourceBind!);if(cards.CardIds.Count==0)return SkillProgramStepOutcome.Continue;
@@ -98,5 +102,8 @@ public sealed partial class GameEngine
         BeginProgramSkillDamage(GetActiveProgramFrame(id),payment.TargetSeat,1,new ProgramParticipantReference(ProgramParticipantRef.Owner));return true;
     }
     [ProgramAiChoice(SkillProgramEffectOp.PublicPileColorDamage, SkillProgramEffectOp.RewardDiscardedActionColor)]
-    private PromptChoice SelectAiPublicPileColorChoice(PendingDecision p,ProgramSkillFrame f)=>p.Choices.OrderByDescending(c=>c.Targets.Count==1&&(c.Cards.Count==0?AreProgramDistributionAllies(_players[f.OwnerSeat],_players[c.Targets[0]]):!AreProgramDistributionAllies(_players[f.OwnerSeat],_players[c.Targets[0]]))).ThenBy(c=>c.Cards.Count==1?GetKeepValue(_cardZones.CardsAt(_cardZones.GetLocation(c.Cards[0])).Single(x=>x.Id==c.Cards[0]),_players[f.OwnerSeat]):0).ThenBy(c=>c.Targets[0]).First();
+    private PromptChoice SelectAiPublicPileColorChoice(PendingDecision p,ProgramSkillFrame f)=>f.HpDifferencePileDamage is not null
+        ? p.Choices.OrderByDescending(c=>c.Targets.Count==1&&!AreProgramDistributionAllies(_players[f.OwnerSeat],_players[c.Targets[0]]))
+            .ThenBy(c=>c.Cards.Count==1?GetKeepValue(GetAdvancedCard(c.Cards[0]),_players[f.OwnerSeat]):0).ThenBy(c=>c.Id.Value,StringComparer.Ordinal).First()
+        : p.Choices.OrderByDescending(c=>c.Targets.Count==1&&(c.Cards.Count==0?AreProgramDistributionAllies(_players[f.OwnerSeat],_players[c.Targets[0]]):!AreProgramDistributionAllies(_players[f.OwnerSeat],_players[c.Targets[0]]))).ThenBy(c=>c.Cards.Count==1?GetKeepValue(_cardZones.CardsAt(_cardZones.GetLocation(c.Cards[0])).Single(x=>x.Id==c.Cards[0]),_players[f.OwnerSeat]):0).ThenBy(c=>c.Targets[0]).First();
 }

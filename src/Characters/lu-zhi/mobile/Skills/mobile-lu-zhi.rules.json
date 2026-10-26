@@ -1,0 +1,10 @@
+{"schemaVersion":62,"skills":[
+ {"id":"mobile:mingren","revision":1,"triggers":[
+  {"id":"initial-reserve","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"draw","target":"owner","amount":1},{"op":"awaitOwnedCardMovement","target":"owner"},{"op":"selectOwnedCards","target":"owner","amount":1,"zones":["hand"],"resultBind":"initial-reserve"},{"op":"storeBoundHandInPublicPile","target":"owner","sourceBind":"initial-reserve"}]},
+  {"id":"exchange-reserve","window":"turnEnding","subject":"owner","optional":true,"effects":[{"op":"exchangePublicPileHand","target":"owner","skillIds":["mobile:mingren"]}]}
+ ]},
+ {"id":"mobile:zhenliang","revision":1,"activations":[{"id":"reserve-hp-difference-damage","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"usesPerPhase":1,"effects":[{"op":"publicPileColorDamage","target":"owner","skillIds":["mobile:mingren"],"costPolicy":"hpDifferenceAtLeastOne"}]}],"triggers":[
+  {"id":"yin-use","window":"cardUseCompleted","ownerRelation":"actor","includeResponseUses":true,"singleActionInstance":true,"requiredPolarity":"yin","optional":true,"effects":[{"op":"commitConversionPolarity","target":"owner"},{"op":"selectTarget","target":"owner","targetKind":"anyLiving"},{"op":"draw","target":"selectedTarget","amount":1},{"op":"awaitBoundCardMovements","target":"owner"}]},
+  {"id":"yin-played","window":"cardResponseCompleted","ownerRelation":"actor","requiredPolarity":"yin","optional":true,"effects":[{"op":"commitConversionPolarity","target":"owner"},{"op":"selectTarget","target":"owner","targetKind":"anyLiving"},{"op":"draw","target":"selectedTarget","amount":1},{"op":"awaitBoundCardMovements","target":"owner"}]}
+ ]}
+]}
