@@ -924,6 +924,7 @@ public enum SkillProgramEffectOp
     ChoosePrivateColorsDiscardAndDuel = 4300,
     GrantLeastHandMarkerOrDraw = 3800,
     ViewAndTakeSelectedTargetHand = 3300, RequestHandBySuitsOrLoseHp = 3301,
+    RecastBoundCards = 62020,
     RecastBoundCard = 3100,
     PayHpToGrantOneUseDamageShield = 3000,
     DrawThenDiscardHandToMaximumHp = 2900,
