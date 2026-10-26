@@ -24,6 +24,8 @@ public static partial class StandardShanheCampaignCatalog
             "你可以将至多两张花色相同的牌按以下规则使用或打出：\n•红桃当【桃】;•方片当火【杀】;\n•梅花当【闪】;•黑桃当【无懈可击】。\n若你以此法转化使用了两张：\n•红色牌，此牌回复值或伤害值+1;\n•黑色牌，你弃置当前回合角色一张牌。"),
         new CurrentBuildSkillSource(3081, "遗计", StandardShanheYijiPackage.SkillId, 600, 3, null,
             "当你受到1点伤害后，你可以观看牌堆顶的两张牌，然后将这些牌交给任意角色。"),
+        new CurrentBuildSkillSource(3083, "节命", StandardShanheCappedRefillSkillsPackage.SkillId, 600, 3, 92,
+            "当你受到1点伤害后，你可以令一名角色将手牌摸至X张（X为其体力上限且至多为5）。"),
         new CurrentBuildSkillSource(3049, "青囊", "classic:qingnang", 100, 1, null,
             "出牌阶段限一次，你可以弃置一张手牌令一名角色回复1点体力。"),
         new CurrentBuildSkillSource(3052, "刚烈", "classic:ganglie", 300, 2, 43,

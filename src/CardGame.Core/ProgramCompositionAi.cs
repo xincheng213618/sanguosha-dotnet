@@ -361,6 +361,19 @@ internal sealed partial class ProgramAiEstimateContext
     {
         var limit = effect.NumberExpression == SkillProgramNumberExpression.LivingPlayerCount
             ? _publicContext.LivingPlayerCount : effect.Amount;
+        if (effect.CapAtTargetMaxHp)
+        {
+            if (TargetsOwner(effect))
+            {
+                if (_player.HpUndefined) return;
+                limit = Math.Min(limit, _estimatedMaxHp);
+            }
+            else
+            {
+                if (_publicContext.SelectedTarget is not { HpUndefined: false } target) return;
+                limit = Math.Min(limit, _targetHealthPrediction?.MaxHpAfter ?? target.MaxHp);
+            }
+        }
         if (TargetsOwner(effect))
         { var count=Math.Max(0,limit-_estimatedHandCount); _ownerDraw+=count; _estimatedHandCount+=count; }
         else _targetDraw += Math.Max(0,limit-(_publicContext.SelectedTarget?.HandCount ?? limit));

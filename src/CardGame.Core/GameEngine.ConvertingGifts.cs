@@ -9,8 +9,9 @@ public sealed partial class GameEngine
         public SkillProgramStepOutcome GiveSelectedOwnedCardAndDamage(ProgramSkillFrame f,int limit)=>engine.BeginConvertingGiftDamage(f,limit);
         public SkillProgramStepOutcome ObserveDamageSourceHandAndGive(ProgramSkillFrame f,int limit)=>engine.BeginDamageSourceObservationGift(f,limit);
         public SkillProgramStepOutcome DrawToHandCount(ProgramSkillFrame f,int seat,int limit,
-            SkillProgramNumberExpression? expression = null)=>engine.DrawProgramToHandCount(f,seat,
-                expression == SkillProgramNumberExpression.LivingPlayerCount ? engine._players.Count(p=>p.IsAlive) : limit);
+            SkillProgramNumberExpression? expression = null, bool capAtTargetMaxHp = false)=>engine.DrawProgramToHandCount(f,seat,
+                expression == SkillProgramNumberExpression.LivingPlayerCount ? engine._players.Count(p=>p.IsAlive) : limit,
+                capAtTargetMaxHp);
     }
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 110)]
     private bool CanActivateConvertingGift(CharacterState owner,string skillId,ProgramInstructionFeatures features) =>
@@ -23,9 +24,15 @@ public sealed partial class GameEngine
         ActiveDamageTrigger?.Id==context.ParentFrameId && CurrentDamageAttempt is { IsSourceLess: false, DamageAmount: > 0 } &&
         context.SourceSeat is {} source && source!=candidate.OwnerSeat &&
         _players[source].IsAlive && GetHand(_players[candidate.OwnerSeat]).Count+GetEquipment(_players[candidate.OwnerSeat]).Count>0;
-    private SkillProgramStepOutcome DrawProgramToHandCount(ProgramSkillFrame f,int seat,int limit)
+    private SkillProgramStepOutcome DrawProgramToHandCount(ProgramSkillFrame f,int seat,int limit, bool capAtTargetMaxHp = false)
     {
         if (!_players[seat].IsAlive) return SkillProgramStepOutcome.Continue;
+        if (capAtTargetMaxHp)
+        {
+            if (!_players[seat].HasHpValue)
+            { CancelProgramBindingAndCleanup(f, "体力值未定义，无法计算此效果。"); return SkillProgramStepOutcome.Continue; }
+            limit = Math.Min(limit, _players[seat].MaxHp);
+        }
         DrawProgramCards(f.Id,seat,Math.Max(0,limit-GetHand(_players[seat]).Count),null,null,SkillProgramCardSetVisibility.Private,new("skill-program.hand-count.draw"));
         return AwaitProgramBoundCardMovements(f.Id,f.OwnerSeat);
     }
