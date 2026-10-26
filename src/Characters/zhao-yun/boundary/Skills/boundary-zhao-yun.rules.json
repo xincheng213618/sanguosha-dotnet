@@ -27,7 +27,8 @@
           "inputKinds": ["alcohol"],
           "inputSuits": [],
           "outputKind": "peach",
-          "forPlay": false,
+          "extendedUse": true,
+          "forPlay": true,
           "forResponse": true
         },
         {

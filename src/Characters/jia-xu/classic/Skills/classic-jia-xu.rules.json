@@ -44,20 +44,8 @@
       "minimumRulesVersion": 190,
       "cardPolicies": [
         {
-          "id": "weimu-spade-trick-immunity",
-          "kind": "prohibitTargetBySuit",
-          "inputSuit": "spade",
-          "cardKinds": ["duel", "dismantlement", "snatch", "fireAttack", "ironChain", "borrowedSword",
-                        "indulgence", "supplyShortage", "barbarianAssault", "arrowBarrage",
-                        "peachGarden", "fiveGrains"]
-        },
-        {
-          "id": "weimu-club-trick-immunity",
-          "kind": "prohibitTargetBySuit",
-          "inputSuit": "club",
-          "cardKinds": ["duel", "dismantlement", "snatch", "fireAttack", "ironChain", "borrowedSword",
-                        "indulgence", "supplyShortage", "barbarianAssault", "arrowBarrage",
-                        "peachGarden", "fiveGrains"]
+          "id": "weimu-all-black-trick-targets",
+          "kind": "prohibitBlackTrickTarget"
         }
       ]
     }
