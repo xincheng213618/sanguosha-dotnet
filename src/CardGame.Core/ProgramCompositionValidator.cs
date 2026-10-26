@@ -352,6 +352,7 @@ internal static class ProgramCompositionValidator
                         if (producer is null || producer.Target != owned.Owner || producer.TargetReference is not null ||
                             !exactPindianHalfReturn && (producer.Condition.Kind != SkillProgramConditionKind.Always || producer.NumberExpression is not null) ||
                             source.CardOwner != owned.Owner || owned.MaximumCount is { } cap && source.MaximumCount > cap ||
+                            owned.MinimumCount > 0 && (producer.MaximumCards > 0 ? producer.MinimumCards : producer.Amount) < owned.MinimumCount ||
                             producer.Zones.Count == 0 || producer.Zones.Any(zone => !owned.Zones.Contains(zone)) ||
                             source.Root.AlreadyMoved || source.Atoms.Overlaps(source.Root.Consumed) || source.Atoms.Overlaps(source.Root.PossiblyGifted))
                             Fail("an owned card set must be a prior unconditional provider-owned zone selection before movement");

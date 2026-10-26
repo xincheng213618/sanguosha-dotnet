@@ -61,7 +61,7 @@ internal sealed record DeriveCardSet(
     IReadOnlyList<SkillProgramCardCategory>? Categories = null,
     IReadOnlyList<EquipmentSlot>? EquipmentSlots = null,
     IReadOnlyList<CardKind>? CardKinds = null, string? MatchSuitOfBind = null) : ProgramResourceOperation;
-internal sealed record RequireOwnedCardSet(string Name, SkillProgramEffectTarget Owner, int? MaximumCount, IReadOnlyList<CardZoneKind> Zones) : ProgramResourceOperation;
+internal sealed record RequireOwnedCardSet(string Name, SkillProgramEffectTarget Owner, int? MaximumCount, IReadOnlyList<CardZoneKind> Zones, int MinimumCount = 0) : ProgramResourceOperation;
 internal sealed record RequireBoundParticipantGiftEntry(string Name) : ProgramResourceOperation;
 internal sealed record RequirePublicOwnedGiftSet(string Name) : ProgramResourceOperation;
 internal sealed record ReadCardSet(string Name) : ProgramResourceOperation;

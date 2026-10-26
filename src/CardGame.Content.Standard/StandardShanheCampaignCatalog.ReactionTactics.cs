@@ -19,9 +19,9 @@ public static partial class StandardShanheCampaignCatalog
     public const string CurrentSougua2SkillId = "shanhe:current-sougua-2169";
 
     private sealed record ReactionTacticSource(int SourceId, string Name, string SkillId, int Price, int Rarity,
-        int? CodexNodeId, string Description, bool BossBattleOnly = false)
+        int? CodexNodeId, string Description, bool BossBattleOnly = false, string? RewardIdOverride = null)
     {
-        public string RewardId => "tactic-build-" + SourceId.ToString(CultureInfo.InvariantCulture);
+        public string RewardId => RewardIdOverride ?? "tactic-build-" + SourceId.ToString(CultureInfo.InvariantCulture);
         public ShanheRewardDefinition Reward => new(RewardId, "战法·" + Name)
         { TacticSkillId = SkillId, BossBattleOnly = BossBattleOnly, Description = Description + "不占额外技能槽，本次征程限获得一份。" };
     }
@@ -151,6 +151,12 @@ public static partial class StandardShanheCampaignCatalog
             "你的回合开始时，从牌堆中获得2张随机锦囊牌"),
         new ReactionTacticSource(2251, "博闻Ⅲ", StandardShanheBowenTacticsPackage.Bowen3SkillId, 700, 4, null,
             "你的回合开始时，从牌堆中获得3张随机锦囊牌"),
+        new ReactionTacticSource(2039, "铸刀", StandardShanheRecastTacticsPackage.ZhudaoSkillId, 300, 2, null,
+            "你使用【杀】后可以重铸1张牌", RewardIdOverride: "tactic-zhudao-current-2039"),
+        new ReactionTacticSource(2040, "铸刀Ⅱ", StandardShanheRecastTacticsPackage.Zhudao2SkillId, 700, 4, null,
+            "你使用【杀】后可以重铸至多2张牌", RewardIdOverride: "tactic-zhudao-current-2040"),
+        new ReactionTacticSource(2128, "及时雨", StandardShanheRecastTacticsPackage.JishiyuSkillId, 200, 1, 29,
+            "回合外失去最后一张手牌后，摸两张牌", RewardIdOverride: "tactic-jishiyu-current-2128"),
     });
 
     private static IEnumerable<KeyValuePair<string, ShanheShopMetadata>> CurrentReactionTacticShopMetadata =>
