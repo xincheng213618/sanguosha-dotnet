@@ -244,7 +244,9 @@ public enum SkillProgramDamageModifierCondition
     SourceHpAtMost = 1042,
     OwnerGameSlashUseOrdinalMultipleOfThree = 1043,
     OwnerUsedFromRound = 1044,
-    OwnerUsedHeartSlash = 1045
+    OwnerUsedHeartSlash = 1045,
+    SourcePreviousRoundNoDamage = 1046,
+    SourcePreviousRoundDamageBelowThree = 1047
 }
 public sealed record SkillProgramDamageModifier(
     string Id, IReadOnlyList<CardKind> CardKinds, int Amount,
@@ -4033,6 +4035,16 @@ public sealed class SkillProgramCatalog
             if (requiredKinds.Count != 0 || value is < 1 or > 20)
                 Fail(path, "Additional DrawTwo cards require a bounded positive amount and no response kinds.");
         }
+        else if (kind is SkillProgramCardPolicyKind.VisibleTargetHandDuringTrick or SkillProgramCardPolicyKind.DismantlementSelectionLimit)
+        {
+            var validKinds = kind == SkillProgramCardPolicyKind.VisibleTargetHandDuringTrick
+                ? cardKinds.Count == 1 && cardKinds[0] is CardKind.Dismantlement or CardKind.Snatch
+                : cardKinds.SequenceEqual([CardKind.Dismantlement]);
+            if (!validKinds || requiredKinds.Count != 0 || inputSuit is not null || outputSuit is not null ||
+                ownerRole is not null || factionId is not null || OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always ||
+                (kind == SkillProgramCardPolicyKind.VisibleTargetHandDuringTrick ? value != 0 : value is not (2 or 3)))
+                Fail(path, "Target-card visibility requires one matching trick; Dismantlement selection requires a total limit of two or three, without other qualifiers.");
+        }
         else if (kind == SkillProgramCardPolicyKind.RoundFirstSlashAdditionalTargets)
         {
             if (requiredKinds.Count != 0 || value is < 1 or > 20)
@@ -4189,6 +4201,8 @@ public sealed class SkillProgramCatalog
                     or SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan
                     or SkillProgramDamageModifierCondition.SourceRoundIsOdd
                     or SkillProgramDamageModifierCondition.SourceRoundIsEven
+                    or SkillProgramDamageModifierCondition.SourcePreviousRoundNoDamage
+                    or SkillProgramDamageModifierCondition.SourcePreviousRoundDamageBelowThree
                     or SkillProgramDamageModifierCondition.DirectSkillDamage
                     or SkillProgramDamageModifierCondition.BothParticipantsPublicEnemiesOfOwner)))
             Fail(path + ".cardKinds", "must contain distinct effective card kinds");
@@ -4269,6 +4283,8 @@ public sealed class SkillProgramCatalog
                  SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan or
                  SkillProgramDamageModifierCondition.SourceRoundIsOdd or
                  SkillProgramDamageModifierCondition.SourceRoundIsEven or
+                 SkillProgramDamageModifierCondition.SourcePreviousRoundNoDamage or
+                 SkillProgramDamageModifierCondition.SourcePreviousRoundDamageBelowThree or
                  SkillProgramDamageModifierCondition.DirectSkillDamage)
         {
             if (scope != SkillProgramDamageModifierSourceScope.DamageSource || kinds.Count != 0)

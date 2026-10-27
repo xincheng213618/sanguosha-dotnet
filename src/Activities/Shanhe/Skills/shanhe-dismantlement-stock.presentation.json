@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:current-chenqibubei-2239": { "name": "趁其不备", "description": "你使用【过河拆桥】时，至多弃置目标2张牌。" },
+    "shanhe:current-chenqibubei-2240": { "name": "趁其不备Ⅱ", "description": "你使用【过河拆桥】时，至多弃置目标3张牌。" }
+  }
+}

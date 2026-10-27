@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:current-badao-2188",
+      "revision": 1,
+      "damageModifiers": [
+        { "id": "previous-round-no-damage", "cardKinds": [], "amount": 1,
+          "condition": "sourcePreviousRoundNoDamage", "sourceScope": "damageSource", "damageLayer": "additionalDamage" }
+      ]
+    },
+    {
+      "id": "shanhe:current-badao-2189",
+      "revision": 1,
+      "damageModifiers": [
+        { "id": "previous-round-below-three", "cardKinds": [], "amount": 1,
+          "condition": "sourcePreviousRoundDamageBelowThree", "sourceScope": "damageSource", "damageLayer": "additionalDamage" }
+      ]
+    }
+  ]
+}

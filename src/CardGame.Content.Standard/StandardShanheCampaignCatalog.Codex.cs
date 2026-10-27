@@ -70,6 +70,7 @@ public static partial class StandardShanheCampaignCatalog
             .Concat(CurrentLowHpDrawCodexBindings)
             .Concat(CurrentLateRoundTacticCodexBindings)
             .Concat(CurrentTrickResponseCodexBindings)
+            .Concat(CurrentDismantlementStockCodexBindings)
             .Concat(CurrentShopCardCodexBindings)
             .Append(new(2, OpeningInheritanceRewardId))
             .Append(new(1, OpeningCompanionRewardId))

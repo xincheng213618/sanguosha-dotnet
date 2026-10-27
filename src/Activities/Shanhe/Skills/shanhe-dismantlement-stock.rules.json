@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:current-chenqibubei-2239", "revision": 1,
+      "cardPolicies": [
+        { "id": "up-to-two-cards", "kind": "dismantlementSelectionLimit", "value": 2, "cardKinds": ["dismantlement"] }
+      ]
+    },
+    {
+      "id": "shanhe:current-chenqibubei-2240", "revision": 1,
+      "cardPolicies": [
+        { "id": "up-to-three-cards", "kind": "dismantlementSelectionLimit", "value": 3, "cardKinds": ["dismantlement"] }
+      ]
+    }
+  ]
+}

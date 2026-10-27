@@ -1682,10 +1682,9 @@ public sealed partial class SimpleAiBrain
             14d);
 
     /// <summary>
-    /// Chooses one opaque ordinal slot from another player's hidden hand. Every
-    /// candidate is intentionally scored identically because the filtered view
-    /// contains no target-hand identity. The first slot is a stable tie-break;
-    /// the choice remains fully replayable without consulting engine state.
+    /// Chooses an issued target-card slot using only the filtered view. Hidden
+    /// hand slots remain equal; authorized face mappings allow card-value
+    /// scoring without changing the original choice ID or consulting engine state.
     /// </summary>
     public (ChoiceId Choice, AiThoughtRecord Thought) ChooseTargetCardSlot(
         GameSnapshot view,
@@ -1720,6 +1719,31 @@ public sealed partial class SimpleAiBrain
         }
         var effectName = effectNameOverride ??
             (actionKind == LegalActionKind.Dismantlement ? "过河拆桥" : "顺手牵羊");
+        if (actionKind is LegalActionKind.Dismantlement or LegalActionKind.Snatch &&
+            choices.Any(choice => choice.Parameters.ContainsKey("visible-target-hand-card-id")))
+        {
+            var visibleCards = (view.PrivateRevealedCards ?? []).DistinctBy(card => card.Id).ToDictionary(card => card.Id);
+            var hostility = GetHostility(view, view.Players.Single(player => player.Seat == Seat).Role ?? Role.Renegade, target);
+            var scored = choices.Select((choice, index) =>
+            {
+                CardSnapshot? card = null;
+                if (choice.Parameters.TryGetValue("visible-target-hand-card-id", out var text) &&
+                    int.TryParse(text, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var id))
+                    card = visibleCards.GetValueOrDefault(id);
+                var value = card is null ? 0d : CardCatalog.Get(card.Kind).HandKeepValue;
+                return (Choice: choice, Index: index, Known: card is not null,
+                    Score: value * (actionKind == LegalActionKind.Dismantlement ? hostility : 1d + hostility / 2d));
+            }).ToArray();
+            if (scored.Any(item => item.Known))
+            {
+                var selectedVisible = scored.OrderByDescending(item => item.Score).ThenBy(item => item.Index).First().Choice;
+                return (selectedVisible.Id, new AiThoughtRecord(thoughtSequence, view.TurnNumber, Seat,
+                    selectedVisible.Description, scored.Select(item => new AiCandidateScore(
+                        new LegalAction(actionKind, null, targetSeat, item.Choice.Description), Math.Round(item.Score, 3),
+                        item.Known ? "按可见牌面的价值选择。" : "牌面未知。" )).ToArray(),
+                    $"{effectName}：从可见牌位中选择。"));
+            }
+        }
         var candidates = choices
             .Select(choice => new AiCandidateScore(
                 new LegalAction(actionKind, null, targetSeat, choice.Description),

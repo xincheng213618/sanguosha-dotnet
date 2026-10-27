@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:current-badao-2188": { "name": "拔刀术", "description": "若上一轮你未造成任何伤害，则你本轮造成的所有伤害+1。" },
+    "shanhe:current-badao-2189": { "name": "拔刀术Ⅱ", "description": "若上一轮造成的伤害小于3，则你本轮造成的所有伤害+1。" }
+  }
+}

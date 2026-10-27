@@ -152,7 +152,8 @@ public sealed partial class GameEngine
     private int WushuangDrawTwoCount(int sourceSeat) => HasWushuangTactic(sourceSeat, 2030) ? 3 : 2;
 
     private bool WushuangHasVisibleTargetHand(int source, CardKind kind) =>
-        kind == CardKind.Dismantlement && HasWushuangTactic(source, 2005) || kind == CardKind.Snatch && HasWushuangTactic(source, 2006);
+        kind == CardKind.Dismantlement && HasWushuangTactic(source, 2005) || kind == CardKind.Snatch && HasWushuangTactic(source, 2006) ||
+        HasProgramVisibleTargetHandDuringTrick(source, kind);
 
     [ProgramViewContributor(ProgramViewContribution.PrivateCards, 61400)]
     private IEnumerable<CardSnapshot> WushuangVisibleTargetHand(int viewer) =>

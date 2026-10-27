@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:current-yanxian-2005": { "name": "眼线", "description": "【过河拆桥】时目标手牌可见。" },
+    "shanhe:current-qiangqu-haoduo-2006": { "name": "强取豪夺", "description": "【顺手牵羊】时目标手牌可见。" }
+  }
+}

@@ -141,7 +141,9 @@ public sealed partial class GameEngine
             {
                 if (modifier.CapsToAmount) continue;
                 var eligible = modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource
-                    ? modifier.Condition == SkillProgramDamageModifierCondition.DirectSkillDamage
+                    ? modifier.Condition is SkillProgramDamageModifierCondition.SourcePreviousRoundNoDamage or SkillProgramDamageModifierCondition.SourcePreviousRoundDamageBelowThree
+                        ? MatchesShanheBadaoDamageModifier(modifier, sourceSeat, chain)
+                        : modifier.Condition == SkillProgramDamageModifierCondition.DirectSkillDamage
                         ? issuedAttack is { } skillAttack && IsDirectSkillDamage(skillAttack)
                         : MatchesPerOccurrenceSourceDamageModifier(modifier, !source.HpUndefined, source.Hp,
                         Math.Max(0, source.HandCount - paidHandCards),

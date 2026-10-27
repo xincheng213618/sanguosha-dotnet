@@ -207,6 +207,7 @@ public sealed partial class GameEngine
         }
 
         var visibleDecision = GetPendingDecisionForActor(viewerSeat);
+        if (visibleDecision is not null) visibleDecision = ProjectVisibleTargetHandDecision(visibleDecision, viewerSeat);
         // Publish only the responder's remaining selection bounds, including restored
         // older prompts. The private runtime draft stays on its owning frame.
         if (visibleDecision is { Kind: DecisionKind.ProgramTrigger } &&

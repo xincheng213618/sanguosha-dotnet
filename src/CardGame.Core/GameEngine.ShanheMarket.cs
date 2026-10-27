@@ -194,6 +194,7 @@ public sealed partial class GameEngine
 
     private void RefreshShanheMarketSuspendedPrompt(ShanheMarketDiscardQuote? discardQuote)
     {
+        if (RefreshVisibleTargetHandSelectionPrompt()) return;
         if (RefreshShanheAlliedHarvestSelection()) return;
         if (RefreshShanheMarketDiscardPrompt(discardQuote)) return;
         if (RefreshRevealedFireAttackPaymentPrompt()) return;

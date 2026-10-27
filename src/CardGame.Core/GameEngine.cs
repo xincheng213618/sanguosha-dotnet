@@ -4751,7 +4751,7 @@ public sealed partial class GameEngine
         _pendingDecision = new PendingDecision(
             DecisionKind.SelectTargetCard,
             source.Seat,
-            $"{source.Name} 使用【{CardCatalog.Get(pending.EffectCardKind).DisplayName}】，请选择 {target.Name} 的一张暗牌。",
+            $"{source.Name} 使用【{CardCatalog.Get(pending.EffectCardKind).DisplayName}】，请选择 {target.Name} 的一张{(WushuangHasVisibleTargetHand(source.Seat, pending.EffectCardKind) ? "手牌" : "暗牌")}。",
             [],
             [target.Seat],
             source.Seat,
@@ -10664,7 +10664,7 @@ public sealed partial class GameEngine
             sourceView,
             pending.TargetSeat,
             pending.ActionKind,
-            decision.Choices,
+            sourceView.PendingDecision is { } projected && projected.PromptId == decision.PromptId ? projected.Choices : decision.Choices,
             ++_thoughtSequence);
         AddThought(thought);
         var choice = decision.Choices.SingleOrDefault(candidate => candidate.Id == choiceId) ??
@@ -15882,7 +15882,9 @@ public sealed partial class GameEngine
                 : _players[attack.SourceSeat].IsAlive && (item.seat == attack.SourceSeat || item.seat == attack.TargetSeat) &&
                   (item.modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource
                 ? item.seat == attack.SourceSeat && !attack.IsSourceLess &&
-                  (item.modifier.Condition == SkillProgramDamageModifierCondition.DirectSkillDamage
+                  (item.modifier.Condition is SkillProgramDamageModifierCondition.SourcePreviousRoundNoDamage or SkillProgramDamageModifierCondition.SourcePreviousRoundDamageBelowThree
+                  ? MatchesShanheBadaoDamageModifier(item.modifier, attack.SourceSeat, attack.IsChainPropagation)
+                  : item.modifier.Condition == SkillProgramDamageModifierCondition.DirectSkillDamage
                   ? IsDirectSkillDamage(attack)
                   : MatchesPerOccurrenceSourceDamageModifier(item.modifier, _players[attack.SourceSeat].HasHpValue,
                       _players[attack.SourceSeat].Hp, GetHand(_players[attack.SourceSeat]).Count,

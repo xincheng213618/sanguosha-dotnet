@@ -13,9 +13,11 @@ public sealed partial class GameEngine
 {
     private void BindWushuangTargetCards(NullificationWindowFrame pending, int targetSeat)
     {
-        if (!IsWushuangMode || pending.ActionKind != LegalActionKind.Dismantlement ||
+        if (pending.ActionKind != LegalActionKind.Dismantlement ||
             LifecycleCardUse(pending.ParentFrameId) is not { Action: { } action, WushuangTargetCards: null } use) return;
-        var extra = (HasWushuangTactic(pending.SourceSeat, 2239) ? 1 : 0) + (HasWushuangTactic(pending.SourceSeat, 2240) ? 2 : 0);
+        var extra = Math.Max(IsWushuangMode
+            ? (HasWushuangTactic(pending.SourceSeat, 2239) ? 1 : 0) + (HasWushuangTactic(pending.SourceSeat, 2240) ? 2 : 0) : 0,
+            ShanheDismantlementSelectionLimit(pending.SourceSeat) - 1);
         if (extra > 0) UpdateLifecycleCardUse(use.Id, current => current with { WushuangTargetCards = new(action.ActionId, targetSeat, extra) });
     }
 

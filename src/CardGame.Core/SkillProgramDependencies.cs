@@ -82,7 +82,8 @@ internal sealed class SkillProgramDependencies
             modifier.Condition == SkillProgramDamageModifierCondition.SourceHpAtMost));
         HasSourceRoundDamageModifiers = programs.Any(program => program.DamageModifiers.Any(modifier =>
             modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource &&
-            modifier.Condition is SkillProgramDamageModifierCondition.SourceRoundIsOdd or SkillProgramDamageModifierCondition.SourceRoundIsEven));
+            modifier.Condition is SkillProgramDamageModifierCondition.SourceRoundIsOdd or SkillProgramDamageModifierCondition.SourceRoundIsEven or
+                SkillProgramDamageModifierCondition.SourcePreviousRoundNoDamage or SkillProgramDamageModifierCondition.SourcePreviousRoundDamageBelowThree));
         HasFixedTargetDamageCaps = programs.Any(program => program.DamageModifiers.Any(modifier =>
             modifier.CapsToAmount && modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageParticipant &&
             modifier.Condition == SkillProgramDamageModifierCondition.Always));
