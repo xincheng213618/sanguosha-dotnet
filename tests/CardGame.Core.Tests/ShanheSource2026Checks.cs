@@ -39,12 +39,15 @@ internal static class ShanheSource2026Checks
             var fengxian = all.Single(encounter => encounter.SourceBattleId == 2644);
             var rageId = difficulty >= 21 ? StandardShanheFengxianBossPackage.SourceRageHellId :
                 difficulty >= 11 ? StandardShanheFengxianBossPackage.SourceRageHardId : StandardShanheFengxianBossPackage.RageId;
+            var rageEquipment = new List<ShanheStartingCard> { new(CardKind.WushuangHalberd, Suit.Heart, 12) };
+            if (difficulty >= 6) rageEquipment.Add(new(CardKind.PurpleGoldCrown, Suit.Heart, 1));
+            if (difficulty >= 11) rageEquipment.Add(new(CardKind.RedCottonRobe, Suit.Diamond, 1));
             Need((fengxian.BossTransition is not null) == (difficulty >= 3) &&
                 (difficulty < 3 || fengxian.BossTransition is { MaxHp: 5, Hp: 5,
-                    Combatant.SourceDifficultyAttributes: not null } && fengxian.BossTransition.StartingEquipment!.Single() is
-                    { Kind: CardKind.WushuangHalberd, Suit: Suit.Heart, Rank: 12 } &&
+                    Combatant.SourceDifficultyAttributes: not null } &&
+                    fengxian.BossTransition.StartingEquipment!.SequenceEqual(rageEquipment) &&
                     fengxian.BossTransition.GeneralId == rageId && fengxian.BossTransition.Combatant.GeneralId == rageId),
-                "Fengxian's real known second form begins only at ordinary three, with its own base data and verified halberd.");
+                "Fengxian's real known second form begins only at ordinary three, with its own base data, verified halberd and cumulative tier equipment.");
             Need(all.Where(encounter => encounter.SourceBattleId == 2397).Count() == 7 &&
                 all.Where(encounter => encounter.SourceBattleId == 2397).All(encounter => encounter.SourceVisibleEnemyCount == 1 && encounter.Enemies.Count == 5),
                 "Every genuinely selectable Luoyang ordinary city may contain Mulu; four hidden source minions do not inflate the visible-enemy multiplier.");

@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:current-mobilization-2203": { "name": "动员令", "description": "队友阵亡后，下一轮开始时复活队友。" }
+  }
+}

@@ -247,6 +247,7 @@ public static partial class StandardShanheCampaignCatalog
         var badaoTactics = RequiresCurrentBadaoRegistry(requirements);
         var steadyHandTactic = RequiresCurrentSteadyHandRegistry(requirements);
         var counterspellClaimTactic = RequiresCurrentCounterspellClaimRegistry(requirements);
+        var mobilizationTactic = RequiresCurrentMobilizationRegistry(requirements);
         var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
@@ -415,6 +416,7 @@ public static partial class StandardShanheCampaignCatalog
             (badaoTactics ? "/current-badao" : "") +
             (steadyHandTactic ? "/current-steady-hand" : "") +
             (counterspellClaimTactic ? "/current-counterspell-claim" : "") +
+            (mobilizationTactic ? "/current-mobilization" : "") +
             (wealthTactics ? "/current-wealth-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
@@ -536,6 +538,7 @@ public static partial class StandardShanheCampaignCatalog
             if (badaoTactics) packages.Add(new StandardShanheBadaoPackage());
             if (steadyHandTactic) packages.Add(new StandardShanheSteadyHandPackage());
             if (counterspellClaimTactic) packages.Add(new StandardShanheCounterspellClaimPackage());
+            if (mobilizationTactic) packages.Add(new StandardShanheMobilizationPackage());
             if (reactionTactics)
             {
                 packages.Add(new StandardShanheArmorTacticsPackage());

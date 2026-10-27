@@ -121,7 +121,7 @@ public static partial class StandardShanheCampaignCatalog
                 "地区内压缩为选择一处普通前战或本地精英、营地与关底，奇遇在前两章关底后、第三章关底前揭晓。" +
                 "普通驻军每章包含四种组合，第一章一至两敌、第二章两至三敌、第三章三至四敌；每区还可选择挑战精锐军营。" +
                 "首领从已支持的来源基础阵容中选取；普通3起接入已实现的原二阶段。" +
-                "二阶段只采用已核基础技能，尚未接入的高阶神威、神戟、神躯等附加技能不计为已实现；" +
+                "暴怒战神在困难起获得神威、炼狱再获神戟；神鬼无前在噩梦起使用动态无双、炼狱再获神躯；董旻在噩梦起获得篡朝。" +
                 "缺失的首领与张牛角、改朝罪魁的未实现二阶段暂不进入相应候选。" +
                 "各档均可直接选择；本地以每场战斗的序号作日数，体力成长同时增加体力上限，" +
                 "护甲从第二轮起按每轮回复量补充至上限，已有护甲超过上限时不倒扣。" +
@@ -209,11 +209,17 @@ public static partial class StandardShanheCampaignCatalog
         ShanheSourceRouteCityDefinition city, int difficulty, IReadOnlyDictionary<string, ShanheEncounterDefinition> templates)
     {
         var original = templates[binding.TemplateEncounterId];
+        var enemies = original.Enemies;
+        if (difficulty >= 11 && (binding.BattleId is 2644 or 2645))
+            enemies = enemies.Select((enemy, index) => index == 0 ? enemy with
+            {
+                StartingCards = (enemy.StartingCards ?? []).Append(new ShanheStartingCard(CardKind.SilverLion, Suit.Diamond, 1)).ToArray()
+            } : enemy).ToArray();
         return WithSource2026EnemyData(original with
         {
             Id = "source-battle-" + binding.BattleId, Name = binding.Name,
             SourceBattleId = binding.BattleId, SourceCityId = city.SourceCityId,
-            Allies = [], HealAfterVictory = 2, VictoryGold = 500,
+            Enemies = enemies, Allies = [], HealAfterVictory = 2, VictoryGold = 500,
             BossTransition = Source2026BossTransition(binding.BattleId, difficulty),
             TerrainSkillId = Source2026Terrain(city.SourceTerrainSkillId, difficulty),
             StoryText = "驻守此地的" + binding.Name + "已经列阵。"
@@ -223,10 +229,9 @@ public static partial class StandardShanheCampaignCatalog
     private static ShanheBossTransition? Source2026BossTransition(int battleId, int difficulty) => difficulty < 3 ? null : battleId switch
     {
         2644 => Source2026RageTransition(difficulty),
-        2645 => new(0, "classic:lu-bu", 3, 3, 4) { Combatant = Source2026StageCombatant(264501, "classic:lu-bu") },
+        2645 => Source2026ShenguiTransition(difficulty),
         2670 => new(0, "ol:niu-fu", 5, 5, 4) { Combatant = Source2026StageCombatant(267001, "ol:niu-fu") },
-        2671 => new(0, StandardShanheS5BossPackage.DongMinBaseId, 5, 5, 4)
-        { Combatant = Source2026StageCombatant(267101, StandardShanheS5BossPackage.DongMinBaseId) },
+        2671 => Source2026DongMinTransition(difficulty),
         _ => null
     };
 
@@ -234,10 +239,36 @@ public static partial class StandardShanheCampaignCatalog
     {
         var generalId = difficulty >= 21 ? StandardShanheFengxianBossPackage.SourceRageHellId :
             difficulty >= 11 ? StandardShanheFengxianBossPackage.SourceRageHardId : StandardShanheFengxianBossPackage.RageId;
+        var equipment = new List<ShanheStartingCard> { new(CardKind.WushuangHalberd, Suit.Heart, 12) };
+        if (difficulty >= 6) equipment.Add(new(CardKind.PurpleGoldCrown, Suit.Heart, 1));
+        if (difficulty >= 11) equipment.Add(new(CardKind.RedCottonRobe, Suit.Diamond, 1));
         return new(0, generalId, 5, 5)
         {
             DrawCards = 4, Combatant = Source2026StageCombatant(264401, generalId),
-            StartingEquipment = [new(CardKind.WushuangHalberd, Suit.Heart, 12)]
+            StartingEquipment = equipment.ToArray()
+        };
+    }
+
+    private static ShanheBossTransition Source2026ShenguiTransition(int difficulty)
+    {
+        var generalId = difficulty >= 21 ? StandardShanheBossPackage.ShenguiLvbuId :
+            difficulty >= 16 ? StandardShanheBossPackage.SourceShenguiNightmareId : "classic:lu-bu";
+        var equipment = new List<ShanheStartingCard> { new(CardKind.ShuraInfernoHalberd, Suit.Heart, 12) };
+        if (difficulty >= 6) equipment.Add(new(CardKind.PurpleGoldCrown, Suit.Heart, 1));
+        if (difficulty >= 11) equipment.Add(new(CardKind.LionBelt, Suit.Club, 2));
+        return new(0, generalId, 3, 3, 4)
+        {
+            Combatant = Source2026StageCombatant(264501, generalId), StartingEquipment = equipment.ToArray()
+        };
+    }
+
+    private static ShanheBossTransition Source2026DongMinTransition(int difficulty)
+    {
+        var generalId = difficulty >= 16 ? StandardShanheS5BossPackage.DongMinCuanchaoId : StandardShanheS5BossPackage.DongMinBaseId;
+        return new(0, generalId, 5, 5, 4)
+        {
+            Combatant = Source2026StageCombatant(267101, generalId),
+            StartingEquipment = difficulty >= 11 ? [new(CardKind.DelusionCrown, Suit.Diamond, 4)] : []
         };
     }
 }

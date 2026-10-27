@@ -1139,6 +1139,7 @@ public enum SkillProgramEffectOp
     UseOlSpLiuBeiZhujiu = 5431, GrantOlSpLiuBeiXudai = 5432, ResolveOlSpLiuBeiJinglei = 5433,
     RecoverShanheShuanghun = 5412, RestoreShanheShuanghunUse = 5413,
     ReviveShanheMuluFollowers = 5420, FreezeShanheElephantRoundDamage = 5421,
+    ReviveShanheRoundAllies = 62045,
     CollectPublicPile = 780,
     GrantNextCardTargetAdjustment = 782,
     GrantNextActualUseTargetAdjustment = 4700,

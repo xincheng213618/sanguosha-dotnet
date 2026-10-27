@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:current-mobilization-2203",
+      "revision": 1,
+      "triggers": [
+        { "id": "next-round-allies", "window": "roundStarting", "subject": "owner", "optional": false,
+          "effects": [{ "op": "reviveShanheRoundAllies", "target": "owner" }] }
+      ]
+    }
+  ]
+}

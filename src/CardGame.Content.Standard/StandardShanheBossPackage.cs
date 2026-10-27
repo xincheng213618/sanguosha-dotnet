@@ -6,6 +6,7 @@ namespace CardGame.Content.Standard;
 public sealed class StandardShanheBossPackage : IGameContentPackage
 {
     public const string ShenguiLvbuId = "shanhe:lvbu-shengui-2026";
+    public const string SourceShenguiNightmareId = "shanhe:source-shengui-264501-nightmare";
     public const string FenghuangId = "shanhe:ally-fenghuang-2026";
     public static readonly Version CurrentVersion = new(1, 0, 0);
 
@@ -24,6 +25,12 @@ public sealed class StandardShanheBossPackage : IGameContentPackage
         {
             CharacterId = "character:lu-bu", VariantId = "shanhe-shengui-2026",
             RulesetId = "shanhe-2026", Gender = GeneralGender.Male
+        });
+        builder.AddGeneral(new(SourceShenguiNightmareId, "神鬼无前", "shen_lu_bu",
+            "shanhe:shengui-wushuang", "qun", 3)
+        {
+            CharacterId = "character:lu-bu", VariantId = "shanhe-source-264501-nightmare",
+            RulesetId = "shanhe-source-2026", Gender = GeneralGender.Male
         });
         builder.AddGeneral(new(FenghuangId, "风篁", "", "ol:fudao", "qun", 4, ["ol:xiuhao"])
         {
