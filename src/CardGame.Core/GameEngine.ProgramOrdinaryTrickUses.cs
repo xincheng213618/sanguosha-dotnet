@@ -292,11 +292,16 @@ public sealed partial class GameEngine
         }
 
         if (Wants(CardKind.Duel))
-        foreach (var target in _players.Where(player =>
+        {
+            var candidates = _players.Where(player =>
                      player.IsAlive && player.Seat != source.Seat &&
                      !IsCardTargetProhibited(player, CardKind.Duel, virtualSuit, effectiveColor) &&
-                     !IsDirectedCardTargetProhibited(source.Seat, player.Seat, CardKind.Duel)))
-            Add(CardKind.Duel, LegalActionKind.Duel, $"当【决斗】对 {target.Name} 使用", [target.Seat]);
+                     !IsDirectedCardTargetProhibited(source.Seat, player.Seat, CardKind.Duel))
+                .Select(player => player.Seat).ToArray();
+            foreach (var targets in EnumerateProgramDuelTargets(source, candidates))
+                Add(CardKind.Duel, LegalActionKind.Duel,
+                    "当【决斗】对 " + string.Join("、", targets.Select(seat => _players[seat].Name)) + " 使用", targets);
+        }
 
         if (Wants(CardKind.Dismantlement))
         foreach (var target in _players.Where(player =>

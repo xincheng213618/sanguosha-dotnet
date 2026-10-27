@@ -14,19 +14,27 @@ public static partial class StandardShanheCampaignCatalog
     public const string CurrentSougua3RewardId = "tactic-sougua-current-2170";
     public const string CurrentFenjinSkillId = "shanhe:current-fenjin-2228";
     public const string CurrentFenjinRewardId = "tactic-fenjin-current-2228";
+    public const string CurrentFenjin2SkillId = "shanhe:current-fenjin-2229";
+    public const string CurrentFenjin2RewardId = "tactic-fenjin-current-2229";
+    public const string CurrentQinmianSkillId = "shanhe:current-qinmian-2360";
+    public const string CurrentQinmianRewardId = "tactic-qinmian-current-2360";
 
     private static IReadOnlyList<ShanheRewardDefinition> BuildTacticRewards { get; } = Array.AsReadOnly(new[]
     {
         new ShanheRewardDefinition(CurrentCuixue2RewardId, "战法·淬血Ⅱ")
-        { TacticSkillId = CurrentCuixue2SkillId, Description = "史诗战法：每轮杀首次造成伤害后摸2张牌，后续杀伤和同次伤害的额外点数不重复奖励。不占额外技能槽，本次征程限获得一份。" },
+        { TacticSkillId = CurrentCuixue2SkillId, Description = "每轮，你的【杀】首次造成伤害后摸2张牌。" },
         new ShanheRewardDefinition(CurrentYuanzhu3RewardId, "战法·援助Ⅲ")
-        { TacticSkillId = CurrentYuanzhu3SkillId, Description = "传说战法：你的回合结束时摸3张牌，补充回合外防守手牌。不占额外技能槽，本次征程限获得一份。" },
+        { TacticSkillId = CurrentYuanzhu3SkillId, Description = "你的回合结束时，摸3张牌。" },
         new ShanheRewardDefinition(CurrentMuniuLiumaRewardId, "战法·木牛流马")
-        { TacticSkillId = CurrentMuniuLiumaSkillId, Description = "史诗战法：摸牌阶段摸牌数+2，手牌上限-1；技能摸牌和开场发牌不增加。不占额外技能槽，本次征程限获得一份。" },
+        { TacticSkillId = CurrentMuniuLiumaSkillId, Description = "摸牌阶段，摸牌数+2；手牌上限-1。" },
         new ShanheRewardDefinition(CurrentSougua3RewardId, "战法·搜刮Ⅲ")
-        { TacticSkillId = CurrentSougua3SkillId, Description = "史诗战法：击杀其他角色后回复4点体力，反伤击杀也走真实击杀与回复流程。不占额外技能槽，本次征程限获得一份。" },
+        { TacticSkillId = CurrentSougua3SkillId, Description = "击杀其他角色后，回复4点体力。" },
         new ShanheRewardDefinition(CurrentFenjinRewardId, "战法·奋进")
-        { TacticSkillId = CurrentFenjinSkillId, Description = "普通战法：你的回合开始时，体力大于2则失去1点体力并摸2张牌；失去体力不触发受伤反击。不占额外技能槽，本次征程限获得一份。" }
+        { TacticSkillId = CurrentFenjinSkillId, Description = "你的回合开始时，若体力大于2，失去1点体力并摸2张牌。" },
+        new ShanheRewardDefinition(CurrentFenjin2RewardId, "战法·奋进Ⅱ")
+        { TacticSkillId = CurrentFenjin2SkillId, Rarity = 4, Description = "你的回合开始时，若体力大于4，失去1点体力并摸1张牌。" },
+        new ShanheRewardDefinition(CurrentQinmianRewardId, "战法·勤勉")
+        { TacticSkillId = CurrentQinmianSkillId, Rarity = 1, Description = "你始终跳过判定阶段。" }
     });
 
     private static ShanheCampaignDefinition WithBuildTactics(ShanheCampaignDefinition definition)
@@ -50,13 +58,13 @@ public static partial class StandardShanheCampaignCatalog
     private static int BuildTacticPrice(string rewardId) => rewardId switch
     {
         CurrentCuixue2RewardId or CurrentMuniuLiumaRewardId or CurrentSougua3RewardId => 500,
-        CurrentYuanzhu3RewardId => 700,
-        CurrentFenjinRewardId => 200,
+        CurrentYuanzhu3RewardId or CurrentFenjin2RewardId => 700,
+        CurrentFenjinRewardId or CurrentQinmianRewardId => 200,
         _ => throw new ArgumentOutOfRangeException(nameof(rewardId), rewardId, "Unknown verified build tactic.")
     };
 
     private static bool RequiresBuildTacticsRegistry(ShanheBattleSetup setup) =>
         setup.TacticSkillIds.Concat(setup.ExtraSkillIds)
             .Concat(setup.AllyRoster.Concat(setup.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
-            .Any(id => id is CurrentCuixue2SkillId or CurrentYuanzhu3SkillId or CurrentMuniuLiumaSkillId or CurrentSougua3SkillId or CurrentFenjinSkillId);
+            .Any(id => id is CurrentCuixue2SkillId or CurrentYuanzhu3SkillId or CurrentMuniuLiumaSkillId or CurrentSougua3SkillId or CurrentFenjinSkillId or CurrentFenjin2SkillId or CurrentQinmianSkillId);
 }

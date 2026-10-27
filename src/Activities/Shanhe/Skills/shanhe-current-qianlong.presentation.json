@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:current-qianlong-2226": {
+      "name": "潜龙",
+      "description": "每有一个已解锁的空技能槽，出杀次数+2。"
+    }
+  }
+}

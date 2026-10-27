@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:current-qianlong-2226",
+      "revision": 1,
+      "modifiers": [
+        {
+          "id": "empty-unlocked-campaign-slots",
+          "query": "slashLimit",
+          "operation": "add",
+          "valueExpression": "emptyCampaignSkillSlotCount",
+          "valueMultiplier": 2,
+          "priority": 0
+        }
+      ]
+    }
+  ]
+}

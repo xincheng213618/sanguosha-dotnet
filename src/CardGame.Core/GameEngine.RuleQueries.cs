@@ -308,7 +308,9 @@ public sealed partial class GameEngine
             CurrentTurnDrawPhaseDrawCount = bindings.Any(binding => binding.Modifier.ValueExpression == SkillRuleValueExpression.CurrentTurnDrawPhaseDrawCountHalfFloor)
                 ? CurrentTurnDrawPhaseDrawCount(player.Seat) : null,
             CurrentRoundActualUseCount = bindings.Any(binding => binding.Modifier.ValueExpression == SkillRuleValueExpression.NegatedCurrentRoundActualUseCount)
-                ? CurrentRoundActualUseCount(player.Seat) : null
+                ? CurrentRoundActualUseCount(player.Seat) : null,
+            EmptyCampaignSkillSlotCount = bindings.Any(binding => binding.Modifier.ValueExpression == SkillRuleValueExpression.EmptyCampaignSkillSlotCount)
+                ? ShanheEmptyCampaignSkillSlotCount(player.Seat) : null
         };
         var programContributions = SkillProgramRules.CollectIndexedContributions(
             query,

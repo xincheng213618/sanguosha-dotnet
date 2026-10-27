@@ -234,6 +234,8 @@ public static partial class StandardShanheCampaignCatalog
         var doubleStealTactic = RequiresCurrentDoubleStealRegistry(requirements);
         var doubleResponseTactics = RequiresCurrentDoubleResponseRegistry(requirements);
         var trickResponseTactics = RequiresCurrentTrickResponseRegistry(requirements);
+        var qianlongTactic = RequiresCurrentQianlongRegistry(requirements);
+        var multiTargetTrickTactics = RequiresCurrentMultiTargetTrickRegistry(requirements);
         var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
@@ -391,6 +393,8 @@ public static partial class StandardShanheCampaignCatalog
             (doubleStealTactic ? "/current-double-steal-2337" : "") +
             (doubleResponseTactics ? "/current-double-response" : "") +
             (trickResponseTactics ? "/current-trick-response" : "") +
+            (qianlongTactic ? "/current-qianlong" : "") +
+            (multiTargetTrickTactics ? "/current-multi-target-tricks" : "") +
             (wealthTactics ? "/current-wealth-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
@@ -501,6 +505,8 @@ public static partial class StandardShanheCampaignCatalog
             if (doubleStealTactic) packages.Add(new StandardShanheDoubleStealPackage());
             if (doubleResponseTactics) packages.Add(new StandardShanheDoubleResponsePackage());
             if (trickResponseTactics) packages.Add(new StandardShanheTrickResponsePackage());
+            if (qianlongTactic) packages.Add(new StandardShanheQianlongPackage());
+            if (multiTargetTrickTactics) packages.Add(new StandardShanheMultiTargetTricksPackage());
             if (reactionTactics)
             {
                 packages.Add(new StandardShanheArmorTacticsPackage());

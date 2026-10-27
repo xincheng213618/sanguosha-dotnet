@@ -11,7 +11,8 @@ public sealed partial class GameEngine
         var index = _resolutionStack.FindIndex(frame => frame.Id == frameId);
         if (index < 0 || _resolutionStack[index] is not CardUseFrame use)
             throw new InvalidOperationException("A trick target window lost its card use.");
-        if (use.SequentialTrick is null && targets.Count > 1 && UsesSequentialTrickTargets(kind))
+        if (use.SequentialTrick is null && targets.Count > 1 && UsesSequentialTrickTargets(kind) &&
+            (kind != LegalActionKind.IronChain || targets.Count > 2 || HasProgramIronChainTargetExpansion(use.SourceSeat)))
         {
             use = use with { SequentialTrick = new(kind, firstTargetCardId, requiredCardKind) };
             ReplaceRuntimeFrame(_resolutionStack[index].Id, use);

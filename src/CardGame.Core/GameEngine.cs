@@ -3630,6 +3630,11 @@ public sealed partial class GameEngine
                 ResolvePeach(actor, actor, card, allowDying: false, conversionSource: action.ConversionSource);
                 break;
             case LegalActionKind.Duel:
+                if (action.TargetSeats.Count > 1)
+                {
+                    ResolveProgramMultiTargetDuel(actor, card, action);
+                    break;
+                }
                 if (action.TargetSeat is null)
                 {
                     throw new InvalidOperationException("Duel requires a target.");
@@ -5086,7 +5091,7 @@ public sealed partial class GameEngine
                 : $"{source.Name} 使用【铁索连环】，" + string.Join("、", changes) + "。",
             source.Seat);
         var finishedIronChain = GetNullificationEffectCard(pending);
-        if (!HasUnstartedExtraCardEffect(pending.ParentFrameId) &&
+        if (!HasUnstartedExtraCardEffect(pending.ParentFrameId) && !HasRemainingSequentialTrickTargets(pending.ParentFrameId) &&
             !SkipTieredRoundZeroFinishedMovement(pending.ParentFrameId, finishedIronChain) && !SkipDiouFinishedMovement(pending.ParentFrameId, finishedIronChain) && !SkipMouXqJueyanFinishedMovement(pending.ParentFrameId, finishedIronChain) &&
             !IsClaimedUseCardEntity(pending.ParentFrameId, finishedIronChain.Id) &&
             !IsProgramVirtualOrdinaryTrickUse(pending.ParentFrameId) &&
@@ -14733,6 +14738,7 @@ public sealed partial class GameEngine
             }
         }
 
+        AddProgramMultiTargetDuelActions(actions, actor);
         AddHulaoAllianceFeastActions(actions, actor, playableCards);
         AddShenwuTrickActions(actions, actor, playableCards);
         AddMantianGuohaiActions(actions, actor, playableCards);

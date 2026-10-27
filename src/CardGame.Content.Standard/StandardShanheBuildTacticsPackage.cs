@@ -29,16 +29,25 @@ public sealed class StandardShanheBuildTacticsPackage : IGameContentPackage
           {"id":"{{{StandardShanheCampaignCatalog.CurrentFenjinSkillId}}}","revision":1,
            "triggers":[{"id":"own-start-exchange-hp-for-cards","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,
              "condition":{"kind":"compare","left":{"kind":"currentHp"},"operator":"greaterThan","right":{"kind":"integerConstant","value":2}},
-             "effects":[{"op":"loseHp","target":"owner","amount":1},{"op":"draw","target":"owner","amount":2}]}]}
+             "effects":[{"op":"loseHp","target":"owner","amount":1},{"op":"draw","target":"owner","amount":2}]}]},
+          {"id":"{{{StandardShanheCampaignCatalog.CurrentFenjin2SkillId}}}","revision":1,
+           "triggers":[{"id":"own-start-higher-hp-exchange","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,
+             "condition":{"kind":"compare","left":{"kind":"currentHp"},"operator":"greaterThan","right":{"kind":"integerConstant","value":4}},
+             "effects":[{"op":"loseHp","target":"owner","amount":1},{"op":"draw","target":"owner","amount":1}]}]},
+          {"id":"{{{StandardShanheCampaignCatalog.CurrentQinmianSkillId}}}","revision":1,
+           "triggers":[{"id":"skip-judgment","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,
+             "effects":[{"op":"skipTurnPhases","target":"owner","phases":["judgment"]}]}]}
         ]}
         """,
         $$$"""
         {"schemaVersion":{{{SkillProgramCatalog.PresentationSchemaVersion}}},"skills":{
-          "{{{StandardShanheCampaignCatalog.CurrentCuixue2SkillId}}}":{"name":"淬血Ⅱ","description":"每轮，你的杀首次造成伤害后摸2张牌。普通杀、属性杀与转化杀共用本轮资格；一次伤害多点仍只触发一次。"},
-          "{{{StandardShanheCampaignCatalog.CurrentYuanzhu3SkillId}}}":{"name":"援助Ⅲ","description":"你的回合结束时，摸3张牌。沿用同源战法的原生回合结束时机；其他角色回合不触发。"},
-          "{{{StandardShanheCampaignCatalog.CurrentMuniuLiumaSkillId}}}":{"name":"木牛流马","description":"摸牌阶段，你的摸牌数+2。你的手牌上限-1。技能摸牌和初始手牌不增加。"},
-          "{{{StandardShanheCampaignCatalog.CurrentSougua3SkillId}}}":{"name":"搜刮Ⅲ","description":"当你击杀其他角色后，回复4点体力。实际回复受体力上限限制，可正常触发回复后的技能。"},
-          "{{{StandardShanheCampaignCatalog.CurrentFenjinSkillId}}}":{"name":"奋进","description":"你的回合开始时，若体力大于2，失去1点体力，然后摸2张牌。失去体力不是受到伤害。"}
+          "{{{StandardShanheCampaignCatalog.CurrentCuixue2SkillId}}}":{"name":"淬血Ⅱ","description":"每轮，你的【杀】首次造成伤害后摸2张牌。"},
+          "{{{StandardShanheCampaignCatalog.CurrentYuanzhu3SkillId}}}":{"name":"援助Ⅲ","description":"你的回合结束时，摸3张牌。"},
+          "{{{StandardShanheCampaignCatalog.CurrentMuniuLiumaSkillId}}}":{"name":"木牛流马","description":"摸牌阶段，摸牌数+2；手牌上限-1。"},
+          "{{{StandardShanheCampaignCatalog.CurrentSougua3SkillId}}}":{"name":"搜刮Ⅲ","description":"当你击杀其他角色后，回复4点体力。"},
+          "{{{StandardShanheCampaignCatalog.CurrentFenjinSkillId}}}":{"name":"奋进","description":"你的回合开始时，若体力大于2，失去1点体力，然后摸2张牌。"},
+          "{{{StandardShanheCampaignCatalog.CurrentFenjin2SkillId}}}":{"name":"奋进Ⅱ","description":"你的回合开始时，若体力大于4，失去1点体力，然后摸1张牌。"},
+          "{{{StandardShanheCampaignCatalog.CurrentQinmianSkillId}}}":{"name":"勤勉","description":"你始终跳过判定阶段。"}
         }}
         """));
 

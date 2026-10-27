@@ -97,6 +97,8 @@ public sealed record ShanheBattleSetup(
     public int? SourceDifficultyId { get; init; }
     public IReadOnlyList<string> TacticSkillIds { get; init; } = Array.Empty<string>();
     public IReadOnlyList<int> ActiveSchoolIds { get; init; } = Array.Empty<int>();
+    /// <summary>Unlocked campaign skill capacity; printed, tactic and rank-privilege skills do not occupy these slots.</summary>
+    public int ExtraSkillSlots { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? TerrainSkillId { get; init; }
     /// <summary>Fallback for a printed God general with no chosen or native effective faction.</summary>
@@ -131,6 +133,8 @@ public sealed record ShanheBattleSetup(
     public static ShanheBattleSetup Freeze(ShanheBattleSetup setup)
     {
         ArgumentNullException.ThrowIfNull(setup);
+        if (setup.ExtraSkillSlots is < 0 or > 8)
+            throw new ArgumentException("Campaign extra skill capacity must be between zero and eight.", nameof(setup));
         if (setup.SourceDifficultyId is < 1 or > 25) throw new ArgumentException("Unknown source battle difficulty.", nameof(setup));
         GodFactionSelectionRules.ValidateDefault(setup.DefaultGodFactionId);
         if (setup.TerrainSkillId is not null) ShanheCampaignContent.ValidateTerrainSkill(setup.TerrainSkillId);

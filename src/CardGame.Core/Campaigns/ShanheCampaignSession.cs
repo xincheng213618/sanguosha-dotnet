@@ -317,6 +317,7 @@ public sealed partial class ShanheCampaignSession
         {
             TacticSkillIds = BattleTacticSkills(state, state.Gold, node.Kind == ShanheNodeKind.BossBattle),
             ActiveSchoolIds = ShanheCampaignContent.Freeze(SchoolProgress(state).Where(p => p.IsComplete).Select(p => p.School.Id)),
+            ExtraSkillSlots = state.ExtraSkillSlots,
             DefaultGodFactionId = Definition.DefaultGodFactionId,
             PlayerRank = _options.PlayerRank,
             SharedAllyRank = GetSharedAllyRank(state),

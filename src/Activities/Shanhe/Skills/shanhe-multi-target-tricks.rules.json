@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:current-hengjiang-2007", "revision": 1,
+      "modifiers": [
+        { "id": "all-legal-chain-targets", "query": "cardTargetCount", "operation": "add", "value": 6,
+          "priority": 0, "cardKinds": ["ironChain"] }
+      ]
+    },
+    {
+      "id": "shanhe:current-dantiaowang-2212", "revision": 1,
+      "modifiers": [
+        { "id": "all-legal-duel-targets", "query": "cardTargetCount", "operation": "add", "value": 6,
+          "priority": 0, "cardKinds": ["duel"] }
+      ]
+    }
+  ]
+}

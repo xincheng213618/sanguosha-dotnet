@@ -7,6 +7,7 @@ internal static class ShanheBuildTacticChecks
 {
     private const string Owner = "fixture:build-tactic-owner", Driver = "fixture:build-tactic-driver";
     private const string Quiet = "fixture:build-tactic-quiet", Deck = "fixture:build-tactic-deck";
+    private const string JudgmentProbe = "fixture:build-tactic-judgment-probe";
     private const string Cuixue = StandardShanheCampaignCatalog.CurrentCuixue2SkillId;
     private const string Sougua = StandardShanheCampaignCatalog.CurrentSougua3SkillId;
     private const string Fenjin = StandardShanheCampaignCatalog.CurrentFenjinSkillId;
@@ -93,6 +94,35 @@ internal static class ShanheBuildTacticChecks
             s.DrawCount(Fenjin) == 2 && s.DrawCount(Yuanzhu) == 3 && s.NormalDrawCount() == 8 &&
             s.E<ProgramSkillHpLostEvent>().Count(fact => fact.SkillId == Fenjin && fact.Amount == 1) == 1,
             "The real discard leaves one card, own ending draws three, enemy endings pay nothing, and the next four-card draw occurs with Fenjin disabled at exactly two HP.");
+    }
+
+    public static void FenjinSecondTierAndQinmianUseNativeHpAndJudgmentBoundariesForward()
+    {
+        const string fenjin2 = StandardShanheCampaignCatalog.CurrentFenjin2SkillId;
+        const string qinmian = StandardShanheCampaignCatalog.CurrentQinmianSkillId;
+        var control = Scene.Start(logistics: true, hp: 4, [fenjin2], startingCards: [], observeJudgment: true);
+        Need(control.V().Hp == 4 && control.DrawCount(fenjin2) == 0 &&
+            control.DrawCount(JudgmentProbe) == 1 && control.NormalDrawCount() == 2 &&
+            !control.E<ProgramSkillHpLostEvent>().Any(fact => fact.SkillId == fenjin2) && !control.E<DamageAppliedEvent>().Any(),
+            "At exactly four HP, Fenjin II does not activate; the real judgment boundary pays the probe's one card before the unchanged two-card normal draw.");
+
+        var active = Scene.Start(logistics: true, hp: 5, [fenjin2, qinmian], startingCards: [], observeJudgment: true);
+        Need(active.V().Hp == 4 && active.V().HandCount == 3 && active.DrawCount(fenjin2) == 1 &&
+            active.DrawCount(JudgmentProbe) == 0 && active.NormalDrawCount() == 2 &&
+            active.E<ProgramSkillHpLostEvent>().Where(fact => fact.SkillId == fenjin2)
+                .Select(fact => fact.Amount).SequenceEqual([1]) && !active.E<DamageAppliedEvent>().Any(),
+            "At five HP, Fenjin II really loses exactly one HP and draws one card; Qinmian suppresses the judgment probe while preserving both normal draw cards, without creating damage.");
+
+        control.NextOwnPlay();
+        active.NextOwnPlay();
+        Need(control.V().Hp == 4 && control.DrawCount(fenjin2) == 0 &&
+            control.DrawCount(JudgmentProbe) == 2 && control.NormalDrawCount() == 4 &&
+            !control.E<ProgramSkillHpLostEvent>().Any(fact => fact.SkillId == fenjin2) && !control.E<DamageAppliedEvent>().Any(),
+            "A second actual turn enters judgment and normal draw again, but Fenjin II still does not activate at the four-HP boundary.");
+        Need(active.V().Hp == 4 && active.DrawCount(fenjin2) == 1 && active.DrawCount(JudgmentProbe) == 0 &&
+            active.NormalDrawCount() == 4 && active.E<ProgramSkillHpLostEvent>().Where(fact => fact.SkillId == fenjin2)
+                .Select(fact => fact.Amount).SequenceEqual([1]) && !active.E<DamageAppliedEvent>().Any(),
+            "After five HP became four, the next actual turn neither repeats Fenjin II's loss nor draws another bonus card; Qinmian again skips judgment without skipping the normal draw.");
     }
 
     public static void PurchasedTiersEnterNativeOpeningArmorAndPhysique()
@@ -199,11 +229,13 @@ internal static class ShanheBuildTacticChecks
             Accept(new EndPlayPhaseCommand(0, G.Revision, P!.PromptId));
             Until(() => G.State.TurnNumber > turn && P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
         }
-        public static Scene Start(bool logistics, int hp, string[] tactics, IReadOnlyList<ShanheStartingCard>? startingCards = null, int slashBonus = 0)
+        public static Scene Start(bool logistics, int hp, string[] tactics, IReadOnlyList<ShanheStartingCard>? startingCards = null,
+            int slashBonus = 0, bool observeJudgment = false)
         {
             var registry = ContentRegistry.Build(new StandardContentPackage(), new StandardShanheLegendaryTacticsPackage(),
                 new StandardShanheBuildTacticsPackage(), new StandardShanheWineTacticsPackage(), new Fixture(logistics));
-            var setup = new ShanheBattleSetup(83, 1, "fixture:build-tactics", Owner, hp, 0, 0, 0, slashBonus, [],
+            var setup = new ShanheBattleSetup(83, 1, "fixture:build-tactics", Owner, hp, 0, 0, 0, slashBonus,
+                observeJudgment ? [JudgmentProbe] : [],
                 startingCards ?? (logistics ? [] : [new(CardKind.Slash, Suit.Spade, 7), new(CardKind.FireSlash, Suit.Spade, 8), new(CardKind.ThunderSlash, Suit.Spade, 9)]), [],
                 [new(Peer(1), Hp: 2) { StartingHand = [] }, new(Peer(2), Hp: 1) { StartingHand = [] }, new(Peer(3)) { StartingHand = [] }],
                 [], new string('b', 64)) { TacticSkillIds = tactics };
@@ -227,12 +259,13 @@ internal static class ShanheBuildTacticChecks
                   {"id":"{{Driver}}","revision":1,"activations":[
                     {"id":"lose-six","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"loseHp","target":"owner","amount":6}]},
                     {"id":"incoming-one","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"owner","sourceRef":{"kind":"selectedTarget"},"amount":1}]}]},
-                  {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}
+                  {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]},
+                  {"id":"{{JudgmentProbe}}","revision":1,"triggers":[{"id":"judgment-probe","window":"judgmentPhaseStarting","subject":"owner","turnOwnerScope":"own","optional":false,"effects":[{"op":"draw","target":"owner","amount":1}]}]}
                 ]}
                 """, JsonSerializer.Serialize(new
             {
                 schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
-                skills = new[] { Driver, Quiet }.ToDictionary(id => id, _ => new { name = "原生构筑驱动", description = "真实伤害、真实失去体力与真实阶段" })
+                skills = new[] { Driver, Quiet, JudgmentProbe }.ToDictionary(id => id, _ => new { name = "原生构筑驱动", description = "真实伤害、真实失去体力与真实阶段" })
             }));
             foreach (var (id, program) in catalog.Programs)
                 builder.AddSkill(new(id, id, id) { Program = program, ProgramPresentation = catalog.Presentations[id] });

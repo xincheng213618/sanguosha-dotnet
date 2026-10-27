@@ -24,7 +24,7 @@ public enum SkillRuleQuery
 }
 public enum SkillRuleOperation { Add, Set, Unlimited }
 public enum SkillRuleRecipientScope { Owner = 0, OtherPublicTeamAllies = 1 }
-public enum SkillRuleValueExpression { LivingFactionCount, OwnedZoneCount, OwnerLostHp = 2, NegatedOwnedZoneCount = 3, NegatedOwnerLostHp = 900, OwnerMarkerCount = 2600, CurrentTurnUsedHandSuitCount = 4600, PublicLivingFactionCount = 5200, OwnerMaxHp = 5600, NegatedLivingFemaleCount = 21400, NegatedCurrentRoundActualUseCount = 27260, PublicTeamEnemyCount = 27600, OtherPublicTeamAllyCount = 27602, CurrentTurnDrawPhaseDrawCountHalfFloor = 27900, OtherLivingPlayerCount = 27910 }
+public enum SkillRuleValueExpression { LivingFactionCount, OwnedZoneCount, OwnerLostHp = 2, NegatedOwnedZoneCount = 3, NegatedOwnerLostHp = 900, EmptyCampaignSkillSlotCount = 2226, OwnerMarkerCount = 2600, CurrentTurnUsedHandSuitCount = 4600, PublicLivingFactionCount = 5200, OwnerMaxHp = 5600, NegatedLivingFemaleCount = 21400, NegatedCurrentRoundActualUseCount = 27260, PublicTeamEnemyCount = 27600, OtherPublicTeamAllyCount = 27602, CurrentTurnDrawPhaseDrawCountHalfFloor = 27900, OtherLivingPlayerCount = 27910 }
 public enum SkillRuleQueryDependency { MarkerState }
 public enum SkillProgramConditionKind { Always, OwnTurn, NotOwnTurn, Wounded, HpAtLeast, HandCountAtLeast, CardUseIsRed, SelectedTargetIsOther, SelectedTargetHandGreaterThanOwner, PindianWon, PindianNotWon, BooleanState, All, Any, Not, FaceDown, Chained, ChoiceIs, BoundCardsSameColor, BoundCardsMatchCategories, BoundCardsMatchKinds = 20, HasClaimableDamageCards = 21, AttackRangeCoverageDecreased = 22, HasOwnedCardCategory = 23, BoundCardCountAtLeast = 24, ActivationCardCountAtLeast = 25, ClassicIdentityMode = 26, BoundCardSuitMatchesChoice = 27, BoundCardsMatchSuits = 28, BoundCardCategoryMatchesCardAction = 29, EventTargetGenderIs = 30, EventSourceGenderIs = 31, EventSourceExists = 32, SelectedTargetWounded = 820, SelectedTargetHpGreaterThanOwner = 47200, RuntimeBooleanState = 450, PublicCounterAtLeast = 451, PublicCounterOdd = 452, HandCountGreaterThanHp = 1020, PositiveHandLimit = 1021, HasUsableHandCard = 1022, RequestedSlashDamagedOwner = 1023, PreviousPlayCardIsBasic = 1024, NoWeapon = 11300, NoArmor = 22501, NoMounts = 22502, NoTreasure = 22503, JudgmentOutcomeMatchesSuits = 14400, OwnPlayPhase = 27603 }
 public enum SkillProgramTriggerConditionKind
@@ -2759,6 +2759,9 @@ public sealed class SkillProgramModifier
         SkillRuleValueExpression.OtherPublicTeamAllyCount => context.OtherPublicTeamAllyCount is >= 0
             ? checked(context.OtherPublicTeamAllyCount.Value * (ValueMultiplier ?? 1))
             : throw new InvalidOperationException("Other living public allies were not captured."),
+        SkillRuleValueExpression.EmptyCampaignSkillSlotCount => context.EmptyCampaignSkillSlotCount is >= 0
+            ? checked(context.EmptyCampaignSkillSlotCount.Value * (ValueMultiplier ?? 1))
+            : throw new InvalidOperationException("Current empty campaign skill slots were not captured."),
         SkillRuleValueExpression.OtherLivingPlayerCount => context.OtherLivingPlayerCount is >= 0
             ? context.OtherLivingPlayerCount.Value
             : throw new InvalidOperationException("Other living participants were not captured."),
@@ -4342,11 +4345,14 @@ public sealed class SkillProgramCatalog
             Fail(path, "other living participants require an owner card-target-count Set modifier");
         var valueMultiplier = node.TryGetProperty("valueMultiplier", out _) ? PositiveInt(node, "valueMultiplier", path) : (int?)null;
         if (valueMultiplier is not null &&
-            (valueExpression != SkillRuleValueExpression.OtherPublicTeamAllyCount || valueMultiplier > 20))
-            Fail(path + ".valueMultiplier", "requires otherPublicTeamAllyCount and a multiplier between 1 and 20");
+            (valueExpression is not (SkillRuleValueExpression.OtherPublicTeamAllyCount or SkillRuleValueExpression.EmptyCampaignSkillSlotCount) || valueMultiplier > 20))
+            Fail(path + ".valueMultiplier", "requires otherPublicTeamAllyCount or emptyCampaignSkillSlotCount and a multiplier between 1 and 20");
         if (valueExpression == SkillRuleValueExpression.OtherPublicTeamAllyCount &&
             (query != SkillRuleQuery.SlashLimit || operation != SkillRuleOperation.Add))
             Fail(path, "other public living allies require an additive Slash-limit modifier");
+        if (valueExpression == SkillRuleValueExpression.EmptyCampaignSkillSlotCount &&
+            (query != SkillRuleQuery.SlashLimit || operation != SkillRuleOperation.Add || recipientScope != SkillRuleRecipientScope.Owner))
+            Fail(path, "empty campaign skill slots require an additive owner Slash-limit modifier");
         var valueZone = node.TryGetProperty("valueZone", out _)
             ? EnumValue<CardZoneKind>(node, "valueZone", path) : (CardZoneKind?)null;
         if (valueExpression == SkillRuleValueExpression.OwnerMaxHp &&
@@ -4384,8 +4390,8 @@ public sealed class SkillProgramCatalog
         var sourceCardIdentityId = node.TryGetProperty("sourceCardIdentityId", out _)
             ? Identifier(node, "sourceCardIdentityId", path)
             : null;
-        if (valueExpression == SkillRuleValueExpression.OtherPublicTeamAllyCount && sourceCardIdentityId is not null)
-            Fail(path + ".sourceCardIdentityId", "other public living allies require an owner-wide Slash-limit modifier");
+        if ((valueExpression is SkillRuleValueExpression.OtherPublicTeamAllyCount or SkillRuleValueExpression.EmptyCampaignSkillSlotCount) && sourceCardIdentityId is not null)
+            Fail(path + ".sourceCardIdentityId", "dynamic ally and campaign-slot counts require an owner-wide Slash-limit modifier");
         var cardKinds = node.TryGetProperty("cardKinds", out _)
             ? EnumArray<CardKind>(node, "cardKinds", path)
             : [];
@@ -4408,7 +4414,7 @@ public sealed class SkillProgramCatalog
                 !(query == SkillRuleQuery.CardTargetCount && valueExpression == SkillRuleValueExpression.OwnerLostHp) &&
                 !(query is (SkillRuleQuery.IncomingDistance or SkillRuleQuery.OutgoingDistance) && valueExpression == SkillRuleValueExpression.OwnerMarkerCount) &&
                 !(query == SkillRuleQuery.DrawCount && valueExpression is (SkillRuleValueExpression.PublicTeamEnemyCount or SkillRuleValueExpression.OwnerLostHp)) &&
-                !(query == SkillRuleQuery.SlashLimit && valueExpression == SkillRuleValueExpression.OtherPublicTeamAllyCount) &&
+                !(query == SkillRuleQuery.SlashLimit && valueExpression is (SkillRuleValueExpression.OtherPublicTeamAllyCount or SkillRuleValueExpression.EmptyCampaignSkillSlotCount)) &&
                 !(query == SkillRuleQuery.InitialHandSize && valueExpression == SkillRuleValueExpression.OwnerMaxHp)))
             Fail(path + ".valueExpression",
                 "livingFactionCount is currently supported only by additive handLimit modifiers");

@@ -33,7 +33,7 @@ public static partial class StandardShanheCampaignCatalog
                 CurrentLeihuoRewardId, CurrentLianjiRewardId, CurrentErlianjiRewardId,
                 CurrentTiebushan4RewardId, CurrentJingjijiaRewardId, "codex-card-4059"])
             .Concat(CurrentEconomyTactics.Where(source => source.RewardId != CurrentInterest2RewardId).Select(source => source.RewardId))
-            .Concat([CurrentMuniuLiumaRewardId, CurrentSougua3RewardId, CurrentFenjinRewardId, CurrentSanbanfuRewardId])
+            .Concat([CurrentMuniuLiumaRewardId, CurrentSougua3RewardId, CurrentFenjinRewardId, CurrentFenjin2RewardId, CurrentSanbanfuRewardId])
             .Concat(CurrentBuildSkillDefaultUnlockedRewardIds)
             .Concat(CurrentMiaoshouDefaultUnlockedRewardIds)
             .Concat(CurrentLateRoundTacticDefaultUnlockedRewardIds)
@@ -48,6 +48,8 @@ public static partial class StandardShanheCampaignCatalog
             .Concat(CurrentDoubleStealDefaultUnlockedRewardIds)
             .Concat(CurrentDoubleResponseDefaultUnlockedRewardIds)
             .Concat(CurrentTrickResponseDefaultUnlockedRewardIds)
+            .Concat(CurrentQianlongDefaultUnlockedRewardIds)
+            .Concat(CurrentMultiTargetTrickDefaultUnlockedRewardIds)
             .Append("tactic-duijia-2026")
             .Concat(StandardShanheOriginalSkills.DefaultStockRewardIds)
             .Concat(CurrentReactionTacticDefaultUnlockedRewardIds)
@@ -94,6 +96,8 @@ public static partial class StandardShanheCampaignCatalog
                 [CurrentMuniuLiumaRewardId] = new(2088, 500, 3, "战法"),
                 [CurrentSougua3RewardId] = new(2170, 500, 3, "战法"),
                 [CurrentFenjinRewardId] = new(2228, 200, 1, "战法"),
+                [CurrentFenjin2RewardId] = new(2229, 700, 4, "战法"),
+                [CurrentQinmianRewardId] = new(2360, 200, 1, "战法"),
                 [CurrentSanbanfuRewardId] = new(2042, 500, 3, "战法"),
                 [CurrentSanbanfu2RewardId] = new(2043, 700, 4, "战法"),
                 [CurrentYaoliRewardId] = new(2319, 200, 1, "战法"),
@@ -193,6 +197,8 @@ public static partial class StandardShanheCampaignCatalog
                 .Concat(CurrentDoubleStealShopMetadata)
                 .Concat(CurrentDoubleResponseShopMetadata)
                 .Concat(CurrentTrickResponseShopMetadata)
+                .Concat(CurrentQianlongShopMetadata)
+                .Concat(CurrentMultiTargetTrickShopMetadata)
                 .Concat(CurrentReactionTacticShopMetadata)
                 .Concat(CurrentShopCardMetadata)
                 .Concat(CurrentEconomyTactics.Select(source => new KeyValuePair<string, ShanheShopMetadata>(source.RewardId,

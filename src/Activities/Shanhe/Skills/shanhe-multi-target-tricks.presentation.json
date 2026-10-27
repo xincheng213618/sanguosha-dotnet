@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:current-hengjiang-2007": { "name": "横江锁", "description": "【铁索连环】能指定任意个目标。" },
+    "shanhe:current-dantiaowang-2212": { "name": "单挑王", "description": "你使用【决斗】可以指定任意个目标。" }
+  }
+}
