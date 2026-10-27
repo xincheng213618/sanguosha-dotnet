@@ -417,6 +417,15 @@ public static partial class StandardShanheCampaignCatalog
         var sourceJiangdongVeteran = RequiresThreeBossRegistry(requirements, StandardShanheSourceJiangdongVeteranPackage.BaseId,
             StandardShanheSourceJiangdongVeteranPackage.FenliSkillId) ||
             ids.Any(id => id is StandardShanheSourceJiangdongVeteranPackage.HardId or StandardShanheSourceJiangdongVeteranPackage.NightmareId);
+        var sourceCoalitionScout = ids.Any(id => id is StandardShanheSourceCoalitionScoutPackage.BaseId or
+            StandardShanheSourceCoalitionScoutPackage.HardId or StandardShanheSourceCoalitionScoutPackage.HellId);
+        var sourceCoalitionSpy = ids.Any(id => id is StandardShanheSourceCoalitionSpyPackage.BaseId or
+            StandardShanheSourceCoalitionSpyPackage.HardId or StandardShanheSourceCoalitionSpyPackage.NightmareId);
+        var sourceLocalMagnate = ids.Any(id => id is StandardShanheSourceLocalMagnatePackage.BaseId or
+            StandardShanheSourceLocalMagnatePackage.HardId or StandardShanheSourceLocalMagnatePackage.NightmareId);
+        var sourceLinZhongGu = ids.Any(id => id is StandardShanheSourceLinZhongGuPackage.BaseId or
+            StandardShanheSourceLinZhongGuPackage.NightmareId);
+        var sourceXinPing = ids.Contains(StandardShanheSourceXinPingPackage.GeneralId, StringComparer.Ordinal);
         var sourceZhangYan = sourceQiangWang || RequiresThreeBossRegistry(requirements,
             StandardShanheSourceZhangYanPackage.ZhangniujiaoMediumId,
             StandardShanheSourceZhangYanPackage.YanyuSkillId,
@@ -536,6 +545,11 @@ public static partial class StandardShanheCampaignCatalog
             (sourceQiangRaider ? "/source-qiang-raider-2473" : "") +
             (sourceXunYue ? "/source-xunyue-2480" : "") +
             (sourceJiangdongVeteran ? "/source-jiangdong-veteran-2497" : "") +
+            (sourceCoalitionScout ? "/source-coalition-scout-2455" : "") +
+            (sourceCoalitionSpy ? "/source-coalition-spy-2459" : "") +
+            (sourceLocalMagnate ? "/source-local-magnate-2460" : "") +
+            (sourceLinZhongGu ? "/source-linzhonggu-2476" : "") +
+            (sourceXinPing ? "/source-xinping-2489" : "") +
             (s5Simayi ? "/s5-simayi-2677" : "") +
             (s5Dianwei ? "/s5-dianwei-weizi-2650" : "") +
             (s5Xiahou ? "/s5-xiahou-pair-2651" : "") +
@@ -709,6 +723,11 @@ public static partial class StandardShanheCampaignCatalog
             if (sourceQiangRaider) packages.Add(new StandardShanheSourceQiangRaiderPackage());
             if (sourceXunYue) packages.Add(new StandardShanheSourceXunYuePackage());
             if (sourceJiangdongVeteran) packages.Add(new StandardShanheSourceJiangdongVeteranPackage());
+            if (sourceCoalitionScout) packages.Add(new StandardShanheSourceCoalitionScoutPackage());
+            if (sourceCoalitionSpy) packages.Add(new StandardShanheSourceCoalitionSpyPackage());
+            if (sourceLocalMagnate) packages.Add(new StandardShanheSourceLocalMagnatePackage());
+            if (sourceLinZhongGu) packages.Add(new StandardShanheSourceLinZhongGuPackage());
+            if (sourceXinPing) packages.Add(new StandardShanheSourceXinPingPackage());
             if (ids.Any(id => id is StandardShanheS5SunJianWuguotaiPackage.SunjianId or StandardShanheS5SunJianWuguotaiPackage.WuguotaiId))
                 packages.Add(new StandardShanheS5SunJianWuguotaiPackage());
             if (ids.Contains(StandardShanheS5DongZhuoBasePackage.DongzhuoId, StringComparer.Ordinal))

@@ -11,7 +11,7 @@ public static partial class StandardShanheCampaignCatalog
         ShanheSourceRouteCityDefinition city, int difficulty)
     {
         var potential = StandardShanheSourceRouteCatalog.Season5.GetPotentialBattleIds(city.SourceCityId);
-        foreach (var group in new[] { 2474, 2467, 2487, 2473, 2480, 2497 })
+        foreach (var group in new[] { 2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489 })
         {
             if (!potential.Contains(group)) continue;
             var general = OrdinaryTroopGeneral(group, difficulty);
@@ -43,15 +43,23 @@ public static partial class StandardShanheCampaignCatalog
         var xunyue = StandardShanheSourceXunYuePackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
         var jiangdongTier = difficulty switch { 1 => 1, 2 => 11, _ => 21 };
         var jiangdong = StandardShanheSourceJiangdongVeteranPackage.GetGeneralId(jiangdongTier);
+        var scout = StandardShanheSourceCoalitionScoutPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var spy = StandardShanheSourceCoalitionSpyPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var magnate = StandardShanheSourceLocalMagnatePackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var linzhonggu = StandardShanheSourceLinZhongGuPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var xinping = StandardShanheSourceXinPingPackage.GetGeneralId(difficulty);
         return ShanheCampaignContent.FreezeAndValidate(definition with
         {
             Nodes = definition.Nodes.Select(node => node.Id is "hulao" or "guangcheng" ? node with
             {
-                Encounters = node.Encounters!.Append(new ShanheEncounterDefinition(node.Id + ":qiang-raider-2473-local",
-                    OrdinaryTroopName(2473), [new(raider, MaxHpBonus: difficulty, Hp: 4 + difficulty,
-                        DrawBonus: difficulty)], [], VictoryGold: 200, HealAfterVictory: 1)
-                    { StoryText = OrdinaryTroopStory(2473) }).ToArray(),
-                Description = node.Description + "羌人劫匪也在此劫掠行军队伍。"
+                Encounters = node.Encounters!.Concat(new[]
+                {
+                    FirstChapter(node.Id + ":qiang-raider-2473-local", 2473, raider),
+                    FirstChapter(node.Id + ":coalition-scout-2455-local", 2455, scout),
+                    FirstChapter(node.Id + ":coalition-spy-2459-local", 2459, spy, baseHp: 3),
+                    FirstChapter(node.Id + ":local-magnate-2460-local", 2460, magnate)
+                }).ToArray(),
+                Description = node.Description + "另有羌人劫匪、联军斥候、联军细作与本地豪强在此游弋。"
             } : node.Id is not ("dagu" or "huanyuan") ? node : node with
             {
                 Encounters = node.Encounters!.Concat(new[]
@@ -63,9 +71,11 @@ public static partial class StandardShanheCampaignCatalog
                     Local(node.Id + ":warrior-2487-local", "探听虚实 · 武卫兵", warrior, OrdinaryTroopStory(2487)),
                     Local(node.Id + ":xunyue-2480-local", OrdinaryTroopName(2480), xunyue, OrdinaryTroopStory(2480), baseHp: 3),
                     Local(node.Id + ":jiangdong-veteran-2497-local", OrdinaryTroopName(2497), jiangdong, OrdinaryTroopStory(2497),
-                        startingCards: JiangdongVeteranGear(jiangdongTier))
+                        startingCards: JiangdongVeteranGear(jiangdongTier)),
+                    Local(node.Id + ":linzhonggu-2476-local", OrdinaryTroopName(2476), linzhonggu, OrdinaryTroopStory(2476)),
+                    Local(node.Id + ":xinping-2489-local", OrdinaryTroopName(2489), xinping, OrdinaryTroopStory(2489))
                 }).ToArray(),
-                Description = node.Description + "另有百战老兵、乌桓骑手、武卫兵、荀悦与江东老兵驻守。"
+                Description = node.Description + "另有百战老兵、乌桓骑手、武卫兵、荀悦、江东老兵、林中鹘与辛评驻守。"
             }).ToArray()
         });
 
@@ -74,6 +84,11 @@ public static partial class StandardShanheCampaignCatalog
             new(id, name, [new(general, MaxHpBonus: 7 + 2 * growth - baseHp, Hp: 7 + 2 * growth,
                 InitialHandBonus: 1 + growth, DrawBonus: 1) { StartingCards = startingCards }], [], VictoryGold: 200, HealAfterVictory: 2)
             { StoryText = story };
+
+        ShanheEncounterDefinition FirstChapter(string id, int group, string general, int baseHp = 4) =>
+            new(id, OrdinaryTroopName(group), [new(general, MaxHpBonus: 4 + difficulty - baseHp,
+                Hp: 4 + difficulty, DrawBonus: difficulty)], [], VictoryGold: 200, HealAfterVictory: 1)
+            { StoryText = OrdinaryTroopStory(group) };
     }
 
     private static string OrdinaryTroopGeneral(int group, int difficulty) => group switch
@@ -84,6 +99,11 @@ public static partial class StandardShanheCampaignCatalog
         2473 => StandardShanheSourceQiangRaiderPackage.GetGeneralId(difficulty),
         2480 => StandardShanheSourceXunYuePackage.GetGeneralId(difficulty),
         2497 => StandardShanheSourceJiangdongVeteranPackage.GetGeneralId(difficulty),
+        2455 => StandardShanheSourceCoalitionScoutPackage.GetGeneralId(difficulty),
+        2459 => StandardShanheSourceCoalitionSpyPackage.GetGeneralId(difficulty),
+        2460 => StandardShanheSourceLocalMagnatePackage.GetGeneralId(difficulty),
+        2476 => StandardShanheSourceLinZhongGuPackage.GetGeneralId(difficulty),
+        2489 => StandardShanheSourceXinPingPackage.GetGeneralId(difficulty),
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static string OrdinaryTroopName(int group) => group switch
@@ -91,6 +111,8 @@ public static partial class StandardShanheCampaignCatalog
         2474 => "经验传承 · 百战老兵", 2467 => "乌桓贼匪 · 乌桓骑手", 2487 => "探听虚实 · 武卫兵",
         2473 => "趁人之危 · 羌人劫匪", 2480 => "空谈无益 · 荀悦",
         2497 => "狭路相逢 · 江东老兵",
+        2455 => "贪得无厌 · 联军斥候", 2459 => "暗中破坏 · 联军细作", 2460 => "巧破城楼 · 本地豪强",
+        2476 => "林中鹘", 2489 => "辛评",
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static string OrdinaryTroopStory(int group) => group switch
@@ -101,6 +123,11 @@ public static partial class StandardShanheCampaignCatalog
         2473 => "羌人劫匪以雉盗夺取辎重，高档还能咆哮连攻、伺机顺手夺牌。",
         2480 => "荀悦以强识辨别牌类，高档还能在回合外明哲自守、出牌时誉虚调度。",
         2497 => "江东老兵持青釭剑接战，高档配白银狮子与照骨镜，兼有奋励与平寇。",
+        2455 => "联军斥候以当先抢攻，高档还能看破锦囊，并以点虎紧盯敌手。",
+        2459 => "联军细作以奇策调度全手牌，高档兼有替身与断发，弃置黑色牌换取手牌。",
+        2460 => "本地豪强以束辎交换辎重，高档还能凭伪诚补牌、顺世增加下次摸牌、出杀次数与手牌上限。",
+        2476 => "林中鹘以长标突击，高档还可用腹鳞留住回合内取得的手牌。",
+        2489 => "辛评每次造成或受到伤害后，依次失去当前技能并摸牌，在回合结束后恢复。",
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
 

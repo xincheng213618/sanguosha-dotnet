@@ -4,7 +4,8 @@ using CardGame.Core.Campaigns;
 
 internal static class ShanheSourceOrdinaryTroopChecks
 {
-    private static readonly int[] Groups = [2474, 2467, 2487, 2473, 2480, 2497];
+    private static readonly int[] Groups = [2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489];
+    private static bool FirstChapter(int group) => group is 2473 or 2455 or 2459 or 2460;
 
     public static void SourcePoolsAndBothRecommendedEntrypointsRetainCompleteTieredRecipes()
     {
@@ -49,16 +50,19 @@ internal static class ShanheSourceOrdinaryTroopChecks
                     .Select(e => e.SourceCityId!.Value).Order().ToArray();
                 Need(actual.SequenceEqual(expected) && expected.Length > 0,
                     "The total recipe count follows currently open source regions, rather than prematurely requiring all56 cities at every tier.");
-                if (difficulty == 25 && (group is 2473 or 2480 or 2497))
-                    Need(actual.Length == (group == 2473 ? 14 : 56),
-                        "With every source region open, the first-chapter raider retains14 cities and both second-chapter groups retain56 actual source-city memberships.");
+                if (difficulty == 25)
+                    Need(actual.Length == (FirstChapter(group) ? 14 : 56),
+                        "With every source region open, first-chapter troops retain14 cities and second-chapter troops retain56 actual source-city memberships.");
             }
-            var probe = new ShanheBattleSetup(83, 1, "fixture:ordinary-source-dependencies", "classic:guan-yu",
-                4, 0, 0, 0, 0, [], [], [], Groups.Select(group => new ShanheCombatantDefinition(General(group, difficulty))
-                    { StartingCards = ExpectedStartingCards(group, difficulty) }).ToArray(),
-                [], "fixture:ordinary-source-dependencies") { SourceDifficultyId = difficulty };
-            var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(probe);
-            foreach (var group in Groups) AssertGeneralAndPrograms(registry, group, difficulty);
+            foreach (var cohort in Groups.Chunk(7))
+            {
+                var probe = new ShanheBattleSetup(83, 1, "fixture:ordinary-source-dependencies", "classic:guan-yu",
+                    4, 0, 0, 0, 0, [], [], [], cohort.Select(group => new ShanheCombatantDefinition(General(group, difficulty))
+                        { StartingCards = ExpectedStartingCards(group, difficulty) }).ToArray(),
+                    [], "fixture:ordinary-source-dependencies") { SourceDifficultyId = difficulty };
+                var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(probe);
+                foreach (var group in cohort) AssertGeneralAndPrograms(registry, group, difficulty);
+            }
         }
 
         (string Node, string Terrain)[] sites =
@@ -80,7 +84,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
             foreach (var (id, terrain) in sites)
             {
                 var node = definition.Nodes.Single(n => n.Id == id);
-                foreach (var group in Groups.Where(group => group != 2473))
+                foreach (var group in Groups.Where(group => !FirstChapter(group)))
                 {
                     var tier = LocalTier(group, difficulty);
                     var encounter = node.Encounters!.Single(e => e.Enemies.Count == 1 && e.Enemies[0].GeneralId == General(group, tier));
@@ -93,22 +97,24 @@ internal static class ShanheSourceOrdinaryTroopChecks
                         (body.StartingCards ?? []).SequenceEqual(ExpectedStartingCards(group, tier)) &&
                         (body.StartingEquipment?.Count ?? 0) == 0 &&
                         1 + encounter.Enemies.Count + (encounter.Allies?.Count ?? 0) <= 8,
-                        "All five complete second-chapter local troop recipes survive both normal nodes and all five terrain clones, retaining each original body's own maximum HP, exact extra hand cards and no fabricated source identities.");
+                        "All complete second-chapter local troop recipes survive both normal nodes and all five terrain clones, retaining each original body's own maximum HP, exact extra hand cards and no fabricated source identities.");
                 }
             }
             foreach (var id in new[] { "hulao", "guangcheng", "hulao-start", "guangcheng-start" })
+            foreach (var group in Groups.Where(FirstChapter))
             {
                 var node = definition.Nodes.Single(n => n.Id == id);
                 var encounter = node.Encounters!.Single(e => e.Enemies.Count == 1 &&
-                    e.Enemies[0].GeneralId == General(2473, LocalTier(2473, difficulty)));
+                    e.Enemies[0].GeneralId == General(group, LocalTier(group, difficulty)));
                 var body = encounter.Enemies.Single();
                 Need(node.ChapterNumber == 1 && encounter.SourceBattleId is null && encounter.SourceCityId is null &&
                     encounter.SourceVisibleEnemyCount is null && encounter.BossTransition is null &&
-                    (encounter.Allies?.Count ?? 0) == 0 && body.Hp == 4 + difficulty && body.MaxHpBonus == difficulty &&
+                    (encounter.Allies?.Count ?? 0) == 0 && body.Hp == 4 + difficulty &&
+                    body.MaxHpBonus == 4 + difficulty - SourceBaseHp(group) &&
                     body.DrawBonus == difficulty && body.InitialHandBonus == 0 && body.SourceDifficultyAttributes is null &&
                     body.StartingHand is null && (body.StartingCards?.Count ?? 0) == 0 &&
                     (body.StartingEquipment?.Count ?? 0) == 0 && 1 + encounter.Enemies.Count <= 8,
-                    "The complete local Qiang raider survives both first-chapter routes and their random-opening copies, with its authored first-chapter growth and no second-chapter hand bonus or source labels.");
+                    "Every complete local first-chapter troop survives both routes and their random-opening copies, with its original-body-based growth and no second-chapter hand bonus or source labels.");
                 if (id.EndsWith("-start", StringComparison.Ordinal))
                 {
                     var original = definition.Nodes.Single(n => n.Id == id[..^6]).Encounters!
@@ -123,7 +129,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
     public static void SourceAndLocalPreviewMoveAndStartUseOneProjectionAndRealOpeningEntities()
     {
         var source = StandardShanheCampaignCatalog.CreateSourceCodexDefinition(25);
-        foreach (var group in new[] { 2474, 2480, 2497 })
+        foreach (var group in new[] { 2474, 2480, 2497, 2455, 2459, 2489 })
         {
             var cityNode = source.Nodes.First(n => n.Kind == ShanheNodeKind.Battle && n.Encounters!.Any(e => e.SourceBattleId == group));
             var sourceEncounter = cityNode.Encounters!.Single(e => e.SourceBattleId == group);
@@ -132,7 +138,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
 
         var local = StandardShanheCampaignCatalog.CreateCodexDefinition(3, StandardShanheCampaignCatalog.Returning2026EditionId);
         var localNode = local.Nodes.Single(n => n.Id == "dagu");
-        foreach (var group in new[] { 2474, 2480, 2497 })
+        foreach (var group in new[] { 2474, 2480, 2497, 2476 })
         {
             var tier = LocalTier(group, 3);
             var localEncounter = localNode.Encounters!.Single(e => e.Enemies.Count == 1 && e.Enemies[0].GeneralId == General(group, tier));
@@ -142,6 +148,9 @@ internal static class ShanheSourceOrdinaryTroopChecks
         var raider = opening.Encounters!.Single(e => e.Enemies.Count == 1 &&
             e.Enemies[0].GeneralId == StandardShanheSourceQiangRaiderPackage.NightmareId);
         EnterAndStart(local, opening, raider, 2473, 16, localDifficulty: 3);
+        var spy = opening.Encounters!.Single(e => e.Enemies.Count == 1 &&
+            e.Enemies[0].GeneralId == StandardShanheSourceCoalitionSpyPackage.NightmareId);
+        EnterAndStart(local, opening, spy, 2459, 21, localDifficulty: 3);
     }
 
     private static void EnterAndStart(ShanheCampaignDefinition definition, ShanheNodeDefinition node,
@@ -187,10 +196,10 @@ internal static class ShanheSourceOrdinaryTroopChecks
         {
             Need(localDifficulty is >= 1 and <= 3, "A local opening retains its explicit local difficulty.");
             var difficulty = localDifficulty!.Value; var growth = difficulty - 1;
-            var hp = group == 2473 ? 4 + difficulty : 7 + 2 * growth;
+            var hp = FirstChapter(group) ? 4 + difficulty : 7 + 2 * growth;
             Need(member.Hp == hp && member.MaxHpBonus == hp - baseHp &&
-                member.InitialHandBonus == (group == 2473 ? 0 : 1 + growth) &&
-                member.DrawBonus == (group == 2473 ? difficulty : 1) && SameMembers([member], selected.Enemies) &&
+                member.InitialHandBonus == (FirstChapter(group) ? 0 : 1 + growth) &&
+                member.DrawBonus == (FirstChapter(group) ? difficulty : 1) && SameMembers([member], selected.Enemies) &&
                 member.SourceDifficultyAttributes is null && preview.SourceBattleId is null && preview.SourceCityId is null,
                 "Recommended local troops keep their authored chapter health, base-specific maximum HP and draw/hand bonuses without a source-growth pass.");
         }
@@ -263,6 +272,8 @@ internal static class ShanheSourceOrdinaryTroopChecks
         {
             2474 => "classic:zhanjue", 2467 => "classic:huaiyi", 2487 => "ol:tuifeng", 2473 => "ol:zhidao",
             2480 => StandardShanheSourceXunYuePackage.QiangzhiSkillId, 2497 => "classic:xuanfeng",
+            2455 => "classic:dangxian", 2459 => "classic:qice", 2460 => "ol:shuzi",
+            2476 => "boundary:changbiao-current", 2489 => "ol:chuanwu",
             _ => throw new ArgumentOutOfRangeException(nameof(group))
         } };
         if (group == 2474)
@@ -297,6 +308,22 @@ internal static class ShanheSourceOrdinaryTroopChecks
             if (difficulty >= 11) skills.Add(StandardShanheSourceJiangdongVeteranPackage.FenliSkillId);
             if (difficulty >= 16) skills.Add("mobile:pingkou");
         }
+        else if (group == 2455)
+        {
+            if (difficulty >= 11) skills.Add("classic:kanpo");
+            if (difficulty >= 21) skills.Add("ol:dianhu");
+        }
+        else if (group == 2459)
+        {
+            if (difficulty >= 11) skills.Add("boundary:tishen");
+            if (difficulty >= 16) skills.Add("mobile:duanfa");
+        }
+        else if (group == 2460)
+        {
+            if (difficulty >= 11) skills.Add("ol:weicheng");
+            if (difficulty >= 16) skills.Add("ol:shunshi");
+        }
+        else if (group == 2476 && difficulty >= 16) skills.Add("classic:fulin");
         return skills.ToArray();
     }
     private static string General(int group, int difficulty) => group switch
@@ -307,19 +334,24 @@ internal static class ShanheSourceOrdinaryTroopChecks
         2473 => StandardShanheSourceQiangRaiderPackage.GetGeneralId(difficulty),
         2480 => StandardShanheSourceXunYuePackage.GetGeneralId(difficulty),
         2497 => StandardShanheSourceJiangdongVeteranPackage.GetGeneralId(difficulty),
+        2455 => StandardShanheSourceCoalitionScoutPackage.GetGeneralId(difficulty),
+        2459 => StandardShanheSourceCoalitionSpyPackage.GetGeneralId(difficulty),
+        2460 => StandardShanheSourceLocalMagnatePackage.GetGeneralId(difficulty),
+        2476 => StandardShanheSourceLinZhongGuPackage.GetGeneralId(difficulty),
+        2489 => StandardShanheSourceXinPingPackage.GetGeneralId(difficulty),
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static int LocalTier(int group, int difficulty) => group switch
     {
         2474 => difficulty switch { 1 => 6, 2 => 16, _ => 21 },
         2473 => difficulty switch { 1 => 1, 2 => 11, _ => 16 },
-        2467 or 2487 or 2480 or 2497 => difficulty switch { 1 => 1, 2 => 11, _ => 21 },
+        2467 or 2487 or 2480 or 2497 or 2455 or 2459 or 2460 or 2476 or 2489 => difficulty switch { 1 => 1, 2 => 11, _ => 21 },
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static int SourceBaseHp(int group) => group switch
     {
-        2480 => 3,
-        2474 or 2467 or 2487 or 2473 or 2497 => 4,
+        2480 or 2459 => 3,
+        2474 or 2467 or 2487 or 2473 or 2497 or 2455 or 2460 or 2476 or 2489 => 4,
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static IReadOnlyList<ShanheStartingCard> ExpectedStartingCards(int group, int difficulty)
