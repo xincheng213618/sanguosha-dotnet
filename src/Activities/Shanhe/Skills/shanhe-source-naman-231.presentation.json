@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-naman-231": {
+      "name": "纳蛮",
+      "description": "当其他角色打出的【杀】置入弃牌堆后，你可以获得之。"
+    }
+  }
+}

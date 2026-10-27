@@ -291,7 +291,8 @@ public sealed partial class GameEngine
         ShenwuEnabled(_players[actorSeat], "shenwu:mingwan") && ShenwuMingwanVictims(actorSeat) is { Count: > 0 } victims && !victims.Contains(targetSeat);
     private bool ShenwuFutaiForbidsPeach(int actorSeat, CardKind kind, CardActionType type) => kind == CardKind.Peach && type == CardActionType.Use &&
         _players.Any(p => p.Seat != actorSeat && !ShenwuOwnActualTurn(p.Seat) && ShenwuEnabled(p, "shenwu:futai"));
-    private bool ShenwuCannotTurnOver(CharacterState target) => ShenwuEnabled(target, "shenwu:xiongshou");
+    private bool ShenwuCannotTurnOver(CharacterState target) =>
+        ShenwuEnabled(target, "shenwu:xiongshou") || ShanheWarElephantCannotTurnOver(target);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 230)]
     private int ShenwuNpcDamageBonus(IDamageAttempt attack)
     {

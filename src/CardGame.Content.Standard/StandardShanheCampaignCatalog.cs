@@ -460,6 +460,13 @@ public static partial class StandardShanheCampaignCatalog
             ids.Any(id => id is StandardShanheSourceMaRiDiPackage.BaseId or StandardShanheSourceMaRiDiPackage.HardId or
                 StandardShanheSourceMaRiDiPackage.NightmareId or StandardShanheSourceMaRiDiPackage.HellId);
         var sourceZhangHe = ids.Any(id => id is StandardShanheSourceZhangHePackage.BaseId or StandardShanheSourceZhangHePackage.WeijingId);
+        var sourceWarElephant = ids.Any(id => id is StandardShanheSourceWarElephantPackage.BaseId or
+            StandardShanheSourceWarElephantPackage.HardId or StandardShanheSourceWarElephantPackage.HellId);
+        var sourceCaiWenji = ids.Any(id => id is StandardShanheSourceCaiWenjiPackage.BaseId or
+            StandardShanheSourceCaiWenjiPackage.HardId or StandardShanheSourceCaiWenjiPackage.NightmareId);
+        var sourceRanger = ids.Any(id => id is StandardShanheSourceRangerPackage.BaseId or
+            StandardShanheSourceRangerPackage.HardId or StandardShanheSourceRangerPackage.NightmareId or StandardShanheSourceRangerPackage.HellId);
+        s5Dongwu |= sourceRanger;
         var sourceCoalitionTrio = extraSkills.Contains(StandardShanheSourceCoalitionTrioPackage.CangchuSkillId) ||
             extraSkills.Contains(StandardShanheSourceCoalitionTrioPackage.SushouSkillId) ||
             ids.Any(id => id is StandardShanheSourceCoalitionTrioPackage.SpyBaseId or StandardShanheSourceCoalitionTrioPackage.SpyHardId or
@@ -610,6 +617,9 @@ public static partial class StandardShanheCampaignCatalog
             (sourceVanguard ? "/source-vanguard-2494" : "") +
             (sourceMaRiDi ? "/source-maridi-2452" : "") +
             (sourceZhangHe ? "/source-zhanghe-2468" : "") +
+            (sourceWarElephant ? "/source-war-elephant-2453" : "") +
+            (sourceCaiWenji ? "/source-caiwenji-2469" : "") +
+            (sourceRanger ? "/source-ranger-2481" : "") +
             (sourceWuqueAssassin ? "/source-wuque-assassin-2493" : "") +
             (sourceExecutioner ? "/source-executioner-2495" : "") +
             (s5Simayi ? "/s5-simayi-2677" : "") +
@@ -802,6 +812,9 @@ public static partial class StandardShanheCampaignCatalog
             if (sourceVanguard) packages.Add(new StandardShanheSourceVanguardPackage());
             if (sourceMaRiDi) packages.Add(new StandardShanheSourceMaRiDiPackage());
             if (sourceZhangHe) packages.Add(new StandardShanheSourceZhangHePackage());
+            if (sourceWarElephant) packages.Add(new StandardShanheSourceWarElephantPackage());
+            if (sourceCaiWenji) packages.Add(new StandardShanheSourceCaiWenjiPackage());
+            if (sourceRanger) packages.Add(new StandardShanheSourceRangerPackage());
             if (sourceAgricultureOfficer) packages.Add(new StandardShanheSourceAgricultureOfficerPackage());
             if (sourceWuqueAssassin) packages.Add(new StandardShanheSourceWuqueAssassinPackage());
             if (sourceDemonAssassin) packages.Add(new StandardShanheSourceDemonAssassinPackage());

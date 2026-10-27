@@ -68,7 +68,29 @@ internal static class ShanheBossPortraitChecks
         }.All(checkedIds.Contains),
             "The representative source generals have real portraits; only explicit supporter mappings and declared no-asset forms are excluded.");
 
+        var ordinaryAliases = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            [StandardShanheSourceCaiWenjiPackage.BaseId] = "boundary-cai-wen-ji",
+            [StandardShanheSourceCaiWenjiPackage.HardId] = "boundary-cai-wen-ji",
+            [StandardShanheSourceCaiWenjiPackage.NightmareId] = "boundary-cai-wen-ji",
+            [StandardShanheSourceMaRiDiPackage.BaseId] = "ol-ma-mi-di",
+            [StandardShanheSourceMaRiDiPackage.HardId] = "ol-ma-mi-di",
+            [StandardShanheSourceMaRiDiPackage.NightmareId] = "ol-ma-mi-di",
+            [StandardShanheSourceMaRiDiPackage.HellId] = "ol-ma-mi-di",
+            [StandardShanheSourceZhangHePackage.BaseId] = "ol-sp-zhang-he",
+            [StandardShanheSourceZhangHePackage.WeijingId] = "ol-sp-zhang-he"
+        };
+        foreach (var (id, expectedKey) in ordinaryAliases)
+        {
+            var expected = GeneralArt.GetSkin(expectedKey);
+            Program.Assert(expected is not null && GeneralArt.GetSkin(id)?.LocalPath == expected.LocalPath &&
+                GeneralArt.GetPortrait(id, decodeWidth: 96) is ImageBrush
+                    { ImageSource: BitmapSource { PixelWidth: > 0, PixelHeight: > 0 } } brush && HasPaintedPixels(brush),
+                "Every published ordinary source form must decode and paint its exact existing local portrait: " + id);
+        }
+
         RenderActualMaSiblingsTable(output);
+        RenderActualCaiWenjiTable(output);
     }
 
     private static ShanheBattleSetup Setup(ShanheCampaignDefinition definition, ShanheNodeDefinition node, ShanheEncounterDefinition encounter) =>
@@ -98,9 +120,32 @@ internal static class ShanheBossPortraitChecks
         var definition = StandardShanheCampaignCatalog.CreateDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
         var node = definition.Nodes.Single(n => n.Id == "dagu");
         var encounter = node.Encounters!.Single(e => e.Id == "dagu:ma-siblings-s5");
+        RenderActualEncounterTable(output, definition, node, encounter,
+            [StandardShanheS5MaSiblingsPackage.MachaoId, StandardShanheS5MaSiblingsPackage.MayunluId],
+            "shanhe-s5-ma-siblings-portraits.png",
+            "The published Ma Chao/Ma Yunlu recipe must start its actual three-seat battle.",
+            StandardShanheS5MaSiblingsPackage.MachaoId, "shanhe-s5-ma-chao-portrait.png");
+    }
+
+    private static void RenderActualCaiWenjiTable(string output)
+    {
+        var definition = StandardShanheCampaignCatalog.CreateDefinition(3, StandardShanheCampaignCatalog.Returning2026EditionId);
+        var node = definition.Nodes.Single(n => n.Id == "dagu");
+        var encounter = node.Encounters!.Single(e => e.Id == "dagu:caiwenji-2469-local");
+        Program.Assert(encounter.Enemies.Count == 1 && encounter.Enemies[0].GeneralId == StandardShanheSourceCaiWenjiPackage.NightmareId,
+            "The published high-tier Cai Wenji recipe must use its actual cumulative Beige/Moshi/Tiandu source form.");
+        RenderActualEncounterTable(output, definition, node, encounter,
+            [StandardShanheSourceCaiWenjiPackage.NightmareId], "shanhe-source-caiwenji-2469-portraits.png",
+            "The published Cai Wenji recipe must start its actual two-seat battle.");
+    }
+
+    private static void RenderActualEncounterTable(string output, ShanheCampaignDefinition definition,
+        ShanheNodeDefinition node, ShanheEncounterDefinition encounter, IReadOnlyList<string> generalIds,
+        string renderFile, string startMessage, string? cropGeneralId = null, string? cropFile = null)
+    {
         var setup = Setup(definition, node, encounter);
         var game = StandardShanheCampaignCatalog.CreateBattle(setup);
-        Program.Assert(game.Submit(new StartGameCommand()).Accepted, "The published Ma Chao/Ma Yunlu recipe must start its actual three-seat battle.");
+        Program.Assert(game.Submit(new StartGameCommand()).Accepted, startMessage);
         using var model = new MainViewModel(false, 83, true, new MemorySaveStore(), useExpandedContent: true,
             shanheSaveStore: new MemoryShanheCampaignSaveStore())
         { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
@@ -112,8 +157,8 @@ internal static class ShanheBossPortraitChecks
         try
         {
             var surface = (FrameworkElement)window.Content;
-            Program.Render(surface, 1440, 880, Path.Combine(output, "shanhe-s5-ma-siblings-portraits.png"));
-            foreach (var id in new[] { StandardShanheS5MaSiblingsPackage.MachaoId, StandardShanheS5MaSiblingsPackage.MayunluId })
+            Program.Render(surface, 1440, 880, Path.Combine(output, renderFile));
+            foreach (var id in generalIds)
             {
                 var seat = model.Seats.Single(s => s.GeneralId == id);
                 var portrait = Program.Find<Rectangle>(surface).Single(r => r.Name == "SinglePortrait" && ReferenceEquals(r.DataContext, seat));
@@ -123,10 +168,10 @@ internal static class ShanheBossPortraitChecks
                 var crop = new RenderTargetBitmap((int)Math.Ceiling(portrait.ActualWidth), (int)Math.Ceiling(portrait.ActualHeight), 96, 96, PixelFormats.Pbgra32);
                 crop.Render(portrait);
                 Program.Assert(HasPaintedPixels(crop), "The real laid-out enemy portrait must contain painted pixels: " + id);
-                if (id == StandardShanheS5MaSiblingsPackage.MachaoId)
+                if (id == cropGeneralId)
                 {
                     var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(crop));
-                    using var file = File.Create(Path.Combine(output, "shanhe-s5-ma-chao-portrait.png")); encoder.Save(file);
+                    using var file = File.Create(Path.Combine(output, cropFile!)); encoder.Save(file);
                 }
             }
         }

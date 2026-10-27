@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:source-naman-231", "revision": 1,
+    "triggers": [{
+      "id": "claim-other-completed-slash-response", "window": "cardResponseCompleted", "ownerRelation": "observer",
+      "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"], "optional": true,
+      "effects": [{ "op": "claimShanheSourceNamanResponseCards", "target": "owner" }]
+    }]
+  }]
+}

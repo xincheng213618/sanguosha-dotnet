@@ -19407,6 +19407,7 @@ public sealed partial class GameEngine
         processing = SeparateHappyQiaoDamageHealthChildProcessing(attack, processing);
         processing = SeparateHappyQiaoCardMaximumHealthChildProcessing(attack, processing);
         processing = SeparateMouLixianDamageChildProcessing(attack, processing);
+        processing = SeparateShanheWarElephantCounterParentProcessing(attack, processing);
         if (MouZyNativeAncestorProcessing(attack.ResolutionId) is { } mouZyAncestors)
             processing = processing.Where(card => !mouZyAncestors.Contains(card.Id)).ToArray();
         if (IsMouZyZeroFireAttackConsistent(attack, processing)) return true;

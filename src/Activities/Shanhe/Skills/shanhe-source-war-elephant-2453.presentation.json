@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-shouyi-673": {
+      "name": "兽裔",
+      "description": "锁定技，你使用牌无距离限制。"
+    },
+    "shanhe:source-xiongshou-1136": {
+      "name": "凶兽",
+      "description": "锁定技，你使用【杀】造成的伤害+1。你与其他角色距离-1。你不能被翻面；每回合首次受到大于1点的伤害后，视为对伤害来源使用一张【杀】。"
+    }
+  }
+}

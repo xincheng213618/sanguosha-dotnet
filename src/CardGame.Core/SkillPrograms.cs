@@ -279,6 +279,8 @@ public enum SkillProgramRandomTransferRevealPolicy { RecipientAfterGain = 0 }
 
 public enum SkillProgramEffectOp
 {
+    UseShanheWarElephantCounterSlash = 24530,
+    ClaimShanheSourceNamanResponseCards = 23130,
     QueueShanheLuanxinNextDraw = 81600,
     ApplyShanheMarketPurchase = 62030,
     ResolveBoundaryManChongJunxing = 53000,
@@ -5727,7 +5729,7 @@ public sealed class SkillProgramCatalog
                     ? cardKinds.All(kind => kind is CardKind.Slash or CardKind.FireSlash or
                         CardKind.ThunderSlash or CardKind.ColdSlash or CardKind.Lightning)
                     : cardKinds.All(kind => kind is CardKind.Slash or CardKind.FireSlash or
-                        CardKind.ThunderSlash or CardKind.Dodge or CardKind.Nullification);
+                        CardKind.ThunderSlash or CardKind.ColdSlash or CardKind.Dodge or CardKind.Nullification);
                 if (!supported)
                     Fail(path + ".cardKinds", $"contains a card kind unsupported by {Camel(window)}");
             }

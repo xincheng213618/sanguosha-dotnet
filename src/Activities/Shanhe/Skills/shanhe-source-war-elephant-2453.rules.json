@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "shanhe:source-shouyi-673", "revision": 1,
+      "modifiers": [
+        { "id": "unlimited-slash-distance", "query": "slashDistanceLimit", "operation": "unlimited", "value": 0, "priority": 0 }
+      ] },
+    { "id": "shanhe:source-xiongshou-1136", "revision": 1,
+      "damageModifiers": [
+        { "id": "all-owned-slash-damage-plus-one", "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"], "amount": 1, "condition": "always", "sourceScope": "ownerUsed" }
+      ],
+      "modifiers": [
+        { "id": "outgoing-distance-minus-one", "query": "outgoingDistance", "operation": "add", "value": -1, "priority": 0 }
+      ],
+      "triggers": [
+        { "id": "first-large-damage-counter-slash", "window": "afterDamageApplied", "subject": "owner",
+          "damageOccurrence": "perDamage", "optional": false, "usageScope": "turn", "usageLimit": 1,
+          "condition": { "kind": "compare", "left": { "kind": "appliedDamageAmount" }, "operator": "greaterThan", "right": { "kind": "integerConstant", "value": 1 } },
+          "effects": [{ "op": "useShanheWarElephantCounterSlash", "target": "owner" }] }
+      ] }
+  ]
+}

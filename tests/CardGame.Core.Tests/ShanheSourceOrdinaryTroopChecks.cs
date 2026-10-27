@@ -4,8 +4,8 @@ using CardGame.Core.Campaigns;
 
 internal static class ShanheSourceOrdinaryTroopChecks
 {
-    private static readonly int[] Groups = [2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495, 2457, 2498, 2451, 2500, 2454, 2456, 2458, 2461, 2452, 2468, 2494];
-    private static bool FirstChapter(int group) => group is 2473 or 2455 or 2459 or 2460 or 2457 or 2498 or 2454 or 2456 or 2458 or 2461 or 2452;
+    private static readonly int[] Groups = [2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495, 2457, 2498, 2451, 2500, 2454, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481];
+    private static bool FirstChapter(int group) => group is 2473 or 2455 or 2459 or 2460 or 2457 or 2498 or 2454 or 2456 or 2458 or 2461 or 2452 or 2453;
     private static bool ThirdChapter(int group) => group is 2493 or 2495 or 2468;
 
     public static void SourcePoolsAndBothRecommendedEntrypointsRetainCompleteTieredRecipes()
@@ -158,7 +158,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
     public static void SourceAndLocalPreviewMoveAndStartUseOneProjectionAndRealOpeningEntities()
     {
         var source = StandardShanheCampaignCatalog.CreateSourceCodexDefinition(25);
-        foreach (var group in new[] { 2474, 2480, 2497, 2455, 2459, 2489, 2493, 2495, 2498, 2456, 2458, 2461, 2452, 2468, 2494 })
+        foreach (var group in new[] { 2474, 2480, 2497, 2455, 2459, 2489, 2493, 2495, 2498, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481 })
         {
             var cityNode = source.Nodes.First(n => n.Kind == ShanheNodeKind.Battle && n.Encounters!.Any(e => e.SourceBattleId == group));
             var sourceEncounter = cityNode.Encounters!.Single(e => e.SourceBattleId == group);
@@ -172,7 +172,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
 
         var local = StandardShanheCampaignCatalog.CreateCodexDefinition(3, StandardShanheCampaignCatalog.Returning2026EditionId);
         var localNode = local.Nodes.Single(n => n.Id == "dagu");
-        foreach (var group in new[] { 2474, 2480, 2497, 2476, 2494 })
+        foreach (var group in new[] { 2474, 2480, 2497, 2476, 2494, 2469, 2481 })
         {
             var tier = LocalTier(group, 3);
             var localEncounter = localNode.Encounters!.Single(e => e.Enemies.Count == 1 && e.Enemies[0].GeneralId == General(group, tier));
@@ -188,7 +188,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
         var guard = opening.Encounters!.Single(e => e.Enemies.Count == 1 &&
             e.Enemies[0].GeneralId == StandardShanheSourceYulinGuardPackage.HellId);
         EnterAndStart(local, opening, guard, 2498, 21, localDifficulty: 3);
-        foreach (var group in new[] { 2456, 2458, 2461, 2452 })
+        foreach (var group in new[] { 2456, 2458, 2461, 2452, 2453 })
         {
             var tier = LocalTier(group, 3);
             var encounter = opening.Encounters!.Single(e => e.Enemies.Count == 1 && e.Enemies[0].GeneralId == General(group, tier));
@@ -322,6 +322,9 @@ internal static class ShanheSourceOrdinaryTroopChecks
         if (group is 2452 or 2468 or 2494)
             Need(general.CharacterId == (group == 2452 ? "character:ma-mi-di" : group == 2468 ? "character:zhang-he" : "character:shanhe-source-soldier-4861"),
                 "The source520/357 characters and soldier4861 retain their own original bodies and selected cumulative skills.");
+        if (group is 2453 or 2469 or 2481)
+            Need(general.CharacterId == (group == 2469 ? "character:cai-wen-ji" : "character:shanhe-source-soldier-4861"),
+                "The source505 Cai Wenji and original4861 elephant/ranger bodies retain their exact identity and full selected tier.");
         if (group == 2474 && difficulty >= 21)
             Need(registry.Skills.Values.Count(s => s.Id == StandardShanheCampaignCatalog.S5ZaiqiSkillId) == 1 &&
                 general.SkillIds.Single(id => id == StandardShanheCampaignCatalog.S5ZaiqiSkillId) ==
@@ -359,6 +362,9 @@ internal static class ShanheSourceOrdinaryTroopChecks
             2452 => StandardShanheSourceMaRiDiPackage.BingjieSkillId,
             2468 => StandardShanheSourceZhangHePackage.ZhouxuanSkillId,
             2494 => StandardShanheSourceVanguardPackage.QingxiSkillId,
+            2453 => StandardShanheSourceWarElephantPackage.ShouyiSkillId,
+            2469 => StandardShanheSourceCaiWenjiPackage.BeigeSkillId,
+            2481 => StandardShanheSourceRangerPackage.YilieSkillId,
             2456 => StandardShanheSourceCoalitionTrioPackage.DuliangSkillId,
             2458 => StandardShanheSourceDemonRaiderPackage.QiangxiSkillId,
             2461 => StandardShanheSourceDemonArcherPackage.GongqiSkillId,
@@ -446,6 +452,22 @@ internal static class ShanheSourceOrdinaryTroopChecks
             if (difficulty >= 11) skills.Add(StandardShanheSourceVanguardPackage.DuoruiSkillId);
             if (difficulty >= 16) skills.Add(StandardShanheSourceVanguardPackage.ZhuijiSkillId);
         }
+        else if (group == 2453)
+        {
+            if (difficulty >= 11) skills.Add(StandardShanheSourceWarElephantPackage.XiongshouSkillId);
+            if (difficulty >= 21) skills.Add(StandardShanheSourceWarElephantPackage.PojunSkillId);
+        }
+        else if (group == 2469)
+        {
+            if (difficulty >= 11) skills.Add(StandardShanheSourceCaiWenjiPackage.MoshiSkillId);
+            if (difficulty >= 16) skills.Add(StandardShanheSourceCaiWenjiPackage.TianduSkillId);
+        }
+        else if (group == 2481)
+        {
+            if (difficulty >= 11) skills.Add(StandardShanheSourceRangerPackage.ChunlaoSkillId);
+            if (difficulty >= 16) skills.Add(StandardShanheSourceRangerPackage.JuesiSkillId);
+            if (difficulty >= 21) skills.Add(StandardShanheSourceRangerPackage.NamanSkillId);
+        }
         else if (group == 2456)
         {
             if (difficulty >= 11)
@@ -492,6 +514,9 @@ internal static class ShanheSourceOrdinaryTroopChecks
         2452 => StandardShanheSourceMaRiDiPackage.GetGeneralId(difficulty),
         2468 => StandardShanheSourceZhangHePackage.GetGeneralId(difficulty),
         2494 => StandardShanheSourceVanguardPackage.GetGeneralId(difficulty),
+        2453 => StandardShanheSourceWarElephantPackage.GetGeneralId(difficulty),
+        2469 => StandardShanheSourceCaiWenjiPackage.GetGeneralId(difficulty),
+        2481 => StandardShanheSourceRangerPackage.GetGeneralId(difficulty),
         2456 => StandardShanheSourceCoalitionTrioPackage.GetQuartermasterGeneralId(difficulty),
         2458 => StandardShanheSourceDemonRaiderPackage.GetGeneralId(difficulty),
         2461 => StandardShanheSourceDemonArcherPackage.GetGeneralId(difficulty),
@@ -518,13 +543,14 @@ internal static class ShanheSourceOrdinaryTroopChecks
     {
         2474 => difficulty switch { 1 => 6, 2 => 16, _ => 21 },
         2473 => difficulty switch { 1 => 1, 2 => 11, _ => 16 },
-        2467 or 2487 or 2480 or 2497 or 2455 or 2459 or 2460 or 2476 or 2489 or 2493 or 2495 or 2457 or 2498 or 2451 or 2500 or 2454 or 2456 or 2458 or 2461 or 2452 or 2468 or 2494 => difficulty switch { 1 => 1, 2 => 11, _ => 21 },
+        2467 or 2487 or 2480 or 2497 or 2455 or 2459 or 2460 or 2476 or 2489 or 2493 or 2495 or 2457 or 2498 or 2451 or 2500 or 2454 or 2456 or 2458 or 2461 or 2452 or 2468 or 2494 or 2453 or 2469 or 2481 => difficulty switch { 1 => 1, 2 => 11, _ => 21 },
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static int SourceBaseHp(int group) => group switch
     {
-        2480 or 2459 or 2493 or 2457 or 2500 or 2456 or 2452 => 3,
-        2474 or 2467 or 2487 or 2473 or 2497 or 2455 or 2460 or 2476 or 2489 or 2495 or 2498 or 2451 or 2454 or 2458 or 2461 or 2468 or 2494 => 4,
+        2480 or 2459 or 2493 or 2457 or 2500 or 2456 or 2452 or 2469 => 3,
+        2453 => 5,
+        2474 or 2467 or 2487 or 2473 or 2497 or 2455 or 2460 or 2476 or 2489 or 2495 or 2498 or 2451 or 2454 or 2458 or 2461 or 2468 or 2494 or 2481 => 4,
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static IReadOnlyList<ShanheStartingCard> ExpectedStartingCards(int group, int difficulty)
