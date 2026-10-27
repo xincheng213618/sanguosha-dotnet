@@ -2355,7 +2355,8 @@ public sealed partial class GameEngine
         if (features.FirstNonTargetSelection is
             {
                 Op: SkillProgramEffectOp.SelectAndMoveOwnedCard,
-                Condition.Kind: SkillProgramConditionKind.Always
+                Condition.Kind: SkillProgramConditionKind.Always,
+                SkipIfNoCards: false
             } payment)
         {
             var payer = payment.CardOwnerRef?.Kind switch

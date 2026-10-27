@@ -6,6 +6,12 @@ public static partial class StandardShanheCampaignCatalog
 {
     private static IReadOnlyList<ShanheCombatantDefinition> MixedOrdinaryMembers(int group, int tier) => group switch
     {
+        2464 =>
+        [
+            new(StandardShanheSourceDemonAssassinPackage.GetGeneralId(tier)),
+            new(StandardShanheSourceDemonArcherPackage.GetTrioGeneralId(tier)),
+            new(StandardShanheSourceDemonRaiderPackage.GetTrioGeneralId(tier))
+        ],
         2499 => StandardShanheSourceYulinOfficerPackage.GetRosterGeneralIds(tier)
             .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
         2465 =>
@@ -25,9 +31,9 @@ public static partial class StandardShanheCampaignCatalog
         var data = Source2026EnemyDataByGroup[group];
         var members = MixedOrdinaryMembers(group, tier).Select((member, index) =>
         {
-            var extraHand = data[index].TierAttributes.Where(t => t.DifficultyGroupId <= (tier + 4) / 5)
-                .Sum(t => t.Attributes.StartingCards);
-            var hpBonus = (third ? 4 : 3) + 2 * growth;
+            var attributes = data[index].TierAttributes.Where(t => t.DifficultyGroupId <= (tier + 4) / 5).Select(t => t.Attributes).ToArray();
+            var extraHand = attributes.Sum(a => a.StartingCards);
+            var hpBonus = (third ? 4 : 3) + 2 * growth + attributes.Sum(a => a.Hp);
             return member with
             {
                 Hp = data[index].Hp + hpBonus, MaxHpBonus = hpBonus, DrawBonus = third ? 2 : 1,

@@ -615,6 +615,8 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe source ordinary troops: real preview move opening projection", ShanheSourceOrdinaryTroopChecks.SourceAndLocalPreviewMoveAndStartUseOneProjectionAndRealOpeningEntities),
     ("Shanhe source mixed troops: complete member recipes and both recommended routes", ShanheSourceMixedTroopChecks.CompleteMixedSourceRecipesAndBothRecommendedRoutes),
     ("Shanhe source mixed troops: real opening grain and independent skill draws", ShanheSourceMixedTroopChecks.MixedPreviewMoveAndNativeOpeningKeepMembersAndSeparateSkillDraws),
+    ("Shanhe source Jielue: native regional gifts return before HP loss", ShanheSourceJielueChecks.ActualRegionsReturnThroughMovementChildrenBeforeHealthLossAndEmptyTargetsStillCharge),
+    ("Shanhe source demon archer: actual Youyan phases and Saogu ending payment", ShanheSourceDemonArcherChecks.GongqiAndActualDiscardTriggerYouyanButSaoguEndingReturnsWithoutIt),
     ("Shanhe source grain: actual fire loss and equipment sharing with true teammates", ShanheSourceGrainChecks.ActualFireDamageConsumesSourceGrainAndSushouSharesEquippedCardsOnlyWithTrueTeammates),
     ("Shanhe source White Horse: paid Xiying native bans and actual ending reward", ShanheSourceWhiteHorseChecks.PaidXiyingDiscardsBansNativeUseAndResponseAndRewardsAtActualEnding),
     ("Shanhe source Qianxi: real mount distance and original judgment hand prohibition", ShanheSourceQianxiChecks.RealHorseDistanceJudgmentRestrictsTheChosenTargetsBlackHand),

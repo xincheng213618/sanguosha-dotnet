@@ -12,8 +12,6 @@
           "movementDiscardOnly": true,
           "discardOwnerScope": "own",
           "sourceZones": ["hand", "equipment", "judgment"],
-          "usageScope": "phase",
-          "usageLimit": 1,
           "optional": true,
           "effects": [
             { "op": "youyanGainSuitCards", "target": "owner" }

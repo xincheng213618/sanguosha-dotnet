@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-jielue-1149",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "damage-other-obtain-each-region-then-lose-hp",
+          "window": "afterDamageApplied",
+          "subject": "damageSource",
+          "damageOccurrence": "perDamage",
+          "optional": false,
+          "condition": { "kind": "damageTargetIsOther" },
+          "effects": [
+            {
+              "op": "selectAndMoveOwnedCard", "target": "owner",
+              "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "eventTarget" },
+              "zones": ["hand"], "count": 1, "destination": "ownerHand",
+              "skipIfNoCards": true, "awaitMovementTriggers": true
+            },
+            {
+              "op": "selectAndMoveOwnedCard", "target": "owner",
+              "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "eventTarget" },
+              "zones": ["equipment"], "count": 1, "destination": "ownerHand",
+              "skipIfNoCards": true, "awaitMovementTriggers": true
+            },
+            {
+              "op": "selectAndMoveOwnedCard", "target": "owner",
+              "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "eventTarget" },
+              "zones": ["judgment"], "count": 1, "destination": "ownerHand",
+              "skipIfNoCards": true, "awaitMovementTriggers": true
+            },
+            { "op": "loseHp", "target": "owner", "amount": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

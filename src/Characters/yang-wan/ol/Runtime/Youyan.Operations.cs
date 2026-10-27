@@ -4,6 +4,7 @@ namespace CardGame.Core;
 // reads the window batch and takes one top card of every other suit.
 internal sealed class YouyanGainSuitCardsDescriptor : ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.YouyanGainSuitCards;
     public override ISkillProgramEffectHandler Handler { get; } = new YouyanGainSuitCardsHandler();
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards,

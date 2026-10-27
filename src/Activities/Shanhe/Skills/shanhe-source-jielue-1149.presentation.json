@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-jielue-1149": {
+      "name": "劫掠",
+      "description": "锁定技，当你对一名其他角色造成伤害后，你获得其区域里的各一张牌，然后失去1点体力。"
+    }
+  }
+}
