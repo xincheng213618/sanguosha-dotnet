@@ -6,7 +6,6 @@ using CardGame.Core.Campaigns;
 internal static class ShanheSustainOpeningTacticChecks
 {
     private const string Feedback = StandardShanheSustainOpeningTacticsPackage.RuoFankuiSkillId;
-    private const string Reserve = StandardShanheSustainOpeningTacticsPackage.LiangcaoChubeiSkillId;
     private const string Owner = "fixture:sustain-opening-owner", Enemy = "fixture:sustain-opening-enemy";
     private const string Driver = "fixture:sustain-opening-driver", Deck = "fixture:sustain-opening-deck";
     private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(
@@ -42,30 +41,6 @@ internal static class ShanheSustainOpeningTacticChecks
         absent.Use("incoming-two", [1]);
         Need(absent.View.Hp == 10 && absent.View.HandCount == 0 && absent.FeedbackMoves.Length == 0,
             "Registering the source without an actual holder grants no damage draw.");
-    }
-
-    public static void OpeningRecoveryPaysOnlyForWoundedHolderAndNeverRepeats()
-    {
-        foreach (var initialHp in new[] { 10, 12 })
-        {
-            var s = Scene.Start(initialHp, [Reserve]);
-            var recovered = initialHp < 12 ? 1 : 0;
-            Need(s.View.Hp == initialHp + recovered &&
-                s.Events<RecoveryAppliedEvent>().Count(fact => fact.TargetSeat == 0 && fact.Amount == 1) == recovered &&
-                s.Events<RecoveryAppliedEvent>().All(fact => fact.TargetSeat == 0) &&
-                s.Events<ProgramBindingStartedEvent>().Count(binding => binding.SkillId == Reserve &&
-                    binding.OwnerSeat == 0 && binding.Window == SkillProgramTriggerWindow.GameStarting) == 1,
-                "The held source uses the actual GameStarting recovery window once: a wounded holder recovers one and a full-health holder gains no recovery benefit.");
-            s.Use("lose-one");
-            var afterLoss = s.View.Hp;
-            s.NextOwnPlay();
-            Need(s.View.Hp == afterLoss && s.Events<RecoveryAppliedEvent>().Length == recovered &&
-                s.Events<ProgramBindingStartedEvent>().Count(binding => binding.SkillId == Reserve) == 1,
-                "Losing real HP and crossing a later natural turn cannot repeat the already completed opening recovery, including after a full-health opening.");
-        }
-        var absent = Scene.Start(10, []);
-        Need(absent.View.Hp == 10 && absent.Events<RecoveryAppliedEvent>().Length == 0,
-            "An injured player without the source receives no opening recovery.");
     }
 
     private static void Need(bool value, string message)

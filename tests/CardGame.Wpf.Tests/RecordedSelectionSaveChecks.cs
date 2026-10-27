@@ -17,7 +17,7 @@ internal static class RecordedSelectionSaveChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, checkpoint));
         using var model = new MainViewModel(false, game.Seed, true, store) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         var restored = Program.Engine(model);
         Program.Assert(restored.Revision == game.Revision && restored.CreateCheckpoint().ContentHash == registry.ContentHash &&
             Enumerable.Range(0, game.PlayerCount).All(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat)) == SnapshotJson.Serialize(restored.CreateSnapshot(seat))) &&

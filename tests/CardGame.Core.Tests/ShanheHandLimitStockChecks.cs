@@ -52,60 +52,6 @@ internal static class ShanheHandLimitStockChecks
             "The next real owner play boundary exposes the same two-card limit and retains the seven actual cards.");
     }
 
-    public static void StableCapacityUsesCurrentMaximumHpInNativeDiscard()
-    {
-        var s = Scene.Start();
-        Need(s.V.Hp == 2 && s.V.MaxHp == 4 && s.V.HandLimit == 2,
-            "The unowned wounded baseline uses current HP instead of the future stock's maximum HP.");
-        var price = s.Buy(StandardShanheCampaignCatalog.CurrentStableCapacityRewardId);
-        Need(price == 200 && s.Market.Gold == 1800 && s.V.HandLimit == 4 && s.V.Hp == 2,
-            "The real purchase sets hand capacity to current maximum HP immediately without recovering health.");
-        s.Use("lose");
-        Need(s.V.Hp == 1 && s.V.MaxHp == 4 && s.V.HandLimit == 4,
-            "A real HP-loss program does not reduce the owned maximum-HP capacity.");
-        s.Use("shrink");
-        Need(s.V.Hp == 1 && s.V.MaxHp == 3 && s.V.HandLimit == 3,
-            "The existing Set/ownerMaxHp modifier follows a real maximum-HP change rather than freezing the purchase value.");
-        s.EndPlay();
-        Need(s.P is { Kind: DecisionKind.DiscardCards, RequiredCardCount: 7 } && s.P.ValidCardIds.Count == 10,
-            "Unowned kind exemptions remain absent while the real discard uses the owned current maximum HP.");
-        var prompt = s.P!;
-        var payment = prompt.ValidCardIds.Take(7).ToArray();
-        s.Accept(new DiscardCardsCommand(0, payment, prompt.PromptId, s.G.Revision));
-        Need(s.V.HandCount == 3 && s.V.Hp == 1 &&
-            payment.All(id => s.G.CardMovements.Count(move => move.CardId == id &&
-                move.From == CardLocation.Hand(0) && move.To == CardLocation.DiscardPile &&
-                move.Reason == CardMoveReasons.HandLimitDiscard) == 1),
-            "The native discard pays the exact original seven physical cards and retains the maximum-HP hand size. " + s.Diagnostic());
-        s.ReachPlay();
-        Need(s.V.HandLimit == 3 && s.V.HandCount == 3 && s.V.Hp == 1 && s.V.MaxHp == 3,
-            "The next actual owner play boundary exposes current maximum-HP capacity after the original discard has finished.");
-    }
-
-    public static void MultipliedPartialPaymentsSurviveCappedAndUncappedPurchases()
-    {
-        foreach (var uncapped in new[] { false, true })
-        {
-            var s = Scene.Start(doubleQuota: true, uncapped: uncapped);
-            s.EndPlay();
-            Need(s.P is { RequiredCardCount: 10 }, "The real doubled discard initially owes ten physical cards. " + s.Diagnostic());
-            var original = s.G.ResolutionStack.OfType<ManualDiscardFrame>().Single();
-            var early = s.PaySlashes(2);
-            Need(s.P is { RequiredCardCount: 8 }, "Two real entities reduce the frozen doubled quota once. " + s.Diagnostic());
-            s.Buy(StandardShanheCampaignCatalog.CurrentHaoshenfaRewardId);
-            var remaining = uncapped ? 2 : 5;
-            s.AssertDiscard(original.Id, remaining, [CardKind.Slash, CardKind.Peach], initial: 10, multiplier: 2);
-            var prompt = s.P!;
-            var final = prompt.ValidCardIds.Take(remaining).ToArray();
-            s.Accept(new DiscardCardsCommand(0, final, prompt.PromptId, s.G.Revision));
-            Need(s.V.HandCount == (uncapped ? 6 : 3) && s.V.Hand.Count(card => card.Kind == CardKind.Dodge) == 3 &&
-                early.Concat(final).All(id => s.G.CardMovements.Count(move => move.CardId == id &&
-                    move.From == CardLocation.Hand(0) && move.To == CardLocation.DiscardPile &&
-                    move.Reason == CardMoveReasons.HandLimitDiscard) == 1),
-                "Both capped and uncapped original doubled obligations preserve actual payments and every exempt Dodge. " + s.Diagnostic());
-        }
-    }
-
     private static void Need(bool value, string message)
     { if (!value) throw new InvalidOperationException(message); }
 

@@ -356,7 +356,8 @@
                         <Button Content="山河图" Command="{Binding OpenShanheCommand}" Style="{StaticResource QuietButton}" Padding="10,8" />
                         <Button x:Name="ShanheMarketButton" Content="集市" Command="{Binding OpenShanheMarketCommand}" Style="{StaticResource QuietButton}" Padding="10,8" />
                         <Button Content="设置" Command="{Binding OpenSettingsCommand}" Style="{StaticResource QuietButton}" Padding="10,8" />
-                        <Button Content="保存" Command="{Binding SaveGameCommand}" ToolTip="保存到手动存档 · F5" Style="{StaticResource QuietButton}" />
+                        <Button Content="保存进度" Command="{Binding SaveGameCommand}" Visibility="{Binding IsShanheBattleSession, Converter={StaticResource BoolToVisibility}}" ToolTip="保存山河图进度，退出后从本关开头挑战 · F5" Style="{StaticResource QuietButton}" />
+                        <Button x:Name="EndShanheBattleButton" Content="结束征程" Command="{Binding EndShanheCommand}" Visibility="{Binding IsShanheBattleSession, Converter={StaticResource BoolToVisibility}}" Style="{StaticResource QuietButton}" />
                         <Button Content="新对局" Command="{Binding NewGameCommand}" Style="{StaticResource ToolbarButton}" Margin="12,0,0,0" Padding="15,8" />
                     </StackPanel>
                 </Grid>
@@ -1002,7 +1003,7 @@
                             <StackPanel VerticalAlignment="Center">
                                 <DockPanel LastChildFill="True">
                                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                                        <Button x:Name="RerollOpeningHandButton" Content="随 机" Command="{Binding RerollOpeningHandCommand}" Style="{StaticResource ToolbarButton}" Padding="16,5" ToolTip="将起手牌放回牌堆，重新随机同样数量的手牌" />
+                                        <Button x:Name="RerollOpeningHandButton" Content="随机换牌" Command="{Binding RerollOpeningHandCommand}" Style="{StaticResource ToolbarButton}" Padding="16,5" ToolTip="重新随机起手牌，山河图的随身牌与装备保留；满意后点击确定开局" />
                                         <Button x:Name="ChangeOpeningHandButton" Content="换 牌" Command="{Binding ToggleOpeningHandEditorCommand}" Style="{StaticResource ToolbarButton}" Padding="16,5" Margin="8,0" ToolTip="点选一张手牌，按牌名选择想换入的牌" />
                                         <Button x:Name="ConfirmOpeningHandButton" Content="确 定" Command="{Binding DismissOpeningDealCommand}" Style="{StaticResource PrimaryButton}" Padding="16,5" ToolTip="确认当前手牌，进入牌局" />
                                     </StackPanel>
@@ -1443,14 +1444,8 @@
                             <TextBlock Text="战 报" Foreground="#E5CCA0" FontFamily="KaiTi" FontSize="25" />
                         </DockPanel>
                         <StackPanel Grid.Row="1" Margin="0,12,0,16">
-                            <TextBlock xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Text="对 局 存 档" Foreground="#DCC491" FontSize="13" Margin="0,0,0,8" />
-                            <StackPanel xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Orientation="Horizontal">
-                                <Button Content="保存当前牌局" Command="{Binding SaveGameCommand}" Style="{StaticResource PrimaryButton}" Padding="12,7" />
-                                <Button Content="读取手动存档" Command="{Binding LoadManualGameCommand}" Style="{StaticResource ToolbarButton}" Padding="12,7" ToolTip="{Binding ManualSaveText}" x:Name="LoadManualSaveButton" />
-                            </StackPanel>
-                            <Button xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Content="恢复自动存档" Command="{Binding ContinueGameCommand}" Style="{StaticResource QuietButton}" HorizontalAlignment="Left" Margin="0,8,0,0" ToolTip="{Binding AutomaticSaveText}" />
-                            <TextBlock xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Text="{Binding SessionSaveStatus}" TextWrapping="Wrap" Foreground="#A7BCAC" FontSize="11" Margin="0,8,0,4" />
-                            <TextBlock xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Text="读取会替换当前牌局。手动存档独立保留。" Foreground="#7D9385" TextWrapping="Wrap" FontSize="10" />
+                            <TextBlock Text="本模式每次独立开局，完成后保留游戏记录。只有山河图保存可继续的征程。" Foreground="#A7BCAC" TextWrapping="Wrap" FontSize="11" />
+                            <Button Content="保存山河图征程" Command="{Binding SaveGameCommand}" Style="{StaticResource PrimaryButton}" Visibility="{Binding IsShanheBattleSession, Converter={StaticResource BoolToVisibility}}" Padding="12,7" HorizontalAlignment="Left" Margin="0,8,0,0" />
                         </StackPanel>
                         <TabControl Grid.Row="2">
                             <TabItem Header="对局记录">
@@ -1588,8 +1583,6 @@
                                     <TextBlock Text="续 接 战 局" FontFamily="KaiTi" FontSize="20" Foreground="#E6C58C" />
                                     <TextBlock Text="{Binding AutomaticSaveText}" Foreground="#BCA98A" FontSize="11" Margin="0,4,0,0" />
                                 </StackPanel>
-                                <Button Grid.Column="1" Content="继续上次对局" Command="{Binding ContinueGameCommand}" Style="{StaticResource PrimaryButton}" Visibility="{Binding HasAutomaticSave, Converter={StaticResource BoolToVisibility}}" VerticalAlignment="Center" Padding="16,8" />
-                                <Button Grid.Column="2" Content="读取手动存档" Command="{Binding LoadManualGameCommand}" Style="{StaticResource ToolbarButton}" Visibility="{Binding HasManualSave, Converter={StaticResource BoolToVisibility}}" VerticalAlignment="Center" Padding="12,8" ToolTip="{Binding ManualSaveText}" />
                             </Grid>
                         </Border>
                         <DockPanel Margin="4,0,4,8">
@@ -1674,8 +1667,6 @@
                             </StackPanel>
                         </Border>
                         <StackPanel Orientation="Horizontal" Margin="4,4,4,8" Visibility="{Binding IsWushuangModeSelection, Converter={StaticResource BoolToVisibility}}">
-                            <Button x:Name="WushuangContinueButton" Content="继续单骑无双" Command="{Binding ContinueWushuangCommand}" Style="{StaticResource ToolbarButton}" Visibility="{Binding HasWushuangSave, Converter={StaticResource BoolToVisibility}}" Padding="14,8" />
-                            <Button x:Name="WushuangLoadManualButton" Content="读取无双手动存档" Command="{Binding LoadWushuangManualGameCommand}" Style="{StaticResource QuietButton}" Visibility="{Binding HasWushuangManualSave, Converter={StaticResource BoolToVisibility}}" Padding="14,8" />
                         </StackPanel>
                         <StackPanel Visibility="{Binding IsClassicIdentityModeSelection, Converter={StaticResource BoolToVisibility}}">
                             <TextBlock Text="牌堆扩展" Foreground="#CFB985" FontSize="13" Margin="4,16,0,8" />
@@ -1801,7 +1792,7 @@
                         </Button>
                         <StackPanel>
                             <TextBlock Text="牌 局 设 置" FontFamily="KaiTi" FontSize="28" Foreground="#E8CA8D" />
-                            <TextBlock Text="声音与动画保存在本机，对局节奏随牌局存档恢复。" Foreground="#C2B297" FontSize="12" Margin="0,6,12,0" TextWrapping="Wrap" />
+                            <TextBlock Text="声音与动画保存在本机，对局节奏应用于当前牌局。" Foreground="#C2B297" FontSize="12" Margin="0,6,12,0" TextWrapping="Wrap" />
                         </StackPanel>
                     </DockPanel>
                     <ScrollViewer x:Name="SettingsContentScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly" Focusable="False" Margin="0,22,0,0" Padding="0,0,8,4" AutomationProperties.Name="游戏设置内容">
@@ -1842,7 +1833,7 @@
                             <Grid.ColumnDefinitions><ColumnDefinition Width="126" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
                             <StackPanel>
                                 <TextBlock Text="对局节奏" FontFamily="KaiTi" FontSize="20" Foreground="#DFC081" />
-                                <TextBlock Text="随当前存档恢复" Foreground="#BCA98A" FontSize="11" Margin="0,6,0,0" />
+                                <TextBlock Text="应用于当前牌局" Foreground="#BCA98A" FontSize="11" Margin="0,6,0,0" />
                             </StackPanel>
                             <StackPanel Grid.Column="1">
                                 <CheckBox x:Name="SettingsAutoAdvanceToggle" Content="自动推进其他角色行动" IsChecked="{Binding IsAutoAdvance}" Style="{StaticResource PreferencesCheckBox}" />
@@ -1871,9 +1862,9 @@
                                 <Border x:Name="SettingsSessionSaveError" Background="#382B22" BorderBrush="#A57D4D" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,10,0,0">
                                     <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed" /><Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding HasSaveError}" Value="True" /><Condition Binding="{Binding IsTutorialActive}" Value="False" /></MultiDataTrigger.Conditions><Setter Property="Visibility" Value="Visible" /></MultiDataTrigger></Style.Triggers></Style></Border.Style>
                                     <StackPanel>
-                                        <TextBlock Text="牌局存档" Foreground="#EAC78B" FontSize="12" />
+                                        <TextBlock Text="山河图存档" Foreground="#EAC78B" FontSize="12" />
                                         <TextBlock x:Name="SettingsSessionSaveStatus" Text="{Binding SessionSaveStatus}" Foreground="#F0D0A8" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0" />
-                                        <Button x:Name="SettingsSaveGameButton" Content="手动保存牌局" Command="{Binding SaveGameCommand}" Click="SettingsSaveGame_Click" Style="{StaticResource ToolbarButton}" Padding="10,5" Margin="0,8,0,0" HorizontalAlignment="Left" ToolTip="保存当前牌局和对局节奏，更新本局手动存档；声音与动画仍独立保存在本机。" AutomationProperties.Name="手动保存当前牌局和对局节奏" />
+                                        <Button x:Name="SettingsSaveGameButton" Content="保存山河图征程" Command="{Binding SaveGameCommand}" Click="SettingsSaveGame_Click" Style="{StaticResource ToolbarButton}" Padding="10,5" Margin="0,8,0,0" HorizontalAlignment="Left" ToolTip="重试保存山河图征程。" AutomationProperties.Name="保存山河图征程" />
                                     </StackPanel>
                                 </Border>
                             </StackPanel>

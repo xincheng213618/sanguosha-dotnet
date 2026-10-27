@@ -69,7 +69,6 @@ internal static class RuleQueryReducerChecks
             "Distance explanations must preserve outgoing and incoming stage identity instead of flattening Set/Add semantics.");
     }
 
-
     public static void StaticSetConflictsAreRejectedBeforePlay()
     {
         var sameValue = LoadPrograms("""
@@ -101,7 +100,6 @@ internal static class RuleQueryReducerChecks
                 exception.Message.Contains("fixture:set-right/future-hp", StringComparison.Ordinal),
             "Registry freeze must reject future conditional Set conflicts with both stable sources.");
     }
-
 
     public static void IsIndependentOfInputOrderAndRejectsOnlyWinningSetConflicts()
     {
@@ -135,8 +133,6 @@ internal static class RuleQueryReducerChecks
             "A winning Set conflict must be deterministic and identify sorted sources.");
     }
 
-
-
     public static void RejectsInvalidInputsAndFreezesOutput()
     {
         Throws<ArgumentNullException>(() => RuleQueryReducer.Reduce(0, new(0, 1), null!));
@@ -168,7 +164,6 @@ internal static class RuleQueryReducerChecks
         Throws<NotSupportedException>(() =>
             ((ICollection<RuleQueryContribution>)result.Contributions).Clear());
     }
-
 
     private static FiniteRuleQueryValue Finite(RuleQueryValue value) => value as FiniteRuleQueryValue ??
         throw new InvalidOperationException("Expected a finite query value.");

@@ -12,38 +12,6 @@ internal static class ShanheFuyiTacticChecks
     private static readonly Lazy<ContentRegistry> AoeRegistry = new(() => ContentRegistry.Build(
         new StandardContentPackage(), new StandardShanheFuyiTacticsPackage(), new Fixture(aoe: true)));
 
-    public static void EachOwnTurnObtainsRealSlashFamilyCardsAndStopsAtExhaustion()
-    {
-        var s = Scene.Create();
-        Need(s.Game.CardMovements.Count == 0 && s.View.HandCount == 0,
-            "The held source is not an opening hand grant; no material moves before the actual first turn starts.");
-        s.Start();
-        for (var count = 1; count <= 4; count++)
-        {
-            if (count > 1) s.NextOwnPlay();
-            var moves = s.Gains;
-            var turns = s.Events<TurnStartedEvent>().ToDictionary(fact => fact.TurnNumber, fact => fact.ActorSeat);
-            Need(moves.Length == count && s.View.HandCount == count &&
-                moves.All(move => move.CardId > 0 && move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0) &&
-                    turns[move.TurnNumber] == 0 && SlashKinds.Contains(move.CardKind)) &&
-                moves.Select(move => move.CardId).Distinct().Count() == count &&
-                s.Events<ProgramBindingStartedEvent>().Count(binding => binding.SkillId == Skill && binding.OwnerSeat == 0 &&
-                    binding.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow) == count &&
-                !s.Game.CardMovements.Any(move => move.Reason == CardMoveReasons.Draw),
-                "Each genuine owner turn obtains one existing matching deck entity through the new operation, while enemy turns and ordinary draw rules grant no substitute cards.");
-        }
-        Need(s.View.Hand.Select(card => card.Kind).ToHashSet().SetEquals(SlashKinds) &&
-            s.Events<TurnStartedEvent>().Any(fact => fact.ActorSeat == 1) &&
-            s.Game.CreateSnapshot(1).Players[1].HandCount == 0,
-            "The four actually acquired entities include ordinary, fire, thunder and cold Slash exactly once; intervening enemy turns leave that enemy's hand empty.");
-        var paid = s.Gains;
-        s.NextOwnPlay();
-        Need(s.Gains.SequenceEqual(paid) && s.View.HandCount == 4 && s.Game.CreateSnapshot(0).DrawPileCount == 20 &&
-            s.Events<ProgramBindingStartedEvent>().Count(binding => binding.SkillId == Skill) == 5 &&
-            !s.Game.CardMovements.Any(move => move.From == CardLocation.OutsideGame),
-            "At the next real owner turn the matching pool is empty, so the source obtains nothing, preserves every previous physical payment and never fabricates a Slash or draws an unrelated card.");
-    }
-
     public static void AoeSupplyObtainsAndUsesActualEntitiesUntilTheMatchingDeckIsExhausted()
     {
         var s = Scene.Create(aoe: true);

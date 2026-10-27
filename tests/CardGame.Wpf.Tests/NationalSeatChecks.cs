@@ -1,3 +1,4 @@
+using CardGame.Wpf.Persistence;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
@@ -150,8 +151,8 @@ internal static class NationalSeatChecks
         vm.ContinueFromIdentityRevealCommand.Execute(null);
         Require(!vm.IsIdentityRevealOpen && !vm.IsOpeningDealVisible && !vm.IsGeneralSelectionPending,
             "The real reveal controls must be reached after the startup overlays.");
-        vm.SaveGameCommand.Execute(null);
-        Require(vm.HasManualSave && !vm.HasSaveError, vm.SaveStatus);
+        LegacySaveFixtures.Save(vm);
+        Require(!vm.HasManualSave && !vm.HasSaveError, vm.SaveStatus);
         var originalGame = Program.Engine(vm);
         var window = new MainWindow(vm);
         var root = (FrameworkElement)window.Content;
@@ -163,7 +164,7 @@ internal static class NationalSeatChecks
             var command = originalButton.Command ?? throw new InvalidOperationException("The reveal button has no command.");
             Require(originalButton.IsEnabled && originalButton.Visibility == Visibility.Visible && originalButton.ActualHeight > 0,
                 "The secondary reveal parameter must come from a visible enabled button.");
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             var game = Program.Engine(vm);
             var current = vm.NationalRevealChoices.Single(choice => choice.Slot == retired.Slot);
             Require(!vm.HasSaveError && !ReferenceEquals(game, originalGame) && current == retired && !ReferenceEquals(current, retired),

@@ -29,7 +29,7 @@ internal static class IdentityConcealmentViewChecks
                 (own?hidden.GeneralId=="ol:xuan-gong-zhu":hidden.GeneralId=="concealment:ol" && hidden.GeneralName=="隐匿" && hidden.Skills is null or { Count:0 }),
                 "A real selected concealed identity supplies projected undefined HP to every viewer, with only owner knowing its real template.");
             var store=new MemorySaveStore();store.Write(GameSaveSlot.Manual,new(1,DateTimeOffset.UtcNow,false,game.CreateCheckpoint()));
-            using var model=new MainViewModel(false,7,true,store,useExpandedContent:false,contentRegistry:registry){IsMotionEnabled=false,IsSoundEnabled=false};model.LoadManualGameCommand.Execute(null);
+            using var model=new MainViewModel(false,7,true,store,useExpandedContent:false,contentRegistry:registry){IsMotionEnabled=false,IsSoundEnabled=false};LegacySaveFixtures.Load(model);
             var restored=Program.Engine(model);var seat=model.Seats.Single(s=>s.Seat==hidden.Seat);
             Program.Assert(seat.IdentityConcealed && seat.HpUndefined && seat.IsAlive && seat.HpText.Contains("未定义",StringComparison.Ordinal) && !seat.HealthImages.Any() &&
                 seat.Portrait.GeneralId==hidden.GeneralId && !model.HumanSummary.Contains("0/0",StringComparison.Ordinal) &&

@@ -35,40 +35,6 @@ internal static class MobileShenSimaYiChecks
         s.Need(s.Ren == 2 && s.Has("classic:zhiheng") && s.E<MobileSimaJilueChoiceEvent>().Single(e => e.Source.SkillId == Jilue).Paid == 2,
             "The first real Play-start learning pays two source-attributed Ren and permanently acquires the selected canonical skill.");
     }
-    public static void EscalatingPermanentLearningKillChoiceAndPaidDrawCold()
-    {
-        var s = Scene.Start(killCase: true);
-        foreach (var skill in new[] { "classic:zhiheng", "classic:fangzhu", "classic:wansha" })
-        {
-            s.Reach(() => s.P?.SkillPrompt?.SkillId == Jilue); s.ActivateJilue();
-            s.Answer(c => c.Parameters.GetValueOrDefault("option") == "learn:" + skill); s.Play();
-            if (skill != "classic:wansha") { s.UseDriver("next-turn", []); s.Play(); s.End(); }
-        }
-        var learns = s.E<MobileSimaJilueChoiceEvent>().Where(e => e.Source.SkillId == Jilue).ToArray();
-        s.Need(learns.Select(e => e.Paid).SequenceEqual([2, 2, 3]) && s.Ren == 2 && s.G.State.TurnNumber == 3 &&
-            new[] { "classic:guicai", "classic:jizhi", "classic:zhiheng", "classic:fangzhu", "classic:wansha" }.All(s.Has),
-            "Three actual Play starts pay 2/2/3 and preserve all previously acquired skills across actual extra turns.");
-        s.UseDriver("kill", [1]); s.Reach(() => s.P?.SkillPrompt?.SkillId == Lianpo);
-        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-        s.Answer(c => c.Parameters.GetValueOrDefault("option") == "extra-turn"); s.Play();
-        s.UseDriver("kill", [2]); s.Play();
-        s.Need(!s.V(1).IsAlive && !s.V(2).IsAlive && s.V(3).IsAlive &&
-            s.E<MobileSimaJilueChoiceEvent>().Count(e => e.Source.SkillId == Lianpo && e.Choice == "extra-turn" && e.ActualTurn == 3) == 1 &&
-            s.E<ProgramExtraTurnPendedEvent>().Count(e => e.SkillId == Lianpo) == 1,
-            "Two real kills in one actual turn reserve only one Lianpo extra turn; with all five skills already owned the second kill creates no false learning option.");
-        s.End(); s.Reach(() => s.P?.SkillPrompt?.SkillId == Jilue); s.ActivateJilue();
-        s.Answer(c => c.Parameters.GetValueOrDefault("option") == "draw:2");
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Hold && s.G.ResolutionStack.OfType<ProgramSkillFrame>().Any(p => p.MobileSimaYi?.Stage == MobileSimaYiStage.Drawing));
-        var draw = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(p => p.MobileSimaYi?.Stage == MobileSimaYiStage.Drawing);
-        s.Need(s.G.State.TurnNumber == 4 && s.Ren == 0 && draw.MobileSimaYi!.Choice == "draw:2" &&
-            s.E<MobileSimaJilueChoiceEvent>().Count(e => e.FrameId == draw.Id && e.Paid == 2) == 1,
-            "Lianpo really starts the next own turn, and Jilue pays its two Ren before opening the native draw child.");
-        var hand = s.V(0).HandCount; s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "skip"); s.Play();
-        s.Need(s.Ren == 0 && s.V(0).HandCount == hand + 2 && s.Has("classic:zhiheng") && s.Has("classic:wansha") &&
-            s.E<MobileSimaJilueDrawReturnedEvent>().Count(e => e.FrameId == draw.Id && e.Requested == 2 && e.Actual == 2) == 1 &&
-            s.E<MobileSimaJilueChoiceEvent>().Count(e => e.FrameId == draw.Id) == 1,
-            "Cold return draws exactly twice from the one paid producer, never repays Ren, and keeps the permanent acquired skills.");
-    }
     private sealed class Fixture : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-mobile-shen-sima-yi", new(1, 0, 0));

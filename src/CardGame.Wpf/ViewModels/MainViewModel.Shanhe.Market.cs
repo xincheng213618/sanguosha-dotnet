@@ -24,8 +24,7 @@ public sealed partial class MainViewModel
     {
         "技能" => CurrentShanheMarketState is { } state
             ? $"额外技能 {state.ExtraSkillIds.Count}/{state.ExtraSkillSlots} · 满槽可替换" : "额外技能 · 满槽可替换",
-        "装备" => IsShanheBattleActive ? "购买即加入手牌" : ShanheStartingResourcesExpireOnUse
-            ? "每战开局获得装备牌" : "每战开局装备",
+        "装备" => IsShanheBattleActive ? "本场购买即加入手牌，后续每战开局直接装备" : "每战开局直接置入装备区",
         "卡牌" => IsShanheBattleActive ? "购买即加入手牌" : "每战开局获得随身牌",
         _ => "战法持续本次征程，不占技能槽"
     };

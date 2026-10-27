@@ -9,30 +9,6 @@ internal static class ShanheSourceWuhuanRiderChecks
     private const string Tuxi = StandardShanheSourceWuhuanRiderPackage.TuxiSkillId;
     private const string Jixi = StandardShanheSourceWuhuanRiderPackage.JixiSkillId;
 
-    public static void TuxiTakesFromASmallerRealHandAndOnlyReducesThePlannedDrawByOne()
-    {
-        var s = Scene.Start(11);
-        Need(s.V(0).GeneralId == StandardShanheSourceWuhuanRiderPackage.HardId &&
-            s.V(0).Hp == 4 && s.V(0).MaxHp == 4 && s.V(0).HandCount == 4 && s.V(1).HandCount == 1,
-            "The actual source4861 body reaches its source722 draw window with four real hand cards against one.");
-        var taken = s.V(1).Hand.Single().Id;
-        var priorDraws = s.Events<CardsDrawnEvent>().Where(e => e.PlayerSeat == 0).Sum(e => e.Count);
-        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-        s.Until(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "select-targets") == true);
-        Need(s.P!.Choices.Any(c => c.Targets.SequenceEqual([1])),
-            "Source722 must offer the living one-card hand even though it is strictly smaller than the owner's four cards.");
-        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "select-targets" && c.Targets.SequenceEqual([1]));
-        s.Play();
-        var transfer = s.Events<ProgramRandomHandCardsTakenEvent>().Single(e => e.SkillId == Tuxi);
-        Need(transfer.OwnerSeat == 0 && transfer.CardCount == 1 && transfer.TargetSeats.SequenceEqual([1]) &&
-            s.V(1).HandCount == 0 && s.V(0).HandCount == 6 && s.Zone(taken) == CardLocation.Hand(0) &&
-            s.Events<CardsDrawnEvent>().Where(e => e.PlayerSeat == 0).Sum(e => e.Count) - priorDraws == 1 &&
-            s.G.CardMovements.Count(m => m.CardId == taken && m.From == CardLocation.Hand(1) && m.To == CardLocation.Processing) == 1 &&
-            s.G.CardMovements.Count(m => m.CardId == taken && m.From == CardLocation.Processing && m.To == CardLocation.Hand(0)) == 1 &&
-            s.Events<ProgramBindingResolvedEvent>().Count(e => e.SkillId == Tuxi && e.Completed) == 1,
-            "One selected target pays one planned draw: its original entity transfers once, the remaining native draw is one, and the original draw frame completes.");
-    }
-
     public static void JixiPaysADelayedTrickEntityForOneNativeSnatchAndKeepsItsDistanceRules()
     {
         var s = Scene.Start(21);

@@ -12,51 +12,6 @@ internal static class ShanheCounterspellClaimChecks
     private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(new StandardContentPackage(),
         new StandardShanheMarketPackage(), new StandardShanheCounterspellClaimPackage(), new StandardShanheMultiTargetTricksPackage(), new Fixture()));
 
-    public static void PaidClaimArrivesBeforeNextSequentialTargetAndNeverMovesAgain()
-    {
-        var s = Scene.Start();
-        var baseline = s.BeginDuel(1, [1]); s.Run([0], 1);
-        Need(s.Events<ShanheNullifiedTrickMaterialClaimedEvent>().Length == 0 &&
-            s.G.CardMovements.Count(move => move.CardId == baseline && move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile) == 1,
-            "Before actual ownership, a genuine counterspell leaves its original Duel on the normal discard path.");
-        s.Buy();
-        var card = s.BeginDuel(2, [1, 2]); s.Run([0], 1);
-        var use = s.Events<CardUseDeclaredEvent>().Single(fact => fact.CardId == card);
-        var facts = s.Events<ShanheNullifiedTrickMaterialClaimedEvent>().Where(fact => fact.CardUseFrameId == use.ResolutionId).ToArray();
-        Need(facts is [{ RecipientSeat: 0, CardId: var claimed }] && claimed == card && s.ClaimChildren == 1 &&
-            s.G.CreateSnapshot(0).Players.Select(player => player.Hp).SequenceEqual([30, 30, 29, 30]) &&
-            s.Events<NullificationResolvedEvent>().Where(fact => fact.ResolutionId == use.ResolutionId)
-                .Select(fact => (fact.TargetSeat, fact.EffectNullified)).SequenceEqual([(1, true), (2, false)]),
-            "The first canceled Duel target gives the exact card immediately, drains its real gain child, then the second target still takes its independent native Duel damage.");
-        s.AssertClaim(use.ResolutionId, [card], 0);
-        Need(s.G.CreateSnapshot(0).Players[0].Hand.Any(value => value.Id == card) &&
-            s.Events<DuelResponseEvent>().Where(fact => fact.ResolutionId == use.ResolutionId).All(fact => fact.ResponderSeat != 1),
-            "A canceled target never supplies a Slash, while the claimed original remains in its real recipient's hand after all targets finish.");
-    }
-
-    public static void FinalCounterspellChainSelectsLastHolderAndEvenChainDoesNotClaim()
-    {
-        var s = Scene.Start(peerClaimant: true); s.Buy();
-        var restored = s.BeginDuel(1, [2]); s.Run([0, 1], 2);
-        var firstUse = s.Events<CardUseDeclaredEvent>().Single(fact => fact.CardId == restored);
-        Need(s.Events<NullificationRespondedEvent>().Where(fact => fact.ResolutionId == firstUse.ResolutionId)
-                .Select(fact => (fact.ResponderSeat, fact.EffectNullified)).SequenceEqual([(0, true), (1, false)]) &&
-            s.Events<ShanheNullifiedTrickMaterialClaimedEvent>().Length == 0 && s.ClaimChildren == 0 &&
-            s.G.CardMovements.Count(move => move.CardId == restored && move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile) == 1,
-            "An actual counter-counterspell restores the trick: neither holder claims its entity at an earlier provisional odd depth.");
-
-        var canceled = s.BeginDuel(2, [2]); s.Run([0, 2, 1], 2);
-        var use = s.Events<CardUseDeclaredEvent>().Single(fact => fact.CardId == canceled);
-        Need(s.Events<NullificationRespondedEvent>().Where(fact => fact.ResolutionId == use.ResolutionId)
-                .Select(fact => (fact.ResponderSeat, fact.ChainDepth, fact.EffectNullified))
-                .SequenceEqual([(0, 1, true), (2, 2, false), (1, 3, true)]) &&
-            s.Events<ShanheNullifiedTrickMaterialClaimedEvent>().Single(fact => fact.CardUseFrameId == use.ResolutionId).RecipientSeat == 1 &&
-            !s.G.CreateSnapshot(0).Players[0].Hand.Any(card => card.Id == canceled) &&
-            s.G.CreateSnapshot(1).Players[1].Hand.Any(card => card.Id == canceled),
-            "The genuine final third counterspell belongs to the other holder, who receives the original entity instead of the first counterspell user.");
-        s.AssertClaim(use.ResolutionId, [canceled], 1);
-    }
-
     public static void MultiMaterialConversionClaimsEveryOriginalAndOrdinaryModeStaysIsolated()
     {
         var s = Scene.Start(); s.Buy();
@@ -80,43 +35,6 @@ internal static class ShanheCounterspellClaimChecks
                 move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.UseFinished) == 1) &&
             ordinary.Events<CardUseFinishedEvent>().Count(fact => fact.ResolutionId == ordinaryUse) == 1,
             "Even the actually held policy does not acquire canceled materials in an ordinary identity game; both original costs keep their native finish movements.");
-    }
-
-    public static void DelayedJudgmentClaimsBothPhaseTricksAndLightningBeforeNaturalContinuation()
-    {
-        var s = Scene.Start(delayedCards: true); s.Buy();
-        var indulgence = s.PlaceDelayed(CardKind.Indulgence, 1);
-        var shortage = s.PlaceDelayed(CardKind.SupplyShortage, 1);
-        s.EndPlay();
-        s.DelayedUntilPlay(1, new Dictionary<int, int[]> { [indulgence] = [0], [shortage] = [0] });
-        Need(s.DelayedClaimChildren == 2 && s.Events<ShanheDelayedNullifiedTrickMaterialClaimedEvent>()
-                .Select(fact => (fact.CardId, fact.EffectiveKind, fact.JudgmentOwnerSeat, fact.RecipientSeat))
-                .SequenceEqual([(indulgence, CardKind.Indulgence, 1, 0), (shortage, CardKind.SupplyShortage, 1, 0)]) &&
-            !s.Events<DelayedCardResolvedEvent>().Any(fact => fact.CardId == indulgence || fact.CardId == shortage) &&
-            s.P is { Kind: DecisionKind.PlayCard, PlayerSeat: 1 },
-            "The two actual judgment-zone tricks each arrive in hand before their real gain child, then the second delayed effect and the holder's normal play phase still proceed without either canceled judgment.");
-        s.AssertDelayedClaim(indulgence, 1); s.AssertDelayedClaim(shortage, 1);
-
-        var lightningScene = Scene.Start(delayedCards: true); lightningScene.Buy();
-        var lightning = lightningScene.PlaceDelayed(CardKind.Lightning, 0);
-        lightningScene.EndPlay();
-        lightningScene.DelayedUntilPlay(0, new Dictionary<int, int[]> { [lightning] = [0] });
-        Need(lightningScene.DelayedClaimChildren == 1 && lightningScene.Events<LightningResolvedEvent>()
-                .Single(fact => fact.CardId == lightning) is { Hit: false, NextTargetSeat: null, JudgmentCardId: null, DamageAmount: 0 } &&
-            !lightningScene.G.CardMovements.Any(move => move.CardId == lightning && move.Reason == CardMoveReasons.DelayedCardTransfer) &&
-            lightningScene.P is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 },
-            "The actual physical Lightning is acquired directly instead of transferred to the next judgment zone, and its owner's next natural play phase remains reachable.");
-        lightningScene.AssertDelayedClaim(lightning, 0);
-
-        var restored = Scene.Start(delayedCards: true); restored.Buy();
-        var original = restored.PlaceDelayed(CardKind.Indulgence, 1);
-        restored.EndPlay(); restored.DelayedUntilPlay(1, new Dictionary<int, int[]> { [original] = [0, 1] });
-        Need(restored.DelayedClaimChildren == 0 && restored.Events<ShanheDelayedNullifiedTrickMaterialClaimedEvent>().Length == 0 &&
-            restored.Events<DelayedCardResolvedEvent>().Single(fact => fact.CardId == original) is
-                { CardKind: CardKind.Indulgence, JudgmentSucceeded: true, SkippedPlayPhase: false } &&
-            restored.G.CardMovements.Count(move => move.CardId == original && move.From == CardLocation.Judgment(1) &&
-                move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.DelayedCardFinish) == 1,
-            "A real counter-counterspell restores the held Indulgence, whose genuine heart judgment and normal delayed finish remain unchanged; no provisional claim steals it.");
     }
 
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }

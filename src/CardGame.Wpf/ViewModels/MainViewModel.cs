@@ -389,7 +389,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private bool NewGame()
     {
         if (!_initializing && (IsWushuangTable || IsWushuangModeSelection) && !FlushPendingSave()) return false;
-        SaveShanheBeforeOrdinaryGame();
+        if (!SaveShanheBeforeOrdinaryGame()) return false;
         if (!_initializing) ResetPersistenceMessage();
         // A predictable seed would let a modified client reconstruct every hidden
         // role and card. Tests inject fixed seeds; ordinary local games use entropy.
@@ -873,7 +873,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 DeferredPileTooltip = PublicStateTooltip(player),
                 HasAlcoholEffect = player.HasAlcoholEffect,
                 StatusBadges = ProjectSeatStatuses(player),
-                WushuangTactics = (player.WushuangTacticIds ?? []).Select(id => new WushuangTacticViewModel(id)).ToArray(),
+                WushuangTactics = BuildTableTacticBadges(player),
                 SkillName = player.IdentityConcealed && !player.IsHuman ? string.Empty : IsNationalSnapshot
                     ? $"{VisibleSkillNames(player.Skills)} / {VisibleSkillNames(player.SecondarySkills)}"
                     : VisibleSkillNames(WenheDisplaySkills(player)),
@@ -2292,7 +2292,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             IsAutoAdvance = false;
             if (_game.IsFaulted) CanStepAi = false;
             PromptText = _game.IsFaulted
-                ? "牌局结算异常，已停止推进。请读取此前存档恢复。"
+                ? IsShanheBattleSession ? "征程战斗结算异常，已停止推进。可重新进入山河图读取已保存的进度。" : "牌局结算异常，已停止推进。请重新开始对局，异常报告已保留。"
                 : $"操作未执行：{exception.Message}";
             ActionHint = $"{PromptText} {_exceptionReportStatus}";
         }

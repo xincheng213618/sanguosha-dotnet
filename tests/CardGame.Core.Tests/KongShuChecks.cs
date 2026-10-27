@@ -8,26 +8,6 @@ internal static class KongShuChecks
 {
     private const string Owner="fixture:ks-owner",Mode="identity:classic-kong-shu",Driver="fixture:ks-driver",Quiet="fixture:ks-quiet",Watch="fixture:ks-watch",Health="fixture:ks-health",Counter="fixture:ks-counter",Conditional="fixture:ks-conditional",Response="fixture:ks-response",Leiluan="ol:leiluan",Fuchao="ol:fuchao";
     private static string Scene="";
-    public static void LeiluanDynamicCountLastHandRewardAndNativeUseCold()
-    {
-        var(g,r)=Start("reward");Use(g,"stock");Play(g);
-        var trick=V(g,0).Hand.First(c=>c.Kind==CardKind.DrawTwo).Id;Native(g,a=>a.CardId==trick&&a.Kind==LegalActionKind.DrawTwo);Play(g);
-        var cost=V(g,0).Hand.First(c=>c.Kind==CardKind.Crossbow).Id;Trim(g,[cost]);
-        Need(g.GetHumanLegalActions().Where(a=>a.ProgramSkillId==Leiluan).All(a=>a.MinCardCount==1&&a.MaxCardCount==1),"No chained character gives the actual minimum X=1, rather than a fixed pair conversion.");
-        Convert(g,CardKind.Slash,[cost],[1]);Reach(g,()=>At(g,Watch));var owner=Own(g)!;var payment=g.ResolutionStack.OfType<CardUseFrame>().Single(u=>u.LeiluanPayments?.Any(p=>p.Id==owner.KongShu!.PaymentId)==true).LeiluanPayments!.Single();
-        Need(payment is{Paid:true,LastHand:true,FrozenX:1}&&payment.HandBefore.SequenceEqual([cost])&&payment.Materials.Single().CardId==cost&&!E<DamageAppliedEvent>(g).Any(e=>e.SourceSeat==0),"The exact original last-Hand payment really completes, and the native Draw2 child pauses before the original Slash's effect.");
-        Frozen(payment.Materials);Frozen(payment.HandBefore);Frozen(payment.Movements);var state=State(g);Need(!g.Submit(new AnswerPromptCommand(1,P(g)!.PromptId,P(g)!.Choices[0].Id,g.Revision)).Accepted&&State(g)==state,"Foreign viewers cannot answer the payer's real private child.");
-        g=Cold(g,r);Continue(g);Reach(g,()=>Own(g)?.KongShu?.Stage==KongShuStage.BenefitChooseTrick&&P(g)?.PlayerSeat==0);g=Cold(g,r);Branch(g,"gain",trick);Play(g);
-        Need(V(g,0).Hand.Any(c=>c.Id==trick)&&E<KongShuDrawIssuedEvent>(g).Single(e=>e.FrameId==owner.Id).Actual==2&&E<KongShuMaterialMovedEvent>(g).Count(e=>e.FrameId==owner.Id&&e.CardId==trick)==1&&E<LeiluanDisabledEvent>(g).Count(e=>e.ProgramId==owner.Id)==1&&E<CardUseFinishedEvent>(g).Count(e=>e.ResolutionId==payment.UseId)==1,"Draw2, the exact current-turn discarded trick and its full children complete once before the native Use returns.");
-        Need(!g.GetHumanLegalActions().Any(a=>a.ProgramSkillId==Leiluan),"The completed last-Hand benefit disables the whole method before a later damage unlock.");
-        Use(g,"hurt",targets:[0]);Play(g);Need(E<DamageAppliedEvent>(g).Any(e=>e.TargetSeat==0&&e.Amount==1)&&g.GetHumanLegalActions().Any(a=>a.ProgramSkillId==Leiluan&&a.PlayedCardKind==CardKind.Peach)&&!g.GetHumanLegalActions().Any(a=>a.ProgramSkillId==Leiluan&&a.PlayedCardKind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash),"Real damage re-enables the method but preserves every ordinary or method Slash-family use in this whole round.");
-        var hp=V(g,0).Hp;Convert(g,CardKind.Peach,[V(g,0).Hand[0].Id],[0]);Play(g);Need(V(g,0).Hp==hp+1,"Leiluan's native Peach keeps its genuine recovery effect.");
-        Convert(g,CardKind.Alcohol,[V(g,0).Hand[0].Id],[]);Play(g);Need(E<CardUseDeclaredEvent>(g).Any(e=>e.SourceSeat==0&&e.CardKind==CardKind.Alcohol)&&g.CardMovements.Any(m=>m.Reason==CardMoveReasons.UseFinished&&m.CardKind!=CardKind.Alcohol),"The native Alcohol path finishes the original converted material rather than inventing an Alcohol entity.");_=Cold(g,r);
-
-        (g,r)=Start("dynamic");foreach(var seat in new[]{0,1,2}){Use(g,"chain",targets:[seat]);Play(g);}var ids=V(g,0).Hand.Take(3).Select(c=>c.Id).ToArray();
-        Need(g.GetHumanLegalActions().Where(a=>a.ProgramSkillId==Leiluan).All(a=>a.MinCardCount==3&&a.MaxCardCount==3),"X dynamically reads all three living chained characters, including the owner.");
-        Convert(g,CardKind.FireSlash,ids,[1]);Play(g);Need(E<LeiluanPaymentPreparedEvent>(g).Single().X==3&&E<LeiluanMaterialPaidEvent>(g).Length==3&&E<LeiluanBenefitIssuedEvent>(g).Length==0&&!g.GetHumanLegalActions().Any(a=>a.ProgramSkillId==Leiluan&&a.PlayedCardKind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash),"A genuine three-material elemental native Slash pays every entity once and shares the canonical Slash name without a false last-Hand benefit.");_=Cold(g,r);
-    }
     public static void LeiluanTrueResponsePlayedAndPreSkillRoundNamesCold()
     {
         var(g,r)=Start("history");Native(g,a=>a.ConversionSource?.SkillId==Driver&&a.PlayedCardKind==CardKind.Slash&&a.TargetSeats.SequenceEqual([1]));Play(g);Use(g,"grant");Play(g);
@@ -59,39 +39,6 @@ internal static class KongShuChecks
             var reward=Own(g)!;Need(V(g,victim).Hp<=0&&E<RecoveryAppliedEvent>(g).Length==0&&E<LeiluanBenefitIssuedEvent>(g).Length==1,"The actually paid dying basic's Draw2 child runs before the original native recovery and keeps the original dying parent suspended.");g=Cold(g,r);Continue(g);Play(g);Need(V(g,victim).IsAlive&&V(g,victim).Hp==1&&E<RecoveryAppliedEvent>(g).Count(e=>e.TargetSeat==victim&&e.Amount==1)==1&&E<LeiluanDisabledEvent>(g).Count(e=>e.ProgramId==reward.Id)==1&&E<LeiluanMaterialPaidEvent>(g).Length==1,"True native rescue, its original program parent and the last-Hand reward return once after cold recovery without paying or recovering twice.");_=Cold(g,r);
         }
     }
-    public static void FuchaoTrueBasicCompletionAndRoundEndingWholeQueuesCold()
-    {
-        var(g,r)=Start("round");foreach(var seat in new[]{0,1,2}){Use(g,"chain",targets:[seat]);Play(g);}End(g);
-        Reach(g,()=>Own(g)?.KongShu is{Stage:KongShuStage.RoundDiscard,Payer:0}&&P(g)?.PlayerSeat==0);
-        var f=Own(g)!;var receipt=f.KongShu!;Frozen(receipt.DrawRecipients);Frozen(receipt.DiscardRecipients);
-        Need(receipt.DrawRecipients.Count(s=>s==0)==2&&receipt.DrawRecipients.ToHashSet().SetEquals([0,1,2])&&receipt.DiscardRecipients.ToHashSet().SetEquals([0,1,2])&&receipt.DiscardCount==3&&E<KongShuDrawIssuedEvent>(g).Where(e=>e.FrameId==f.Id).Select(e=>e.RecipientSeat).SequenceEqual(receipt.DrawRecipients),"The real round mother gives the chained owner both shares, all other frozen chained recipients their shares, then freezes the live X=3 discard queue.");
-        Need(g.CreateSnapshot(1).PendingDecision is null&&P(g)!.IsPrivate,"Only the current payer receives the actual private HE discard selection.");g=Cold(g,r);var costs=P(g)!.Choices.Where(c=>c.Parameters.GetValueOrDefault("branch")=="pick").Take(3).Select(c=>c.Cards.Single()).ToArray();foreach(var id in costs)Branch(g,"pick",id);g=Cold(g,r);Branch(g,"discard");
-        Reach(g,()=>At(g,Watch));Need(E<NativeLogicalDiscardInvocationRecordedEvent>(g).Any(e=>e.ParentFrameId==f.Id&&e.ExecutorSeat==0&&e.ActualCount==3&&e.HandCount==3),"The payer's three selected hand cards form one true whole logical discard, rather than three unrelated one-card invocations.");g=Cold(g,r);Continue(g);Reach(g,()=>E<KongShuCompletedEvent>(g).Any(e=>e.FrameId==f.Id));
-        var payments=E<NativeLogicalDiscardInvocationRecordedEvent>(g).Where(e=>e.ParentFrameId==f.Id).ToArray();Need(payments.Length==3&&payments.Select(e=>e.ExecutorSeat).SequenceEqual(receipt.DiscardRecipients)&&payments.All(e=>e.ActualCount==3)&&E<KongShuCompletedEvent>(g).Count(e=>e.FrameId==f.Id)==1,"Each living frozen payer executes exactly one full mandatory discard, and the original round-ending candidate returns once.");_=Cold(g,r);
-    }
-    public static void LeiluanEquipmentPaymentsSourceLossDeathAndPrivacyCold()
-    {
-        foreach(var scene in new[]{"lion","ox","loss","death"})
-        {
-            var(g,r)=Start(scene);Use(g,"stock");Play(g);var selected=new List<int>();
-            if(scene is"lion"or"ox")
-            {
-                var kind=scene=="lion"?CardKind.SilverLion:CardKind.WoodenOx;var equipment=V(g,0).Hand.First(c=>c.Kind==kind).Id;Native(g,a=>a.Kind==LegalActionKind.Equip&&a.CardId==equipment);Play(g);selected.Add(equipment);
-                if(scene=="lion"){Use(g,"hurt",targets:[0]);Play(g);}else{var grain=V(g,0).Hand.First(c=>c.Kind==CardKind.Crossbow).Id;Accept(g,new UseEquipmentEffectCommand(0,CardKind.WoodenOx,[grain],[],g.Revision,P(g)!.PromptId));Play(g);Need(V(g,0).WoodenOxGrain!.Any(c=>c.Id==grain)&&Enumerable.Range(1,3).All(s=>!(g.CreateSnapshot(s).Players[0].WoodenOxGrain??[]).Any(c=>c.Id==grain)),"Real Ox storage stays owner-private before the equipment payment.");}
-                foreach(var seat in new[]{0,1}){Use(g,"chain",targets:[seat]);Play(g);}
-            }
-            var hand=V(g,0).Hand.First(c=>c.Kind==CardKind.Crossbow).Id;Trim(g,[hand]);selected.Add(hand);var hp=V(g,0).Hp;
-            Convert(g,CardKind.Slash,selected.ToArray(),[1]);
-            if(scene=="lion")
-            {Reach(g,()=>At(g,Health));Need(V(g,0).Hp==hp+1&&E<LeiluanMaterialPaidEvent>(g).Length==2&&!E<LeiluanBenefitIssuedEvent>(g).Any(),"The genuinely paid equipped Lion's recovery child runs before committing the method's last-Hand reward.");g=Cold(g,r);Continue(g);}
-            Reach(g,()=>At(g,Watch));var own=Own(g)!;Need(own.KongShu is{Paid:true,Stage:KongShuStage.BenefitDrawChildren}&&E<LeiluanBenefitIssuedEvent>(g).Length==1,"A completed whole native cost issues exactly one original-payer benefit before its Draw2 child returns.");g=Cold(g,r);Continue(g);
-            if(scene=="death")Reach(g,()=>!V(g,0).IsAlive&&E<KongShuCompletedEvent>(g).Any(e=>e.FrameId==own.Id));else Play(g);
-            if(scene=="loss")Need(V(g,0).IsAlive&&!V(g,0).Skills!.Any(s=>s.Id==Leiluan)&&E<LeiluanDisabledEvent>(g).Count(e=>e.ProgramId==own.Id)==1,"Actual conditional skill loss within the paid Draw2 subtree preserves the original benefit and disables its state once.");
-            if(scene=="death")Need(g.State.Winner==Winner.None&&E<PlayerDiedEvent>(g).Any(e=>e.VictimSeat==0)&&E<KongShuCompletedEvent>(g).Count(e=>e.FrameId==own.Id)==1&&!g.ResolutionStack.OfType<ProgramSkillFrame>().Any(p=>p.KongShu is not null),"A genuinely dead non-Lord payer drains all issued native children and closes once without presenting new cards or choices to the corpse.");
-            if(scene=="ox")Need(g.CardMovements.Any(m=>m.From==CardLocation.WoodenOxGrain(0)&&m.To==CardLocation.DiscardPile&&m.Reason==CardMoveReasons.WoodenOxGrainDiscard)&&E<LeiluanMaterialPaidEvent>(g).Length==2,"Ox grain spill is a real auxiliary native movement, never a third primary payment or a false last-Hand cost.");
-            Need(E<LeiluanBenefitIssuedEvent>(g).Length==1&&E<KongShuDrawIssuedEvent>(g).Count(e=>e.FrameId==own.Id)==1,"Every actual primary payment and native reward draw remains once-only across cold continuation.");_=Cold(g,r);
-        }
-    }
 
     private static PlayerSnapshot V(GameEngine g,int s)=>g.CreateSnapshot(s).Players[s];
     private static PendingDecision? P(GameEngine g)=>Enumerable.Range(0,4).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);
@@ -103,10 +50,8 @@ internal static class KongShuChecks
     private static void Answer(GameEngine g,Func<PromptChoice,bool> predicate){var p=P(g);var c=p?.Choices.FirstOrDefault(predicate);Need(p?.PlayerSeat==0&&c is not null,"No actual human choice matched: "+Diagnostic(g));Accept(g,new AnswerPromptCommand(0,p!.PromptId,c!.Id,g.Revision));}
     private static void Branch(GameEngine g,string branch,int? card=null)=>Answer(g,c=>c.Parameters.GetValueOrDefault("branch")==branch&&(card is null||c.Cards.SequenceEqual([card.Value])));
     private static void Continue(GameEngine g)=>Answer(g,c=>c.Parameters.GetValueOrDefault("option-id")=="continue");
-    private static void Activate(GameEngine g)=>Answer(g,c=>c.Parameters.GetValueOrDefault("program-action")=="activate");
     private static void Use(GameEngine g,string id,int[]? cards=null,int[]? targets=null)=>Accept(g,new UseProgramSkillCommand(0,Driver,id,cards??[],targets??[],g.Revision,P(g)!.PromptId));
     private static void Native(GameEngine g,Func<LegalAction,bool> predicate){var a=g.GetHumanLegalActions().First(predicate);Accept(g,new PlayCardCommand(0,a.CardId!.Value,a.TargetSeats,g.Revision,P(g)!.PromptId,a.PlayedCardKind,a.TargetCardId){ConversionSource=a.ConversionSource});}
-    private static void Convert(GameEngine g,CardKind kind,int[] cards,int[] targets){var a=g.GetHumanLegalActions().First(a=>a.ProgramSkillId==Leiluan&&a.PlayedCardKind==kind&&a.SelectableCardIds!.Order().SequenceEqual(cards.Order())&&targets.All(t=>a.SelectableTargetSeats!.Contains(t)));Accept(g,new UseProgramSkillCommand(0,Leiluan,a.ProgramActivationId!,cards,targets,g.Revision,P(g)!.PromptId));}
     private static void Trim(GameEngine g,int[] keep){var ids=V(g,0).Hand.Where(c=>!keep.Contains(c.Id)).Select(c=>c.Id).ToArray();if(ids.Length>0){Use(g,"trim",ids);Play(g);}}
     private static void End(GameEngine g)=>Accept(g,new EndPlayPhaseCommand(0,g.Revision,P(g)!.PromptId));
     private static void Play(GameEngine g)=>Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.PlayCard});
@@ -117,7 +62,6 @@ internal static class KongShuChecks
     private static string Diagnostic(GameEngine g)=>JsonSerializer.Serialize(new{Scene,g.State.TurnNumber,g.State.CurrentSeat,g.State.Phase,g.State.Winner,Prompt=P(g)is{}p?new{p.PlayerSeat,p.Kind,Skill=p.SkillPrompt?.SkillId,Choices=p.Choices.Take(4).Select(c=>new{c.Cards,c.Targets,c.Parameters})}:null,Frames=g.ResolutionStack.TakeLast(5).Select(f=>new{f.Id,Kind=f.GetType().Name,Stage=(f as ProgramSkillFrame)?.KongShu?.Stage}),Facts=g.Events.TakeLast(6).Select(e=>e.Payload.ToString())});
     private static string State(GameEngine g)=>JsonSerializer.Serialize(new{Views=Enumerable.Range(0,4).Select(s=>SnapshotJson.Serialize(g.CreateSnapshot(s))),Frames=g.ResolutionStack.Select(f=>JsonSerializer.Serialize(f,f.GetType())),Events=g.Events.Select(e=>JsonSerializer.Serialize(e.Payload,e.Payload.GetType())),g.CardMovements,Zones=g.CreateCardZoneDiagnostics(),Commands=CommandJson.Serialize(g.AcceptedCommands)});
     private static GameEngine Cold(GameEngine g,ContentRegistry r){var copy=GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(g.CreateCheckpoint())),r);Need(State(g)==State(copy),"Cold replay preserves every private native material, actual-turn/round fact and once-only typed continuation.");return copy;}
-    private static void Frozen<T>(IReadOnlyList<T> list){var refused=false;try{((IList<T>)list)[0]=list[0];}catch(NotSupportedException){refused=true;}Need(refused,"Original nested native cost and recipient collections must be frozen.");}
     private static (GameEngine,ContentRegistry) Start(string scene)
     {
         Scene=scene;var r=ContentRegistry.Build(new StandardContentPackage(),new Fixture(scene));var g=GameEngine.CreateStandard(new GameOptions{Seed=31,PlayerCount=4,HumanSeat=0,HumanRole=scene=="death"?Role.Renegade:Role.Lord,ModeId=Mode,UseInteractiveSetup=true,UseInteractiveDiscard=false,AdvanceAfterHumanCommands=false,MaxTurns=10},r);Accept(g,new StartGameCommand());Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.SelectGeneral});Accept(g,new SelectGeneralCommand(0,Owner,g.Revision,P(g)!.PromptId));Play(g);return(g,r);

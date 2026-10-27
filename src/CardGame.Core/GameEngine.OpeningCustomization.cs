@@ -28,7 +28,7 @@ public sealed partial class GameEngine
         var choices = new[] { "reroll", "confirm" }.Select(action => new PromptChoice(
             new ChoiceId($"setup.opening.{action}"), action == "reroll" ? "随机" : "确定", [], [],
             new Dictionary<string, string> { ["action"] = action })).ToList();
-        foreach (var card in hand)
+        foreach (var card in hand.Where(card => !IsFixedShanheOpeningCard(card)))
         foreach (var kind in kinds.Where(kind => kind != card.Kind))
             choices.Add(new(new($"setup.opening.replace.{card.Id}.{kind}"), CardCatalog.Get(kind).DisplayName,
                 [card.Id], [], new Dictionary<string, string> { ["action"] = "replace", ["kind"] = kind.ToString() }));
@@ -43,7 +43,12 @@ public sealed partial class GameEngine
     }
 
     private IEnumerable<Card> OpeningReplacementCards() => _cardZones.CardsAt(CardLocation.DrawPile)
-        .Concat(_players.Where(player => player.Seat != _options.HumanSeat).SelectMany(GetHand));
+        .Concat(_players.Where(player => player.Seat != _options.HumanSeat).SelectMany(GetHand))
+        .Where(card => !IsFixedShanheOpeningCard(card));
+
+    private bool IsFixedShanheOpeningCard(Card card) => _options.ShanheBattle is not null &&
+        _generatedPhysicalCardIds.Contains(card.Id) && _cardMovements.Any(move => move.CardId == card.Id &&
+            move.From == CardLocation.OutsideGame && move.To.Zone == CardZoneKind.Hand && move.Reason == CardMoveReasons.InitialDeal);
 
     private void ReplaceOpeningCard(PromptChoice selected)
     {
@@ -81,7 +86,7 @@ public sealed partial class GameEngine
         if (selected.Parameters["action"] == "reroll")
         {
             var player = _players[_options.HumanSeat];
-            var cards = GetHand(player).ToArray();
+            var cards = GetHand(player).Where(card => !IsFixedShanheOpeningCard(card)).ToArray();
             MoveCards(cards, CardLocation.Hand(player.Seat), CardLocation.DrawPile, new("setup.opening-reroll"));
             _cardZones.Shuffle(CardLocation.DrawPile, _random);
             DrawCards(player, cards.Length, log: false, CardMoveReasons.InitialDeal);

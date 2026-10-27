@@ -128,7 +128,7 @@ internal static class StableHandResponseFixture
             store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
             var model = new MainViewModel(autoAdvance: false, seed: game.Seed, showSetup: true,
                 saveStore: store, useExpandedContent: false, contentRegistry: registry) { IsMotionEnabled = false };
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Program.Assert(!model.HasSaveError && (lifeOutcome || model.Hand.Any(card => card.IsPlayable)) &&
                            SnapshotJson.Serialize(Program.Engine(model).CreateSnapshot(0)) == SnapshotJson.Serialize(game.CreateSnapshot(0)),
                 "Public registry injection and manual load must restore the exact live playable response.");

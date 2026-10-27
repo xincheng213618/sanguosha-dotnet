@@ -6,9 +6,6 @@ using CardGame.Core;
 internal static class ProgramCompositionDefinitionChecks
 {
 
-
-
-
     public static void ResourceGraphsRejectAliasingLeaksAndMissingInputs()
     {
         CardDomainCompatibilityKeepsLegacyProofsAndRejectsUnsafeCombinations();
@@ -492,7 +489,6 @@ internal static class ProgramCompositionDefinitionChecks
         throw new InvalidOperationException($"Invalid skill program at {path}: malformed condition.");
     }
 
-
     private static void Accept(string id, string effects) =>
         _ = Load("fixture:" + id.Replace(' ', '-'), Rules("fixture:" + id.Replace(' ', '-'), effects,
             Entries(effects, includeTriggers: false)));
@@ -685,33 +681,4 @@ internal static class ProgramCompositionDefinitionChecks
         exception is TargetInvocationException { InnerException: { } inner } ? inner : exception;
     private static void Require(bool condition, string message)
     { if (!condition) throw new InvalidOperationException(message); }
-
-    private sealed class ReplacementDrawDescriptor : IProgramOperationDescriptor
-    {
-        public int ParseCalls { get; private set; }
-        public SkillProgramEffectOp Op => SkillProgramEffectOp.Draw;
-        public ISkillProgramEffectHandler Handler { get; } = new DrawSkillProgramEffectHandler();
-        public ProgramOperationInteraction Interaction => ProgramOperationInteraction.Automatic;
-        public ProgramContextCapability RequiredCapabilities => ProgramContextCapability.None;
-        public ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (effect, context) => context.Draw(effect));
-        public SkillProgramEffect Parse(ProgramOperationNodeReader reader)
-        {
-            ParseCalls++;
-            reader.AllowOnly("op", "target", "amount");
-            return new(Op, reader.RequiredEnum<SkillProgramEffectTarget>("target"),
-                reader.RequiredInt("amount"), new(SkillProgramConditionKind.Always, 0, []));
-        }
-        public IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [];
-    }
-
-    private sealed class WrongHandlerDescriptor : IProgramOperationDescriptor
-    {
-        public SkillProgramEffectOp Op => SkillProgramEffectOp.Draw;
-        public ISkillProgramEffectHandler Handler { get; } = new RecoverSkillProgramEffectHandler();
-        public ProgramOperationInteraction Interaction => ProgramOperationInteraction.Automatic;
-        public ProgramContextCapability RequiredCapabilities => ProgramContextCapability.None;
-        public ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (effect, context) => context.Draw(effect));
-        public SkillProgramEffect Parse(ProgramOperationNodeReader reader) => throw new NotSupportedException();
-        public IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [];
-    }
 }

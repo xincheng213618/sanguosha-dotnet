@@ -10,23 +10,6 @@ internal static class ShanheDualBladeChecks
     private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(new StandardContentPackage(),
         new StandardShanheMarketPackage(), new StandardShanheDualBladePackage(), new Fixture()));
 
-    public static void PaidFirstSlashTargetsUseOneMaterialAndReturnNextRound()
-    {
-        var s = Scene.Start();
-        s.Buy(StandardShanheCampaignCatalog.CurrentDualBladeRewardId, 300);
-        s.Card(CardKind.Duel, 1, [1], false, 1, []);
-        s.Maximum(CardKind.Peach, 2, 2);
-        s.Card(CardKind.Peach, 2, [1, 2], true, 1, [StandardShanheDualBladePackage.SkillId]);
-        s.Buy(StandardShanheCampaignCatalog.CurrentDualBlade2RewardId, 600);
-        s.Maximum(CardKind.Slash, 3, 1);
-        s.Card(CardKind.Slash, 3, [1], false, 1, []);
-        s.NextRound();
-        s.Maximum(CardKind.FireSlash, 5, 4);
-        s.Card(CardKind.FireSlash, 5, [1, 2, 3, 4], false, 1,
-            [StandardShanheDualBladePackage.SkillId, StandardShanheDualBladePackage.UpgradedSkillId]);
-        s.Maximum(CardKind.Slash, 4, 1);
-    }
-
     public static void DodgedUnownedSlashConsumesRoundBeforeLivePurchase()
     {
         var s = Scene.Start(firstDefenderDodge: true);

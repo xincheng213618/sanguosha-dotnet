@@ -7,7 +7,6 @@ internal static class CardMovementProgramChecks
 {
     private const int HumanSeat = 0;
 
-
     public static void AtomicBatchRunsPerCardAndPerBatchAndReplays()
     {
         var registry = Registry();

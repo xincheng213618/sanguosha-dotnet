@@ -145,10 +145,12 @@ public sealed partial class MainViewModel
             {
                 var rule = RewardRule(reward);
                 var showSkillRule = reward.SkillId is not null && !string.IsNullOrWhiteSpace(rule);
+                var artwork = CreateShanheRewardArtwork(reward);
                 ShanheRewardCards.Add(new(reward.Id, reward.Name.Replace("传习·", ""), showSkillRule ? rule : reward.Description,
                     showSkillRule ? string.Empty : rule, RewardCategory(reward), false, "", state.Revision,
                     CurrentShanheRewardChoices.Any(choice => choice.IsReward && choice.Id == reward.Id && choice.IsEnabled))
-                { Rarity = reward.Rarity, CardImage = (reward.StartingCards ?? []).Concat(reward.StartingEquipment ?? []).FirstOrDefault() is { } card ? CardArt.Get(card.Kind) : null,
+                { Rarity = reward.Rarity, CardImage = artwork.IsCard ? artwork.Image : null,
+                  TacticImage = artwork.IsCard ? null : artwork.Image,
                   CardRuleDescription = (reward.StartingCards ?? []).Concat(reward.StartingEquipment ?? []).FirstOrDefault() is { } ruleCard
                       ? CardCatalog.Get(ruleCard.Kind).Description : string.Empty });
             }
@@ -189,6 +191,11 @@ public sealed class ShanheRewardCard(string id, string name, string description,
     public string QualityText => Rarity switch { 1 => "普通", 2 => "稀有", 3 => "史诗", 4 => "传说", _ => string.Empty };
     public string HeadingText => string.IsNullOrEmpty(QualityText) ? Category : QualityText + " · " + Category;
     public ImageSource? CardImage { get; init; }
+    public ImageSource? TacticImage { get; init; }
+    public ImageSource? Artwork => CardImage ?? TacticImage;
+    public bool HasArtwork => Artwork is not null;
+    public double ArtworkWidth => HasCardImage ? 88 : 112;
+    public double ArtworkHeight => HasCardImage ? 123 : 112;
     public string CardRuleDescription { get; init; } = string.Empty;
     public ShanheRewardCategory? RewardCategoryChoice { get; init; }
     public bool HasCardImage => CardImage is not null;

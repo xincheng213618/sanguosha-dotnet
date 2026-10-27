@@ -85,7 +85,6 @@ internal static class DrawPhaseCompositionChecks
             "Skipping reveal replacement must perform only the ordinary draw.");
     }
 
-
     public static void ValidatorRejectsUnsafeGraphs()
     {
         Reject("missing", """[{"op":"filterBoundCards","target":"owner","sourceBind":"missing","resultBind":"x","suits":["heart"]}]""");

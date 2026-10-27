@@ -2,6 +2,42 @@ namespace CardGame.Core.Campaigns;
 
 public sealed partial class ShanheCampaignSession
 {
+    private IEnumerable<ShanheRewardDefinition> SelectShopStockRewards(RunState state, ShanheNodeDefinition node,
+        List<ShanheRewardDefinition> candidates, int count, DeterministicRandom random)
+    {
+        if (Definition.ShopRarityPolicy is null) return candidates.Take(count);
+        var selected = new List<ShanheRewardDefinition>();
+        while (selected.Count < count && candidates.Count > 0)
+        {
+            var rarity = SelectShopRarity(state, node, candidates, random);
+            // Candidates have already been shuffled and refreshes prefer new faces.
+            var index = rarity is { } tier ? candidates.FindIndex(reward => reward.Rarity == tier) : 0;
+            selected.Add(candidates[index]);
+            candidates.RemoveAt(index);
+        }
+        return selected;
+    }
+
+    private int? SelectShopRarity(RunState state, ShanheNodeDefinition node,
+        IEnumerable<ShanheRewardDefinition> candidates, DeterministicRandom random)
+    {
+        if (Definition.ShopRarityPolicy is not { } policy) return null;
+        var chapter = state.MarketChapterNumber > 0 ? state.MarketChapterNumber : node.ChapterNumber;
+        var weights = chapter <= 1 ? policy.FirstChapter : policy.LaterChapters;
+        var available = candidates.Select(reward => reward.Rarity).ToHashSet();
+        var total = Enumerable.Range(1, 4).Where(available.Contains).Sum(weights.Weight);
+        // Exhausted tiers cannot duplicate stock or bypass research/ownership gates.
+        if (total == 0) return null;
+        var roll = random.Next(total);
+        for (var rarity = 1; rarity <= 4; rarity++)
+        {
+            if (!available.Contains(rarity)) continue;
+            roll -= weights.Weight(rarity);
+            if (roll < 0) return rarity;
+        }
+        throw new InvalidOperationException("The authored shop rarity distribution could not be sampled.");
+    }
+
     private int ShopPromotionPercent(RunState state, ShopRewardCategory category) => Math.Min(100,
         OwnedEconomy(state).Sum(effect => category switch
         {

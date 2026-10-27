@@ -172,12 +172,6 @@ internal static class PublicMarkerChecks
             $"Direct={game.Events.Count(item => item.Payload is ProgramSkillCauseDeathDeclaredEvent)}");
     }
 
-
-
-
-
-
-
     private static GameEngine FindFixture(
         ContentRegistry registry,
         bool requireAlcohol,
@@ -281,7 +275,6 @@ internal static class PublicMarkerChecks
         ExpectedRevision: game.Revision,
         PromptId: game.PendingDecision!.PromptId));
 
-
     private static ContentRegistry CreateRegistry(
         int ownerHp,
         string packageId,
@@ -383,7 +376,6 @@ internal static class PublicMarkerChecks
                 replay.Events.Select(item => item.Payload).OfType<PlayerMarkerChangedEvent>().Count() == expectedCount,
             "Public markers did not replay exactly.");
     }
-
 
     private static GameCheckpoint RoundTrip(GameCheckpoint checkpoint) =>
         GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(checkpoint));

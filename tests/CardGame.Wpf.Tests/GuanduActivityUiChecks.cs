@@ -84,10 +84,10 @@ internal static class GuanduActivityUiChecks
                 vm.IsGuanduGuide && !vm.IsTeamGuide && !vm.IsIdentityGuide,
                 "The real commander game must render eight public army seats, two fixed leaders, one of nine events and no teammate hands or Jiange labels.");
             Program.Render(root, 1440, 880, Path.Combine(output, "185-guandu-commanders-and-event.png"));
-            vm.SaveGameCommand.Execute(null); var saved = SnapshotJson.Serialize(View(game));
+            LegacySaveFixtures.Save(vm); var saved = SnapshotJson.Serialize(View(game));
             using var restored = new MainViewModel(false, 17, true, store, contentRegistry: ComposedSkillContentRegistry.CreateShowcase())
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-            restored.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(restored);
             Program.Assert(!restored.HasSaveError && restored.IsGuanduActivityTable && restored.SelectedStartingTeam.TeamId == "team:cao" &&
                 restored.SelectedGuanduRole.Role == GuanduSeatRole.Commander && SnapshotJson.Serialize(View(Program.Engine(restored))) == saved,
                 "Cross-configuration recovery must restore the actual Guandu package, army, commander role and fixed event without substituting another game.");
@@ -112,8 +112,8 @@ internal static class GuanduActivityUiChecks
                 vm.GeneralSelectionSubtitle.Contains("三名AI队友") && vm.GeneralChoices.All(choice => choice.HealthText.Contains("五阶体力上限")),
                 "A real Yuan general opening must expose its private faction pool rather than offer either fixed commander.");
             AssertFixedDraft();
-            vm.SaveGameCommand.Execute(null); saved = SnapshotJson.Serialize(View(game));
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm); saved = SnapshotJson.Serialize(View(game));
+            LegacySaveFixtures.Load(vm);
             Program.Assert(!vm.HasSaveError && vm.IsGeneralSelectionPending && vm.SelectedGuanduRole.Role == GuanduSeatRole.General &&
                 vm.SelectedStartingTeam.TeamId == "team:yuan" && SnapshotJson.Serialize(View(Program.Engine(vm))) == saved,
                 "Saving during the actual general draft must retain its prompt, army, role and event exactly.");
@@ -162,7 +162,7 @@ internal static class GuanduActivityUiChecks
             store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, original.CreateCheckpoint()));
             using var vm = new MainViewModel(false, 7, true, store, historyStore: history, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             var window = new MainWindow(vm); window.ApplyTemplate();
             var root = (FrameworkElement)window.Content;
             try

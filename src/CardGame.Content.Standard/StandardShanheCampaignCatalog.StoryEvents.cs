@@ -106,9 +106,10 @@ public static partial class StandardShanheCampaignCatalog
             elite ? eliteRewards : ordinaryRewards)
         {
             IsStoryBattle = true, ChapterNumber = origin.ChapterNumber, ChapterTitle = origin.ChapterTitle,
-            PrimaryTacticRarity = elite ? 0 : 1,
-            PrimarySkillRarity = elite ? 0 : origin.ChapterNumber >= 2 ? 2 : 1,
-            CategorizedRewards = true, RewardSkipGold = 100,
+            PrimaryTacticRarity = elite ? 2 : 1,
+            PrimarySkillRarity = elite ? origin.ChapterNumber >= 2 ? 3 : 2 : origin.ChapterNumber >= 2 ? 2 : 1,
+            PrimaryCardRarity = elite ? 2 : 0,
+            CategorizedRewards = true, AutomaticRewardCategory = true, RewardSkipGold = 100,
             StoryText = elite ? "击败黄巾精锐，领取300铜币与稀有及以上战利品。" : "击败疲惫的黄巾余众，领取200铜币。",
             Description = "由奇遇选项进入的本地战斗编排，胜利后回到原来的行军路线。"
         };

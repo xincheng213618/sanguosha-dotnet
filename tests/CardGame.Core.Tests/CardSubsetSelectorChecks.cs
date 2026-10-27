@@ -16,7 +16,6 @@ internal static class CardSubsetSelectorChecks
             "Card-count constraints must exclude empty, single-card and three-card choices.");
     }
 
-
     public static void OnePerSuitSelectsExactlyOneCardOfEachDistinctSuit()
     {
         CardSubsetCandidate[] cards =

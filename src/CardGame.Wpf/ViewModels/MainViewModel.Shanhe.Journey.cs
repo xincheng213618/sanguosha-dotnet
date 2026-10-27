@@ -40,18 +40,20 @@ public sealed partial class MainViewModel
     public string ShanheChapterProgressText => $"本章已过 {_shanheChapterCompleted} 处 · 难度 {_shanheRunDifficulty}";
     public string ShanheChapterObjectiveText => _shanheSession?.Snapshot.Phase switch
     {
-        ShanheCampaignPhase.Battle => "返回牌桌，击败本场全部敌军",
+        ShanheCampaignPhase.Battle => IsShanheBattleRetryReady ? "关卡进度保留，可重新挑战本关" : "返回牌桌，击败本场全部敌军",
         ShanheCampaignPhase.OpeningSkillDraft => "传承触发，先选择一项稀有技能",
         ShanheCampaignPhase.Reward => _shanheSession?.Snapshot.BossRewardSummary is { IsBonusOnly: true }
             ? "领取追加奖励，确认后继续行军" : _shanheSession?.Snapshot.BossRewardSummary is not null
-            ? "分别领取红色战法和技能，确认后进入下一章" : "领取一项战利品，或放弃并领取铜币",
+            ? "领取本章各组奖励，确认后进入下一章" : "领取一项战利品，或放弃并领取铜币",
         ShanheCampaignPhase.NodeChoice => "完成当前地点的选择，继续行军",
         ShanheCampaignPhase.Won => "此番征程已完成，可重新整备出征",
         ShanheCampaignPhase.Lost => "此番征程已结束，可重新整备出征",
         _ => _shanheChapter == 3
             ? _shanheSession?.Snapshot.AvailableNodes.Any(node => node.Kind == ShanheNodeKind.EliteBattle) == true
                 ? "选择精英挑战或最终路线，继续进军" : "选择最终路线，迎接最后一战"
-            : "选择亮起的地点，击败本章首领"
+            : _shanheSession?.Definition.AllowChapterDetours == true
+                ? "亮起的地点都可挑战，也可返回补打本章分支"
+                : "选择亮起的地点，击败本章首领"
     };
     public Brush CurrentShanheGeneralPortrait => _shanheSession?.Snapshot.PlayerGeneralId is { } id
         ? GeneralArt.GetPortrait(id, decodeWidth: 300) : SelectedShanhePortrait;
@@ -192,13 +194,15 @@ public sealed partial class MainViewModel
                 ? $"基础铜币 × {boss.FixedGold}    技能槽 +{boss.SkillSlots}\n" +
                     string.Join("    ", boss.Groups.Select(group => $"{group.Name}（{group.ChoiceCount}选一）"))
                 : $"基础铜币 × {goldText}" +
-                    (definition.RewardIds?.Count > 0 ? "\n" + ShanheEncounterRewardPoolText(definition, session.Definition) : string.Empty)) +
+                    (definition.RewardIds?.Count > 0 ? "\n" + ShanheEncounterRewardPoolText(definition, session.Definition,
+                        session.PreviewRewardCategory(definition.Id)) : string.Empty)) +
                 (first.HealAfterVictory > 0 && encounters.All(encounter => encounter.HealAfterVictory == first.HealAfterVictory)
                     ? $"\n胜利后恢复 {first.HealAfterVictory} 点体力，剩余体力带入后续战斗" : string.Empty);
         NotifyShanheEncounterPreview();
     }
 
-    private static string ShanheEncounterRewardPoolText(ShanheNodeDefinition node, ShanheCampaignDefinition definition)
+    private static string ShanheEncounterRewardPoolText(ShanheNodeDefinition node, ShanheCampaignDefinition definition,
+        ShanheRewardCategory? automaticCategory)
     {
         static ShanheRewardCategory CategoryOf(ShanheRewardDefinition reward) => IsShanheTactic(reward)
             ? ShanheRewardCategory.Tactic : reward.SkillId is not null ? ShanheRewardCategory.Skill
@@ -209,13 +213,15 @@ public sealed partial class MainViewModel
             {
                 ShanheRewardCategory.Tactic => node.PrimaryTacticRarity,
                 ShanheRewardCategory.Skill => node.PrimarySkillRarity,
+                ShanheRewardCategory.Card => node.PrimaryCardRarity,
                 _ => 0
             };
             return (rarity == 0 || reward.Rarity == rarity) && reward.OpeningCompanionPool is null &&
                 reward.CampaignEconomy?.StartingGold is not > 0;
         }
         var pool = (node.RewardIds ?? []).Select(id => definition.Rewards.Single(reward => reward.Id == id))
-            .Where(IsBaseline).DistinctBy(reward => reward.Id).ToArray();
+            .Where(reward => IsBaseline(reward) && (automaticCategory is null || CategoryOf(reward) == automaticCategory))
+            .DistinctBy(reward => reward.Id).ToArray();
         if (pool.Length == 0) return string.Empty;
         var groups = pool.GroupBy(CategoryOf).OrderBy(group => group.Key).ToArray();
         var perCategory = node.CategorizedRewards || groups.Length == 1;
@@ -235,7 +241,8 @@ public sealed partial class MainViewModel
         });
         return "基础奖励：" + string.Join(" · ", labels) +
             (!perCategory ? $"（合计{Math.Min(node.RewardChoiceCount, pool.Length)}选一）" : "") +
-            (node.CategorizedRewards ? "\n先选择类别，再查看候选。" : "") +
+            (node.AutomaticRewardCategory ? "\n奖励类型已在本地点确定，战后直接选择同类候选。"
+                : node.CategorizedRewards ? "\n先选择类别，再查看候选。" : "") +
             "\n候选数量与品质提升按所持战法结算。" +
             (pool.All(IsShanheTactic) ? "\n战法必须领取，不可放弃换取铜币。" :
                 node.RewardSkipGold > 0 ? "\n装备、手牌与技能可按本次候选标明的金额放弃换取铜币；战法必须领取。" : "");

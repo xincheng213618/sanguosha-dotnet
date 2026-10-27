@@ -371,7 +371,7 @@ public sealed partial class GameEngine
             foreach (var player in _players) BindHappyQiaoHealth(player);
             DealInitialHands();
             foreach (var player in _players) InitializeSelectedIdentityConcealment(player);
-            _setupComplete = true;
+            _setupComplete = !options.ConfirmOpeningHand || options.HumanSeat < 0;
             InitializeStructuredConversionSkills();
         }
 
@@ -1799,10 +1799,12 @@ public sealed partial class GameEngine
 );
         AddLog(
             "Rules",
-            $"{modeRules}；模式 {_modeDefinition.Id}；牌堆含杀、火杀、雷杀、闪、桃、酒、决斗、无中生有、南蛮入侵、万箭齐发、桃园结义、五谷丰登、过河拆桥、顺手牵羊、火攻、乐不思蜀、兵粮寸断、无懈可击和七种装备牌。默认战斗距离按存活座位环计算、攻击范围为 1；装备按五类槽位公开替换，{weaponRules}，赤兔和绝影修正战斗距离，玉玺额外摸一张，{armorRules}。{dyingAlcoholRules}，{alcoholPlayRules}，桃可在出牌阶段自救或在基础濒死窗口救援，桃园结义按座次使所有存活角色各回复 1 点体力，五谷丰登公开翻牌并按座次私有选牌，{fireAttackRules}，并通过攻击者同花色弃牌决定是否造成火焰伤害，无懈可击在可抵消锦囊结算前按座次进入有限多层响应窗口，{(_options.UseInteractiveDiscard ? "人类回合末弃牌由玩家选择，AI 自动处理" : "弃牌自动处理")}。");
+            $"{modeRules}；模式 {_modeDefinition.Id}；牌堆含杀、火杀、雷杀、闪、桃、酒、决斗、无中生有、南蛮入侵、万箭齐发、桃园结义、五谷丰登、过河拆桥、顺手牵羊、火攻、乐不思蜀、兵粮寸断、无懈可击{(_options.ShanheBattle is null ? "和七种装备牌" : "；山河图牌堆不含装备，随身装备开战直接装备，可正常夺取敌方装备")}。默认战斗距离按存活座位环计算、攻击范围为 1；装备按五类槽位公开替换，{weaponRules}，赤兔和绝影修正战斗距离，玉玺额外摸一张，{armorRules}。{dyingAlcoholRules}，{alcoholPlayRules}，桃可在出牌阶段自救或在基础濒死窗口救援，桃园结义按座次使所有存活角色各回复 1 点体力，五谷丰登公开翻牌并按座次私有选牌，{fireAttackRules}，并通过攻击者同花色弃牌决定是否造成火焰伤害，无懈可击在可抵消锦囊结算前按座次进入有限多层响应窗口，{(_options.UseInteractiveDiscard ? "人类回合末弃牌由玩家选择，AI 自动处理" : "弃牌自动处理")}。");
         AddLog("Rules", $"{targetCardRules}。");
         AddLog("Rules", delayedCardRules);
         AddLog("Rules", "闪电仅可对自己使用：黑桃 2 至 9 命中并造成 3 点雷电伤害，其他判定牌则移至下一名存活角色。 ");
+        if (!_options.UseInteractiveSetup && _options.ConfirmOpeningHand && _options.HumanSeat >= 0)
+            RequestOpeningHandConfirmation();
         AdvanceRulesAndPublishState();
         AdvanceToHumanBoundary();
     }
@@ -16698,6 +16700,7 @@ public sealed partial class GameEngine
 
     private bool EnsureDrawPile()
     {
+        ExcludeShanheDeckEquipment(CardLocation.DrawPile);
         if (_cardZones.Count(CardLocation.DrawPile) > 0)
         {
             return true;
@@ -16709,6 +16712,7 @@ public sealed partial class GameEngine
             return false;
         }
 
+        ExcludeShanheDeckEquipment(CardLocation.DiscardPile);
         if (_cardZones.Count(CardLocation.DiscardPile) == 0)
         {
             return false;

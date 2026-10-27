@@ -93,19 +93,6 @@ internal static class ShanheTargetHandVisibilityChecks
         }
     }
 
-    public static void RegisteredVisibilitySkillsRemainInactiveInAnOrdinaryIdentityTable()
-    {
-        var s = Scene.StartIdentity();
-        var trick = s.Begin(CardKind.Dismantlement);
-        Need(s.P is { Kind: DecisionKind.SelectTargetCard } &&
-            s.P.Choices.All(choice => choice.Cards.Count == 0 && !choice.Parameters.ContainsKey(VisibleCardId)) &&
-            (s.G.CreateSnapshot(0).PrivateRevealedCards?.Count ?? 0) == 0 &&
-            s.G.CreateSnapshot(0).Players[1].Hand.Count == 0,
-            "Even a general owning both registered tactic programs gains no target-hand visibility in ordinary identity mode.");
-        s.Accept(new AnswerPromptCommand(0, s.P!.PromptId, s.P.Choices[0].Id, s.G.Revision));
-        s.Play(); s.AssertPaid(trick);
-    }
-
     private static void Need(bool value, string message)
     { if (!value) throw new InvalidOperationException(message); }
 

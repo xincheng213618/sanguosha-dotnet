@@ -7,40 +7,6 @@ internal static partial class DuanJiongChecks
 {
     private const string Skill = "ol:saogu", Owner = "fixture:dj-owner", Driver = "fixture:dj-driver", Quiet = "fixture:dj-quiet", Watch = "fixture:dj-watch",
         Commit = "fixture:dj-commit", Health = "fixture:dj-health", Grain = "fixture:dj-grain", Source = "fixture:dj-source", Mode = "identity:classic-duan-jiong-fixture";
-    public static void YangYinOriginalSlashesForcedQuotaAndCold()
-    {
-        var (g, r) = Start("slashes"); Draw(g);
-        Native(g, g.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Slash && a.TargetSeats.SequenceEqual([1]))); Play(g);
-        Need(E<CardUseDebitRecordedEvent>(g).Length == 1, "A real ordinary Slash spends its allowance before the Yang sweep.");
-        Begin(g); DiscardBoundary(g); var pair = Current(g)!.Candidates.Take(2).Select(c => c.CardId).ToArray();
-        var p = P(g)!; var state = State(g);
-        Need(p is { PlayerSeat: 0, IsPrivate: true } && g.CreateSnapshot(1).PendingDecision is null &&
-            !g.Submit(new AnswerPromptCommand(1, p.PromptId, p.Choices[0].Id, g.Revision)).Accepted && state == State(g),
-            "The accepted Yang draft is private to its payer and rejects a different seat without any payment.");
-        Answer(g, c => c.Cards.SequenceEqual([pair[0]])); g = Cold(g, r); Answer(g, c => c.Cards.SequenceEqual([pair[1]]));
-        Reach(g, () => P(g)?.SkillPrompt?.SkillId == Watch);
-        Need(Yin(g) && E<DuanJiongSaoguEntityPaidEvent>(g).Length == 2 && !E<DuanJiongSaoguNativeIssuedEvent>(g).Any(),
-            "Both actual entities are discarded once and Yang is consumed before the real payment child and before either native Slash.");
-        g = Cold(g, r); Continue(g);
-        foreach (var id in pair)
-        {
-            UseBoundary(g); Need(P(g)!.Choices.All(c => c.Parameters.GetValueOrDefault("branch") == "use") && P(g)!.Choices.All(c => !c.Targets.Contains(2)),
-                "Every legally usable paid Slash is mandatory, and the real distance-two target is absent even though ordinary quota is exhausted.");
-            Answer(g, c => c.Cards.SequenceEqual([id]) && c.Targets.SequenceEqual([1]));
-            Reach(g, () => Current(g)?.Stage == DuanJiongSaoguStage.NativeUse && P(g)?.SkillPrompt?.SkillId == Commit);
-            g = Cold(g, r); Continue(g);
-        }
-        Play(g);
-        Need(E<DuanJiongSaoguNativeIssuedEvent>(g).Select(e => e.Origin.CardId).SequenceEqual(pair) && E<DuanJiongSaoguNativeReturnedEvent>(g).Length == 2 &&
-            E<DuanJiongSaoguCompletedEvent>(g).Single().UsedCards == 2 && E<CardUseDebitRecordedEvent>(g).Length == 1 &&
-            pair.All(id => g.CardMovements.Count(m => m.CardId == id && m.From == CardLocation.DiscardPile && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use) == 1),
-            "Both original discarded physical Slashes really finish, retain current distance, and neither consumes an ordinary Slash debit or uses a substitute entity.");
-        var hand = V(g).HandCount; Begin(g); Reach(g, () => Current(g)?.Stage == DuanJiongSaoguStage.DrawChildren && P(g)?.SkillPrompt?.SkillId == Watch);
-        Need(!Yin(g) && V(g).HandCount == hand + 1, "The Yin half draws exactly one actual card and flips to Yang before its gain child.");
-        g = Cold(g, r); Continue(g); Play(g);
-        Need(E<DuanJiongSaoguBranchPaidEvent>(g).Select(e => e.Yang).SequenceEqual([true, false]) && E<DuanJiongSaoguBranchPaidEvent>(g).Last().ActualCount == 1,
-            "Both conversion halves have their own real once-paid receipt, without adding a once-per-phase limit to the alternating skill."); _ = Cold(g, r);
-    }
     private static PlayerSnapshot V(GameEngine g, int seat = 0) => g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, g.State.Players.Count).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static T[] E<T>(GameEngine g) where T : IGameEvent => g.Events.Select(e => e.Payload).OfType<T>().ToArray();

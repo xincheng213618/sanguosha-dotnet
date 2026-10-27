@@ -30,40 +30,6 @@ internal static class ClassicGeneralChecks
             "A selected multi-skill classic general must replay exactly.");
     }
 
-
-
-
-
-
-    private sealed class TuxiTransferScenario : IGameContentPackage
-    {
-        public PackageManifest Manifest { get; } = new("tuxi-transfer-check", new Version(1, 0, 0),
-            [new PackageDependency("standard-classic-generals", StandardClassicGeneralPackage.CurrentVersion)]);
-
-        public void Register(IContentRegistryBuilder builder)
-        {
-            var pool = new List<string> { "classic:zhang-liao" };
-            for (var index = 0; index < 4; index++)
-            {
-                var id = "fixture:tuxi-bank-" + index;
-                pool.Add(id);
-                builder.AddGeneral(new(id, "测试对手", "supporter", "standard:none", "qun"));
-            }
-            builder.AddMode(new("identity:classic-tuxi-transfer", "突袭转移测试", 5, 5,
-                new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Loyalist)] = 1,
-                    [nameof(Role.Rebel)] = 2, [nameof(Role.Renegade)] = 1 },
-                "classic:standard-deck", GeneralCandidateCount: 5, GeneralPoolIds: pool));
-        }
-    }
-
-
-
-
-
-
-
-
-
     public static void FormalPaoxiaoFlow()
     {
         var registry = CreatePreProgramClassicRegistry();
@@ -199,12 +165,6 @@ internal static class ClassicGeneralChecks
             "An in-flight formal Longdan Slash-to-Dodge response must replay exactly.");
     }
 
-
-
-
-
-
-
     public static void FormalWushengEquipmentFlow()
     {
         var registry = StandardContentRegistry.CreateWithClassicGenerals();
@@ -299,11 +259,6 @@ internal static class ClassicGeneralChecks
             answered.Error?.Message ??
             "Formal Wusheng must pay the equipped physical card through the Slash response chain.");
     }
-
-
-
-
-
 
     public static void FormalFactionSlashResponseFlow()
     {
@@ -513,9 +468,6 @@ internal static class ClassicGeneralChecks
                 new PackageDependency("standard-classic-generals", new Version(1, 5, 0))));
         return (registry, modeId);
     }
-
-
-
 
     private static GameEngine? StartClassicGeneralAtPlay(
         ContentRegistry registry,
@@ -735,7 +687,6 @@ internal static class ClassicGeneralChecks
         return false;
     }
 
-
     private static CommandResult SubmitPlayAction(GameEngine game, LegalAction action) =>
         game.Submit(new PlayCardCommand(
             0,
@@ -750,7 +701,6 @@ internal static class ClassicGeneralChecks
             ConversionSource = action.ConversionSource,
             AdditionalConversionSources = action.AdditionalConversionSources,
         });
-
 
     private static void Equip(GameEngine game, int cardId)
     {

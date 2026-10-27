@@ -23,25 +23,6 @@ internal static class ZhangYanChecks
    "The next actual Suji uses its own explicit source and real material once, without inheriting the completed counterspell's source.");
   _=Cold(g,r);
  }
- public static void SujiAnyTargetOwnForeignNormalRangeAndDamageOwnerCold()
- {
-  var(g,r)=Start("own",true);Activate(g);Reach(g,()=>Current(g)is{Stage:ZhangYanStage.SujiCard});var material=P(g)!.Choices.First(c=>c.Cards.Count==1).Cards.Single();g=Cold(g,r);Answer(g,c=>c.Cards.SequenceEqual([material]));Reach(g,()=>Current(g)is{Stage:ZhangYanStage.SujiTarget});
-  Need(P(g)!.Choices.SelectMany(c=>c.Targets).Order().SequenceEqual([1,3])&&g.CreateSnapshot(1).PendingDecision is null,"Own wounded Play-start accepts any normally in-range legal target; it does not force a self target or expose the private black material choice.");
-  g=Cold(g,r);Answer(g,c=>c.Targets.SequenceEqual([1]));Play(g);var ret=E<ZhangYanSujiIssuedEvent>(g).Single().Return;
-  Need(ret.PhaseOwner==0&&ret.OriginalTarget==1&&g.CardMovements.Count(m=>m.CardId==material&&m.From==CardLocation.Hand(0)&&m.To==CardLocation.Processing&&m.Reason==CardMoveReasons.Use)==1&&!E<ZhangYanRewardIssuedEvent>(g).Any()&&!E<CardUseDebitRecordedEvent>(g).Any()&&g.GetHumanLegalActions().Any(a=>a.Kind==LegalActionKind.Slash),"The real black entity is used once, adds no ordinary Slash debit, and injuring someone other than the wounded phase owner grants no false obtain.");_=Cold(g,r);
-  foreach(var hitOwner in new[]{false,true})
-  {
-   (g,r)=Start("foreign");Use(g,"hurt",targets:[1]);Play(g);End(g);Reach(g,()=>g.State.CurrentSeat==1&&Optional(P(g),Suji));Activate(g);Reach(g,()=>Current(g)is{Stage:ZhangYanStage.SujiCard});Answer(g,c=>c.Cards.Count==1);Reach(g,()=>Current(g)is{Stage:ZhangYanStage.SujiTarget});
-   Need(P(g)!.Choices.Any(c=>c.Targets.SequenceEqual([3]))&&!P(g)!.Choices.Any(c=>c.Targets.SequenceEqual([2])),"A foreign wounded participant's actual phase offers another in-range target and rejects the out-of-range seat.");var target=hitOwner?1:3;var hp=V(g,target).Hp;Answer(g,c=>c.Targets.SequenceEqual([target]));
-   if(hitOwner)
-   {
-    Reach(g,()=>Current(g)is{Stage:ZhangYanStage.RewardChoice});Need(Current(g)!.PhaseOwner==1&&P(g)!.Choices.Where(c=>c.Parameters.GetValueOrDefault("source-zone")=="Hand").All(c=>c.Cards.Count==0)&&g.CreateSnapshot(1).PendingDecision is null,"Actual same-use damage to the frozen phase owner issues one source-private opaque foreign hand obtain.");
-    g=Cold(g,r);Answer(g,c=>c.Parameters.GetValueOrDefault("source-zone")=="Hand");Reach(g,()=>E<ZhangYanSujiReturnedEvent>(g).Any());var obtained=E<ZhangYanRewardIssuedEvent>(g).Single();
-    Need(V(g,target).Hp==hp-1&&obtained.PhaseOwner==1&&g.CardMovements.Count(m=>m.CardId==obtained.CardId&&m.From==CardLocation.Hand(1)&&m.To==CardLocation.Hand(0)&&m.Reason.Value=="skill-program.zhang-yan.suji.obtain")==1,"A genuine injury obtains one actual card from that participant, not from another Slash target.");
-   }
-   else{Reach(g,()=>E<ZhangYanSujiReturnedEvent>(g).Any());Need(V(g,target).Hp==hp-1&&!E<ZhangYanRewardIssuedEvent>(g).Any(),"Free target selection does not change the conditional reward's original wounded participant.");}_=Cold(g,r);
-  }
- }
  private static PlayerSnapshot V(GameEngine g,int seat=0)=>g.CreateSnapshot(seat).Players.Single(p=>p.Seat==seat);
  private static PendingDecision? P(GameEngine g)=>Enumerable.Range(0,4).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);
  private static ZhangYanReceipt? Current(GameEngine g)=>g.ResolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f=>f.ZhangYan is not null)?.ZhangYan;

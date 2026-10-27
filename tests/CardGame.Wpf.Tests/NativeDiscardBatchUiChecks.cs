@@ -14,7 +14,7 @@ internal static class NativeDiscardBatchUiChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(false, 373, showSetup: false, saveStore: store, contentRegistry: registry)
             { IsMotionEnabled = false, IsMusicEnabled = false, IsSoundEnabled = false };
-        model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Load(model); game = Program.Engine(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         VerifyDraft(5, "lingxi");
         NativeCollectedDiscardProjectionChecks.BeginCaoXianSelfDiscard(game); Refresh();
@@ -65,7 +65,7 @@ internal static class NativeDiscardBatchUiChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(false, 31, showSetup: false, saveStore: store, contentRegistry: registry)
             { IsMotionEnabled = false, IsMusicEnabled = false, IsSoundEnabled = false };
-        model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Load(model); game = Program.Engine(model);
         Program.Assert(model.IsOwnedCardSelectionPending && !model.IsCardPaymentSelectionPending && !model.IsHandResponsePending,
             "Xianying's singleton native card commands must form an arbitrary-size local discard draft.");
         var ids = model.Hand.Take(3).Select(c => c.Id).ToArray();

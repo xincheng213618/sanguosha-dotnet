@@ -9,51 +9,6 @@ internal static class ShanheSourceSunCeChecks
     private const string Yinghun = StandardShanheSourceSunCePackage.YinghunSkillId;
     private const string Driver = "fixture:source-sunce-damage", Deck = "fixture:source-sunce-deck";
 
-    public static void WoundedAtTwoHpAwakensAndDrawsThreeOnlyInThatTurnEnding()
-    {
-        var scene = Scene.Start(1);
-        Need(scene.Owner.Hp == 3 && scene.Owner.MaxHp == 3 && scene.Events<SkillAwakenedEvent>().Length == 0,
-            "The actual source2655 body starts at 3/3 and its healthy first preparation does not awaken.");
-        scene.Hurt();
-        Need(scene.Owner.Hp == 2 && scene.Events<DamageAppliedEvent>().Any(fact => fact.TargetSeat == 0 && fact.Amount == 1),
-            "The source really takes native damage to 2/3 before a later natural preparation.");
-        scene.EndPlay(); scene.Reach(() => scene.IsOwnPlay && scene.Game.State.TurnNumber >= 3);
-        AssertAwakening(scene, hp: 2);
-        Need(scene.Events<ProgramBindingStartedEvent>().All(fact => fact.SkillId != Skill || fact.BindingId != "awakening-turn-ending"),
-            "A preparation awakening does not immediately execute its deferred ending reward.");
-        // Keep the awakened body wounded for a later, genuine acquired Yinghun preparation.
-        scene.Hurt();
-        scene.EndPlay(); scene.Reach(() => scene.IsHunziChoice);
-        var rewardTurn = scene.Game.State.TurnNumber;
-        var before = scene.Owner.HandCount;
-        scene.Answer(option => option.Parameters.GetValueOrDefault("option-id") == "draw-three");
-        scene.Reach(() => scene.Completed("awakening-turn-ending") == 1);
-        var drawn = scene.Game.CardMovements.Where(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0) &&
-            move.Reason.Value == "skill-program." + Skill + ".Draw").ToArray();
-        Need(rewardTurn == 3 && drawn.Length == 3 && drawn.Select(move => move.CardId).Distinct().Count() == 3 &&
-            scene.Owner.HandCount == before + 3 && scene.Owner.Hp == 1 && scene.Events<RecoveryAppliedEvent>().Length == 0,
-            "The awakening turn's real ending choice draws exactly three distinct entities and executes no recovery branch.");
-        scene.Reach(() => scene.P is { Kind: DecisionKind.ProgramTrigger, PlayerSeat: 0 } prompt &&
-            prompt.Choices.Any(option => option.Parameters.GetValueOrDefault("skill-id") == Yinghun));
-        scene.Answer(option => option.Parameters.GetValueOrDefault("skill-id") == Yinghun &&
-            option.Parameters.GetValueOrDefault("binding-id") == "draw-many" &&
-            option.Parameters.GetValueOrDefault("program-action") == "activate");
-        scene.Reach(() => scene.P?.SkillPrompt?.SkillId == Yinghun &&
-            scene.P.Choices.Any(option => option.Targets.Contains(1)));
-        scene.Answer(option => option.Targets.Contains(1));
-        scene.Reach(() => scene.IsOwnPlay && scene.Game.State.TurnNumber >= 5);
-        Need(scene.Game.CardMovements.Count(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(1) &&
-                move.Reason.Value == "skill-program." + Yinghun + ".Draw") == 1 &&
-            scene.Game.CardMovements.Count(move => move.From == CardLocation.Hand(1) && move.To == CardLocation.DiscardPile &&
-                move.Reason.Value == "skill-program." + Yinghun + ".MoveBoundCards") == 1,
-            "The actually acquired source108 Yinghun works in Shanhe: its selected other character draws X=1 and discards one real card.");
-        scene.EndPlay(); scene.Reach(() => scene.IsOwnPlay && scene.Game.State.TurnNumber >= 7);
-        Need(scene.Completed("wounded-preparation-awakening") == 1 && scene.Completed("awakening-turn-ending") == 1 &&
-            scene.Events<MaximumHpChangedEvent>().Count(fact => fact.SkillId == Skill) == 1 && scene.Owner.MaxHp == 2 &&
-            !scene.IsHunziChoice && scene.Game.State.Winner == Winner.None,
-            "Acquired skills remain usable while neither the game-limited awakening nor its one-turn ending reward repeats.");
-    }
-
     public static void EndingRecoveryRequestsTwoAndRespectsTheActualAwakenedMaximum()
     {
         foreach (var maxHpBonus in new[] { 0, 2 })

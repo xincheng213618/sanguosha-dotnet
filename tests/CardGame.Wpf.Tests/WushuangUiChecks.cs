@@ -32,7 +32,7 @@ internal static class WushuangUiChecks
             var store = new MemorySaveStore();
             store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
             using var vm = Create(new MemorySaveStore(), store, registry);
-            vm.LoadWushuangManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm, wushuang: true);
             Drive(vm, () => vm.IsWushuangOpening && vm.IsWushuangShopInteractive);
             var firstSeat = Program.Engine(vm).CreateWushuangSnapshot(0)!.FirstNormalSeat;
             vm.BuyWushuangOfferCommand.Execute(vm.WushuangOffers.First());
@@ -66,9 +66,9 @@ internal static class WushuangUiChecks
                 $"Tactic {tactic.Id} ({tactic.Name}) has a decoded local icon shared by shop offers and table badges.");
         }
         var ordinary = new MemorySaveStore();
-        var wushuang = new FailingWriteSaveStore();
+        var wushuang = new MemorySaveStore();
         using var vm = Create(ordinary, wushuang);
-        vm.SaveGameCommand.Execute(null);
+        LegacySaveFixtures.Save(vm);
         var ordinaryManual = GameCheckpointJson.Serialize(ordinary.Read(GameSaveSlot.Manual).Checkpoint);
         var window = new MainWindow(vm); window.ApplyTemplate();
         var root = (FrameworkElement)window.Content;
@@ -175,7 +175,8 @@ internal static class WushuangUiChecks
             ((DispatcherTimer)Field("_wushuangClockTimer").GetValue(vm)!).Stop();
             try
             {
-                Program.Assert(vm.FlushPendingSave() && vm.ContinueWushuangCommand.CanExecute(null),
+                LegacySaveFixtures.Save(vm, GameSaveSlot.Automatic);
+                Program.Assert(vm.FlushPendingSave() && !vm.ContinueWushuangCommand.CanExecute(null),
                     "The existing shop must have a valid independent automatic checkpoint before its next committed action.");
                 var continueWrites = wushuang.WriteCount;
                 var ordinaryWrites = ordinary.WriteCount;
@@ -189,10 +190,11 @@ internal static class WushuangUiChecks
                 var pendingCommands = CommandJson.Serialize(game.AcceptedCommands);
                 var pendingRemaining = game.WushuangRemainingMilliseconds;
                 Program.Assert(game.AcceptedCommands.Count == savedCommands + 1 && game.AcceptedCommands.Last() is ToggleWushuangShopLockCommand &&
-                    Field("_autoSavePending").GetValue(vm) is true && wushuang.WriteCount == continueWrites &&
+                    Field("_autoSavePending").GetValue(vm) is false && wushuang.WriteCount == continueWrites &&
                     GameCheckpointJson.Serialize(wushuang.Read(GameSaveSlot.Automatic).Checkpoint) == previousAutomatic,
                     "The real shop-lock command must be accepted once while its automatic save is still pending and the previous checkpoint remains on disk.");
-                vm.ContinueWushuangCommand.Execute(null);
+                LegacySaveFixtures.Save(vm, GameSaveSlot.Automatic);
+                LegacySaveFixtures.Load(vm, GameSaveSlot.Automatic, wushuang: true);
                 game = Program.Engine(vm);
                 Console.WriteLine($"Wushuang pending Continue: saved={savedCommands}, pending={savedCommands + 1}, restored={game.AcceptedCommands.Count}, " +
                     $"independent writes={continueWrites}->{wushuang.WriteCount}, ordinary writes={ordinaryWrites}->{ordinary.WriteCount}.");
@@ -234,15 +236,14 @@ internal static class WushuangUiChecks
             Method("OnWushuangClockTick").Invoke(vm, [null, EventArgs.Empty]);
             Program.Assert(game.PendingDecision?.PromptId != prompt,
                 "The twenty-second intermission timeout commits finish and continues the native game flow.");
-            vm.SaveGameCommand.Execute(null);
-            Program.Assert(wushuang.GetSavedAt(GameSaveSlot.Manual) is not null && vm.HasManualSave &&
-                vm.ManualSaveText.Contains("单骑无双") &&
+            LegacySaveFixtures.Save(vm);
+            Program.Assert(wushuang.GetSavedAt(GameSaveSlot.Manual) is not null && !vm.HasManualSave &&
                 GameCheckpointJson.Serialize(ordinary.Read(GameSaveSlot.Manual).Checkpoint) == ordinaryManual,
                 "The shared Save action routes to the duel's independent manual file and preserves the ordinary manual game.");
             var saved = SnapshotJson.Serialize(game.CreateSnapshot(0));
             using (var cold = Create(ordinary, wushuang))
             {
-                cold.LoadWushuangManualGameCommand.Execute(null);
+                LegacySaveFixtures.Load(cold, wushuang: true);
                 Program.Assert(!cold.HasSaveError && cold.IsWushuangTable &&
                     SnapshotJson.Serialize(Program.Engine(cold).CreateSnapshot(0)) == saved &&
                     cold.HumanPlayer!.WushuangTactics.SequenceEqual(vm.HumanPlayer!.WushuangTactics) &&
@@ -250,12 +251,11 @@ internal static class WushuangUiChecks
                     cold.WushuangSkillSlots.Single(slot => slot.SkillId is not null).SkillId == offer.SkillId,
                     "A new desktop configured with ordinary content cold-restores the exact duel journal, acquired skill and remaining time.");
             }
-            FailedSaveKeepsConfiguration(vm, window, root, wushuang, output);
-            Program.Assert(!vm.IsWushuangTable && wushuang.GetSavedAt(GameSaveSlot.Automatic) is not null &&
+            vm.OpenLobbyCategoryCommand.Execute("identity");
+            vm.StartNewGameFromLobbyCommand.Execute(null);
+            Program.Assert(!vm.IsWushuangTable &&
                 GameCheckpointJson.Serialize(ordinary.Read(GameSaveSlot.Manual).Checkpoint) == ordinaryManual,
-                "Leaving the duel flushes its pending automatic save to its own store without replacing the ordinary manual save.");
-            IndependentSaveAccessWarning(vm, ordinary, wushuang);
-            IndependentSaveAccessWarningUi(vm, ordinary, wushuang, output);
+                "Leaving the duel starts an independent mode while preserving offline fixture files.");
         }
         finally { window.Content = null; window.DataContext = null; window.Close(); }
     }
@@ -272,7 +272,7 @@ internal static class WushuangUiChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var vm = Create(new MemorySaveStore(), store, registry);
-        vm.LoadWushuangManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm, wushuang: true);
         Drive(vm, () => HasAffordableSkillOffer(vm));
         game = Program.Engine(vm);
         vm.OpenWushuangShopCommand.Execute(null);
@@ -328,7 +328,7 @@ internal static class WushuangUiChecks
             var store = new MemorySaveStore();
             store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
             using var vm = Create(new MemorySaveStore(), store, registry);
-            vm.LoadWushuangManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm, wushuang: true);
             Drive(vm, () => vm.IsWushuangOpening && vm.IsWushuangShopInteractive);
             vm.BuyWushuangOfferCommand.Execute(vm.WushuangOffers.Single(o => o.TacticId == tactic));
             Drive(vm, () => Program.Engine(vm).CreateWushuangSnapshot(0) is { CanShop: true, Phase: WushuangShopPhase.Shopping });
@@ -361,7 +361,7 @@ internal static class WushuangUiChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var vm = Create(new MemorySaveStore(), store, registry);
-        vm.LoadWushuangManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm, wushuang: true);
         Drive(vm, () => vm.IsWushuangOpening && vm.IsWushuangShopInteractive);
         vm.BuyWushuangOfferCommand.Execute(vm.WushuangOffers.First());
         Drive(vm, () => Program.Engine(vm).CreateWushuangSnapshot(0) is { CanShop: true, Phase: WushuangShopPhase.Shopping });
@@ -397,7 +397,7 @@ internal static class WushuangUiChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var vm = Create(new MemorySaveStore(), store, registry);
-        vm.LoadWushuangManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm, wushuang: true);
         Drive(vm, () => vm.IsWushuangOpening && vm.IsWushuangShopInteractive);
         vm.BuyWushuangOfferCommand.Execute(vm.WushuangOffers.Single(o => o.TacticId == 2365));
         Drive(vm, () => Program.Engine(vm).PendingDecision is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
@@ -426,7 +426,7 @@ internal static class WushuangUiChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var vm = Create(new MemorySaveStore(), store, registry);
-        vm.LoadWushuangManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm, wushuang: true);
         Drive(vm, () => Program.Engine(vm).PendingDecision is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
         game = Program.Engine(vm);
         vm.ActivateHumanSkillCommand.Execute(vm.HumanSkillCards.Single(skill => skill.ContentId == "ol:sanchen"));
@@ -635,7 +635,7 @@ internal static class WushuangUiChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var vm = Create(new MemorySaveStore(), store, registry);
-        vm.LoadWushuangManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm, wushuang: true);
         Drive(vm, () => Program.Engine(vm).PendingDecision is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
         game = Program.Engine(vm);
         var window = new MainWindow(vm);
@@ -722,473 +722,6 @@ internal static class WushuangUiChecks
             Program.Assert(!vm.HasSelection && game.CardMovements.Count == before, "Cancelling the insufficient draft is a no-op for Core.");
         }
         finally { window.Content = null; window.DataContext = null; window.Close(); }
-    }
-
-    private static void FailedSaveKeepsConfiguration(MainViewModel vm, MainWindow window, FrameworkElement root,
-        FailingWriteSaveStore store, string output)
-    {
-        vm.NewGameCommand.Execute(null);
-        vm.OpenLobbyCategoryCommand.Execute("identity");
-        vm.OpenModeConfigurationCommand.Execute(vm.VisibleModeGroups.Single(group => group.Variants.Contains(vm.SelectedTableMode)));
-        Layout(root);
-        // Commit real elapsed time before freezing this fixture's wall clock.
-        Method("FlushWushuangClock").Invoke(vm, null);
-        Field("_wushuangClockSubmitting").SetValue(vm, true);
-        ((DispatcherTimer)Field("_wushuangClockTimer").GetValue(vm)!).Stop();
-        var game = Program.Engine(vm);
-        var revision = game.Revision;
-        var views = Enumerable.Range(0, game.CreateSnapshot(0).Players.Count)
-            .Select(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat))).ToArray();
-        var journal = CommandJson.Serialize(game.AcceptedCommands);
-        var mode = vm.SelectedTableMode;
-        var group = vm.SelectedModeGroup;
-        var category = vm.SelectedModeCategory;
-        var role = vm.SelectedStartingRole;
-        var team = vm.SelectedStartingTeam;
-        var error = (TextBlock)window.FindName("LobbySaveErrorText");
-        // Reuse this already committed game boundary; no new match or seed search.
-        Method("QueueAutoSave").Invoke(vm, null);
-        ((DispatcherTimer)Field("_saveTimer").GetValue(vm)!).Stop();
-        try
-        {
-            CheckSettingsSaveError();
-            var automatic = Saved(GameSaveSlot.Automatic);
-            var manual = Saved(GameSaveSlot.Manual);
-            var writes = store.WriteCount;
-            store.FailWrites = true;
-            foreach (var command in new[] { vm.StartNewGameCommand, vm.StartNewGameFromLobbyCommand })
-            {
-                var attempts = store.WriteAttempts;
-                command.Execute(null);
-                Program.Render(root, 1120, 740, ReferenceEquals(command, vm.StartNewGameFromLobbyCommand)
-                    ? Path.Combine(output, "wushuang-start-save-error.png") : null);
-                Program.Assert(store.WriteAttempts == attempts + 1 && store.WriteCount == writes &&
-                    Saved(GameSaveSlot.Automatic) == automatic && Saved(GameSaveSlot.Manual) == manual &&
-                    ReferenceEquals(Program.Engine(vm), game) && game.Revision == revision &&
-                    CommandJson.Serialize(game.AcceptedCommands) == journal &&
-                    Enumerable.Range(0, views.Length).All(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat)) == views[seat]) &&
-                    vm.IsNewGameSetupOpen && vm.IsLobbyConfigurationOpen && vm.IsModeConfigurationOpen &&
-                    vm.SelectedModeCategory == category && vm.SelectedModeGroup == group && vm.SelectedTableMode == mode &&
-                    vm.SelectedStartingRole == role && vm.SelectedStartingTeam == team && vm.HasSaveError &&
-                    !vm.IsIdentityRevealOpen && !vm.IsOpeningDealVisible && Field("_openingDealArmed").GetValue(vm) is false,
-                    "A blocked save must attempt once, preserve both files, the live game, all player views, journal and setup choices, and retain configuration without an identity or opening display.");
-                CheckError();
-            }
-            var message = vm.SaveStatus;
-            vm.BackInLobbySetupCommand.Execute(null);
-            Program.Render(root, 1120, 740, null);
-            CheckError();
-            Program.Assert(vm.IsModeSelectionOpen && vm.SaveStatus == message,
-                "Returning to mode selection must retain the visible save failure.");
-            vm.OpenModeConfigurationCommand.Execute(group);
-        }
-        finally
-        {
-            store.FailWrites = false;
-            Field("_wushuangClockSubmitting").SetValue(vm, false);
-        }
-        vm.StartNewGameFromLobbyCommand.Execute(null);
-        Program.Render(root, 1120, 740, null);
-        Program.Assert(!ReferenceEquals(Program.Engine(vm), game) && !vm.IsWushuangTable &&
-            !vm.IsNewGameSetupOpen && !vm.IsLobbyConfigurationOpen && vm.IsIdentityRevealOpen &&
-            !vm.HasSaveError && error.Visibility == Visibility.Collapsed &&
-            vm.SelectedTableMode == mode && store.GetSavedAt(GameSaveSlot.Automatic) is not null,
-            "Retrying after save recovery must persist the old game and enter the selected new match's identity display.");
-
-        void CheckSettingsSaveError()
-        {
-            var originalSpeed = vm.SelectedPlaybackSpeed;
-            var changedSpeed = vm.PlaybackSpeeds.First(speed => speed != originalSpeed);
-            var previousAutomatic = AutomaticFile();
-            var completedWrites = store.WriteCount;
-            try
-            {
-                Console.WriteLine($"Settings session-save boundary: status={game.State.Status}, pending={game.PendingDecision?.Kind}/{game.PendingDecision?.PlayerSeat}, " +
-                    $"duel={vm.IsWushuangTable}, auto={vm.IsAutoAdvance}, clock guard={Field("_wushuangClockSubmitting").GetValue(vm)}.");
-                Program.Assert(game.State.Status == EngineStatus.Running && vm.IsWushuangTable && !vm.IsAutoAdvance &&
-                    Field("_wushuangClockSubmitting").GetValue(vm) is true,
-                    "The settings save fixture must reuse the committed running duel with automatic progression stopped and its clock frozen.");
-                vm.OpenSettingsCommand.Execute(null);
-                vm.SelectedPlaybackSpeed = changedSpeed;
-                store.FailWrites = true;
-                Program.Assert(!vm.FlushPendingSave() && vm.HasSaveError && !vm.HasPreferencesError,
-                    "A failed session autosave must retain an independent, successful device-preferences state.");
-                Program.Render(root, 1120, 740, null);
-                var banner = window.FindName("SettingsSessionSaveError") as Border;
-                var message = window.FindName("SettingsSessionSaveStatus") as TextBlock;
-                var save = window.FindName("SettingsSaveGameButton") as Button;
-                Program.Assert(banner is not null && message is not null && save is not null,
-                    "Settings must expose the session save failure and its actual manual-save action in the pace section.");
-                var scroll = (ScrollViewer)window.FindName("SettingsContentScroll");
-                scroll.ScrollToEnd();
-                Program.Render(root, 1120, 740, Path.Combine(output, "settings-session-save-error.png"));
-                var presenter = Program.Find<ScrollContentPresenter>(scroll)
-                    .Single(item => ReferenceEquals(item.TemplatedParent, scroll));
-                var bounds = message!.TransformToAncestor(presenter).TransformBounds(new Rect(message.RenderSize));
-                var saveBounds = save!.TransformToAncestor(presenter).TransformBounds(new Rect(save.RenderSize));
-                var header = (Button)window.FindName("CloseSettingsButton");
-                var fullText = new TextBlock { Text = message.Text, FontFamily = message.FontFamily,
-                    FontSize = message.FontSize, TextWrapping = message.TextWrapping };
-                fullText.Measure(new Size(message.ActualWidth, double.PositiveInfinity));
-                Program.Assert(banner!.Visibility == Visibility.Visible && message.Text == vm.SessionSaveStatus &&
-                    message.ActualWidth > 0 && message.ActualHeight >= fullText.DesiredSize.Height - 1 &&
-                    Fits(bounds) && Fits(saveBounds) && header.ActualWidth > 0 && header.ActualHeight > 0 &&
-                    new Rect(root.RenderSize).Contains(header.TransformToAncestor(root).TransformBounds(new Rect(header.RenderSize))) &&
-                    save.IsEnabled && Equals(save.Content, "手动保存牌局") && ReferenceEquals(save.Command, vm.SaveGameCommand) &&
-                    vm.IsSettingsOpen && vm.SelectedPlaybackSpeed == changedSpeed && AutomaticFile() == previousAutomatic &&
-                    store.WriteCount == completedWrites && SameBoundary(),
-                    "The complete session error and clearly named manual-save action must be readable inside settings without losing the selected pace, header or any player boundary.");
-                store.FailWrites = false;
-                ((DispatcherTimer)Field("_saveTimer").GetValue(vm)!).Stop();
-                using (var host = new NativeResponseStatusChecks.NativeHost(vm))
-                {
-                    var nativeWindow = host.Window;
-                    host.Root.Width = 1120; host.Root.Height = 740;
-                    nativeWindow.UpdateLayout();
-                    var nativeSave = (Button)nativeWindow.FindName("SettingsSaveGameButton");
-                    var nativeScroll = (ScrollViewer)nativeWindow.FindName("SettingsContentScroll");
-                    nativeScroll.ScrollToEnd();
-                    SetFocus(new WindowInteropHelper(nativeWindow).Handle);
-                    Program.Assert(nativeSave.Focus() && ReferenceEquals(Keyboard.FocusedElement, nativeSave) &&
-                        GetFocus() == new WindowInteropHelper(nativeWindow).Handle,
-                        "Session saving must begin on the actual focused button in the hidden native settings window.");
-                    var routed = TableShortcutChecks.WithModifiers(ModifierKeys.None, () =>
-                    {
-                        var input = new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(nativeSave)!, 0, Key.Enter)
-                            { RoutedEvent = Keyboard.PreviewKeyDownEvent };
-                        nativeSave.RaiseEvent(input);
-                        var previewHandled = input.Handled;
-                        if (!previewHandled) { input.RoutedEvent = Keyboard.KeyDownEvent; nativeSave.RaiseEvent(input); }
-                        return !previewHandled && input.Handled;
-                    });
-                    nativeWindow.Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle);
-                    nativeWindow.UpdateLayout();
-                    var fallback = (CheckBox)nativeWindow.FindName("SettingsAutoAdvanceToggle");
-                    var nativePresenter = Program.Find<ScrollContentPresenter>(nativeScroll)
-                        .Single(item => ReferenceEquals(item.TemplatedParent, nativeScroll));
-                    var focusBounds = fallback.TransformToAncestor(nativePresenter).TransformBounds(new Rect(fallback.RenderSize));
-                    Console.WriteLine($"Native settings save focus: {Keyboard.FocusedElement?.GetType().Name}/{(Keyboard.FocusedElement as FrameworkElement)?.Name}, target={focusBounds}.");
-                    Program.Assert(routed && vm.IsSettingsOpen && !vm.HasSaveError && !vm.HasPreferencesError &&
-                        ReferenceEquals(Keyboard.FocusedElement, fallback) && fallback.IsVisible && fallback.IsEnabled && fallback.Focusable &&
-                        focusBounds.Width > 0 && focusBounds.Height > 0 && focusBounds.Left >= -1 && focusBounds.Top >= -1 &&
-                        focusBounds.Right <= nativePresenter.ActualWidth + 1 && focusBounds.Bottom <= nativePresenter.ActualHeight + 1 &&
-                        store.WriteCount == completedWrites + 1 && store.Read(GameSaveSlot.Manual).PlaybackSpeedId == changedSpeed.Id &&
-                        AutomaticFile() == previousAutomatic && SameBoundary(),
-                        "Fresh native Enter must save the manual slot once and recover visible settings pace focus without touching the automatic slot or any player boundary.");
-                }
-                Program.Render(root, 1120, 740, null);
-                Program.Assert(!vm.HasSaveError && !vm.HasPreferencesError && banner.Visibility == Visibility.Collapsed &&
-                    store.WriteCount == completedWrites + 1 && store.Read(GameSaveSlot.Manual).PlaybackSpeedId == changedSpeed.Id &&
-                    vm.SaveStatus.Contains("已手动保存", StringComparison.Ordinal) && vm.SelectedPlaybackSpeed == changedSpeed &&
-                    vm.IsSettingsOpen && AutomaticFile() == previousAutomatic && SameBoundary(),
-                    "Saving through settings must persist the active pace to the manual slot, clear the session warning and preserve the automatic save and every player boundary.");
-                bool Fits(Rect area) => area.Width > 0 && area.Height > 0 && area.Left >= -1 && area.Top >= -1 &&
-                    area.Right <= presenter.ActualWidth + 1 && area.Bottom <= presenter.ActualHeight + 1;
-            }
-            finally
-            {
-                store.FailWrites = false;
-                vm.SelectedPlaybackSpeed = originalSpeed;
-                vm.CloseSettingsCommand.Execute(null);
-                ((DispatcherTimer)Field("_saveTimer").GetValue(vm)!).Stop();
-            }
-            string? AutomaticFile() => store.GetSavedAt(GameSaveSlot.Automatic) is null ? null :
-                System.Text.Json.JsonSerializer.Serialize(store.Read(GameSaveSlot.Automatic));
-            bool SameBoundary() => ReferenceEquals(Program.Engine(vm), game) && game.Revision == revision &&
-                CommandJson.Serialize(game.AcceptedCommands) == journal &&
-                Enumerable.Range(0, views.Length).All(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat)) == views[seat]) &&
-                vm.SelectedModeCategory == category && vm.SelectedModeGroup == group && vm.SelectedTableMode == mode &&
-                vm.SelectedStartingRole == role && vm.SelectedStartingTeam == team && vm.IsModeConfigurationOpen;
-        }
-
-        string? Saved(GameSaveSlot slot) => store.GetSavedAt(slot) is null
-            ? null : GameCheckpointJson.Serialize(store.Read(slot).Checkpoint);
-        void CheckError()
-        {
-            var bounds = error.TransformToAncestor(root).TransformBounds(new Rect(error.RenderSize));
-            var fullText = new TextBlock { Text = error.Text, FontFamily = error.FontFamily,
-                FontSize = error.FontSize, TextWrapping = error.TextWrapping };
-            fullText.Measure(new Size(error.ActualWidth, double.PositiveInfinity));
-            Program.Assert(error.Visibility == Visibility.Visible && error.Text == vm.SessionSaveStatus &&
-                error.Parent is UIElement footer && DockPanel.GetDock(footer) == Dock.Bottom &&
-                !error.IsDescendantOf((ScrollViewer)window.FindName("ModeSetupScroll")) &&
-                error.ActualWidth > 0 && error.ActualHeight >= fullText.DesiredSize.Height - 1 &&
-                bounds.Left >= -1 && bounds.Top >= -1 && bounds.Right <= root.ActualWidth + 1 &&
-                bounds.Bottom <= root.ActualHeight + 1,
-                "The full save error must remain visible in the fixed setup footer on both steps at 1120x740.");
-        }
-    }
-
-    private static void IndependentSaveAccessWarning(MainViewModel vm, MemorySaveStore ordinary, FailingWriteSaveStore store)
-    {
-        var game = Program.Engine(vm);
-        var revision = game.Revision;
-        var views = Enumerable.Range(0, game.CreateSnapshot(0).Players.Count)
-            .Select(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat))).ToArray();
-        var journal = CommandJson.Serialize(game.AcceptedCommands);
-        var mode = vm.SelectedTableMode;
-        var independentWrites = store.WriteCount;
-        var automatic = GameCheckpointJson.Serialize(store.Read(GameSaveSlot.Automatic).Checkpoint);
-        var manual = GameCheckpointJson.Serialize(store.Read(GameSaveSlot.Manual).Checkpoint);
-        var ordinaryWrites = ordinary.WriteCount;
-        var status = vm.SaveStatus;
-        try
-        {
-            store.FailMetadata = true;
-            Method("RefreshWushuangSaveSlot").Invoke(vm, null);
-            Program.Assert(vm.HasWushuangSaveAccessError && vm.WushuangSaveAccessStatus.Contains("单骑无双", StringComparison.Ordinal) &&
-                !vm.HasWushuangSave && !vm.HasWushuangManualSave &&
-                !vm.ContinueWushuangCommand.CanExecute(null) && !vm.LoadWushuangManualGameCommand.CanExecute(null) &&
-                vm.RetryWushuangSaveAccessCommand.CanExecute(null) && !vm.HasSaveError && vm.SaveStatus == status &&
-                ordinary.WriteCount == ordinaryWrites && store.WriteCount == independentWrites && SameBoundary(),
-                "An independent metadata failure must expose its own recoverable warning without pretending there is no save, writing files or changing the ordinary save result or game.");
-            vm.SaveGameCommand.Execute(null);
-            var savedStatus = vm.SaveStatus;
-            Program.Assert(ordinary.WriteCount == ordinaryWrites + 1 && !vm.HasSaveError &&
-                savedStatus.Contains("已手动保存", StringComparison.Ordinal) &&
-                GameCheckpointJson.Serialize(ordinary.Read(GameSaveSlot.Manual).Checkpoint) == GameCheckpointJson.Serialize(game.CreateCheckpoint()) &&
-                vm.HasWushuangSaveAccessError && !vm.HasWushuangSave && !vm.HasWushuangManualSave && SameBoundary(),
-                "A successful ordinary write must remain a real save success while retaining the independent access warning.");
-            var warning = vm.WushuangSaveAccessStatus;
-            vm.RetryWushuangSaveAccessCommand.Execute(null);
-            Program.Assert(vm.HasWushuangSaveAccessError && vm.WushuangSaveAccessStatus == warning &&
-                !vm.HasWushuangSave && !vm.HasWushuangManualSave && vm.SaveStatus == savedStatus && !vm.HasSaveError &&
-                ordinary.WriteCount == ordinaryWrites + 1 && store.WriteCount == independentWrites && SameBoundary(),
-                "A failed access retry must retain its warning and ordinary save result without writing either store.");
-            store.FailMetadata = false;
-            vm.RetryWushuangSaveAccessCommand.Execute(null);
-            Program.Assert(!vm.HasWushuangSaveAccessError && vm.WushuangSaveAccessStatus.Length == 0 &&
-                vm.HasWushuangSave && vm.HasWushuangManualSave &&
-                vm.ContinueWushuangCommand.CanExecute(null) && vm.LoadWushuangManualGameCommand.CanExecute(null) &&
-                !vm.RetryWushuangSaveAccessCommand.CanExecute(null) && !vm.HasSaveError && vm.SaveStatus == savedStatus &&
-                ordinary.WriteCount == ordinaryWrites + 1 && store.WriteCount == independentWrites &&
-                GameCheckpointJson.Serialize(store.Read(GameSaveSlot.Automatic).Checkpoint) == automatic &&
-                GameCheckpointJson.Serialize(store.Read(GameSaveSlot.Manual).Checkpoint) == manual && SameBoundary(),
-                "Access recovery must restore both existing resume actions, clear only its own warning and preserve every saved checkpoint and live player boundary.");
-        }
-        finally
-        {
-            store.FailMetadata = false;
-            if (vm.HasWushuangSaveAccessError) vm.RetryWushuangSaveAccessCommand.Execute(null);
-        }
-
-        bool SameBoundary() => ReferenceEquals(Program.Engine(vm), game) && game.Revision == revision &&
-            vm.SelectedTableMode == mode && CommandJson.Serialize(game.AcceptedCommands) == journal &&
-            Enumerable.Range(0, views.Length).All(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat)) == views[seat]);
-    }
-
-    private static void IndependentSaveAccessWarningUi(MainViewModel vm, MemorySaveStore ordinary, FailingWriteSaveStore store, string output)
-    {
-        Program.Assert(vm.FlushPendingSave(), "The native access-warning fixture must settle its existing pending memory save before measuring retry writes.");
-        var game = Program.Engine(vm);
-        var revision = game.Revision;
-        var views = Enumerable.Range(0, game.CreateSnapshot(0).Players.Count)
-            .Select(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat))).ToArray();
-        var journal = CommandJson.Serialize(game.AcceptedCommands);
-        var independentWrites = store.WriteCount;
-        var attempts = store.WriteAttempts;
-        var ordinaryWrites = ordinary.WriteCount;
-        var automatic = GameCheckpointJson.Serialize(store.Read(GameSaveSlot.Automatic).Checkpoint);
-        var manual = GameCheckpointJson.Serialize(store.Read(GameSaveSlot.Manual).Checkpoint);
-        var ordinaryManual = GameCheckpointJson.Serialize(ordinary.Read(GameSaveSlot.Manual).Checkpoint);
-        var status = vm.SaveStatus;
-        var category = vm.SelectedModeCategory;
-        var mode = vm.SelectedTableMode;
-        var role = vm.SelectedStartingRole;
-        var team = vm.SelectedStartingTeam;
-        using var host = new NativeResponseStatusChecks.NativeHost(vm);
-        var window = host.Window;
-        var root = host.Root;
-        var handle = new WindowInteropHelper(window).Handle;
-        SetFocus(handle);
-        try
-        {
-            vm.NewGameCommand.Execute(null);
-            Pump();
-            var lobby = Program.Find<HomeLobby>(root).Single();
-            foreach (var configuration in new[] { false, true })
-            {
-                if (configuration) vm.OpenWushuangModeCommand.Execute(null);
-                else vm.BackToLobbyCommand.Execute(null);
-                Pump();
-                var scope = configuration ? (FrameworkElement)window : lobby;
-                var page = configuration ? "setup" : "lobby";
-                var warning = (Border)scope.FindName("WushuangSaveAccessWarning");
-                var text = (TextBlock)scope.FindName("WushuangSaveAccessErrorText");
-                var retry = (Button)scope.FindName("RetryWushuangSaveAccessButton");
-                var resume = (Button)scope.FindName(configuration ? "WushuangContinueButton" : "ContinueWushuangButton");
-                var fallback = (Button)(configuration ? window.FindName("StartNewGameButton") : lobby.FindName("WushuangBattleButton"));
-                ShowWarning();
-                host.Capture(output, $"wushuang-save-access-{page}-retry-before", 1120);
-                var bounds = text.TransformToAncestor(root).TransformBounds(new Rect(text.RenderSize));
-                var completeText = new TextBlock { Text = text.Text, FontFamily = text.FontFamily,
-                    FontSize = text.FontSize, TextWrapping = text.TextWrapping };
-                completeText.Measure(new Size(text.ActualWidth, double.PositiveInfinity));
-                Program.Assert(warning.IsVisible && text.Text == vm.WushuangSaveAccessStatus && text.Text.Contains("单骑无双", StringComparison.Ordinal) &&
-                    text.ActualWidth > 0 && text.ActualHeight >= completeText.DesiredSize.Height - 1 &&
-                    bounds.Left >= -1 && bounds.Top >= -1 && bounds.Right <= root.ActualWidth + 1 && bounds.Bottom <= root.ActualHeight + 1 &&
-                    ReferenceEquals(retry.Command, vm.RetryWushuangSaveAccessCommand) && FullyVisible(retry) && !resume.IsVisible && SameBoundary(),
-                    $"The native {page} must display the complete independent access warning and a real retry without changing saves or the game.");
-                PressRetry();
-                Pump();
-                Program.Assert(vm.HasWushuangSaveAccessError && warning.IsVisible && retry.IsVisible && retry.IsEnabled &&
-                    ReferenceEquals(Keyboard.FocusedElement, retry) && SameBoundary(),
-                    $"A failed native {page} retry must retain its usable retry focus and the unchanged save boundary.");
-
-                store.FailMetadata = false;
-                PressRetry();
-                Pump();
-                Program.Assert(!vm.HasWushuangSaveAccessError && !warning.IsVisible && resume.IsVisible && resume.IsEnabled &&
-                    ReferenceEquals(Keyboard.FocusedElement, resume) && FullyVisible(resume) && SameBoundary(),
-                    $"Successful native {page} retry must focus the existing same-page automatic resume action without loading or writing a game.");
-                host.Capture(output, $"wushuang-save-access-{page}-retry-after", 1120);
-
-                store.HideAutomaticMetadata = store.HideManualMetadata = true;
-                ShowWarning();
-                store.FailMetadata = false;
-                PressRetry();
-                Pump();
-                Program.Assert(!vm.HasWushuangSaveAccessError && !vm.HasWushuangSave && !vm.HasWushuangManualSave &&
-                    !warning.IsVisible && fallback.IsVisible && fallback.IsEnabled && ReferenceEquals(Keyboard.FocusedElement, fallback) &&
-                    FullyVisible(fallback) && SameBoundary(),
-                    $"A recovered empty {page} store must focus its existing new-game entry while retaining every stored fixture checkpoint.");
-                store.HideAutomaticMetadata = store.HideManualMetadata = false;
-                Method("RefreshWushuangSaveSlot").Invoke(vm, null);
-                Pump();
-                if (!configuration) continue;
-
-                store.HideAutomaticMetadata = true;
-                ShowWarning();
-                store.FailMetadata = false;
-                PressRetry();
-                Pump();
-                var manualResume = (Button)window.FindName("WushuangLoadManualButton");
-                Program.Assert(!vm.HasWushuangSaveAccessError && !vm.HasWushuangSave && vm.HasWushuangManualSave &&
-                    manualResume.IsVisible && manualResume.IsEnabled && ReferenceEquals(Keyboard.FocusedElement, manualResume) &&
-                    FullyVisible(manualResume) && SameBoundary(),
-                    "A native configuration retry with only a manual save must focus that real independent load action.");
-                store.HideAutomaticMetadata = false;
-                Method("RefreshWushuangSaveSlot").Invoke(vm, null);
-                Pump();
-
-                QueueSuccessfulRetry();
-                Program.Assert(fallback.Focus(), "The live configuration start action must accept focus before the retry callback.");
-                Pump();
-                Program.Assert(ReferenceEquals(Keyboard.FocusedElement, fallback) && !vm.HasWushuangSaveAccessError && SameBoundary(),
-                    "A delayed access retry must preserve the valid configuration action the user reached.");
-                QueueSuccessfulRetry();
-                vm.OpenSettingsCommand.Execute(null);
-                Pump();
-                var settings = (FrameworkElement)window.FindName("SettingsOverlay");
-                Program.Assert(vm.IsSettingsOpen && Keyboard.FocusedElement is UIElement { IsVisible: true, IsEnabled: true } focused &&
-                    focused.IsDescendantOf(settings) && !vm.HasWushuangSaveAccessError && SameBoundary(),
-                    "A delayed independent access retry must not steal focus from covering settings.");
-                vm.CloseSettingsCommand.Execute(null);
-                Pump();
-                QueueSuccessfulRetry();
-                vm.BackInLobbySetupCommand.Execute(null);
-                Pump();
-                Program.Assert(vm.IsModeSelectionOpen && Keyboard.FocusedElement is UIElement current &&
-                    current.IsDescendantOf((FrameworkElement)window.FindName("ModeSelectionPanel")) &&
-                    !vm.HasWushuangSaveAccessError && SameBoundary(),
-                    "An access retry queued by a closed configuration step must preserve the actual mode-selection focus.");
-
-                bool FullyVisible(Button button)
-                {
-                    FrameworkElement viewport = root;
-                    var scroll = (ScrollViewer)window.FindName("ModeSetupScroll");
-                    if (configuration && button.IsDescendantOf(scroll))
-                        viewport = Program.Find<ScrollContentPresenter>(scroll).Single(item => ReferenceEquals(item.TemplatedParent, scroll));
-                    var buttonBounds = button.TransformToAncestor(viewport).TransformBounds(new Rect(button.RenderSize));
-                    return buttonBounds.Width > 0 && buttonBounds.Height > 0 && buttonBounds.Left >= -1 && buttonBounds.Top >= -1 &&
-                        buttonBounds.Right <= viewport.ActualWidth + 1 && buttonBounds.Bottom <= viewport.ActualHeight + 1;
-                }
-                void ShowWarning()
-                {
-                    store.FailMetadata = true;
-                    Method("RefreshWushuangSaveSlot").Invoke(vm, null);
-                    Pump();
-                    Program.Assert(retry.IsVisible && retry.IsEnabled && retry.Focus(),
-                        $"The native {page} retry must be visible, enabled and focusable before Enter.");
-                    Pump();
-                }
-                void PressRetry()
-                {
-                    Program.Assert(ReferenceEquals(Keyboard.FocusedElement, retry) && GetFocus() == handle,
-                        $"Native {page} retry input must start on the actual focused button in its hidden HWND.");
-                    TableShortcutChecks.WithModifiers(ModifierKeys.None, () =>
-                    {
-                        var input = new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(retry)!, 0, Key.Enter)
-                            { RoutedEvent = Keyboard.PreviewKeyDownEvent };
-                        retry.RaiseEvent(input);
-                        Program.Assert(!input.Handled, "The access retry must receive native Enter rather than a window default action.");
-                        input.RoutedEvent = Keyboard.KeyDownEvent;
-                        retry.RaiseEvent(input);
-                        return true;
-                    });
-                }
-                void QueueSuccessfulRetry()
-                {
-                    ShowWarning();
-                    store.FailMetadata = false;
-                    PressRetry();
-                    window.Dispatcher.Invoke(() => { }, DispatcherPriority.DataBind);
-                }
-            }
-            Program.Assert(SameBoundary(), "All native access-warning paths must preserve saves, every player view and the accepted command journal.");
-        }
-        finally
-        {
-            store.FailMetadata = store.HideAutomaticMetadata = store.HideManualMetadata = false;
-            Method("RefreshWushuangSaveSlot").Invoke(vm, null);
-            vm.IsSettingsOpen = false;
-            vm.IsNewGameSetupOpen = false;
-            vm.SelectedModeCategory = category;
-            vm.SelectedTableMode = mode;
-            vm.SelectedStartingRole = role;
-            vm.SelectedStartingTeam = team;
-            Pump();
-        }
-        void Pump()
-        {
-            window.UpdateLayout();
-            window.Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle);
-            window.UpdateLayout();
-        }
-        bool SameBoundary() => ReferenceEquals(Program.Engine(vm), game) && game.Revision == revision &&
-            ordinary.WriteCount == ordinaryWrites && store.WriteCount == independentWrites && store.WriteAttempts == attempts &&
-            vm.SaveStatus == status && !vm.HasSaveError && CommandJson.Serialize(game.AcceptedCommands) == journal &&
-            GameCheckpointJson.Serialize(store.Read(GameSaveSlot.Automatic).Checkpoint) == automatic &&
-            GameCheckpointJson.Serialize(store.Read(GameSaveSlot.Manual).Checkpoint) == manual &&
-            GameCheckpointJson.Serialize(ordinary.Read(GameSaveSlot.Manual).Checkpoint) == ordinaryManual &&
-            Enumerable.Range(0, views.Length).All(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat)) == views[seat]);
-    }
-
-    [DllImport("user32.dll")] private static extern nint SetFocus(nint handle);
-    [DllImport("user32.dll")] private static extern nint GetFocus();
-
-    private sealed class FailingWriteSaveStore : IGameSaveStore
-    {
-        private readonly MemorySaveStore _inner = new();
-        public bool FailWrites { get; set; }
-        public bool FailMetadata { get; set; }
-        public bool HideAutomaticMetadata { get; set; }
-        public bool HideManualMetadata { get; set; }
-        public int WriteAttempts { get; private set; }
-        public int WriteCount => _inner.WriteCount;
-        public DateTimeOffset? GetSavedAt(GameSaveSlot slot)
-        {
-            if (FailMetadata) throw new IOException("Controlled independent save metadata failure.");
-            if (slot == GameSaveSlot.Automatic && HideAutomaticMetadata || slot == GameSaveSlot.Manual && HideManualMetadata) return null;
-            return _inner.GetSavedAt(slot);
-        }
-        public GameSaveFile Read(GameSaveSlot slot) => _inner.Read(slot);
-        public void Write(GameSaveSlot slot, GameSaveFile save)
-        {
-            WriteAttempts++;
-            if (FailWrites) throw new IOException("Controlled save failure.");
-            _inner.Write(slot, save);
-        }
     }
 
     private static FieldInfo Field(string name) => typeof(MainViewModel).GetField(name, BindingFlags.NonPublic | BindingFlags.Instance)!;

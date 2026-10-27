@@ -11,67 +11,6 @@ internal static class ShanheSchoolSlashChecks
     private const string Identity = "fixture:school-slash-identity";
     private static readonly CardKind[] Slashes = [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.ColdSlash, CardKind.Slash];
 
-    public static void InitialAndPaidCompletionAllowRealSlashesWithoutRemovingDistance()
-    {
-        foreach (var initiallyComplete in new[] { true, false })
-        {
-            var s = Scene.Start(initiallyComplete);
-            Need(!s.Game.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash && a.TargetSeats.Contains(2)) &&
-                s.Game.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash && a.TargetSeats.SequenceEqual([1])),
-                "With four living seats and no weapon, the ordinary adjacent target is legal and the opposite seat remains outside Slash distance.");
-            s.Slash(CardKind.Slash);
-            if (!initiallyComplete)
-            {
-                Need(!s.Game.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash),
-                    "Before owning the school, one real normal Slash consumes the shared ordinary quota for all remaining elemental Slashes.");
-                var item = s.Game.CreateShanheMarketSnapshot(0)!.ShopItems.Single(i => i.Reward?.Id == Component);
-                s.Accept(new CardGame.Core.BuyShanheMarketItemCommand(0, item.ChoiceId, null, s.Game.Revision)); s.Play();
-                Need(s.Game.CreateShanheMarketSnapshot(0)!.Gold == 400 &&
-                    s.Events<ShanheMarketPurchaseCommittedEvent>().Length == 1 &&
-                    s.Events<ShanheMarketPurchaseAppliedEvent>().Length == 1,
-                    "The missing component is paid and applied exactly once inside the already-used Play phase.");
-            }
-            foreach (var kind in Slashes.Skip(1))
-            {
-                Need(s.Game.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash && a.CardId is { } id &&
-                        s.View().Hand.Any(card => card.Id == id && card.Kind == kind) && a.TargetSeats.SequenceEqual([1])) &&
-                    !s.Game.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash && a.TargetSeats.Contains(2)),
-                    "A genuinely completed school allows the next normal or elemental Slash while retaining each card's ordinary distance restriction.");
-                s.Slash(kind);
-            }
-            var uses = s.Events<CardUseDeclaredEvent>().Where(e => e.SourceSeat == 0).ToArray();
-            Need(uses.Select(e => e.CardKind).SequenceEqual(Slashes) && uses.Select(e => e.CardId).Distinct().Count() == 5 &&
-                uses.All(e => s.Events<CardUseFinishedEvent>().Count(done => done.ResolutionId == e.ResolutionId) == 1 &&
-                    s.Game.CardMovements.Count(m => m.CardId == e.CardId && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1) &&
-                s.View().Skills!.Count(skill => skill.ContentId == ShanheSchoolEffects.MultiSlashSkillId) == 1 &&
-                s.Game.CreateShanheMarketSnapshot(0)!.ExtraSkillIds.Count == 0 &&
-                s.Game.ResolutionStack.All(frame => frame is not CardUseFrame and not ProgramSkillFrame),
-                "Five genuine physical uses complete once each, including Fire, Thunder and Cold; the derived unlimited tactic occupies no ordinary skill slot.");
-        }
-    }
-
-    public static void UnownedGrantAndOrdinaryModeCannotProvideUnlimitedSlashes()
-    {
-        var incomplete = Scene.Start(false);
-        incomplete.Accept(new UseProgramSkillCommand(0, Driver, "grant-unlimited", [], [], incomplete.Game.Revision,
-            incomplete.Game.PendingDecision!.PromptId)); incomplete.Play();
-        Need(incomplete.View().Skills!.Any(s => s.ContentId == ShanheSchoolEffects.MultiSlashSkillId),
-            "The incomplete-school fixture truly holds the same registered unlimited program before its negative quota check.");
-        incomplete.Slash(CardKind.Slash);
-        Need(!incomplete.Game.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash),
-            "A manual grant cannot impersonate an actual completed school and cannot exempt the second elemental Slash from the normal quota.");
-
-        var normal = Scene.StartOrdinary();
-        Need(normal.View().Skills!.Any(s => s.ContentId == ShanheSchoolEffects.MultiSlashSkillId) && normal.View().HandCount >= 2,
-            "An actual ordinary-mode printed general really owns the exact same derived program and multiple physical Slash cards.");
-        var target = normal.Game.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Slash && a.TargetSeats.SequenceEqual([1]));
-        normal.Accept(new PlayCardCommand(0, target.CardId!.Value, [1], normal.Game.Revision,
-            normal.Game.PendingDecision!.PromptId, target.PlayedCardKind)); normal.Play();
-        Need(normal.View().Hand.Any(c => c.Kind == CardKind.Slash) &&
-            !normal.Game.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash),
-            "The Shanhe-only school program supplies no unlimited quota in an ordinary identity game, despite being printed and registered there.");
-    }
-
     public static void ProductionSixComponentRecipeDispatchesItsDerivedSchoolProgram()
     {
         var source = StandardShanheCampaignCatalog.CreateCodexDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);

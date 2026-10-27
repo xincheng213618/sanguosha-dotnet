@@ -145,7 +145,6 @@ internal static class TargetCardChecks
             "An AI target-card thought included a hidden card id.");
     }
 
-
     private static (GameEngine Game, LegalAction Action) FindHumanFixture(CardKind? required = null, bool paced = false, bool sourceNullification = false)
     {
         IEnumerable<int> seeds = sourceNullification && required is { } kind

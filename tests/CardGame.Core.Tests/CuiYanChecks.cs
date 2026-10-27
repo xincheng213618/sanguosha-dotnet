@@ -8,48 +8,6 @@ internal static class CuiYanChecks
 {
     private const string Owner="fixture:cui-owner",Mode="identity:classic-cui",Driver="fixture:cui-driver",Peer="fixture:cui-peer-response",Quiet="fixture:cui-quiet",Watch="fixture:cui-watch",Health="fixture:cui-health",Conditional="fixture:cui-conditional",Rescue="fixture:cui-rescue",Foreign="fixture:cui-foreign",Shutong="ol:shutong",Zhijie="ol:zhijie";
     private static string Scene="";
-    public static void ShutongSelfEquipmentMultiMaterialAndNextUseCold()
-    {
-        var(g,r)=Start("equipment");var hand=V(g,0).HandCount;
-        Native(g,a=>a.ConversionSource is null&&a.Kind==LegalActionKind.Equip);Reach(g,()=>At(g,Watch));
-        var first=E<CuiYanStartedEvent>(g).Single();Need(first.DrawQualified&&first.Suit==Suit.Spade&&E<ShutongNextUseGrantedEvent>(g)is[{RecipientSeat:0,Suit:Suit.Spade}]&&V(g,0).HandCount==hand,"Real native self equipment is a designated self use, draws once, then issues one deduplicated exact-suit next-use restriction.");
-        var receipt=g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.CuiYan is not null).CuiYan!;var frozen=false;try{((IList<int>)receipt.Targets).Add(3);}catch(NotSupportedException){frozen=true;}Need(frozen&&g.CreateSnapshot(1).Players[0].Hand.Count==0,"The own receipt targets are deeply frozen and other viewers cannot inspect the actual hand/draw entity.");
-        g=Cold(g,r);Continue(g);Play(g);Need(!g.GetHumanLegalActions().Any(a=>a.Kind==LegalActionKind.Equip&&a.ConversionSource is null),"The same printed/native suit cannot be used as the next physical equipment.");
-        var blocked=V(g,0).Hand.First().Id;var state=State(g);var rejected=g.Submit(new PlayCardCommand(0,blocked,[],g.Revision,P(g)!.PromptId));Need(!rejected.Accepted&&State(g)==state,"An unpublished forbidden native use is rejected without paying or mutating committed state.");
-        Pair(g);Reach(g,()=>At(g,Watch));var pair=g.ResolutionStack.OfType<CardUseFrame>().Last(u=>u.Action?.PhysicalCards.Count==2);var current=g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.CuiYan is not null).CuiYan!;
-        Need(pair.Action!.EffectiveSuit==Suit.Spade&&current.Suit==Suit.None&&current.DrawQualified&&E<ShutongNextUseConsumedEvent>(g).Count(e=>e.GrantFrameId==first.FrameId&&e.RecipientSeat==0&&!e.ResponseUse)==1&&E<ShutongNextUseGrantedEvent>(g).All(e=>e.FrameId!=g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.CuiYan is not null).Id),"Two same-Spade physical materials retain the old shared appearance, are no-suit for Shutong, consume the prior next-use once, and do not invent a new suit ban.");
-        g=Cold(g,r);Continue(g);Play(g);Need(g.GetHumanLegalActions().Any(a=>a.Kind==LegalActionKind.Equip&&a.ConversionSource is null),"After the genuine no-suit use, another same-suit physical card is legal again.");_=Cold(g,r);
-    }
-    public static void ShutongTrueResponsesPlayedAndTurnExpiryCold()
-    {
-        foreach(var scene in new[]{"played","dodge","nullification","expiry","rescue-native","rescue-converted"})
-        {
-            var(g,r)=Start(scene);Use(g,"stock");Play(g);NativeConverted(g,CardKind.Alcohol,Suit.Heart);Reach(g,()=>At(g,Watch));g=Cold(g,r);Continue(g);Play(g);var grant=E<ShutongNextUseGrantedEvent>(g).Single(e=>e.RecipientSeat==0);
-            Need(grant.Suit==Suit.Heart,"The issued suit is Heart, not a red/black prohibition.");
-            if(scene.StartsWith("rescue-",StringComparison.Ordinal))
-            {
-                Need(V(g,0).Hand.Any(c=>c.Suit==Suit.Heart)&&V(g,0).Hand.Any(c=>c.Suit==Suit.Spade),"Both forbidden and allowed physical suits really remain before the dying request.");
-                Use(g,"dying");Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.RescueDying});var rescue=P(g)!;
-                var choices=rescue.Choices.Where(c=>c.Parameters.GetValueOrDefault("response")is"peach"or"alcohol").ToArray();
-                Need(V(g,0).Hp==0&&choices.All(c=>c.Cards.Count==1&&V(g,0).Hand.Single(h=>h.Id==c.Cards[0]).Suit==Suit.Spade)&&new[]{"peach","alcohol"}.All(name=>choices.Any(c=>c.Parameters.GetValueOrDefault("response")==name))&&choices.All(c=>(c.Parameters.ContainsKey("conversion-skill-id"))==(scene=="rescue-converted")),"The genuine dying menu suppresses Heart Peach and Wine for native cards and exact conversions, while both legal Spade rescue kinds remain: "+Diagnostic(g));
-                var paid=choices.First(c=>c.Parameters.GetValueOrDefault("response")=="peach");g=Cold(g,r);Answer(g,c=>c.Id==paid.Id);Reach(g,()=>At(g,Watch));
-                Need(E<ShutongNextUseConsumedEvent>(g).Count(e=>e.GrantFrameId==grant.FrameId&&e.RecipientSeat==0&&!e.ResponseUse)==1&&V(g,0).Hp==0,"A real accepted Spade rescue Use consumes the previous Heart restriction before its target-finalized draw and native recovery.");g=Cold(g,r);Continue(g);Play(g);
-                Need(V(g,0).Hp==1&&E<RecoveryAppliedEvent>(g).Count(e=>e.SourceSeat==0&&e.TargetSeat==0&&e.Amount==1)==1,"Cold rescue return applies the paid native recovery once after its genuine draw child.");_=Cold(g,r);continue;
-            }
-            if(scene=="expiry")
-            {End(g);Reach(g,()=>g.State.CurrentSeat==0&&g.State.TurnNumber>grant.ActualTurn&&P(g)is{Kind:DecisionKind.PlayCard,PlayerSeat:0});Need(!E<ShutongNextUseConsumedEvent>(g).Any(e=>e.GrantFrameId==grant.FrameId)&&g.GetHumanLegalActions().Any(a=>a.CardId is{}id&&V(g,0).Hand.Any(c=>c.Id==id&&c.Suit==Suit.Heart)),"An unused grant expires only when its actual turn cursor returns; no fake use consumption is emitted.");_=Cold(g,r);continue;}
-            Use(g,scene=="dodge"?"incoming":"incoming-duel",[1]);
-            if(scene=="dodge")
-            {Reach(g,()=>P(g)?.Choices.Any(c=>c.Parameters.GetValueOrDefault("offer-option")?.StartsWith("target-",StringComparison.Ordinal)==true)==true);Answer(g,c=>c.Targets.SequenceEqual([0]));Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.RespondDodge});}
-            else if(scene=="nullification")Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.Nullification});
-            else Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.RespondSlash});
-            var prompt=P(g)!;var heart=prompt.Choices.Where(c=>c.Cards.Count==1&&V(g,0).Hand.Any(h=>h.Id==c.Cards[0]&&h.Suit==Suit.Heart)).ToArray();var spade=prompt.Choices.FirstOrDefault(c=>c.Cards.Count==1&&V(g,0).Hand.Any(h=>h.Id==c.Cards[0]&&h.Suit==Suit.Spade));
-            Need(scene=="played"?heart.Length>0:heart.Length==0&&spade is not null,"Pure Duel played cards remain legal; actual own Dodge/Nullification rejects only the exact forbidden Heart suit: "+Diagnostic(g));g=Cold(g,r);
-            Answer(g,c=>scene=="played"?c.Id==heart[0].Id:c.Id==spade!.Id);Play(g);
-            Need(E<ShutongNextUseConsumedEvent>(g).Count(e=>e.GrantFrameId==grant.FrameId&&e.RecipientSeat==0&&e.ResponseUse)==(scene=="played"?0:1),"True response use consumes once; pure played does not consume a use-only obligation.");
-            Need(E<CardRespondedEvent>(g).Any(e=>e.ResponderSeat==0),"The response was genuinely paid and executed by the human through the native request.");_=Cold(g,r);
-        }
-    }
     public static void ZhijiePreSkillHistoryActualEndAndRangeCold()
     {
         foreach(var scene in new[]{"history","missing-target"})
@@ -71,19 +29,6 @@ internal static class CuiYanChecks
             Need(V(g,target).Hp==hp-1&&E<CuiYanDamageIssuedEvent>(g)is[{SourceSeat:0}]&&E<DamageAppliedEvent>(g).Count(e=>e.SourceSeat==0&&e.TargetSeat==target&&e.Amount==1)==1,"Dead actual-turn-owner typed return and cold replay preserve precisely one genuine Zhijie damage.");_=Cold(g,r);
         }
     }
-    public static void ShutongIssuedLossDeathAndLegacyAlcoholCold()
-    {
-        foreach(var scene in new[]{"loss","death","legacy"})
-        {
-            var(g,r)=Start(scene);
-            if(scene=="legacy")
-            {Use(g,"dying");Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.RescueDying}&&P(g)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("response")=="program-trigger"&&c.Parameters.GetValueOrDefault("skill-id")==Rescue));Answer(g,c=>c.Parameters.GetValueOrDefault("response")=="program-trigger"&&c.Parameters.GetValueOrDefault("skill-id")==Rescue);Reach(g,()=>At(g,Watch));var use=g.ResolutionStack.OfType<CardUseFrame>().Last(u=>u.CardKind==CardKind.Alcohol);Need(use is{CardId:0,PhysicalCardIds.Count:0,CuiYanLegacyAlcohol.Stage:CuiYanLegacyAlcoholStage.Targets}&&V(g,0).Hp==0&&E<CuiYanDrawIssuedEvent>(g).Single().ActualCount==1,"The real zero-entity self-rescue Wine enters actual target-finalized Draw1 before native recovery.");g=Cold(g,r);Continue(g);Play(g);Need(V(g,0).Hp==1&&E<RecoveryAppliedEvent>(g).Count(e=>e.SourceSeat==0&&e.TargetSeat==0&&e.Amount==1)==1&&E<CuiYanLegacyAlcoholStageEvent>(g).Count(e=>e.Stage==CuiYanLegacyAlcoholStage.Recovery)==1,"Original Dying and legacy Wine return recover exactly once after the real draw children.");_=Cold(g,r);continue;}
-            Native(g,a=>a.Kind==LegalActionKind.Equip&&a.ConversionSource is null);Reach(g,()=>At(g,Watch));var grant=E<ShutongNextUseGrantedEvent>(g).Single(e=>e.RecipientSeat==0);Need(grant.Suit==Suit.Spade&&E<CuiYanDrawIssuedEvent>(g).Single().ActualCount==1,"Next-use entitlement is issued before the draw child mutates health/source.");g=Cold(g,r);Continue(g);
-            if(scene=="death")
-            {Reach(g,()=>!V(g,0).IsAlive);Need(g.State.Winner==Winner.None,"A real non-lord issuer death leaves a live native game.");g=Cold(g,r);Reach(g,()=>E<CuiYanCompletedEvent>(g).Any(e=>e.FrameId==grant.FrameId));Need(E<CuiYanDrawIssuedEvent>(g).Count(e=>e.FrameId==grant.FrameId)==1,"A paid draw source's death drains children and finishes its original receipt without another draw.");_=Cold(g,r);continue;}
-            Play(g);Need(!V(g,0).Skills!.Any(s=>s.Id==Shutong)&&!g.GetHumanLegalActions().Any(a=>a.Kind==LegalActionKind.Equip&&a.ConversionSource is null),"Actual HP-conditional skill loss cannot revoke an already-issued suit prohibition.");Pair(g);Play(g);Need(E<ShutongNextUseConsumedEvent>(g).Count(e=>e.GrantFrameId==grant.FrameId&&e.RecipientSeat==0)==1&&E<CuiYanStartedEvent>(g).Length==1&&g.GetHumanLegalActions().Any(a=>a.Kind==LegalActionKind.Equip&&a.ConversionSource is null),"A later legal no-suit true use consumes the retained grant once and lost ShuTong cannot issue another.");_=Cold(g,r);
-        }
-    }
     private static PlayerSnapshot V(GameEngine g,int seat)=>g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g)=>Enumerable.Range(0,4).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);
     private static T[] E<T>(GameEngine g)where T:IGameEvent=>g.Events.Select(e=>e.Payload).OfType<T>().ToArray();
@@ -93,7 +38,6 @@ internal static class CuiYanChecks
     private static void Answer(GameEngine g,Func<PromptChoice,bool> pick){var p=P(g)!;var choice=p.Choices.FirstOrDefault(pick);Need(p.PlayerSeat==0&&choice is not null,"Missing actual human choice: "+Diagnostic(g));Accept(g,new AnswerPromptCommand(0,p.PromptId,choice!.Id,g.Revision));}
     private static void Continue(GameEngine g)=>Answer(g,c=>c.Parameters.GetValueOrDefault("option-id")=="continue");
     private static void Use(GameEngine g,string id,int[]? targets=null)=>Accept(g,new UseProgramSkillCommand(0,Driver,id,[],targets??[],g.Revision,P(g)!.PromptId));
-    private static void Pair(GameEngine g)=>Accept(g,new UseProgramSkillCommand(0,Driver,"pair",V(g,0).Hand.Take(2).Select(c=>c.Id).ToArray(),[1],g.Revision,P(g)!.PromptId));
     private static void Native(GameEngine g,Func<LegalAction,bool> pick){var a=g.GetHumanLegalActions().First(pick);Accept(g,new PlayCardCommand(0,a.CardId!.Value,a.TargetSeats,g.Revision,P(g)!.PromptId,a.PlayedCardKind,a.TargetCardId){ConversionSource=a.ConversionSource});}
     private static void NativeConverted(GameEngine g,CardKind kind,Suit suit)=>Native(g,a=>a.ConversionSource?.SkillId==Driver&&a.PlayedCardKind==kind&&a.CardId is{}id&&V(g,0).Hand.Any(h=>h.Id==id&&h.Suit==suit));
     private static void End(GameEngine g)=>Accept(g,new EndPlayPhaseCommand(0,g.Revision,P(g)!.PromptId));

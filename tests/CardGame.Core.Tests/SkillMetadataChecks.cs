@@ -124,7 +124,6 @@ internal static class SkillMetadataChecks
         }
     }
 
-
     private static void Require(bool value, string message)
     {
         if (!value) throw new InvalidOperationException(message);
@@ -143,7 +142,6 @@ internal static class SkillMetadataChecks
 
         throw new InvalidOperationException($"Expected {typeof(T).Name}.");
     }
-
 
     private sealed class MetadataFixture(
         SkillTag tags,

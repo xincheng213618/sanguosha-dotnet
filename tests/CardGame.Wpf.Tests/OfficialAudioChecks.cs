@@ -14,7 +14,6 @@ using static Program;
 internal static class OfficialAudioChecks
 {
 
-
     public static void NativeSilentPlayback()
     {
         using var output = new MediaPlayerAudioOutput();

@@ -19,6 +19,7 @@ public sealed record MobileShiWeiYanPending(string Operation, int Stage, int Tur
 {
     private readonly IReadOnlyList<int> _cards = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
+    public NativeDrawOutcome? KuangguDraw { get; init; }
 }
 public sealed partial record ProgramSkillFrame
 {

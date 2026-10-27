@@ -79,8 +79,7 @@ public sealed partial class MainViewModel
             if (state is not null)
             {
                 foreach (var card in state.StartingCards) AddLoadout(card, "随身牌 · 每战起手获得");
-                foreach (var card in state.StartingEquipment) AddLoadout(card, ShanheStartingResourcesExpireOnUse
-                    ? "随身装备 · 每战起手获得" : "开场装备 · 每战装备");
+                foreach (var card in state.StartingEquipment) AddLoadout(card, "随身装备 · 开战直接装备");
             }
         }
         else

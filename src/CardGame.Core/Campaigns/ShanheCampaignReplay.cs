@@ -56,7 +56,12 @@ public sealed record ShanheCampaignOptions(int Seed, string PlayerGeneralId)
 [JsonDerivedType(typeof(BuyShanheMarketItemCommand), "buy-market-item")]
 [JsonDerivedType(typeof(ChooseShanheNodeOptionCommand), "choose-option")]
 [JsonDerivedType(typeof(CompleteShanheBattleCommand), "complete-battle")]
+[JsonDerivedType(typeof(BeginShanheBattleAttemptCommand), "begin-battle-attempt")]
+[JsonDerivedType(typeof(EndShanheExpeditionCommand), "end-expedition")]
 public abstract record ShanheCampaignCommand(long ExpectedRevision);
+
+public sealed record EndShanheExpeditionCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
+public sealed record BeginShanheBattleAttemptCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 
 public sealed record MoveShanheNodeCommand(string NodeId, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record ChooseShanheRewardCommand(string RewardId, string? ReplaceSkillId, long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);

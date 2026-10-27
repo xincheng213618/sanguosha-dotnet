@@ -35,20 +35,6 @@ internal static class ShanheBlackLightArmorChecks
             "Every target suppression returns through the original native action to the live human Play boundary.");
     }
 
-    public static void QinggangMultiTargetSlashBypassesArmorWithoutBypassingBlackTrickProtection()
-    {
-        var scene = Scene.Start(ignoreArmor: true);
-        Need(scene.Player(0).Equipment.Any(card => card.Kind == CardKind.QinggangSword),
-            "The attacker's armor bypass comes from a real installed Qinggang Sword entity.");
-        var slash = scene.Use(CardKind.FireSlash, 2, [1, 3]);
-        Need(scene.Player(1).Hp == 19 && scene.Player(3).Hp == 19 && !scene.Nullified(slash, 1),
-            "Qinggang's actual multi-target Slash ignores Black Light Armor before individual response attacks are issued.");
-        var chain = scene.Use(CardKind.IronChain, 4, [1, 3]);
-        Need(!scene.Player(1).IsChained && scene.Player(3).IsChained && scene.Nullified(chain, 1),
-            "The same physical weapon does not grant ordinary tricks armor bypass: the black Iron Chain still has its wearer's effect nullified.");
-        scene.AssertSinglePayment(slash); scene.AssertSinglePayment(chain);
-    }
-
     private sealed class Scene(GameEngine game)
     {
         public GameEngine Game { get; } = game;

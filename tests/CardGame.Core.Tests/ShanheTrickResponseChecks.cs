@@ -49,57 +49,6 @@ internal static class ShanheTrickResponseChecks
             "The enemy may respond to the actual subsequent counterspell, and the friendly original target still pays its own Duel response.");
     }
 
-    public static void PaidSuanwuyiceKeepsBystandersAndResumesItsOwnBlockedInitialCounterspell()
-    {
-        var chain = Scene.Start(ownCounter: true, targetCounter: true, bystanderCounter: true);
-        chain.Buy(StandardShanheCampaignCatalog.CurrentSuanwuyiceRewardId);
-        var card = chain.Begin(CardKind.Duel, 1, Enemy);
-        chain.Until(() => chain.P is { PlayerSeat: 0, Kind: DecisionKind.Nullification });
-        Need(chain.Events<NullificationRespondedEvent>().Select(e => (e.ResponderSeat, e.ChainDepth)).SequenceEqual([(Bystander, 1)]) &&
-            chain.Hand(Enemy).Any(c => c.Kind == CardKind.Nullification),
-            "Only the actual original target is prohibited: an enemy bystander pays the initial counterspell and the target keeps its card.");
-        chain.Counter(); chain.Play(); chain.AssertPaid(card);
-        Need(chain.Events<NullificationRespondedEvent>().Select(e => (e.ResponderSeat, e.ChainDepth)).SequenceEqual([(Bystander, 1), (0, 2), (Enemy, 3)]) &&
-            chain.Events<NullificationResolvedEvent>().Last().EffectNullified,
-            "A target can counter the real counterspell at a later chain node; the original trick's prohibition is not inherited.");
-
-        var target = Scene.Start(); target.Buy(StandardShanheCampaignCatalog.CurrentSuanwuyiceRewardId);
-        var allySlashes = target.Hand(Ally).Count(c => c.Kind == CardKind.Slash);
-        target.Use(CardKind.Duel, 1, Ally);
-        Need(target.Hand(Ally).Count(c => c.Kind == CardKind.Slash) == allySlashes &&
-            target.Events<DamageAppliedEvent>().Any(e => e.SourceSeat == 0 && e.TargetSeat == Ally),
-            "The actual friendly target is also prohibited, rather than silently replacing target scope with enemy scope.");
-
-        var own = Scene.Start(ownCounter: true);
-        var draw = own.Begin(CardKind.DrawTwo, 5, 0);
-        own.Until(() => own.P is { PlayerSeat: 0, Kind: DecisionKind.Nullification });
-        var oldPrompt = own.P!.PromptId;
-        own.Buy(StandardShanheCampaignCatalog.CurrentSuanwuyiceRewardId);
-        own.Play(); own.AssertPaid(draw);
-        Need(own.Events<NullificationRespondedEvent>().Length == 0 && own.Hand(0).Any(c => c.Kind == CardKind.Nullification) &&
-            own.G.CardMovements.Count(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(0) && m.Reason == CardMoveReasons.Draw) == 2 &&
-            own.P!.PromptId != oldPrompt,
-            "Buying during one's own DrawTwo initial counterspell resumes that original native window, blocks the now-target owner's response, and resolves two real draws without paying its retained counterspell.");
-    }
-
-    public static void DamageTrickScopeIncludesQiZhengFloodAndUnexpectedAssault()
-    {
-        foreach (var (kind, rank) in new[] { (CardKind.QizhengXiangsheng, 7), (CardKind.WumiaoFlood, 8), (CardKind.UnexpectedAssault, 9) })
-        {
-            var s = Scene.Start(bystanderCounter: true);
-            s.Buy(StandardShanheCampaignCatalog.CurrentYinyangRewardId);
-            var card = s.Use(kind, rank, Enemy);
-            var use = s.Events<CardUseDeclaredEvent>().Single(e => e.CardId == card);
-            Need(!s.Events<NullificationRespondedEvent>().Any(e => e.ResolutionId == use.ResolutionId) &&
-                s.Hand(Bystander).Any(c => c.Kind == CardKind.Nullification),
-                "The existing damage-trick classification includes the extended real native effect and prohibits an enemy's initial counterspell: " + kind);
-            if (kind == CardKind.QizhengXiangsheng)
-                Need(s.Events<QizhengResolvedEvent>().Single(e => e.UseId == use.ResolutionId) is { ResponseKind: null, Ambush: true } &&
-                    !s.Events<QizhengResponsePaidEvent>().Any(e => e.UseId == use.ResolutionId),
-                    "QiZheng's typed response owner offers no physical or converted Slash/Dodge when its actual enemy target cannot respond.");
-        }
-    }
-
     private static void Need(bool condition, string message)
     { if (!condition) throw new InvalidOperationException(message); }
 

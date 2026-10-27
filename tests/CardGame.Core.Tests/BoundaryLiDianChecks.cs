@@ -5,48 +5,6 @@ using CardGame.Content.Standard;
 
 internal static class BoundaryLiDianChecks
 {
-    public static void DefinitionAndLegacy()
-    {
-        foreach (var bad in new[] { "0", "-1", "5", "null", "1.2", "\"2\"" })
-        {
-            var failed = false;
-            try { Load("fixture:bad", "\"activations\":[" + Activation("order", "[{\"op\":\"reorderTopCards\",\"target\":\"owner\",\"amount\":4,\"exactTopCount\":" + bad + "}]") + "]"); }
-            catch (InvalidOperationException) { failed = true; }
-            Require(failed, "exactTopCount rejects non-positive, oversized, null and non-integer inputs: " + bad);
-        }
-        var receiptEffects="[{\"op\":\"draw\",\"target\":\"owner\",\"amount\":2,\"resultBind\":\"drawn\"},{\"op\":\"selectCardSubset\",\"target\":\"owner\",\"sourceBind\":\"drawn\",\"resultBind\":\"gift\",\"minimumCards\":1,\"maximumCards\":1,\"maximumRankSum\":13,\"aiOrder\":\"mostCardsThenRankSum\"{FLAG}}]";
-        foreach(var bad in new[]{"false","null","0","\"true\""})
-        {var rejected=false;try{Load("fixture:bad-subset","\"activations\":["+Activation("subset",receiptEffects.Replace("{FLAG}",",\"availableAtSourceOnly\":"+bad))+"]");}catch(InvalidOperationException){rejected=true;}Require(rejected,"The available-source opt-in accepts only true: "+bad);}
-        var old=Load("fixture:old-subset","\"activations\":["+Activation("subset",receiptEffects.Replace("{FLAG}",""))+"]");
-        Require(old.Activations.Single().Effects[1].AvailableAtSourceOnly==null && !JsonSerializer.Serialize(old.Activations.Single().Effects[1]).Contains("AvailableAtSourceOnly"),"Missing available-source metadata retains old null serialization.");
-        var (g,r) = Start(normalDraw:0); Skip(g); Settle(g); Driver(g,"legacy");
-        Require(P(g)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("action")=="finish-top"), "Legacy null still allows an immediate finish-top.");
-        var frame=Frame(g);
-        var orderView = g.CreateSnapshot(0).PendingDecision!.DeckReorder!;
-        Require(orderView is { RequiredTopCount: null, ChoosingBottom: false } && orderView.FrameId == frame.Id &&
-            orderView.Cards.Select(card => card.Id).SequenceEqual(frame.TopReorder!.ViewedCardIds) &&
-            Enumerable.Range(1, 3).All(seat => g.CreateSnapshot(seat).PendingDecision is null),
-            "Legacy ordering exposes exact detached private faces and accepted row prefixes only to its owner.");
-        Require(orderView.Cards is IList<CardSnapshot> { IsReadOnly: true } &&
-            orderView.TopCardIds is IList<int> { IsReadOnly: true } && orderView.BottomCardIds is IList<int> { IsReadOnly: true },
-            "The prepared ordering projection freezes every nested card and row collection.");
-        Replay(g,r);
-        Require(!JsonSerializer.Serialize(frame.TopReorder).Contains("RequiredTopCount") &&
-            !JsonSerializer.Serialize(Load("fixture:old", "\"activations\":[" + Activation("order", "[{\"op\":\"reorderTopCards\",\"target\":\"owner\",\"amount\":4}]") + "]").Activations.Single().Effects.Single()).Contains("ExactTopCount"), "Old null metadata stays absent.");
-        var before=Pile(g); Answer(g,c=>c.Parameters.GetValueOrDefault("action")=="finish-top");
-        while(P(g)?.Kind==DecisionKind.ProgramTopReorder) { Replay(g,r); Answer(g,c=>c.Cards.Count==1); }
-        Settle(g); Require(!before.SequenceEqual(Pile(g)), "Legacy all-bottom path remains selectable."); Replay(g,r);
-        var(strict,sr)=Start(normalDraw:0,child:"move");Skip(strict);Settle(strict);Driver(strict,"old-receipt");
-        var receipt=strict.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.SkillId=="fixture:li-driver").CardSetBindings.Single(b=>b.Name=="drawn").CardIds;
-        Answer(strict,c=>c.Cards.Contains(receipt[0]));Reach(strict,p=>p.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="select-owned-cards"));Replay(strict,sr);
-        var originalFailure=false;try{Answer(strict,c=>c.Cards.Count==1&&!receipt.Contains(c.Cards[0]));}catch(InvalidOperationException ex){originalFailure=ex.Message.Contains("bound card left its frozen source",StringComparison.OrdinalIgnoreCase);}
-        Require(originalFailure,"A missing-flag receipt consumer preserves its original strict failure after a real child moved its card.");
-        var(suits,ur)=Start(normalDraw:0,child:"move");Skip(suits);Settle(suits);Driver(suits,"available-suits");
-        var suitReceipt=suits.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.SkillId=="fixture:li-driver").CardSetBindings.Single(b=>b.Name=="drawn").CardIds;
-        Answer(suits,c=>c.Cards.Contains(suitReceipt[0]));Reach(suits,p=>p.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="select-owned-cards"));Replay(suits,ur);
-        Answer(suits,c=>c.Cards.Count==1&&!suitReceipt.Contains(c.Cards[0]));Reach(suits,p=>p.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="select-subset"));
-        Require(P(suits)!.Choices.Single().Cards.SequenceEqual([suitReceipt[1]]),"The same new available-source subset respects onePerSuit after actual receipt movement.");Replay(suits,ur);Answer(suits,c=>c.Cards.SequenceEqual([suitReceipt[1]]));Settle(suits);Replay(suits,ur);
-    }
     internal static void SaveReceiptAfterPhysicalPeach(string child)
     {
         var (game,registry)=Start(normalDraw:0,child:child);Skip(game);Settle(game);

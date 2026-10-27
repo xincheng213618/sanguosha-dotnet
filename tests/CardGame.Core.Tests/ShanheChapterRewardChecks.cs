@@ -122,35 +122,41 @@ internal static class ShanheChapterRewardChecks
             Require(current.Nodes.All(node => node.ChapterNumber is >= 1 and <= 3 && !string.IsNullOrWhiteSpace(node.ChapterTitle)) &&
                 bosses.Select(node => node.Id).Order(StringComparer.Ordinal).SequenceEqual(new[] { "huaxiong", "lijue", "guosi" }.Order(StringComparer.Ordinal)) &&
                 bosses.All(node => node.BossRewards is { FixedGold: 500, SkillSlots: 1 } && node.BossRewards.Groups.Count == 2 &&
-                    node.BossRewards.Groups.Select(group => group.Id).SequenceEqual(["tactics", "cards"]) &&
+                    node.BossRewards.Groups.Select(group => group.Id).SequenceEqual(node.ChapterNumber == 2
+                        ? new[] { "tactics", "skills" } : ["tactics", "cards"]) &&
                     node.BossRewards.Groups.All(group => group.ChoiceCount == 3 && group.RewardIds.Count >= 3)),
-                "Every current difficulty and codex pool publishes epic tactic and physical hand-card choices for its first two chapter bosses.");
+                "Every current difficulty and codex pool pairs epic tactics with first-chapter hand cards and second-chapter skills.");
             foreach (var boss in bosses)
             foreach (var group in boss.BossRewards!.Groups)
             foreach (var id in group.RewardIds)
             {
                 var reward = current.Rewards.Single(reward => reward.Id == id);
-                Require(reward.Rarity == 3 && (group.Id == "cards"
+                Require(reward.Rarity == 3 && (group.Id == "skills"
+                        ? reward.SkillId is not null && (reward.StartingCards?.Count ?? 0) == 0 &&
+                            StandardShanheCampaignCatalog.ShopMetadataByRewardId[id] is { Rarity: 3, Kind: "技能" }
+                        : group.Id == "cards"
                         ? reward.StartingCards is { Count: 1 } && !EquipmentCatalog.IsEquipment(reward.StartingCards[0].Kind) &&
                             reward.SkillId is null && reward.TacticSkillId is null
                         : StandardShanheCampaignCatalog.ShopMetadataByRewardId[id] is { Rarity: 3, Kind: "战法" } &&
                             (reward.TacticSkillId is not null || reward.CampaignEconomy is not null)) &&
                     (reward.StartingEquipment?.Count ?? 0) == 0,
-                    "Chapter offers contain actual epic tactics and epic physical hand cards, preserving their source quality.");
+                    "Chapter offers preserve epic quality and grant the authored tactic, physical card or native skill: " + boss.Id + "/" + id);
             }
-            Require(current.Nodes.Where(node => node.BossRewards is null && node.ChapterNumber < 3 && node.RewardIds is { Count: > 0 } &&
-                    (!node.IsStoryBattle || node.Kind == ShanheNodeKind.Battle))
+            Require(current.Nodes.Where(node => node.Kind == ShanheNodeKind.Battle && node.ChapterNumber < 3 && node.RewardIds is { Count: > 0 })
                     .SelectMany(node => node.RewardIds!).All(id => current.Rewards.Single(reward => reward.Id == id).Rarity is 1 or 2) &&
                 current.Rewards.Any(reward => reward.Rarity == 4) &&
                 current.Nodes.Single(node => node.Id == "hulao").Kind == ShanheNodeKind.EliteBattle &&
-                current.Nodes.Where(node => !node.IsStoryBattle && node.Kind is ShanheNodeKind.Battle or ShanheNodeKind.EliteBattle)
-                    .All(node => node.PrimaryTacticRarity == 1 && node.PrimarySkillRarity is 1 or 2) &&
+                current.Nodes.Where(node => !node.IsStoryBattle && node.Kind == ShanheNodeKind.Battle)
+                    .All(node => node.PrimaryTacticRarity == (node.Id == StandardShanheCampaignCatalog.ThirdChapterPatrolNodeId ? 2 : 1) &&
+                        node.PrimarySkillRarity is 1 or 2) &&
+                current.Nodes.Single(node => node.Id == "hulao") is
+                    { PrimaryTacticRarity: 2, PrimarySkillRarity: 2, PrimaryCardRarity: 2, CategorizedRewards: true } &&
                 current.Nodes.Where(node => node.Kind == ShanheNodeKind.BossBattle && node.ChapterNumber < 3)
                     .All(node => node.BossRewards is not null) &&
                 current.Nodes.Where(node => node.Encounters is { Count: > 0 }).All(node =>
                     node.Encounters!.All(encounter => encounter.VictoryGold == (node.Kind == ShanheNodeKind.BossBattle ? 500 :
                         node.IsStoryBattle && node.Kind == ShanheNodeKind.EliteBattle ? 300 : 200))),
-                "Ordinary battle pools stay common or rare and historical legendary sources remain available; route battle credits are 200/500 and an optional elite story battle retains its authored 300.");
+                "Ordinary battle pools stay common or rare, third-chapter optional battles retain rare primary rewards, and historical legendary sources remain available; route credits are 200/500 and an optional elite story battle retains its authored 300.");
             var finals = current.Nodes.Where(node => node.NextNodeIds.Count == 0).ToArray();
             Require(finals.Length == 3 && finals.All(node => node.ChapterNumber == 3 && node.BossRewards is null &&
                 node.AddSkillSlotsOnVictory == 0 && node.Encounters!.All(encounter => encounter.VictoryGold == 500)),
@@ -158,6 +164,13 @@ internal static class ShanheChapterRewardChecks
             _ = ShanheCampaignSession.Create(current, new(71, "classic:guan-yu") { UseCodexRewardPool = codex, UnlockedRewardIds = [] },
                 StandardShanheCampaignCatalog.CreateBattleRegistry);
         }
+        var originalRoute = StandardShanheCampaignCatalog.CreateSourceCodexDefinition(11);
+        Require(originalRoute.Nodes.Where(node => node.BossRewards is not null).All(node =>
+                node.BossRewards!.Groups.Select(group => group.Id).SequenceEqual(node.ChapterNumber == 2
+                    ? new[] { "tactics", "skills" } : ["tactics", "cards"]) &&
+                node.BossRewards.Groups.SelectMany(group => group.RewardIds).All(id =>
+                    originalRoute.Rewards.Single(reward => reward.Id == id).Rarity == 3)),
+            "The source-region route uses each chapter's own epic reward bundle instead of copying the first chapter's cards.");
         var choices = Enumerable.Range(0, 65).Select(index => new ShanheNodeChoiceDefinition("stock-" + index, "军资", RewardId: "draw", LeavesNode: false)).ToArray();
         var shop = new ShanheNodeDefinition("large-shop", "行商目录", ShanheNodeKind.Shop, ["boss-1"], Choices: choices);
         var shopDefinition = frozen with { StartingNodeIds = [shop.Id], Nodes = new[] { shop }.Concat(frozen.Nodes).ToArray() };

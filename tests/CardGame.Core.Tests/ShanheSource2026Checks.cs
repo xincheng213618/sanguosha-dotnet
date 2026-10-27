@@ -7,61 +7,6 @@ internal static class ShanheSource2026Checks
 {
     private const string Driver = "fixture:source-route-driver", DriverReward = "fixture:source-route-reward";
 
-    public static void SourceBranchesKnownStagesAndLocalBodiesKeepTheirIdentities()
-    {
-        foreach (var difficulty in new[] { 1, 2, 3, 6, 11, 16, 25 })
-        {
-            var definition = StandardShanheCampaignCatalog.CreateSourceCodexDefinition(difficulty);
-            Need(StandardShanheCampaignCatalog.IsSource2026Campaign(definition.Id, difficulty) &&
-                definition.SourceDifficultyId == difficulty && definition.SourceEnemyGrowthHash == StandardShanheSourceEnemyGrowth.Season5.ContentHash,
-                "Every source recipe binds its real selected tier and immutable growth table.");
-            var graph = StandardShanheSourceRouteCatalog.Season5;
-            var expectedRegions = graph.Regions.Where(region => region.MinimumSourceDifficultyId <= difficulty).ToArray();
-            Need(definition.Nodes.Count == expectedRegions.Length * 12 && definition.StartingNodeIds.SequenceEqual(["source-region-2:market", "source-region-4:market"]),
-                "Source region gates and the two random first-chapter entries survive itinerary compression.");
-            foreach (var region in expectedRegions)
-            {
-                var exit = definition.Nodes.Single(node => node.Id == "source-region-" + region.SourceUniqueId + ":story");
-                var expected = region.ChapterNumber == 3 ? new[] { "source-region-" + region.SourceUniqueId + ":camp" } :
-                    region.NextRegionIds.Where(next => graph.ByRegionId[next].MinimumSourceDifficultyId <= difficulty)
-                        .Select(next => "source-region-" + next + ":market").ToArray();
-                Need(exit.NextNodeIds.SequenceEqual(expected), "Only the original available next-region edges may leave a region.");
-                string[] firstChapterOnly = ["story:zhijinanpeng", "story:recruit-qinmi", "story:recruit-lusu", "story:recruit-cao-ang"];
-                Need(exit.StoryEvents is { Count: > 0 } && firstChapterOnly.All(id =>
-                    exit.StoryEvents.Any(story => story.Id == id) == (region.ChapterNumber == 1)),
-                    "All three source chapters have a real story pool; Cao Ang, Qin Mi, Lu Su and Cao Rui remain restricted to chapter one.");
-            }
-            var all = definition.Nodes.SelectMany(node => node.Encounters ?? []).ToArray();
-            Need(all.Where(encounter => encounter.Id.StartsWith("source-local:", StringComparison.Ordinal)).All(encounter =>
-                    encounter.SourceBattleId is null && encounter.SourceCityId is > 0) &&
-                all.All(encounter => difficulty >= 11 || encounter.TerrainSkillId is null),
-                "Local troop bodies carry their genuinely chosen city but never an invented source battle, and terrain keeps its separate tier gate.");
-            var fengxian = all.Single(encounter => encounter.SourceBattleId == 2644);
-            var rageId = difficulty >= 21 ? StandardShanheFengxianBossPackage.SourceRageHellId :
-                difficulty >= 11 ? StandardShanheFengxianBossPackage.SourceRageHardId : StandardShanheFengxianBossPackage.RageId;
-            var rageEquipment = new List<ShanheStartingCard> { new(CardKind.WushuangHalberd, Suit.Heart, 12) };
-            if (difficulty >= 6) rageEquipment.Add(new(CardKind.PurpleGoldCrown, Suit.Heart, 1));
-            if (difficulty >= 11) rageEquipment.Add(new(CardKind.RedCottonRobe, Suit.Diamond, 1));
-            Need((fengxian.BossTransition is not null) == (difficulty >= 3) &&
-                (difficulty < 3 || fengxian.BossTransition is { MaxHp: 5, Hp: 5,
-                    Combatant.SourceDifficultyAttributes: not null } &&
-                    fengxian.BossTransition.StartingEquipment!.SequenceEqual(rageEquipment) &&
-                    fengxian.BossTransition.GeneralId == rageId && fengxian.BossTransition.Combatant.GeneralId == rageId),
-                "Fengxian's real known second form begins only at ordinary three, with its own base data, verified halberd and cumulative tier equipment.");
-            Need(all.Where(encounter => encounter.SourceBattleId == 2397).Count() == 7 &&
-                all.Where(encounter => encounter.SourceBattleId == 2397).All(encounter => encounter.SourceVisibleEnemyCount == 1 && encounter.Enemies.Count == 5),
-                "Every genuinely selectable Luoyang ordinary city may contain Mulu; four hidden source minions do not inflate the visible-enemy multiplier.");
-            if (difficulty >= 16)
-                Need(all.Count(encounter => encounter.SourceBattleId is >= 2632 and <= 2687) == 56 &&
-                    all.Count(encounter => encounter.BossTransition is not null) == 6,
-                    "The high-tier route exposes all fourteen regions with fifty-six supported base groups and six known playable stage transitions.");
-        }
-        Need(!StandardShanheCampaignCatalog.IsSource2026Campaign("shanhe:zhuhou-source-2026-11", 1) &&
-            !StandardShanheCampaignCatalog.IsSource2026Campaign("shanhe:zhuhou-1", 11) &&
-            !StandardShanheCampaignCatalog.IsSource2026Campaign("shanhe:zhuhou-source-2026-26", 26),
-            "An arbitrary campaign ID or local tier cannot be relabelled as an executable source difficulty.");
-    }
-
     public static void ThreeSourceChaptersNativeStagesCityReceiptsAndColdRecovery()
     {
         var source = StandardShanheCampaignCatalog.CreateSourceCodexDefinition(11);

@@ -156,12 +156,21 @@ public sealed partial class GameEngine
             return paid.InstructionIndex == producer.InstructionIndex && paid.RecipientIndex >= 0 &&
                 paid.RecipientIndex < paid.Recipients.Count && paid.Recipients[paid.RecipientIndex] == proof.OwnerSeat &&
                 paid.RequestedCount == proof.RequestedCount && paid.Reason == proof.Reason;
-        // The established synchronous Draw fast path owns no NativeDraw cursor.
-        // Its exact paused typed instruction and standard movement return still
-        // bind the paid invoice; do not recalculate a mutable numeric expression.
         if (producer.NativeDraw is not null || producer.InstructionIndex < 1 ||
             !RuntimeSkills.RuntimeRules_Core_CommonRules.ProgramMovementReturnMatches(producer, movement)) return false;
+        // Native operations retain their own completed draw receipt on the
+        // producer frame, rather than pausing a generic JSON Draw instruction.
+        if (MobileShiKuangguThresholdDrawMatches(producer, proof)) return true;
         var plan = ProgramInstructionResolver.Default.Resolve(producer, _contentRegistry.GetSkill(producer.SkillId).Program!);
+        if (producer.InstructionIndex <= plan.Instructions.Count && producer.NativeOperationDrawReturns.Count(returned =>
+                returned.InstructionIndex == producer.InstructionIndex && returned.Operation == plan.Instructions[producer.InstructionIndex - 1].Op &&
+                ProgramNativeDrawReturns.Value.ContainsKey(returned.Operation) && returned.Reason == proof.Reason &&
+                returned.Outcome is { Replacement: null } outcome && outcome.RecipientSeat == proof.OwnerSeat &&
+                outcome.RequestedCount == proof.RequestedCount && outcome.SequenceBefore == proof.SequenceBefore &&
+                outcome.SequenceAfter == proof.SequenceAfter && outcome.ActualDrawIds.SequenceEqual(proof.Materials.Select(material => material.CardId))) == 1)
+            return true;
+        // The synchronous Draw fast path owns no NativeDraw cursor. Bind its
+        // paused typed instruction without recalculating mutable draw amounts.
         if (producer.InstructionIndex > plan.Instructions.Count ||
             plan.GetPausedInstruction(producer.InstructionIndex).Effect.CompiledInstruction is not DrawProgramInstruction draw ||
             proof.Reason.Value != $"skill-program.{producer.SkillId}.{SkillProgramEffectOp.Draw}" ||
@@ -184,6 +193,16 @@ public sealed partial class GameEngine
         var index = _resolutionStack.FindIndex(item => item.Id == producer.Id);
         while (index > 0 && NativeDrawThresholdObserverEdge(_resolutionStack[index - 1], _resolutionStack[index])) index--;
         if (index < 1 || _resolutionStack[index] is not ProgramSkillFrame root || root.WindowContext is not { } origin) return null;
+        if (origin.Window == SkillProgramTriggerWindow.CardUseCommitted && origin.CardUse is { } identity && index >= 2 &&
+            _resolutionStack[index - 1] is ProgramCardTriggerWindowFrame committed && committed.Id == origin.ParentFrameId &&
+            root.ParentFrameId == committed.Id && GetCardActionWindow(committed) == origin.Window &&
+            committed.CandidateIndex >= 0 && committed.CandidateIndex < committed.Candidates.Count &&
+            MountObserverCandidateMatches(root, ToSharedCandidate(committed.Candidates[committed.CandidateIndex])) &&
+            _resolutionStack[index - 2] is CardUseFrame { ProgramUseCommitted: true, Action: { Type: CardActionType.Use } action } use &&
+            use.Id == committed.ParentFrameId && identity.ParentCardUseFrameId == use.Id &&
+            action.ActionId == identity.CardActionId && committed.Action.ActionId == action.ActionId &&
+            action.ActorSeat == identity.ActorSeat && action.EffectiveKind == identity.EffectiveKind)
+            return use.Id;
         if (origin.Window == SkillProgramTriggerWindow.BeforeDamageApplied &&
             _resolutionStack[index - 1] is BeforeDamageProgramWindowFrame before && before.Id == origin.ParentFrameId &&
             origin.SourceSeat == (BeforeDamageHasNoSource(before) ? (int?)null : before.SourceSeat) &&

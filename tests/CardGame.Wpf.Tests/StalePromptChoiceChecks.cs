@@ -30,7 +30,7 @@ internal static class StalePromptChoiceChecks
             {
                 var stale = Choices(model, kind).First(choice => choice.Cards.Count == 1);
                 var retiredCard = model.Hand.First(card => card.IsPlayable);
-                model.LoadManualGameCommand.Execute(null);
+                LegacySaveFixtures.Load(model);
                 var current = Choices(model, kind).Single(choice => choice.Id == stale.Id);
                 Program.Assert(!ReferenceEquals(stale, current), "Reload must replace the published choice objects.");
                 var engine = Program.Engine(model);
@@ -95,7 +95,7 @@ internal static class StalePromptChoiceChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(false, game.Seed, true, store, contentRegistry: registry) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         var engine = Program.Engine(model);
         var action = engine.GetHumanLegalActions().First(candidate => candidate.Kind == LegalActionKind.BorrowedSword);
         Console.WriteLine($"Play-choice fixture: seed {game.Seed}, {game.AcceptedCommands.Count} setup commands, native Borrowed Sword.");
@@ -112,7 +112,7 @@ internal static class StalePromptChoiceChecks
                 "The fixed Borrowed Sword choice must be captured from a real enabled rendered button.");
             var capturedCommand = button.Command!;
             var capturedParameter = button.CommandParameter;
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             engine = Program.Engine(model);
             model.SelectCardCommand.Execute(model.Hand.Single(card => card.Id == action.CardId));
             var current = model.TargetCombinationChoices.Single(choice => choice.Id == retired.Id);
@@ -160,7 +160,7 @@ internal static class StalePromptChoiceChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, prepared.CreateCheckpoint()));
         using var model = new MainViewModel(false, prepared.Seed, true, store, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         var game = Program.Engine(model);
         var nativeBoundary = OpaqueBoundary(game);
         Program.Assert(!model.HasSaveError && nativeBoundary == OpaqueBoundary(prepared) && model.IsTargetCardSelectionPending,
@@ -282,7 +282,7 @@ internal static class StalePromptChoiceChecks
             model.IsDeveloperView = true;
             window.Dispatcher.Invoke(() => { }, DispatcherPriority.DataBind);
             store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, changed.CreateCheckpoint()));
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Pump();
             var changedGame = Program.Engine(model);
             var changedBoundary = OpaqueBoundary(changedGame);
@@ -293,7 +293,7 @@ internal static class StalePromptChoiceChecks
             Program.Assert(OpaqueBoundary(changedGame) == changedBoundary,
                 "The retired target's actual button parameter must not answer the alternate native private prompt.");
             store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, prepared.CreateCheckpoint()));
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Pump();
             game = Program.Engine(model);
             choice = model.TargetCardChoices.Last();
@@ -307,7 +307,7 @@ internal static class StalePromptChoiceChecks
             var liveParameter = button.CommandParameter;
             var liveChoice = choice;
             var liveButton = button;
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Pump();
             var reloaded = Program.Engine(model);
             choice = model.TargetCardChoices.Single(candidate => candidate.Id == liveChoice.Id);
@@ -477,7 +477,7 @@ internal static class StalePromptChoiceChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(false, game.Seed, true, store, contentRegistry: registry) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         model.SelectCardCommand.Execute(model.Hand.Single(card => card.Id == action.CardId));
         model.SelectTargetCommand.Execute(model.Seats.Single(seat => seat.Seat == 1));
         var retired = model.PublicTargetChoices.Single(choice => choice.Cards.SequenceEqual([action.CardId!.Value]) &&
@@ -514,7 +514,7 @@ internal static class StalePromptChoiceChecks
                 model.Seats.Single(seat => seat.Seat == 2).IsSelectedTarget,
                 "A withdrawn public weapon button committed against the previous target in the same Play prompt.");
 
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             model.SelectCardCommand.Execute(model.Hand.Single(card => card.Id == action.CardId));
             model.SelectTargetCommand.Execute(model.Seats.Single(seat => seat.Seat == 1));
             engine = Program.Engine(model);

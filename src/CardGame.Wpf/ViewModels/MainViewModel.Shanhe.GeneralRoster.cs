@@ -1,5 +1,8 @@
 using System.Windows.Input;
+using System.Security.Cryptography;
 using CardGame.Content.Standard;
+using CardGame.Core;
+using CardGame.Core.Campaigns;
 
 namespace CardGame.Wpf.ViewModels;
 
@@ -10,6 +13,15 @@ public sealed partial class MainViewModel
     private int _shanheGeneralPageIndex;
     private ShanheGeneralOption[] _filteredShanheGenerals = [];
     private bool _shanheGeneralRosterReady;
+    private ShanheGeneralOption[] _shanheGeneralCandidates = [];
+    private ShanheCampaignSession? _shanheCandidateOwner;
+    private bool _isShanheFreeGeneralSelection;
+
+    public bool IsShanheFreeGeneralSelection => _isShanheFreeGeneralSelection;
+    public string ShanheGeneralSelectionSourceText => IsShanheFreeGeneralSelection ? "返回候选" : "自选武将（作弊）";
+    public string ShanheGeneralSelectionHint => IsShanheFreeGeneralSelection
+        ? "自选模式 · 搜索并指定出征武将" : $"从 {_shanheGeneralCandidates.Length} 名候选中选择武将，再确认出征";
+    public ICommand ToggleShanheGeneralRosterCommand { get; private set; } = null!;
 
     public ObservableRangeCollection<ShanheGeneralOption> ShanheGeneralPage { get; } = [];
     public ShanheCodexLoadoutOption? SelectedShanheSetupLoadout
@@ -33,7 +45,8 @@ public sealed partial class MainViewModel
             FilterShanheGenerals();
         }
     }
-    public string ShanheGeneralCountText => $"{_filteredShanheGenerals.Length} / {ShanheGenerals.Count} 名武将";
+    public string ShanheGeneralCountText => IsShanheFreeGeneralSelection
+        ? $"{_filteredShanheGenerals.Length} / {ShanheGenerals.Count} 名武将" : $"{_shanheGeneralCandidates.Length} 名候选武将";
     public string ShanheGeneralPageText => $"第 {_shanheGeneralPageIndex + 1} / {ShanheGeneralPageCount} 页";
     public bool HasNoShanheGeneralResults => _filteredShanheGenerals.Length == 0;
     public ICommand PreviousShanheGeneralPageCommand { get; private set; } = null!;
@@ -46,6 +59,16 @@ public sealed partial class MainViewModel
         PreviousShanheGeneralPageCommand = new RelayCommand(() => ChangeShanheGeneralPage(-1), () => _shanheGeneralPageIndex > 0);
         NextShanheGeneralPageCommand = new RelayCommand(() => ChangeShanheGeneralPage(1), () => _shanheGeneralPageIndex + 1 < ShanheGeneralPageCount);
         ClearShanheGeneralSearchCommand = new RelayCommand(() => ShanheGeneralSearch = string.Empty);
+        ToggleShanheGeneralRosterCommand = new RelayCommand(() =>
+        {
+            if (!CanPrepareShanheExpedition) return;
+            _isShanheFreeGeneralSelection = !_isShanheFreeGeneralSelection;
+            ShanheGeneralSearch = string.Empty;
+            _shanheGeneralPageIndex = 0;
+            FilterShanheGenerals();
+            if (!IsSelectableShanheGeneral(SelectedShanheGeneral)) SelectedShanheGeneral = _shanheGeneralCandidates.FirstOrDefault();
+            NotifyShanheGeneralSelection();
+        }, () => CanPrepareShanheExpedition);
     }
 
     private void RefreshShanheGeneralRoster()
@@ -66,15 +89,19 @@ public sealed partial class MainViewModel
                 };
             }));
             _shanheGeneralRosterReady = true;
+            CreateShanheGeneralCandidates();
             FilterShanheGenerals();
         }
-        SelectedShanheGeneral = ShanheGenerals.FirstOrDefault(general => general.Id == selectedId) ?? ShanheGenerals.FirstOrDefault();
+        var selected = ShanheGenerals.FirstOrDefault(general => general.Id == selectedId);
+        SelectedShanheGeneral = IsShanheRunInProgress || IsSelectableShanheGeneral(selected)
+            ? selected : _shanheGeneralCandidates.FirstOrDefault();
     }
 
     private void FilterShanheGenerals()
     {
         var terms = ShanheGeneralSearch.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        _filteredShanheGenerals = ShanheGenerals.Where(general => terms.All(term =>
+        IEnumerable<ShanheGeneralOption> roster = IsShanheFreeGeneralSelection ? ShanheGenerals : _shanheGeneralCandidates;
+        _filteredShanheGenerals = roster.Where(general => terms.All(term =>
             general.SearchText.Contains(term, StringComparison.OrdinalIgnoreCase))).ToArray();
         RefreshShanheGeneralPage();
         RaisePropertyChanged(nameof(ShanheGeneralCountText));
@@ -110,7 +137,39 @@ public sealed partial class MainViewModel
 
     public void PrepareShanheGeneralSelection()
     {
+        if (!CanPrepareShanheExpedition) return;
+        if (!ReferenceEquals(_shanheCandidateOwner, _shanheSession))
+        {
+            CreateShanheGeneralCandidates();
+            _isShanheFreeGeneralSelection = false;
+            SelectedShanheGeneral = _shanheGeneralCandidates.FirstOrDefault();
+        }
         ShanheGeneralSearch = string.Empty;
+        FilterShanheGenerals();
         RevealSelectedShanheGeneral();
+        NotifyShanheGeneralSelection();
+    }
+
+    private bool IsSelectableShanheGeneral(ShanheGeneralOption? general) => general is not null &&
+        (IsShanheFreeGeneralSelection ? ShanheGenerals.Contains(general) : _shanheGeneralCandidates.Contains(general));
+
+    private void CreateShanheGeneralCandidates()
+    {
+        var registry = StandardShanheCampaignCatalog.PlayerRosterRegistry;
+        var random = new Random(_seedOverride ?? RandomNumberGenerator.GetInt32(int.MaxValue));
+        // Match the ordinary single-combat candidate count and keep one character
+        // per slot. Reopening/cancelling does not reroll the current preparation.
+        var count = WushuangRegistry.Value.Modes[WushuangMode.ModeId].GeneralCandidateCount;
+        _shanheGeneralCandidates = ShanheGenerals.OrderBy(_ => random.Next())
+            .DistinctBy(general => registry.Generals[general.Id].CharacterId ?? general.Id).Take(count).ToArray();
+        _shanheCandidateOwner = _shanheSession;
+    }
+
+    private void NotifyShanheGeneralSelection()
+    {
+        foreach (var property in new[] { nameof(IsShanheFreeGeneralSelection), nameof(ShanheGeneralSelectionSourceText),
+            nameof(ShanheGeneralSelectionHint), nameof(ShanheGeneralCountText) }) RaisePropertyChanged(property);
+        (StartShanheCommand as RelayCommand)?.NotifyCanExecuteChanged();
+        (ToggleShanheGeneralRosterCommand as RelayCommand)?.NotifyCanExecuteChanged();
     }
 }

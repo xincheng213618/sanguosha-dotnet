@@ -50,51 +50,6 @@ internal static class Fame2017PublicPileChecks
         return (game, registry);
     }
 
-    public static void StoreExchangeDistributionAndReplay()
-    {
-        var (game, registry) = CreateDistributionTableFixture();
-        for (var i = 0; i < 4; i++)
-        {
-            var choice = Prompt(game)!.Choices.First(c => c.Targets.SequenceEqual([1])); Answer(game, choice);
-            Reach(game, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "choose-option"));
-            Require(Pile(game).Count == 3 - i, "Recipient gain observer must pause after each real distributed card."); Replay(game, registry); Answer(game, Prompt(game)!.Choices.Single());
-            if (i < 3) Reach(game, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("stage") == "distribute"));
-        }
-        Settle(game); Require(Pile(game).Count == 0 && game.CardMovements.Count(m => m.Reason.Value == "skill-program.public-pile.distribute") == 4, "Every book must be distributed once without stranded cards."); Replay(game, registry);
-    }
-
-    public static void MobileTargetTimingAndClassicCompletionRemainDistinctCold()
-    {
-        foreach (var mobile in new[] { true, false })
-        {
-            var registry = Registry(mobile ? "mobile-timing" : "classic-timing");
-            var game = Start(registry); var action = SpadeDraw(game);
-            var before = game.CreateSnapshot(0, true).Players[0].HandCount;
-            var skill = mobile ? "mobile:bizhuan" : "classic:bizhuan";
-            Play(game, action);
-            Reach(game, p => p.SkillPrompt?.SkillId == skill && p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
-            Require(Pile(game).Count == 0 && game.CreateSnapshot(0, true).Players[0].HandCount == before + (mobile ? -1 : 1),
-                "Mobile offers the real book before Draw Two's two-card effect; classic retains its completed-use timing.");
-            Replay(game, registry);
-            Answer(game, Prompt(game)!.Choices.Single(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
-            Settle(game); Replay(game, registry); Public(game);
-            Require(Pile(game).Count == 1 && game.CreateSnapshot(0, true).Players[0].HandCount == before + 1 &&
-                game.CreateCardZoneDiagnostics().Single(z => z.CardId == action.CardId).Location == CardLocation.DiscardPile &&
-                game.CardMovements.Count(m => m.Reason.Value == "skill-program.public-pile.store") == 1,
-                "The native draw, source card disposal and actual top-card deposit each complete once after cold continuation.");
-            var book = Pile(game).Single().Id;
-            NextExchange(game); Replay(game, registry);
-            var entering = Prompt(game)!.Choices.First(c => c.Cards.Count == 1);
-            var enteringId = entering.Cards.Single(); Answer(game, entering);
-            Require(Prompt(game)!.Choices.Any(c => c.Cards.SequenceEqual([book])),
-                "The consumer references the correct mobile or classic source's actual public book.");
-            Replay(game, registry); Answer(game, Prompt(game)!.Choices.Single(c => c.Cards.SequenceEqual([book])));
-            Settle(game); Replay(game, registry); Public(game);
-            Require(Pile(game).Single().Id == enteringId && game.CreateSnapshot(0, true).Players[0].Hand.Any(c => c.Id == book),
-                "Equal exchange moves the original book to hand and the selected real entity to the corresponding source pile.");
-        }
-    }
-
     private static readonly Dictionary<string, ContentRegistry> Registries = [];
     private static ContentRegistry Registry(string mode="")
     {

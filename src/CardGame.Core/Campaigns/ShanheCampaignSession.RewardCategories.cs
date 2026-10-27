@@ -25,9 +25,40 @@ public sealed partial class ShanheCampaignSession
         {
             ShanheRewardCategory.Tactic => node.PrimaryTacticRarity,
             ShanheRewardCategory.Skill => node.PrimarySkillRarity,
+            ShanheRewardCategory.Card => node.PrimaryCardRarity,
             _ => 0
         };
         return rarity == 0 || reward.Rarity == rarity;
+    }
+
+    public ShanheRewardCategory? PreviewRewardCategory(string nodeId)
+    {
+        Require(_nodes.TryGetValue(nodeId, out var node), "Unknown reward location.");
+        return AutomaticRewardCategory(ResolveBattleNode(_state, node!));
+    }
+
+    private ShanheRewardCategory? AutomaticRewardCategory(ShanheNodeDefinition node)
+    {
+        if (!node.AutomaticRewardCategory) return null;
+        // Type is a property of the appearing location, independent of battle
+        // order, later acquisitions and the elite quality of its candidates.
+        var categories = (node.RewardIds ?? []).Select(id => _rewards[id])
+            .Where(reward => IsRewardUnlocked(reward) && reward.OpeningCompanionPool is null &&
+                reward.OpeningSkillRewardIds is null && reward.CampaignEconomy?.StartingGold is not > 0)
+            .Select(RewardCategory).Distinct().Order().Where(category => CategoryWeight(category) > 0).ToArray();
+        var total = categories.Sum(CategoryWeight);
+        if (total == 0) return null;
+        var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, node.Id + ":reward-category", 1));
+        var roll = random.Next(total);
+        foreach (var category in categories)
+        {
+            roll -= CategoryWeight(category);
+            if (roll < 0) return category;
+        }
+        throw new InvalidOperationException("The location's reward category lost its weighted choice.");
+
+        static int CategoryWeight(ShanheRewardCategory category) => category switch
+        { ShanheRewardCategory.Tactic => 6, ShanheRewardCategory.Skill => 3, ShanheRewardCategory.Card => 1, _ => 0 };
     }
 
     private int CategorizedRewardChoiceCount(RunState state, ShanheRewardCategory category, int baseCount) =>

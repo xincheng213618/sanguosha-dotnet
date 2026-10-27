@@ -18,7 +18,6 @@ internal static class ProgramActivationLimitChecks
         {"schemaVersion":3,"skills":{"fixture:turn-draw":{"name":"限次摸牌","description":"回合和阶段分别限次。"}}}
         """;
 
-
     public static void MixedZonesAtomicityAndReplay()
     {
         var (game, registry) = Create();
@@ -60,9 +59,6 @@ internal static class ProgramActivationLimitChecks
         RejectUse(game, [after.Hand[0].Id], []);
         AssertReplay(game, registry);
     }
-
-
-
 
     private static LegalAction Exchange(GameEngine game) => game.GetHumanLegalActions().Single(action => action.ProgramSkillId == SkillId);
     private static void Use(GameEngine game, IReadOnlyList<int> cards) => Accept(game.Submit(

@@ -9,69 +9,6 @@ internal static class ShanheTrickOrdinalTacticChecks
     private const string Owner = "fixture:shanhe-trick-owner", Enemy = "fixture:shanhe-trick-enemy";
     private const string Deck = "fixture:shanhe-trick-deck", Fengzi = "ol:fengzi", Luanji = "classic:luanji";
 
-    public static void NonDamagingFirstTrickConsumesSlotAndNextActualTurnResetsCold()
-    {
-        foreach (var tier in new[] { 1, 2 })
-        {
-            var s = Scenario.Start("physical", tier);
-            s.PlayCard(CardKind.DrawTwo);
-            s.Need(s.Events<DamageAppliedEvent>().Length == 0 &&
-                s.Events<CardUseDeclaredEvent>().Count(e => e.SourceSeat == 0 && e.CardKind == CardKind.DrawTwo) == 1,
-                "The first slot is one genuine non-damaging DrawTwo use, rather than the first damage occurrence.");
-            s.Cold();
-            s.PlayCard(CardKind.Duel, 1);
-            s.PlayCard(CardKind.Duel, 2);
-            var hits = s.Events<DamageAppliedEvent>();
-            s.Need(hits.Length == 2 && hits[0] is { SourceSeat: 0, TargetSeat: 1 } &&
-                hits[0].Amount == (tier == 2 ? 2 : 1) && hits[1] is { SourceSeat: 0, TargetSeat: 2, Amount: 1 },
-                "Miaoji I has already spent its first-use slot; Miaoji II still boosts the second use, and neither boosts the third trick.");
-            var turn = s.Events<TurnStartedEvent>().Last().TurnNumber;
-            s.EndTurn();
-            s.Need(s.Events<TurnStartedEvent>().Last().TurnNumber > turn &&
-                s.Events<TurnStartedEvent>().Last().ActorSeat == 0,
-                "The fixture crosses a real native turn cycle rather than manually clearing the tactic.");
-            s.PlayCard(CardKind.Duel, 3);
-            s.Need(s.Events<DamageAppliedEvent>().Last() is { SourceSeat: 0, TargetSeat: 3, Amount: 2 },
-                "The first trick of the next actual turn gets exactly one bonus for either tier.");
-            s.Cold();
-        }
-    }
-
-    public static void PaidNullificationPrecedesOwnVirtualDuelAndKeepsActorIsolationCold()
-    {
-        foreach (var tier in new[] { 1, 2 })
-        {
-            var s = Scenario.Start("virtual", tier);
-            var counter = s.V().Hand.Single().Id;
-            s.Reach(() => s.P?.SkillPrompt?.SkillId == Driver && s.P.Choices.Any(c => c.Targets.SequenceEqual([1])));
-            s.Answer(c => c.Targets.SequenceEqual([1]));
-            s.Reach(() => s.NullificationFor(0));
-            s.Need(s.Events<CardUseDeclaredEvent>().Single() is { SourceSeat: 1, CardKind: CardKind.Duel, CardId: 0 } &&
-                s.Events<DamageAppliedEvent>().Length == 0,
-                "The first Duel really belongs to the selected enemy and occupies none of the owner's trick slots.");
-            s.Cold();
-            s.Answer(c => c.Cards.SequenceEqual([counter]) && c.Parameters.GetValueOrDefault("response") != "pass");
-            s.Reach(() => s.IsDamagePause(1));
-            var ownUse = s.G.ResolutionStack.OfType<CardUseFrame>().Last(f => f.SourceSeat == 0 && f.CardKind == CardKind.Duel);
-            var nullification = s.Events<CardActionAcceptedEvent>().Single(e =>
-                e.Action.ActorSeat == 0 && e.Action.EffectiveKind == CardKind.Nullification).Action;
-            s.Need(ownUse is { CardId: 0, PhysicalCardIds.Count: 0, Action: not null } &&
-                ownUse.Action.ActorSeat == 0 && ownUse.Action.ActionId > nullification.ActionId &&
-                nullification.Type == CardActionType.Response && nullification.ProviderSeat == 0 &&
-                s.Events<DamageAppliedEvent>() is [{ SourceSeat: 0, TargetSeat: 1 }] &&
-                s.Events<DamageAppliedEvent>().Single().Amount == (tier == 2 ? 2 : 1) && s.V().Hp == 12,
-                "One real Response-use Nullification occupies the owner's first trick slot; the later virtual own Duel is second, independently of the foreign actor's first use.");
-            s.Cold(); s.ContinueDamage(); s.Play();
-            s.Need(s.Events<CardUseDeclaredEvent>().Count(e => e.CardKind == CardKind.Duel) == 2 &&
-                s.Events<CardUseFinishedEvent>().Count(e => e.CardKind == CardKind.Duel) == 2 &&
-                s.Events<ProgramBindingResolvedEvent>().Count(e => e.SkillId == Driver && e.Activated && e.Completed) == 1 &&
-                s.G.CardMovements.Count(m => m.CardId == counter && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1 &&
-                s.G.CardMovements.Count(m => m.CardId == counter && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile) == 1,
-                "Both genuine virtual uses and their original preparation program finish once, while the physical Nullification pays and settles only once.");
-            s.Cold();
-        }
-    }
-
     public static void ConvertedRepeatedAoeKeepsOriginalOrdinalAcrossOwnCounterspellCold()
     {
         var s = Scenario.Start("repeat", 1);

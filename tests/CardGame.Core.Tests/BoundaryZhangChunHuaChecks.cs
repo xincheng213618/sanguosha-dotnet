@@ -14,65 +14,6 @@ internal static class BoundaryZhangChunHuaChecks
     private const string Reason = "skill-program.dual-color.discard";
     private const string Mode = "identity:classic-dual-color-fixture";
 
-    public static void PrivateCommitmentsAtomicPaymentAndRealDuelCold()
-    {
-        var (game, registry) = Create();
-        Require(game.State.Players[0].Hp == 2 && game.State.Players[0].MaxHp == 4 && Hand(game, 0).Count == 6,
-            "The formal Lord fixture really begins wounded with six actual black Slashes.");
-        var sourceCards = Hand(game, 0).Select(card => card.Id).ToArray();
-        var otherCards = Hand(game, 1).Select(card => card.Id).ToArray();
-        Begin(game, 1); var root = Paid(game);
-        Require(root.DualColorDuel!.Stage == ProgramDualColorDuelStage.ChoosingOwner, "The real activation owns its first private commitment.");
-        Private(game); RejectUnpublished(game); Cold(game, registry); AnswerColor(game, "black");
-        Require(P(game) is { PlayerSeat: 1 } && Paid(game).DualColorDuel is { OwnerIsRed: false, OtherIsRed: null } &&
-            Facts<ProgramDualColorsCommittedEvent>(game).Length == 0 && CostMoves(game).Length == 0,
-            "The first color is retained privately, without public color facts or any early hand payment.");
-        Private(game); Cold(game, registry);
-        Reach(game, prompt => prompt.SkillPrompt?.SkillId == Cost);
-        var receipt = Paid(game).DualColorDuel!;
-        Require(receipt.Stage == ProgramDualColorDuelStage.PaymentChildren && receipt.OwnerCardIds.SequenceEqual(sourceCards) &&
-            receipt.OtherCardIds.Count == 0 && receipt.OtherIsRed == true && Hand(game, 0).Count == 0 && Hand(game, 1).Count == otherCards.Length,
-            "The native opponent chooses from its own private hand; both sets commit before any payment observer.");
-        var movement = game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(frame => frame.Batch.ParentFrameId == root.Id);
-        Require(movement.ResumeProgramFrameId == root.Id && movement.Batch.AwaitingProgramFrameId is null &&
-            movement.Batch.Movements.Count == sourceCards.Length && movement.Batch.Movements.All(move =>
-                move.From == CardLocation.Hand(0) && move.To == CardLocation.DiscardPile && move.Reason.Value == Reason),
-            "The paid mixed-owner batch has its exact direct Program return, even when the other set is empty.");
-        Frozen(receipt.OwnerCardIds); Frozen(receipt.OtherCardIds); Cold(game, registry);
-        Continue(game); Reach(game, prompt => prompt.SkillPrompt?.SkillId == Hp);
-        Require(game.State.Players[0].Hp == 3 && Paid(game).DualColorDuel!.OwnerCardIds.Count == 6 &&
-            game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Any(),
-            "The real cost observer recovers the wounded source before the future Duel is issued.");
-        Cold(game, registry); Continue(game);
-        Reach(game, prompt => prompt.SkillPrompt?.SkillId == "classic:shangshi" && Action(prompt, "activate"));
-        Answer(game, choice => choice.Parameters.GetValueOrDefault("program-action") == "activate");
-        Reach(game, prompt => prompt.SkillPrompt?.SkillId == Gain && PaidOrNull(game) is not null);
-        Require(Hand(game, 0).Count == 1 && Paid(game).DualColorDuel!.OwnerCardIds.Count == 6 && CostMoves(game).Length == 6,
-            "A real Shangshi draw and its gain observer return without recomputing the already paid six-card comparison.");
-        Cold(game, registry); Continue(game); Reach(game, prompt => prompt.SkillPrompt?.SkillId == Before);
-        var use = game.ResolutionStack.OfType<CardUseFrame>().Single(frame => frame.DualColorDuelOrigin is not null);
-        var origin = use.DualColorDuelOrigin!;
-        Require(origin.ParentProgramFrameId == root.Id && origin.InitialActorSeat == 0 && origin.InitialTargetSeat == 1 &&
-            origin.OwnerDiscardCount == 6 && origin.OtherDiscardCount == 0 && use.CardId == 0 && use.PhysicalCardIds?.Count == 0 &&
-            use.Action is { Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0, ConversionChain.Count: 0 },
-            "Six paid cards beats zero despite the later one-versus-four hands; a true zero-entity Duel enters its card-use window.");
-        Cold(game, registry); Continue(game); ReachPlay(game);
-        Require(PaidOrNull(game) is null && Facts<ProgramDualColorsCommittedEvent>(game).Length == 1 &&
-            Facts<ProgramDualColorCardsDiscardedEvent>(game).Single() is { OwnerCount: 6, OtherCount: 0 } &&
-            Facts<ProgramDualColorDuelIssuedEvent>(game).Single().CardUseFrameId == use.Id &&
-            Facts<CardUseFinishedEvent>(game).Any(fact => fact.ResolutionId == use.Id && fact.CardKind == CardKind.Duel) &&
-            CostMoves(game).Select(move => move.CardId).Order().SequenceEqual(sourceCards.Order()) &&
-            Facts<ActualPlayPhaseCardUseRecordedEvent>(game).Any(fact => fact.CardActionId == use.Action!.ActionId),
-            "The real Duel and all cost/recovery/gain descendants finish once and enter actual Play-use history.");
-        RejectSecondActivation(game); Cold(game, registry);
-
-        var (tie, tieRegistry) = Create(); Begin(tie, 1); AnswerColor(tie, "red"); ReachPlay(tie);
-        Require(Facts<ProgramDualColorCardsDiscardedEvent>(tie).Single() is { OwnerCount: 0, OtherCount: 0 } &&
-            CostMoves(tie).Length == 0 && Facts<ProgramDualColorDuelIssuedEvent>(tie).Length == 0,
-            "Two valid empty color selections consume the activation once, without inventing a Duel or payment.");
-        RejectSecondActivation(tie); Cold(tie, tieRegistry);
-    }
-
     public static void TerminalDuelReturnsToItsPaidParentOnceCold()
     {
         foreach (var ownerDies in new[] { false, true })

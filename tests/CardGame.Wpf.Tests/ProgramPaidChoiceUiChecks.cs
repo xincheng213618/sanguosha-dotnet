@@ -49,7 +49,7 @@ internal static class ProgramPaidChoiceUiChecks
         store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(autoAdvance: false, seed: game.Seed, showSetup: true,
             saveStore: store, useExpandedContent: true, contentRegistry: registry) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         game = Program.Engine(model);
         Program.Assert(model.CurrentDecisionContext is { TargetSeat: 0, TargetLabel: "正在选择" } context &&
@@ -109,7 +109,7 @@ internal static class ProgramPaidChoiceUiChecks
         store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(autoAdvance: false, seed: game.Seed, showSetup: true,
             saveStore: store, useExpandedContent: true, contentRegistry: registry) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         game = Program.Engine(model);
         var ownChoice = model.SkillChoices.First(choice => choice.Cards.Count == 1);
@@ -190,7 +190,7 @@ internal static class ProgramPaidChoiceUiChecks
         using var model = new MainViewModel(false, checkpoint.Options.Seed, true, store,
             useExpandedContent: true, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         var game = Program.Engine(model);
         var boundary = ChoiceBoundary(game);
         var native = GameReplay.Restore(checkpoint, registry);
@@ -254,7 +254,7 @@ internal static class ProgramPaidChoiceUiChecks
             var retiredButton = button;
             var retiredCommand = button.Command!;
             var retiredParameter = button.CommandParameter;
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Pump();
             var reloaded = Program.Engine(model);
             choice = model.CenterSkillChoices.Single();

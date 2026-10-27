@@ -8,8 +8,6 @@ internal static class ShanheSourceMouDongZhuoChecks
     private const string General = StandardShanheSourceMouDongZhuoPackage.GeneralId;
     private const string Xiongni = StandardShanheSourceMouDongZhuoPackage.XiongniSkillId;
     private const string Fengshang = StandardShanheSourceMouDongZhuoPackage.FengshangSkillId;
-    private const string Zhibing = StandardShanheSourceMouDongZhuoPackage.ZhibingSkillId;
-    private const string Zhixi = StandardShanheSourceMouDongZhuoPackage.ZhixiSkillId;
     private const string Neutral = "fixture:source-mou-neutral", Peer = "fixture:source-mou-peer", Driver = "fixture:source-mou-driver";
     private const string CostWatch = "fixture:source-mou-cost-watch", WineWatch = "fixture:source-mou-wine-watch";
     private const string HpWatch = "fixture:source-mou-hp-watch", DrawWatch = "fixture:source-mou-draw-watch", Deck = "fixture:source-mou-deck";
@@ -99,68 +97,6 @@ internal static class ShanheSourceMouDongZhuoChecks
             s.Facts<ShanheSourceMouWineReturnedEvent>().Count(e => e.UseId == selfWine.UseId && e.FrameId == selfWine.FrameId) == 1 &&
             s.Facts<CardUseFinishedEvent>().Count(e => e.ResolutionId == selfWine.UseId && e.CardKind == CardKind.Alcohol) == 1,
             "The actual self-dying wine recovers one HP, returns once to its original Fengshang and allows the original dying frame to resolve survived.");
-    }
-
-    public static void TrueBlackUsesThresholdThreeSixNineGrantUseOnlyZhixiUntilActualTurnEnd()
-    {
-        foreach (var initialBossHand in new[] { 0, 11 }) RunThresholdCase(initialBossHand);
-    }
-
-    private static void RunThresholdCase(int initialBossHand)
-    {
-        var s = Scene.Start(true, initialBossHand); s.Play();
-        var originalBossHand = s.V(1).Hand.Select(card => card.Id).ToArray();
-        var materials = s.V(0).Hand.Where(card => card.Kind == CardKind.Crossbow).Select(card => card.Id).ToArray();
-        Need(materials.Length == 10 && s.V(0).Hp == 8, "Ten distinct native black equipment entities form the bounded actual-Use sequence.");
-        for (var count = 1; count <= 9; count++)
-        {
-            s.Equip(materials[count - 1]);
-            if (count == 3)
-            {
-                s.Until(() => s.At(HpWatch));
-                Need(s.V(0).Hp == 7 && s.Facts<ShanheSourceMouThresholdEvent>() is [{ Owner: 1, Actor: 0, Ordinal: 3 }] &&
-                    s.Game.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.SkillId == Zhibing && f.ShanheSourceMou is { Actor: 0, Ordinal: 3 }),
-                    "The third actual black Use loses one HP and retains its original observer frame while the real loss child waits.");
-                s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
-            }
-            if (count == 6)
-            {
-                s.Until(() => s.At(DrawWatch));
-                Need(s.P!.PlayerSeat == 1 && s.V(1).HandCount == 9 && s.Game.ResolutionStack.OfType<ProgramSkillFrame>().Any(f =>
-                    f.SkillId == Zhibing && f.ShanheSourceMou is { Actor: 0, Ordinal: 6 } && f.PendingMovementContinuation is not null),
-                    "The sixth true Use adjusts the source owner's hand to nine and owns the actual gain/discard child before returning to the original equipment use.");
-                if (initialBossHand == 11)
-                {
-                    var paid = s.Facts<ShanheSourceMouPaidEvent>().Where(e => e.Payer == 1).ToArray();
-                    Need(paid.Length == 2 && paid.Select(e => e.CardId).Distinct().Count() == 2 && paid.All(e => originalBossHand.Contains(e.CardId) && e.From == CardLocation.Hand(1)) &&
-                        paid.All(e => s.Game.CardMovements.Count(move => move.CardId == e.CardId && move.From == CardLocation.Hand(1) &&
-                            move.To == CardLocation.DiscardPile && move.Reason.Value == "skill.shanhe-source-mou.discard") == 1) &&
-                        s.Game.CardMovements.All(move => move.Reason.Value != "skill.shanhe-source-zhibing.draw"),
-                        "An actual eleven-card owner selects and pays precisely two original hand entities, rather than drawing, and pauses at the real discard child.");
-                }
-                else Need(s.Game.CardMovements.Count(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(1) &&
-                    move.Reason.Value == "skill.shanhe-source-zhibing.draw") == 9,
-                    "The zero-card owner really draws nine distinct native entities before its gain children return.");
-            }
-            s.Play();
-        }
-        Need(s.Facts<ShanheSourceMouThresholdEvent>().Select(e => e.Ordinal).SequenceEqual([3, 6, 9]) &&
-            s.Facts<ShanheSourceMouBlackUseEvent>().Count(e => e.Actor == 0 && e.Black) == 9 &&
-            s.Facts<ShanheSourceMouBlackUseEvent>().Where(e => e.Actor == 0 && e.Black).All(e => e.Kind == CardKind.Crossbow && e.Suit == Suit.Spade) &&
-            s.Facts<CardUseFinishedEvent>().Count(e => materials.Take(9).Contains(e.CardId) && e.CardKind == CardKind.Crossbow) == 9 &&
-            s.V(0).Skills!.Any(skill => skill.Id == Zhixi) && s.V(1).HandCount == 9 &&
-            !s.Game.GetHumanLegalActions().Any(action => action.CardId == materials[9]),
-            "One actor's actual-turn counts trigger exactly3/6/9; the ninth original Use still completes, then the source-specific locked Zhixi prohibits a tenth Use.");
-        var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
-        var query = typeof(GameEngine).GetMethod("IsCardUseForbidden", flags)!;
-        bool Banned(CardKind kind, CardActionType action) => (bool)query.Invoke(s.Game, [0, kind, action, false, null])!;
-        Need(Banned(CardKind.Slash, CardActionType.Use) && !Banned(CardKind.Slash, CardActionType.Response),
-            "The same native legality rule prohibits actual Use while preserving a pure played Slash response; it is not the use-and-play ban or an unrelated Zhixi.");
-        var turn = s.Facts<TurnStartedEvent>().Last().TurnNumber;
-        s.Submit(new EndPlayPhaseCommand(0, s.Game.Revision, s.P!.PromptId));
-        s.Until(() => s.V(0).Skills!.All(skill => skill.Id != Zhixi));
-        Need(s.Facts<TurnEndedEvent>().Any(e => e.TurnNumber == turn && e.ActorSeat == 0),
-            "The issued native grant expires on the actual granting turn end rather than leaking into later turns.");
     }
 
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }

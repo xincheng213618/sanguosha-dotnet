@@ -38,7 +38,7 @@ internal static class WenheActivityUiChecks
         var history = new MemoryMatchHistoryStore();
         using var vm = new MainViewModel(false, 17, true, store, historyStore: history, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         var window = new MainWindow(vm);
         window.ApplyTemplate();
         var root = (FrameworkElement)window.Content;
@@ -86,8 +86,8 @@ internal static class WenheActivityUiChecks
             Program.Assert(report.Items.Count == 8 && report.ItemsSource == summary.Players,
                 "The visible completed-match table must bind the actual ranked rows rather than re-sort by seat.");
             Program.Render(root, 1440, 880, Path.Combine(output, "172-wenhe-ranking-report.png"));
-            vm.SaveGameCommand.Execute(null);
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
+            LegacySaveFixtures.Load(vm);
             Program.Assert(!vm.HasSaveError && vm.GameOutcomeTitle == "第 1 名" &&
                 vm.CompletedMatch!.Players.Select(player => player.SurvivalRank).SequenceEqual(summary.Players.Select(player => player.SurvivalRank)) &&
                 vm.MatchHistory.Count == 1,
@@ -212,17 +212,17 @@ internal static class WenheActivityUiChecks
                 vm.WenheCurrentRuleDescription.Contains("最近") && vm.TableModeText.Contains("乱武"),
                 "The actual first-round lifecycle event must feed the visible rule banner independently of the ordinary action-turn counter.");
             Program.Render(root, 1440, 880, Path.Combine(output, "171-wenhe-eight-survivors.png"));
-            vm.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
             var saved = SnapshotJson.Serialize(game.CreateSnapshot(0));
             vm.SelectedTableMode = vm.TableModes.Single(option => option.ModeId == "identity:classic-8");
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             Program.Assert(!vm.HasSaveError && Program.Engine(vm).ModeId == "activity:wenhe-2019" &&
                 vm.SelectedWenheAspiration.GoalRank == 4 && vm.IsWenheActivityTable &&
                 SnapshotJson.Serialize(Program.Engine(vm).CreateSnapshot(0)) == saved,
                 "A real manual restore must recover the exact live rule, private goal and survival view after another lobby mode is selected.");
             using var other = new MainViewModel(false, 17, true, store, contentRegistry: ComposedSkillContentRegistry.CreateShowcase())
                 { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-            other.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(other);
             Program.Assert(!other.HasSaveError && other.IsWenheActivityTable && other.Seats.Count == 8 &&
                 other.SelectedTableMode.ModeId == "activity:wenhe-2019" && other.SelectedWenheAspiration.GoalRank == 4,
                 "Package metadata must recover a survival save even when the new desktop configuration did not opt in to Wenhe.");
@@ -279,11 +279,11 @@ internal static class WenheActivityUiChecks
                 {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[
                 {"id":"{{{Driver}}}","revision":1,"activations":[
                 {"id":"defeat","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,
-                 "effects":[{"op":"loseHp","target":"selectedTarget","amount":20}]}]},
+                 "effects":[{"op":"damage","target":"selectedTarget","amount":5}]}]},
                 {"id":"{{{Quiet}}}","revision":1,"triggers":[{"id":"skip-ai-play","window":"afterNormalDraw","subject":"owner","optional":false,
                  "effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}]}
                 """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
-                skills = new Dictionary<string, object> { [Driver] = new { name = "Fixture elimination", description = "Real native HP-loss and death sequence for ranked UI." },
+                skills = new Dictionary<string, object> { [Driver] = new { name = "Fixture elimination", description = "Lethal five-damage hit, native Nirvana and subsequent death sequence for ranked UI." },
                     [Quiet] = new { name = "Quiet peer", description = "Skip ordinary AI play while retaining actual turn and activity-rule boundaries." } } }));
             foreach (var (id, program) in programs.Programs)
                 builder.AddSkill(new(id, programs.Presentations[id].Name, programs.Presentations[id].Description)

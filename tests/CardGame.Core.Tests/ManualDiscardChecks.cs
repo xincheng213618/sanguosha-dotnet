@@ -40,7 +40,6 @@ internal static class ManualDiscardChecks
             });
     }
 
-
     public static void Rejections()
     {
         var game = AtDiscard();
@@ -77,7 +76,6 @@ internal static class ManualDiscardChecks
         }
         Require(game.Submit(new AdvanceCommand(game.Revision)).PendingDecision?.Kind == DecisionKind.DiscardCards, "Host advance skipped the human decision.");
     }
-
 
     public static void PartialPaymentsRestoreRemainingQuota()
     {

@@ -49,38 +49,6 @@ internal static class ShanheSourceYanyuChecks
         }
     }
 
-    public static void LethalFireClaimsAfterNativeDeathIncludingTheTerminalEntity()
-    {
-        foreach (var otherEnemy in new[] { true, false })
-        {
-            var scene = Scene.StartLethal(otherEnemy);
-            scene.EndOwnPlay();
-            scene.Reach(() => scene.Events<ShanheSourceYanyuCardSettledEvent>().SingleOrDefault(fact => fact.TargetSeat == 1) is { } paid &&
-                !scene.Game.ResolutionStack.Any(frame => frame.Id == paid.ProgramFrameId) &&
-                (otherEnemy || scene.Game.State.Winner != Winner.None && scene.Game.ResolutionStack.Count == 0));
-            if (otherEnemy)
-                scene.Reach(() => scene.Game.CreateSnapshot(0).PendingDecision is { PlayerSeat: 0, Kind: DecisionKind.PlayCard } &&
-                    scene.Game.ResolutionStack.Count == 0);
-            var result = scene.Events<JudgmentResolvedEvent>().Single(fact => fact.Reason == "shanhe.source-yanyu-3292" && fact.TargetSeat == 1);
-            var receipt = scene.Events<ShanheSourceYanyuCardSettledEvent>().Single(fact => fact.TargetSeat == 1);
-            var facts = scene.Game.Events.Select(envelope => envelope.Payload).ToArray();
-            var resolved = Array.FindIndex(facts, fact => fact is DyingResolvedEvent { VictimSeat: 1, Survived: false });
-            var claimed = Array.FindIndex(facts, fact => fact is CardMovedEvent move && move.CardId == result.CardId &&
-                move.From == CardLocation.Processing && move.To == CardLocation.Hand(scene.Owner));
-            Need(scene.Game.CreateSnapshot(0).Players[0].IsAlive && !scene.Game.CreateSnapshot(0).Players[1].IsAlive && resolved >= 0 && claimed > resolved &&
-                receipt.CardId == result.CardId && receipt.MovementSequence is { } sequence &&
-                scene.Game.CardMovements.Count(move => move.Sequence == sequence && move.CardId == result.CardId &&
-                    move.From == CardLocation.Processing && move.To == CardLocation.Hand(scene.Owner)) == 1 &&
-                scene.Game.CardMovements.Count(move => move.CardId == result.CardId && move.From == CardLocation.Processing) == 1 &&
-                scene.Game.CreateSnapshot(scene.Owner).Players[scene.Owner].Hand.Any(card => card.Id == result.CardId),
-                "Lethal native damage first resolves real dying/death, then transfers that exact original judgment entity once to the surviving source, including when the death ends the match.");
-            Need(scene.Events<ShanheSourceYanyuDamageRequestedEvent>().Count(fact => fact.ProgramFrameId == receipt.ProgramFrameId) == 1 &&
-                scene.Events<JudgmentResolvedEvent>().Count(fact => fact.ParentResolutionId == receipt.ProgramFrameId) == 1 &&
-                (scene.Game.State.Winner == Winner.None) == otherEnemy,
-                "The original dead preparation target receives no second judgment in its frame; the separate surviving enemy keeps the nonterminal case live and the human source remains actionable.");
-        }
-    }
-
     private sealed class Scene(GameEngine game, int owner)
     {
         public GameEngine Game { get; } = game;

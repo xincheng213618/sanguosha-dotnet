@@ -17,6 +17,7 @@ public sealed partial class MainViewModel
     private ShanheCampaignSession? _shanheSession;
     private GameEngine? _shanheBattleGame;
     private GameEngine? _shanheTableGame;
+    private GameEngine? _shanheReturnGame;
     private ShanheBattleSetup? _shanheTableSetup;
     private int _shanheRunDifficulty = 1;
     private bool _isShanheOpen;
@@ -79,6 +80,7 @@ public sealed partial class MainViewModel
         set
         {
             if (IsShanheRunInProgress && value?.Id != _shanheSession!.Snapshot.PlayerGeneralId) return;
+            if (!IsShanheRunInProgress && !IsSelectableShanheGeneral(value)) return;
             // Changing a page clears the ListBox selection before it binds the next eight cards.
             // Keep the chosen general until the player explicitly chooses another card.
             if (value is null || !ShanheGenerals.Contains(value) || !SetProperty(ref _selectedShanheGeneral, value)) return;
@@ -134,10 +136,18 @@ public sealed partial class MainViewModel
             if (!SetProperty(ref _isShanheOpen, value)) return;
             if (value) { _shanheWasAutoAdvance = IsAutoAdvance; IsAutoAdvance = false; }
             else IsAutoAdvance = _shanheWasAutoAdvance;
+            RaisePropertyChanged(nameof(CanSaveShanheProgress));
+            RaisePropertyChanged(nameof(SessionSaveStatus));
+            (SaveGameCommand as RelayCommand)?.NotifyCanExecuteChanged();
         }
     }
     public bool HasShanheProgress { get => _hasShanheProgress; private set => SetProperty(ref _hasShanheProgress, value); }
-    public string ShanheStatusText { get => _shanheStatusText; private set => SetProperty(ref _shanheStatusText, value); }
+    public bool CanContinueShanheExpedition => HasShanheProgress && (_shanheSession is null || IsShanheRunInProgress);
+    public string ShanheStatusText
+    {
+        get => _shanheStatusText;
+        private set { if (SetProperty(ref _shanheStatusText, value)) RaisePropertyChanged(nameof(SessionSaveStatus)); }
+    }
     public string ShanheEditionNotice => "单机征程 · " + SelectedShanheScenario.Name +
         (SelectedShanheScenario.Id == StandardShanheCampaignCatalog.LocalEditionId
             ? " · 本地起步版" : " · 神武将出征默认按群");
@@ -154,7 +164,7 @@ public sealed partial class MainViewModel
         get
         {
             if (_shanheSession is not { } session) return "选择一名武将，踏上征途";
-            var live = session.Snapshot.Phase == ShanheCampaignPhase.Battle
+            var live = HasLiveShanheBattle
                 ? _shanheBattleGame?.CreateSnapshot(0).Players.Single(player => player.IsHuman) : null;
             return $"{ShanheGeneralName(session.Snapshot.PlayerGeneralId)}   体力 {live?.Hp ?? session.Snapshot.Hp}/{live?.MaxHp ?? session.Snapshot.MaxHp}";
         }
@@ -170,10 +180,10 @@ public sealed partial class MainViewModel
             string.Join("、", state.StartingCards.Select(card => CardCatalog.Get(card.Kind).DisplayName))) +
             "\n随身装备：" + (state.StartingEquipment.Count == 0 ? "无" :
                 string.Join("、", state.StartingEquipment.Select(card => CardCatalog.Get(card.Kind).DisplayName)))
-        : "在征途中获取随身牌和装备，每战加入手牌，完善你的构筑。";
+        : "随身牌每战加入手牌，随身装备每战开局直接置入装备区。";
     private bool ShanheStartingResourcesExpireOnUse => _shanheSession?.Definition.StartingResourcesExpireOnUse ?? true;
     private string ShanheStartingResourceNotice => ShanheStartingResourcesExpireOnUse
-        ? "随身牌和装备每战加入手牌；使用或响应后本应进入弃牌堆时移出本局，被技能提前取得则保留。"
+        ? "随身牌每战加入手牌，用后按规则移出；随身装备开战直接装备，可正常夺取和使用。牌堆不含装备。"
         : "随身牌每战加入手牌，初始装备每战直接装备。";
     public string ShanheSkillsText => CurrentShanheBuildState is { } state
         ? $"额外技能 {state.ExtraSkillIds.Count}/{state.ExtraSkillSlots}：" +
@@ -189,7 +199,7 @@ public sealed partial class MainViewModel
     private string ShanheBattleRosterText => $"义军 {ShanheAlliedSeatCount} 席 · 敌军 {ShanheEnemySeatCount} 席 · {Math.Max(0, ShanheAlliedSeatCount - 1)} 名人机友军";
     private string ShanheBattleObjective => $"你的目标：击败{ShanheBattleNodeName}的全部敌军。" +
         (ShanheAlliedSeatCount > 1 ? $"本战有 {ShanheAlliedSeatCount - 1} 名人机友军助战。" : "本战由你独自迎敌。") +
-        "胜利后保留剩余体力，领取战利品再继续行军；本次征程战败后结束。";
+        "胜利后保留剩余体力，领取战利品再继续行军；战败可按进入本关时的状态重新挑战。";
     public string ShanheCarryoverNotice => "胜利后保留剩余体力。战法持续本次征程，每战获得且不占技能槽；额外所学技能单独占槽，满槽时可替换。" + ShanheStartingResourceNotice;
     public string ShanheContextTitle => _shanheSession?.Snapshot.Phase switch
     {
@@ -211,7 +221,8 @@ public sealed partial class MainViewModel
             return state.StoryText + (state.BossRewardSummary is { IsBonusOnly: true } ? "\n\n领取本次胜利的追加奖励，确认后继续行军。"
                 : state.BossRewardSummary is not null ? "\n\n首领已败，分别领取战法与技能，确认奖励后继续征程。"
                 : state.Phase == ShanheCampaignPhase.Reward ? "\n\n从下方奖励中选择一项，再继续征程。"
-                : state.Phase == ShanheCampaignPhase.Battle ? "\n\n此战的体力和收获会影响后续路程。可返回牌桌继续战斗。" : "");
+                : state.Phase == ShanheCampaignPhase.Battle ? "\n\n" + (IsShanheBattleRetryReady ? ShanheBattleRetryDescription
+                    : "可返回牌桌继续战斗；保存进度并退出后，下次从本关开头重新挑战。") : "");
         }
     }
 
@@ -231,11 +242,12 @@ public sealed partial class MainViewModel
             if (IsTutorialActive) return;
             IsHelpOpen = false; IsLogOpen = false; IsHistoryOpen = false; IsGeneralGalleryOpen = false;
             IsShanheOpen = true;
+            if (_shanheSession is null && HasShanheProgress) ContinueShanheCampaign();
             RefreshShanhePresentation();
         }, () => !IsTutorialActive);
-        CloseShanheCommand = new RelayCommand(() => { if (SaveShanheProgress()) IsShanheOpen = false; });
-        StartShanheCommand = new RelayCommand(StartShanheCampaign, () => CanPrepareShanheExpedition && SelectedShanheGeneral is not null);
-        ContinueShanheCommand = new RelayCommand(ContinueShanheCampaign, () => !IsTutorialActive && HasShanheProgress);
+        CloseShanheCommand = new RelayCommand(LeaveShanheExpedition);
+        StartShanheCommand = new RelayCommand(StartShanheCampaign, () => CanPrepareShanheExpedition && IsSelectableShanheGeneral(SelectedShanheGeneral));
+        ContinueShanheCommand = new RelayCommand(ContinueShanheCampaign, () => !IsTutorialActive && CanContinueShanheExpedition);
         ResumeShanheBattleCommand = new RelayCommand(ResumeShanheBattle, () => IsShanheBattleActive && !IsTutorialActive);
         SelectShanheNodeCommand = new RelayCommand<ShanheCampaignNode>(SelectShanheNode,
             IsCurrentShanheNode);
@@ -244,6 +256,7 @@ public sealed partial class MainViewModel
         _selectedShanheDifficulty = ShanheDifficulties[0];
         InitializeShanheGeneralRoster();
         InitializeShanheJourney();
+        InitializeShanheExit();
         InitializeShanheRewards();
         HasShanheProgress = _shanheSaveStore.Exists;
         RefreshShanhePresentation();
@@ -251,7 +264,7 @@ public sealed partial class MainViewModel
 
     private void StartShanheCampaign()
     {
-        if (!CanPrepareShanheExpedition || SelectedShanheGeneral is not { } general) return;
+        if (!CanPrepareShanheExpedition || SelectedShanheGeneral is not { } general || !IsSelectableShanheGeneral(general)) return;
         if (IsShanheSettlementPending && (!SaveShanheProgress() || IsShanheSettlementPending))
         { ShanheStatusText = "上次征程结算尚未保存，请先重试结算，避免覆盖图册与征程记录。"; return; }
         try
@@ -280,49 +293,34 @@ public sealed partial class MainViewModel
         if (IsTutorialActive || _shanheSaveStore is null) return;
         if (_shanheSession is not null)
         {
-            if (_shanheSession.PendingBattleSetup is not null && _shanheBattleGame is null) StartShanheBattle();
             IsShanheOpen = true; RefreshShanhePresentation(); return;
         }
         try
         {
             var save = _shanheSaveStore.Read();
-            var session = ShanheCampaignSession.Restore(save.Campaign,
-                StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(save.Campaign, save.Difficulty), StandardShanheCampaignCatalog.CreateBattleRegistry);
-            GameEngine? battle = null;
-            if (session.PendingBattleSetup is { } setup)
-            {
-                if (save.Battle is not { } checkpoint || checkpoint.Options is not { } battleOptions || battleOptions.HumanSeat != 0 ||
-                    battleOptions.Seed != setup.BattleSeed || checkpoint.ModeId != ShanheBattleSetup.BattleModeId ||
-                    !ShanheBattleSetup.ValueEquals(battleOptions.ShanheBattle, setup))
-                    throw new InvalidDataException("当前战斗与征程节点不一致。");
-                battle = GameReplay.Restore(checkpoint, StandardShanheCampaignCatalog.CreateBattleRegistry(setup));
-            }
-            else if (save.Battle is not null) throw new InvalidDataException("当前征程阶段不应带有未结算的战斗。");
-            // Replace both halves only after both journals have fully validated.
-            _shanheSession = session; _shanheRunDifficulty = save.Difficulty; _shanheBattleGame = battle;
+            var session = RestoreShanheProgress(save);
+            _shanheSession = session; _shanheRunDifficulty = save.Difficulty; _shanheBattleGame = null;
+            if (session.AcceptedCommands.LastOrDefault() is EndShanheExpeditionCommand) _dismissedShanheSettlement = session;
             _shanheResumeFailed = false;
             SelectedShanheScenario = ShanheScenarios.Single(option => option.Id ==
                 StandardShanheCampaignCatalog.EditionIdForCampaign(session.Definition.Id, save.Difficulty));
             SelectedShanheDifficulty = ShanheDifficulties.Single(option => option.Value == save.Difficulty);
             SelectedShanheRank = ShanheRanks.Single(option => option.Value == session.Snapshot.PlayerRank);
-            if (battle is not null)
-            {
-                _shanheTableGame = battle;
-                _shanheTableSetup = session.PendingBattleSetup;
-                ReplaceEngine(battle);
-                IsNewGameSetupOpen = false;
-                CaptureShanheBattleResult();
-            }
             IsShanheOpen = true;
-            ShanheStatusText = $"已恢复本机征程 · {save.SavedAtUtc.ToLocalTime():MM-dd HH:mm}。";
+            ShanheStatusText = $"已恢复征程进度 · {save.SavedAtUtc.ToLocalTime():MM-dd HH:mm}。" +
+                (session.PendingBattleSetup is not null ? "本关从头挑战，不恢复退出前的牌局。" : "");
             SettleShanheCodexReward();
+            if (IsShanheSettlementPending) _dismissedShanheSettlement = null;
             RefreshShanhePresentation();
         }
         catch (Exception error) when (IsSaveException(error))
         {
+            _shanheSession = null;
             _shanheResumeFailed = true;
-            ShanheStatusText = $"读取征程失败：{ReadableSaveError(error)} 原文件已保留，可开始新征程。";
-            RefreshShanheJourney();
+            HasShanheProgress = false;
+            IsShanheOpen = true;
+            ShanheStatusText = $"读取征程失败，已重置到出征准备：{ReadableSaveError(error)} 原文件保留，确认新出征前不会覆盖。";
+            RefreshShanhePresentation();
         }
     }
 
@@ -356,14 +354,24 @@ public sealed partial class MainViewModel
 
     private void StartShanheBattle()
     {
-        if (_shanheSession?.PendingBattleSetup is not { } setup) return;
+        if (_shanheSession is not { PendingBattleSetup: not null } session) return;
         try
         {
-            var battle = StandardShanheCampaignCatalog.CreateBattle(setup);
-            _shanheBattleGame = _shanheTableGame = battle;
-            _shanheTableSetup = setup;
+            var previous = session.CreateCheckpoint();
+            var issued = session.Submit(new BeginShanheBattleAttemptCommand(session.Revision));
+            if (!issued.Accepted) throw new InvalidOperationException(issued.Error);
+            if (!SaveShanheProgress())
+            {
+                _shanheSession = ShanheCampaignSession.Restore(previous, session.Definition,
+                    StandardShanheCampaignCatalog.CreateBattleRegistry);
+                RefreshShanhePresentation();
+                return;
+            }
+            var setup = session.PendingBattleSetup!;
+            var battle = StandardShanheCampaignCatalog.CreateBattle(setup, _confirmOpeningHand);
+            _shanheBattleGame = battle;
             IsNewGameSetupOpen = false; IsIdentityRevealOpen = false;
-            ReplaceEngine(battle);
+            AttachShanheBattle(battle, setup);
             var result = SubmitCommand(new StartGameCommand());
             if (!result.Accepted) throw new InvalidOperationException(result.Error?.Message ?? "战斗开局失败。");
             RefreshCommandResult(result.State);
@@ -378,8 +386,9 @@ public sealed partial class MainViewModel
     private void ResumeShanheBattle()
     {
         if (IsTutorialActive || !IsShanheBattleActive) return;
-        if (_shanheBattleGame is not { } battle) { StartShanheBattle(); return; }
-        if (!ReferenceEquals(_game, battle)) { _shanheTableGame = battle; ReplaceEngine(battle); }
+        if (!HasLiveShanheBattle) { StartShanheBattle(); return; }
+        var battle = _shanheBattleGame!;
+        if (!ReferenceEquals(_game, battle)) AttachShanheBattle(battle, _shanheSession!.PendingBattleSetup!);
         IsNewGameSetupOpen = false;
         IsShanheOpen = false;
     }
@@ -388,6 +397,18 @@ public sealed partial class MainViewModel
     {
         if (_shanheSession is not { } session || session.Snapshot.Phase != ShanheCampaignPhase.Battle ||
             _shanheBattleGame is not { } battle || !ReferenceEquals(_game, battle) || battle.State.Status != EngineStatus.Completed) return;
+        var completed = battle.CreateSnapshot(0);
+        var player = completed.Players.Single(seat => seat.IsHuman);
+        if (completed.WinnerTeamId != ShanheBattleSetup.PlayerTeamId || !player.IsAlive || player.Hp <= 0)
+        {
+            // The failed attempt never advances the expedition journal, spends its
+            // entry resources, or issues a settlement receipt. Retry uses the same setup.
+            IsShanheOpen = true;
+            IsShanheMarketOpen = false;
+            RefreshShanhePresentation();
+            SaveShanheProgress();
+            return;
+        }
         var result = session.CompleteBattle(battle, session.Revision);
         if (!result.Accepted) { ShanheStatusText = $"战斗结算未完成：{result.Error}"; return; }
         SettleShanheCodexReward();
@@ -396,9 +417,14 @@ public sealed partial class MainViewModel
         SaveShanheProgress();
     }
 
-    private void SaveShanheBeforeOrdinaryGame()
+    private bool SaveShanheBeforeOrdinaryGame()
     {
-        if (IsShanheBattleSession) SaveShanheProgress();
+        if (!IsShanheBattleSession) return true;
+        if (!SaveShanheProgress()) return false;
+        DiscardShanheBattleAttempt();
+        _shanheWasAutoAdvance = false;
+        IsShanheOpen = false;
+        return true;
     }
 
     public bool FlushShanheProgress() => SaveShanheProgress();
@@ -408,15 +434,12 @@ public sealed partial class MainViewModel
         if (_shanheSession is not { } session || _shanheSaveStore is null || IsTutorialActive) return true;
         try
         {
-            var checkpoint = session.PendingBattleSetup is not null ? _shanheBattleGame?.CreateCheckpoint() : null;
-            // A just-selected encounter may not have been constructed yet. Its first complete save follows StartGame.
-            if (session.PendingBattleSetup is { } pending && (checkpoint is null ||
-                !ShanheBattleSetup.ValueEquals(checkpoint.Options.ShanheBattle, pending))) return true;
             _shanheSaveStore.Write(new ShanheCampaignSaveFile(ShanheCampaignSaveFile.CurrentFormatVersion,
-                DateTimeOffset.UtcNow, _shanheRunDifficulty, session.CreateCheckpoint(), checkpoint));
+                DateTimeOffset.UtcNow, _shanheRunDifficulty, session.CreateCheckpoint()));
             SettleShanheCodexReward();
             HasShanheProgress = true;
-            ShanheStatusText = $"山河图已保存 · {DateTime.Now:HH:mm:ss}";
+            ShanheStatusText = $"山河图进度已保存 · {DateTime.Now:HH:mm:ss}" +
+                (session.PendingBattleSetup is not null ? " · 退出后从本关开头挑战" : "");
             if (IsShanheBattleSession)
             {
                 _autoSavePending = false;
@@ -516,9 +539,10 @@ public sealed partial class MainViewModel
         foreach (var property in new[] { nameof(ShanheCampaignTitle), nameof(ShanheRouteSummary), nameof(ShanheVitalText),
             nameof(ShanheGoldText), nameof(ShanheTacticsText), nameof(ShanheSkillsText), nameof(ShanheRecruitedCompanionCards), nameof(IsShanheStoryEventOpen), nameof(ShanheRankStatusText), nameof(SelectedShanheRankDescription), nameof(ShanheContextTitle),
             nameof(ShanheContextDescription), nameof(ShanheScenarioDetails), nameof(IsShanheBattleActive), nameof(IsShanheBattleSession),
-            nameof(ShanheBuildTabTitle), nameof(ShanheTacticEmptyText), nameof(ShanheStartingLoadoutText), nameof(ShanheCarryoverNotice), nameof(ShanheEditionNotice), nameof(SelectedShanheGeneralMeta), nameof(HasShanheSession),
-            nameof(ShanheStartingCompanionCards), nameof(ShanheStartingCompanionName), nameof(ShanheStartingCompanionPortrait), nameof(ShanheStartingCompanionDescription), nameof(HasShanheStartingCompanion) }) RaisePropertyChanged(property);
-        foreach (var command in new[] { StartShanheCommand, ContinueShanheCommand, ResumeShanheBattleCommand })
+            nameof(ShanheBuildTabTitle), nameof(ShanheTacticEmptyText), nameof(ShanheStartingLoadoutText), nameof(ShanheCarryoverNotice), nameof(ShanheEditionNotice), nameof(SelectedShanheGeneralMeta), nameof(HasShanheSession), nameof(CanSaveShanheProgress), nameof(CanContinueShanheExpedition),
+            nameof(ShanheStartingCompanionCards), nameof(ShanheStartingCompanionName), nameof(ShanheStartingCompanionPortrait), nameof(ShanheStartingCompanionDescription), nameof(HasShanheStartingCompanion),
+            nameof(IsShanheBattleRetryReady), nameof(ShanheBattleActionText), nameof(ShanheBattleRetryTitle), nameof(ShanheBattleRetryDescription) }) RaisePropertyChanged(property);
+        foreach (var command in new[] { StartShanheCommand, ContinueShanheCommand, ResumeShanheBattleCommand, EndShanheCommand, SaveGameCommand, ToggleShanheGeneralRosterCommand })
             (command as RelayCommand)?.NotifyCanExecuteChanged();
     }
 

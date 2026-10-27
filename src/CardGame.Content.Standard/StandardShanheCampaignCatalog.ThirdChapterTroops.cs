@@ -28,7 +28,7 @@ public static partial class StandardShanheCampaignCatalog
         var patrol = new ShanheNodeDefinition(ThirdChapterPatrolNodeId, "第三章 · 京畿巡军", ShanheNodeKind.Battle,
             camp.NextNodeIds, encounters, rewards)
         {
-            ChapterNumber = 3, ChapterTitle = "第三章 · 京畿巡军", CategorizedRewards = true,
+            ChapterNumber = 3, ChapterTitle = "第三章 · 京畿巡军", CategorizedRewards = true, AutomaticRewardCategory = true,
             PrimaryTacticRarity = 2, PrimarySkillRarity = 2, RewardSkipGold = 100,
             StoryText = "京畿巡军封住去路。可先清剿巡军取得补给，再选择最终路线或挑战东吴精锐。",
             Description = "可选前战，遭遇巡军或三将阵容。胜利后继续最终路线。"

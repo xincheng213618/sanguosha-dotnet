@@ -28,14 +28,14 @@ internal static class ActiveSkillMatchingCostUiChecks
                 false, original.CreateCheckpoint()));
             using var model = new MainViewModel(false, 31, true, store, contentRegistry: registry)
                 { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             var window = new MainWindow(model);
             var root = (FrameworkElement)window.Content;
             try
             {
                 foreach (var route in new[] { "button", "Enter" })
                 {
-                    model.LoadManualGameCommand.Execute(null);
+                    LegacySaveFixtures.Load(model);
                     var game = Program.Engine(model);
                     Program.Assert(!model.HasSaveError && game.CreateSnapshot(0).PendingDecision is
                         { Kind: DecisionKind.PlayCard, PlayerSeat: 0 },

@@ -20,9 +20,12 @@ public static partial class StandardShanheCampaignCatalog
             {
                 Description = reward.Description
                     .Replace("本地版按普通实体牌流转。", string.Empty, StringComparison.Ordinal)
-                    .Replace("每场开始装备八卦阵", "每场开始将八卦阵加入手牌", StringComparison.Ordinal)
-                    .Replace("每场开始装备青釭剑", "每场开始将青釭剑加入手牌", StringComparison.Ordinal)
-                    .Replace("每场战斗开始时装备", "每场战斗开始时加入手牌", StringComparison.Ordinal) + useNotice
+                    .Replace(useNotice, string.Empty, StringComparison.Ordinal)
+                    .Replace("每场开始将八卦阵加入手牌", "每场开始直接装备八卦阵", StringComparison.Ordinal)
+                    .Replace("每战开始将八卦阵加入手牌", "每战开始直接装备八卦阵", StringComparison.Ordinal) +
+                    (reward.StartingEquipment?.Count > 0
+                        ? "每场战斗开始时置入装备区，可被其他角色正常获得和使用。"
+                        : useNotice)
             }, StringComparer.Ordinal);
         var originals = definition.Rewards.ToDictionary(reward => reward.Id, StringComparer.Ordinal);
         return ShanheCampaignContent.FreezeAndValidate(definition with
@@ -32,6 +35,8 @@ public static partial class StandardShanheCampaignCatalog
             Nodes = definition.Nodes.Select(node => node with
             {
                 CategorizedRewards = node.CategorizedRewards || categorizeNormalRewards &&
+                    node.Kind is ShanheNodeKind.Battle or ShanheNodeKind.EliteBattle,
+                AutomaticRewardCategory = node.AutomaticRewardCategory || node.CategorizedRewards || categorizeNormalRewards &&
                     node.Kind is ShanheNodeKind.Battle or ShanheNodeKind.EliteBattle,
                 Encounters = currentSeason && node.Kind == ShanheNodeKind.Battle
                     ? node.Encounters!.Select(encounter => encounter with { VictoryGold = 200 }).ToArray()

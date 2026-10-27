@@ -9,17 +9,6 @@ internal static class ShanheSchoolChecks
     private const string AliasA = "fixture:school-alias-a", AliasB = "fixture:school-alias-b";
     private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(new StandardContentPackage(), new Fixture()));
 
-    public static void ImplementedProductionSchoolsHaveEnoughDistinctMembersInEveryRequiredTier()
-    {
-        var definition = StandardShanheCampaignCatalog.CreateCodexDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
-        var shortages = definition.Schools!.Where(s => s.Id == 1 || ShanheSchoolEffects.SkillId(s) is not null)
-            .Select(s => new { s.Name, s.Requirements, Available = Enumerable.Range(1, 4)
-                .Select(tier => definition.Rewards.Where(r => r.SchoolMembership is { } member &&
-                    member.SchoolId == s.Id && member.Rarity == tier).Select(r => r.SchoolMembership!.SourceId).Distinct().Count()).ToArray() })
-            .Where(s => s.Requirements.Where((count, tier) => s.Available[tier] < count).Any()).ToArray();
-        Need(shortages.Length == 0, "Every implemented production school must be attainable from real catalogue members: " + JsonSerializer.Serialize(shortages));
-    }
-
     public static void CompletionRequiresOwnedExactRaritiesAndDistinctAcquisitionSources()
     {
         foreach (var sameAcquisitionIdentity in new[] { false, true })

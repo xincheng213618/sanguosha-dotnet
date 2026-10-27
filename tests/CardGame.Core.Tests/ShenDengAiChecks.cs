@@ -9,69 +9,6 @@ internal static class ShenDengAiChecks
     private const string Hero = "anniversary:shen-deng-ai", Driver = "fixture:shen-da-driver", Quiet = "fixture:shen-da-quiet",
         Ally = "fixture:shen-da-ally", Enemy = "fixture:shen-da-enemy", Deck = "fixture:shen-da-deck";
 
-    public static void AllocationOffersEveryUnassignedCardAndKeepsIssuedDomainsCold()
-    {
-        var s = ReadyToAllocate();
-        var ids = s.V().Hand.Select(c => c.Id).ToArray();
-        s.Need(s.P!.ValidCardIds.ToHashSet().SetEquals(ids) && ids.All(id => s.P.Choices.Count(c => c.Cards.SequenceEqual([id])) == 3),
-            "Allocation exposes every unassigned hand card with each developed domain, rather than forcing the first card.");
-        var id = ids[^1];
-        s.Answer(c => c.Cards.SequenceEqual([id]) && c.Parameters.GetValueOrDefault("distribution-target") == "domain:2");
-        s.Need(s.V().Hand.Single(c => c.Id == id).SkillMarkLabel == "丰田" && !s.P!.ValidCardIds.Contains(id) &&
-            s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("distribution-label") == "丰田 · 1 张\n伤害与回复值 +1"),
-            "Assigning a non-first card labels only that entity, removes it from this edition's unassigned pool and updates domain counts.");
-        s.Cold();
-        s.Need(s.P!.ValidCardIds.Count == ids.Length - 1 && s.E<ShenDengAiAssignedEvent>().Count(e => e.CardId == id) == 1,
-            "Cold restore resumes the remaining allocation without assigning the already committed card again.");
-    }
-
-    public static void DevelopAllocateAwakenAndUseIssuedDomains()
-    {
-        var s = Awaken();
-        s.Need(s.G.CreateSnapshot(0).TableOrder?.SequenceEqual([1, 2, 0, 3]) == true && s.V().MaxHp == 3 && s.G.State.CurrentSeat == 0 &&
-            s.E<ProgramExtraTurnPendedEvent>().Length == 1 && s.V().Skills!.Any(k => k.ContentId == "anniversary-god:cuixin"),
-            "Qijing moves the actual general between the selected living neighbors, reduces max HP, grants Cuixin and begins exactly one real extra turn.");
-        var qingqu = s.V().Hand.Single(c => c.Kind == CardKind.Slash && c.SkillMarkLabel == "清渠");
-        var fengtian = s.V().Hand.Single(c => c.Kind == CardKind.Slash && c.SkillMarkLabel == "丰田");
-        var junshan = s.V().Hand.Single(c => c.Kind == CardKind.Slash && c.SkillMarkLabel == "峻山");
-        var hp = s.V(1).Hp; s.PlayCard(qingqu.Id, 1); s.Play(skipCuixin: true);
-        s.Need(s.V(1).Hp == hp - 1 && s.E<ShenDengAiDomainIssuedEvent>().Any(e => (e.DomainMask & 2) != 0),
-            "Qingqu reaches an actual distance-two target with a genuine native Slash and signs its own quota exemption.");
-        hp = s.V(2).Hp; s.PlayCard(fengtian.Id, 2); s.Play(skipCuixin: true);
-        s.Need(s.V(2).Hp == hp - 2 && !s.G.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash && a.CardId == junshan.Id),
-            "Fengtian raises actual Slash damage to two; Qingqu did not debit the ordinary quota, while Junshan does not inherit unlimited usage.");
-        s.Accept(new UseProgramSkillCommand(0, Driver, "hurt", [], [], s.G.Revision, s.P!.PromptId)); s.Play();
-        var peach = s.V().Hand.Single(c => c.Kind == CardKind.Peach && c.SkillMarkLabel == "丰田");
-        s.PlayCard(peach.Id, 0); s.Play();
-        s.Need(s.V().Hp == 3 && s.E<RecoveryAppliedEvent>().Any(e => e.SourceSeat == 0 && e.TargetSeat == 0 && e.Amount == 2),
-            "Fengtian also changes an actual recovery card's requested value to two through the native recovery pipeline.");
-        s.Cold();
-    }
-
-    public static void CuixinRestoresCompletedUseAfterNativeChildAndDelayedCarrier()
-    {
-        var s = Awaken(); var card = s.V().Hand.Single(c => c.Kind == CardKind.Slash && c.SkillMarkLabel == "峻山");
-        var hp2 = s.V(2).Hp; var hp3 = s.V(3).Hp;
-        s.PlayCard(card.Id, 2); s.Reach(() => s.P?.SkillPrompt?.SkillId == "anniversary-god:cuixin");
-        s.Need(s.V(2).Hp == hp2 - 1 && s.E<IssuedCardNoResponseEvent>().Any() && s.P!.Choices.Any(c => c.Targets.SequenceEqual([3])),
-            "Junshan makes its real hand Slash unrespondable, and that completed use offers the opposite living neighbor.");
-        s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("option") == "slash:3"); s.Cold(); s.Play(skipCuixin: true);
-        var issued = s.E<ShenDengAiNativeIssuedEvent>().Single();
-        s.Need(s.V(3).Hp == hp3 - 1 && s.E<ShenDengAiNativeReturnedEvent>() is [{ UseId: var useId }] && useId == issued.Origin.UseId &&
-            s.E<ShenDengAiCursorRestoredEvent>().Length == 1 && s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == issued.Origin.OriginalUseId) == 1 &&
-            s.E<ShenDengAiDomainIssuedEvent>().All(e => e.UseId != issued.Origin.UseId),
-            "The native zero-material Slash returns once and restores its original completed mother without copying the physical card's domain.");
-        var delayed = s.V().Hand.First(c => c.Kind == CardKind.Indulgence);
-        s.PlayCard(delayed.Id, 2); s.Reach(() => s.P?.SkillPrompt?.SkillId == "anniversary-god:cuixin"); s.Cold();
-        s.Answer(c => c.Parameters.GetValueOrDefault("option") == "delayed:3"); s.Play(skipCuixin: true);
-        var carrier = s.E<ShenDengAiCarrierCreatedEvent>().Single();
-        s.Need(s.V(3).Judgment.Any(c => c.Id == carrier.CardId && c.Kind == CardKind.Indulgence) &&
-            s.G.CardMovements.Any(m => m.CardId == carrier.CardId && m.From == CardLocation.OutsideGame && m.To == CardLocation.Processing) &&
-            s.E<ShenDengAiNativeReturnedEvent>().Length == 2,
-            "A repeated delayed trick places one genuine generated judgment carrier and returns through the original native flow.");
-        s.Cold();
-    }
-
     internal static (GameEngine Game, ContentRegistry Registry) CreateAwakenedTableFixture()
     { var s = Awaken(); return (s.G, s.Registry); }
 

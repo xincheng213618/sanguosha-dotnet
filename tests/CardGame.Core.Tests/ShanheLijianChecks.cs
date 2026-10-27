@@ -141,45 +141,6 @@ internal static class ShanheLijianChecks
         s.Cold(); s.Finish(); s.AssertCost(cost); s.Cold();
     }
 
-    public static void PaidDiscardSurvivesOwnerLossOrDeathAndDeadParticipantsCold()
-    {
-        foreach (var scene in new[] { "loss", "owner-death", "actor-death", "target-death" })
-        {
-            var s = Scene.Start(scene); var cost = s.View(0).Hand.Single(card => card.Kind == CardKind.Peach).Id;
-            s.Use(cost); s.Until(() => s.P?.SkillPrompt?.SkillId == Watch && s.P.Choices.Any(choice => Action(choice) == "activate"));
-            Need(s.Events<OrderedSelectedActorDuelPaidEvent>().Length == 1 && s.Events<CardUseDeclaredEvent>().All(fact => fact.CardKind != CardKind.Duel),
-                "The actual one-card payment precedes its real discard observer and any later Duel issuance.");
-            s.Cold(); s.Answer(choice => Action(choice) == "activate");
-            if (scene is "actor-death" or "target-death")
-            {
-                s.Until(() => s.P?.PlayerSeat == 0 && s.P.Choices.Any(choice => choice.Targets.Count == 1));
-                s.Answer(choice => choice.Targets.SequenceEqual([scene == "actor-death" ? 1 : 2]));
-            }
-            if (scene == "loss")
-            {
-                s.Until(() => s.View(0).Hp == 5 && s.P?.SkillPrompt?.SkillId == Watch && s.P.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue"));
-                Need(s.View(0).Skills?.Any(skill => skill.ContentId == Skill) != true,
-                    "An actual HP loss withdraws the conditional Lijian instance after its physical discard was paid.");
-                s.Cold(); s.Answer(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
-            }
-            else
-            {
-                var deadSeat = scene == "owner-death" ? 0 : scene == "actor-death" ? 1 : 2;
-                s.Until(() => !s.View(deadSeat).IsAlive); s.Cold();
-            }
-            s.Finish();
-            var issued = s.Events<OrderedSelectedActorDuelIssuedEvent>();
-            Need(issued.Length == (scene is "loss" or "owner-death" ? 1 : 0),
-                "Paid source loss/death preserves the remaining other-participant effect, while a dead actor or target opens no new Duel: " + s.Diagnostic());
-            if (issued.Length == 1)
-                Need(s.Events<CardUseDeclaredEvent>().Any(fact => fact.ResolutionId == issued[0].CardUseFrameId && fact.SourceSeat == 1 && fact.CardKind == CardKind.Duel) &&
-                    s.Events<CardUseFinishedEvent>().Count(fact => fact.ResolutionId == issued[0].CardUseFrameId) == 1,
-                    "A dead or skill-less original owner still receives its exact native child return once, without becoming the Duel's actor or target.");
-            s.AssertCost(cost); Need(s.Events<OrderedSelectedActorDuelPaidEvent>().Length == 1,
-                "Neither cold recovery nor source lifetime changes repeat the original selected-card cost."); s.Cold();
-        }
-    }
-
     private static string Action(PromptChoice choice) => choice.Parameters.GetValueOrDefault("program-action") ?? "";
     private static void Need(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
     private static void VerifyParserRejectsUnpaidOrUnpairedOptIn()

@@ -135,8 +135,8 @@ internal static class OpeningCustomizationUiChecks
                 ReferenceEquals(button.Command, vm.ChangeStartingIdentityCommand) &&
                 button.CommandParameter is StartingRoleOption { Role: Role.Lord }), Key.Enter);
             vm.ContinueFromIdentityRevealCommand.Execute(null);
-            vm.SaveGameCommand.Execute(null);
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
+            LegacySaveFixtures.Load(vm);
             Program.Assert(!vm.HasSaveError && vm.SelectedStartingRole.Role is null &&
                 Program.Engine(vm).CreateSnapshot(0).Players.Single(player => player.IsHuman).Role == Role.Lord,
                 "The current-identity regression must cold restore an actual Lord while the requested lobby identity is random.");
@@ -384,8 +384,8 @@ internal static class OpeningCustomizationUiChecks
                 vm.CanRerollOpeningHand && !vm.IsOpeningDealVisible,
                 "The actual inline replacement button swaps one real hand card for its published replacement and keeps the match before its first turn.");
             var saved = SnapshotJson.Serialize(Program.Engine(vm).CreateSnapshot(0));
-            vm.SaveGameCommand.Execute(null);
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
+            LegacySaveFixtures.Load(vm);
             vm.IsMotionEnabled = false;
             Program.Assert(saved == SnapshotJson.Serialize(Program.Engine(vm).CreateSnapshot(0)) &&
                 !vm.IsOpeningDealVisible && vm.CanRerollOpeningHand && !vm.IsOpeningHandEditorOpen,

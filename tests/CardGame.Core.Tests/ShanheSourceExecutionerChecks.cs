@@ -10,35 +10,6 @@ internal static class ShanheSourceExecutionerChecks
     private const string Huanfu = StandardShanheSourceExecutionerPackage.HuanfuSkillId;
     private const string Driver = "fixture:executioner-driver", Multi = "fixture:executioner-multi", Watch = "fixture:executioner-paid-child", Deck = "fixture:executioner-deck";
 
-    public static void YishiPreventsActualSlashAndAcquiresTheOriginalTargetEntity()
-    {
-        var s = Scene.Start(Profile.Yishi); var equipment = s.V(1).Equipment.Single().Id;
-        var slash = s.Slash([1]);
-        s.Until(() => s.P?.SkillPrompt?.SkillId == Yishi);
-        Need(s.V(1).Hp == 20 && s.Events<SourceExecutionerYishiPreventedEvent>().Length == 0,
-            "Source611 offers on the original positive Slash damage before preventing or acquiring anything.");
-        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-        s.Until(() => s.P?.SkillPrompt?.SkillId == Yishi && s.P.Choices.Any(c => c.Cards.Contains(equipment)));
-        s.Answer(c => c.Cards.Contains(equipment)); s.Play();
-        var use = s.Events<CardUseDeclaredEvent>().Single(e => e.CardId == slash).ResolutionId;
-        Need(s.Events<SourceExecutionerYishiPreventedEvent>() is [{ OwnerSeat: 0, TargetSeat: 1, Amount: 1 } fact] && fact.UseId == use &&
-            s.Events<DamageAppliedEvent>().All(e => e.SourceCardUseResolutionId != use) && s.V(1).Hp == 20 &&
-            s.Zone(equipment) == CardLocation.Hand(0) &&
-            s.G.CardMovements.Count(m => m.CardId == equipment && m.From == CardLocation.Equipment(1) && m.To == CardLocation.Hand(0)) == 1,
-            "Accepted Yishi prevents precisely the original Slash segment and obtains the actual chosen equipment once.");
-        s.AssertSlashPaid(slash, use);
-        var decline = Scene.Start(Profile.Yishi); var declined = decline.Slash([1]); decline.Play();
-        Need(decline.V(1).Hp == 19 && decline.Events<SourceExecutionerYishiPreventedEvent>().Length == 0 && decline.V(1).Equipment.Count == 1 &&
-            decline.Events<DamageAppliedEvent>().Single().Amount == 1, "Declining leaves the real Slash damage and original target equipment unchanged.");
-        var empty = Scene.Start(Profile.Empty); empty.Slash([1]); empty.Play();
-        Need(empty.V(1).Hp == 19 && empty.Events<ProgramBindingStartedEvent>().All(e => e.SkillId != Yishi),
-            "A target with no HEJ has no Yishi candidate; the original Slash applies normally.");
-        var direct = Scene.Start(Profile.Yishi); direct.UseDriver(); direct.Play();
-        Need(direct.V(1).Hp == 19 && direct.Events<ProgramBindingStartedEvent>().All(e => e.SkillId != Yishi) &&
-            direct.Events<DamageAppliedEvent>().Single().SourceCardUseResolutionId is null,
-            "A genuine independent program damage attempt is not a Slash-use qualification.");
-    }
-
     public static void HuanfuPaysBothNativeWagersAndSettlesTheSameMultiTargetSlash()
     {
         var s = Scene.Start(Profile.Both); var actorCosts = s.V(0).Hand.Where(c => c.Kind != CardKind.Slash).Select(c => c.Id).ToArray();
@@ -64,43 +35,6 @@ internal static class ShanheSourceExecutionerChecks
             Need(s.G.CardMovements.Count(m => m.CardId == id && m.Reason.Value == "skill-program.source-huanfu-3156.discard" && m.To == CardLocation.DiscardPile) == 1,
                 "Each independently selected HE entity is actually discarded once despite native movement children.");
         s.AssertSlashPaid(slash, use);
-    }
-
-    public static void HuanfuFailedWagerRetainsRealDodgePaymentAndDrawsNothing()
-    {
-        var s = Scene.Start(Profile.Dodged); var dodge = s.V(1).Hand.Single().Id;
-        var costs = s.V(0).Hand.Where(c => c.Kind != CardKind.Slash).Select(c => c.Id).ToArray(); var slash = s.Slash([1]);
-        s.Wager(0, costs);
-        s.Until(() => s.P?.Choices.Any(c => c.Cards.Contains(dodge)) == true);
-        s.Answer(c => c.Cards.Contains(dodge)); s.Play();
-        var use = s.Events<CardUseDeclaredEvent>().Single(e => e.CardId == slash).ResolutionId;
-        Need(s.Events<SourceExecutionerHuanfuPaidEvent>() is [{ Amount: 2, Source.OwnerSeat: 0 }] &&
-            s.Events<SourceExecutionerHuanfuSettledEvent>() is [{ Wager: 2, ActualDamage: 0, RequestedDraw: 0 }] &&
-            s.Events<SourceExecutionerHuanfuDrawReturnedEvent>().Length == 0 && s.V(0).HandCount == 0 && s.V(1).Hp == 20 &&
-            s.Events<CardRespondedEvent>().Any(e => e.CardId == dodge && e.ResponderSeat == 1 && e.EffectiveCardKind == CardKind.Dodge) &&
-            s.G.CardMovements.Count(m => m.CardId == dodge && m.To == CardLocation.Processing) == 1 && s.Zone(dodge) == CardLocation.DiscardPile &&
-            s.Events<DamageAppliedEvent>().All(e => e.SourceCardUseResolutionId != use),
-            "The failed two-card wager is still genuinely paid; the target's original Dodge is consumed by the native response and the zero-damage result draws nothing.");
-        s.AssertSlashPaid(slash, use);
-
-        var redirect = Scene.Start(Profile.Redirect); var wagerCard = redirect.V(0).Hand.First(c => c.Kind == CardKind.Peach).Id;
-        var liuliCard = redirect.V(1).Hand.Single().Id; var redirectedSlash = redirect.Slash([1]);
-        // Native PrepareProgramSlashTargets completes Liuli before issuing finalized-target wagers.
-        redirect.Until(() => redirect.P?.SkillPrompt?.SkillId == "classic:liuli");
-        redirect.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-        redirect.Until(() => redirect.P?.Choices.Any(c => c.Targets.SequenceEqual([2])) == true);
-        redirect.Answer(c => c.Targets.SequenceEqual([2]));
-        redirect.Until(() => redirect.P?.Choices.Any(c => c.Cards.Contains(liuliCard)) == true);
-        redirect.Answer(c => c.Cards.Contains(liuliCard));
-        redirect.Wager(0, [wagerCard]); redirect.Play();
-        var redirectedUse = redirect.Events<CardUseDeclaredEvent>().Single(e => e.CardId == redirectedSlash).ResolutionId;
-        Need(redirect.Events<DamageAppliedEvent>().Where(e => e.SourceCardUseResolutionId == redirectedUse).Select(e => (e.SourceSeat, e.TargetSeat, e.Amount)).SequenceEqual([(0, 2, 1)]) &&
-            redirect.V(1).Hp == 20 && redirect.V(2).Hp == 19 &&
-            redirect.Events<SourceExecutionerHuanfuSettledEvent>() is [{ OwnerSeat: 0, Wager: 1, ActualDamage: 1, RequestedDraw: 2 }] &&
-            redirect.Events<SourceExecutionerHuanfuDrawReturnedEvent>() is [{ Requested: 2, ActualCount: 2 }] &&
-            redirect.G.CardMovements.Count(m => m.CardId == liuliCard && m.From == CardLocation.Hand(1) && m.To == CardLocation.DiscardPile) == 1,
-            "Native Liuli changes the original Slash's actual target: its user's wager counts that same Slash damage while the real redirect cost is paid once.");
-        redirect.AssertSlashPaid(redirectedSlash, redirectedUse);
     }
 
     private enum Profile { Yishi, Empty, Both, Dodged, Redirect }

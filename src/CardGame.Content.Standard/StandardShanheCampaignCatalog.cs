@@ -899,11 +899,14 @@ public static partial class StandardShanheCampaignCatalog
         setup.PlayerGeneralId == StandardShanheS5GaichaoPackage.DongZhuoGaichaoId ||
         setup.AllyRoster.Concat(setup.EnemyRoster).Any(member => member.GeneralId == StandardShanheS5GaichaoPackage.DongZhuoGaichaoId);
 
-    public static GameEngine CreateBattle(ShanheBattleSetup setup) => GameEngine.CreateStandard(new GameOptions
+    public static GameEngine CreateBattle(ShanheBattleSetup setup) => CreateBattle(setup, false);
+
+    public static GameEngine CreateBattle(ShanheBattleSetup setup, bool confirmOpeningHand) => GameEngine.CreateStandard(new GameOptions
     {
         Seed = setup.BattleSeed, PlayerCount = 1 + setup.AllyRoster.Count + setup.EnemyRoster.Count,
         HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,
         ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup, UseInteractiveSetup = false,
+        ConfirmOpeningHand = confirmOpeningHand,
         UseInteractiveDiscard = true, AdvanceAfterHumanCommands = false, MaxTurns = 150,
         AiPolicyVersion = AiDecisionPolicy.CurrentVersion
     }, CreateBattleRegistry(setup));

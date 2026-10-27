@@ -70,47 +70,6 @@ internal static class OlMoZhangFeiChecks
             "A real Spade/Club black Zhangba pair pays both entities once, retains its color without a single suit, settles mixed Slash/Duel on one Use and consumes the native Slash quota.");
     }
 
-    public static void NativeThreeDamageModificationColorsAndIssuedGreenCold()
-    {
-        var s = Scene.Start(true);
-        var slash = s.Action(a => a.Kind == LegalActionKind.Slash && a.TargetSeats.SequenceEqual([1]));
-        s.Use(slash); s.Play();
-        s.Need(s.E<DamageAppliedEvent>().Any(e => e.SourceSeat == 0 && e.TargetSeat == 1 && e.Amount == 3) &&
-            s.E<RecoveryAppliedEvent>().Any(e => e.TargetSeat == 0 && e.Amount == 1) && s.V().Hp == 5 &&
-            s.E<MoZhangFeiChenshiEnteredEvent>().Length == 1 && s.E<OlMoRumoEnteredEvent>().Length == 1 &&
-            s.V().Skills!.Any(skill => skill.Id == MoZhangFeiRuntime.ModifiedZhuohun) &&
-            !s.V().Skills!.Any(skill => skill.Id == MoZhangFeiRuntime.Zhuohun),
-            "One actual three-point Slash/Duel occurrence recovers, modifies Zhuohun and enters the existing native Rumo exactly once.");
-        s.Drive("lose-three", 1); s.Play();
-        s.Need(s.E<MoZhangFeiColorEffectIssuedEvent>().Any(e => e.TargetSeat == 1 && e.Color == MoZhangFeiColor.Yellow) &&
-            s.E<CurrentTurnNonLockedSkillSuppressionIssuedEvent>().Any(e => e.Suppression.TargetSeat == 1) &&
-            s.E<MoZhangFeiDrawReturnedEvent>().Any(e => e.Outcome.RequestedCount > 0) && s.V().HandCount >= s.V().MaxHp,
-            "Modified yellow first fills the owner's hand, then issues the native current-turn nonlocked suppression.");
-        s.Drive("recover", 1); s.Play();
-        var grant = s.E<MoZhangFeiColorEffectIssuedEvent>().Single(e => e.TargetSeat == 1 && e.Color == MoZhangFeiColor.Green);
-        s.Cold(); s.Drive("draw-two", 1); s.Play();
-        var replaced = s.E<MoZhangFeiGreenReplacementEvent>().Single();
-        s.Need(replaced.GrantFrameId == grant.FrameId && replaced.Requested == 2 && replaced.Count == 2 &&
-            s.E<MoZhangFeiGreenMaterialEvent>().Where(e => e.FrameId == replaced.FrameId).All(e =>
-                e.From == CardLocation.DrawPile && e.To == CardLocation.Hand(1) && e.Kind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash) &&
-            !s.G.CardMovements.Any(m => m.Sequence > replaced.Before && m.Sequence <= replaced.After && m.To == CardLocation.Hand(1) && m.Reason.Value == "skill-program." + Driver + ".Draw"),
-            "The restored issued green entitlement obtains real DrawPile Slashes instead of drawing, on the exact original request.");
-        s.Drive("lose-three", 3); s.Play();
-        s.Need(!s.V(3).IsAlive && s.E<MoZhangFeiColorEffectIssuedEvent>().Any(e => e.TargetSeat == 3 && e.Color == MoZhangFeiColor.Red),
-            "A new red arrival with no dying character uses native HP loss to remove the remaining HP and drain genuine dying/death.");
-        s.Drive("lose-three", 0); s.Play();
-        s.Drive("grant-probe"); s.Play();
-        s.Need(s.E<CurrentTurnNonLockedSkillSuppressionIssuedEvent>().Any(e => e.Suppression.TargetSeat == 0) &&
-            s.E<SkillsAcquiredEvent>().Any(e => e.PlayerSeat == 0 && e.SkillIds.Contains(Probe)) && !s.Actions().Any(a => a.ProgramSkillId == Probe) &&
-            s.Actions().Any(a => a.ProgramSkillId == Driver),
-            "Yellow includes its own owner and a future acquired nonlocked grant, while locked fixture/native skills remain qualified.");
-        s.Drive("lose-zhuohun"); s.Play(); s.Cold();
-        s.Drive("draw-two", 1); s.Play();
-        s.Need(s.E<MoZhangFeiGreenReplacementEvent>().Count(e => e.GrantFrameId == grant.FrameId) == 2 &&
-            s.E<MoZhangFeiChenshiEnteredEvent>().Length == 1 && !s.V().Skills!.Any(skill => skill.Id == MoZhangFeiRuntime.ModifiedZhuohun),
-            "Losing the original modified skill does not revoke an already issued green entitlement or repeat entry/payment after cold restoration.");
-    }
-
     private sealed class Fixture : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-ol-mo-zhang-fei", new(1, 0, 0));

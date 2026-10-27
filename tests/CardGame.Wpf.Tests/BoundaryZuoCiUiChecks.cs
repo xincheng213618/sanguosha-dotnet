@@ -1,3 +1,4 @@
+using CardGame.Wpf.Persistence;
 using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -28,8 +29,8 @@ internal static class BoundaryZuoCiUiChecks
             "The actual Back button retires the unpaid selection and keeps all three original avatars.");
         Click(model, host, choice => Action(choice, "exchange"));
         foreach (var id in hidden) Click(model, host, choice => Action(choice, "select", id));
-        model.SaveGameCommand.Execute(null);
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Save(model);
+        LegacySaveFixtures.Load(model);
         game = Program.Engine(model);
         Program.Assert(!model.HasSaveError && Library(game).GeneralIds!.SequenceEqual(before.GeneralIds!) &&
                 game.ResolutionStack.OfType<ProgramSkillFrame>().Single(item => item.Id == frame.Id).ShanheS5AvatarChoice!.SelectedGeneralIds.SequenceEqual(hidden) &&

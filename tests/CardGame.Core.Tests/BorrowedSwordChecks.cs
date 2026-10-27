@@ -129,7 +129,6 @@ internal static class BorrowedSwordChecks
             "A completed Borrowed Sword forced-Slash branch must replay exactly.");
     }
 
-
     private static bool HasUsedSlashResolution(GameEngine game) =>
         game.Events.Select(item => item.Payload)
             .OfType<BorrowedSwordResolvedEvent>()

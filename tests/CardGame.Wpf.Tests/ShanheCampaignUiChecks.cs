@@ -17,7 +17,7 @@ using CardGame.Wpf.Controls;
 using CardGame.Wpf.Persistence;
 using CardGame.Wpf.ViewModels;
 
-internal static class ShanheCampaignUiChecks
+internal static partial class ShanheCampaignUiChecks
 {
     public static void StoryMapChoicesAndIndependentColdRestore(string output)
     {
@@ -28,7 +28,7 @@ internal static class ShanheCampaignUiChecks
         {
             using var vm = Create(ordinary, campaign);
             vm.SelectedShanheScenario = vm.ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.LocalEditionId);
-            vm.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
             var ordinarySave = GameCheckpointJson.Serialize(ordinary.Read(GameSaveSlot.Manual).Checkpoint);
             var ordinarySaveStatus = vm.SaveStatus;
             var window = new MainWindow(vm);
@@ -120,7 +120,7 @@ internal static class ShanheCampaignUiChecks
         var campaign = new SwitchingShanheSaveStore();
         using var vm = Create(ordinary, campaign);
         vm.SelectedShanheScenario = vm.ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.LocalEditionId);
-        vm.SaveGameCommand.Execute(null);
+        LegacySaveFixtures.Save(vm);
         var ordinarySave = GameCheckpointJson.Serialize(ordinary.Read(GameSaveSlot.Manual).Checkpoint);
         vm.OpenShanheCommand.Execute(null);
         vm.StartShanheCommand.Execute(null);
@@ -142,10 +142,10 @@ internal static class ShanheCampaignUiChecks
         vm.SelectShanheNodeCommand.Execute(battleNode);
         var game = Program.Engine(vm);
         var tacticIds = game.CreateCheckpoint().Options.ShanheBattle!.TacticSkillIds;
-        Program.Assert(tacticIds.Count == 1 && tacticIds.All(id => vm.HumanSkillCards.Any(skill =>
-            skill.ContentId == id && skill.Description == game.ContentRegistry!.GetSkill(id).Description &&
-            skill.Tooltip.Contains(skill.Description))) && vm.ShanheExtraSkillCards.Count == 0,
-            "The real encounter must expose its newly granted tactic as a fully described native skill using the active battle registry.");
+        Program.Assert(tacticIds.Count == 1 && tacticIds.All(id => vm.HumanSkillCards.All(skill => skill.ContentId != id) &&
+            vm.HumanPlayer!.WushuangTactics.Any(tactic => tactic.SkillId == id &&
+                tactic.Tooltip.Contains(game.ContentRegistry!.GetSkill(id).Description, StringComparison.Ordinal))) && vm.ShanheExtraSkillCards.Count == 0,
+            "The real encounter exposes its native passive tactic through the shared tactic badge rail without consuming a skill slot.");
         Program.Assert(vm.IsShanheBattleSession && vm.IsShanheBattleActive && !vm.IsShanheOpen &&
             game.CreateSnapshot(0).Players.Count == 2 && game.AcceptedCommands.OfType<StartGameCommand>().Count() == 1,
             "The real route must create one native two-seat encounter and submit exactly one normal StartGame command.");
@@ -155,28 +155,28 @@ internal static class ShanheCampaignUiChecks
             vm.Seats.Select(seat => seat.RoleLabel).ToHashSet().SetEquals(["义军", "敌军"]) &&
             vm.ShanheCarryoverNotice.Contains("技能槽") && vm.ShanheCarryoverNotice.Contains("剩余体力"),
             "The native table must describe its actual single-player encounter, public sides and persistent build rather than a standard 2v2.");
-        vm.SaveGameCommand.Execute(null);
-        Program.Assert(vm.FlushPendingSave() && campaign.Read().Battle is not null && !vm.HasSaveError &&
-            vm.SaveStatus.Contains("山河图已保存") &&
+        LegacySaveFixtures.Save(vm);
+        Program.Assert(vm.FlushPendingSave() && campaign.Read().Battle is null && !vm.HasSaveError &&
+            vm.SaveStatus.Contains("山河图进度已保存") &&
             GameCheckpointJson.Serialize(ordinary.Read(GameSaveSlot.Manual).Checkpoint) == ordinarySave,
             "Manual and close-flush saves during a campaign encounter must use the independent campaign file.");
         var expected = SnapshotJson.Serialize(game.CreateSnapshot(0));
         var campaignJournal = ShanheCampaignJsonText(campaign);
-        var previousBattle = GameCheckpointJson.Serialize(campaign.Read().Battle!);
+        var previousSave = JsonSerializer.Serialize(campaign.Read());
         campaign.FailWrites = true;
-        vm.SaveGameCommand.Execute(null);
+        LegacySaveFixtures.Save(vm);
         Program.Assert(vm.HasSaveError && vm.SaveStatus.Contains("独立征程未保存") &&
             (bool)typeof(MainViewModel).GetField("_autoSavePending", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(vm)! &&
             SnapshotJson.Serialize(game.CreateSnapshot(0)) == expected && ShanheCampaignJsonText(campaign) == campaignJournal &&
-            GameCheckpointJson.Serialize(campaign.Read().Battle!) == previousBattle,
+            JsonSerializer.Serialize(campaign.Read()) == previousSave,
             "A failed campaign manual save must expose its unsaved state on the table, retain its pending retry and preserve the prior file and live battle.");
         campaign.FailWrites = false;
-        vm.SaveGameCommand.Execute(null);
-        Program.Assert(!vm.HasSaveError && vm.SaveStatus.Contains("山河图已保存") &&
+        LegacySaveFixtures.Save(vm);
+        Program.Assert(!vm.HasSaveError && vm.SaveStatus.Contains("山河图进度已保存") &&
             !(bool)typeof(MainViewModel).GetField("_autoSavePending", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(vm)!,
             "A later successful manual campaign save must clear both the visible error and the pending retry.");
         var saved = campaign.Read();
-        var savedBattle = saved.Battle!;
+        var savedBattle = game.CreateCheckpoint();
         var wrongBattle = savedBattle with { Options = savedBattle.Options with { Seed = savedBattle.Options.Seed ^ 1 } };
         foreach (var invalidBattle in new[] { wrongBattle, savedBattle with { Options = null! } })
         {
@@ -186,22 +186,27 @@ internal static class ShanheCampaignUiChecks
             using var invalid = Create(ordinary, mismatchedStore);
             var untouched = SnapshotJson.Serialize(Program.Engine(invalid).CreateSnapshot(0));
             invalid.ContinueShanheCommand.Execute(null);
-            Program.Assert(!invalid.HasShanheSession && !invalid.IsShanheBattleSession && invalid.ShanheStatusText.Contains("失败") &&
-                invalid.CanPrepareShanheExpedition && invalid.StartShanheCommand.CanExecute(null) &&
+            Program.Assert(invalid.HasShanheSession && !invalid.IsShanheBattleSession && invalid.IsShanheBattleRetryReady &&
                 SnapshotJson.Serialize(Program.Engine(invalid).CreateSnapshot(0)) == untouched &&
                 JsonSerializer.Serialize(mismatchedStore.Read()) == source,
-                "A campaign with the wrong encounter seed or missing battle options must fail safely, preserve its source and ordinary game, and allow a fresh expedition.");
+                "Legacy in-flight battle data is ignored, so invalid battle options cannot run or prevent restoring the validated expedition progress.");
         }
         using var cold = Create(ordinary, campaign);
         cold.ContinueShanheCommand.Execute(null);
-        Program.Assert(cold.IsShanheOpen && cold.IsShanheBattleActive && cold.IsShanheBattleSession &&
-            SnapshotJson.Serialize(Program.Engine(cold).CreateSnapshot(0)) == expected,
-            "A fresh view model must restore the campaign and its current battle from their independent journals.");
+        Program.Assert(cold.IsShanheOpen && cold.IsShanheBattleRetryReady && !cold.IsShanheBattleSession,
+            "A fresh view model restores the encounter entry without reviving an in-flight battle.");
         cold.ResumeShanheBattleCommand.Execute(null);
+        var retriedSetup = Program.Engine(cold).CreateCheckpoint().Options.ShanheBattle!;
+        var savedSetup = savedBattle.Options.ShanheBattle!;
+        Program.Assert(retriedSetup.AttemptNumber == savedSetup.AttemptNumber + 1 &&
+            retriedSetup.BattleSeed != savedSetup.BattleSeed &&
+            ShanheBattleSetup.ValueEquals(retriedSetup with { AttemptNumber = savedSetup.AttemptNumber }, savedSetup),
+            "Retry keeps the same genuine encounter recipe and resources while issuing a new shuffled challenge.");
+        var retriedJournal = ShanheCampaignJsonText(campaign);
         Program.Assert(!cold.IsShanheOpen && !cold.SelectShanheNodeCommand.CanExecute(battleNode),
             "Returning to the restored battle must retire all earlier view model map objects.");
         cold.SelectShanheNodeCommand.Execute(battleNode);
-        Program.Assert(ShanheCampaignJsonText(campaign) == campaignJournal,
+        Program.Assert(ShanheCampaignJsonText(campaign) == retriedJournal,
             "An old encounter button must not restart or advance a restored battle.");
         var window = new MainWindow(cold);
         window.ApplyTemplate();
@@ -213,7 +218,7 @@ internal static class ShanheCampaignUiChecks
             AssertUniqueOpponentRings(window, cold, 2);
             Program.Assert(cold.TopSeats.Count == 1 && cold.LeftSeats.Count == 0 && cold.RightSeats.Count == 0,
                 "A two-seat encounter must display its sole opponent once, centered above the human seat.");
-            Program.Assert(Program.Find<TextBlock>(root).Any(text => text.Text.Contains("山河图已保存") &&
+            Program.Assert(Program.Find<TextBlock>(root).Any(text => text.Text.Contains("山河图进度已保存") &&
                 BindingOperations.GetBinding(text, TextBlock.TextProperty)?.Path?.Path == nameof(MainViewModel.SessionSaveStatus)),
                 "The actual battle dock must bind the independent campaign manual-save confirmation while the map is closed.");
             cold.OpenShanheCommand.Execute(null);
@@ -233,8 +238,11 @@ internal static class ShanheCampaignUiChecks
         Program.Assert(!cold.IsShanheBattleSession, "An ordinary new match must detach the campaign table marker.");
         cold.OpenShanheCommand.Execute(null);
         cold.ResumeShanheBattleCommand.Execute(null);
-        Program.Assert(cold.IsShanheBattleSession && SnapshotJson.Serialize(Program.Engine(cold).CreateSnapshot(0)) == expected,
-            "Starting an ordinary match must leave the suspended campaign battle available for an exact return.");
+        var switchedSetup = Program.Engine(cold).CreateCheckpoint().Options.ShanheBattle!;
+        Program.Assert(cold.IsShanheBattleSession && switchedSetup.AttemptNumber == retriedSetup.AttemptNumber + 1 &&
+            switchedSetup.BattleSeed != retriedSetup.BattleSeed &&
+            ShanheBattleSetup.ValueEquals(switchedSetup with { AttemptNumber = savedSetup.AttemptNumber }, savedSetup),
+            "After switching modes the expedition resumes the same encounter and resources, with another new shuffle.");
         RenderThreeSeatRepresentative(output, savedBattle.Options.ShanheBattle!);
     }
 
@@ -254,6 +262,7 @@ internal static class ShanheCampaignUiChecks
             ClickNavigation((Button)panel.FindName("ShanhePrepareButton"), root);
             var selector = (ComboBox)panel.FindName("ShanheScenarioSelector");
             selector.SelectedItem = vm.ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.Returning2026EditionId);
+            vm.ToggleShanheGeneralRosterCommand.Execute(null);
             vm.SelectedShanheGeneral = vm.ShanheGenerals.Single(general => general.Id == "classic:shen-guan-yu");
             Layout(root);
             Program.Assert(vm.SelectedShanheScenario.Id == StandardShanheCampaignCatalog.Returning2026EditionId &&
@@ -312,20 +321,25 @@ internal static class ShanheCampaignUiChecks
             Program.Assert(game.CreateCheckpoint().Options.ShanheBattle!.DefaultGodFactionId == "qun" &&
                 game.CreateSnapshot(0).Players[0].FactionId == "qun",
                 "The selected edition's visible god-faction notice reaches the actual battle recipe and public table faction.");
-            vm.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
             Program.Assert(vm.FlushPendingSave(), "The real exclusive encounter must save successfully.");
             var original = ShanheCampaignJsonText(campaign);
-            var expected = SnapshotJson.Serialize(game.CreateSnapshot(0));
+            var originalSetup = game.CreateCheckpoint().Options.ShanheBattle!;
             Program.Render(root, 1440, 880, Path.Combine(output, "180-shanhe-2026-exclusive-boss.png"));
             using var cold = Create(ordinary, campaign);
             cold.SelectedShanheScenario = cold.ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.LocalEditionId);
             Program.Assert(cold.SelectedShanheScenario.Id == StandardShanheCampaignCatalog.LocalEditionId,
                 "Explicitly selecting the other edition requires restoration to obtain the saved edition from its checkpoint, independently of the new preparation default.");
             cold.ContinueShanheCommand.Execute(null);
+            Program.Assert(cold.IsShanheBattleRetryReady && !cold.IsShanheBattleSession && ShanheCampaignJsonText(campaign) == original,
+                "Restoring an edition exposes the encounter entry before its new battle starts.");
+            cold.ResumeShanheBattleCommand.Execute(null);
+            var nextSetup = Program.Engine(cold).CreateCheckpoint().Options.ShanheBattle!;
             Program.Assert(cold.IsShanheBattleSession && cold.SelectedShanheScenario.Id == StandardShanheCampaignCatalog.Returning2026EditionId &&
                 cold.SelectedShanheGeneralMeta.Contains("出征默认群") &&
-                SnapshotJson.Serialize(Program.Engine(cold).CreateSnapshot(0)) == expected && ShanheCampaignJsonText(campaign) == original,
-                "Cold restoration must recover the saved edition and exact exclusive boss state without rewriting the source save.");
+                nextSetup.AttemptNumber == originalSetup.AttemptNumber + 1 && nextSetup.BattleSeed != originalSetup.BattleSeed &&
+                ShanheBattleSetup.ValueEquals(nextSetup with { AttemptNumber = originalSetup.AttemptNumber }, originalSetup),
+                "The saved edition starts the same exclusive boss and resources with a new independently recorded shuffle.");
             var mismatched = new MemoryShanheCampaignSaveStore();
             var saved = campaign.Read();
             mismatched.Write(saved with { Difficulty = saved.Difficulty == 1 ? 2 : 1 });
@@ -360,6 +374,7 @@ internal static class ShanheCampaignUiChecks
             ClickNavigation((Button)panel.FindName("ShanhePrepareButton"), root);
             var setup = (Border)panel.FindName("ShanheSetupOverlay");
             var generals = (ListBox)panel.FindName("ShanheGeneralSelector");
+            Click((Button)panel.FindName("ShanheToggleGeneralRosterButton"), root);
             Click((Button)panel.FindName("ShanheNextGeneralPageButton"), root);
             var chosen = vm.ShanheGeneralPage.Last();
             generals.SelectedItem = chosen;
@@ -472,9 +487,25 @@ internal static class ShanheCampaignUiChecks
             ClickNavigation((Button)panel.FindName("ShanhePrepareButton"), root);
             var roster = (ListBox)panel.FindName("ShanheGeneralSelector");
             var search = (TextBox)panel.FindName("ShanheGeneralSearchBox");
+            var candidates = vm.ShanheGeneralPage.Select(general => general.Id).ToArray();
+            Program.Assert(!vm.IsShanheFreeGeneralSelection && candidates.Length ==
+                StandardWushuangContentRegistry.Create().Modes[WushuangMode.ModeId].GeneralCandidateCount &&
+                !search.IsVisible && !store.Exists,
+                "Normal preparation starts with the single-combat candidate count and does not expose the full roster.");
+            AssertVisibleCards();
+            Program.Render(root, 1440, 880, Path.Combine(output, "shanhe-candidate-selection.png"));
+            var unavailable = vm.ShanheGenerals.First(general => !candidates.Contains(general.Id));
+            vm.SelectedShanheGeneral = unavailable;
+            Program.Assert(vm.SelectedShanheGeneral != unavailable, "An unpublished general cannot bypass normal selection.");
+            ClickNavigation((Button)panel.FindName("ShanheSetupCloseButton"), root);
+            ClickNavigation((Button)panel.FindName("ShanhePrepareButton"), root);
+            Program.Assert(candidates.SequenceEqual(vm.ShanheGeneralPage.Select(general => general.Id)) && !store.Exists,
+                "Cancelling and reopening keeps the same candidates and does not create an expedition.");
+            Click((Button)panel.FindName("ShanheToggleGeneralRosterButton"), root);
             Program.Assert(vm.ShanheGenerals.Count > 100 && roster.Items.Count is > 0 and <= 8 &&
                 Program.Find<ListBoxItem>(roster).Count() <= 8 && vm.ShanheGeneralCountText.Contains(vm.ShanheGenerals.Count.ToString()),
                 "The campaign must offer the complete ordinary roster while realizing only a bounded page of portraits.");
+            AssertVisibleCards();
             var firstPage = vm.ShanheGeneralPage.Select(general => general.Id).ToArray();
             var selectedBeforePage = vm.SelectedShanheGeneral;
             Click((Button)panel.FindName("ShanheNextGeneralPageButton"), root);
@@ -513,6 +544,17 @@ internal static class ShanheCampaignUiChecks
             Click((Button)panel.FindName("ShanheStartButton"), root);
             Program.Assert(store.Exists && store.Read().Campaign.Options.PlayerGeneralId == target.Id,
                 "Confirming a searched general must create the real campaign with that exact content ID.");
+
+            void AssertVisibleCards()
+            {
+                foreach (var item in Program.Find<ListBoxItem>(roster))
+                {
+                    var bounds = item.TransformToAncestor(roster).TransformBounds(new Rect(item.RenderSize));
+                    Program.Assert(bounds.Left >= 0 && bounds.Top >= 0 && bounds.Right <= roster.ActualWidth + 1 &&
+                        bounds.Bottom <= roster.ActualHeight + 1,
+                        "Every candidate and full-roster card must fit entirely inside the selection viewport.");
+                }
+            }
         }
         finally { window.Content = null; window.DataContext = null; window.Close(); }
     }
@@ -530,17 +572,18 @@ internal static class ShanheCampaignUiChecks
             var panel = (ShanheCampaignPanel)window.FindName("ShanhePanel");
             Program.Assert(vm.IsShanhePreparation && vm.CanPrepareShanheExpedition,
                 "A fresh preparation surface must permit choosing a general and editing a loadout.");
-            ClickNavigation((Button)panel.FindName("ShanhePrepareButton"), root);
             var rankSelector = (ComboBox)panel.FindName("ShanheRankSelector");
             rankSelector.SetCurrentValue(Selector.SelectedItemProperty, vm.ShanheRanks.Single(option => option.Value == 5));
-            vm.SelectedShanheGeneral = vm.ShanheGenerals.Single(general => general.Id == "classic:qu-yi");
             Layout(root);
             Program.Assert(vm.ShanheRanks.Count == 5 && vm.SelectedShanheRank.Value == 5 &&
-                ((Border)panel.FindName("ShanheSetupOverlay")).Visibility == Visibility.Visible &&
+                ((Border)panel.FindName("ShanheSetupOverlay")).Visibility == Visibility.Collapsed &&
                 rankSelector.Visibility == Visibility.Visible && rankSelector.ActualHeight > 0 && rankSelector.IsEnabled &&
                 vm.SelectedShanheRankDescription.Contains("获得5张") && vm.SelectedShanheRankDescription.Contains("整次征程"),
                 $"The actual preparation selector must expose all five ranks and distinguish gaining five cards from refilling a hand. Rank={vm.SelectedShanheRank.Value}, enabled={rankSelector.IsEnabled}, height={rankSelector.ActualHeight}.");
             Program.Render(root, 1440, 880, Path.Combine(output, "shanhe-rank-five-preparation.png"));
+            ClickNavigation((Button)panel.FindName("ShanhePrepareButton"), root);
+            vm.ToggleShanheGeneralRosterCommand.Execute(null);
+            vm.SelectedShanheGeneral = vm.ShanheGenerals.Single(general => general.Id == "classic:qu-yi");
             vm.StartShanheCommand.Execute(null);
             Layout(root);
             var saved = ShanheCampaignJsonText(store);
@@ -592,7 +635,7 @@ internal static class ShanheCampaignUiChecks
             Click(Bound(panel, vm.PreviewShanheNodeCommand, battleNode), root);
             Click(Program.Find<Button>(panel).Single(button => ReferenceEquals(button.Command, vm.ChallengeShanheEncounterCommand)), root);
             Program.Assert(!vm.IsShanheEncounterPreviewOpen && vm.IsShanheBattleActive && vm.IsShanheBattleSession &&
-                store.Read().Battle?.Options.ShanheBattle is { PlayerGeneralId: "classic:qu-yi", PlayerRank: 5, RebirthAvailable: true,
+                store.Read().Battle is null && Program.Engine(vm).CreateCheckpoint().Options.ShanheBattle is { PlayerGeneralId: "classic:qu-yi", PlayerRank: 5, RebirthAvailable: true,
                     Hp: 6, MaxHpBonus: 2, InitialHandBonus: 2, DrawBonus: 1, SlashBonus: 1 } &&
                 Program.Engine(vm).CreateSnapshot(0).Players[0] is { Hp: 6, MaxHp: 6 } &&
                 Program.Engine(vm).CreateSnapshot(0).Players[0].Skills!.Count(skill => skill.ContentId == ShanheGeneralRanks.RebirthSkillId) == 1 &&
@@ -794,8 +837,8 @@ internal static class ShanheCampaignUiChecks
         finally { panel.DataContext = null; }
     }
 
-    private static MainViewModel Create(IGameSaveStore ordinary, IShanheCampaignSaveStore campaign, int seed = 270017) =>
-        new(false, seed, true, ordinary, useExpandedContent: true, shanheSaveStore: campaign)
+    private static MainViewModel Create(IGameSaveStore ordinary, IShanheCampaignSaveStore campaign, int seed = 270017, bool confirmOpeningHand = false) =>
+        new(false, seed, true, ordinary, useExpandedContent: true, shanheSaveStore: campaign, confirmOpeningHand: confirmOpeningHand)
         { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
 
     private sealed class SwitchingShanheSaveStore : IShanheCampaignSaveStore

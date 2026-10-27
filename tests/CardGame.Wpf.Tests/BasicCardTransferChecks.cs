@@ -633,7 +633,7 @@ internal static class BasicCardTransferChecks
         var model = new MainViewModel(false, source.Seed, true, store, contentRegistry: registry,
             historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore())
             { IsMotionEnabled = true, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Assert(!model.HasSaveError && model.BattleCues.Count == 0, model.SaveStatus);
         return model;
     }

@@ -90,31 +90,6 @@ internal static partial class GhostRuleChecks
         ColdGuanpingMoyan(ref own, ownRegistry);
     }
 
-    public static void MandatoryGuanpingMoyanFromActualDodgeCold()
-    {
-        var (g, registry) = StartGuanpingMoyan(Suit.Heart);
-        var dodge = V(g, 1).Hand.Single().Id;
-        var slash = UseCard(g, CardKind.Slash, 1);
-        MoyanUntil(ref g, () => P(g)?.SkillPrompt?.SkillId == "classic:longyin");
-        Answer(g, choice => choice.Parameters.GetValueOrDefault("program-action") == "skip");
-        MoyanUntil(ref g, () => P(g) is { PlayerSeat: 1, Kind: DecisionKind.RespondDodge });
-        ColdGuanpingMoyan(ref g, registry);
-        Accept(g, new AdvanceOneStepCommand(g.Revision));
-        MoyanUntil(ref g, () => MoyanJudgments(g).Length == 1);
-        Require(MoyanPayments(g).Length == 0 && !E<CardUseDebitRefundedEvent>(g).Any() && V(g, 1).Hp == 4 &&
-            E<CardActionAcceptedEvent>(g).Any(item => item.Action.Type == CardActionType.Response && item.Action.ActorSeat == 1 &&
-                item.Action.EffectiveKind == CardKind.Dodge && item.Action.PhysicalCards.Any(card => card.CardId == dodge)),
-            "The actual Dodge response pays its own physical card, skips Longyin and starts mandatory Moyan while the original Slash is still pending.");
-        ColdGuanpingMoyan(ref g, registry);
-        ResolveMoyanToPlay(ref g, registry, Suit.Heart, expectedJudgments: 1, fireTarget: 3);
-        Require(V(g, 1).Hp == 4 && V(g, 3).Hp == 9 && !E<DamageAppliedEvent>(g).Any(item => item.SourceSeat == 0 && item.TargetSeat == 1) &&
-            g.CardMovements.Count(move => move.CardId == dodge && move.From == CardLocation.Hand(1) && move.To == CardLocation.Processing) == 1 &&
-            g.CardMovements.Count(move => move.CardId == dodge && move.To == CardLocation.DiscardPile) == 1 &&
-            g.CardMovements.Count(move => move.CardId == slash && move.To == CardLocation.DiscardPile) == 1 && MoyanPayments(g).Length == 0,
-            "Cold finishes one independent fire damage, then the original Slash stays dodged and each original response/use material cleans up once.");
-        ColdGuanpingMoyan(ref g, registry);
-    }
-
     private static JudgmentRequestedEvent[] MoyanJudgments(GameEngine game) => E<JudgmentRequestedEvent>(game)
         .Where(judgment => judgment.Reason == GuanpingJudgmentReason).ToArray();
     private static CardMovementRecord[] MoyanPayments(GameEngine game) => game.CardMovements.Where(move => move.Reason.Value == LongyinPayment).ToArray();

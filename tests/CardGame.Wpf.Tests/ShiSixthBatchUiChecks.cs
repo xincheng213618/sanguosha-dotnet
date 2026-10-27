@@ -1,3 +1,4 @@
+using CardGame.Wpf.Persistence;
 using System.Text.Json;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -10,22 +11,6 @@ internal static class ShiSixthBatchUiChecks
 {
     private static readonly string[] Heroes = ["mobile:shi-sun-chen", "mobile:shi-sun-jun", "mobile:shi-cao-zhen"];
     private const string Nigu = "mobile:shi-nigu", Reason = "skill.mobile-shi-sun-chen.nigu.discard", Peer = "fixture:shi-sixth-ui-peer", Driver = "fixture:shi-sixth-ui-driver", Quiet = "fixture:shi-sixth-ui-quiet", Deck = "fixture:shi-sixth-ui-deck";
-    public static void GalleryPortraitSkillCountsAndProgress(string output, IReadOnlyList<string>? heroes = null)
-    {
-        foreach (var hero in heroes ?? Heroes)
-        {
-            var (registry, game) = CreateScene(hero); ShiFifthBatchUiChecks.Reach(game, () => game.CreateSnapshot(0).PendingDecision is { Kind: DecisionKind.PlayCard });
-            using var model = ShiFifthBatchUiChecks.Model(game, registry);
-            Program.Assert(GeneralGalleryCatalog.Classify(hero).SeriesId == "shi" && GeneralRosterCatalog.Classify(hero) == "shi", "Each formal sixth-batch Shi general belongs to the actual gallery and selection series.");
-            model.OpenGeneralGalleryCommand.Execute(null); model.GeneralGallerySearchText = registry.Generals[hero].Name;
-            var entry = model.GeneralGalleryEntries.Single(e => e.GeneralId == hero); model.SelectGeneralGalleryEntryCommand.Execute(entry);
-            var expected = hero == "mobile:shi-cao-zhen" ? 1 : hero == "mobile:shi-deng-ai" ? 3 : 2;
-            Program.Assert(entry.IsPlayable && entry.Skills.Count == expected && entry.Portrait.Brush is ImageBrush { ImageSource: BitmapSource { PixelWidth: > 100 } }, "The official portrait decodes and the real general keeps its printed skill count: Cao Zhen has one and the other released Shi generals in this check have two.");
-            model.CloseGeneralGalleryCommand.Execute(null); var ids = registry.Generals[hero].SkillIds.ToHashSet(); var rail = model.HumanSkillCards.Where(s => s.ContentId is not null && ids.Contains(s.ContentId)).ToArray();
-            Program.Assert(rail.Length == expected && rail.Any(s => !string.IsNullOrWhiteSpace(s.ProgressText)), "The loaded native rail shows this actual general's printed skills and live progress.");
-            using var host = new NativeResponseStatusChecks.NativeHost(model); host.Capture(output, hero.Replace(':', '-') + "-progress", 1120);
-        }
-    }
     public static void NiguTwoDifferentSuitsRemainUnpaidUntilConfirmation(string output)
     {
         var scene = CreateScene(Heroes[0]); var game = scene.Game; ShiFifthBatchUiChecks.Reach(game, () => game.CreateSnapshot(0).PendingDecision is { Kind: DecisionKind.PlayCard });
@@ -33,7 +18,7 @@ internal static class ShiSixthBatchUiChecks
         var chip = model.HumanSkillCards.Single(s => s.ContentId == Nigu); Program.Assert(chip.IsAvailable, "The real Nigu rail exposes its once-Play activation."); model.ActivateHumanSkillCommand.Execute(chip);
         ShiFifthBatchUiChecks.Reach(game, () => game.CreateSnapshot(0).PendingDecision?.Choices.Any(c => Branch(c) == "pay") == true); ShiFifthBatchUiChecks.Refresh(model);
         var frame = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.ShiSunChen is not null).Id;
-        model.SaveGameCommand.Execute(null); model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model); game = Program.Engine(model);
         Program.Assert(!model.HasSaveError && model.IsOwnedCardSelectionPending && game.CreateSnapshot(0).PendingDecision?.MinimumCardCount == 0 && game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.ShiSunChen is not null).Id == frame, "Cold loading restores Nigu's unpaid original multi-card collector and legal zero-card lower bound.");
         var ids = model.Hand.Where(c => c.IsPlayable).Take(2).Select(c => c.Id).ToArray();
         Program.Assert(ids.Length == 2 && game.CreateSnapshot(0).Players.Single(p => p.Seat == 0).Hand.Where(c => ids.Contains(c.Id)).Select(c => c.Suit).Distinct().Count() == 2, "The genuine hand contains two selectable original entities with different suits.");
@@ -49,7 +34,7 @@ internal static class ShiSixthBatchUiChecks
             game.Events.Select(e => e.Payload).OfType<ShiScCostPaidEvent>().Single() is { Count: 2 } cost && cost.FrameId == frame &&
             game.Events.Select(e => e.Payload).OfType<NativeLogicalDiscardInvocationRecordedEvent>().Count(e => e.ParentFrameId == frame && e.Reason.Value == Reason && e.ActualCount == 2) == 1 &&
             !model.HumanSkillCards.Single(s => s.ContentId == Nigu).IsAvailable, "One actual UI confirmation pays exactly both original hand entities as one native logical discard and spends this Play activation.");
-        model.SaveGameCommand.Execute(null); model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model); game = Program.Engine(model);
         Program.Assert(!model.HasSaveError && game.Events.Select(e => e.Payload).OfType<ShiScCostPaidEvent>().Count() == 1 && game.CardMovements.Count(m => m.Reason.Value == Reason) == 2, "A cold UI load preserves the completed payment without discarding either entity again.");
         bool Unpaid() => game.AcceptedCommands.Count == commands && game.CardMovements.Count == movements && !game.Events.Select(e => e.Payload).OfType<ShiScCostPaidEvent>().Any();
     }

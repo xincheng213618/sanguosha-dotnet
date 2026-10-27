@@ -25,7 +25,8 @@ public sealed partial class MainViewModel
     public string TutorialExitText => _suspendedMatch?.SetupOpen == true ? "返回开局" : "返回原牌局";
     public string TutorialEntryError { get => _tutorialEntryError; private set { if (SetProperty(ref _tutorialEntryError, value)) RaisePropertyChanged(nameof(HasTutorialEntryError)); } }
     public bool HasTutorialEntryError => TutorialEntryError.Length > 0;
-    public string SessionSaveStatus => IsTutorialActive ? "新手演练 · 正式牌局已保留 · 可随时返回" : SaveStatus;
+    public string SessionSaveStatus => IsTutorialActive ? "新手演练 · 正式牌局已保留 · 可随时返回" :
+        IsShanheBattleSession || IsShanheOpen ? ShanheStatusText : "本模式每次独立开局；结束后保留战绩，不保存续玩进度。";
     private TutorialLesson CurrentTutorialLesson => TutorialScenario.Lessons[_tutorialIndex];
 
     public ICommand StartTutorialCommand { get; private set; } = null!;

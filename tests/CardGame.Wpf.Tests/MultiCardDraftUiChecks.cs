@@ -101,7 +101,7 @@ internal static class MultiCardDraftUiChecks
         using var model = new MainViewModel(false, 31, true, new MemorySaveStore(), contentRegistry: registry,
             wushuangSaveStore: store, shanheSaveStore: new MemoryShanheCampaignSaveStore())
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadWushuangManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model, wushuang: true);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         DriveToPlay(model);
         game = Program.Engine(model);
@@ -259,7 +259,7 @@ internal static class MultiCardDraftUiChecks
     {
         var model = new MainViewModel(false, game.Seed, true, Store(game), contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         return model;
     }

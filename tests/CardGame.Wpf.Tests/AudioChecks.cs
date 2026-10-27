@@ -36,7 +36,7 @@ internal static class AudioChecks
         vm.IsDeveloperView = false;
         vm.SortHandCommand.Execute(null);
         Assert(output.Played.Count == before, "Presentation refresh repeated a prompt sound.");
-        vm.SaveGameCommand.Execute(null);
+        LegacySaveFixtures.Save(vm);
         var savedState = State(vm);
         SelectSlash(vm);
         Assert(output.Played.Count == before, "Selecting a card played an uncommitted sound.");
@@ -51,7 +51,7 @@ internal static class AudioChecks
         vm.IsSoundEnabled = false;
         Assert(output.StopCount > stops, "Mute did not stop active voices.");
         before = output.Played.Count;
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         Assert(State(vm) == savedState && !vm.IsSoundEnabled, "Restore failed or unexpectedly unmuted the player.");
         Assert(output.Played.Count == before, "Restore replayed historical sounds.");
         vm.IsSoundEnabled = true;
@@ -60,7 +60,7 @@ internal static class AudioChecks
         Assert(output.Played.Count == before, "Background AI or player action played audio.");
         audio.SetActive(true);
         Assert(output.Played.Count == before, "Reactivation played missed background audio.");
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         vm.SoundVolume = 0;
         Assert(vm.SoundStatusText.Contains("音量为 0") && vm.SoundStatusText.Contains("调高音量") &&
                vm.GeneralVoiceStatus.Contains("音量为 0") && vm.GeneralVoiceStatus.Contains("调高音量"),
@@ -74,7 +74,7 @@ internal static class AudioChecks
             "Re-enabling the master switch must retain zero volume and its level-specific recovery instructions.");
         PlaySlash(vm);
         Assert(output.Played.Count == before, "Zero volume still submitted a sound after cycling the master switch.");
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         vm.SoundVolume = .23;
         clock.Advance(1);
         PlaySlash(vm);
@@ -83,7 +83,7 @@ internal static class AudioChecks
             "Raising zero volume must restore the normal level and audition status while real committed sounds reach the output.");
         audio.Dispose();
         Assert(output.Disposed, "Closing leaked the audio output.");
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         before = output.Played.Count;
         PlaySlash(vm);
         Assert(output.Played.Count == before, "Disposed controller still receives commands.");

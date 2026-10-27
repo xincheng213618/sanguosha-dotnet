@@ -1,3 +1,4 @@
+using CardGame.Wpf.Persistence;
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
@@ -26,7 +27,7 @@ internal static class ShiSunJunDiscardUiChecks
         ShiFifthBatchUiChecks.Reach(game, () => game.CreateSnapshot(0).PendingDecision?.Choices.Any(c => Branch(c) == "damage") == true); ShiFifthBatchUiChecks.Refresh(model);
         model.DockSkillChoiceCommand.Execute(model.DockSkillChoices.Single(c => Branch(c) == "damage"));
         var frame = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.ShiSunJun?.Stage == ShiSunJunStage.Payment).Id;
-        model.SaveGameCommand.Execute(null); model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model); game = Program.Engine(model);
         Program.Assert(!model.HasSaveError && model.IsOwnedCardSelectionPending && !model.IsCardPaymentSelectionPending &&
             game.CreateSnapshot(0).PendingDecision is { RequiredCardCount: 4, MinimumCardCount: 4 } &&
             game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.ShiSunJun is not null).Id == frame,
@@ -57,7 +58,7 @@ internal static class ShiSunJunDiscardUiChecks
             game.Events.Select(e => e.Payload).OfType<NativeLogicalDiscardInvocationRecordedEvent>().Count(e => e.ParentFrameId == frame && e.Reason.Value == Reason && e.ActualCount == 4) == 1 &&
             game.CreateSnapshot(0).Players.Single(p => p.Seat == 1).Hp == 7 && !model.HumanSkillCards.Single(s => s.ContentId == Skill).IsAvailable,
             "One actual UI confirmation pays precisely four selected originals in one logical discard, issues one real damage and consumes the initial phase quota.");
-        model.SaveGameCommand.Execute(null); model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model); game = Program.Engine(model);
         Program.Assert(!model.HasSaveError && game.Events.Select(e => e.Payload).OfType<ShiSunJunCostPaidEvent>().Count() == 1 && game.CardMovements.Count(m => m.Reason.Value == Reason) == 4,
             "Cold loading the completed native payment cannot discard any selected card again.");
         void Select(int id) => model.SelectCardCommand.Execute(model.Hand.Single(c => c.Id == id));

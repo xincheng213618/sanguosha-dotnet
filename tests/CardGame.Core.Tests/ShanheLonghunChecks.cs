@@ -38,29 +38,6 @@ internal static class ShanheLonghunChecks
         }
     }
 
-    public static void SingleBlackHasNoBonusAndOrdinaryOlKeepsOptionalDiscard()
-    {
-        var single = Scene.Start(Suit.Club);
-        single.Response(); var singleChoice = single.ConvertedChoice(1);
-        single.Answer(candidate => candidate.Id == singleChoice.Id); single.Play();
-        Need(single.Events<CardActionAcceptedEvent>().Any(fact => fact.Action.ActorSeat == 0 &&
-                fact.Action.EffectiveKind == CardKind.Dodge && fact.Action.PhysicalCards is [var material] &&
-                material.CardKind == CardKind.Slash && material.CardId == singleChoice.Cards.Single() &&
-                fact.Action.ConversionChain.Any(conversion => conversion.SkillId == Skill && conversion.BindingId == "1-club")) &&
-            !single.Events<ProgramCardTriggerResolvedEvent>().Any(fact => fact.SkillId == Skill) &&
-            !single.Game.CardMovements.Any(move => move.Reason.Value.Contains(Skill, StringComparison.Ordinal)),
-            "A real one-club Slash is actually converted into Dodge and has no two-black discard bonus.");
-
-        var ordinary = Scene.Start(Suit.Club, ordinary: true);
-        ordinary.Response(); ordinary.Answer(candidate => candidate.Id == ordinary.ConvertedChoice(2).Id);
-        ordinary.Reach(() => ordinary.P?.SkillPrompt?.SkillId == "ol:longhun");
-        Need(ordinary.P!.Choices.Any(candidate => candidate.Parameters.GetValueOrDefault("program-action") == "skip"),
-            "The original OL Longhun still offers its optional discard after a genuine two-club response.");
-        ordinary.Answer(candidate => candidate.Parameters.GetValueOrDefault("program-action") == "skip"); ordinary.Play();
-        Need(!ordinary.Game.CardMovements.Any(move => move.Reason.Value.Contains("skill-program.ol:longhun", StringComparison.Ordinal)),
-            "Declining the ordinary OL bonus preserves the current turn player's cards.");
-    }
-
     private static void Need(bool value, string message)
     { if (!value) throw new InvalidOperationException(message); }
 

@@ -47,14 +47,14 @@ internal static class BossActivityUiChecks
                 vm.TableModeText.Contains("第 1/4 关") && vm.AliveText.Contains("联合军 3"),
                 "The four actual seats must show the coalition, AI boss and current stage without Jiange labels.");
             Program.Render(root, 1440, 880, Path.Combine(output, "155-ghost-table.png"));
-            vm.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
             var saved = SnapshotJson.Serialize(Program.Engine(vm).CreateSnapshot(0));
 
             // The selected setup mode can differ from the saved match. Restoring
             // validates the saved team's mode, rather than the current selector.
             vm.SelectedTableMode = vm.TableModes.Single(mode => mode.ModeId == "team:standard-2v2");
             Program.Assert(vm.SelectedStartingTeam.TeamId == "team:blue", "Changing setup modes must retire an incompatible coalition choice.");
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             Program.Assert(!vm.HasSaveError && Program.Engine(vm).ModeId == "activity:ghost-2018" &&
                 vm.SelectedStartingTeam.TeamId == "team:allies" && vm.WindowTitle.Contains("驱鬼逐邪") &&
                 SnapshotJson.Serialize(Program.Engine(vm).CreateSnapshot(0)) == saved,

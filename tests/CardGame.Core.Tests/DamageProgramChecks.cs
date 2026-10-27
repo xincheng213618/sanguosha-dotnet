@@ -6,7 +6,6 @@ internal static class DamageProgramChecks
 {
     private const int HumanSeat = 0;
 
-
     public static void GenericDamageChoicesClaimSelectGiftDrawAndReplay()
     {
         VerifyDamageCardClaim();
@@ -559,15 +558,4 @@ internal static class DamageProgramChecks
     {
         if (!condition) throw new InvalidOperationException(message);
     }
-
-    private const string ValidationRules = """
-        {"schemaVersion":62,"skills":[{"id":"fixture:damage","revision":1,
-        "minimumRulesVersion": 171,"modifiers":[],"viewAs":[],"activations":[],"triggers":[
-        {"id":"per-point","window":"afterDamageApplied","subject":"owner",
-        "damageOccurrence":"perDamagePoint","optional":true,"priority":0,
-        "effects":[
-        {"op":"selectTarget","target":"owner","targetKind":"anyLivingHandBelowMaxHp"},
-        {"op":"draw","target":"selectedTarget","numberExpression":"targetMaxHpMinusHandCount"}]}],
-        "contributions":[],"cardIdentities":[]}]}
-        """;
 }

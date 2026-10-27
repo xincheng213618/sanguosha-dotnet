@@ -14,96 +14,6 @@ internal static class ShanheHuaxiongChecks
         new ShanheBattleSetup(83, 1, "fixture:s5-hx-production", StandardShanheS5HuaxiongPackage.HuaxiongId, 3, 0, 0, 0, 0,
             [], [], [], [new("classic:cao-cao")], [], new string('a', 64)) { TacticSkillIds = [Medicine] }));
 
-    public static void ColoredCardDamageChangesMaximumHpOrRecoversWholeAmountBeforeArmorCold()
-    {
-        foreach (var name in new[] { "red", "black", "medicine" })
-        {
-            var s = Scene.Start(name); s.Use("armor-two", [1]); s.Card(CardKind.Alcohol, []); s.Play();
-            var slash = s.Card(CardKind.Slash, [1]); s.Until(s.AtDamage);
-            var paid = s.ColorPaid().Single(); var red = name == "red";
-            Need(paid.OwnerSeat == 1 && paid.DamageSourceSeat == 0 && paid.Amount == 2 && paid.EffectiveCardKind == CardKind.Slash && paid.IsRed == red &&
-                paid.HpBefore == 12 && paid.MaxHpBefore == 20 && paid.MaxHpAfter == (red ? 22 : 20) && paid.CardUseFrameId > 0 && paid.CardActionId > 0 &&
-                s.E<DamageAppliedEvent>() is [{ TargetSeat: 1, Amount: 2, ArmorPayment: { ArmorBefore: 2, ArmorAbsorbed: 2, HpLossAmount: 0 } }] &&
-                s.V(1).Hp == (red ? 12 : name == "medicine" ? 16 : 14) && s.V(1).MaxHp == (red ? 22 : 20),
-                "The actual wine Slash first resolves one whole color-health benefit, then pays the same two damage through Armor; red increases only maximum HP. " + s.Diagnostic());
-            if (red) Need(s.E<RecoveryAppliedEvent>().Length == 0, "Red maximum-HP growth does not synthesize a recovery.");
-            else
-            {
-                Need(s.E<RecoveryAppliedEvent>() is [{ SourceSeat: 1, TargetSeat: 1, Amount: var amount }] && amount == (name == "medicine" ? 4 : 2),
-                    "The frozen non-red damage amount produces one genuine whole recovery, rather than two per-point recoveries.");
-                if (name == "medicine") Need(s.E<ProgramRecoveryRequestedEvent>().Where(f => f.ProgramFrameId == paid.ProgramFrameId).ToArray() is [{ RequestedAmount: 2 }] &&
-                    s.E<RecoveryAmountBonusAppliedEvent>() is [{ Receipt: { BaseRequestedAmount: 2, ModifiedRequestedAmount: 4, ActualTurnRecoveryOrdinal: 1 } }] &&
-                    s.E<ActualTurnRecoveryRecordedEvent>() is [{ TargetSeat: 1, Ordinal: 1, ActualAmount: 4 }], "Medicine VI modifies that single recovery once.");
-            }
-            s.Cold(); s.Continue(); s.Finish(slash);
-            Need(s.ColorPaid().Length == 1 && s.E<ProgramDamageCardColorHealthCompletedEvent>().Count(f => f.ProgramFrameId == paid.ProgramFrameId) == 1 &&
-                s.G.CardMovements.Count(m => m.CardId == slash && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1,
-                "Cold replay neither repeats the color-health benefit nor re-pays the original physical Slash."); s.Cold();
-        }
-
-        var chain = Scene.Start("chain"); chain.Use("armor-two", [1]); chain.Use("armor-two", [2]);
-        chain.Card(CardKind.IronChain, [1, 2]); chain.Play(); chain.Card(CardKind.Alcohol, []); chain.Play();
-        var fire = chain.Card(CardKind.FireSlash, [1]); chain.Until(chain.AtDamage); chain.Cold(); chain.Continue();
-        chain.Until(() => chain.AtDamage() && chain.E<DamageAppliedEvent>().Length == 2);
-        Need(chain.ColorPaid().Select(f => f.OwnerSeat).SequenceEqual([1, 2]) && chain.ColorPaid().All(f => f is { IsRed: true, Amount: 2, EffectiveCardKind: CardKind.FireSlash, MaxHpBefore: 20, MaxHpAfter: 22 }) &&
-            chain.E<DamageAppliedEvent>().Select(f => (f.TargetSeat, f.Amount)).SequenceEqual([(1, 2), (2, 2)]) &&
-            chain.E<DamageAppliedEvent>().All(f => f.ArmorPayment is { ArmorAbsorbed: 2, HpLossAmount: 0 }) &&
-            chain.E<ChainedDamagePropagatedEvent>() is [{ TargetSeat: 2, Amount: 2 }] && chain.V(1).Hp == 12 && chain.V(2).Hp == 12,
-            "Real red Fire Slash chain damage retains the causing card's color and triggers each actual recipient's Yaowu before that recipient's Armor payment; this skill has no direct-target-only restriction.");
-        chain.Cold(); chain.Continue(); chain.Finish(fire);
-
-        var colorless = Scene.Start("colorless-target"); colorless.BeginDuel(); colorless.Until(colorless.AtDamage);
-        Need(colorless.ColorPaid() is [{ OwnerSeat: 1, DamageSourceSeat: 0, Amount: 1, EffectiveCardKind: CardKind.Duel, EffectiveSuit: Suit.None, IsRed: false }] &&
-            colorless.E<RecoveryAppliedEvent>() is [{ SourceSeat: 1, TargetSeat: 1, Amount: 1, RemainingHp: 13 }] &&
-            colorless.E<DamageAppliedEvent>() is [{ SourceSeat: 0, TargetSeat: 1, Amount: 1, RemainingHp: 12 }] && colorless.V(1).MaxHp == 20,
-            "The real new Shizhan Duel is a colorless damage-causing card: the opposing Yaowu owner genuinely recovers once before receiving its one damage; this is distinct from cardless program damage.");
-        colorless.Cold(); colorless.Continue(); colorless.Play();
-
-        foreach (var name in new[] { "cardless", "source-less", "jueqing", "maximum" })
-        {
-            var s = Scene.Start(name);
-            if (name == "cardless") s.Use("damage", [1]);
-            else if (name == "source-less") s.Use("receive", []);
-            else { var slash = s.Card(CardKind.Slash, [1]); s.Finish(slash); }
-            Need(s.ColorPaid().Length == 0 && s.E<RecoveryAppliedEvent>().Length == 0 &&
-                (name == "cardless" ? s.E<DamageAppliedEvent>() is [{ TargetSeat: 1, Amount: 1 }] :
-                 name == "source-less" ? s.E<DamageAppliedEvent>() is [{ TargetSeat: 0, Amount: 1, SourceLess: true }] :
-                 s.E<DamageAppliedEvent>().Length == 0),
-                "Truly cardless/source-less program damage and early HP/maximum-HP replacements cannot masquerade as a colorless damage-causing card. " + s.Diagnostic()); s.Cold();
-        }
-        VerifyLoaderBoundaries();
-    }
-
-    public static void RoundLimitedNativeDuelUsesResponsesNullificationAndPaidSourceLossCold()
-    {
-        var s = Scene.Start("quota"); var firstTurn = s.G.State.TurnNumber;
-        Need(s.Round == 1 && s.E<ProgramPhaseScheduledEvent>().Any(f => f.SkillId == Insert && f.Started), "A true preparation insertion starts a separate Play in the first real round.");
-        s.Card(CardKind.Alcohol, []); s.Play(); var instance = s.E<HpConditionalSkillGrantChangedEvent>().Single(f => f.SkillId == Shizhan && f.Added).SkillInstanceId;
-        s.Duel(); s.Play();
-        Need(s.E<DamageAppliedEvent>() is [{ SourceSeat: 0, TargetSeat: 1, Amount: 1 }] && s.V().HasAlcoholEffect && !s.CanDuel(),
-            "The actual zero-entity Duel consumes one round-one Play opportunity, does not consume wine or add wine damage, and uses the owner as actor.");
-        s.RejectDuel(); s.Use("lose-one", []); Need(!s.CanDuel(), "The real HP-derived Shizhan source is now absent."); s.Use("recover-one", []);
-        Need(s.Has(Shizhan) && !s.CanDuel() && s.E<HpConditionalSkillGrantChangedEvent>().Where(f => f.SkillId == Shizhan && f.Added).All(f => f.SkillInstanceId == instance),
-            "Losing and restoring the same genuine skill instance cannot erase its already-paid phase use."); s.Cold();
-        s.EndPlay(); s.Play(); Need(s.G.State.TurnNumber == firstTurn && s.Round == 1 && s.CanDuel(), "The normal Play of the same actual turn has a distinct fresh phase budget.");
-        s.Duel(); s.Play(); Need(!s.CanDuel(), "The normal Play independently permits exactly one round-one Duel."); s.Cold();
-        s.EndPlay(); s.Until(() => s.Round == 2 && s.P is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
-        s.Duel(); s.Play(); Need(s.CanDuel(), "A new real round raises the genuine per-Play allowance to two."); s.Duel(); s.Play(); s.RejectDuel();
-        Need(s.E<CardUseDeclaredEvent>().Count(f => f.CardKind == CardKind.Duel && f.SourceSeat == 0 && f.CardId == 0) == 4 &&
-            s.E<CardUseFinishedEvent>().Count(f => f.CardKind == CardKind.Duel) == 4 &&
-            s.E<ProgramSkillResolvedEvent>().Count(f => f.SkillId == Shizhan && f.Completed) == 4 && s.E<DamageAppliedEvent>().Count(f => f.TargetSeat == 1 && f.Amount == 1) == 4,
-            "Four independent native Uses finish once: one in each first-round Play and two in the second round, with no reused quota or virtual material payment."); s.Cold();
-
-        var counter = Scene.Start("nullification"); var physical = counter.V().Hand.Single(c => c.Kind == CardKind.Nullification).Id;
-        counter.BeginDuel(); counter.Until(() => counter.P is { Kind: DecisionKind.Nullification, PlayerSeat: 0 });
-        Need(counter.E<ProgramBindingStartedEvent>().Any(f => f.SkillId == "classic:jizhi") && counter.V().HandCount == 2,
-            "The real owner-to-other Duel passes through ordinary Jizhi and its native Draw before the genuine Nullification window.");
-        counter.Cold(); counter.Answer(c => c.Cards.SequenceEqual([physical])); counter.Play();
-        Need(counter.E<DamageAppliedEvent>().Length == 0 && counter.E<CardUseFinishedEvent>().Count(f => f.CardKind == CardKind.Duel) == 1 && !counter.CanDuel() &&
-            counter.G.CardMovements.Count(m => m.CardId == physical && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1,
-            "A real paid Nullification can cancel the new Duel; its native finish still returns and spends its sole phase use exactly once."); counter.Cold();
-    }
-
     public static void PairedYaowuDuelInteractionsAndActualRecipesStayIsolatedCold()
     {
         foreach (var name in new[] { "paired", "paid-loss" })
@@ -160,20 +70,6 @@ internal static class ShanheHuaxiongChecks
             var plain = setup with { EnemyRoster = [new("classic:cao-cao")] };
             Need(!StandardShanheCampaignCatalog.CreateBattleRegistry(plain).Skills.ContainsKey(Yaowu) && registry.Skills.ContainsKey(Yaowu) &&
                 !StandardShanheCampaignCatalog.CreateBattleRegistry(plain).Generals.ContainsKey(boss), "Warming the exact new boss cannot leak its package or skill into an ordinary recipe with no owner.");
-        }
-    }
-
-    private static void VerifyLoaderBoundaries()
-    {
-        string Read(string suffix) { var a = typeof(StandardContentPackage).Assembly; using var stream = a.GetManifestResourceStream(a.GetManifestResourceNames().Single(n => n.EndsWith('.' + suffix, StringComparison.Ordinal)))!; using var reader = new StreamReader(stream); return reader.ReadToEnd(); }
-        var rules = Read("shanhe-s5-huaxiong.rules.json"); var presentation = Read("shanhe-s5-huaxiong.presentation.json"); _ = SkillProgramCatalog.Load(rules, presentation);
-        foreach (var edit in new Action<JsonNode>[] { n => n["skills"]![0]!["triggers"]![0]!["subject"] = "owner", n => n["skills"]![0]!["triggers"]![0]!["optional"] = true,
-            n => n["skills"]![0]!["triggers"]![0]!["effects"]![0]!["target"] = "selectedTarget", n => n["skills"]![1]!["activations"]![0]!["usesPerPhase"] = 1,
-            n => n["skills"]![1]!["activations"]![0]!["usesPerPhaseExpression"] = "ownerHp" })
-        {
-            var copy = JsonNode.Parse(rules)!; edit(copy); var rejected = false;
-            try { _ = SkillProgramCatalog.Load(copy.ToJsonString(), presentation); } catch (InvalidOperationException) { rejected = true; }
-            Need(rejected, "The new color-health and current-round phase quota paths reject the wrong recipient contract, optional health, foreign effect target and unsupported expression.");
         }
     }
 

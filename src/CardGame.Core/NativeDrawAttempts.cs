@@ -72,6 +72,20 @@ public sealed record NativeDrawOutcome(int RecipientSeat, int RequestedCount, lo
     [JsonIgnore] public IReadOnlyList<int> ReplacementGainedIds => Replacement?.GainedIds ?? Array.AsReadOnly(Array.Empty<int>());
 }
 
+/// <summary>A completed native draw payment whose movement observers still belong to the issuing program.</summary>
+public sealed record NativeOperationDrawReturn(int InstructionIndex, SkillProgramEffectOp Operation,
+    CardMoveReason Reason, NativeDrawOutcome Outcome);
+
+public sealed partial record ProgramSkillFrame
+{
+    private readonly IReadOnlyList<NativeOperationDrawReturn> _nativeOperationDrawReturns = Array.AsReadOnly(Array.Empty<NativeOperationDrawReturn>());
+    public IReadOnlyList<NativeOperationDrawReturn> NativeOperationDrawReturns
+    {
+        get => _nativeOperationDrawReturns;
+        init => _nativeOperationDrawReturns = Array.AsReadOnly(value.ToArray());
+    }
+}
+
 public abstract partial record ResolutionFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

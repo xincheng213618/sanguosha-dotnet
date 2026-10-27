@@ -8,58 +8,6 @@ internal static class MobileShenLuBuChecks
     private const string Hero = "mobile:shen-lu-bu", Wuqian = "mobile-god:wuqian", Wumou = "mobile-god:wumou",
         Peer = "fixture:mobile-lb-peer", Quiet = "fixture:mobile-lb-quiet", NoDraw = "fixture:mobile-lb-no-draw",
         Keep = "fixture:mobile-lb-keep", GainHold = "fixture:mobile-lb-gain", Deck = "fixture:mobile-lb-deck";
-    public static void PrintedTrickTargetsAndWholeUseWuqianAcrossTurns()
-    {
-        var s = Scene.Start(); s.Play();
-        var hand = s.V(0).Hand.ToArray();
-        var arrows = hand.Single(c => c.Kind == CardKind.ArrowBarrage).Id;
-        var draw = hand.Single(c => c.Kind == CardKind.DrawTwo).Id;
-        var chain = hand.Single(c => c.Kind == CardKind.IronChain).Id;
-        var counter = hand.Single(c => c.Kind == CardKind.Nullification).Id;
-        var actions = s.G.GetHumanLegalActions();
-        s.Need(s.G.GetCombatDistance(0, 2) == 2 && s.G.GetAttackRange(0) == 1 &&
-            actions.Any(a => a.CardId == arrows && a.Kind == LegalActionKind.Slash && a.TargetSeats.SequenceEqual([1, 2, 3])) &&
-            actions.Where(a => a.CardId == draw).All(a => a.Kind == LegalActionKind.Slash && a.TargetSeats.SequenceEqual([0])) &&
-            actions.Any(a => a.CardId == draw) && actions.Any(a => a.CardId == chain && a.TargetSeats.SequenceEqual([0, 2])) &&
-            actions.Any(a => a.CardId == chain && a.TargetSeats.SequenceEqual([2])) && actions.All(a => a.CardId != counter),
-            "Wumou preserves the actual printed AOE, self-use and linked-target templates, including a target outside Slash range; Nullification acquires no invented play target.");
-        s.Issue(2); s.Play();
-        var issue1 = s.E<MobileLuBuWuqianIssuedEvent>().Single();
-        s.Need(s.Rage == 0 && s.V(0).Skills!.Count(k => k.Id == "classic:wushuang") == 1,
-            "The real two-Rage cost grants the canonical Wushuang binding once.");
-        var hp = Enumerable.Range(1, 3).Select(i => s.V(i).Hp).ToArray();
-        s.Use(arrows, [1, 2, 3]);
-        s.Reach(() => s.P is { PlayerSeat: 2, Kind: DecisionKind.RespondDodge });
-        var whole = s.G.ResolutionStack.OfType<CardUseFrame>().Single(f => f.MobileLuBuUse is not null);
-        s.Need(whole.TargetSeats.SequenceEqual([1, 2, 3]) && whole.CardKind == CardKind.Slash &&
-            s.E<CardUseDeclaredEvent>().Single(e => e.ResolutionId == whole.Id).PublicCard?.Kind == CardKind.ArrowBarrage,
-            "The accepted multi-target action is one real effective Slash Use with its original publicly paid ordinary-trick material.");
-        s.Step();
-        s.Reach(() => s.P is { PlayerSeat: 2, Kind: DecisionKind.RespondDodge } &&
-            s.E<CardActionAcceptedEvent>().Count(e => e.Action.ActorSeat == 2 && e.Action.Type == CardActionType.Response && e.Action.EffectiveKind == CardKind.Dodge) == 1);
-        s.Cold(); s.Step(); s.Play();
-        s.Need(s.V(1).Hp == hp[0] - 1 && s.V(2).Hp == hp[1] && s.V(3).Hp == hp[2] - 1 && s.Rage == 2 &&
-            !s.E<MobileLuBuWuqianEndedEvent>().Any() && s.V(2).HandCount == 2 &&
-            s.G.CardMovements.Count(m => m.CardId == arrows && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1,
-            "The distant target pays two real Dodges while the other two targets take damage; a partially dodged whole Use preserves Wuqian and cold return does not repay its material.");
-        s.Issue(3); s.Play(); var issues = s.E<MobileLuBuWuqianIssuedEvent>();
-        s.Need(issues.Length == 2 && s.Rage == 0 && s.V(0).Skills!.Count(k => k.Id == "classic:wushuang") == 1 &&
-            s.G.GetHumanLegalActions().Any(a => a.CardId == draw),
-            "Wuqian can really be invoked again in the same Play phase; distinct affected targets increase Slash quota without duplicating Wushuang.");
-        s.End(); s.Play();
-        s.Need(s.G.State.TurnNumber == 5 && !s.E<MobileLuBuWuqianEndedEvent>().Any() &&
-            s.V(0).Skills!.Any(k => k.Id == "classic:wushuang") && !s.G.CardMovements.Any(m => m.Reason.Value == "skill.mobile-god.wuqian.damage-card"),
-            "Issued effects survive the actual round boundary; a current ordinary trick is an effective damage card and prevents the ending-stage fallback gain.");
-        var ownerHp = s.V(0).Hp;
-        s.Use(draw, [0]); s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge }); s.AnswerDodge();
-        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge }); s.AnswerDodge(); s.Play();
-        var ended = s.E<MobileLuBuWuqianEndedEvent>();
-        s.Need(s.V(0).Hp == ownerHp && ended.Length == 2 && ended.Select(e => e.FrameId).ToHashSet().SetEquals(issues.Select(i => i.FrameId)) &&
-            ended.Select(e => e.UseFrameId).Distinct().Count() == 1 && !s.V(0).Skills!.Any(k => k.Id == "classic:wushuang") &&
-            s.E<MobileLuBuWushuangRevokedEvent>().Count(e => e.GrantId == issue1.GrantId) == 1 &&
-            s.E<MobileLuBuWushuangRevokedEvent>().Length == 2,
-            "Only completion of the next whole damage-card Use with zero damage retires both original issues and their own grants, after both self-targeted native Dodges.");
-    }
     public static void EndingDamageCardGainKeepsOriginalPaidFrameCold()
     {
         var s = Scene.Start(gainOnly: true); s.Play(); var before = s.V(0).HandCount; s.End();

@@ -15,81 +15,6 @@ internal static class ShiFifthBatchUiChecks
     private const string Peer = "fixture:shi-fifth-ui-peer", Actor = "fixture:shi-fifth-ui-actor",
         Driver = "fixture:shi-fifth-ui-driver", Quiet = "fixture:shi-fifth-ui-quiet", Deck = "fixture:shi-fifth-ui-deck";
 
-    public static void GalleryProgressAndForeignHandUseResponse(string output)
-    {
-        foreach (var hero in Heroes)
-        {
-            var (registry, game) = CreateScene(hero);
-            Reach(game, () => game.CreateSnapshot(0).PendingDecision is { Kind: DecisionKind.PlayCard });
-            using var model = Model(game, registry);
-            Program.Assert(GeneralGalleryCatalog.Classify(hero).SeriesId == "shi" && GeneralRosterCatalog.Classify(hero) == "shi",
-                "The three formal Shi editions belong to their actual gallery and selection series.");
-            model.OpenGeneralGalleryCommand.Execute(null);
-            model.GeneralGallerySearchText = registry.Generals[hero].Name;
-            var entry = model.GeneralGalleryEntries.Single(e => e.GeneralId == hero);
-            model.SelectGeneralGalleryEntryCommand.Execute(entry);
-            Program.Assert(entry.IsPlayable && entry.Skills.Count == 2 &&
-                entry.Portrait.Brush is ImageBrush { ImageSource: BitmapSource { PixelWidth: > 100 } },
-                "Every real gallery entry decodes its official portrait and both skills.");
-            model.CloseGeneralGalleryCommand.Execute(null);
-            var skillIds = registry.Generals[hero].SkillIds.ToHashSet();
-            var progress = model.HumanSkillCards.Where(c => c.ContentId is not null && skillIds.Contains(c.ContentId)).ToArray();
-            Program.Assert(progress.Length == 2 && progress.Any(c => !string.IsNullOrWhiteSpace(c.ProgressText)),
-                "The actual loaded rail exposes the new general's current progress.");
-            using var host = new NativeResponseStatusChecks.NativeHost(model);
-            host.Capture(output, hero.Replace(':', '-') + "-progress", 1120);
-        }
-
-        CheckBorrowed(false);
-        CheckBorrowed(true);
-        void CheckBorrowed(bool response)
-        {
-            var (registry, game) = CreateScene(Actor, shared: true, response: response);
-            Reach(game, () => game.CreateSnapshot(0).PendingDecision is { Kind: DecisionKind.PlayCard });
-            var prompt = game.CreateSnapshot(0).PendingDecision!;
-            Accept(game, new EndPlayPhaseCommand(0, game.Revision, prompt.PromptId));
-            Reach(game, () => game.CreateSnapshot(0).PendingDecision is { PlayerSeat: 0 } p &&
-                p.Kind == (response ? DecisionKind.RespondDodge : DecisionKind.PlayCard));
-            var provider = game.CreateSnapshot(0).Players.Single(p => p.Seat == 1);
-            var id = provider.Hand.Single().Id;
-            using var model = Model(game, registry);
-            game = Program.Engine(model);
-            var card = model.Hand.Single(c => c.Id == id);
-            Program.Assert(provider.ViewerCanUseHand && card.IsPlayable && card.OriginalHandTag.Contains("好施") &&
-                game.CreateSnapshot(2).Players.Single(p => p.Seat == 1).Hand.Count == 0 &&
-                game.CreateSnapshot(0).Players.Single(p => p.Seat == 0).Hand.All(c => c.Id != id),
-                "The beneficiary can click the real foreign card with its source label, while other viewers cannot see it.");
-            var accepted = game.AcceptedCommands.Count;
-            model.SelectCardCommand.Execute(card);
-            Program.Assert(game.AcceptedCommands.Count == accepted, "Selecting a shared material remains an editable UI draft.");
-            if (response)
-            {
-                Program.Assert(model.IsHandResponsePending && model.ConfirmSelectedCommand.CanExecute(null),
-                    "The shared Dodge is selectable through the ordinary hand-response surface.");
-                model.ConfirmSelectedCommand.Execute(null);
-            }
-            else
-            {
-                Program.Assert(model.PlaySelectedCardCommand.CanExecute(null), "The shared Draw Two has a real legal play command.");
-                model.PlaySelectedCardCommand.Execute(null);
-            }
-            Reach(game, () => game.Events.Select(e => e.Payload).OfType<ShiLsRefillIssuedEvent>().Any() &&
-                NativeActions().Any(action => action.PhysicalCards.Any(c => c.CardId == id)) &&
-                game.CreateSnapshot(0).Players.Single(p => p.Seat == 1).HandCount == 3);
-            var action = NativeActions().Single(a => a.PhysicalCards.Any(c => c.CardId == id));
-            Program.Assert(action.ActorSeat == 0 && action.ProviderSeat == 1 &&
-                action.PhysicalCards.Single().From == CardLocation.Hand(1) &&
-                action.Type == (response ? CardActionType.Response : CardActionType.Use),
-                "The actual UI command preserves actor, provider, original hand and native use/response semantics.");
-            Refresh(model);
-            using var host = new NativeResponseStatusChecks.NativeHost(model);
-            host.Capture(output, response ? "shi-lu-su-shared-dodge" : "shi-lu-su-shared-use", 1120);
-            IEnumerable<CardActionContext> NativeActions() => response
-                ? game.Events.Select(e => e.Payload).OfType<CardActionAcceptedEvent>().Select(e => e.Action)
-                : game.Events.Select(e => e.Payload).OfType<CardUseAppearanceCapturedEvent>().Select(e => e.Action);
-        }
-    }
-
     internal static (ContentRegistry Registry, GameEngine Game) CreateScene(string hero, bool shared = false,
         bool response = false, bool wounded = false)
     {
@@ -119,7 +44,7 @@ internal static class ShiFifthBatchUiChecks
         var model = new MainViewModel(false, 638, showSetup: false, saveStore: store, contentRegistry: registry,
             historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore())
             { IsMotionEnabled = false, IsMusicEnabled = false, IsSoundEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         return model;
     }

@@ -6,7 +6,6 @@ internal static class TurnEndingBoundaryChecks
 {
     private const int HumanSeat = 0;
 
-
     public static void OrdersJushouJujianBiyueAndReplays()
     {
         var registry = CombinedRegistry();
@@ -112,15 +111,12 @@ internal static class TurnEndingBoundaryChecks
             "Audit events must retain the Jushou -> Jujian -> Biyue ordering.");
     }
 
-
-
     private static ContentRegistry CombinedRegistry() => ContentRegistry.Build(
         new StandardContentPackage(),
         new StandardActiveSkillExpansionPackage(includeJijiu: true),
         new StandardRescueSkillExpansionPackage(),
         new StandardClassicGeneralPackage(),
         new CombinedScenarioPackage());
-
 
     private static GameEngine CreateAndSelect(
         ContentRegistry registry,
@@ -272,53 +268,6 @@ internal static class TurnEndingBoundaryChecks
             builder.AddMode(new ContentModeDefinition(
                 ModeId,
                 "五人经典身份（结束阶段边界场景）",
-                5,
-                5,
-                new Dictionary<string, int>
-                {
-                    [nameof(Role.Lord)] = 1,
-                    [nameof(Role.Loyalist)] = 1,
-                    [nameof(Role.Rebel)] = 2,
-                    [nameof(Role.Renegade)] = 1
-                },
-                DeckId,
-                GeneralCandidateCount: 5,
-                GeneralPoolIds: [OwnerGeneralId, .. targetIds]));
-        }
-    }
-
-    private sealed class FrozenFactsScenarioPackage(SkillProgram program) : IGameContentPackage
-    {
-        public const string SkillId = "fixture:turn-ending-facts";
-        public const string OwnerGeneralId = "fixture:turn-ending-facts-owner";
-        public const string ModeId = "identity:classic-turn-ending-facts-test-5";
-        private const string DeckId = "fixture:turn-ending-facts-deck";
-
-        public PackageManifest Manifest { get; } = new("turn-ending-facts-scenario", new Version(1, 0, 0));
-
-        public void Register(IContentRegistryBuilder builder)
-        {
-            builder.AddSkill(new ContentSkillDefinition(SkillId, "冻结事实", "测试")
-            {
-                Program = program,
-                ExecutionForms = SkillExecutionForm.Trigger
-            });
-            var targetIds = Enumerable.Range(1, 4)
-                .Select(index => $"fixture:turn-ending-facts-target-{index}").ToArray();
-            builder.AddGeneral(new ContentGeneralDefinition(
-                OwnerGeneralId, "冻结事实测试武将", "supporter", SkillId, "wei", BaseHp: 4));
-            foreach (var id in targetIds)
-                builder.AddGeneral(new ContentGeneralDefinition(
-                    id, "冻结事实测试目标", "supporter", "standard:none", "wei", BaseHp: 4));
-            builder.AddDeck(new ContentDeckRecipe(
-                DeckId,
-                "冻结事实测试牌堆",
-                InitialHandSize: 4,
-                DrawPerTurn: 2,
-                [new ContentDeckCardCount("standard:crossbow", 96)]));
-            builder.AddMode(new ContentModeDefinition(
-                ModeId,
-                "五人经典身份（冻结事实场景）",
                 5,
                 5,
                 new Dictionary<string, int>

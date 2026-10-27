@@ -32,7 +32,7 @@ internal static class GeneralSelectionChecks
         store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var vm = new MainViewModel(autoAdvance: false, seed: 31, showSetup: true, saveStore: store,
             useExpandedContent: false, contentRegistry: registry, wushuangSaveStore: new MemorySaveStore()) { IsMotionEnabled = false };
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         var engine = Program.Engine(vm);
         var revision = engine.Revision;
         var state = SnapshotJson.Serialize(engine.CreateSnapshot(0));
@@ -159,8 +159,8 @@ internal static class GeneralSelectionChecks
             var oldVariants = vm.SelectedGeneralVariants;
             var staleChoice = vm.SelectedGeneralChoice!;
             var choicesBeforeLoad = vm.GeneralChoices.Concat(vm.SelectedGeneralVariants).Distinct().ToArray();
-            vm.SaveGameCommand.Execute(null);
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
+            LegacySaveFixtures.Load(vm);
             Program.Render(root, 1120, 820, Path.Combine(output, "general-variant-reloaded.png"));
             window.Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle);
             Program.Assert(!ReferenceEquals(Program.Engine(vm), engine),
@@ -184,7 +184,7 @@ internal static class GeneralSelectionChecks
                 $"{(Keyboard.FocusedElement as FrameworkElement)?.Name ?? "null"}.");
 
             FocusVersion();
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             window.Dispatcher.Invoke(() => { }, DispatcherPriority.DataBind);
             var confirm = (Button)window.FindName("ConfirmGeneralChoiceButton");
             confirm.Focus();
@@ -194,7 +194,7 @@ internal static class GeneralSelectionChecks
 
             Program.Render(root, 1120, 820, Path.Combine(output, "general-variant-current.png"));
             FocusVersion();
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             window.Dispatcher.Invoke(() => { }, DispatcherPriority.DataBind);
             vm.OpenSettingsCommand.Execute(null);
             window.Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle);
@@ -527,7 +527,7 @@ internal static class GeneralSelectionChecks
         using var vm = new MainViewModel(autoAdvance: false, seed: checkpoint.Options.Seed, showSetup: true,
             saveStore: store, useExpandedContent: false, contentRegistry: registry, wushuangSaveStore: new MemorySaveStore())
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         var engine = Program.Engine(vm);
         var prompt = vm.ChoiceSnapshot.PendingDecision!;
         var boundary = Boundary(engine);
@@ -749,7 +749,7 @@ internal static class GeneralSelectionChecks
 
             void Reload()
             {
-                vm.LoadManualGameCommand.Execute(null);
+                LegacySaveFixtures.Load(vm);
                 Pump();
                 Program.Assert(!vm.HasSaveError && vm.IsGeneralSelectionPending && Boundary(Program.Engine(vm)) == boundary,
                     "Each actual keyboard route must reload the same untouched native selection checkpoint.");
@@ -859,7 +859,7 @@ internal static class GeneralSelectionChecks
         store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, original));
         using var vm = new MainViewModel(autoAdvance: false, seed: 31, showSetup: true, saveStore: store,
             useExpandedContent: false, contentRegistry: registry, wushuangSaveStore: new MemorySaveStore()) { IsMotionEnabled = false };
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         var previousGame = Program.Engine(vm);
         var previousBoundary = Boundary(previousGame);
         foreach (var edition in new[] { "boundary:ling-tong", "classic:gao-da-yi-hao", selectedId })
@@ -876,7 +876,7 @@ internal static class GeneralSelectionChecks
             "Separate native checkpoints must reuse the prompt number while the original draft remains uncommitted.");
         var expectedBoundary = Boundary(replacement);
         store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, replacement.CreateCheckpoint()));
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         var currentGame = Program.Engine(vm);
         var currentPreview = vm.SelectedGeneralChoice;
         Console.WriteLine($"General changed contract {mode}: prompt={replacementPrompt.PromptId}, selected={currentPreview?.GeneralId}, editions={string.Join(',', vm.GeneralChoices.Select(choice => choice.GeneralId))}.");
@@ -1058,8 +1058,8 @@ internal static class GeneralSelectionChecks
             vm.IsDeveloperView = false;
             Program.Assert(vm.CustomGeneralSearch == rosterPrimary.Name && vm.CustomGeneralChoices.Count == 1,
                 "Refreshing the same national selection slot must retain its full-roster search.");
-            vm.SaveGameCommand.Execute(null);
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
+            LegacySaveFixtures.Load(vm);
             engine = Program.Engine(vm);
             Program.Assert(!vm.HasSaveError && vm.IsCustomGeneralSelectionOpen &&
                 vm.ChoiceSnapshot.PendingDecision?.PromptId == rosterPrimaryPrompt &&

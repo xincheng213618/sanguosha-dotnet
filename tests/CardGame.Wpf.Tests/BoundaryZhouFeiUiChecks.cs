@@ -1,3 +1,4 @@
+using CardGame.Wpf.Persistence;
 using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -43,7 +44,7 @@ internal static class BoundaryZhouFeiUiChecks
         Reach(game, SourceChoice); Answer(game, choice => choice.Parameters.GetValueOrDefault("option-id") == "keep");
         Reach(game, prompt => Branch(prompt, "return"));
         ShiFifthBatchUiChecks.Refresh(model);
-        model.SaveGameCommand.Execute(null); model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model); game = Program.Engine(model);
         var ending = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.BoundaryZhouFei?.Stage == BoundaryZhouFeiStage.UseChoice);
         Program.Assert(!model.HasSaveError && ending.BoundaryZhouFei!.Deposits.SequenceEqual([deposit.FrameId]) &&
                 model.PrivatelyViewedCards.Select(card => card.Id).ToHashSet().SetEquals(ids) && model.PrivatelyViewedCards.All(card => card.IsPrivateReveal) &&

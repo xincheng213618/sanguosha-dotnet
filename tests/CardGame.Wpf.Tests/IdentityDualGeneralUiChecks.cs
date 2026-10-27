@@ -37,8 +37,8 @@ internal static class IdentityDualGeneralUiChecks
         var revision = Program.Engine(vm).Revision;
         vm.SelectGeneralChoiceCommand.Execute(primary);
         Program.Assert(Program.Engine(vm).Revision == revision, "A retired primary choice must not answer the deputy prompt.");
-        vm.SaveGameCommand.Execute(null);
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Save(vm);
+        LegacySaveFixtures.Load(vm);
         vm.SelectGeneralChoiceCommand.Execute(vm.CustomGeneralChoices.Single(choice => choice.GeneralId == deputy.GeneralId));
         for (var step = 0; step < 40 && !Program.Engine(vm).Events.Any(e => e.Payload is SetupCompletedEvent); step++)
             vm.StepAiCommand.Execute(null);

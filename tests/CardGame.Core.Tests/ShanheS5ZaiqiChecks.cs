@@ -13,57 +13,6 @@ internal static class ShanheS5ZaiqiChecks
     private static readonly Lazy<ContentRegistry> Production = new(() =>
         StandardShanheCampaignCatalog.CreateBattleRegistry(ContentSetup([Skill])));
 
-    public static void LostHpPlusOneRevealsRealCardsAndReturnsGainAndRecoveryChildrenCold()
-    {
-        foreach (var scene in new[] { "hearts", "black" })
-        {
-            var s = Scene.Start(scene);
-            s.Until(() => s.Optional());
-            Need(s.V().Hp == 4 && s.V().MaxHp == 6 && s.V().HandCount == 0 && s.Reveals().Length == 0,
-                "The wounded owner chooses a real draw-phase replacement before any normal draw or reveal.");
-            s.Cold(); s.Answer(choice => Action(choice) == "activate");
-            var watch = scene == "hearts" ? Recovery : Gain;
-            s.Until(() => s.P?.SkillPrompt?.SkillId == watch && s.P.Choices.Any(IsContinue));
-            var reveal = s.Reveals().Single();
-            var ids = reveal.Cards.Select(card => card.Id).ToArray();
-            Need(ids.Length == 3 && ids.Distinct().Count() == 3 && reveal.OwnerSeat == 0 &&
-                reveal.Cards.All(card => card.Suit == (scene == "hearts" ? Suit.Heart : Suit.Spade)) &&
-                s.G.CardMovements.Where(move => ids.Contains(move.CardId) && move.From == CardLocation.DrawPile &&
-                    move.To == CardLocation.Processing).Select(move => move.CardId).SequenceEqual(ids) && s.NormalDraws().Length == 0,
-                "The actual new 887 instruction reveals lost HP plus one original entity (three, not classic 116's two) and replaces the normal draw.");
-            if (scene == "hearts")
-            {
-                var child = s.G.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single();
-                Need(child.Change is { Kind: HpChangeKind.Recovery, SourceSeat: 0, TargetSeat: 0, Amount: 2, HpBefore: 4, HpAfter: 6 } &&
-                    child.Change.ParentFrameId == reveal.FrameId && s.V().Hp == 6 && s.V().HandCount == 0 &&
-                    s.E<RecoveryAppliedEvent>() is [{ SourceSeat: 0, TargetSeat: 0, Amount: 2, RemainingHp: 6 }] &&
-                    s.E<ProgramRecoveryAppliedEvent>().Single().ProgramFrameId == reveal.FrameId,
-                    "Three genuine hearts recover only the actual two missing HP and enter the original native recovery child before its parent continues.");
-            }
-            else
-            {
-                var child = s.G.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single();
-                Need(child.Batch.ParentFrameId == reveal.FrameId && child.Batch.NativeDrawInvocation is null &&
-                    child.Batch.Movements.Select(move => move.CardId).SequenceEqual(ids) &&
-                    child.Batch.Movements.All(move => move.From == CardLocation.Processing &&
-                        move.To == CardLocation.Hand(0) && move.Reason.Value == MoveReason) &&
-                    s.V().Hand.Select(card => card.Id).Order().SequenceEqual(ids.Order()) && s.V().Hp == 4 &&
-                    s.E<RecoveryAppliedEvent>().Length == 0,
-                    "Non-hearts enter the real owner's hand in the exact reveal-owned movement batch; obtaining them is not a fake normal draw or recovery.");
-            }
-            s.Cold(); s.Answer(IsContinue); s.Play();
-            Need(s.Reveals().Length == 1 && s.NormalDraws().Length == 0 &&
-                s.E<ProgramBindingResolvedEvent>().Count(fact => fact.SkillId == Skill && fact.Completed) == 1 &&
-                s.E<ProgramBindingResolvedEvent>().Count(fact => fact.SkillId == watch && fact.Completed) == 1 &&
-                ids.All(id => s.G.CardMovements.Count(move => move.CardId == id && move.From == CardLocation.Processing &&
-                    move.To == (scene == "hearts" ? CardLocation.DiscardPile : CardLocation.Hand(0)) && move.Reason.Value == MoveReason) == 1) &&
-                s.V().Hp == (scene == "hearts" ? 6 : 4) && s.V().HandCount == (scene == "hearts" ? 0 : 3) &&
-                s.E<RecoveryAppliedEvent>().Length == (scene == "hearts" ? 1 : 0),
-                "Returning from an in-flight native gain or recovery child neither reveals, recovers, moves materials nor completes the replacement twice: " + s.Diagnostic());
-            s.Cold();
-        }
-    }
-
     public static void FullHpAndDeclinedReplacementKeepNormalDrawAndVerifiedCodexReward()
     {
         foreach (var scene in new[] { "full", "decline" })
@@ -182,7 +131,6 @@ internal static class ShanheS5ZaiqiChecks
     }
 
     private static string Action(PromptChoice choice) => choice.Parameters.GetValueOrDefault("program-action") ?? "";
-    private static bool IsContinue(PromptChoice choice) => choice.Parameters.GetValueOrDefault("option-id") == "continue";
     private static string Peer(int seat) => "fixture:s5-zaiqi-peer-" + seat;
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 

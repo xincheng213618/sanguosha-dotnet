@@ -4,8 +4,12 @@ namespace CardGame.Wpf.ViewModels;
 
 public sealed partial class MainViewModel
 {
-    private IReadOnlyList<HumanSkillViewModel> BuildHumanSkillCards() =>
-        BuildOwnedHumanSkillCards().Where(skill => !IsWushuangPassiveTacticSkill(skill.ContentId))
+    private IReadOnlyList<HumanSkillViewModel> BuildHumanSkillCards()
+    {
+        var human = _snapshot?.Players.SingleOrDefault(player => player.IsHuman);
+        var tacticSkills = human is null ? new HashSet<string>(StringComparer.Ordinal) :
+            BuildTableTacticBadges(human).Select(tactic => tactic.SkillId).OfType<string>().ToHashSet(StringComparer.Ordinal);
+        return BuildOwnedHumanSkillCards().Where(skill => !IsPassiveTableTacticSkill(skill.ContentId, tacticSkills))
             .Select(skill => skill with { ProgressText = SkillActivationProgressText(skill.ContentId) })
             .Select(ApplyBoundaryQuanCongProgress)
             .Select(ApplyBoundaryZhuZhiProgress)
@@ -34,10 +38,10 @@ public sealed partial class MainViewModel
             .Select(ApplyMobileShiZhangYanProgress)
             .Select(ApplyMobileShiDengAiProgress)
             .Concat(BuildForeignHumanSkillCards()).ToArray();
+    }
 
-    private bool IsWushuangPassiveTacticSkill(string? skillId) => skillId is not null && IsWushuangTable &&
-        (_snapshot?.Players.SingleOrDefault(player => player.IsHuman)?.WushuangTacticIds ?? [])
-            .Any(id => WushuangTactics.ById.TryGetValue(id, out var tactic) && tactic.SkillId == skillId) &&
+    private bool IsPassiveTableTacticSkill(string? skillId, IReadOnlySet<string> tacticSkills) =>
+        skillId is not null && tacticSkills.Contains(skillId) &&
         !(CurrentPresentationRegistry.Skills.TryGetValue(skillId, out var definition) &&
             (definition.ActionForms.HasFlag(SkillActionForm.Active) || definition.Program?.Activations.Count > 0 ||
              definition.Program?.ViewAs.Count > 0));

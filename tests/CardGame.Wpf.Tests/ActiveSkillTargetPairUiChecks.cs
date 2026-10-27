@@ -42,7 +42,7 @@ internal static class ActiveSkillTargetPairUiChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, checkpoint));
         using var model = new MainViewModel(false, 31, true, store, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         var window = new MainWindow(model);
         var root = (FrameworkElement)window.Content;
         try
@@ -117,7 +117,7 @@ internal static class ActiveSkillTargetPairUiChecks
             {
                 foreach (var route in new[] { "button", "Enter" })
                 {
-                    model.LoadManualGameCommand.Execute(null);
+                    LegacySaveFixtures.Load(model);
                     game = Program.Engine(model);
                     Program.Assert(!model.HasSaveError && !model.HasSelection && Boundary(game) == unchanged,
                         "Every ordered confirmation route must reload the same actual checkpoint, without retaining a previous pair or debt.");

@@ -95,8 +95,6 @@ internal static partial class QinglongCrescentBladeChecks
 
     }
 
-
-
     private const string GiftMode = "identity:classic-qinglong-completed-gift";
     private const string GiftDriver = "fixture:qinglong-gift-driver";
 

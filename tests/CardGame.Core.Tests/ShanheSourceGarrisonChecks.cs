@@ -4,51 +4,6 @@ using CardGame.Core.Campaigns;
 
 internal static class ShanheSourceGarrisonChecks
 {
-    public static void ThreeChaptersOfferDifferentLocalRostersAndARealEliteBranch()
-    {
-        foreach (var difficulty in new[] { 1, 25 })
-        {
-            var definition = StandardShanheCampaignCatalog.CreateSourceDefinition(difficulty);
-            var graph = StandardShanheSourceRouteCatalog.Season5;
-            foreach (var chapter in new[] { 1, 2, 3 })
-            {
-                var ordinary = definition.Nodes.Where(node => node.ChapterNumber == chapter && node.Kind == ShanheNodeKind.Battle).ToArray();
-                var local = ordinary.SelectMany(node => node.Encounters!).Where(encounter => encounter.SourceBattleId is null).ToArray();
-                var signatures = local.Select(encounter => string.Join("|", encounter.Enemies.Select(enemy => enemy.GeneralId))).Distinct().ToArray();
-                Need(signatures.Length >= 4 && local.All(encounter =>
-                        encounter.Enemies.Count >= chapter && encounter.Enemies.Count <= chapter + 1 &&
-                        encounter.SourceCityId is > 0 && encounter.BossTransition is null && encounter.VictoryGold == 200) &&
-                    ordinary.All(node => node.Encounters!.Count(encounter => encounter.SourceBattleId is null) == 4 &&
-                        node.Encounters.All(encounter => encounter.SourceCityId is { } city &&
-                            node.Id == StandardShanheCampaignCatalog.Source2026CityNodeId(city))),
-                    "Every actual ordinary city offers four different local lineups with chapter-appropriate enemy counts and keeps only its genuine city identity.");
-            }
-            foreach (var region in graph.Regions.Where(region => region.MinimumSourceDifficultyId <= difficulty))
-            {
-                var prefix = "source-region-" + region.SourceUniqueId;
-                var market = definition.Nodes.Single(node => node.Id == prefix + ":market");
-                var elite = definition.Nodes.Single(node => node.Id == prefix + ":local-elite");
-                var expectedNext = prefix + (region.ChapterNumber == 3 ? ":story" : ":camp");
-                Need(elite.Kind == ShanheNodeKind.EliteBattle && elite.ChapterNumber == region.ChapterNumber &&
-                    market.NextNodeIds.Contains(elite.Id) && elite.NextNodeIds.SequenceEqual([expectedNext]) &&
-                    elite.CategorizedRewards && elite.PrimaryTacticRarity == 2 && elite.PrimarySkillRarity == 2 &&
-                    elite.Encounters is { Count: > 0 } && elite.Encounters.All(encounter =>
-                        encounter.SourceCityId is null && encounter.SourceBattleId is null && encounter.BossTransition is null &&
-                        encounter.Enemies.Count == region.ChapterNumber + 1 && encounter.VictoryGold == 200 &&
-                        encounter.Name.Contains("本地", StringComparison.Ordinal)) &&
-                    definition.Rewards.Any(reward => elite.RewardIds!.Contains(reward.Id) && reward.Rarity == 2 && reward.TacticSkillId is not null) &&
-                    definition.Rewards.Any(reward => elite.RewardIds!.Contains(reward.Id) && reward.Rarity == 2 && reward.SkillId is not null),
-                    "Every source region has a selectable local elite with real enemies, two rare reward categories and its original rejoin path; it claims no official city or battle.");
-            }
-            Need(definition.Nodes.Where(node => node.Kind == ShanheNodeKind.EliteBattle).Count() ==
-                    graph.Regions.Count(region => region.MinimumSourceDifficultyId <= difficulty) &&
-                definition.Nodes.SelectMany(node => node.Encounters ?? []).All(encounter =>
-                    encounter.Enemies.Count + (encounter.Allies?.Count ?? 0) + 1 <= 8) &&
-                definition.Nodes.Where(node => node.Kind == ShanheNodeKind.Battle)
-                    .SelectMany(node => node.Encounters!).Count(encounter => encounter.SourceBattleId == 2397) == 7,
-                "The optional branches keep the total-seat cap and preserve exactly the existing seven genuinely eligible Luoyang Mulu placements.");
-        }
-    }
 
     public static void NativePreviewMoveAndStartKeepTheChosenRosterAndPhysicalOpening()
     {

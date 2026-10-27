@@ -8,7 +8,6 @@ internal static class ProgramOwnedCardsChecks
     private const string SkillId = "fixture:owned-card-set";
     private const string ModeId = "identity:classic-owned-cards-4";
 
-
     public static void PrivateDraftBatchMovementAndReplay()
     {
         var (game, registry) = Create(2);

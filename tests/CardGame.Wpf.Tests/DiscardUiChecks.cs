@@ -24,7 +24,7 @@ internal static class DiscardUiChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(false, 87381, showSetup: false, saveStore: store, contentRegistry: registry)
             { IsMotionEnabled = false, IsMusicEnabled = false, IsSoundEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         using var host = new NativeResponseStatusChecks.NativeHost(model);
         var window = host.Window;
         var root = host.Root;
@@ -58,8 +58,8 @@ internal static class DiscardUiChecks
         Program.Assert(model.IsDiscardSelectionPending && model.RequiredDiscardCount == required - 1 &&
             model.Hand.Count == hand - 1 && model.SelectedDiscardCount == 0,
             "A one-card confirmation must remove only that card and show the remaining quantity.");
-        model.SaveGameCommand.Execute(null);
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Save(model);
+        LegacySaveFixtures.Load(model);
         Program.Assert(model.IsDiscardSelectionPending && model.RequiredDiscardCount == required - 1 && model.Hand.Count == hand - 1,
             "Reloading a partial discard must preserve its paid card and remaining quantity.");
         model.RecommendDiscardCommand.Execute(null);

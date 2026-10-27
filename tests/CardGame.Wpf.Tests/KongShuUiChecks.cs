@@ -31,7 +31,7 @@ internal static class KongShuUiChecks
         var store = new MemorySaveStore();
         Save();
         using var model = new MainViewModel(false, game.Seed, true, store, contentRegistry: registry) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Load(model); game = Program.Engine(model);
         var window = new MainWindow(model);
         try
         {
@@ -43,7 +43,7 @@ internal static class KongShuUiChecks
             Accept(new AnswerPromptCommand(0, game.PendingDecision!.PromptId, choice.Id, game.Revision));
             Program.Assert(game.CardMovements.Count == moves && game.PendingDecision!.Choices.Any(c => c.Parameters.GetValueOrDefault("branch") == "unpick"),
                 "A native partial selection retains undo without moving the unpaid cards.");
-            Save(); model.LoadManualGameCommand.Execute(null); game = Program.Engine(model); CheckChoices();
+            Save(); LegacySaveFixtures.Load(model); game = Program.Engine(model); CheckChoices();
             Program.Assert(model.Hand.Single(card => card.Id == first).IsSelected,
                 "Cold recovery highlights the actual selected entity from its native undo choice.");
             model.SelectCardCommand.Execute(model.Hand.Single(card => card.Id == first));

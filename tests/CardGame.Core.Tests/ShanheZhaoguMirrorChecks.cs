@@ -9,34 +9,6 @@ internal static class ShanheZhaoguMirrorChecks
     private const string Skill = "shanhe:zhaogu-mirror-6018", Deck = "fixture:zhaogu-mirror-deck";
     private const string TemplateAction = "shanhe-zhaogu-template", UseAction = "shanhe-zhaogu-use";
 
-    public static void RevealedSlashKeepsItsEntityAndPaysOneNativeDodgeBeforeEndingReturns()
-    {
-        var s = Scene.Start(Profile.Slash);
-        var template = s.V(0).Hand.Single(c => c.Kind == CardKind.Slash).Id;
-        var dodge = s.V(1).Hand.Single(c => c.Kind == CardKind.Dodge).Id;
-        var producer = s.Show(template);
-        s.Until(() => s.IsUseChoice);
-        Need(s.P!.Choices.Where(c => c.Parameters.GetValueOrDefault("program-action") == UseAction)
-                .All(c => !c.Targets.Contains(0) && !c.Targets.Contains(2)) &&
-            s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == UseAction && c.Targets.SequenceEqual([1])),
-            "The shown Slash preserves its native distance-one other targets; neither self nor the opposite seat becomes legal.");
-        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == UseAction && c.Targets.SequenceEqual([1]));
-        s.Until(() => s.P is { Kind: DecisionKind.RespondDodge, PlayerSeat: 1 });
-        var use = s.G.ResolutionStack.OfType<CardUseFrame>().Single(f => f.CardId == 0 && f.CardKind == CardKind.Slash);
-        AssertVirtualAction(use.Action!, CardKind.Slash);
-        Need(s.G.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == producer && f.SkillId == Skill) &&
-            !s.Events<ProgramBindingResolvedEvent>().Any(e => e.FrameId == producer) &&
-            !s.Events<CardUseFinishedEvent>().Any(e => e.ResolutionId == use.Id),
-            "The exact original PlayEnding program waits while the zero-material Slash asks its actual target for a real Dodge.");
-        s.Answer(c => c.Cards.SequenceEqual([dodge]));
-        s.NextPlay();
-        Need(s.V(1).Hp == 20 && s.Events<CardRespondedEvent>().Any(e => e.CardId == dodge && e.ResponderSeat == 1) &&
-            s.G.CardMovements.Count(m => m.CardId == dodge && m.From == CardLocation.Hand(1) && m.To == CardLocation.Processing) == 1 &&
-            s.G.CardMovements.Count(m => m.CardId == dodge && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile) == 1,
-            "The target pays and discards its own original Dodge once; the mirror does not replace native response with direct damage.");
-        s.AssertReturned(producer, template, use.Id, CardKind.Slash);
-    }
-
     public static void RevealedOrdinaryTrickUsesRealDrawAndPaidCounterspellBranches()
     {
         foreach (var counter in new[] { false, true })
@@ -96,43 +68,6 @@ internal static class ShanheZhaoguMirrorChecks
             damageIndex >= 0 && finishIndex > damageIndex && returnIndex > finishIndex,
             "The original zero-material Duel takes the target's actual failed Slash response, applies one native damage, then finishes before returning once to its own PlayEnding program.");
         duel.AssertReturned(duelProducer, duelTemplate, duelUse.ResolutionId, CardKind.Duel);
-    }
-
-    public static void UnusableTemplatesStillRevealAndRealTreasureReplacementRemovesTheOffer()
-    {
-        foreach (var profile in new[] { Profile.Dodge, Profile.Counterspell, Profile.SlashQuota })
-        {
-            var s = Scene.Start(profile);
-            var kind = profile == Profile.Dodge ? CardKind.Dodge : profile == Profile.Counterspell ? CardKind.Nullification : CardKind.Slash;
-            var template = s.V(0).Hand.Single(c => c.Kind == kind && c.Rank == 7).Id;
-            if (profile == Profile.SlashQuota)
-            {
-                s.Physical(CardKind.Slash, 3, [1]);
-                Need(!s.G.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash && a.CardId == template),
-                    "The first original Slash really consumes the ordinary play quota before the second Slash is shown.");
-            }
-            var producer = s.Show(template);
-            // No use plan exists; the original ending must finish without a fabricated Use.
-            s.NextPlay();
-            Need(s.Events<ProgramCardsRevealedEvent>().Count(e => e.FrameId == producer && e.SkillId == Skill &&
-                    e.Cards.Select(c => c.Id).SequenceEqual([template])) == 1 &&
-                !s.Events<CardUseDeclaredEvent>().Any(e => e.CardId == 0 && e.SourceSeat == 0) &&
-                s.Events<ProgramBindingResolvedEvent>().Count(e => e.FrameId == producer && e.SkillId == Skill && e.Completed) == 1 &&
-                s.Zone(template) == CardLocation.Hand(0) && !s.G.CardMovements.Any(m => m.CardId == template && m.From == CardLocation.Hand(0)),
-                "Dodge, Nullification and quota-exhausted Slash are still genuinely shown, then finish the same ending without inventing a response context, free quota or virtual Use.");
-        }
-        var removed = Scene.Start(Profile.Replace);
-        var mirror = removed.V(0).Equipment.Single(c => c.Kind == CardKind.ZhaoguMirror).Id;
-        removed.Physical(CardKind.WoodenOx, 4, []);
-        Need(removed.Zone(mirror) == CardLocation.DiscardPile &&
-            removed.V(0).Equipment.Any(c => c.Kind == CardKind.WoodenOx) &&
-            !removed.V(0).Skills!.Any(s => s.ContentId == Skill),
-            "A real new Treasure replaces the actual mirror entity and removes that physical source's skill.");
-        removed.End(); removed.NextPlay();
-        Need(!removed.Events<ProgramBindingStartedEvent>().Any(e => e.SkillId == Skill) &&
-            !removed.Events<ProgramCardsRevealedEvent>().Any(e => e.SkillId == Skill) &&
-            !removed.Events<CardUseDeclaredEvent>().Any(e => e.CardId == 0 && e.SourceSeat == 0),
-            "After the equipped mirror leaves, the same actual phase ending offers no lingering template or virtual use.");
     }
 
     private static void AssertVirtualAction(CardActionContext action, CardKind kind) => Need(

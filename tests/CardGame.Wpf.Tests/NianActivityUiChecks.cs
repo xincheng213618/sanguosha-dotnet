@@ -35,7 +35,7 @@ internal static class NianActivityUiChecks
             original.CreateCheckpoint()));
         using var vm = new MainViewModel(false, 17, true, store, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         var window = new MainWindow(vm);
         window.ApplyTemplate();
         var root = (FrameworkElement)window.Content;
@@ -93,8 +93,8 @@ internal static class NianActivityUiChecks
                 vm.HumanActiveSkillActions.All(action => action.ProgramSkillId != "nian:revive") &&
                 Program.Find<Border>(TargetButton(1)).Single(border => border.Name == "DeathShade").Visibility == Visibility.Collapsed,
                 "The actual confirmation button must submit one native dead-ally revival, revive the original general with two cards and deduct exactly one shared use.");
-            vm.SaveGameCommand.Execute(null);
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
+            LegacySaveFixtures.Load(vm);
             Program.Assert(!vm.HasSaveError && Program.Engine(vm).CreateSnapshot(0).Players[1] is { IsAlive: true, Hp: 2, HandCount: 2 } &&
                 vm.TableModeText.Contains("共享复活 2/3") &&
                 Program.Engine(vm).Events.Count(e => e.Payload is NianRevivalPaidEvent) == 1,
@@ -273,14 +273,14 @@ internal static class NianActivityUiChecks
             var remainingBeforeSave = game.NianRemainingMilliseconds!.Value;
             // Stay below the five-second timer interval; saving itself must commit this elapsed tail.
             System.Threading.Thread.Sleep(25);
-            vm.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
             var savedRemaining = game.NianRemainingMilliseconds!.Value;
             Program.Assert(!vm.HasSaveError && savedRemaining < remainingBeforeSave &&
                 store.Read(GameSaveSlot.Manual).Checkpoint.Commands.OfType<TickNianClockCommand>().Any(),
                 "Saving must flush even a partial timer interval through a real replayable clock command.");
             var saved = SnapshotJson.Serialize(game.CreateSnapshot(0));
             vm.SelectedTableMode = vm.TableModes.Single(option => option.ModeId == "team:standard-2v2");
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             Program.Assert(!vm.HasSaveError && Program.Engine(vm).ModeId == mode.Id &&
                 vm.SelectedStartingTeam.TeamId == coalition.PlayerTeamId && vm.WindowTitle.Contains("年兽") &&
                 vm.TableArenaTitle == "挑 战 年 兽" && vm.TableModeText.Contains("共享复活 3/3") &&
@@ -294,7 +294,7 @@ internal static class NianActivityUiChecks
                 useExpandedContent: true, contentRegistry: configuredWithoutNian) { IsMotionEnabled = false };
             Program.Assert(!configuredWithoutNian.Modes.ContainsKey(mode.Id) && reopened.TableModes.All(option => option.ModeId != mode.Id),
                 "The second desktop must genuinely be configured without the Nian activity package.");
-            reopened.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(reopened);
             Program.Assert(!reopened.HasSaveError && Program.Engine(reopened).ModeId == mode.Id &&
                 reopened.SelectedTableMode.ModeId == mode.Id && reopened.SelectedStartingTeam.TeamId == coalition.PlayerTeamId &&
                 reopened.Seats.Count == 4 && reopened.TableArenaTitle == "挑 战 年 兽" &&

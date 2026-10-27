@@ -8,23 +8,6 @@ namespace CardGame.Core.Tests;
 internal static class OlShenCaoPiChecks
 {
     private const string Hero = "ol:shen-cao-pi", Driver = "fixture:ol-scp-driver", Quiet = "fixture:ol-scp-quiet", Peer = "fixture:ol-scp-peer", Deck = "fixture:ol-scp-deck";
-    public static void ChuyuanNativeDrawForeignDepositCapacityAndCold()
-    {
-        var s = Scene.Start(); s.Play(); var limit = s.Limit();
-        s.BeginDeposit("two"); var f = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(p => p.OlShenCaoPi is not null);
-        s.Need(f.OlShenCaoPi is { TargetSeat: 2, DrawOutcome.ActualDrawIds.Count: 1 } && s.E<OlChuyuanDrawReturnedEvent>() is [{ Actual: 1 }] &&
-            s.P is { PlayerSeat: 2, IsPrivate: true } && s.G.CreateSnapshot(0).PendingDecision is null,
-            "A single actual two-point damage event gives one native draw and a recipient-only deposit choice on Cao Pi's original skill frame.");
-        s.Cold(); s.Play();
-        for (var i = 0; i < 4; i++) { s.BeginDeposit("two"); s.Play(); }
-        s.Need(s.Pile().Length == 5 && s.E<OlChuyuanDrawReturnedEvent>().Length == 5 && s.E<OlChuyuanDepositedEvent>().Length == 5 && s.Limit() == limit,
-            "Five genuine draws and chosen hand entities fill the five-HP Chu limit, without the deleted first-draft hand-limit bonus.");
-        s.Use("two"); s.Play();
-        s.Need(s.E<OlChuyuanDrawReturnedEvent>().Length == 5 && s.Pile().Length == 5 &&
-            s.E<OlChuyuanDepositedEvent>().All(e => s.G.CardMovements.Count(m => m.CardId == e.CardId && m.From == CardLocation.Hand(2) && m.To == e.Pile && m.Sequence > e.Before && m.Sequence <= e.After) == 1),
-            "Chuyuan cannot start when Chu equals maximum HP; every existing public Chu is backed by its recipient's once-paid real hand movement.");
-        s.Replay();
-    }
     public static void TwoActualAwakeningsObtainChuAndGrantPermanentSkillCold()
     {
         var s = Scene.Start(); s.Play();

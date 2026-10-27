@@ -9,7 +9,6 @@ internal static class SkillProgramCardIdentityChecks
     private const string OwnerGeneralId = "card-identity-test:owner";
     private const string ModeId = "identity:card-identity-test-4";
 
-
     internal static void MandatoryIdentityDistanceAndReplay()
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new FixturePackage());

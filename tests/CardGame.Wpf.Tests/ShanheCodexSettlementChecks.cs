@@ -177,6 +177,12 @@ internal static class ShanheCodexSettlementChecks
             lost.RunRecords is [{ Won: false, BooksEarned: 0 }],
             "A genuine loss grants no books but retains a durable expedition record instead of disappearing.");
         Refuse(lost, loss, 1);
+        var retried = ShanheCampaignSession.Create(definition, loss.CreateCheckpoint().Options, _ => Registry.Value);
+        Accept(retried, new MoveShanheNodeCommand("battle", retried.Revision));
+        CompleteBattle(retried, "victory");
+        Refuse(lost, retried, 1);
+        Program.Assert(lost.RunRecords is [{ Won: false, BooksEarned: 0 }],
+            "A settled expedition identity is not upgraded or paid again by a reconstructed run.");
         var both = new MemoryShanheCodexStore(); both.Write(lost);
         Program.Assert(ShanheCodexSettlement.TryPrepare(both.Read(), session, 1, out var afterLoss) &&
             afterLoss.RunRecords.Length == 2 && afterLoss.RunRecords[0].Won && !afterLoss.RunRecords[1].Won,

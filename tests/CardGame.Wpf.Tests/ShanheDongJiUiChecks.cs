@@ -39,7 +39,7 @@ internal static class ShanheDongJiUiChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, prepared.CreateCheckpoint()));
         using var model = new MainViewModel(false, prepared.Seed, true, store, contentRegistry: registry)
         { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         var game = Program.Engine(model);
         var window = new MainWindow(model);
@@ -68,8 +68,8 @@ internal static class ShanheDongJiUiChecks
                 "Confirming an incomplete draft must submit no answer and pay no part of the actual discard.");
 
             var frozen = GameCheckpointJson.Serialize(game.CreateCheckpoint());
-            model.SaveGameCommand.Execute(null);
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(model);
+            LegacySaveFixtures.Load(model);
             game = Program.Engine(model);
             Layout();
             Program.Assert(!model.HasSaveError && GameCheckpointJson.Serialize(game.CreateCheckpoint()) == frozen &&
@@ -100,8 +100,8 @@ internal static class ShanheDongJiUiChecks
             Until(game, () => game.Events.Select(item => item.Payload).OfType<ProgramSkillResolvedEvent>().Any(fact => fact.FrameId == rootId));
             AssertPaid(game);
             var completed = GameCheckpointJson.Serialize(game.CreateCheckpoint());
-            model.SaveGameCommand.Execute(null);
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(model);
+            LegacySaveFixtures.Load(model);
             game = Program.Engine(model);
             Layout();
             Program.Assert(!model.HasSaveError && GameCheckpointJson.Serialize(game.CreateCheckpoint()) == completed &&

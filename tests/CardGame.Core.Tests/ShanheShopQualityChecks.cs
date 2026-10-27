@@ -3,7 +3,7 @@ using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
 
-internal static class ShanheShopQualityChecks
+internal static partial class ShanheShopQualityChecks
 {
     private const string Player = "fixture:shop-quality-player", Enemy = "fixture:shop-quality-enemy";
     private const string Tactic100 = "quality-tactic-100", Skill100 = "quality-skill-100", Material100 = "quality-material-100", All100 = "quality-all-100";

@@ -1,3 +1,4 @@
+using CardGame.Wpf.Persistence;
 using CardGame.Core;
 
 internal static class BoundaryQuanCongUiChecks
@@ -38,7 +39,7 @@ internal static class BoundaryQuanCongUiChecks
             c.Parameters.GetValueOrDefault("program-action") == "boundary-quan-cong-yaoming") == true);
         ShiFifthBatchUiChecks.Refresh(model);
         var root = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.BoundaryQuanCongYaoming is not null).Id;
-        model.SaveGameCommand.Execute(null); model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model); game = Program.Engine(model);
         Program.Assert(!model.HasSaveError && model.HumanSkillCards.Single(c => c.ContentId == skill).ProgressText == "剩余 3/4" &&
             game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.BoundaryQuanCongYaoming is not null).Id == root &&
             model.CanCancelAction && game.CreateSnapshot(0).PendingDecision!.Choices.Any(c => c.Parameters.GetValueOrDefault("option") == "skip"),

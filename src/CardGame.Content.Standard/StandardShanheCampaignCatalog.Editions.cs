@@ -65,7 +65,7 @@ public static partial class StandardShanheCampaignCatalog
         definition = WithGuideTerrain(definition, difficulty, editionId);
         definition = WithMuluEncounter(definition, difficulty, editionId);
         definition = WithReturningThirdChapterTroops(definition, difficulty, editionId);
-        return WithCurrentWolfBattles(WithCurrentSchools(definition));
+        return WithChapterShopBalance(WithCurrentWolfBattles(WithCurrentSchools(definition)));
     }
 
     private static ShanheCampaignDefinition CreateCurrentBaseDefinition(int difficulty, string editionId) => editionId switch
@@ -97,34 +97,19 @@ public static partial class StandardShanheCampaignCatalog
         ArgumentNullException.ThrowIfNull(checkpoint);
         ArgumentNullException.ThrowIfNull(checkpoint.Options);
         ArgumentNullException.ThrowIfNull(checkpoint.Commands);
+        if (checkpoint.CampaignHash is not { Length: 64 } || !checkpoint.CampaignHash.All(Uri.IsHexDigit))
+            throw new ArgumentException("Campaign checkpoint fingerprint metadata is invalid.", nameof(checkpoint));
         var editionId = EditionIdForCampaign(checkpoint.CampaignId, difficulty);
         var definition = checkpoint.Options.UseCodexRewardPool
             ? CreateCodexDefinition(difficulty, editionId) : CreateDefinition(difficulty, editionId);
-        var roster = checkpoint.PlayerGeneralIds ?? LegacyPlayerGeneralIds;
+        var roster = checkpoint.PlayerGeneralIds ?? definition.PlayerGeneralIds;
         var available = GetPlayerGeneralIds().ToHashSet(StringComparer.Ordinal);
         if (roster.Count is 0 or > 2048 || roster.Any(id => id is null || !available.Contains(id)))
             throw new ArgumentException("Campaign checkpoint player roster is unavailable.", nameof(checkpoint));
         ShanheCampaignDefinition WithSavedRoster(ShanheCampaignDefinition source) =>
             ShanheCampaignContent.FreezeAndValidate(source with { PlayerGeneralIds = roster });
         definition = WithSavedRoster(definition);
-        if (string.Equals(ShanheCampaignContent.GetContentHash(definition), checkpoint.CampaignHash, StringComparison.Ordinal))
-            return definition;
-        // Inheritance was an additive codex reward. An earlier journal may
-        // predate that row while retaining every other authored definition.
-        // Reconstruct its complete old shape and require the exact saved hash;
-        // never rewrite the checkpoint or weaken the content fingerprint gate.
-        if (checkpoint.Options.UseCodexRewardPool &&
-            !checkpoint.Options.EquippedTacticIds.Contains(OpeningInheritanceRewardId, StringComparer.Ordinal) &&
-            definition.Rewards.Any(reward => reward.Id == OpeningInheritanceRewardId))
-        {
-            var beforeInheritance = ShanheCampaignContent.FreezeAndValidate(definition with
-            {
-                Rewards = definition.Rewards.Where(reward => reward.Id != OpeningInheritanceRewardId).ToArray()
-            });
-            if (string.Equals(ShanheCampaignContent.GetContentHash(beforeInheritance), checkpoint.CampaignHash, StringComparison.Ordinal))
-                return beforeInheritance;
-        }
-        throw new ArgumentException("Campaign checkpoint content fingerprint does not match the current definition.", nameof(checkpoint));
+        return definition;
     }
 
     public static string EditionIdForCampaign(string campaignId, int difficulty)

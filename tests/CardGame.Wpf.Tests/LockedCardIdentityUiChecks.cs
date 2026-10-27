@@ -38,7 +38,7 @@ internal static class LockedCardIdentityUiChecks
             using var model = new MainViewModel(false, 31, true, store, contentRegistry: registry,
                 historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore())
                 { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Program.Assert(!model.HasSaveError, model.SaveStatus);
             var game = Program.Engine(model);
             var expected = general == "classic:shen-guan-yu" ? CardKind.Slash : secondPlay ? CardKind.ThunderSlash : CardKind.FireSlash;

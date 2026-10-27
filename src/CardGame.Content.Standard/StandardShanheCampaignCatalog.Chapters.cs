@@ -32,6 +32,8 @@ public static partial class StandardShanheCampaignCatalog
         var rewards = definition.Rewards.Concat(additions.Where(addition => definition.Rewards.All(reward => reward.Id != addition.Id))).ToArray();
         var tactics = rewards.Where(IsChapterTactic).Where(reward => !currentSeason || IsEpicChapterReward(reward, "战法"))
             .Select(reward => reward.Id).ToArray();
+        var skills = rewards.Where(reward => reward.SkillId is not null && IsEpicChapterReward(reward, "技能"))
+            .Select(reward => reward.Id).ToArray();
         // Prefer the verified physical card faces when the codex catalogue is present; ordinary local editions
         // use their existing Peach/Duel recipes plus explicitly labelled local Slash/Dodge opening cards.
         var cards = currentSeason ? rewards.Where(reward => reward.Id.StartsWith("chapter-epic-card-", StringComparison.Ordinal) &&
@@ -68,7 +70,8 @@ public static partial class StandardShanheCampaignCatalog
                     BossRewards = chapterBoss && chapter < 3 ? currentSeason
                         ? new(500, 1, [
                             new("tactics", "史诗战法", tactics, Math.Min(3, tactics.Length)),
-                            new("cards", "史诗手牌", cards.Select(reward => reward.Id).ToArray(), Math.Min(3, cards.Length))])
+                            chapter == 2 ? new("skills", "史诗技能", skills, Math.Min(3, skills.Length))
+                                : new("cards", "史诗手牌", cards.Select(reward => reward.Id).ToArray(), Math.Min(3, cards.Length))])
                         : new(500, 1, [new("tactics", "战法三选一", tactics),
                             new("cards", "卡牌三选一", cards.Select(reward => reward.Id).ToArray())])
                         : null

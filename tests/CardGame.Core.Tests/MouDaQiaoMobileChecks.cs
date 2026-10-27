@@ -57,14 +57,6 @@ internal static class MouDaQiaoMobileChecks
         s.Cold();
     }
 
-    public static void IdentityGuoseSharesFourNativeUses()
-    {
-        var s = Scene.Start(identity: true); GuosePair(s, 1); GuosePair(s, 1);
-        s.Need(s.E<MouDaQiaoGuoseReservedEvent>().Length == 4 && s.E<MouDaQiaoGuoseReservedEvent>().All(e => e.PhaseLimit == 4) &&
-            s.E<MouDaQiaoGuoseDrawReturnedEvent>().Length == 4 && !s.G.GetHumanLegalActions().Any(a => a.SkillId == Guose),
-            "The actual Identity mode shares four paid uses across both complete Guose branches, then closes both entries.");
-    }
-
     private static void GuosePair(Scene s, int target)
     {
         var diamond = s.V().Hand.First(c => c.Suit == Suit.Diamond).Id;

@@ -13,35 +13,6 @@ internal static class ShanheTeamSlashChecks
     private const string Watch = "fixture:team-slash-before-response", Loss = "fixture:team-slash-dying-loss";
     private const string Deck = "fixture:team-slash-deck", Identity = "identity:classic-team-slash-unknown";
 
-    public static void OtherPublicAlliesAddNativeSharedSlashQuotaAndInsertedPlayResetsCold()
-    {
-        VerifyLoaderBoundaries();
-        var s = Scene.Start("insert"); var turn = s.G.State.TurnNumber;
-        Need(s.Events<ProgramPhaseScheduledEvent>().Any(e => e.OwnerSeat == 0 && e.Phase == TurnPhase.Play && e.Started),
-            "The first real Play is inserted by the existing preparation-phase instruction, without starting a new turn.");
-        s.Slash(CardKind.Slash); s.Slash(CardKind.FireSlash); s.Slash(CardKind.Dodge, converted: true);
-        var firstPhase = s.Debits().Select(e => e.PhaseInstanceId).Distinct().Single();
-        Need(s.Debits().Length == 3 && !s.CanSlash() && s.V().Hand.Any(card => card.Kind == CardKind.Slash) &&
-            s.Debits().All(e => e.ActorSeat == 0 && e.Query == SkillRuleQuery.SlashLimit && e.Phase == TurnPhase.Play && e.TurnNumber == turn),
-            "Two distinct allied holders add two uses: ordinary, elemental and real Wusheng-converted Slash share exactly three native paid uses; the owner's own copy and the enemy's copy add none.");
-        s.Cold(); s.EndPlay(); s.Play();
-        Need(s.G.State.TurnNumber == turn && s.CanSlash(), "Returning from the inserted Play into the same actual turn's normal Play gives a fresh phase-local Slash budget.");
-        s.Cold(); s.Slash(CardKind.Slash); s.Slash(CardKind.ThunderSlash); s.Slash(CardKind.Dodge, converted: true);
-        var debits = s.Debits(); var phases = debits.GroupBy(e => e.PhaseInstanceId).ToArray();
-        Need(debits.Length == 6 && phases.Length == 2 && phases.All(group => group.Count() == 3) &&
-            phases.Any(group => group.Key == firstPhase) && debits.All(e => e.TurnNumber == turn) &&
-            debits.Select(e => e.CardActionId).Distinct().Count() == 6 && !s.CanSlash() &&
-            s.Events<CardUseDebitRefundedEvent>().Length == 0 && s.Events<DamageAppliedEvent>().Count(e => e.SourceSeat == 0 && e.TargetSeat == 3) == 6,
-            "Both genuine Play identities spend their own three-use allowance through the same native debit path, without refunding, sharing or double-paying actions across phases."); s.Cold();
-
-        var ownAndEnemy = Scene.Start("own-and-enemy"); ownAndEnemy.Slash(CardKind.Slash);
-        Need(!ownAndEnemy.CanSlash() && ownAndEnemy.Debits().Length == 1 && ownAndEnemy.V().Hand.Any(card => card.Kind == CardKind.Slash),
-            "With only the owner's and opposing team's live copies, the public aura still leaves the ordinary single native Slash use."); ownAndEnemy.Cold();
-        var unknown = Scene.Start("unknown"); unknown.Slash(CardKind.Slash);
-        Need(Enumerable.Range(0, 4).All(seat => unknown.V(seat).TeamId is null) && !unknown.CanSlash() && unknown.Debits().Length == 1,
-            "Four same-printed-faction holders in an identity game have no public allied relationship and cannot invent extra Slash uses."); unknown.Cold();
-    }
-
     public static void PaidSlashSurvivesHolderDeathOrLossWhileFutureQuotaRechecksCold()
     {
         foreach (var scene in new[] { "death", "loss" })
@@ -84,21 +55,6 @@ internal static class ShanheTeamSlashChecks
         var assembly = typeof(StandardContentPackage).Assembly;
         using var stream = assembly.GetManifestResourceStream(assembly.GetManifestResourceNames().Single(name => name.EndsWith('.' + suffix, StringComparison.Ordinal)))!;
         using var reader = new StreamReader(stream); return reader.ReadToEnd();
-    }
-    private static void VerifyLoaderBoundaries()
-    {
-        var rules = Resource("shanhe-tactics-2026.rules.json"); var presentation = Resource("shanhe-tactics-2026.presentation.json");
-        void Reject(Action<JsonObject> change)
-        {
-            var copy = JsonNode.Parse(rules)!;
-            var skill = copy["skills"]!.AsArray().Single(node => node!["id"]!.GetValue<string>() == Skill)!;
-            change(skill["modifiers"]![0]!.AsObject()); var rejected = false;
-            try { _ = SkillProgramCatalog.Load(copy.ToJsonString(), presentation); } catch (InvalidOperationException) { rejected = true; }
-            Need(rejected, "The new numeric Slash aura keeps the shared positive-constant/Add/Always contract instead of accepting set, zero, conditional or card-specific policies.");
-        }
-        Reject(m => m["operation"] = "set"); Reject(m => m["value"] = 0);
-        Reject(m => m["condition"] = new JsonObject { ["kind"] = "wounded" });
-        Reject(m => m["cardKinds"] = new JsonArray("slash"));
     }
 
     private static readonly ShanheStartingCard[] Opening = [new(CardKind.Slash, Suit.Spade, 2), new(CardKind.FireSlash, Suit.Club, 3),

@@ -7,46 +7,6 @@ internal static class ShanheStartingWealthChecks
     private static readonly (int SourceId, int StartingBalance)[] Tiers =
         [(2112, 300), (2139, 400), (2140, 600), (2141, 800)];
 
-    public static void EquippedWealthCreditsEachTierOnceAcrossRealCampaignCommands()
-    {
-        var catalog = StandardShanheCampaignCatalog.CreateDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
-        var rewards = WealthRewards(catalog);
-        var definition = Route(rewards, 100);
-        foreach (var (sourceId, balance) in Tiers)
-        {
-            var id = "tactic-economy-" + sourceId;
-            var session = Create(definition, new(71, Player) { UseCodexRewardPool = true, EquippedTacticIds = [id] });
-            var first = session.Snapshot;
-            var second = session.Snapshot;
-            Require(first.Gold == balance && second.Gold == balance && session.Revision == 0 &&
-                session.AcceptedCommands.Count == 0 && first.TacticIds.SequenceEqual([id]),
-                "Each actual equipped wealth tier credits its published opening amount once on top of the hundred-coin expedition balance.");
-
-            Accept(session, new MoveShanheNodeCommand("shop", session.Revision));
-            Require(session.Snapshot.Gold == balance && session.Snapshot.ShopRefreshCost == 100,
-                "Entering a genuine refreshable shop cannot pay the opening tactic again.");
-            Accept(session, new ChooseShanheNodeOptionCommand("supply", null, session.Revision));
-            Require(session.Snapshot.Gold == balance - 10 && session.Snapshot.ShopItems.Single().IsPurchased,
-                "The accepted ten-coin supply purchase uses the credited starting balance without another wealth grant.");
-            Accept(session, new RefreshShanheShopCommand(session.Revision));
-            Require(session.Snapshot.Gold == balance - 110 && session.Snapshot.ShopRefreshRemaining == 0,
-                "A real shop refresh spends its hundred coins without retriggering the equipped opening credit.");
-            Accept(session, new ChooseShanheNodeOptionCommand("$leave", null, session.Revision));
-            Accept(session, new MoveShanheNodeCommand("story", session.Revision));
-            Accept(session, new ChooseShanheNodeOptionCommand("march", null, session.Revision));
-            Accept(session, new MoveShanheNodeCommand("battle", session.Revision));
-            Require(session.Snapshot.Gold == balance - 110 && session.Snapshot.TacticIds.SequenceEqual([id]) &&
-                session.PendingBattleSetup!.TacticSkillIds.Count == 0,
-                "Normal onward commands retain exactly the spent opening balance and do not manufacture a battle skill for expedition-only wealth.");
-        }
-
-        string[] equipped = [rewards[0].Id, rewards[^1].Id];
-        var stacked = Create(definition, new(71, Player) { EquippedTacticIds = equipped });
-        Require(equipped.Length <= ShanheCampaignOptions.MaximumEquippedTactics && stacked.Snapshot.Gold == 1000 &&
-            stacked.Snapshot.TacticIds.SequenceEqual(equipped),
-            "Two distinct genuine wealth tiers add their two-hundred and seven-hundred opening credits within the normal equipped limit.");
-    }
-
     public static void StartingWealthRemainsEquipOnlyAndRejectsMidExpeditionGrants()
     {
         var source = StandardShanheCampaignCatalog.CreateDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);

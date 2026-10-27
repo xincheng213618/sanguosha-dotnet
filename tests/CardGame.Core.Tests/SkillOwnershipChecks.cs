@@ -23,7 +23,6 @@ internal static class SkillOwnershipChecks
             "A current Lord must retain every printed Sun Quan skill in stable order.");
     }
 
-
     private static PlayerSnapshot Human(GameEngine game) =>
         game.CreateSnapshot(0, revealAll: true).Players.Single(player => player.IsHuman);
 

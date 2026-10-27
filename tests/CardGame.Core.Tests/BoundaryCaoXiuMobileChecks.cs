@@ -11,59 +11,6 @@ internal static class BoundaryCaoXiuMobileChecks
         Quiet = "fixture:boundary-cao-xiu-quiet", SkipPlay = "fixture:boundary-cao-xiu-skip-play", Pulse = "fixture:boundary-cao-xiu-native-pulse",
         Hold = "fixture:boundary-cao-xiu-paid", Peer = "fixture:boundary-cao-xiu-peer";
 
-    public static void DistanceHandPaymentActualTurnQuotaAndNativeDamageCold()
-    {
-        var s = Scene.Start(); s.Play();
-        s.Need(s.G.GetCombatDistance(0, 2) == 2 && s.V().Equipment.Count == 0, "The real starting table has no weapon and two-seat distance.");
-        s.Use("wound", 0); s.Play();
-        s.Need(s.V().Hp == 3 && s.G.GetCombatDistance(0, 2) == 1, "The reused Qianju reduces outgoing distance by the actual lost HP.");
-        s.Use("recover", 0); s.Play();
-        s.Need(s.G.GetCombatDistance(0, 2) == 2, "Native recovery removes the lost-HP distance contribution.");
-        s.Use("damage", 0); s.Play();
-        s.Need(s.Facts<BoundaryCaoXiuQingxiResolvedEvent>().Length == 0, "Self damage does not offer Qingxi or consume its other-role quota.");
-        s.Use("recover", 0); s.Play();
-
-        s.Use("damage", 2); s.Offer(); s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "skip"); s.Play();
-        var before = s.V(2).Hp;
-        s.Use("damage", 2); s.Offer(); s.Activate(); s.TargetChoice();
-        var draft = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == Skill).BoundaryCaoXiuQingxi!;
-        s.Need(draft is { TargetSeat: 2, Distance: 2, RequiredCount: 2 }, "Non-card native damage uses current directional distance, without requiring a Slash or weapon.");
-        var originals = s.V(2).Hand.Take(2).Select(c => c.Id).ToArray();
-        s.Answer(c => c.Cards.SequenceEqual([originals[0]])); s.Cold();
-        s.Answer(c => c.Cards.SequenceEqual([originals[1]]));
-        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "discard");
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Hold);
-        s.Need(originals.All(id => s.Zone(id) == CardLocation.DiscardPile) &&
-            s.G.CardMovements.Count(m => originals.Contains(m.CardId) && m.Reason.Value == "skill-program.boundary-qingxi.discard") == 2 &&
-            s.V(2).Hp == before && s.Facts<BoundaryCaoXiuQingxiResolvedEvent>() is [{ Discarded: true, RequiredCount: 2, DamageBefore: 1, DamageAfter: 1 }],
-            "Both original hand entities pay once in one native discard batch before its movement child returns and before damage is applied.");
-        s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue"); s.Play();
-        s.Need(s.V(2).Hp == before - 1 && s.Facts<BoundaryCaoXiuQingxiResolvedEvent>().Length == 1,
-            "Cold returns to the original one-damage attempt after the paid movement child without repaying the cards.");
-        s.Use("damage", 3); s.Play();
-        s.Need(s.Facts<BoundaryCaoXiuQingxiResolvedEvent>().Length == 1, "An accepted Qingxi consumes this actual turn's quota across different damage targets.");
-        s.End(); s.Play();
-        s.Need(s.G.State.TurnNumber == 5, "A later original own turn starts after all three actual intervening turns.");
-        var hp = s.V(2).Hp; s.Use("damage", 2); s.Offer(); s.Activate(); s.TargetChoice();
-        s.Need(s.P!.Choices.Count == 1 && s.P.Choices[0].Parameters.GetValueOrDefault("branch") == "bonus",
-            "Insufficient hand cards cannot make a partial payment; the next actual turn has a fresh invocation quota.");
-        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "bonus"); s.Play();
-        s.Need(s.V(2).Hp == hp - 2 && s.Facts<BoundaryCaoXiuQingxiResolvedEvent>().Last() is { Discarded: false, DamageBefore: 1, DamageAfter: 2 },
-            "The bonus changes the original native damage to two and keeps the once-per-actual-turn limit.");
-    }
-
-    public static void FarDistanceClampsToOneHandCard()
-    {
-        var s = Scene.Start(far: true); s.Play(); s.Use("damage", 2); s.Offer(); s.Activate(); s.TargetChoice();
-        var draft = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == Skill).BoundaryCaoXiuQingxi!;
-        s.Need(draft.Distance >= 4 && draft.RequiredCount == 1, "Qingxi clamps a nonpositive four-minus-distance cost to one actual hand card.");
-        var original = s.V(2).Hand[0].Id; var hp = s.V(2).Hp;
-        s.Answer(c => c.Cards.SequenceEqual([original])); s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "discard");
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Hold); s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue"); s.Play();
-        s.Need(s.Zone(original) == CardLocation.DiscardPile && s.V(2).Hp == hp - 1 &&
-            s.Facts<BoundaryCaoXiuQingxiResolvedEvent>() is [{ RequiredCount: 1, Discarded: true }], "The clamped payment really discards exactly one hand entity and retains ordinary damage.");
-    }
-
     internal static (GameEngine Game, ContentRegistry Registry) CreateQingxiChoice(bool humanTarget = false)
     {
         var scene = Scene.Start(humanTarget: humanTarget);

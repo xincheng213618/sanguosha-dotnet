@@ -17,7 +17,7 @@ internal static class CardDistributionUiChecks
         var store = new MemorySaveStore();
         Save();
         using var model = new MainViewModel(false, game.Seed, true, store, contentRegistry: registry) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Load(model); game = Program.Engine(model);
         var window = new MainWindow(model);
         try
         {
@@ -50,7 +50,7 @@ internal static class CardDistributionUiChecks
                 game.CreateSnapshot(0).Players[0].Hand.Where(card => ids.Contains(card.Id)).All(card => card.SkillMarkLabel == "丰田") &&
                 game.CardMovements.Count == movements && !model.CanConfirmSelected,
                 "One confirmation assigns exactly the selected cards without physical movement or unintended repeats.");
-            Save(); model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+            Save(); LegacySaveFixtures.Load(model); game = Program.Engine(model);
             model.SelectDistributionCardCommand.Execute(staleCard); model.SelectDistributionTargetCommand.Execute(staleTarget);
             Program.Assert(model.Hand.All(card => !card.IsSelected) && !model.CanConfirmSelected &&
                 model.DistributionDestinations.Single(t => t.Key == "domain:2").Label.Contains("2 张"),
@@ -78,7 +78,7 @@ internal static class CardDistributionUiChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(false, game.Seed, true, store, contentRegistry: registry) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Load(model); game = Program.Engine(model);
         Program.Assert(model.IsCardDistributionPending && model.DistributionCards.Count >= 3, "The real consecutive give instructions expose their owned cards in the common picker.");
         model.SelectAllDistributionCardsCommand.Execute(null);
         var ids = model.Hand.Where(card => card.IsSelected).Select(card => card.Id).ToArray();
@@ -100,7 +100,7 @@ internal static class CardDistributionUiChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(false, game.Seed, true, store, contentRegistry: registry) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Load(model); game = Program.Engine(model);
         var window = new MainWindow(model);
         try
         {

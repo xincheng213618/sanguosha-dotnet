@@ -50,7 +50,7 @@ internal static class HellActivityUiChecks
             original.CreateCheckpoint()));
         using var vm = new MainViewModel(false, 7, true, store, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         var window = new MainWindow(vm);
         window.ApplyTemplate();
         var root = (FrameworkElement)window.Content;
@@ -155,7 +155,7 @@ internal static class HellActivityUiChecks
             original.CreateCheckpoint()));
         using var vm = new MainViewModel(false, 7, true, store, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         var window = new MainWindow(vm);
         window.ApplyTemplate();
         var root = (FrameworkElement)window.Content;
@@ -309,10 +309,10 @@ internal static class HellActivityUiChecks
             Program.Assert(shade.Visibility == Visibility.Visible && !shade.IsHitTestVisible &&
                 Program.Find<TextBlock>(shade).Single().Text == "未登场",
                 "The actual portrait template must label the dormant seat as not yet appeared, preserving its native dead/non-targetable state.");
-            vm.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
             var saved = SnapshotJson.Serialize(game.CreateSnapshot(0));
             vm.SelectedTableMode = vm.TableModes.Single(option => option.ModeId == "team:standard-2v2");
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             Program.Assert(!vm.HasSaveError && Program.Engine(vm).ModeId == "activity:hell-2020-tier-3" &&
                 vm.SelectedStartingTeam.TeamId == "team:allies" && vm.Seats.Count == 5 &&
                 vm.TableModeText.Contains("敌方3阶") && vm.AliveText.Contains("孟婆未登场") &&
@@ -322,7 +322,7 @@ internal static class HellActivityUiChecks
             using var other = new MainViewModel(false, 17, true, store, useExpandedContent: true,
                 contentRegistry: ComposedSkillContentRegistry.CreateShowcase(includeNianActivities: true))
                 { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-            other.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(other);
             Program.Assert(!other.HasSaveError && other.SelectedTableMode.ModeId == game.ModeId &&
                 other.StartingTeams.Count == 1 && other.SelectedStartingTeam.TeamId == "team:allies" &&
                 other.Seats.Count == 5 && other.TableArenaTitle == "十 殿 阎 罗" &&

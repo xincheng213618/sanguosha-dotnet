@@ -134,7 +134,14 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
                 {
                     var outcome = new NativeDrawOutcome(seat, paid.RequestedCount, paid.ActiveAttemptId,
                         materialBefore, queries.MovementSequence, paid.Replacement) { ActualDrawIds = drawn };
-                    frames.ReplaceTop(frame = frames.ActiveProgram(id) with { NativeDraw = null });
+                    var active = frames.ActiveProgram(id);
+                    frames.ReplaceTop(frame = active with
+                    {
+                        NativeDraw = null,
+                        NativeOperationDrawReturns = active.NativeOperationDrawReturns
+                            .Where(returned => returned.InstructionIndex == paid.InstructionIndex).Append(
+                            new(paid.InstructionIndex, paid.Operation!.Value, paid.Reason, outcome)).ToArray()
+                    });
                     operations.ReturnOperation(paid.Operation!.Value, frame, outcome);
                     return true;
                 }

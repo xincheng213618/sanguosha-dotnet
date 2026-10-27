@@ -101,8 +101,8 @@ internal static class PreferencesChecks
             Require(!reopened.IsSoundEnabled && reopened.SoundVolume == .19 && !reopened.IsMotionEnabled && saves.WriteCount == 0,
                 "Relaunch without loading a match lost device preferences.");
             reopened.StartNewGameCommand.Execute(null);
-            reopened.SaveGameCommand.Execute(null);
-            reopened.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(reopened);
+            LegacySaveFixtures.Load(reopened);
             Require(!reopened.HasSaveError && !reopened.IsSoundEnabled && reopened.SoundVolume == .19 && !reopened.IsMotionEnabled,
                 "Loading a match overrode device preferences.");
             reopened.StartTutorialCommand.Execute(null);
@@ -117,11 +117,11 @@ internal static class PreferencesChecks
         using (var firstLoad = new MainViewModel(false, 721019, true, saves, preferencesStore: new FilePlayerPreferencesStore(freshPath)))
         {
             var before = (firstLoad.IsSoundEnabled, firstLoad.SoundVolume, firstLoad.IsMotionEnabled);
-            firstLoad.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(firstLoad);
             Require((firstLoad.IsSoundEnabled, firstLoad.SoundVolume, firstLoad.IsMotionEnabled) == before,
                 "A match save must not seed or replace device preferences.");
             firstLoad.IsSoundEnabled = false;
-            firstLoad.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(firstLoad);
             Require(!firstLoad.IsSoundEnabled, "Repeated loading unmuted the player.");
         }
         Require(new FilePlayerPreferencesStore(freshPath).Read() is { SoundEnabled: false }, "Closing failed to flush the latest setting.");

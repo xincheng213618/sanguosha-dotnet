@@ -40,7 +40,7 @@ internal static class MoCaoCaoUiChecks
                 historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore(),
                 exceptionReportStore: new ExceptionReportChecks.IgnoredReports())
                 { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Program.Assert(!model.HasSaveError, model.SaveStatus);
             var game = Program.Engine(model);
             var prompt = game.CreateSnapshot(0).PendingDecision!;

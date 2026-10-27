@@ -11,7 +11,7 @@ public sealed partial class MainViewModel
     private RelayCommand? _openShanheMarketCommand, _closeShanheMarketCommand;
     private IReadOnlyList<ShanheCampaignChoice> _shanheLiveMarketChoices = [];
 
-    private ShanheCampaignSnapshot? CurrentShanheMarketState => IsShanheBattleActive
+    private ShanheCampaignSnapshot? CurrentShanheMarketState => HasLiveShanheBattle
         ? _shanheBattleGame?.CreateShanheMarketSnapshot(0) : _shanheSession?.Snapshot;
     private ShanheCampaignSnapshot? CurrentShanheBuildState => CurrentShanheMarketState ?? _shanheSession?.Snapshot;
     private long ShanheMarketActionRevision => IsShanheBattleActive
@@ -32,7 +32,7 @@ public sealed partial class MainViewModel
         if (!OpenShanheMarketCommand.CanExecute(null)) return;
         RefreshShanheModules();
         IsShanheMarketOpen = true;
-    }, () => !IsTutorialActive && IsShanheRunInProgress && _shanheBattleGame?.HasPendingShanheMarketPurchase != true);
+    }, () => !IsTutorialActive && IsShanheRunInProgress && !IsShanheBattleRetryReady && _shanheBattleGame?.HasPendingShanheMarketPurchase != true);
     public ICommand CloseShanheMarketCommand => _closeShanheMarketCommand ??= new RelayCommand(() =>
     {
         CancelShanheSkillReplacement();

@@ -36,7 +36,7 @@ internal static class TieqiUiChecks
         {
             foreach (var selectCard in new[] { false, true })
             {
-                model.LoadManualGameCommand.Execute(null);
+                LegacySaveFixtures.Load(model);
                 Program.Assert(!model.HasSaveError, model.SaveStatus);
                 game = Program.Engine(model);
                 var prompt = game.PendingDecision!;

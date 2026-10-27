@@ -25,8 +25,7 @@ public partial class HomeLobby : UserControl
             _lastModeEntry = entry;
     }
 
-    internal Button WushuangSaveAccessFocusTarget => ContinueWushuangButton.IsVisible && ContinueWushuangButton.IsEnabled
-        ? ContinueWushuangButton : WushuangBattleButton;
+    internal Button WushuangSaveAccessFocusTarget => WushuangBattleButton;
 
     private void OpenCustomGenerals(object sender, RoutedEventArgs e)
     {

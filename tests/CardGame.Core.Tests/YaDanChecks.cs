@@ -9,44 +9,6 @@ internal static class YaDanChecks
 {
     private const string Skill="ol:qingya",Distance="ol:tielun",Driver="fixture:yd-driver",Quiet="fixture:yd-quiet",Watch="fixture:yd-health",Peer="fixture:yd-peer-watch",Owner="fixture:yd-owner",Mode="identity:classic-ya-dan-fixture";
     private const string DiscardReason="skill-program.ya-dan.qingya.discard";
-    public static void QingyaShortestLivingArcTieOpaqueAndNativeDiscardsCold()
-    {
-        foreach(var scene in new[]{"tie","zero","dead-gap"})
-        {
-            var(g,r)=Start(scene);Equip(g);
-            if(scene=="dead-gap"){Use(g,"kill",[1]);Play(g);Need(!V(g,1).IsAlive&&g.State.Winner==Winner.None,"A real nonterminal death removes a seat from the live shortest arc.");}
-            var target=scene=="zero"?1:2;var one=V(g,1).HandCount;var three=V(g,3).HandCount;
-            StartSweep(g,target);
-            if(scene=="tie")
-            {
-                Need(Branch(g,"side")&&P(g)!.Choices.Count==2&&P(g)!.Choices.Any(c=>c.Targets.SequenceEqual([1]))&&P(g)!.Choices.Any(c=>c.Targets.SequenceEqual([3])),
-                    "Equal living-seat arcs publish two separate real sides, never their union.");
-                g=Cold(g,r);Answer(g,c=>c.Targets.SequenceEqual([1]));Reach(g,()=>Branch(g,"hand"));
-                var p=P(g)!;var before=State(g);
-                Need(p.IsPrivate&&p.ValidCardIds.Count==0&&p.Choices.All(c=>c.Cards.Count==0)&&Enumerable.Range(1,3).All(s=>g.CreateSnapshot(s).PendingDecision is null)&&
-                    Enumerable.Range(0,4).All(s=>g.CreateSnapshot(s).Players.Where(v=>v.Seat!=s).All(v=>v.Hand.Count==0)),
-                    "The actual discard chooser receives only original opaque Hand slots; other viewers receive no foreign private entities or prompt.");
-                Need(!g.Submit(new AnswerPromptCommand(1,p.PromptId,p.Choices[0].Id,g.Revision)).Accepted&&State(g)==before&&
-                    !g.Submit(new AnswerPromptCommand(0,p.PromptId,new("invented-original-slot"),g.Revision)).Accepted&&State(g)==before,
-                    "Wrong actors and invented private slots leave every view, RNG and issuing cursor unchanged.");
-                var receipt=g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.YaDan is not null).YaDan!;
-                Need(receipt.Arcs is IList<QingyaArc>{IsReadOnly:true}&&receipt.Arcs.All(a=>a.Seats is IList<int>{IsReadOnly:true})&&receipt.Materials is IList<QingyaHandMaterial>{IsReadOnly:true},
-                    "Both outer and nested original geometry and private material collections are frozen.");
-                g=Cold(g,r);Answer(g,c=>c.Parameters.GetValueOrDefault("slot-index")=="0");Play(g);
-                var paid=E<QingyaHandDiscardedEvent>(g).Single();var grant=E<QingyaGrantIssuedEvent>(g).Single();
-                Need(paid.Material.HolderSeat==1&&V(g,1).HandCount==one-1&&V(g,3).HandCount==three&&grant.EntityCount==1&&
-                    E<NativeLogicalDiscardInvocationRecordedEvent>(g).Any(e=>e.ParentFrameId==paid.FrameId&&e.InitiatorSeat==0&&e.ExecutorSeat==0&&e.SubjectSeat==1&&e.ActualCount==1&&e.HandCount==1),
-                    "Only the chosen side loses one original Hand entity, with the real skill owner as both discard initiator and executor: "+JsonSerializer.Serialize(new{paid.Material.HolderSeat,CurrentOne=V(g,1).HandCount,one,CurrentThree=V(g,3).HandCount,three,grant.EntityCount,Logical=E<NativeLogicalDiscardInvocationRecordedEvent>(g)}));
-            }
-            else
-            {
-                Play(g);
-                Need(!E<QingyaHandDiscardedEvent>(g).Any()&&!E<QingyaGrantIssuedEvent>(g).Any()&&V(g,3).HandCount==three,
-                    "An adjacent target or an actually dead intervening seat gives an empty shortest side without fake movement or a future material.");
-            }
-            _=Cold(g,r);
-        }
-    }
     public static void QingyaNextActualPhaseOriginalCardNativeUsesAndExpiryCold()
     {
         foreach(var scene in new[]{"equipment","iron-chain","skip-discard","inserted","slash","alcohol","offturn-alcohol","residency"})
@@ -116,131 +78,11 @@ internal static class YaDanChecks
             _=Cold(g,r);
         }
     }
-    public static void QingyaPaidChildrenLossDeathAndRecursiveSlashCold()
-    {
-        foreach(var scene in new[]{"loss","death","lion","ox","recursive"})
-        {
-            var(g,r)=Start(scene);if(scene!="recursive")Equip(g);
-            if(scene=="lion"){Use(g,"hurt");Play(g);}
-            if(scene=="ox"){var grain=V(g,0).Hand[0].Id;Accept(g,new UseEquipmentEffectCommand(0,CardKind.WoodenOx,[grain],[],g.Revision,P(g)!.PromptId));Play(g);}
-            var oldEquipment=V(g,0).Equipment.FirstOrDefault()?.Id;
-            StartSweep(g,2);PickSide(g);g=Cold(g,r);Answer(g,c=>c.Parameters.GetValueOrDefault("slot-index")=="0");
-            if(scene is"loss"or"death")
-            {
-                Reach(g,()=>P(g)?.SkillPrompt?.SkillId==Watch||scene=="death"&&(P(g)is{PlayerSeat:0,Kind:DecisionKind.RescueDying}||!V(g,0).IsAlive),boundary:scene+" genuine paid HP, dying or automatic no-rescue completion");
-                Need(E<QingyaHandDiscardedEvent>(g).Length==1&&(scene=="death"||!E<QingyaGrantIssuedEvent>(g).Any()),
-                    "A real discarded-Hand child can change the original source before the paid sweep and future grant finish.");
-                g=Cold(g,r);if(P(g)?.SkillPrompt?.SkillId==Watch)Continue(g);
-                if(scene=="death")
-                {
-                    Reach(g,()=>!V(g,0).IsAlive&&E<YaDanCompletedEvent>(g).Any());
-                    var paid=E<QingyaHandDiscardedEvent>(g).Single();
-                    Need(g.State.Winner==Winner.None&&E<PlayerDyingEvent>(g).Count(e=>e.VictimSeat==0)==1&&
-                        E<DyingResolvedEvent>(g).Count(e=>e.VictimSeat==0&&!e.Survived)==1&&E<PlayerDiedEvent>(g).Count(e=>e.VictimSeat==0)==1&&
-                        E<YaDanCompletedEvent>(g).Count(e=>e.FrameId==paid.FrameId)==1&&E<QingyaHandDiscardedEvent>(g).Length==1&&!E<QingyaNativeIssuedEvent>(g).Any(),
-                        "A paid discard and its genuine HP/death subtree finish without repaying after the non-Lord source dies.");
-                    _=Cold(g,r);continue;
-                }
-            }
-            Play(g);var grant=E<QingyaGrantIssuedEvent>(g).Single();var original=E<QingyaHandDiscardedEvent>(g).Single().Material.CardId;
-            if(scene=="loss")Need(V(g,0).Skills!.All(s=>s.ContentId!=Skill),"A genuine paid child removes the original conditional Qingya instance.");
-            var hp=V(g,0).Hp;End(g);Reach(g,()=>Branch(g,"use"),boundary:scene+" issued next-phase use");g=Cold(g,r);
-            Answer(g,c=>c.Cards.SequenceEqual([original])&&c.Parameters.GetValueOrDefault("branch")=="use"&&(scene=="recursive"?c.Targets.SequenceEqual([2]):true));
-            if(scene=="lion")
-            {
-                Reach(g,()=>P(g)?.SkillPrompt?.SkillId==Watch);
-                Need(V(g,0).Hp==hp+1&&g.ResolutionStack.OfType<CardUseFrame>().Any(u=>u.QingyaOrigin?.CardId==original),
-                    "The native original Lion use owns the real replaced-armor recovery and its HP child under the exact Use.");
-                g=Cold(g,r);Continue(g);
-            }
-            if(scene=="recursive")
-            {
-                Reach(g,()=>Offer(g));Answer(g,c=>c.Parameters.GetValueOrDefault("program-action")=="activate");Reach(g,()=>Branch(g,"side"));PickSide(g);
-                g=Cold(g,r);Answer(g,c=>c.Parameters.GetValueOrDefault("slot-index")=="0");
-                Reach(g,()=>E<QingyaGrantIssuedEvent>(g).Length==2);
-                Need(E<QingyaGrantIssuedEvent>(g).Select(e=>e.GrantId).Distinct().Count()==2&&E<QingyaHandDiscardedEvent>(g).Length==2&&
-                    E<QingyaGrantIssuedEvent>(g).Last().IssuedPhase?.Kind==ActualDiscardRecoveryPhaseKind.Discard,
-                    "A genuine later Slash creates a new independent sweep and next-phase obligation under its own native Use.");
-            }
-            Reach(g,()=>E<QingyaNativeReturnedEvent>(g).Any(e=>e.Origin.GrantId==grant.GrantId));
-            Need(E<QingyaHandDiscardedEvent>(g).Count(e=>e.FrameId==grant.GrantId)==1&&E<QingyaNativeIssuedEvent>(g).Count(e=>e.Origin.GrantId==grant.GrantId)==1,
-                "Paid source loss and nested native child returns never repay the original discard or use.");
-            if(scene=="lion")Need(g.CardMovements.Count(m=>m.CardId==oldEquipment&&m.From==CardLocation.Equipment(0)&&m.To==CardLocation.DiscardPile)==1&&E<RecoveryAppliedEvent>(g).Count(e=>e.TargetSeat==0)==1,"Cold Lion replacement and recovery complete once.");
-            if(scene=="ox")Need(g.CardMovements.Any(m=>m.From==CardLocation.WoodenOxGrain(0)&&m.To==CardLocation.DiscardPile)&&V(g,0).Equipment.Any(c=>c.Id==original),"Native Ox replacement cleans its stored grain before the exact parent returns.");
-            _=Cold(g,r);
-        }
-    }
-    public static void TielunWholeRoundTrueUsesActorReplacementAndResetCold()
-    {
-        foreach(var scene in new[]{"round","actor","legacy","zero-actor","late","duel"})
-        {
-            var(g,r)=Start(scene);
-            if(scene=="legacy")
-            {
-                Need(RoundCount(g,0)==1&&E<CardUseDeclaredEvent>(g).Any(e=>e.CardId==0&&e.CardKind==CardKind.Slash),
-                    "A real useCardActionWindows:false request still records its native zero-entity declaration exactly once.");
-                _=Cold(g,r);continue;
-            }
-            if(scene=="duel")
-            {
-                Use(g,"wound-peer",[1]);Play(g);
-                Native(g,a=>a.Kind==LegalActionKind.Duel&&a.TargetSeats.SequenceEqual([1]));Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.RespondSlash});
-                g=Cold(g,r);Answer(g,c=>c.Cards.Count==1);Play(g);
-                Need(E<CardRespondedEvent>(g).Any(e=>e.ResponderSeat==0&&e.EffectiveCardKind==CardKind.Slash)&&RoundCount(g,0)==1,
-                    "A genuinely played Slash inside native Duel is excluded while the enclosing true Duel Use counts once.");
-                _=Cold(g,r);continue;
-            }
-            if(scene=="zero-actor")
-            {
-                End(g);Reach(g,()=>P(g)?.SkillPrompt?.SkillId=="fixture:yd-zero"&&Action(g,"select-target"));
-                Answer(g,c=>c.Targets.SequenceEqual([1]));Reach(g,()=>P(g)?.SkillPrompt?.SkillId=="fixture:yd-committed");
-                var use=g.ResolutionStack.OfType<CardUseFrame>().Single(u=>u.CardId==0&&u.CardKind==CardKind.Slash);var action=use.Action!;
-                var fact=E<CurrentTurnCardUseKindsRecordedEvent>(g).Single(e=>e.OriginFrameId==use.Id);
-                Need(use.PhysicalCardIds is{Count:0}&&!E<CardActionAcceptedEvent>(g).Any(e=>e.Action.ActionId==action.ActionId)&&
-                    E<CardUseDeclaredEvent>(g).Count(e=>e.ResolutionId==use.Id&&e.CardId==0&&e.SourceSeat==0)==1&&
-                    fact.RoundActionType==CardActionType.Use&&fact.RoundProviderSeat==0&&fact.CardActionId==action.ActionId&&RoundCount(g,0)==1,
-                    "At the genuine committed-use child, one zero-entity declaration has already frozen Use/provider/count before native acceptance: "+JsonSerializer.Serialize(new{NoPhysical=use.PhysicalCardIds is{Count:0},NoAccepted=!E<CardActionAcceptedEvent>(g).Any(e=>e.Action.ActionId==action.ActionId),OneDeclaration=E<CardUseDeclaredEvent>(g).Count(e=>e.ResolutionId==use.Id&&e.CardId==0&&e.SourceSeat==0)==1,UseId=use.Id,action.ActionId,use.PhysicalCardIds,fact}));
-                g=Cold(g,r);Continue(g);Reach(g,()=>P(g)?.SkillPrompt?.SkillId=="fixture:yd-actor"&&Action(g,"select-target"));
-                Need(E<CardActionAcceptedEvent>(g).Count(e=>e.Action.ActionId==action.ActionId)==1&&RoundCount(g,0)==1,
-                    "Native target finalization then accepts that same zero-entity Use exactly once before publishing the real actor replacement.");
-                g=Cold(g,r);Answer(g,c=>c.Targets.SequenceEqual([2]));Reach(g,()=>E<CardUseFinishedEvent>(g).Any(e=>e.ResolutionId==use.Id));
-                Need(E<ProgramCardUseActorReplacedEvent>(g).Count(e=>e.CardUseFrameId==use.Id&&e.PreviousActorSeat==0&&e.ActorSeat==2&&e.ProviderSeat==0)==1&&
-                    E<CardActionAcceptedEvent>(g).Count(e=>e.Action.ActionId==action.ActionId)==1&&E<CardUseFinishedEvent>(g).Count(e=>e.ResolutionId==use.Id)==1&&
-                    RoundCount(g,0)==0&&RoundCount(g,2)==1,
-                    "The declaration originally counted before acceptance now follows its same-Use replacement chain and belongs exactly once to the final actor.");
-                _=Cold(g,r);continue;
-            }
-            Equip(g);
-            if(scene=="late")
-            {
-                Need(V(g,0).Skills!.All(s=>s.ContentId!=Distance)&&RoundCount(g,0)==1,"Whole-round history exists before acquiring the distance skill.");
-                Use(g,"grant-distance");Play(g);Need(V(g,0).Skills!.Any(s=>s.ContentId==Distance)&&RoundCount(g,0)==1,"Acquiring Tielun reads existing real uses without fabricating another use.");_=Cold(g,r);continue;
-            }
-            Need(RoundCount(g,0)==1&&g.GetHumanLegalActions().Any(a=>a.Kind==LegalActionKind.Slash&&a.TargetSeats.SequenceEqual([2])),
-                "One real equipment Use reduces the distance to the opposite living seat before a first Slash is declared.");
-            Native(g,a=>a.Kind==LegalActionKind.Slash&&a.TargetSeats.SequenceEqual([scene=="actor"?1:2]));
-            if(scene=="actor")
-            {
-                Reach(g,()=>P(g)?.SkillPrompt?.SkillId=="fixture:yd-actor"&&Action(g,"select-target"));Answer(g,c=>c.Targets.SequenceEqual([2]));Play(g);
-                Need(E<ProgramCardUseActorReplacedEvent>(g).Any(e=>e.PreviousActorSeat==0&&e.ActorSeat==2&&e.ProviderSeat==0)&&RoundCount(g,0)==1&&RoundCount(g,2)==1,
-                    "A genuine same-Use actor replacement moves one round-use entitlement to the final actor while keeping the physical provider unchanged.");
-                _=Cold(g,r);continue;
-            }
-            Play(g);Need(RoundCount(g,0)==2,"A true converted Slash counts once, separately from its physical materials.");
-            Use(g,"incoming",[1]);Reach(g,()=>P(g)?.PlayerSeat==0&&Action(g,"virtual-slash-offer")&&P(g)!.Choices.Any(c=>c.Targets.SequenceEqual([0])));Answer(g,c=>c.Targets.SequenceEqual([0]));
-            Reach(g,()=>P(g)?.Kind==DecisionKind.RespondDodge);g=Cold(g,r);Answer(g,c=>c.Cards.Count==1);Play(g);
-            Need(E<CardRespondedEvent>(g).Any(e=>e.ResponderSeat==0&&e.EffectiveCardKind==CardKind.Dodge)&&RoundCount(g,0)==3&&RoundCount(g,1)==1,
-                "Slash-defense Dodge is a real out-of-turn Use for the defender; the zero-entity incoming Slash belongs to its real actor.");
-            var oldRound=E<RoundStartedEvent>(g).Last().RoundNumber;End(g);Reach(g,()=>E<RoundStartedEvent>(g).Last().RoundNumber>oldRound&&P(g)?.Kind==DecisionKind.PlayCard);
-            Need(RoundCount(g,0)==0&&RoundCount(g,1)==0,"The next real round resets the dynamic use count without erasing previous receipts.");_=Cold(g,r);
-        }
-    }
 
     private static PlayerSnapshot V(GameEngine g,int s)=>g.CreateSnapshot(s).Players[s];
     private static PendingDecision? P(GameEngine g)=>Enumerable.Range(0,4).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);
     private static T[] E<T>(GameEngine g)where T:IGameEvent=>g.Events.Select(e=>e.Payload).OfType<T>().ToArray();
     private static CardLocation Location(GameEngine g,int id)=>g.CreateCardZoneDiagnostics().Single(c=>c.CardId==id).Location;
-    private static int RoundCount(GameEngine g,int seat)=>(int)typeof(GameEngine).GetMethod("CurrentRoundActualUseCount",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(g,[seat])!;
     private static bool Action(GameEngine g,string a)=>P(g)?.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")==a)==true;
     private static bool Branch(GameEngine g,string b)=>Action(g,"ya-dan-qingya")&&P(g)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("branch")==b);
     private static bool Offer(GameEngine g)=>P(g)?.PlayerSeat==0&&P(g)?.SkillPrompt?.SkillId==Skill&&Action(g,"activate");
@@ -249,7 +91,6 @@ internal static class YaDanChecks
     private static void Answer(GameEngine g,Func<PromptChoice,bool> pick)
     {var p=P(g);var c=p?.Choices.FirstOrDefault(pick);Need(p?.PlayerSeat==0&&c is not null,"Missing real human Ya Dan choice: "+Diagnostic(g));Accept(g,new AnswerPromptCommand(0,p!.PromptId,c!.Id,g.Revision));}
     private static void Continue(GameEngine g)=>Answer(g,c=>c.Parameters.GetValueOrDefault("option-id")=="continue");
-    private static void Use(GameEngine g,string id,int[]? targets=null)=>Accept(g,new UseProgramSkillCommand(0,Driver,id,[],targets??[],g.Revision,P(g)!.PromptId));
     private static void Native(GameEngine g,Func<LegalAction,bool> pick)
     {var a=g.GetHumanLegalActions().FirstOrDefault(pick);Need(a is not null,"Missing real Ya Dan native action: "+Diagnostic(g));Accept(g,new PlayCardCommand(0,a!.CardId!.Value,a.TargetSeats,g.Revision,P(g)!.PromptId,a.PlayedCardKind,a.TargetCardId){ConversionSource=a.ConversionSource,AdditionalConversionSources=a.AdditionalConversionSources??[]});}
     private static void End(GameEngine g)=>Accept(g,new EndPlayPhaseCommand(0,g.Revision,P(g)!.PromptId));

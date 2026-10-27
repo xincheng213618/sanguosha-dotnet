@@ -30,7 +30,7 @@ internal static class ActiveSkillSuitUiChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, original.CreateCheckpoint()));
         using var model = new MainViewModel(false, 31, true, store, contentRegistry: registry)
         { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         var game = Program.Engine(model);
         var action = model.HumanActiveSkillActions.Single(a => a.ProgramSkillId == "ol:yeyan" && a.ProgramActivationId == "two");
         var human = game.CreateSnapshot(0).Players[0];

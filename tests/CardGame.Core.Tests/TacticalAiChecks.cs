@@ -35,12 +35,6 @@ internal static class TacticalAiChecks
         throw new InvalidOperationException("A prompt with no published choices must remain invalid.");
     }
 
-
-
-
-
-
-
     public static void PolicyReplay()
     {
         foreach (var version in new[] { 1, 2, 3, AiDecisionPolicy.CooperativeCategoryGiftVersion,
@@ -65,12 +59,6 @@ internal static class TacticalAiChecks
         }
     }
 
-
-
-
-
-
-
     private static GameSnapshot View(Role role, params CardKind[] cards)
     {
         var game = GameEngine.CreateStandard(new GameOptions { Seed = 721019, HumanSeat = 0, HumanRole = role }, StandardContentRegistry.Create());
@@ -82,9 +70,7 @@ internal static class TacticalAiChecks
         });
     }
 
-
     private static GameSnapshot Change(GameSnapshot view, int seat, Func<PlayerSnapshot, PlayerSnapshot> change) =>
         view with { Players = view.Players.Select(player => player.Seat == seat ? change(player) : player).ToArray() };
-    private sealed record PlayCase(string Name, GameSnapshot View, IReadOnlyList<LegalAction> Actions, LegalActionKind Expected);
     private static void Require(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 }

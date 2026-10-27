@@ -33,6 +33,8 @@ public sealed partial class ShanheCampaignSession
         var ordinal = checked(state.ShopRestockCount + 1);
         var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed,
             $"{node.Id}:shop-restock:{state.ShopRefreshCount}:{position}", ordinal));
+        if (SelectShopRarity(state, node, candidates.Select(choice => _rewards[choice.RewardId!]), random) is { } rarity)
+            candidates = candidates.Where(choice => _rewards[choice.RewardId!].Rarity == rarity).ToList();
         var authored = candidates[random.Next(candidates.Count)];
         var reward = _rewards[authored.RewardId!];
         stock[position] = new($"$restock:{state.ShopRefreshCount}:{ordinal}:{reward.Id}", reward.Name,

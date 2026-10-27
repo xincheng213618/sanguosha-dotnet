@@ -171,7 +171,7 @@ internal static class LiuBaCoinUiChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, checkpoint));
         var model = new MainViewModel(false, checkpoint.Options.Seed, true, store, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         return model;
     }

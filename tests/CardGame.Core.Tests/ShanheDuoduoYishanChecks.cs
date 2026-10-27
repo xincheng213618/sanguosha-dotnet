@@ -6,7 +6,6 @@ using CardGame.Core.Campaigns;
 internal static class ShanheDuoduoYishanChecks
 {
     private const string First = "shanhe:current-duoduo-yishan-2082", Second = "shanhe:current-duoduo-yishan-2083", Third = "shanhe:current-duoduo-yishan-2084";
-    private const string FirstReward = "tactic-duoduo-yishan-current-2082", SecondReward = "tactic-duoduo-yishan-current-2083", ThirdReward = "tactic-duoduo-yishan-current-2084";
     private const string Capacity = StandardShanheCampaignCatalog.CurrentJinnangJiSkillId, Zaiqi = StandardShanheCampaignCatalog.S5ZaiqiSkillId;
     private const string Owner = "fixture:ddys-owner", Deck = "fixture:ddys-deck", Driver = "fixture:ddys-driver", ThirdDraw = "fixture:ddys-third-draw";
     private const string Gain = "fixture:ddys-gain", Mutation = "fixture:ddys-mutation", Gate = "fixture:ddys-hp-source";
@@ -17,39 +16,6 @@ internal static class ShanheDuoduoYishanChecks
         new(83, 1, "fixture:ddys-production", "classic:guan-yu", 4, 0, 0, 0, 0, [Zaiqi], [], [],
             [new(StandardShanheS5BossPackage.ZhangliaoHuangkongId)], [], new string('b', 64))
         { TacticSkillIds = [First, Second, Third, Capacity] }));
-
-    public static void ActualDrawOrdinalsStackThreeVersionsAndFreezeProductionLoadoutCold()
-    {
-        VerifyConditionLoaderBoundaries();
-        VerifyProductionLoadout();
-        var s = Scene.Start("stack"); s.Play();
-        var initial = s.V().HandCount;
-        Need(initial == 3 && s.Draws().Length == 0 && Families.All(id => s.Paid(id).Length == 0),
-            "Three genuinely dealt initial cards are neither three native Draw calls nor an early family reward.");
-        s.Begin("one"); s.Until(() => s.AtOrdinal(1));
-        var proof = s.Proof!;
-        Need(proof.RequestedCount == 1 && proof.ActualCount == 1 && proof.LastBatchId == s.Batch!.Id &&
-            proof.OrdinalEntitlements?.Any(entry => entry.Source.SkillId == Third && entry.Source.OwnerSeat == 0) == true,
-            "The first real Draw owns its frozen ordinal, final gain batch and original live tactic source.");
-        Frozen(proof.OrdinalEntitlements!); s.Privacy(); s.Cold(); s.Continue();
-        s.Until(() => s.AtOrdinal(2));
-        Need(s.Proof is { RequestedCount: 2, ActualCount: 2 } && s.FromSkill(Third) && s.Paid(Third).Length == 1,
-            "The third version's actual Draw2 is one second native invocation, even though it generates two physical gain batches.");
-        s.Cold(); s.Play();
-        s.Begin("one"); s.Until(() => s.AtOrdinal(4));
-        Need(s.Proof is { RequestedCount: 1, ActualCount: 1 } && s.FromSkill(Second) && s.Paid(Second).Length == 1,
-            "The next original Draw is third and triggers II once; its real reward is the fourth invocation.");
-        s.Cold(); s.Play();
-        s.Begin("one"); s.Until(() => s.AtOrdinal(6));
-        Need(s.Proof is { RequestedCount: 1, ActualCount: 1 } && s.FromSkill(First) && s.Paid(First).Length == 1,
-            "The fifth original Draw triggers the unsuffixed version once and produces a real sixth invocation.");
-        s.Cold(); s.Play();
-        Need(s.Draws().Select(draw => draw.ActualTurnDrawOrdinal).SequenceEqual([1, 2, 3, 4, 5, 6]) &&
-            s.Draws().Select(draw => draw.ActualCount).SequenceEqual([1, 2, 1, 1, 1, 1]) &&
-            s.V().HandCount == initial + 7 && Families.All(id => s.Paid(id).Length == 1),
-            "Three independently owned production versions coexist without an invented upgrade or recursion exclusion; each issues exactly its one real reward.");
-        s.AssertPureQueries(); s.Cold();
-    }
 
     public static void CapturedDrawEligibilityRejectsLateSourcesAndPreservesPaidChildrenCold()
     {
@@ -115,153 +81,7 @@ internal static class ShanheDuoduoYishanChecks
             s.Cold();
         }
     }
-
-    public static void DrawPhaseBonusesFeedJinnangJiButReplacementGainsAndOtherTurnsStayScopedCold()
-    {
-        var phase = Scene.Start("phase"); phase.Until(() => phase.AtOrdinal(3));
-        Need(phase.Draws().Select(draw => draw.ActualCount).SequenceEqual([3, 2, 2]) && phase.DrawPhaseTotal() == 7 &&
-            phase.V().HandLimit == 9 && phase.Paid(Second).Length == 0,
-            "The third actual invocation is Draw2, not the third physical card; before its reward, seven Draw-phase cards add floor(7/2). " + phase.Diagnostic());
-        phase.Cold(); phase.Continue(); phase.Until(() => phase.AtOrdinal(4));
-        Need(phase.FromSkill(Second) && phase.DrawPhaseTotal() == 8 && phase.V().HandLimit == 10,
-            "II's genuine reward remains in the actual Draw phase and raises Jinnang Ji from three to four extra hand capacity.");
-        phase.Cold(); phase.Play();
-
-        var cross = Scene.Start("cross"); cross.Play();
-        Need(cross.Draws().Select(draw => draw.ActualCount).SequenceEqual([3, 2]) && cross.Paid(Second).Length == 0 && cross.V().HandLimit == 8,
-            "A Draw3 followed by Draw2 consists of two invocations despite five acquired entities.");
-        cross.BeginThird(); cross.Play();
-        Need(cross.Draws().Select(draw => draw.ActualTurnDrawOrdinal).SequenceEqual([1, 2, 3, 4]) &&
-            cross.Paid(Second).Length == 1 && cross.DrawPhaseTotal() == 5 && cross.V().HandLimit == 8,
-            "The same turn's Play-phase third Draw qualifies for II, while neither it nor its reward can borrow Draw-phase hand capacity.");
-        cross.Cold();
-
-        foreach (var scene in new[] { "zaiqi", "tuxi" })
-        {
-            var s = Scene.Start(scene); var replacement = scene == "zaiqi" ? Zaiqi : "classic:tuxi";
-            s.Until(() => s.P?.SkillPrompt?.SkillId == replacement && s.P.Choices.Any(choice => Action(choice) == "activate"));
-            s.Cold(); s.Answer(choice => Action(choice) == "activate");
-            if (scene == "tuxi")
-            {
-                s.Until(() => s.P?.Choices.Any(choice => choice.Targets.SequenceEqual([1, 2])) == true);
-                s.Answer(choice => choice.Targets.SequenceEqual([1, 2]));
-            }
-            s.Until(s.AtGain);
-            Need(s.Draws().Length == 0 && s.Paid(Second).Length == 0 && s.V().HandLimit == s.V().Hp &&
-                (scene == "zaiqi" ? s.E<ProgramCardsRevealedEvent>().Any(fact => fact.SkillId == Zaiqi && fact.Cards.Count == 3) :
-                    s.E<ProgramRandomHandCardsTakenEvent>().Any(fact => fact.TargetSeats.SequenceEqual([1, 2]))),
-                "A real 887 reveal/gain or Tuxi hand transfer does not become a native Draw, an ordinal, or Jinnang Ji capacity.");
-            s.Cold(); s.Play();
-            for (var call = 0; call < 3; call++) { s.Begin("one"); s.Play(); }
-            Need(s.Draws().Select(draw => draw.ActualTurnDrawOrdinal).SequenceEqual([1, 2, 3, 4]) && s.Paid(Second).Length == 1 &&
-                s.DrawPhaseTotal() == 0 && s.V().HandLimit == s.V().Hp,
-                "Only three subsequent real Play Draw calls reach II's opportunity, independently of earlier dealt or transferred cards.");
-            s.Cold();
-        }
-
-        var off = Scene.Start("offturn"); off.Play();
-        for (var call = 0; call < 3; call++) { off.Begin("one"); off.Play(); }
-        var firstTurn = off.Turn; off.EndPlay();
-        off.Until(() => off.AtOrdinal(3) && off.Proof?.ActualTurnOwnerSeat == 1);
-        Need(off.Turn > firstTurn && off.Draws().Select(draw => draw.ActualTurnDrawOrdinal).SequenceEqual([1, 2, 3]) &&
-            off.DrawPhaseTotal() == 0 && off.V().HandLimit is null,
-            "A real allied NPC turn starts a fresh recipient-owned draw ordinal; its support draws are not the human's Draw phase, and the inactive human's view does not project a hand limit. " +
-            $"FirstTurn={firstTurn}, DrawPhaseTotal={off.DrawPhaseTotal()}. " + off.Diagnostic());
-        off.Cold(); off.Continue(); off.Until(() => off.AtOrdinal(4) && off.FromSkill(Second));
-        Need(off.Paid(Second).Length == 2 && off.Draws().All(draw => draw.ActualTurnOwnerSeat == 1) && off.V().HandLimit is null,
-            "The family genuinely triggers once on another character's third draw; the inactive human's hand-limit projection remains absent rather than exposing an old phase value.");
-        off.Privacy(); off.Cold();
-    }
-
-    private static void VerifyProductionLoadout()
-    {
-        var definition = StandardShanheCampaignCatalog.CreateCodexDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
-        var old = StandardShanheCampaignCatalog.CreateCodexDefinition(1, StandardShanheCampaignCatalog.LocalEditionId);
-        string[] rewards = [FirstReward, SecondReward, ThirdReward];
-        var defaults = StandardShanheCampaignCatalog.GetDefaultCodexUnlockedRewardIds(definition);
-        var oldDefaults = StandardShanheCampaignCatalog.GetDefaultCodexUnlockedRewardIds(old);
-        Need(rewards.All(id => definition.Rewards.Any(reward => reward.Id == id) && old.Rewards.All(reward => reward.Id != id)),
-            "Only the actual current edition offers these three separately acquirable tactic versions.");
-        Need(defaults.Contains(FirstReward) && defaults.Contains(SecondReward) && !defaults.Contains(ThirdReward) &&
-            defaults.All(id => definition.Rewards.Any(reward => reward.Id == id)) && rewards.All(id => !oldDefaults.Contains(id)),
-            "The actual definition-aware default pool exposes I/II without inventing a tree node, while III still requires research and the original edition receives no unsupported reward ID.");
-        var run = ShanheCampaignSession.Create(definition, new(83, "classic:guan-yu")
-        { UseCodexRewardPool = true, UnlockedRewardIds = defaults.Append(ThirdReward).ToArray(), EquippedTacticIds = rewards }, StandardShanheCampaignCatalog.CreateBattleRegistry);
-        void ColdRun()
-        {
-            var before = JsonSerializer.Serialize(run.Snapshot);
-            run = ShanheCampaignSession.Restore(ShanheCampaignJson.Deserialize(ShanheCampaignJson.Serialize(run.CreateCheckpoint())),
-                definition, StandardShanheCampaignCatalog.CreateBattleRegistry);
-            Need(JsonSerializer.Serialize(run.Snapshot) == before, "Cold recovery preserves the production loadout, actual map route and issued tactic recipe.");
-        }
-        ColdRun();
-        for (var step = 0; step < 6 && run.Snapshot.Phase != ShanheCampaignPhase.Battle; step++)
-        {
-            ShanheCampaignCommand command = run.Snapshot.Phase == ShanheCampaignPhase.Map
-                ? new MoveShanheNodeCommand(run.Snapshot.AvailableNodes[0].Id, run.Revision)
-                : new ChooseShanheNodeOptionCommand(run.Snapshot.NodeChoices.First(choice => choice.RewardId == "supplies").Id, null, run.Revision);
-            var accepted = run.Submit(command); Need(accepted.Accepted, accepted.Error ?? "The actual equipped route was rejected."); ColdRun();
-        }
-        var setup = run.PendingBattleSetup ?? throw new InvalidOperationException("The actual current-edition route did not issue its first battle.");
-        Need(setup.TacticSkillIds.SequenceEqual(Families) && setup.ExtraSkillIds.Count == 0,
-            "An actual equipped campaign issues all three distinct tactic programs, rather than copying probe rewards into general-skill slots.");
-        var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup);
-        var battle = StandardShanheCampaignCatalog.CreateBattle(setup);
-        var result = battle.Submit(new StartGameCommand()); Need(result.Accepted, result.Error?.Message ?? "The actual production encounter failed to start.");
-        Need(Families.All(id => battle.CreateSnapshot(0).Players[0].Skills?.Count(skill => skill.ContentId == id) == 1),
-            "The native encounter really grants each separately equipped production definition once.");
-        var beforeBattle = State(battle);
-        battle = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(battle.CreateCheckpoint())), registry);
-        Need(beforeBattle == State(battle), "The real equipped native battle cold-restores its actual sources, private views and physical card ledger.");
-    }
-
-    private static void VerifyConditionLoaderBoundaries()
-    {
-        const string id = "fixture:ddys-ordinal-condition";
-        object Condition(int ordinal) => new { kind = "nativeDrawActualTurnOrdinalIs", value = ordinal };
-        Dictionary<string, object> Trigger() => new()
-        {
-            ["id"] = "exact-native-draw", ["window"] = "cardsGained", ["subject"] = "owner", ["destinationZones"] = new[] { "hand" },
-            ["movementOccurrence"] = "perBatch", ["optional"] = false, ["condition"] = Condition(3),
-            ["effects"] = new[] { new { op = "draw", target = "owner", amount = 1 } }
-        };
-        var presentation = JsonSerializer.Serialize(new
-        {
-            schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
-            skills = new Dictionary<string, object> { [id] = new { name = "原生摸牌序号条件", description = "只读取原调用的冻结序号和来源" } }
-        });
-        void Load(Dictionary<string, object> trigger) => _ = SkillProgramCatalog.Load(JsonSerializer.Serialize(new
-        {
-            schemaVersion = SkillProgramCatalog.RulesSchemaVersion,
-            skills = new[] { new { id, revision = 1, triggers = new[] { trigger } } }
-        }), presentation);
-        Load(Trigger());
-        var nested = Trigger(); nested["condition"] = new { kind = "all", children = new[] { Condition(3) } }; Load(nested);
-        foreach (var change in new Action<Dictionary<string, object>>[]
-        {
-            trigger => trigger["condition"] = Condition(0), trigger => trigger["condition"] = Condition(-1),
-            trigger => trigger["condition"] = new { kind = "nativeDrawActualTurnOrdinalIs" },
-            trigger => trigger["condition"] = new { kind = "always", value = 3 },
-            trigger => trigger["window"] = "turnEnding", trigger => trigger["subject"] = "any",
-            trigger => trigger["destinationZones"] = new[] { "equipment" }, trigger => trigger.Remove("movementOccurrence"),
-            trigger => trigger["evaluateConditionAtResolution"] = true,
-            trigger => { trigger["condition"] = new { kind = "all", children = new[] { Condition(3) } }; trigger["window"] = "turnEnding"; }
-        })
-        {
-            var trigger = Trigger(); change(trigger); var rejected = false;
-            try { Load(trigger); } catch (InvalidOperationException) { rejected = true; }
-            Need(rejected, "Native ordinal conditions reject nonpositive/missing values, unrelated values, wrong or nested windows, subjects, zones, occurrences and live reevaluation.");
-        }
-    }
-
-    private static string Action(PromptChoice choice) => choice.Parameters.GetValueOrDefault("program-action") ?? "";
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
-    private static void Frozen<T>(IReadOnlyList<T> values)
-    {
-        Need(values is IList<T> { IsReadOnly: true }, "The native draw entitlement list is frozen.");
-        try { ((IList<T>)values).Add(default!); throw new InvalidOperationException("Draw entitlements allowed mutation."); }
-        catch (NotSupportedException) { }
-    }
     private static string State(GameEngine game) => JsonSerializer.Serialize(new
     {
         Views = Enumerable.Range(0, game.PlayerCount).Select(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat))),

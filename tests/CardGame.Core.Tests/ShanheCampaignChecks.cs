@@ -11,6 +11,136 @@ internal static partial class ShanheCampaignChecks
     private const string Guard = "fixture:shanhe-guard";
     private const string Raid = "fixture:shanhe-raid";
 
+    public static void NoninteractiveOpeningRerollsKeepFixedResourcesCold()
+    {
+        var session = Create(StoryDefinition());
+        Accept(session, new MoveShanheNodeCommand("shop", session.Revision));
+        Accept(session, new ChooseShanheNodeOptionCommand("$leave", null, session.Revision));
+        Accept(session, new MoveShanheNodeCommand("battle", session.Revision));
+        var setup = session.PendingBattleSetup! with
+        {
+            StartingCards = [new(CardKind.Slash, Suit.Spade, 1)],
+            StartingEquipment = [new(CardKind.Crossbow, Suit.Club, 1)], StartingResourcesExpireOnUse = true
+        };
+        var registry = Registry(setup);
+        var game = GameEngine.CreateStandard(CreateBattle(setup).CreateCheckpoint().Options with
+            { ConfirmOpeningHand = true }, registry);
+        Accept(game, new StartGameCommand());
+        var prompt = game.PendingDecision!;
+        var fixedCard = game.CreateSnapshot(0).Players[0].Hand.Single(card => card.Kind == CardKind.Slash).Id;
+        var initialHand = game.CreateSnapshot(0).Players[0].Hand.Select(card => card.Id).ToArray();
+        var equipment = game.CreateSnapshot(0).Players[0].Equipment.Select(card => card.Id).ToArray();
+        var inventory = game.CreateCardZoneDiagnostics().Select(card => card.CardId).Order().ToArray();
+        Require(prompt.Kind == DecisionKind.OpeningHand && game.CreateSnapshot(0).TurnNumber == 0 &&
+            game.Events.All(item => item.Payload is not GameStartedEvent) && prompt.Choices.All(choice => !choice.Cards.Contains(fixedCard)),
+            "Automatic roster setup still waits for private opening confirmation, without offering fixed expedition resources for replacement.");
+        Accept(game, new AnswerPromptCommand(0, prompt.PromptId, prompt.Choices.Single(c => c.Parameters["action"] == "reroll").Id, game.Revision));
+        Require(game.PendingDecision?.Kind == DecisionKind.OpeningHand &&
+            game.CreateSnapshot(0).Players[0].Hand.Any(card => card.Id == fixedCard) &&
+            !initialHand.SequenceEqual(game.CreateSnapshot(0).Players[0].Hand.Select(card => card.Id)) &&
+            equipment.SequenceEqual(game.CreateSnapshot(0).Players[0].Equipment.Select(card => card.Id)) &&
+            inventory.SequenceEqual(game.CreateCardZoneDiagnostics().Select(card => card.CardId).Order()),
+            "Random opening replacement changes genuine random entities, retaining purchased hand resources, equipment and the whole physical inventory.");
+        var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+        Require(SnapshotJson.Serialize(restored.CreateSnapshot(0)) == SnapshotJson.Serialize(game.CreateSnapshot(0)),
+            "The noninteractive opening prompt and random replacement cold-replay exactly.");
+        game = restored;
+        var stale = game.Submit(new AnswerPromptCommand(0, prompt.PromptId, prompt.Choices.Single(c => c.Parameters["action"] == "confirm").Id, game.Revision));
+        Require(!stale.Accepted, "The old opening prompt cannot confirm a freshly rerolled hand.");
+        prompt = game.PendingDecision!;
+        Accept(game, new AnswerPromptCommand(0, prompt.PromptId, prompt.Choices.Single(c => c.Parameters["action"] == "confirm").Id, game.Revision));
+        Require(game.Events.Count(item => item.Payload is GameStartedEvent) == 1 && game.PendingDecision?.Kind != DecisionKind.OpeningHand,
+            "Only confirmation starts the real game and its opening skills, exactly once.");
+    }
+
+    public static void RetriedEncountersIssueNewShuffleAndRejectEarlierVictoriesCold()
+    {
+        var definition = StoryDefinition();
+        var session = Create(definition);
+        Require(!session.Submit(new BeginShanheBattleAttemptCommand(session.Revision)).Accepted,
+            "A challenge can only be issued for an already selected encounter.");
+        Accept(session, new MoveShanheNodeCommand("shop", session.Revision));
+        Accept(session, new ChooseShanheNodeOptionCommand("$leave", null, session.Revision));
+        Accept(session, new MoveShanheNodeCommand("battle", session.Revision));
+        var entry = session.PendingBattleSetup!;
+        var gold = session.Snapshot.Gold;
+        var hp = session.Snapshot.Hp;
+        Accept(session, new BeginShanheBattleAttemptCommand(session.Revision));
+        var first = session.PendingBattleSetup!;
+        var oldBattle = CreateBattle(first);
+        FinishBattle(oldBattle, "defeat");
+        Cold(session, definition);
+        session = ShanheCampaignSession.Restore(ShanheCampaignJson.Deserialize(ShanheCampaignJson.Serialize(session.CreateCheckpoint())), definition, Registry);
+        var before = Snapshot(session);
+        Require(!session.Submit(new BeginShanheBattleAttemptCommand(session.Revision - 1)).Accepted && Snapshot(session) == before,
+            "A stale retry must not advance its persisted attempt number.");
+        Accept(session, new BeginShanheBattleAttemptCommand(session.Revision));
+        var second = session.PendingBattleSetup!;
+        Require(first.AttemptNumber == 1 && second.AttemptNumber == 2 && first.BattleSeed != second.BattleSeed &&
+            ShanheBattleSetup.ValueEquals(entry, second with { AttemptNumber = 0 }) &&
+            session.Snapshot.Hp == hp && session.Snapshot.Gold == gold && session.Snapshot.CompletedBattles.Count == 0,
+            "A retry changes the shuffle, preserving the exact encounter, roster, entry resources, build and reward progress.");
+        before = Snapshot(session);
+        Require(!session.CompleteBattle(oldBattle, session.Revision).Accepted && Snapshot(session) == before,
+            "A victory from an older challenge cannot settle the current attempt or grant rewards.");
+        Cold(session, definition);
+        var current = CreateBattle(second);
+        FinishBattle(current, "defeat");
+        Require(session.CompleteBattle(current, session.Revision).Accepted && session.Snapshot.CompletedBattles.Count == 1,
+            "The current independently replayed challenge can settle exactly once.");
+        Cold(session, definition);
+        var marketRun = ShanheCampaignSession.Create(definition,
+            new(71, Player) { UseCodexRewardPool = true, PersistentMarket = true }, Registry);
+        Accept(marketRun, new MoveShanheNodeCommand("battle", marketRun.Revision));
+        var marketBattle = CreateBattle(marketRun.PendingBattleSetup!);
+        FinishBattle(marketBattle, "defeat");
+        Require(marketRun.CompleteBattle(marketBattle, marketRun.Revision).Accepted,
+            "The metadata regression must include a real completed battle with its frozen market inputs.");
+        var changed = definition with { IntroText = "Updated map and shop presentation",
+            Rewards = definition.Rewards.Select(reward => reward with { Description = reward.Description + " Updated catalogue text." }).ToArray() };
+        var loaded = ShanheCampaignSession.Restore(marketRun.CreateCheckpoint(), changed, Registry);
+        Require(loaded.Snapshot.CompletedBattles.Count == 1 && loaded.Snapshot.Gold == marketRun.Snapshot.Gold &&
+            loaded.Definition.IntroText == changed.IntroText,
+            "Current campaign metadata can change while recorded native market battles still replay and pay their real rewards once.");
+    }
+
+    public static void EndExpeditionFromMapChoiceBattleAndRewardReplaysCold()
+    {
+        var definition = StoryDefinition();
+        for (var stage = 0; stage < 4; stage++)
+        {
+            var session = Create(definition);
+            if (stage >= 1) Accept(session, new MoveShanheNodeCommand("shop", session.Revision));
+            if (stage >= 2)
+            {
+                Accept(session, new ChooseShanheNodeOptionCommand("$leave", null, session.Revision));
+                Accept(session, new MoveShanheNodeCommand("battle", session.Revision));
+            }
+            if (stage >= 3)
+            {
+                var battle = CreateBattle(session.PendingBattleSetup!);
+                FinishBattle(battle, "defeat");
+                Require(session.CompleteBattle(battle, session.Revision).Accepted, "The fixture battle must settle.");
+            }
+            var before = Snapshot(session);
+            Require(!session.Submit(new EndShanheExpeditionCommand(session.Revision - 1)).Accepted && before == Snapshot(session),
+                "A stale end request must leave the expedition unchanged.");
+            var gold = session.Snapshot.Gold;
+            var completed = session.Snapshot.CompletedNodeIds.ToArray();
+            Accept(session, new EndShanheExpeditionCommand(session.Revision));
+            var state = session.Snapshot;
+            Require(state.Phase == ShanheCampaignPhase.Lost && state.PendingBattleSetup is null &&
+                state.AvailableNodes.Count == 0 && state.NodeChoices.Count == 0 && state.RewardOffers.Count == 0 &&
+                state.OpeningSkillOffers.Count == 0 && state.BossRewardSummary is null &&
+                state.Gold == gold && state.CompletedNodeIds.SequenceEqual(completed) && state.EndingText.Contains("主动结束"),
+                "Ending retires pending actions without granting a victory, rewards or a completed node.");
+            Cold(session, definition);
+            before = Snapshot(session);
+            Require(!session.Submit(new EndShanheExpeditionCommand(session.Revision)).Accepted && before == Snapshot(session),
+                "An ended expedition cannot be ended or rewarded twice.");
+        }
+    }
+
     public static void ContentRoutesAndPublishedNestedListsAreFrozen()
     {
         var enemySkills = new List<string> { Guard };
@@ -236,7 +366,12 @@ internal static partial class ShanheCampaignChecks
         Cold(first, definition);
         var saved = first.CreateCheckpoint();
         MustThrow(() => ShanheCampaignSession.Restore(saved with { CampaignHash = "different" }, definition, Registry));
-        MustThrow(() => ShanheCampaignSession.Restore(saved, definition with { IntroText = "changed story" }, Registry));
+        var current = ShanheCampaignSession.Restore(saved, definition with { IntroText = "changed story" }, Registry);
+        Require(ShanheBattleSetup.ValueEquals(current.PendingBattleSetup, first.PendingBattleSetup) && current.ContentHash == saved.CampaignHash,
+            "Changed presentation metadata does not block valid command replay or alter the pending battle's recorded identity.");
+        var remaining = definition.Nodes.Single(node => node.Id != entry);
+        MustThrow(() => ShanheCampaignSession.Restore(saved, definition with
+            { Nodes = [remaining], StartingNodeIds = [remaining.Id] }, Registry));
         MustThrow(() => ShanheCampaignSession.Restore(saved with { Revision = saved.Revision + 1 }, definition, Registry));
     }
 
@@ -310,14 +445,16 @@ internal static partial class ShanheCampaignChecks
         {
             var current = StandardShanheCampaignCatalog.CreateDefinition(1, edition.Id);
             var legacy = current with { Nodes = current.Nodes.Select(node => node with { RewardSkipGold = 0 }).ToArray() };
-            var saved = ShanheCampaignSession.Create(legacy, new(71, legacy.PlayerGeneralIds[0]),
+            var saved = ShanheCampaignSession.Create(legacy, new(71, legacy.PlayerGeneralIds[0]) { SourceDifficultyId = legacy.SourceDifficultyId },
                 StandardShanheCampaignCatalog.CreateBattleRegistry).CreateCheckpoint();
-            var reconstructed = StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(saved, 1);
-            Require(reconstructed.Nodes.All(node => node.RewardSkipGold == 0) &&
-                ShanheCampaignContent.GetContentHash(reconstructed) == saved.CampaignHash &&
-                !JsonSerializer.Serialize(reconstructed).Contains("RewardSkipGold", StringComparison.Ordinal),
-                "A pre-compensation save selects the exact legacy definition; optional zero fields preserve the original hash shape.");
-            _ = ShanheCampaignSession.Restore(saved, reconstructed, StandardShanheCampaignCatalog.CreateBattleRegistry);
+            Require(legacy.Nodes.All(node => node.RewardSkipGold == 0) &&
+                ShanheCampaignContent.GetContentHash(legacy) == saved.CampaignHash &&
+                !JsonSerializer.Serialize(legacy).Contains("RewardSkipGold", StringComparison.Ordinal),
+                "Optional zero compensation fields preserve the exact definition fingerprint and original hash shape.");
+            var active = StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(saved, 1);
+            var loaded = ShanheCampaignSession.Restore(saved, active, StandardShanheCampaignCatalog.CreateBattleRegistry);
+            Require(loaded.ContentHash == saved.CampaignHash && active.Nodes.Any(node => node.RewardSkipGold > 0),
+                "Current compensation rules load normally when the journal remains valid, without reconstructing old definitions.");
             MustThrow(() => StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(saved with { CampaignHash = "different" }, 1));
         }
     }

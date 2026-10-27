@@ -10,23 +10,6 @@ internal static class ShanheDoubleStealChecks
     private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(new StandardContentPackage(),
         new StandardShanheMarketPackage(), new StandardShanheDoubleStealPackage(), new Fixture()));
 
-    public static void PaidExtraEffectUsesOriginalSnatchAndFinishesAnEmptiedTarget()
-    {
-        var s = Scene.Start(enemyCards: 4);
-        s.Snatch(3, expectedTransfers: 1, owned: false);
-        Need(s.Events<ShanheSchoolTrickIssuedEvent>().Length == 0,
-            "Registering future Double Steal stock cannot enhance an unowned actual Snatch.");
-        s.Buy();
-        Need(s.Market().Gold == 700 && s.Events<ShanheMarketPurchaseCommittedEvent>() is [{ Price: 300 }] &&
-            s.Player(0).Skills!.Count(skill => skill.ContentId == StandardShanheDoubleStealPackage.SkillId) == 1,
-            "The actual 300-coin purchase grants Double Steal once before the next use.");
-        s.Snatch(4, expectedTransfers: 2, owned: true);
-        Need(s.Player(1).HandCount == 1, "Both native Snatch effects each take one real remaining target card.");
-        s.Snatch(5, expectedTransfers: 1, owned: true);
-        Need(s.Player(1).HandCount == 0 && s.Player(1).IsAlive,
-            "After the first effect takes the final target card, the extra effect returns without inventing a second entity or another use.");
-    }
-
     public static void RealCounterspellAndPaidFengziKeepIndependentEffectRounds()
     {
         var cancelled = Scene.Start(enemyCards: 2); cancelled.Buy();

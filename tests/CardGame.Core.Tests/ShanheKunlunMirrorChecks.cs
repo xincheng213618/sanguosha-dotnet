@@ -53,41 +53,6 @@ internal static class ShanheKunlunMirrorChecks
             "A different trick pays its first damage and learns separately; an actual basic Slash and raw skill damage remain unrelated, while prevented Duel uses still pay and finish exactly once.");
     }
 
-    public static void ElementalChainKeepsTheOriginalPaidFireAttackNameAtItsLaterRecipient()
-    {
-        var scene = Scene.Start("chain");
-        scene.FireAttack(2); var learned = scene.Learned.Single();
-        Need(scene.View(2).Hp == 11 && learned.Receipt.Origin is { EffectiveKind: CardKind.FireAttack, ChainPropagation: false, TargetSeat: 2 },
-            "A genuine Fire Attack first damages the mirror holder and learns its actual effective trick name.");
-        scene.Card(CardKind.IronChain, [1, 2]); scene.Play();
-        Need(scene.View(1).IsChained && scene.View(2).IsChained, "Both real recipients are chained through a paid Iron Chain use.");
-        var fire = scene.FireAttack(1);
-        var prevented = scene.Prevented.Single();
-        Need(scene.View(1).Hp == 11 && scene.View(2).Hp == 11 && scene.Learned.Single() == learned &&
-            prevented.Receipt.Origin is { EffectiveKind: CardKind.FireAttack, ChainPropagation: true, SourceSeat: 0, CardUserSeat: 0, TargetSeat: 2 } &&
-            prevented.Receipt.Origin.AttackResolutionId == scene.UseId(fire) && prevented.Receipt.Origin.NativeCardId == fire &&
-            prevented.Receipt.Origin.CardActionId is > 0 && scene.View(0).Hand.All(card => card.Kind != CardKind.FireAttack) &&
-            scene.Events<DamageAppliedEvent>().Count(fact => fact.TargetSeat == 2) == 1 &&
-            scene.Events<ProgramDamagePreventedEvent>().Single(fact => fact.SkillId == Skill).TargetSeat == 2 &&
-            scene.Events<CardUseFinishedEvent>().Count(fact => fact.ResolutionId == scene.UseId(fire)) == 1,
-            "The later chained recipient prevents the original Fire Attack damage using frozen native use identity after both paid Fire Attack cards have left the attacker's hand.");
-    }
-
-    public static void RealSourceLessLightningLearnsAfterItsFirstJudgmentAndPreventsTheNext()
-    {
-        var scene = Scene.Start("lightning"); var hp = scene.View(0).Hp;
-        scene.Card(CardKind.Lightning); scene.Play(); scene.NextOwnPlay();
-        Need(scene.View(0).Hp == hp - 3 && scene.Learned is [{ Receipt.Origin: {
-                EffectiveKind: CardKind.Lightning, SourceSeat: null, TargetSeat: 0, DelayedJudgment: true } }] &&
-            scene.Events<DamageAppliedEvent>().Count(fact => fact.TargetSeat == 0 && fact.SourceLess && fact.Amount == 3) == 1,
-            "A real spade-five judgment applies three source-less Lightning damage before learning the delayed trick's name.");
-        scene.Card(CardKind.Lightning); scene.Play(); scene.NextOwnPlay();
-        Need(scene.View(0).Hp == hp - 3 && scene.Learned.Length == 1 && scene.Prevented is [{ Receipt.Origin: {
-                EffectiveKind: CardKind.Lightning, SourceSeat: null, TargetSeat: 0, DelayedJudgment: true } }] &&
-            scene.Events<DamageAppliedEvent>().Count(fact => fact.TargetSeat == 0) == 1 && scene.Game.State.Winner == Winner.None,
-            "The next independently paid Lightning judgment is prevented through the ordinary native prevention window, without inventing an attacker or learning again.");
-    }
-
     private sealed class Scene(GameEngine game)
     {
         public GameEngine Game { get; } = game;

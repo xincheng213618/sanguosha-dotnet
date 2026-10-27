@@ -30,7 +30,7 @@ internal static class ChenglueUiChecks
             store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, source.CreateCheckpoint()));
             using var model = new MainViewModel(false, 17, showSetup: false, saveStore: store, contentRegistry: registry)
                 { IsMotionEnabled = false, IsMusicEnabled = false, IsSoundEnabled = false };
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Program.Assert(!model.HasSaveError && model.IsOwnedCardSelectionPending && !model.IsCardPaymentSelectionPending,
                 "Cold Chenglue must use the shared multi-card draft rather than a singleton payment.");
             var game = Program.Engine(model);
@@ -64,8 +64,8 @@ internal static class ChenglueUiChecks
                     { RequiredCardCount: 1 } && model.Hand.Count == handCount && !model.HasSelection &&
                     game.AcceptedCommands.Count == commands + 1,
                     "Confirming one card keeps the remaining selection open without discarding the unpaid set.");
-                model.SaveGameCommand.Execute(null);
-                model.LoadManualGameCommand.Execute(null);
+                LegacySaveFixtures.Save(model);
+                LegacySaveFixtures.Load(model);
                 Program.Assert(!model.HasSaveError && model.IsOwnedCardSelectionPending,
                     "The partially confirmed discard can be saved and cold loaded.");
                 game = Program.Engine(model);

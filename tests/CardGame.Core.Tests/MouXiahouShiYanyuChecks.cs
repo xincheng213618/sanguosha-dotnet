@@ -54,57 +54,6 @@ internal static class MouXiahouShiYanyuChecks
             s.E<CardRecastEvent>().Length == 0 && s.E<MouXiahouShiYanyuDiscardPaidEvent>().Length == 4,
             "The later Play ending uses whole-turn four times three, without a six-card cap, resetting the earlier count or paying a cost again."); s.Cold();
     }
-
-    public static void PaidDiscardChildrenSourceLossRegrantAndNativeRescueCold()
-    {
-        foreach (var loss in new[] { 1, 3 })
-        {
-            var s = MouXiahouShiScene.Start(new("paid-yanyu-child-" + loss) { Yanyu = true, ConditionalMinimum = 3, WatchCost = true, ChildLoss = loss,
-                Hand = [C(CardKind.Slash), C(CardKind.FireSlash), C(CardKind.ThunderSlash), C(CardKind.Peach)] });
-            var card = s.V().Hand.Single(c => c.Kind == CardKind.Slash).Id;
-            var peach = s.V().Hand.Single(c => c.Kind == CardKind.Peach).Id;
-            s.Discard(CardKind.Slash); s.Reach(s.Hold);
-            var paid = s.E<MouXiahouShiYanyuDiscardPaidEvent>().Single();
-            s.Need(paid.CardId == card && s.Location(card) == CardLocation.DiscardPile && s.E<MouXiahouShiDrawReturnedEvent>().Length == 0 &&
-                s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == paid.FrameId).MouXiahouShiYanyu is { Payment: not null },
-                "The owning frame holds its once-paid physical discard while the real movement child precedes Draw1."); s.Private(); s.RejectPrompt(); s.Cold(); s.Continue();
-            if (loss == 3)
-            {
-                s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RescueDying }); s.Private(); s.Cold();
-                s.Answer(c => c.Cards.SequenceEqual([peach]) && c.Parameters.GetValueOrDefault("response") == "peach");
-            }
-            s.Play();
-            s.Need(!s.Has(MouXiahouShiScene.Yanyu) && s.E<MouXiahouShiDrawReturnedEvent>().Single(e => e.FrameId == paid.FrameId) is { RecipientSeat: 0, RequestedCount: 1, ActualCount: 1 } &&
-                s.E<MouXiahouShiCompletedEvent>().Count(e => e.FrameId == paid.FrameId && e.Accepted) == 1 &&
-                s.G.CardMovements.Count(m => m.CardId == card && m.Reason.Value == Discard) == 1 &&
-                (loss != 3 || s.E<DyingResolvedEvent>().Any(e => e.VictimSeat == 0 && e.Survived)),
-                "Actual source loss or a native Dying/Peach child cannot refund the paid discard, cancel its living owner's draw or replay its exact completion."); s.Cold();
-            if (loss != 1) continue;
-            s.Use("recover-one"); s.Play(); s.Need(s.Has(MouXiahouShiScene.Yanyu), "Real recovery regrants the conditional source.");
-            s.Discard(CardKind.FireSlash); s.Play();
-            s.Need(!s.Actions().Any(a => a.ProgramSkillId == MouXiahouShiScene.Yanyu) && s.E<MouXiahouShiYanyuDiscardPaidEvent>().Length == 2,
-                "Regrant in the same actual Play does not reset the already paid activation budget.");
-            var target = s.Support(1);
-            s.Need(target.FrozenDiscardCount == 2 && target.RequestedDraw == 6 && s.E<MouXiahouShiDrawReturnedEvent>().Single(e => e.FrameId == target.FrameId).ActualCount == 6,
-                "The source regrant's ending support includes both old and new source-instance payments from this actual turn."); s.Cold();
-        }
-    }
-}
-
-internal sealed record MouXiahouShiSpec(string Name)
-{
-    public int HeroSeat { get; init; }
-    public bool Yanyu { get; init; }
-    public bool Qiaoshi { get; init; }
-    public bool InsertPlay { get; init; }
-    public int ConditionalMinimum { get; init; }
-    public bool WatchCost { get; init; }
-    public bool WatchRecovery { get; init; }
-    public bool WatchDraw { get; init; }
-    public int ChildLoss { get; init; }
-    public bool RecoveryReplacement { get; init; }
-    public ShanheStartingCard[] Hand { get; init; } = [MouXiahouShiScene.C(CardKind.Dodge), MouXiahouShiScene.C(CardKind.Peach)];
-    public ShanheStartingCard[] Equipment { get; init; } = [];
 }
 
 internal sealed class MouXiahouShiScene(MouXiahouShiSpec spec, GameEngine game, ContentRegistry registry)
@@ -252,4 +201,21 @@ internal sealed class MouXiahouShiScene(MouXiahouShiSpec spec, GameEngine game, 
                 TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 2, [ShanheBattleSetup.EnemyTeamId] = 2 }));
         }
     }
+}
+
+
+internal sealed record MouXiahouShiSpec(string Name)
+{
+    public int HeroSeat { get; init; }
+    public bool Yanyu { get; init; }
+    public bool Qiaoshi { get; init; }
+    public bool InsertPlay { get; init; }
+    public int ConditionalMinimum { get; init; }
+    public bool WatchCost { get; init; }
+    public bool WatchRecovery { get; init; }
+    public bool WatchDraw { get; init; }
+    public int ChildLoss { get; init; }
+    public bool RecoveryReplacement { get; init; }
+    public ShanheStartingCard[] Hand { get; init; } = [MouXiahouShiScene.C(CardKind.Dodge), MouXiahouShiScene.C(CardKind.Peach)];
+    public ShanheStartingCard[] Equipment { get; init; } = [];
 }

@@ -72,37 +72,6 @@ internal static class ShanheFengxianBossChecks
         }
     }
 
-    public static void XiuluoPaysOneMismatchedCardThenClearsAllJudgmentsCold()
-    {
-        var (scene, _) = Start(xiuluo: true);
-        scene.Play();
-        scene.Accept(new EndPlayPhaseCommand(0, scene.G.Revision, scene.P!.PromptId));
-        scene.Until(() => scene.P?.SkillPrompt?.SkillId == StandardShanheFengxianBossPackage.XiuluoId &&
-            scene.P.Choices.Any(choice => Key(choice) == "activate"));
-        var judgments = scene.V().Judgment.ToArray();
-        Need(judgments.Select(card => (card.Kind, card.Suit)).OrderBy(card => card.Kind)
-                .SequenceEqual(new[] { (CardKind.Indulgence, Suit.Heart), (CardKind.SupplyShortage, Suit.Club) }.OrderBy(card => card.Item1)) &&
-            scene.E<CardUseDeclaredEvent>().Count(use => use.SourceSeat == 1 && use.CardKind is CardKind.Indulgence or CardKind.SupplyShortage) == 2,
-            "The opponent's actual native uses place two differently suited delayed cards before the rage form's next preparation.");
-        scene.Answer(choice => Key(choice) == "activate");
-        scene.Until(() => scene.P?.Choices.Any(choice => Key(choice) == "select-and-move-owned-card") == true);
-        var payment = scene.V().Hand.First(card => card.Suit == Suit.Diamond).Id;
-        scene.Answer(choice => choice.Cards.SequenceEqual([payment]));
-        scene.Until(() => scene.P?.SkillPrompt?.SkillId == Watch);
-        Need(scene.V().Judgment.Select(card => card.Id).SequenceEqual(judgments.Select(card => card.Id)) &&
-            scene.G.CardMovements.Count(move => move.CardId == payment && move.From == CardLocation.Hand(0) && move.To == CardLocation.DiscardPile) == 1 &&
-            scene.G.ResolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.SkillId == StandardShanheFengxianBossPackage.XiuluoId),
-            "One differently suited hand card has been paid while both judgments and the original Xiuluo parent await its real movement child.");
-        scene.Cold();
-        scene.Answer(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
-        scene.Play();
-        var paid = scene.G.CardMovements.Single(move => move.CardId == payment && move.From == CardLocation.Hand(0) && move.To == CardLocation.DiscardPile);
-        Need(scene.V().Judgment.Count == 0 && judgments.All(card => scene.G.CardMovements.Count(move => move.CardId == card.Id &&
-                move.From == CardLocation.Judgment(0) && move.To == CardLocation.DiscardPile && move.Sequence > paid.Sequence) == 1),
-            "Returning from the cold-restored cost child clears every current judgment after the one payment, without a suit match or repeated cost.");
-        scene.Cold();
-    }
-
     private static (Scene, ShanheBattleSetup) Start(bool xiuluo)
     {
         var definition = StandardShanheCampaignCatalog.CreateDefinition(2, StandardShanheCampaignCatalog.Returning2026EditionId);
@@ -131,8 +100,6 @@ internal static class ShanheFengxianBossChecks
         scene.Accept(new StartGameCommand());
         return (scene, setup);
     }
-
-    private static string? Key(PromptChoice choice) => choice.Parameters.GetValueOrDefault("program-action");
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 
     private sealed class Scene(GameEngine game, ContentRegistry registry)

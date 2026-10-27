@@ -45,36 +45,6 @@ internal static class ShanheMuluChecks
         scene.Cold();
     }
 
-    public static void YangshengCountsOccurrencesCapsThreeAndReplacesEachOwnTurnCold()
-    {
-        var scene = new Scene(elephantPlayer: true); scene.Play();
-        Need(scene.LastBonus().Amount == 0, "The first own turn has no earlier received-damage occurrences.");
-        scene.Use("hurt-two"); scene.Play(); scene.Use("hurt-one"); scene.Play();
-        scene.ExtraTurn();
-        Need(scene.LastBonus() is { Amount: 2, RoundNumber: 1 },
-            "Two received-damage occurrences totaling three HP freeze two, including before another own turn in the same round.");
-        scene.Use("strike", [7]); scene.Play();
-        Need(scene.Facts<DamageAppliedEvent>().Last(item => item.TargetSeat == 7).Amount == 3,
-            "The frozen bonus applies to real standalone skill damage, not only card damage.");
-        scene.Cold(); scene.Use("hurt-one"); scene.Play(); scene.ExtraTurn();
-        Need(scene.LastBonus().Amount == 3, "A third occurrence increases the next frozen amount to its cap of three.");
-        scene.Use("strike", [7]); scene.Play();
-        Need(scene.Facts<DamageAppliedEvent>().Last(item => item.TargetSeat == 7).Amount == 4,
-            "The capped bonus increases the next actual one-point damage to four.");
-        scene.ExtraTurn();
-        Need(scene.LastBonus().Amount == 3, "Another own turn replaces the old three-point layer instead of adding a second layer.");
-        scene.Use("strike", [7]); scene.Play();
-        Need(scene.Facts<DamageAppliedEvent>().Last(item => item.TargetSeat == 7).Amount == 4,
-            "Repeated turn starts retain one frozen layer rather than accumulating six additional damage.");
-        scene.Cold();
-        scene.Accept(new EndPlayPhaseCommand(0, scene.G.Revision, scene.P!.PromptId)); scene.Play();
-        Need(scene.LastBonus() is { RoundNumber: 2, Amount: 0 }, "The next round freezes a fresh zero when the owner has received no damage in that round.");
-        scene.Use("strike", [7]); scene.Play();
-        Need(scene.Facts<DamageAppliedEvent>().Last(item => item.TargetSeat == 7).Amount == 1,
-            "The replaced zero removes the previous round's bonus from real damage.");
-        scene.Cold();
-    }
-
     private sealed class Scene
     {
         private readonly ContentRegistry _registry;

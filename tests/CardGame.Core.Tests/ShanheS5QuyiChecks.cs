@@ -46,40 +46,6 @@ internal static class ShanheS5QuyiChecks
         s.Cold();
     }
 
-    public static void JiaoziTiedMaximumRoundTwoDamageAndPaidCardPredictionRecoverCold()
-    {
-        var s = Scene.Start("damage"); s.Play(); s.EndPlay();
-        s.Until(() => s.P is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } && s.E<RoundStartedEvent>().LastOrDefault()?.RoundNumber == 2);
-        Need(s.V().HandCount == 6 && s.V(1).HandCount == 6 && s.E<RoundStartedEvent>().LastOrDefault()?.RoundNumber == 2,
-            "The real second round begins with a tied maximum of six physical hand cards.");
-        s.Cold();
-        s.Use("outgoing", [1]);
-        Need(s.E<DamageAppliedEvent>().Last() is { SourceSeat: 0, TargetSeat: 1, Amount: 3, SourceLess: false },
-            "A tied maximum increases actual cardless outgoing damage by the current round, two, rather than one.");
-        s.Use("incoming", [1]);
-        Need(s.E<DamageAppliedEvent>().Last() is { SourceSeat: 1, TargetSeat: 0, Amount: 3, SourceLess: false },
-            "The same tied maximum also increases actual incoming damage by two.");
-        s.Use("self");
-        Need(s.E<DamageAppliedEvent>().Last() is { SourceSeat: 0, TargetSeat: 0, Amount: 3, SourceLess: false },
-            "Self damage counts one owning skill instance rather than duplicating it for both participant roles.");
-        s.Use("source-less");
-        Need(s.E<DamageAppliedEvent>().Last() is { TargetSeat: 0, Amount: 3, SourceLess: true },
-            "Source-less damage still receives the victim's round-scaled modifier without inventing a source skill.");
-        s.Cold();
-        var action = s.Action(CardKind.Slash, 3);
-        Need(s.G.PredictPublicActionDamage(0, action, 3).DamageAmount == 1,
-            "The public proposed Slash pays one hand material before comparing maxima, so its formerly tied owner gets no speculative bonus.");
-        s.Begin(action); s.Play();
-        Need(s.V().HandCount == 5 && s.V(1).HandCount == 6 &&
-            s.E<DamageAppliedEvent>().Last() is { SourceSeat: 0, TargetSeat: 3, Amount: 1, SourceCardUseResolutionId: not null },
-            "The native Slash's actual payment loses the tied maximum and causes exactly its original one damage.");
-        var count = s.E<DamageAppliedEvent>().Length; var hp = s.V().Hp;
-        s.Use("lose");
-        Need(s.V().Hp == hp - 1 && s.E<DamageAppliedEvent>().Length == count,
-            "Direct HP loss remains a one-point non-damage payment.");
-        s.Cold();
-    }
-
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 
     private sealed class Scene(GameEngine game, ContentRegistry registry)

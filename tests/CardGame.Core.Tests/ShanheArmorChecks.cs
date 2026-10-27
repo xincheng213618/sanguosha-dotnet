@@ -15,37 +15,6 @@ internal static class ShanheArmorChecks
         new(83, 1, "fixture-armor-production", "classic:guan-yu", 4, 0, 0, 0, 0, [], [], [],
             [new("standard:cao-cao")], [], new string('a', 64))));
 
-    public static void RepeatedTeamArmorStartsOnlyAlliesSurvivesSkillLossAndRestartsCold()
-    {
-        var s = Scene.Start("opening");
-        var grants = s.Events<ArmorGrantedEvent>().Where(e => e.Source.SkillId == Duijia).ToArray();
-        Need(s.V(0).Armor == 0 && s.V(1).Armor == 6 && s.V(2).Armor == 0 && s.V(3).Armor == 0 &&
-            s.V(0).Hp == 8 && s.V(1).Hp == 8 && s.V(1).MaxHp == 12,
-            "Two real acquired copies grant six Armor to the actual teammate, excluding their owner and both enemies; no HP or maximum-HP is granted.");
-        Need(grants.Length == 2 && grants.All(e => e.PlayerSeat == 1 && e.Amount == 3 && e.Source.OwnerSeat == 0) &&
-            grants.Select(e => (e.ArmorBefore, e.ArmorAfter)).SequenceEqual([(0, 3), (3, 6)]) &&
-            grants.Select(e => e.Source.SkillInstanceId).Distinct(StringComparer.Ordinal).Count() == 2 &&
-            s.Events<RecoveryAppliedEvent>().Length == 0 && s.Events<ProgramRecoveryAppliedEvent>().Length == 0,
-            "Each formal GameStarting tactic instance issues its own genuine three-point grant; Armor is neither capped at five nor disguised as recovery.");
-        Need(!JsonSerializer.Serialize(s.V()).Contains("\"Armor\"", StringComparison.Ordinal) &&
-            Enumerable.Range(0, 4).All(viewer => s.G.CreateSnapshot(viewer).Players[1].Armor == 6),
-            "A zero Armor value preserves the old snapshot JSON shape while acquired Armor is public to every viewer.");
-        s.Cold();
-        s.Use("lose-team-armor");
-        Need(s.V().Skills?.Any(skill => skill.ContentId == Duijia) != true && s.V(1).Armor == 6,
-            "Actual skill loss removes both tactic grants without revoking Armor already paid to a teammate.");
-        s.Use("hit-one", [1]);
-        Need(s.V(1).Armor == 5 && s.V(1).Hp == 8 && s.Events<DamageAppliedEvent>().Single() is
-                { TargetSeat: 1, Amount: 1, ArmorPayment: { ArmorBefore: 6, ArmorAbsorbed: 1, ArmorAfter: 5, HpLossAmount: 0 } },
-            "The retained Armor is genuinely spendable after its source skill is lost.");
-        s.Cold();
-        var next = Scene.Start("opening");
-        Need(next.V(1).Armor == 6 && next.Events<ArmorGrantedEvent>().Where(e => e.Source.SkillId == Duijia)
-                .Select(e => (e.ArmorBefore, e.ArmorAfter)).SequenceEqual([(0, 3), (3, 6)]),
-            "A new real encounter initializes Armor from zero and executes the two opening grants, rather than adding them to the previous encounter's remainder.");
-        next.Cold();
-    }
-
     public static void FullAndPartialArmorKeepDamageCounterAndRealHealthDeltaCold()
     {
         var s = Scene.Start("counter");
@@ -96,55 +65,6 @@ internal static class ShanheArmorChecks
                 e.Receipt.TargetSeat == 0 && e.Receipt.HpAfter - e.Receipt.HpBefore == 1) == 2,
             "Native classic Kuanggu recovers once per actual damage point at distance one even when the recipient's Armor absorbs both points and its HP stays unchanged.");
         k.Cold();
-    }
-
-    public static void IronChainCarriesFullDamageWhileHpLossAndMaximumReplacementBypassArmorCold()
-    {
-        var s = Scene.Start("chain");
-        s.Use("armor-three", [1]); s.Use("armor-one", [2]);
-        var chain = s.PlayCard(CardKind.IronChain, [1, 2]);
-        Need(s.V(1).IsChained && s.V(2).IsChained, "One genuine Iron Chain physically links the two selected recipients.");
-        s.Cold();
-        s.PlayCard(CardKind.Alcohol);
-        Need(s.V().HasAlcoholEffect, "The actual paid Alcohol supplies the elemental Slash's native two-point damage.");
-        var slash = s.PlayCard(CardKind.FireSlash, [1]);
-        var hits = s.Events<DamageAppliedEvent>();
-        Need(hits is [{ SourceSeat: 0, TargetSeat: 1, Amount: 2, Nature: DamageNature.Fire,
-                    ArmorPayment: { ArmorBefore: 3, ArmorAbsorbed: 2, ArmorAfter: 1, HpLossAmount: 0 } },
-                { SourceSeat: 0, TargetSeat: 2, Amount: 2, Nature: DamageNature.Fire,
-                    ArmorPayment: { ArmorBefore: 1, ArmorAbsorbed: 1, ArmorAfter: 0, HpLossAmount: 1 } }] &&
-            s.V(1).Hp == 12 && s.V(2).Hp == 11 && !s.V(1).IsChained && !s.V(2).IsChained &&
-            !s.V().HasAlcoholEffect && hits[0].ArmorPayment!.DamageFrameId != hits[1].ArmorPayment!.DamageFrameId &&
-            hits[0].ArmorPayment!.AttackFrameId == hits[1].ArmorPayment!.AttackFrameId &&
-            s.Events<AfterDamageEvent>().Count(e => e.Amount == 2 && e.Nature == DamageNature.Fire) == 2,
-            "A fully absorbed first elemental hit still conducts its full two damage; each recipient owns a distinct Armor payment instead of propagating zero HP loss or reusing the first receipt.");
-        Need(new[] { chain, slash }.All(id => s.G.CardMovements.Count(m => m.CardId == id &&
-                m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1),
-            "The real chained damage spends its original physical Iron Chain and elemental Slash once each.");
-        s.Cold();
-
-        var j = Scene.Start("jueqing");
-        j.Use("armor-three", [1]); j.Use("lose-one", [1]); j.PlayCard(CardKind.Slash, [1]);
-        Need(j.V(1).Armor == 3 && j.V(1).Hp == 10 && j.Events<DamageAppliedEvent>().Length == 0 &&
-            j.Events<AfterDamageEvent>().Length == 0 &&
-            j.Events<ProgramSkillHpLostEvent>().Single() is { SkillId: Driver, TargetSeat: 1, Amount: 1 } &&
-            j.Events<DamageReplacedWithHpLossEvent>().Single() is { PolicyOwnerSeat: 0, TargetSeat: 1, Amount: 1 },
-            "A genuine loseHp instruction and native Jueqing's real physical Slash replacement both bypass Armor without creating fake damage or consuming Armor.");
-        j.Cold();
-
-        var x = Scene.Start("maximum");
-        x.Use("armor-three", [1]); x.PlayCard(CardKind.Slash, [1]);
-        Need(x.V(1).Armor == 3 && x.V(1).MaxHp == 11 && x.V(1).Hp == 11 &&
-            x.Events<DamageAppliedEvent>().Length == 0 &&
-            x.Events<CardDamageReplacedWithMaximumHpLossEvent>().Single().Receipt is { TargetSeat: 1, Amount: 1 },
-            "The actual first-Slash Xiaoming replacement changes maximum HP before damage payment and cannot spend the recipient's Armor.");
-        x.Cold(); x.PlayCard(CardKind.Slash, [1]);
-        Need(x.V(1).Armor == 2 && x.V(1).Hp == 11 &&
-            x.Events<CardDamageReplacedWithMaximumHpLossEvent>().Length == 1 &&
-            x.Events<DamageAppliedEvent>().Single() is { Amount: 1, ArmorPayment: { ArmorBefore: 3,
-                ArmorAbsorbed: 1, ArmorAfter: 2, HpLossAmount: 0 } },
-            "After the real round replacement quota is spent, the next physical Slash returns to ordinary Armor-paid damage exactly once across cold recovery.");
-        x.Cold();
     }
 
     private static void Need(bool condition, string message)

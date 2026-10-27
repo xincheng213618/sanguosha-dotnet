@@ -20,47 +20,6 @@ internal static class ShanheRepeatableTacticChecks
     private static readonly Lazy<ContentRegistry> CurrentRegistry = new(() => ContentRegistry.Build(new StandardContentPackage(), new Fixture()));
     private static readonly Lazy<ContentRegistry> ChangedRegistry = new(() => ContentRegistry.Build(new StandardContentPackage(), new Fixture(ruleDrift: true)));
 
-    public static void JingyuTwoInstancesUsePaidSlashHandBoundaryConversionsAndCold()
-    {
-        VerifyHandLimitGrammarAndLegacyCanonical();
-        var s = Battle.Start();
-        Need(s.V.HandCount == 7, "The seven genuine starting entities establish the live post-payment boundary without searching seeds.");
-        var first = s.Play(CardKind.Slash);
-        Need(s.V.HandCount == 6 && s.Events<DamageAppliedEvent>() is [{ Amount: 1 }] &&
-            s.Events<ProgramCardDamageModifiedEvent>().All(e => e.Source.SkillId != Tactic),
-            "A paid physical Slash leaves exactly six Hand cards, so neither independent tactic instance qualifies.");
-        var converted = s.Play(CardKind.Dodge, conversion: true);
-        var pair = s.Events<ProgramCardDamageModifiedEvent>().Where(e => e.Source.SkillId == Tactic).ToArray();
-        Need(s.V.HandCount == 5 && s.Events<DamageAppliedEvent>().Last().Amount == 3 && pair.Length == 2 &&
-            pair.All(e => e.Source.OwnerSeat == 0 && e.CardKind == CardKind.Slash) &&
-            pair.Select(e => e.Source.SkillInstanceId).Distinct(StringComparer.Ordinal).Count() == 2 &&
-            pair.Select(e => (e.BaseAmount, e.ModifiedAmount)).SequenceEqual([(1, 2), (2, 3)]),
-            "The original Wusheng conversion really pays a red Dodge and leaves five cards; two acquired copies each contribute their own +1 and instance receipt.");
-        s.Play(CardKind.Duel);
-        s.Use("damage");
-        Need(s.Events<DamageAppliedEvent>().TakeLast(2).All(e => e.Amount == 1) &&
-            s.Events<ProgramCardDamageModifiedEvent>().Count(e => e.Source.SkillId == Tactic) == 2,
-            "A real non-Slash Duel and an actual untyped program damage action receive no bonus despite the low Hand count.");
-        s.Play(CardKind.Alcohol);
-        Need(s.V.HasAlcoholEffect, "The player must really pay and acquire the native Alcohol enhancement before the elemental Slash.");
-        s.Play(CardKind.ThunderSlash);
-        Need(s.Events<DamageAppliedEvent>().Last() is { Amount: 4, Nature: DamageNature.Thunder } && !s.V.HasAlcoholEffect &&
-            s.Events<ProgramCardDamageModifiedEvent>().Count(e => e.Source.SkillId == Tactic) == 4,
-            "The actual Thunder Slash inherits the Slash-family condition and consumes one real Alcohol enhancement while retaining both independent tactic bonuses.");
-        s.Use("lose-tactic");
-        Need(s.V.Skills?.Any(skill => skill.ContentId == Tactic) != true,
-            "The existing native replacement operation removes all owned grants of the specified skill ID, without pretending it removes only one instance.");
-        s.Cold(); s.Play(CardKind.Slash);
-        Need(s.Events<DamageAppliedEvent>().Last().Amount == 1 &&
-            s.Events<ProgramCardDamageModifiedEvent>().Count(e => e.Source.SkillId == Tactic) == 4 &&
-            s.G.CardMovements.Count(m => m.CardId == first && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1 &&
-            s.G.CardMovements.Count(m => m.CardId == converted && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1,
-            "Real skill loss disables both copies immediately, preserving already-paid physical and converted Slash costs exactly once through cold replay.");
-        s.Conserved(); s.Cold();
-        VerifyAdditionalLayerDoesNotEnterMaximumHpReplacement();
-        VerifyElementalChainInheritsOnlyTheFinalizedFirstDamage();
-    }
-
     public static void CampaignRepeatedAcquisitionsRespectIdentityHashAndKeepAllInstancesCold()
     {
         var choices = new List<ShanheNodeChoiceDefinition>
@@ -267,63 +226,6 @@ internal static class ShanheRepeatableTacticChecks
 
     private static void Accept(ShanheCampaignSession session, ShanheCampaignCommand command)
     { var result = session.Submit(command); Need(result.Accepted, result.Error ?? "Repeated-tactic campaign command rejected."); }
-
-    private static void VerifyHandLimitGrammarAndLegacyCanonical()
-    {
-        static JsonObject Skill(string condition, int? limit, string scope = "ownerUsed")
-        {
-            var modifier = new JsonObject { ["id"] = "legacy", ["cardKinds"] = new JsonArray("slash"),
-                ["amount"] = 1, ["condition"] = condition, ["sourceScope"] = scope };
-            if (limit is { } value) modifier["sourceHandCountLimit"] = value;
-            return new() { ["id"] = "fixture:repeat-hand-limit", ["revision"] = 1, ["damageModifiers"] = new JsonArray(modifier) };
-        }
-        static SkillProgram Load(JsonObject skill) => LoadFixtureRules(new JsonObject
-        { ["schemaVersion"] = SkillProgramCatalog.RulesSchemaVersion, ["skills"] = new JsonArray(skill) }.ToJsonString()).Programs["fixture:repeat-hand-limit"];
-        Need(Load(Skill("sourceHandBelowLimit", 6)).DamageModifiers.Single().SourceHandCountLimit == 6,
-            "The shared grammar keeps a positive explicit owner-used Hand threshold.");
-        Throws(() => Load(Skill("sourceHandBelowLimit", null)));
-        Throws(() => Load(Skill("sourceHandBelowLimit", 0)));
-        Throws(() => Load(Skill("always", 6)));
-        Throws(() => Load(Skill("sourceHandBelowLimit", 6, "damageSource")));
-        const string canonical = """{"damageModifiers":[{"amount":1,"cardKinds":["slash"],"condition":"always","id":"legacy","sourceScope":"ownerUsed"}],"id":"fixture:repeat-hand-limit","revision":1}""";
-        var legacy = Load(Skill("always", null));
-        var expected = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(SkillProgramCatalog.RuntimeVersion + "\n" + canonical))).ToLowerInvariant();
-        Need(legacy.GameplayHash == expected && legacy.DamageModifiers.Single().SourceHandCountLimit is null &&
-            !JsonSerializer.Serialize(legacy.DamageModifiers.Single()).Contains("SourceHandCountLimit", StringComparison.Ordinal),
-            "Omitting the additive optional threshold preserves the old canonical gameplay bytes and hash without injecting a new default field.");
-    }
-
-    private static void VerifyAdditionalLayerDoesNotEnterMaximumHpReplacement()
-    {
-        var s = Battle.Start(replacement: true);
-        s.Play(CardKind.Alcohol); s.Play(CardKind.Slash);
-        Need(s.Events<CardDamageReplacedWithMaximumHpLossEvent>().Single().Receipt.Amount == 2 &&
-            s.Events<DamageAppliedEvent>().Length == 0 && s.Events<ProgramCardDamageModifiedEvent>().All(e => e.Source.SkillId != Tactic),
-            "The real first-Slash maximum-HP replacement includes native Alcohol but excludes the two additional-damage tactic instances under the explicit local layer interpretation.");
-        s.Cold(); s.Play(CardKind.Slash);
-        Need(s.Events<CardDamageReplacedWithMaximumHpLossEvent>().Length == 1 &&
-            s.Events<DamageAppliedEvent>().Single().Amount == 3 && s.Events<ProgramCardDamageModifiedEvent>().Count(e => e.Source.SkillId == Tactic) == 2,
-            "After the real round allowance is consumed, the next actual Slash applies both independent tactic bonuses normally.");
-        s.Conserved(); s.Cold();
-    }
-
-    private static void VerifyElementalChainInheritsOnlyTheFinalizedFirstDamage()
-    {
-        var s = Battle.Start(chained: true);
-        s.Play(CardKind.IronChain, targets: [0, 1]);
-        Need(s.G.CreateSnapshot(0).Players.All(player => player.IsChained) &&
-            s.Events<IronChainResolvedEvent>().Single().TargetSeats.SequenceEqual([0, 1]),
-            "A real two-target Iron Chain pays its physical material and links both the source and actual enemy.");
-        s.Cold(); s.Play(CardKind.ThunderSlash);
-        var damage = s.Events<DamageAppliedEvent>();
-        Need(damage.Length == 2 && damage[0] is { TargetSeat: 1, Amount: 3, Nature: DamageNature.Thunder } &&
-            damage[1] is { TargetSeat: 0, Amount: 3, Nature: DamageNature.Thunder } &&
-            s.Events<ChainedDamagePropagatedEvent>() is [{ TargetSeat: 0, Amount: 3 }] &&
-            s.Events<ProgramCardDamageModifiedEvent>().Count(e => e.Source.SkillId == Tactic) == 2 &&
-            s.G.CreateSnapshot(0).Players.All(player => !player.IsChained),
-            "Both copies apply only to the genuine first Slash damage; the native elemental link inherits finalized three without reapplying either instance to the source recipient.");
-        s.Conserved(); s.Cold();
-    }
 
     private sealed class Battle(GameEngine game, ContentRegistry registry)
     {

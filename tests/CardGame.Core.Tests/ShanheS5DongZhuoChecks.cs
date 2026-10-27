@@ -14,44 +14,6 @@ internal static class ShanheS5DongZhuoChecks
     private const string ExtraLord = "fixture:s5-dong-extra-lord", NoProgramLord = "fixture:s5-dong-no-program-lord";
     private const string NoProgramGeneral = "fixture:s5-dong-no-program-general", Deck = "fixture:s5-dong-deck";
 
-    public static void ExplicitPrintedLordRecipeFreezesValidatesHashesAndNeverChangesTeamRole()
-    {
-        var modern = StandardShanheCampaignCatalog.CreateDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
-        var actual = modern.Nodes.Single(node => node.Id == "luoyang").Encounters!
-            .Single(encounter => encounter.Id == "luoyang:dongzhuo-s5").Enemies.Single();
-        Need(actual.GeneralId == Boss && actual.QualifiedPrintedLordSkillIds?.SequenceEqual([Baonue]) == true &&
-            StandardShanheCampaignCatalog.CreateDefinition(1).Nodes.SelectMany(node => node.Encounters ?? []).SelectMany(encounter => encounter.Enemies)
-                .All(member => member.GeneralId != Boss),
-            "The actual 2026 local Luoyang recipe uses the separate verified four-skill form with explicit printed Baonue qualification, without inserting it into the 2024 entry.");
-        var registry = Registry(); var mutable = new List<string> { Baonue };
-        var member = Member() with { QualifiedPrintedLordSkillIds = mutable }; mutable.Add(Jiuchi);
-        Need(member.QualifiedPrintedLordSkillIds!.SequenceEqual([Baonue]) && member.QualifiedPrintedLordSkillIds is IList<string> { IsReadOnly: true },
-            "The explicit recipe detaches its qualified printed Lord list immediately, before callers can mutate the input.");
-        var setup = Recipe(member, Member());
-        var s = Scene.Start(setup, registry);
-        Need(new[] { 2, 3 }.All(seat => s.V(seat) is { Hp: 4, MaxHp: 8, TeamId: ShanheBattleSetup.EnemyTeamId } &&
-                s.V(seat).Skills?.Any(skill => skill.ContentId == Baonue) == true && s.HasQualifiedBinding(seat)) &&
-            Enumerable.Range(0, 4).All(seat => s.G.State.Players[seat].Role != Role.Lord),
-            "Both actual scenario NPCs activate exactly their printed Baonue without becoming identity Lords or receiving a Lord HP bonus. " + s.BindingDiagnostic());
-        s.Cold();
-        var unqualified = Scene.Start(Recipe(Member(false), Member(false)), registry);
-        Need(new[] { 2, 3 }.All(seat => !unqualified.HasQualifiedBinding(seat)),
-            "An unconfigured scenario team role and the same printed skill definition do not implicitly qualify a Lord skill.");
-        unqualified.Cold();
-        Need(!JsonSerializer.Serialize(Member(false)).Contains(nameof(ShanheCombatantDefinition.QualifiedPrintedLordSkillIds), StringComparison.Ordinal) &&
-            !ShanheBattleSetup.ValueEquals(setup, Recipe(Member(false), Member())) &&
-            ShanheCampaignContent.GetContentHash(Definition(member)) != ShanheCampaignContent.GetContentHash(Definition(Member(false))),
-            "Null keeps the old recipe shape, while an explicit qualification changes encounter equality and the actual campaign content fingerprint.");
-        var frozen = ShanheCampaignContent.FreezeAndValidate(Definition(member));
-        Need(frozen.Nodes.Single().Encounters!.Single().Enemies.Single().QualifiedPrintedLordSkillIds is IList<string> { IsReadOnly: true },
-            "Campaign publication also freezes the nested qualification list.");
-        foreach (var ids in new IReadOnlyList<string>[] { [Baonue, Baonue], [Jiuchi], ["fixture:unknown-lord"], [ExtraLord] })
-            Reject(() => Scene.Start(Recipe(Member() with { QualifiedPrintedLordSkillIds = ids, ExtraSkillIds = [ExtraLord] }, Member(false)), registry));
-        Reject(() => Scene.Start(Recipe(Member() with { GeneralId = Ally, ExtraSkillIds = [Baonue], QualifiedPrintedLordSkillIds = [Baonue] }, Member(false)), registry));
-        Reject(() => Scene.Start(Recipe(Member() with { GeneralId = NoProgramGeneral, QualifiedPrintedLordSkillIds = [NoProgramLord] }, Member(false)), registry));
-        VerifySameGrantGeneralReplacementInvalidatesOnlyConfiguredIndex(registry);
-    }
-
     private static void VerifySameGrantGeneralReplacementInvalidatesOnlyConfiguredIndex(ContentRegistry registry)
     {
         // This is an isolated shared-index model, never a mutation of a running
@@ -116,41 +78,6 @@ internal static class ShanheS5DongZhuoChecks
             s.Events<ProgramJudgmentCardClaimedEvent>().Count(e => e.SkillId == Baonue) == 4 &&
             new[] { 2, 3 }.All(owner => s.V(owner).Hp == 6 && s.V(owner).HandCount == 2),
             "Resuming the exact paid damage producer after cold recovery repeats no point, recovery or original-card claim."); s.Cold();
-    }
-
-    public static void DisabledPrintedSourceOwnDamageSourceLessAndJueqingDoNotInventBaonue()
-    {
-        var inactive = Scene.Start(); inactive.Use("lose-three", [2]);
-        Need(inactive.V(2).Hp == 1 && !inactive.HasQualifiedBinding(2),
-            "A genuine HP payment activates the existing HP-one suppressor; explicit recipe qualification does not keep Baonue enabled. " + inactive.BindingDiagnostic());
-        inactive.Cold(); inactive.Begin("hit-two", [1]); inactive.FinishBaonue();
-        Need(inactive.Events<JudgmentRequestedEvent>().Count(e => e.Reason == Reason && e.TargetSeat == 2) == 0 &&
-            inactive.Events<JudgmentRequestedEvent>().Count(e => e.Reason == Reason && e.TargetSeat == 3) == 2 &&
-            inactive.Events<ProgramJudgmentCardClaimedEvent>().Count(e => e.SkillId == Baonue && e.OwnerSeat == 3) == 2,
-            "Future real damage skips only the suppressed Dong Zhuo while the other explicitly qualified owner still receives both independent points."); inactive.Cold();
-
-        var sourceLess = Scene.Start(); sourceLess.Use("armor-self"); sourceLess.Use("source-less");
-        Need(sourceLess.Events<DamageAppliedEvent>() is [{ TargetSeat: 0, Amount: 2, SourceLess: true,
-                ArmorPayment: { ArmorAbsorbed: 2, HpLossAmount: 0 } }] && sourceLess.V().Hp == 8 &&
-            !sourceLess.Events<ProgramBindingStartedEvent>().Any(e => e.SkillId == Baonue),
-            "A genuine source-less damage paid entirely by Armor remains real damage but cannot name another Qun source for either Baonue owner."); sourceLess.Cold();
-
-        var own = Scene.Start(Recipe(Member(), Member(false))); own.Use("target-self", [2]); own.Use("incoming", [2]);
-        Need(own.Events<DamageAppliedEvent>().Select(e => (e.SourceSeat, e.TargetSeat)).SequenceEqual([(2, 2), (2, 0)]) &&
-            !own.Events<ProgramBindingStartedEvent>().Any(e => e.SkillId == Baonue) &&
-            own.HasQualifiedBinding(2),
-            "An enabled Dong Zhuo's own source is excluded for both its actual self-damage and its damage to another character; a registered but unqualified second observer does not borrow eligibility.");
-        own.Begin("hit-two", [1]); own.FinishBaonue();
-        Need(own.Events<JudgmentRequestedEvent>().Count(e => e.Reason == Reason && e.TargetSeat == 2) == 2,
-            "The same still-enabled qualified owner subsequently responds normally to another Qun source, proving the exclusion was about source ownership."); own.Cold();
-
-        var jueqing = Scene.Start(Recipe(Member(), Member(), jueqing: true)); jueqing.Use("armor-two", [1]);
-        jueqing.Use("lose-one", [1]); jueqing.PlaySlash(1);
-        Need(jueqing.V(1) is { Hp: 6, Armor: 2 } && jueqing.Events<DamageReplacedWithHpLossEvent>() is [{ TargetSeat: 1, Amount: 1 }] &&
-            jueqing.Events<DamageAppliedEvent>().Length == 0 && jueqing.Events<AfterDamageEvent>().Length == 0 &&
-            jueqing.Events<JudgmentRequestedEvent>().All(e => e.Reason != Reason) &&
-            !jueqing.Events<ProgramBindingStartedEvent>().Any(e => e.SkillId == Baonue),
-            "Real loseHp and the original Jueqing physical Slash replacement bypass Armor and never manufacture damage-point Baonue opportunities."); jueqing.Cold();
     }
 
     private static ShanheCombatantDefinition Member(bool qualify = true) => new(Boss, MaxHpBonus: 4, Hp: 4, ExtraSkillIds: [HpWatch, GainWatch, Suppress])

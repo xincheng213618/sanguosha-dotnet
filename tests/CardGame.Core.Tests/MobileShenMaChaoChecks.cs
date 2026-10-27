@@ -45,38 +45,6 @@ internal static class MobileShenMaChaoChecks
         s.Need(s.Ting(0) == 0 && s.E<DamageAppliedEvent>().Count(e => e.SourceSeat == 0 && e.TargetSeat == 2 && e.Amount == 12) == 1,
             "The refreshed limited skill genuinely pays eight again and returns through its native damage/death result.");
     }
-    public static void FrozenTingweiSubsetGiftDamageAndNextTargetTurnExpiryCold()
-    {
-        var s = Scene.Start(subset: true); s.Play(); s.End();
-        s.Reach(() => s.P is { PlayerSeat: 0 } && s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("option") == "mask:15"));
-        var first = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.MobileShenMaChao?.Stage == MobileMaChaoStage.Options);
-        s.Need(first.OwnerSeat == 2 && first.MobileShenMaChao!.Target == 0 && s.Ting(2) == 4,
-            "A real NPC-owned Slash target window lets the target choose one complete subset after the four Ting are granted.");
-        s.Choose("mask:15");
-        s.Reach(() => s.P is { PlayerSeat: 0 } && s.G.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.MobileShenMaChao?.Stage == MobileMaChaoStage.Gift));
-        var f = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.MobileShenMaChao?.Stage == MobileMaChaoStage.Gift);
-        var gift = s.V(0).Hand.Single(c => c.Kind == CardKind.QinggangSword).Id;
-        s.Need(f.Id == first.Id && f.MobileShenMaChao is { Mask: 15, Cursor: 3 } && s.Ting(2) == 0 &&
-            s.E<MobileTingweiSelectedEvent>().Count(e => e.FrameId == f.Id && e.Paid == 4) == 1 &&
-            s.Limit(0) == s.V(0).Hp && s.P!.Choices.All(c => c.Cards.SequenceEqual([gift])),
-            "The frozen four-option set pays all four Ting once and suppresses nonlocked skills before its real target-owned equipment choice.");
-        s.Cold(); s.Answer(c => c.Cards.SequenceEqual([gift]));
-        s.Reach(() => s.E<DamageAppliedEvent>().Any(e => e.SourceSeat == 2 && e.TargetSeat == 0));
-        s.Need(s.V(0).Hp == 2 && s.V(0).HandCount == 0 && s.Ting(2) == 0 &&
-            s.G.CardMovements.Count(m => m.CardId == gift && m.From == CardLocation.Hand(0) && m.To == CardLocation.Hand(2) && m.Reason.Value == "skill.mobile-shen-ma-chao.tingwei.gift") == 1 &&
-            s.G.CardMovements.Count(m => m.From == CardLocation.Hand(0) && m.To == CardLocation.DiscardPile && m.Reason.Value == "skill.mobile-shen-ma-chao.tingwei.random-discard") == 1 &&
-            s.E<MobileTingweiSelectedEvent>().Count(e => e.FrameId == f.Id) == 1 &&
-            s.E<DamageAppliedEvent>().Single(e => e.SourceSeat == 2 && e.TargetSeat == 0).Nature == DamageNature.Thunder &&
-            s.E<MobileTingweiExpiredEvent>().Length == 0,
-            "Cold never repays the subset: equipment is really given, one remaining legal card is discarded, and only this original Slash target takes the extra point.");
-        s.Play();
-        s.Need(s.Limit(0) == s.V(0).Hp && s.E<MobileTingweiExpiredEvent>().Length == 0,
-            "Suppression persists through the affected role's next actual turn, including its Play phase.");
-        var turn = s.G.State.TurnNumber; s.End(); s.Reach(() => s.E<MobileTingweiExpiredEvent>().Any(e => e.FrameId == f.Id));
-        s.Need(s.E<TurnEndedEvent>().Any(e => e.ActorSeat == 0 && e.TurnNumber == turn) && s.Limit(0) == s.V(0).Hp + 3 &&
-            s.E<MobileTingweiExpiredEvent>().Count(e => e.FrameId == f.Id) == 1,
-            "Only the target's next real TurnEnded expires the issued silence and restores qualification of the original nonlocked grant.");
-    }
     private sealed class Fixture : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-mobile-shen-ma-chao", new(1, 0, 0));

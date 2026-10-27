@@ -35,7 +35,8 @@ public static partial class StandardShanheCampaignCatalog
         return ShanheCampaignContent.FreezeAndValidate(definition with
         {
             RandomStartingNode = false,
-            IntroText = definition.IntroText + "\n开局从两处战斗地点选择前路；每处按本局种子从第一章预设关卡中确定剧情和敌军，预览与挑战一致。仅装备传承时先选择初始技能。",
+            AllowChapterDetours = true,
+            IntroText = definition.IntroText + "\n开局两处战斗地点都可挑战，先后顺序自选；本章已开启的未完成地点可返回补打，进入下一章后关闭旧章地点。每处按本局种子确定剧情和敌军，预览与挑战一致。仅装备传承时先选择初始技能。",
             Nodes = definition.Nodes.Select(node =>
             {
                 // Older standalone exclusive forms were labelled bosses. Only
@@ -43,15 +44,22 @@ public static partial class StandardShanheCampaignCatalog
                 // chapter reward contract; other strong encounters are elite.
                 var kind = node.Kind == ShanheNodeKind.BossBattle && !ChapterBossIds.Contains(node.Id)
                     ? ShanheNodeKind.EliteBattle : node.Kind;
+                var elite = kind == ShanheNodeKind.EliteBattle;
                 return node with
                 {
                     Kind = kind,
-                    PrimaryTacticRarity = kind is ShanheNodeKind.Battle or ShanheNodeKind.EliteBattle ? 1 : 0,
-                    PrimarySkillRarity = kind is ShanheNodeKind.Battle or ShanheNodeKind.EliteBattle
+                    CategorizedRewards = node.CategorizedRewards || elite,
+                    AutomaticRewardCategory = node.AutomaticRewardCategory || elite,
+                    RewardSkipGold = elite && node.RewardSkipGold == 0 ? 100 : node.RewardSkipGold,
+                    PrimaryTacticRarity = elite ? 2 : kind == ShanheNodeKind.Battle ? 1 : 0,
+                    PrimarySkillRarity = elite ? node.ChapterNumber >= 2 ? 3 : 2 : kind == ShanheNodeKind.Battle
                         ? node.ChapterNumber >= 2 ? 2 : 1 : 0,
+                    PrimaryCardRarity = elite ? 2 : 0,
                     Encounters = node.Encounters?.Select(encounter => encounter with
                         { VictoryGold = kind == ShanheNodeKind.BossBattle ? 500 : 200 }).ToArray(),
-                    RewardIds = node.BossRewards is null && node.ChapterNumber < 3 && node.RewardIds is { Count: > 0 }
+                    // The base sampler applies the quality independently to
+                    // each category. Retain elite upgrades for promotion tactics.
+                    RewardIds = !elite && node.BossRewards is null && node.ChapterNumber < 3 && node.RewardIds is { Count: > 0 }
                         ? node.RewardIds.Where(ordinaryRewards.Contains).ToArray() : node.RewardIds
                 };
             }).Select(node => node.Id is not ("hulao-start" or "guangcheng-start") ? node : node with
@@ -76,6 +84,7 @@ public static partial class StandardShanheCampaignCatalog
                 RewardChoiceCount = 3,
                 RewardSkipGold = 100,
                 CategorizedRewards = false,
+                AutomaticRewardCategory = false,
                 PrimaryTacticRarity = 1,
                 PrimarySkillRarity = 2,
                 StoryText = "前方驻军已现。选择此处，查看本次征程确定的剧情、敌军和过关奖励，再决定是否挑战。",

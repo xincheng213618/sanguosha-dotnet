@@ -212,8 +212,8 @@ internal static class SkillDrawFeedbackChecks
             var savedSnapshot = SnapshotJson.Serialize(game.CreateSnapshot(0));
             var savedRevision = game.Revision;
             Assert(host.Layer.ActiveEffectCount > 0, "The live reload must interrupt actual skill feedback.");
-            model.SaveGameCommand.Execute(null);
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(model);
+            LegacySaveFixtures.Load(model);
             var reloaded = Engine(model);
             Assert(!model.HasSaveError && !ReferenceEquals(game, reloaded) && reloaded.Revision == savedRevision &&
                 SnapshotJson.Serialize(reloaded.CreateSnapshot(0)) == savedSnapshot && model.BattleCues.Count == 0,
@@ -692,7 +692,7 @@ internal static class SkillDrawFeedbackChecks
         var model = new MainViewModel(autoAdvance: false, seed: 31, showSetup: true, saveStore: store,
             useExpandedContent: false, contentRegistry: registry)
         { IsMotionEnabled = true, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Assert(!model.HasSaveError && model.BattleCues.Count == 0, model.SaveStatus);
         return model;
     }

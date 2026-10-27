@@ -132,7 +132,7 @@ internal static class TargetCardChecks
             store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
             using var model = new MainViewModel(false, game.Seed, true, store, contentRegistry: registry)
                 { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             game = Program.Engine(model);
             var commandsBefore = game.AcceptedCommands.Count;
             var oldChoice = ChooseHand();
@@ -226,7 +226,7 @@ internal static class TargetCardChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(false, game.Seed, true, store, contentRegistry: registry) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         game = Program.Engine(model);
         var targetBefore = game.CreateSnapshot(1).Players[1].HandCount;
         var sourceBefore = game.CreateSnapshot(0).Players[0].HandCount;
@@ -293,7 +293,7 @@ internal static class TargetCardChecks
             var store = new MemorySaveStore();
             store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
             using var model = new MainViewModel(false, game.Seed, true, store, contentRegistry: registry) { IsMotionEnabled = false };
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             var engine = Program.Engine(model);
             model.SelectCardCommand.Execute(model.Hand.Single(card => card.Id == action.CardId));
             var host = CreatePickerHost(model, 1120, 740);
@@ -395,7 +395,7 @@ internal static class TargetCardChecks
             store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
             using var model = new MainViewModel(false, game.Seed, true, store, contentRegistry: registry)
                 { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             game = Program.Engine(model);
             model.SelectCardCommand.Execute(model.Hand.Single(card => card.Id == action.CardId));
             model.SelectTargetCommand.Execute(model.Seats.Single(seat => seat.Seat == 1));
@@ -444,7 +444,7 @@ internal static class TargetCardChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(false, game.Seed, true, store, contentRegistry: registry) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         game = Program.Engine(model);
         var host = CreatePickerHost(model, 1440, 920);
         var window = host.Window;
@@ -546,7 +546,7 @@ internal static class TargetCardChecks
         var store = new MemorySaveStore();
         store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(false, game.Seed, true, store, contentRegistry: registry) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         game = Program.Engine(model);
         var host = CreatePickerHost(model, 1440, 920);
         var window = host.Window;

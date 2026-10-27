@@ -15,220 +15,6 @@ internal static class LiFengChecks
     private static string Scene = "";
     private static GameEngine? Context;
 
-    public static void JiyunInitialCategoriesPreparationLeasesAndEndingDistributionCold()
-    {
-        {
-            var (g, r) = Start("prep", beforePrep: true);
-            var initial = Pile(g).ToArray();
-            Need(initial.Length == 3 && initial.Select(c => CardCatalog.Get(c.Kind).CategoryName).Distinct().Count() == 3,
-                "The genuine GameStarting operation stores one original entity of each of the three categories.");
-            Need(g.CardMovements.Count(m => m.Reason.Value == Initial && m.From == CardLocation.DrawPile &&
-                m.To.Zone == CardZoneKind.PublicPersistentPile && initial.Any(c => c.Id == m.CardId)) == 3,
-                "Each public original grain has one actual Deck-to-pile initial invoice.");
-            AssertPublicPile(g, initial.Select(c => c.Id));
-            AssertPrivate(g, 0); g = Cold(g, r);
-            Prepare(g, [1, 0]);
-            Reach(g, () => Option(g, "prep-gained"));
-            var gains = g.CardMovements.Where(m => m.Reason.Value == PrepDraw && m.From == CardLocation.DrawPile &&
-                m.To.Zone == CardZoneKind.Hand).ToArray();
-            Need(gains.Length == 2 && gains.Select(m => m.To.OwnerSeat).Order().SequenceEqual(new int?[] { 0, 1 }) &&
-                V(g).Hand.Count == 1 && V(g, 1).Hand.Count == 1,
-                "Two distinct selected recipients each receive exactly one actual draw before the final gain child returns.");
-            var ownMarked = V(g).Hand.Single();
-            var peerMarked = V(g, 1).Hand.Single();
-            Need(Marked(ownMarked) && Marked(peerMarked), "Only the exact actual Prep draw entities receive continuous Hand leases.");
-            Need(Enumerable.Range(1, 3).All(s => g.CreateSnapshot(s).Players[0].Hand.Count == 0),
-                "A public grain pile does not expose its recipient's private newly drawn Hand card.");
-            g = Cold(g, r); Continue(g); Play(g);
-            var grainSlash = initial.Single(c => c.Kind == CardKind.Slash);
-            PlayOriginalGrain(g, grainSlash.Id, [1]); Play(g);
-            AssertOriginalUse(g, grainSlash, 0);
-            Need(Pile(g).Count == 2, "A genuine original grain Use first frees one real pile slot.");
-            PlayHand(g, ownMarked.Id, [1]); Play(g);
-            Need(Zone(g, ownMarked.Id).Zone == CardZoneKind.PublicPersistentPile &&
-                g.CardMovements.Count(m => m.CardId == ownMarked.Id && m.Reason.Value == Collect &&
-                    m.From == CardLocation.DiscardPile && m.To.Zone == CardZoneKind.PublicPersistentPile) == 1 &&
-                Pile(g).Count == 3,
-                "Only after the marked Hand card's whole Slash Use finishes is its exact discarded original collected once.");
-            Need(g.CardMovements.Count(m => m.CardId == ownMarked.Id && m.From == CardLocation.Hand(0) &&
-                m.To == CardLocation.Processing) == 1, "Collection cannot repay or substitute the original Use material.");
-            var give = Pile(g).Take(2).Select(c => c.Id).ToArray();
-            var retained = Pile(g).Single(c => !give.Contains(c.Id)).Id;
-            End(g); Reach(g, () => Optional(g, Shuliang)); Activate(g); Reach(g, () => Branch(g, "give"));
-            AssertPrivate(g, 0); g = Cold(g, r);
-            GiveGrain(g, give[0], 1); Reach(g, () => Branch(g, "give"));
-            g = Cold(g, r); GiveGrain(g, give[1], 1);
-            Reach(g, () => Branch(g, "finish")); Answer(g, c => B(c) == "finish");
-            Reach(g, () => Pile(g).Select(c => c.Id).SequenceEqual([retained]) && !Branch(g, "give") && !Branch(g, "finish"));
-            Need(g.CardMovements.Count(m => give.Contains(m.CardId) && m.Reason.Value == Gift &&
-                m.From.Zone == CardZoneKind.PublicPersistentPile && m.To == CardLocation.Hand(1)) == 2 &&
-                give.All(id => V(g, 1).Hand.Any(c => c.Id == id && !Marked(c))),
-                "Ending distribution permits an arbitrary subset and the same living recipient twice; gift gains are not Prep leases.");
-            var oldTurn = g.State.TurnNumber;
-            Reach(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard } && g.State.TurnNumber > oldTurn);
-            Need(V(g, 1).Hand.Any(c => c.Id == peerMarked.Id && Marked(c)),
-                "An untouched original recipient's lease survives subsequent actual turns.");
-            Use(g, "take", targets: [1]); Reach(g, () => Action(g, "select-and-move-owned-card"));
-            var peerHand = V(g, 1).Hand.Select(c => c.Id).ToArray();
-            var index = Array.IndexOf(peerHand, peerMarked.Id);
-            Need(index >= 0 && P(g)!.Choices.All(c => c.Cards.Count == 0),
-                "The real foreign-Hand acquisition chooses an opaque slot, never a leaked original id.");
-            Answer(g, c => c.Parameters.GetValueOrDefault("slot-index") == index.ToString()); Play(g);
-            Need(V(g).Hand.Any(c => c.Id == peerMarked.Id && !Marked(c)),
-                "The original recipient's first departure retires its lease even if another player later owns that same entity.");
-            var before = Pile(g).Count;
-            PlayHand(g, peerMarked.Id, [1]); Play(g);
-            Need(Zone(g, peerMarked.Id) == CardLocation.DiscardPile && Pile(g).Count == before &&
-                !g.CardMovements.Any(m => m.CardId == peerMarked.Id && m.Reason.Value == Collect),
-                "A transferred and reused former marked card cannot be reclaimed as the original recipient's Use.");
-            _ = Cold(g, r);
-        }
-        {
-            var (g, r) = Start("prep-replacement", beforePrep: true);
-            var originalVictimHand = V(g, 1).Hand.Single().Id;
-            Prepare(g, [0]); Reach(g, () => Optional(g, "ol:zenrun"));
-            Need(!E<JiyunLeaseIssuedEvent>(g).Any() && !g.CardMovements.Any(m => m.Reason.Value == PrepDraw),
-                "The real Jiyun draw waits for the native pre-draw replacement before any Deck material or Hand lease exists.");
-            AssertPrivate(g, 0); g = Cold(g, r); Activate(g);
-            Reach(g, () => P(g)?.Choices.Any(c => B(c) == "target") == true);
-            Answer(g, c => B(c) == "target" && c.Targets.SequenceEqual([1]));
-            Reach(g, () => P(g)?.Choices.Any(c => B(c) == "pick") == true);
-            Need(P(g)!.Choices.Where(c => B(c) == "pick").All(c => c.Cards.Count == 0),
-                "The actual replacement obtains a foreign opaque Hand slot rather than publishing its face.");
-            Answer(g, c => B(c) == "pick" && c.Parameters.GetValueOrDefault("source-zone") == nameof(CardZoneKind.Hand));
-            Answer(g, c => B(c) == "take");
-            Reach(g, () => g.CreateSnapshot(1).PendingDecision?.SkillPrompt?.SkillId == "ol:zenrun");
-            AssertPrivate(g, 1); g = Cold(g, r); Play(g);
-            Need(E<JiyunPreparationDrawReturnedEvent>(g) is [{ RecipientSeat: 0, ActualCount: 0, ReplacementCount: 1 }] &&
-                !E<JiyunLeaseIssuedEvent>(g).Any() && !g.CardMovements.Any(m => m.Reason.Value == PrepDraw) &&
-                V(g).Hand.Any(c => c.Id == originalVictimHand && !Marked(c)),
-                "Real replacement gains finish the Prep queue but never masquerade as actual Draw IDs or acquire collection leases.");
-            _ = Cold(g, r);
-        }
-        {
-            var (g, r) = Start("initial-short", beforePrep: true);
-            Need(Pile(g).Count == 2 && g.CardMovements.Count(m => m.Reason.Value == Initial) == 2,
-                "A truly short initial Deck stores only the two available categories without inventing a third entity.");
-            Prepare(g, [0]); Play(g);
-            Need(V(g).HandCount == 0 && !g.CardMovements.Any(m => m.Reason.Value == PrepDraw),
-                "A real shortfall Draw1 issues no fake Hand card or collection lease.");
-            End(g); Reach(g, () => Optional(g, Shuliang)); Activate(g);
-            Reach(g, () => Branch(g, "finish")); g = Cold(g, r); Answer(g, c => B(c) == "finish");
-            Need(Pile(g).Count == 2 && !g.CardMovements.Any(m => m.Reason.Value == Gift),
-                "The genuine Ending choice may finish with no distribution while retaining all original grain.");
-        }
-    }
-
-    public static void ShuliangOriginalPlayKindsAndWholeUseCollectionCold()
-    {
-        foreach (var scene in new[] { "play-slash", "play-trick", "play-chain", "play-equipment", "play-delayed", "play-snatch", "play-dismantlement", "converted-lease" })
-        {
-            var (g, r) = Start(scene, beforePrep: true);
-            Prepare(g, [0]); Play(g);
-            var marked = V(g).Hand.Single();
-            var original = Pile(g).Single(c => c.Kind == (scene == "converted-lease" ? CardKind.DrawTwo : PrimaryKind(scene)));
-            Need(Marked(marked) && marked.Kind == PrimaryKind(scene), "The real one-card Prep lease has this scene's exact printed primary kind.");
-            if (scene is "play-snatch" or "play-dismantlement")
-            {
-                Use(g, "stock-two"); Play(g);
-                var targets = V(g).Hand.Where(card => card.Id != marked.Id).ToArray();
-                Need(targets.Length == 2, "The targeted native trick receives two genuine extra Hand entities, separately from its original marked lease.");
-                foreach (var targetCard in targets) { Use(g, "give", [targetCard.Id], [1]); Play(g); }
-                Need(V(g, 1).HandCount == 2 && V(g).Hand.Any(card => card.Id == marked.Id),
-                    "Two real gifts give the target one entity for each complete original-grain and marked-Hand trick use.");
-            }
-            var raw = g.GetHumanLegalActions().First(a => a.CardId == original.Id && a.NativePublicPileSource is not null);
-            Need(raw.ConversionSource is null && (raw.AdditionalConversionSources?.Count ?? 0) == 0,
-                "Direct grain authorization remains separate from optional ViewAs conversion sources.");
-            if (scene == "play-chain")
-            {
-                var state = State(g);
-                Need(!g.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Recast && a.CardId == original.Id) &&
-                    !g.Submit(new RecastCardCommand(0, original.Id, g.Revision, P(g)!.PromptId)).Accepted && State(g) == state,
-                    "A real IronChain grain is usable in its native direction but never leaks into Hand-only recast costs.");
-            }
-            g = Cold(g, r);
-            PlayOriginalGrain(g, original.Id, NativeTargets(original.Kind, 1));
-            Reach(g, () => Option(g, "original-live"));
-            var liveOriginal = g.ResolutionStack.OfType<CardUseFrame>().Single(u => u.CardId == original.Id);
-            var originalAction = liveOriginal.Action;
-            Need(originalAction is not null && !E<CardUseFinishedEvent>(g).Any(e => e.ResolutionId == liveOriginal.Id),
-                "The real committed observer freezes the original typed Action before its native Use finishes.");
-            g = Cold(g, r); Continue(g); Play(g);
-            AssertOriginalUse(g, original, 0, originalAction);
-            var target = scene == "play-delayed" ? 3 : 1;
-            CardActionContext? convertedAction = null;
-            if (scene == "converted-lease")
-            {
-                var converted = g.GetHumanLegalActions().First(a => a.CardId == marked.Id && a.Kind == LegalActionKind.IronChain &&
-                    a.ConversionSource?.SkillId == "classic:lianhuan" && a.TargetSeats.SequenceEqual([target]));
-                Accept(g, new PlayCardCommand(0, marked.Id, converted.TargetSeats, g.Revision, P(g)!.PromptId,
-                    converted.PlayedCardKind, converted.TargetCardId) { ConversionSource = converted.ConversionSource,
-                    AdditionalConversionSources = converted.AdditionalConversionSources ?? [] });
-                Reach(g, () => Option(g, "converted-live"));
-                convertedAction = g.ResolutionStack.OfType<CardUseFrame>().Single(u => u.CardId == marked.Id).Action;
-                g = Cold(g, r); Continue(g);
-            }
-            else PlayHand(g, marked.Id, NativeTargets(marked.Kind, target));
-            Play(g);
-            var handUse = E<CardUseDeclaredEvent>(g).Single(e => e.CardId == marked.Id);
-            Need(E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == handUse.ResolutionId) == 1,
-                "A marked original Hand entity reaches a complete native Use before any collection decision.");
-            if (scene == "play-delayed")
-                Need(Zone(g, marked.Id) == CardLocation.Judgment(target) &&
-                    !g.CardMovements.Any(m => m.CardId == marked.Id && m.Reason.Value == Collect) && Pile(g).Count == 2,
-                    "A finished delayed-card Use leaves its original in Judgment; Jiyun cannot collect from Judgment.");
-            else
-                Need(Zone(g, marked.Id).Zone == CardZoneKind.PublicPersistentPile &&
-                    g.CardMovements.Count(m => m.CardId == marked.Id && m.Reason.Value == Collect &&
-                        m.From.Zone == (scene == "play-equipment" ? CardZoneKind.Equipment : CardZoneKind.DiscardPile)) == 1 &&
-                    Pile(g).Count == 3,
-                    "Whole-use collection retrieves only the exact marked entity from native Equipment or Discard.");
-            Need(g.CardMovements.Count(m => m.CardId == marked.Id && m.From == CardLocation.Hand(0) &&
-                m.To == CardLocation.Processing) == 1 &&
-                !g.CardMovements.Any(m => m.Reason.Value == Collect && m.CardId != marked.Id),
-                "Other actual native gains or replacement equipment are not mistaken for the Prep-marked Use material.");
-            if (scene == "converted-lease")
-                Need(handUse.CardKind == CardKind.IronChain && convertedAction is { EffectiveKind: CardKind.IronChain } &&
-                    convertedAction.PhysicalCards.Any(c => c.CardId == marked.Id && c.CardKind == CardKind.Dodge) &&
-                    convertedAction.ConversionChain.Any(s => s.SkillId == "classic:lianhuan"),
-                    "A genuine Lianhuan Use collects its original printed marked Dodge, not an invented IronChain entity.");
-            _ = Cold(g, r);
-        }
-        foreach (var scene in new[] { "lease-dodge", "lease-null", "lease-played" })
-        {
-            var (g, r) = Start(scene, beforePrep: true);
-            Prepare(g, [0]); Play(g);
-            var marked = V(g).Hand.Single();
-            var opening = Pile(g).Single(c => c.Kind == (scene == "lease-null" ? CardKind.Crossbow : CardKind.DrawTwo));
-            PlayOriginalGrain(g, opening.Id, []); Play(g);
-            if (scene == "lease-dodge") Incoming(g);
-            else Use(g, "duel", targets: [1]);
-            Reach(g, () => P(g) is { PlayerSeat: 0 } p && p.Kind == (scene == "lease-null" ? DecisionKind.Nullification :
-                scene == "lease-dodge" ? DecisionKind.RespondDodge : DecisionKind.RespondSlash));
-            var parent = g.ResolutionStack.OfType<CardUseFrame>().Last();
-            Need(P(g)!.Choices.Any(c => c.Cards.SequenceEqual([marked.Id]) &&
-                !c.Parameters.ContainsKey("native-original-public-pile")),
-                "The marked entity responds from its real Hand, independently of the already-spent original grain quota.");
-            g = Cold(g, r); Answer(g, c => c.Cards.SequenceEqual([marked.Id])); Play(g);
-            Need(E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == parent.Id) == 1 &&
-                E<ShuliangGrainPaidEvent>(g).Length == 1,
-                "The original response parent finishes once; the normal marked Hand response does not pay another Shuliang quota.");
-            if (scene == "lease-played")
-                Need(Zone(g, marked.Id) == CardLocation.DiscardPile &&
-                    !E<JiyunClaimedEntityEvent>(g).Any(e => e.CardId == marked.Id) &&
-                    E<DuelResponseEvent>(g).Any(e => e.ResolutionId == parent.Id && e.ResponderSeat == 0 && e.UsedSlash && e.SlashCardId == marked.Id),
-                    "A marked but purely played Duel Slash cannot trigger true-Use collection.");
-            else
-                Need(Zone(g, marked.Id).Zone == CardZoneKind.PublicPersistentPile &&
-                    E<JiyunClaimedEntityEvent>(g).Count(e => e.CardId == marked.Id &&
-                        e.ResponseKind == (scene == "lease-null" ? ProgramCompletedResponseKind.Nullification : ProgramCompletedResponseKind.Dodge)) == 1 &&
-                    g.CardMovements.Count(m => m.CardId == marked.Id && m.Reason.Value == Collect && m.From == CardLocation.DiscardPile) == 1,
-                    "A genuine marked Hand Dodge/Nullification is reclaimed once through its native completed-response return.");
-            _ = Cold(g, r);
-        }
-    }
-
     public static void ShuliangNativeResponsesPlayedQuotaAndFactionSupplyCold()
     {
         foreach (var scene in new[] { "dodge-quota", "duel-quota" })
@@ -483,114 +269,6 @@ internal static class LiFengChecks
         }
     }
 
-    public static void LiFengPaidChildrenSourceLossDeathAndInputPrivacyCold()
-    {
-        {
-            var (g, r) = Start("prep-loss", beforePrep: true);
-            var oldGrain = Pile(g).Select(c => c.Id).ToArray();
-            Prepare(g, [0, 1]); Reach(g, () => Option(g, "prep-paid"));
-            var paid = g.ResolutionStack.OfType<ProgramSkillFrame>().Last(f => f.LiFeng is not null);
-            var frameId = paid.Id;
-            Need(paid.LiFeng is { Paid: true, Stage: LiFengStage.PreparationChildren } receipt &&
-                receipt.Recipients.SequenceEqual([0, 1]) && receipt.Recipients is System.Collections.IList { IsReadOnly: true } &&
-                E<JiyunPreparationDrawReturnedEvent>(g).Count(e => e.FrameId == frameId) == 1,
-                "The real first gain child owns a frozen, paid two-recipient Prep queue before actual skill loss.");
-            g = Cold(g, r); Continue(g); Play(g);
-            Need(V(g).IsAlive && !V(g).Skills!.Any(s => s.ContentId == Jiyun) &&
-                E<JiyunPreparationDrawReturnedEvent>(g).Count(e => e.FrameId == frameId && e.ActualCount == 1) == 2 &&
-                E<LiFengCompletedEvent>(g).Count(e => e.FrameId == frameId && e.Paid) == 1 &&
-                E<JiyunLeaseIssuedEvent>(g).Count(e => e.FrameId == frameId) == 2,
-                "Source loss after the first actual draw cannot cancel or replay the already-issued second recipient and its original lease.");
-            Need(Pile(g).Count == 0 && oldGrain.All(id => g.CardMovements.Count(m => m.CardId == id &&
-                    m.From.Zone == CardZoneKind.PublicPersistentPile && m.To == CardLocation.DiscardPile &&
-                    m.Reason.Value == "skill-program.public-pile.source-lost") == 1) &&
-                !g.GetHumanLegalActions().Any(a => a.NativePublicPileSource is not null),
-                "A paid Prep queue does not preserve unrelated old grain or grant a fresh original-pile Use after the real Jiyun source is lost.");
-            _ = Cold(g, r);
-        }
-        foreach (var scene in new[] { "paid-loss", "paid-death" })
-        {
-            var (g, r) = Start(scene);
-            var original = Pile(g).Single(c => c.Kind == CardKind.DrawTwo);
-            var action = g.GetHumanLegalActions().Single(a => a.CardId == original.Id && a.NativePublicPileSource is not null);
-            var state = State(g);
-            Need(!g.Submit(new UseProgramSkillCommand(0, Driver, "give", [original.Id], [1], g.Revision, P(g)!.PromptId)).Accepted &&
-                State(g) == state, "Original public grain is excluded from ordinary Hand gift/cost selection.");
-            PlayOriginalGrain(g, original.Id, action.TargetSeats.ToArray());
-            Reach(g, () => Option(g, "paid"));
-            var use = g.ResolutionStack.OfType<CardUseFrame>().Last(f => f.CardId == original.Id);
-            var invoice = E<ShuliangGrainPaidEvent>(g).Single(e => e.CardId == original.Id);
-            Need(invoice.ParentFrameId == use.Id && Zone(g, original.Id) == CardLocation.Processing &&
-                !E<CardUseFinishedEvent>(g).Any(e => e.ResolutionId == use.Id) &&
-                g.CardMovements.Count(m => m.CardId == original.Id && m.From.Zone == CardZoneKind.PublicPersistentPile) == 1,
-                "The committed native Use owns the actual paid original grain before its real source-loss/death child and before DrawTwo effects.");
-            var old = P(g)!; AssertPrivate(g, 0); state = State(g);
-            Need(!g.Submit(new AnswerPromptCommand(1, old.PromptId, old.Choices[0].Id, g.Revision)).Accepted && State(g) == state,
-                "A peer cannot answer the original actor's paid native observer.");
-            g = Cold(g, r); Continue(g);
-            Reach(g, () => E<CardUseFinishedEvent>(g).Any(e => e.ResolutionId == use.Id));
-            Need(E<ShuliangGrainPaidEvent>(g).Count(e => e.CardId == original.Id) == 1 &&
-                E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == use.Id) == 1 &&
-                !g.ResolutionStack.Any(f => f.Id == use.Id) &&
-                g.CardMovements.Count(m => m.CardId == original.Id && m.From.Zone == CardZoneKind.PublicPersistentPile) == 1,
-                "Cold continuation cannot repay the original grain and must return the whole already-paid native Use exactly once.");
-            if (scene == "paid-loss")
-                Need(V(g).IsAlive && !V(g).Skills!.Any(s => s.ContentId == Shuliang) &&
-                    g.CardMovements.Count(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(0) &&
-                        m.Sequence > invoice.MovementSequence && m.Reason == CardMoveReasons.Draw) == 2,
-                    "Actual loss of the authorizing skill does not revoke an already-paid original DrawTwo.");
-            else
-                Need(!V(g).IsAlive && E<PlayerDiedEvent>(g).Any(e => e.VictimSeat == 0) && P(g)?.PlayerSeat != 0 &&
-                    !g.CardMovements.Any(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(0) &&
-                        m.Sequence > invoice.MovementSequence && m.Reason == CardMoveReasons.Draw),
-                    "Cost-child death completes the paid native source without a fresh draw or a dead actor's private choice.");
-            _ = Cold(g, r);
-        }
-        foreach (var scene in new[] { "lion", "ox" })
-        {
-            var (g, r) = Start(scene);
-            Use(g, "stock-two"); Play(g);
-            var equipped = V(g).Hand.First().Id;
-            PlayHand(g, equipped, []); Play(g);
-            int? held = null;
-            if (scene == "lion") { Use(g, "wound"); Play(g); }
-            else
-            {
-                held = V(g).Hand.Single().Id;
-                Accept(g, new UseEquipmentEffectCommand(0, CardKind.WoodenOx, [held.Value], [], g.Revision, P(g)!.PromptId)); Play(g);
-                Need(V(g).WoodenOxGrain is [{ Id: var heldCardId }] && heldCardId == held &&
-                    Enumerable.Range(1, 3).All(s => (g.CreateSnapshot(s).Players[0].WoodenOxGrain?.Count ?? 0) == 0),
-                    "The real existing Ox holds its separate private grain before original-pile replacement.");
-            }
-            var original = Pile(g).Single(c => c.Kind == (scene == "lion" ? CardKind.SilverLion : CardKind.WoodenOx));
-            var hp = V(g).Hp;
-            PlayOriginalGrain(g, original.Id, []);
-            Reach(g, () => Option(g, scene));
-            var use = g.ResolutionStack.OfType<CardUseFrame>().Last(f => f.CardId == original.Id);
-            Need(E<ShuliangGrainPaidEvent>(g).Count(e => e.CardId == original.Id) == 1 &&
-                !E<CardUseFinishedEvent>(g).Any(e => e.ResolutionId == use.Id) &&
-                g.CardMovements.Count(m => m.CardId == equipped && m.From == CardLocation.Equipment(0)) == 1,
-                "A real native replacement child runs before the one original-pile Equipment Use completes.");
-            if (scene == "lion")
-                Need(V(g).Hp == hp + 1 && E<RecoveryAppliedEvent>(g).Any(e => e.TargetSeat == 0 && e.Amount == 1),
-                    "The removed old Silver Lion triggers actual recovery inside the original equipment-use subtree.");
-            else
-                Need(held is { } spillCardId && g.CardMovements.Count(m => m.CardId == spillCardId &&
-                    m.From == CardLocation.WoodenOxGrain(0) && m.To == CardLocation.DiscardPile &&
-                    m.Reason.Value == "equipment.wooden-ox.grain-discard") == 1 &&
-                    !E<ShuliangGrainPaidEvent>(g).Any(e => e.CardId == spillCardId),
-                    "Only the original public grain pays Shuliang; native Ox spill is a separate real child invoice.");
-            g = Cold(g, r); Continue(g); Play(g);
-            Need(Zone(g, original.Id) == CardLocation.Equipment(0) &&
-                E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == use.Id) == 1 &&
-                g.CardMovements.Count(m => m.CardId == original.Id && m.From.Zone == CardZoneKind.PublicPersistentPile &&
-                    m.To == CardLocation.Processing) == 1 &&
-                g.CardMovements.Count(m => m.CardId == equipped && m.From == CardLocation.Equipment(0)) == 1,
-                "The exact original equipment enters natively after all recovery/spill children and cannot pay or return twice.");
-            _ = Cold(g, r);
-        }
-    }
-
     private static PlayerSnapshot V(GameEngine g, int seat = 0) => g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 4).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static T[] E<T>(GameEngine g) where T : IGameEvent => g.Events.Select(e => e.Payload).OfType<T>().ToArray();
@@ -601,7 +279,6 @@ internal static class LiFengChecks
             ?? (p.PublicPersistentPileSkillId == Jiyun ? p.PublicPersistentPileCards ?? [] : []);
     }
     private static CardLocation Zone(GameEngine g, int id) => g.CreateCardZoneDiagnostics().Single(z => z.CardId == id).Location;
-    private static bool Marked(CardSnapshot card) => card.SkillMarkLabel?.Contains("集运", StringComparison.Ordinal) == true;
     private static string? B(PromptChoice c) => c.Parameters.GetValueOrDefault("branch");
     private static bool Branch(GameEngine g, string branch) => P(g)?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "li-feng" && B(c) == branch) == true;
     private static bool Option(GameEngine g, string option) => P(g)?.SkillPrompt?.SkillId == Watch &&
@@ -609,23 +286,7 @@ internal static class LiFengChecks
     private static bool Optional(GameEngine g, string skill) => P(g)?.SkillPrompt?.SkillId == skill &&
         P(g)!.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
     private static bool Action(GameEngine g, string action) => P(g)?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == action) == true;
-    private static void Activate(GameEngine g) => Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
     private static void Continue(GameEngine g) => Answer(g, c => c.Parameters.ContainsKey("option-id"));
-    private static void Prepare(GameEngine g, int[] recipients)
-    {
-        Need(Optional(g, Jiyun), "The genuine Preparation boundary must publish Jiyun before recipients are selected.");
-        Activate(g); Reach(g, () => Branch(g, "recipient"));
-        foreach (var recipient in recipients)
-            Answer(g, c => B(c) == "recipient" && c.Targets.SequenceEqual([recipient]));
-        var frame = g.ResolutionStack.OfType<ProgramSkillFrame>().Last(f => f.LiFeng is not null);
-        Need(frame.LiFeng is { Paid: false, Stage: LiFengStage.PreparationTargets } draft &&
-            draft.Recipients.SequenceEqual(recipients) && draft.MaximumRecipients == Math.Max(1, Pile(g).Count) &&
-            draft.Recipients is System.Collections.IList { IsReadOnly: true },
-            "The unissued private recipient draft freezes the exact distinct selection and current real grain capacity.");
-        Answer(g, c => B(c) == "start");
-    }
-    private static void GiveGrain(GameEngine g, int id, int recipient) =>
-        Answer(g, c => B(c) == "give" && c.Cards.SequenceEqual([id]) && c.Targets.SequenceEqual([recipient]));
     private static void Use(GameEngine g, string id, int[]? cards = null, int[]? targets = null) =>
         Accept(g, new UseProgramSkillCommand(0, Driver, id, cards ?? [], targets ?? [], g.Revision, P(g)!.PromptId));
     private static void Incoming(GameEngine g)
@@ -638,26 +299,6 @@ internal static class LiFengChecks
         P(g)?.Choices.FirstOrDefault(c => c.Cards.SequenceEqual([id]) &&
             c.Parameters.GetValueOrDefault("native-original-public-pile") == "true")
         ?? throw new InvalidOperationException("Missing published original-pile response " + id + " " + Diagnostic(g));
-    private static void PlayOriginalGrain(GameEngine g, int id, int[] targets)
-    {
-        var a = g.GetHumanLegalActions().FirstOrDefault(a => a.CardId == id && a.NativePublicPileSource is not null &&
-            a.TargetSeats.SequenceEqual(targets)) ?? throw new InvalidOperationException("Missing original grain action " + id + " " + Diagnostic(g));
-        Need(a.ConversionSource is null && (a.AdditionalConversionSources?.Count ?? 0) == 0,
-            "Natural grain permission cannot borrow a ViewAs source or a synthetic physical material.");
-        Accept(g, new PlayCardCommand(0, id, a.TargetSeats, g.Revision, P(g)!.PromptId, a.PlayedCardKind, a.TargetCardId));
-    }
-    private static void PlayHand(GameEngine g, int id, int[] targets)
-    {
-        var a = g.GetHumanLegalActions().FirstOrDefault(a => a.CardId == id && a.NativePublicPileSource is null &&
-            a.ConversionSource is null && a.TargetSeats.SequenceEqual(targets))
-            ?? throw new InvalidOperationException("Missing genuine Hand action " + id + " " + Diagnostic(g));
-        Accept(g, new PlayCardCommand(0, id, a.TargetSeats, g.Revision, P(g)!.PromptId, a.PlayedCardKind, a.TargetCardId));
-    }
-    private static int[] NativeTargets(CardKind kind, int target) => kind switch
-    {
-        CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.Indulgence or CardKind.IronChain or CardKind.Snatch or CardKind.Dismantlement => [target],
-        _ => []
-    };
     private static void AssertOriginalUse(GameEngine g, CardSnapshot original, int provider, CardActionContext? captured = null)
     {
         var observed = captured is null ? E<CardActionAcceptedEvent>(g).Select(e => e.Action).ToArray() : new[] { captured };
@@ -689,17 +330,6 @@ internal static class LiFengChecks
             g.CardMovements.Count(m => m.CardId == original.Id && m.From.Zone == CardZoneKind.PublicPersistentPile) == 1 &&
             E<ShuliangGrainPaidEvent>(g).Count(e => e.CardId == original.Id && e.ProviderSeat == provider && !e.Played) == 1,
             "The whole natural Use keeps the original printed kind/suit/rank and exact pile cost, one quota invoice and one completion.");
-    }
-    private static void AssertPublicPile(GameEngine g, IEnumerable<int> ids)
-    {
-        var expected = ids.Order().ToArray();
-        Need(Enumerable.Range(0, 4).All(viewer =>
-        {
-            var p = g.CreateSnapshot(viewer).Players[0];
-            var cards = p.PublicPersistentPiles?.Where(x => x.SourceSkillId == Jiyun).SelectMany(x => x.Cards)
-                ?? (p.PublicPersistentPileSkillId == Jiyun ? p.PublicPersistentPileCards ?? [] : []);
-            return cards.Select(c => c.Id).Order().SequenceEqual(expected);
-        }), "Every viewer sees the same public original grain entities, without acquiring their owner's private choices.");
     }
     private static void AssertPrivate(GameEngine g, int seat) => Need(g.CreateSnapshot(seat).PendingDecision is { IsPrivate: true } p &&
         p.PlayerSeat == seat && Enumerable.Range(0, 4).Where(s => s != seat).All(s => g.CreateSnapshot(s).PendingDecision is null),

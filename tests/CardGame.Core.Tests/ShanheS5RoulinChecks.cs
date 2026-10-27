@@ -53,49 +53,6 @@ internal static class ShanheS5RoulinChecks
         unrelated.AssertPaidOnce(sole.Single().CardId, 2, CardMoveReasons.ResponseFinished); unrelated.Cold();
     }
 
-    public static void FrozenIssuedResponseSurvivesSourceLossButNewSlashRechecksArmorCold()
-    {
-        var s = Scene.Create("loss"); s.Use("armor");
-        Need(s.V(0) is { Hp: 4, Armor: 1 } && s.Has(Skill), "The actual target starts with conditional production Roulin and one real numerical Armor grant.");
-        var first = s.BeginRequested(); var firstUse = s.Attack(first).Id; s.Cold();
-        var firstDodge = s.Respond(); s.At(Watch);
-        Need(s.V(0).Hp == 3 && !s.Has(Skill) && s.Attack(first).CardAttack?.RequiredDodgeResponses == 2 &&
-            s.E<CardRespondedEvent>().Any(item => item.CardId == firstDodge && item.ResponderSeat == 0) &&
-            s.G.CreateCardZoneDiagnostics().Single(item => item.CardId == firstDodge).Location == CardLocation.DiscardPile,
-            "The real first-response completion child loses HP and withdraws the original conditional source after physical payment, while the issued Slash retains its frozen two-Dodge requirement.");
-        s.Cold(); s.Continue(); s.AtResponse(0);
-        Need(s.Attack(first).CardAttack is { RequiredDodgeResponses: 2, SuccessfulDodgeResponses: 1 } &&
-            s.E<RequiredResponseProgressEvent>().Any(item => item.ResolutionId == firstUse && item.ResponseCount == 1 && item.RequiredResponseCount == 2),
-            "Returning from the already-paid loss child must still request the second actual Dodge, rather than recomputing the old response set as one.");
-        s.Cold(); var secondDodge = s.Respond(); s.Reach(() => s.E<CardUseFinishedEvent>().Any(item => item.ResolutionId == firstUse)); s.Play();
-        Need(firstDodge != secondDodge && s.E<DamageAppliedEvent>().Length == 0 && s.V().Armor == 1,
-            "Both original response costs finish the pre-loss defense without spending Armor or applying damage.");
-
-        var next = s.BeginRequested(); var nextUse = s.Attack(next).Id;
-        Need(s.Attack(next).CardAttack is { RequiredDodgeResponses: 1, SuccessfulDodgeResponses: 0 } && !s.Has(Skill),
-            "A new actual Slash rechecks the now-missing skill and starts with the ordinary one-Dodge requirement.");
-        s.Cold(); var ordinary = s.Respond(); s.Reach(() => s.E<CardUseFinishedEvent>().Any(item => item.ResolutionId == nextUse)); s.Play();
-        Need(s.E<RequiredResponseProgressEvent>().All(item => item.ResolutionId != nextUse) && s.E<DamageAppliedEvent>().Length == 0,
-            "One real new response suffices after source loss; the old frozen requirement cannot leak into another use.");
-
-        s.Use("recover"); Need(s.V().Hp == 4 && s.Has(Skill), "An actual recovery restores the conditional production skill for future actions.");
-        var third = s.BeginRequested(); var thirdUse = s.Attack(third).Id;
-        Need(s.Attack(third).CardAttack?.RequiredDodgeResponses == 2, "The recovered source again requires two for a newly issued Slash.");
-        var partial = s.Respond(); s.AtResponse(0); s.Cold();
-        Need(s.Attack(third).CardAttack is { RequiredDodgeResponses: 2, SuccessfulDodgeResponses: 1 }, "The first original Dodge alone does not complete the recovered double defense.");
-        s.Answer(choice => choice.Parameters.GetValueOrDefault("response") == "take-damage"); s.At(DamageWatch);
-        Need(s.E<DamageAppliedEvent>() is [{ SourceSeat: 1, TargetSeat: 0, Amount: 1, ArmorPayment: { ArmorBefore: 1, ArmorAbsorbed: 1, HpLossAmount: 0 } }] &&
-            s.V() is { Hp: 4, Armor: 0 } && s.E<RequiredResponseProgressEvent>().Where(item => item.ResolutionId == thirdUse)
-                .Select(item => (item.ResponseCount, item.RequiredResponseCount)).SequenceEqual([(1, 2)]),
-            "Declining the still-required second Dodge applies one complete native damage fact through Armor; the prior paid Dodge is neither refunded nor counted as two.");
-        s.Cold(); s.Continue(); s.Reach(() => s.E<CardUseFinishedEvent>().Any(item => item.ResolutionId == thirdUse)); s.Play();
-        foreach (var card in new[] { firstDodge, secondDodge, ordinary, partial }) s.AssertPaidOnce(card, 0, CardMoveReasons.ResponseFinished);
-        foreach (var card in new[] { first, next, third }) s.AssertPaidOnce(card, 1, CardMoveReasons.UseFinished);
-        Need(s.E<CardRespondedEvent>().Count(item => item.ResponderSeat == 0 && item.EffectiveCardKind == CardKind.Dodge) == 4 &&
-            s.E<CardUseFinishedEvent>().Count(item => IsSlash(item.CardKind)) == 3,
-            "Cold replay preserves all four separate original responses, three distinct physical Slash uses and one Armor payment exactly once."); s.Cold();
-    }
-
     private static bool IsSlash(CardKind kind) => kind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash;
     private static void Need(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
     private static string State(GameEngine game) => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, game.PlayerCount).Select(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat))),

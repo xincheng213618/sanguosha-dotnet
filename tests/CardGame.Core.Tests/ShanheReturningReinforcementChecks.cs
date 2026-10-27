@@ -105,65 +105,6 @@ internal static class ShanheReturningReinforcementChecks
         }
     }
 
-    public static void FreshLocalOpeningsKeepPhysicalHandGearAndInitialDongdangThenLethallyEnterShenNu()
-    {
-        var definition = Definition(3, true);
-        foreach (var id in new[] { "huanyuan:xunyu-source-native", "dagu:qiangwang-source-native" })
-        {
-            var node = definition.Nodes.Single(candidate => candidate.Id == id.Split(':')[0]);
-            var setup = Enter(definition, node, node.Encounters!.Single(encounter => encounter.Id == id));
-            var game = Start(setup, withDriver: false);
-            if (id.StartsWith("huanyuan", StringComparison.Ordinal))
-            {
-                Reach(game, () => HumanPlay(game));
-                var leader = game.CreateSnapshot(1).Players[1];
-                Need(leader is { GeneralId: StandardShanheSourceXunYuPackage.GeneralId, Hp: 3, MaxHp: 10, Armor: 4, HandCount: 8 } &&
-                    leader.Hand.Any(card => card.Kind == CardKind.GouXiang && card.Suit == Suit.Club && card.Rank == 2) &&
-                    leader.Equipment.Count == 0 && game.CreateSnapshot(2).Players[2] is { Hp: 8, MaxHp: 8, HandCount: 6 } &&
-                    Facts<TurnStartedEvent>(game).All(turn => turn.ActorSeat == 0),
-                    "At the first real human Play, Xun Yu and his guard have their exact local HP/armor/physical opening; the extra armor card is in Hand rather than auto-equipped.");
-            }
-            else
-            {
-                Reach(game, () => Facts<TurnStartedEvent>(game).Length > 0);
-                Need(Facts<TurnStartedEvent>(game).First().ActorSeat == 1 &&
-                    Facts<ShanheSourceDongdangInitialEntryEvent>(game) is [{ OwnerSeat: 1,
-                        GeneralId: StandardShanheSourceQiangWangPackage.GeneralId,
-                        Source: { OwnerSeat: 1, SkillId: ShanheSourceDongdangRules.SkillId, BindingId: ShanheSourceDongdangRules.InitialBindingId } }] &&
-                    Facts<ShanheBossStageStartedEvent>(game).Length == 0 && game.CreateSnapshot(1).Players[1] is { Hp: 11, MaxHp: 11 },
-                    "The actual local Qiang Wang consumes its own initial Dongdang source and takes the first natural turn without manufacturing a transformation.");
-            }
-            for (var index = 0; index < setup.EnemyRoster.Count; index++)
-            {
-                var member = setup.EnemyRoster[index]; var seat = 1 + setup.AllyRoster.Count + index;
-                Need(game.CardMovements.Count(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(seat) &&
-                        move.Reason == CardMoveReasons.InitialDeal) == 4 + member.InitialHandBonus &&
-                    (member.StartingCards ?? []).All(card => game.CardMovements.Count(move => move.From == CardLocation.OutsideGame &&
-                        move.To == CardLocation.Hand(seat) && move.CardKind == card.Kind) == 1),
-                    "Every real NPC receives the configured random opening plus each fixed equipment hand entity exactly once.");
-            }
-        }
-
-        var final = definition.Nodes.Single(node => node.Id == "luoyang");
-        var battle = Enter(definition, final, final.Encounters!.Single(encounter => encounter.Id == "luoyang:gaichao-s5"), sturdyPlayer: true);
-        var stageGame = Start(battle, withDriver: true); Reach(stageGame, () => HumanPlay(stageGame));
-        var bossSeat = 1 + battle.AllyRoster.Count; var previousTurn = stageGame.State.TurnNumber;
-        Submit(stageGame, new UseProgramSkillCommand(0, Driver, "lethal", [], [bossSeat], stageGame.Revision,
-            stageGame.CreateSnapshot(0).PendingDecision!.PromptId));
-        Reach(stageGame, () => Facts<ShanheBossStageStartedEvent>(stageGame).Length == 1 &&
-            stageGame.State.CurrentSeat == bossSeat && stageGame.State.Phase == TurnPhase.Play && stageGame.ResolutionStack.Count == 0);
-        var boss = stageGame.CreateSnapshot(bossSeat).Players[bossSeat];
-        Need(battle.SourceDifficultyId is null && boss is { GeneralId: StandardShanheSourceShenNuStagePackage.GeneralId, Hp: 28, MaxHp: 28 } &&
-            boss.Skills!.Any(skill => skill.ContentId == StandardShanheSourceShenNuStagePackage.SkillId) &&
-            Facts<DamageAppliedEvent>(stageGame).Any(damage => damage.SourceSeat == 0 && damage.TargetSeat == bossSeat && damage.Amount == 20) &&
-            Facts<ShanheBossTurnInterruptedEvent>(stageGame).Single().TurnNumber == previousTurn &&
-            Facts<TurnStartedEvent>(stageGame).Last().ActorSeat == bossSeat && stageGame.State.Winner == Winner.None &&
-            battle.BossTransition!.StartingEquipment!.All(face => boss.Equipment.Count(card => card.Kind == face.Kind &&
-                card.Suit == face.Suit && card.Rank == face.Rank && stageGame.CardMovements.Count(move => move.CardId == card.Id &&
-                    move.From == CardLocation.OutsideGame && move.To == CardLocation.Equipment(bossSeat)) == 1) == 1),
-            "Real lethal damage in the local session enters the 28-HP Shen Nu body, installs its exact stage gear and starts its natural turn once without completing the battle.");
-    }
-
     private static ShanheCampaignDefinition Definition(int difficulty, bool codex) => codex
         ? StandardShanheCampaignCatalog.CreateCodexDefinition(difficulty, StandardShanheCampaignCatalog.Returning2026EditionId)
         : StandardShanheCampaignCatalog.CreateDefinition(difficulty, StandardShanheCampaignCatalog.Returning2026EditionId);

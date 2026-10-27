@@ -35,7 +35,7 @@ internal static class LeDiaoChanUiChecks
         using var model = new MainViewModel(false, prepared.Seed, true, store, contentRegistry: registry,
             historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore())
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         var window = new MainWindow(model);
         try

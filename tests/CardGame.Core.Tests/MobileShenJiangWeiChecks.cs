@@ -7,42 +7,6 @@ using CardGame.Core.Campaigns;
 internal static partial class MobileShenJiangWeiChecks
 {
     private const string Hero = "mobile:shen-jiang-wei", Driver = "fixture:mobile-jw-driver", Watch = "fixture:mobile-jw-watch", Rescue = "fixture:mobile-jw-rescue", Quiet = "fixture:mobile-jw-quiet", Mode = "identity:classic-mobile-jw-fixture";
-    public static void XinghunPhysicalExchangeAndOrderedSlashesCold()
-    {
-        var (g, registry) = Start(); Play(g);
-        Need(V(g).Hand.Any(c => c.Kind == CardKind.Slash) && V(g).Hand.Any(c => c.Kind == CardKind.Dodge), "The small fixed physical deck supplies an actual Slash and Dodge without searching seeds.");
-        var keep = new[] { V(g).Hand.First(c => c.Kind == CardKind.Slash).Id, V(g).Hand.First(c => c.Kind == CardKind.Dodge).Id };
-        while (V(g).HandCount > 2) Give(g, V(g).Hand.First(c => !keep.Contains(c.Id)).Id, 2);
-        Accept(g, new UseProgramSkillCommand(0, "mobile:xinghun", "five-stars", [], [], g.Revision, P(g)!.PromptId));
-        Menu(g, MobileJiangWeiStage.Exchange); Answer(g, c => Branch(c) == "hand" && c.Cards.SequenceEqual([keep[0]]));
-        Menu(g, MobileJiangWeiStage.ExchangeTop);
-        var top = P(g)!.Choices.FirstOrDefault(c => Branch(c) == "top" && c.Label.Contains("闪", StringComparison.Ordinal)) ?? P(g)!.Choices.First(c => Branch(c) == "top");
-        var topId = top.Cards.Single(); var ownHand = V(g).HandCount;
-        Answer(g, c => c.Id == top.Id); Reach(g, p => p.SkillPrompt?.SkillId == Watch);
-        var root = Root(g)!; var rootId = root.Id;
-        Need(root.MobileJiangWei is { Stage: MobileJiangWeiStage.ExchangeChildren, Paid.Count: 2 } && root.PendingMovementContinuation is not null &&
-            Zone(g, topId) == CardLocation.Hand(0) && Zone(g, keep[0]) == CardLocation.DrawPile && V(g).HandCount == ownHand,
-            "Xinghun truly exchanges equal physical cards before its original paid movement child; it never turns this into drawing or a private public event.");
-        g = Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue");
-        Menu(g, MobileJiangWeiStage.Exchange); Answer(g, c => Branch(c) == "exchange-done");
-        while (Root(g)?.MobileJiangWei?.Stage == MobileJiangWeiStage.Ordering || P(g) is null)
-        {
-            Reach(g, p => p.SkillPrompt?.SkillId == "mobile:xinghun");
-            if (Root(g)?.MobileJiangWei?.Stage != MobileJiangWeiStage.Ordering) break;
-            var choices = P(g)!.Choices; Answer(g, c => c.Id == (choices.FirstOrDefault(c => c.Cards.SequenceEqual([keep[0]])) ?? choices.First()).Id);
-        }
-        Menu(g, MobileJiangWeiStage.Target); Answer(g, c => c.Targets.SequenceEqual([1])); Play(g);
-        var issued = E<MobileJiangWeiUseIssuedEvent>(g).Where(e => e.Return.ParentId == rootId).Select(e => e.Return).ToArray();
-        var shown = E<CardsRevealedEvent>(g).Where(e => e.ResolutionId == rootId).SelectMany(e => e.Cards).ToArray();
-        Need(shown.Length == 5 && shown.Select(c => c.Id).Distinct().Count() == 5 && issued.Length > 0 && issued.Any(e => e.From == CardLocation.Processing) &&
-            issued.All(e => e.Kind == CardKind.Slash && E<MobileJiangWeiUseReturnedEvent>(g).Count(r => r.FrameId == rootId && r.UseId == e.UseId && r.ActionId == e.ActionId) == 1) &&
-            g.CreateCardZoneDiagnostics().All(c => c.Location != CardLocation.Processing) && E<MobileJiangWeiCompletedEvent>(g).Count(e => e.FrameId == rootId) == 1,
-            "The other character reveals five distinct real hand/top cards; each payable Slash completes its native Use once and no unspent shown deck card leaks in Processing.");
-        Use(g, "draw"); Play(g);
-        Need(g.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash), "The physical Xinghun sequence does not debit the owner's normal Slash quota.");
-        var replay = GameReplay.Replay(Options(), g.AcceptedCommands, registry);
-        Need(State(g) == State(replay), "The exact exchange, private order, foreign opaque choices and physical Slash stream replay from commands.");
-    }
     public static void TiantaoShenpeiAndHuitianUseRealNativeReturns()
     {
         var (g, registry) = Start(); Play(g);

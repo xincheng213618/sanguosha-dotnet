@@ -274,7 +274,9 @@ internal static class ShanheXingtianChecks
                 [new(old ? CardKind.XingtianAxe : CardKind.ShanheXingtianAxe, Suit.Spade, 2), new(CardKind.IronChain, Suit.Club, 12),
                  new(CardKind.Slash, Suit.Heart, 7), new(CardKind.Slash, Suit.Club, 8), new(CardKind.Slash, Suit.Heart, 9),
                  new(CardKind.Peach, Suit.Heart, 2), new(CardKind.Peach, Suit.Heart, 3), new(CardKind.Peach, Suit.Heart, 4), .. (extra ?? [])], [],
-                [new(Target) { StartingHand = [new(CardKind.Dodge, Suit.Heart, 2)] }, new(Reactor) { StartingHand = [] },
+                [new(Target) { StartingHand = [new(CardKind.Dodge, Suit.Heart, 2)],
+                    StartingEquipment = [new(CardKind.SilverLion, Suit.Club, 1), new(CardKind.Crossbow, Suit.Club, 2)] },
+                 new(Reactor) { StartingHand = [] },
                  new(Peer) { StartingHand = [] }], [], new string('c', 64));
             var g = GameEngine.CreateStandard(new GameOptions
             {

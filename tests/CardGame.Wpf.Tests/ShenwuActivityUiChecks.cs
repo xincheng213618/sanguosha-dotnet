@@ -64,10 +64,10 @@ internal static partial class ShenwuActivityUiChecks
                 vm.AliveText.Contains("联合军 3") && vm.AliveText.Contains("首领 1") && vm.AliveText.Contains("烛阴 2"),
                 "The live six-seat table must retain god faction, dedicated equipment and distinct leader/minion labels.");
             Program.Render(root, 1440, 880, Path.Combine(output, "161-shenwu-table.png"));
-            vm.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
             var saved = SnapshotJson.Serialize(game.CreateSnapshot(0));
             vm.SelectedTableMode = vm.TableModes.Single(mode => mode.ModeId == "team:standard-2v2");
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             Program.Assert(!vm.HasSaveError && Program.Engine(vm).ModeId == "activity:shenwu-2017" &&
                 vm.SelectedStartingTeam.TeamId == activity.PlayerTeamId && vm.WindowTitle.Contains("神武再世") &&
                 vm.TableArenaTitle == "神 武 再 世" && vm.Seats.Count(seat => seat.RoleLabel == "首领") == 1 &&
@@ -81,7 +81,7 @@ internal static partial class ShenwuActivityUiChecks
             Program.Assert(!configuredWithoutShenwu.Modes.ContainsKey("activity:shenwu-2017") &&
                 reopened.TableModes.All(mode => mode.ModeId != "activity:shenwu-2017"),
                 "The second desktop must genuinely start without Shenwu in its configured registry or lobby.");
-            reopened.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(reopened);
             Program.Assert(!reopened.HasSaveError && Program.Engine(reopened).ModeId == "activity:shenwu-2017" &&
                 reopened.SelectedTableMode.ModeId == "activity:shenwu-2017" && reopened.IsTeamModeSelection &&
                 reopened.StartingTeams.Count == 1 && reopened.SelectedStartingTeam.TeamId == activity.PlayerTeamId &&

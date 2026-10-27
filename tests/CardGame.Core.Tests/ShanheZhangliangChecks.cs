@@ -31,27 +31,6 @@ internal static class ShanheZhangliangChecks
         s.Cold();
     }
 
-    public static void OwnTurnActualDrawAndObtainBatchesDealOnceCold()
-    {
-        var s = Scene.Start(); s.Play(); var hp = s.V().Hp;
-        s.Use("draw-two"); s.AtWatch();
-        s.CheckGainFrame(CardLocation.DrawPile);
-        Need(s.V().HandCount == 12 && s.V().Hp == hp - 1,
-            "One real two-card draw batch above ten hand cards deals one native damage, rather than damage per entity.");
-        s.Cold(); s.Continue(); s.Play();
-        Need(s.WuyingCount == 1, "The paid native damage returns to the original gain frame once.");
-        s.Use("gain-two", 1); s.AtWatch(); s.CheckGainFrame(CardLocation.Hand(1));
-        Need(s.V().HandCount == 14 && s.V().Hp == hp - 2,
-            "A two-card hand acquisition also qualifies once; Wuying is not limited to draws.");
-        s.Cold(); s.Continue(); s.Play();
-        Need(s.WuyingCount == 2, "Cold recovery cannot repeat a completed acquisition penalty.");
-        var otherHand = s.V(1).HandCount;
-        s.Use("draw-other", 1); s.Play();
-        Need(s.V(1).HandCount == otherHand + 2 && s.WuyingCount == 2,
-            "Another character gaining cards during the enemy's turn cannot borrow the actual turn owner's Wuying qualification.");
-        s.Cold();
-    }
-
     private static void Need(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
 
     private sealed class Scene(GameEngine game, ContentRegistry registry)

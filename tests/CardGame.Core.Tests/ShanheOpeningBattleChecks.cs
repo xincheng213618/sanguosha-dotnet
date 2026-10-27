@@ -12,7 +12,7 @@ internal static class ShanheOpeningBattleChecks
         ShanheCampaignSession Create(ShanheCampaignOptions? current = null) => ShanheCampaignSession.Create(definition,
             current ?? options, StandardShanheCampaignCatalog.CreateBattleRegistry);
         var session = Create();
-        Need(session.Snapshot.Phase == ShanheCampaignPhase.Map && session.Snapshot.AvailableNodes.Count == 2 &&
+        Need(definition.AllowChapterDetours && session.Snapshot.Phase == ShanheCampaignPhase.Map && session.Snapshot.AvailableNodes.Count == 2 &&
             session.Snapshot.AvailableNodes.All(node => node.Kind == ShanheNodeKind.Battle && node.ChapterNumber == 1) &&
             session.Snapshot.OpeningSkillOffers.Count == 0 && session.Snapshot.ExtraSkillIds.Count == 0,
             "Without inheritance the expedition opens directly on two first-chapter battle locations and grants no forced initial skill.");

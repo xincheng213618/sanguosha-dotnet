@@ -50,7 +50,7 @@ Windows 用户也可以双击 [Play.cmd](Play.cmd)：源码目录会构建并启
 2. 出牌时点选可用手牌，再点选合法目标；操作区展示实际牌名、转化效果和所需目标。
 3. 点击主按钮或按 Enter 确认；Esc 取消当前选择，1–9 选择手牌，Ctrl+Enter 结束出牌。
 4. 响应时选择亮起的手牌并确认；多牌组合、装备效果、技能与放弃选项按中央公布的精确候选执行。
-5. 自动推进在需要玩家操作时暂停；可以调节速度、暂停或单步观察。F5 独立保存手动存档。
+5. 自动推进在需要玩家操作时暂停；可以调节速度、暂停或单步观察。山河图可用 F5 保存征程进度，战败或退出后从当前关卡开头重试，保留此前通关与领奖进度，不恢复手牌和回合；其他模式每次独立开局，仅保留游戏记录。
 
 牌桌显示公开身份与武将信息、装备、判定区、连环和翻面状态。隐藏手牌、身份及私有选择按玩家视角投影；开发者视图属于可信本机诊断。
 
@@ -61,7 +61,7 @@ Windows 用户也可以双击 [Play.cmd](Play.cmd)：源码目录会构建并启
 | 选牌、目标与响应 | [目标选择](docs/CARD_TARGET_SELECTION.md)、[手牌响应](docs/HAND_RESPONSES.md)、[技能交互](docs/SKILL_INTERACTION.md) |
 | 铁索与重铸 | [铁索连环](docs/IRON_CHAIN_RECAST.md) |
 | 教学与指南 | [新手演练](docs/NEW_PLAYER_TUTORIAL.md)、[玩家指南](docs/PLAYER_GUIDE.md) |
-| 保存与继续 | [本地存档与恢复](docs/SAVE_AND_RESUME.md) |
+| 保存与继续 | [征程保存与对局记录](docs/SAVE_AND_RESUME.md) |
 | 设置与反馈 | [本机偏好](docs/PLAYER_PREFERENCES.md)、[战斗反馈](docs/BATTLE_FEEDBACK.md)、[音频](docs/BATTLE_AUDIO.md) |
 | 战绩与观战 | [战绩](docs/MATCH_HISTORY.md)、[对局速度与观战](docs/PLAYBACK_AND_SPECTATING.md) |
 | 创建自己的武将 | [自定义武将与可视化技能编辑](docs/CUSTOM_GENERALS.md) |

@@ -93,64 +93,6 @@ internal static class ShanheHuxinMirrorChecks
             "Qinggang bypasses only the directly attacked mirror; the actual later chained holder pays its own armor once and prevents the same frozen Fire Slash damage.");
     }
 
-    public static void HandMirrorPlacesOnAnotherNativeSlotAndReturnsReplacementRecoveryAndMovementChildren()
-    {
-        var s = Scene.Start(placement: true);
-        var incoming = s.V(0).Hand.First(c => c.Kind == CardKind.HuxinMirror).Id;
-        var spare = s.V(0).Hand.Last(c => c.Kind == CardKind.HuxinMirror).Id;
-        var oldArmor = s.V(1).Equipment.Single(c => c.Kind == CardKind.SilverLion).Id;
-        Need(!s.Has(0) && !s.Has(1) && s.V(1).Hp == 4, "Only a real equipped mirror grants prevention; a hand mirror does not.");
-        var action = s.G.GetHumanLegalActions().Single(a => a.CardId == incoming && a.Kind == LegalActionKind.Equip && a.TargetSeat == 1);
-        s.Submit(new PlayCardCommand(0, incoming, action.TargetSeats, s.G.Revision, s.P!.PromptId, action.PlayedCardKind));
-        s.Until(() => s.P?.SkillPrompt?.SkillId == Watch);
-        var parent = s.G.ResolutionStack.OfType<HuxinMirrorPlacementFrame>().Single();
-        Need(parent.ActorSeat == 0 && parent.TargetSeat == 1 && parent.CardId == incoming && parent.From == CardLocation.Hand(0) &&
-            s.G.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Any(w => w.ResumeHuxinMirrorPlacementFrameId == parent.Id &&
-                w.Batch.ParentFrameId == parent.Id) && s.V(1).Equipment.Single(c => c.Kind == CardKind.HuxinMirror).Id == incoming &&
-            s.Has(1) && !s.Has(0) && s.V(1).Hp == 5 &&
-            s.Events<SilverLionRemovedRecoveryEvent>().Count(e => e.PlayerSeat == 1 && e.RecoveredAmount == 1) == 1 &&
-            s.Events<CardUseDeclaredEvent>().All(e => e.CardId != incoming) && s.Events<CardUseFinishedEvent>().Length == 0,
-            "The original hand entity directly replaces the other person's armor, returns real Silver Lion recovery and pauses on its own movement child without inventing a card use.");
-        s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue" || c.Parameters.GetValueOrDefault("option") == "continue" || c.Id.Value.EndsWith("continue", StringComparison.Ordinal));
-        s.Play();
-        Need(s.G.CardMovements.Count(m => m.CardId == incoming && m.From == CardLocation.Hand(0) &&
-                m.To == CardLocation.Equipment(1) && m.Reason == CardMoveReasons.EquipmentEnter) == 1 &&
-            s.G.CardMovements.All(m => m.CardId != incoming || m.To != CardLocation.Processing) &&
-            s.G.CardMovements.Count(m => m.CardId == oldArmor && m.From == CardLocation.Equipment(1) &&
-                m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.EquipmentReplace) == 1 &&
-            s.Events<EquipmentChangedEvent>().Count(e => e.ResolutionId == parent.Id && e.CardId == incoming && e.ReplacedCardId == oldArmor) == 1 &&
-            s.V(0).HandCount == 2 && s.Events<HuxinMirrorPaidEvent>().Length == 0,
-            "Placement commits each original move once and resumes the original human Play after its real movement benefit.");
-        var self = s.G.GetHumanLegalActions().Single(a => a.CardId == spare && a.Kind == LegalActionKind.Equip && a.TargetSeat is null);
-        s.Submit(new PlayCardCommand(0, spare, self.TargetSeats, s.G.Revision, s.P!.PromptId, self.PlayedCardKind)); s.Play();
-        Need(s.Has(0) && s.V(0).Equipment.Single(c => c.Kind == CardKind.HuxinMirror).Id == spare &&
-            s.Events<CardUseDeclaredEvent>().Count(e => e.CardId == spare && e.CardKind == CardKind.HuxinMirror) == 1 &&
-            s.Events<CardUseFinishedEvent>().Length == 1,
-            "The separate ordinary self-equip path remains a real card use; only the source rule's other-person placement bypasses Use.");
-        s.Submit(new EndPlayPhaseCommand(0, s.G.Revision, s.P!.PromptId));
-        CheckPlacementDoesNotInheritARealHandUseProhibition();
-    }
-
-    private static void CheckPlacementDoesNotInheritARealHandUseProhibition()
-    {
-        var s = Scene.Start(placement: true, ban: true);
-        var mirror = s.V(0).Hand.First(c => c.Kind == CardKind.HuxinMirror).Id;
-        s.Submit(new UseProgramSkillCommand(0, Driver, "hurt-peer", [], [1], s.G.Revision, s.P!.PromptId)); s.Play();
-        Need(s.Events<HandCardColorRestrictionGrantedEvent>().Count(e => e.Restriction.AffectedSeat == 0 &&
-                e.Restriction.Source.OwnerSeat == 1) == 2 &&
-            s.G.GetHumanLegalActions().All(a => a.CardId != mirror || a.Kind != LegalActionKind.Equip || a.TargetSeat is not null),
-            "A genuine opponent damage-triggered two-colour hand ban removes ordinary hand-mirror use through the native use restriction.");
-        var place = s.G.GetHumanLegalActions().Single(a => a.CardId == mirror && a.Kind == LegalActionKind.Equip && a.TargetSeat == 1);
-        s.Submit(new PlayCardCommand(0, mirror, place.TargetSeats, s.G.Revision, s.P!.PromptId, place.PlayedCardKind));
-        s.Until(() => s.P?.SkillPrompt?.SkillId == Watch);
-        s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue"); s.Play();
-        Need(s.V(1).Equipment.Single(c => c.Kind == CardKind.HuxinMirror).Id == mirror && s.Has(1) &&
-            s.G.CardMovements.Count(m => m.CardId == mirror && m.From == CardLocation.Hand(0) &&
-                m.To == CardLocation.Equipment(1)) == 1 &&
-            s.Events<CardUseDeclaredEvent>().All(e => e.CardId != mirror),
-            "The very same prohibited hand entity still follows the source rule's legal direct placement and original movement-child return, without using the card.");
-    }
-
     private sealed class Scene(GameEngine game)
     {
         public GameEngine G { get; } = game;

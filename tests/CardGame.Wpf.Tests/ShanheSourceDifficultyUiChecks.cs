@@ -24,6 +24,7 @@ internal static class ShanheSourceDifficultyUiChecks
             "The source-reproduction scenario exposes the genuine twenty-five distinct source identities.");
         vm.SelectedShanheDifficulty = vm.ShanheDifficulties[24];
         vm.ShanheGeneralSearch = "SP刘备·煮酒";
+        vm.ToggleShanheGeneralRosterCommand.Execute(null);
         vm.SelectedShanheGeneral = vm.ShanheGenerals.Single(general => general.Id == StandardOlSpLiuBei664Package.GeneralId);
         vm.SelectedShanheScenario = vm.ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.LocalEditionId);
         Program.Assert(vm.ShanheDifficulties.Count == 3 && vm.SelectedShanheDifficulty.Value == 1,
@@ -48,9 +49,10 @@ internal static class ShanheSourceDifficultyUiChecks
         Program.Render(panel, 1440, 880, Path.Combine(output, "shanhe-source-25-map.png"));
         var offeredButtons = Program.Find<Button>(panel).Where(button => button.DataContext is ShanheJourneyNode { IsAvailable: true }).ToArray();
         var bounds = offeredButtons.Select(button => button.TransformToAncestor(panel).TransformBounds(new Rect(new Size(button.ActualWidth, button.ActualHeight)))).ToArray();
-        Program.Assert(offeredButtons.Length == 7 && vm.ShanheSourceRegions.Count == 1 &&
+        Program.Assert(offeredButtons.Select(button => ((ShanheJourneyNode)button.DataContext).Node.Id).ToHashSet()
+                .SetEquals(session.Snapshot.AvailableNodes.Select(node => node.Id)) && vm.ShanheSourceRegions.Count == 1 &&
             bounds.SelectMany((rectangle, index) => bounds.Skip(index + 1).Select(other => rectangle.IntersectsWith(other))).All(overlap => !overlap),
-            "Seven actual source destinations have separate clickable rectangles, and the unchosen starting region does not crowd the map.");
+            "Every available source destination, including the local elite camp, has a separate clickable rectangle; the unchosen region does not crowd the map.");
         panel.DataContext = null;
         var first = vm.ShanheMapRows.SelectMany(row => row.Nodes).First(node => node.IsAvailable);
         var preview = session.PreviewEncounter(first.Id);
@@ -67,10 +69,13 @@ internal static class ShanheSourceDifficultyUiChecks
         var saved = ShanheCampaignJson.Serialize(progress.Read().Campaign);
         using var cold = Create();
         cold.ContinueShanheCommand.Execute(null);
+        Program.Assert(cold.IsShanheBattleRetryReady && !cold.IsShanheBattleSession,
+            "Source progress restores the current encounter entry without an in-flight game.");
+        cold.ResumeShanheBattleCommand.Execute(null);
         Program.Assert(cold.IsShanheBattleSession && cold.SelectedShanheScenario.Id == StandardShanheCampaignCatalog.Source2026EditionId &&
             cold.SelectedShanheDifficulty.Value == 25 && SnapshotJson.Serialize(Program.Engine(cold).CreateSnapshot(0)) == expected &&
             ShanheCampaignJson.Serialize(progress.Read().Campaign) == saved,
-            "Cold restore preserves source tier twenty-five, its battle state and the original expedition save.");
+            "Retry preserves source tier twenty-five and reconstructs its initial battle without changing expedition progress.");
         VerifyRegionChoiceOnlyChangesPresentation(output);
 
         MainViewModel Create() => new(false, 71, true, new MemorySaveStore(), useExpandedContent: true,
@@ -84,7 +89,7 @@ internal static class ShanheSourceDifficultyUiChecks
         var definition = ShanheCampaignContent.FreezeAndValidate(source with
         {
             StartingNodeIds = cities.ToArray(), RandomStartingNode = false,
-            Nodes = source.Nodes.Where(node => cities.Contains(node.Id)).Select(node => node with { NextNodeIds = [] }).ToArray()
+            Nodes = source.Nodes.Where(node => cities.Contains(node.Id)).Select(node => node with { NextNodeIds = [], EliteUpgradeNodeId = null }).ToArray()
         });
         var session = ShanheCampaignSession.Create(definition,
             new(71, StandardOlSpLiuBei664Package.GeneralId) { SourceDifficultyId = 11, UseCodexRewardPool = true },

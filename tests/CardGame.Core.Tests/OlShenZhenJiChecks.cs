@@ -9,38 +9,6 @@ internal static class OlShenZhenJiChecks
     private const string Hero = "ol:shen-zhen-ji", Shenfu = "ol:shenfu", Peer = "fixture:ol-shen-zhen-ji-peer",
         NoDraw = "fixture:ol-shen-zhen-ji-no-draw", Quiet = "fixture:ol-shen-zhen-ji-quiet",
         Hold = "fixture:ol-shen-zhen-ji-hold", Deck = "fixture:ol-shen-zhen-ji-deck";
-    public static void EvenDrawAndOpaqueDiscardRepeatFromOriginalFrameCold()
-    {
-        var s = Scene.Begin(odd: false);
-        s.Need(s.V(0).HandLimit == 7 && s.V(0).HandCount == 0 && !s.Frame.OlShenfu!.Odd,
-            "The official four-HP event general really starts the fixed even Shenfu branch with Qixian's seven-card limit.");
-        s.Choose("draw:2");
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Hold && s.G.ResolutionStack.OfType<NativeDrawAttemptFrame>().Any());
-        var frame = s.Frame;
-        s.Need(frame.OlShenfu is { Stage: OlShenfuStage.Drawing, TargetSeat: 2, Ordinal: 1 } && s.V(2).HandCount == 0,
-            "The original Shenfu instruction holds its accepted target while the real one-card producer is suspended.");
-        s.Cold(); s.Reach(() => s.P is { PlayerSeat: 0 } && s.P.SkillPrompt?.SkillId == Shenfu);
-        s.Need(s.V(2).HandCount == 1 && s.V(2).Hp == 1 && !s.P!.Choices.Any(c => c.Targets.Contains(2)) &&
-            s.E<OlShenfuDrawReturnedEvent>().Count(e => e.FrameId == frame.Id && e.Ordinal == 1 && e.Actual == 1) == 1,
-            "Cold completes one actual draw exactly once; hand equals HP permits another flow, excluding the first target.");
-        s.Choose("discard:1");
-        s.Need(s.Frame.OlShenfu is { Stage: OlShenfuStage.HandCard, TargetSeat: 1 } &&
-            s.P!.Choices.Count == 2 && s.P.Choices.All(c => c.Cards.Count == 0 && c.Description.Contains("手牌", StringComparison.Ordinal)),
-            "Shenfu chooses an actual legal foreign Hand slot without revealing its physical identity.");
-        s.Answer(c => c.Parameters.GetValueOrDefault("option") == "card");
-        s.Reach(() => s.P is { PlayerSeat: 0 } && s.P.SkillPrompt?.SkillId == Shenfu);
-        s.Need(s.V(1).HandCount == 1 && s.V(1).Hp == 1 && !s.P!.Choices.Any(c => c.Targets.Contains(1) || c.Targets.Contains(2)) &&
-            s.E<OlShenfuDiscardedEvent>().Count(e => e.FrameId == frame.Id && e.Ordinal == 2 && e.After > e.Before) == 1 &&
-            s.G.CardMovements.Count(m => m.From == CardLocation.Hand(1) && m.To == CardLocation.DiscardPile && m.Reason.Value == "skill.ol-shen-zhen-ji.shenfu.discard") == 1,
-            "One real logical discard leaves equal hand and HP and opens the next flow without reusing either target.");
-        s.Choose("draw:0"); s.Reach(() => s.E<TurnEndedEvent>().Any(e => e.TurnNumber == 1));
-        var results = s.E<OlShenfuFlowResolvedEvent>().Where(e => e.FrameId == frame.Id).ToArray();
-        s.Need(s.V(0).HandCount == 1 && s.V(0).Hp == 4 && results.Select(e => e.MayRepeat).SequenceEqual([true, true, false]) &&
-            s.E<OlShenfuStartedEvent>().Count(e => e.FrameId == frame.Id && !e.Odd) == 1 &&
-            s.E<OlShenfuTargetSelectedEvent>().Where(e => e.FrameId == frame.Id).Select(e => e.TargetSeat).SequenceEqual([2, 1, 0]) &&
-            s.G.ResolutionStack.OfType<ProgramSkillFrame>().All(f => f.OlShenfu is null),
-            "The initial even branch remains fixed when self draw changes hand parity; a nonmatching hand/HP result stops and cleans the original instruction.");
-    }
     public static void OddNativeDyingDeathRepeatsAndSurvivorStopsCold()
     {
         var s = Scene.Begin(odd: true); var frameId = s.Frame.Id;

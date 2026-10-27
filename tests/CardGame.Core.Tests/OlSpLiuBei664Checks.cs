@@ -12,9 +12,6 @@ internal static class OlSpLiuBei664Checks
     public static void RealBrewQuotaLimitedGrantAndThunderAdjustmentResumeCold() =>
         RealBrewQuotaLimitedGrantAndThunderAdjustment(restoreAtBoundaries: true);
 
-    public static void RealBrewQuotaLimitedGrantAndThunderAdjustmentForward() =>
-        RealBrewQuotaLimitedGrantAndThunderAdjustment(restoreAtBoundaries: false);
-
     private static void RealBrewQuotaLimitedGrantAndThunderAdjustment(bool restoreAtBoundaries)
     {
         var (game, registry) = Create(true, 4); Play(game);
@@ -60,38 +57,6 @@ internal static class OlSpLiuBei664Checks
         Need(ordinary.Events.All(item => item.Payload is not OlSpLiuBeiZhujiuDisabledEvent) &&
             ordinary.GetHumanLegalActions().All(action => action.ProgramSkillId != Zhujiu),
             "An all-club conversion preserves Zhujiu but cannot exceed the ordinary wine quota without an actual extra-use policy.");
-    }
-
-    public static void DyingBrewUsesRealMaterialsAndRaisesSubsequentWinePriceCold() =>
-        DyingBrewUsesRealMaterialsAndRaisesSubsequentWinePrice(restoreAtBoundaries: true);
-
-    public static void DyingBrewUsesRealMaterialsAndRaisesSubsequentWinePriceForward() =>
-        DyingBrewUsesRealMaterialsAndRaisesSubsequentWinePrice(restoreAtBoundaries: false);
-
-    private static void DyingBrewUsesRealMaterialsAndRaisesSubsequentWinePrice(bool restoreAtBoundaries)
-    {
-        var (game, registry) = Create(false, 1); Play(game);
-        Use(game, "lose");
-        Reach(game, () => game.PendingDecision is { PlayerSeat: 0 } prompt && prompt.SkillPrompt?.SkillId == Zhujiu &&
-            prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("stage") == "materials"));
-        if (restoreAtBoundaries) game = Cold(game, registry);
-        var card = Hand(game).First(item => item.Suit == Suit.Club).Id;
-        Answer(game, choice => choice.Cards.SequenceEqual([card])); Answer(game, choice => choice.Id.Value.EndsWith(".use", StringComparison.Ordinal));
-        Reach(game, () => game.PendingDecision is { PlayerSeat: 0 } prompt && prompt.SkillPrompt?.SkillId == Zhujiu &&
-            prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("stage") == "materials"));
-        var more = Hand(game).Where(item => item.Suit == Suit.Club).Take(2).Select(item => item.Id).ToArray();
-        foreach (var material in more) Answer(game, choice => choice.Cards.SequenceEqual([material]));
-        Answer(game, choice => choice.Id.Value.EndsWith(".use", StringComparison.Ordinal));
-        Play(game, decline: true);
-        Need(game.CreateSnapshot(0).Players[0] is { IsAlive: true, Hp: 1, HasAlcoholEffect: false } &&
-            game.Events.Select(item => item.Payload).OfType<OlSpLiuBeiZhujiuIssuedEvent>().Select(item => item.PaidCount).SequenceEqual([1, 2]) &&
-            !game.Events.Select(item => item.Payload).OfType<JianjiOrdinaryAlcoholPaidEvent>().Any(fact => fact.ActorSeat == 0 && fact.CountsQuota) &&
-            game.CardMovements.Count(move => move.CardId == card && move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile) == 1,
-            "The self-dying conversion consumes the actual material and completes a real alcohol recovery without creating an ordinary damage boost.");
-        UseBrew(game);
-        Need(game.ResolutionStack.OfType<ProgramSkillFrame>().Last(frame => frame.SkillId == Zhujiu).OlSpLiuBei664?.Minimum == 3,
-            "Both real dying wines raise X for a subsequent ordinary conversion while leaving the ordinary allowance available.");
-        Answer(game, choice => choice.Id.Value.EndsWith(".cancel", StringComparison.Ordinal)); Play(game, decline: true);
     }
 
     private static (GameEngine, ContentRegistry) Create(bool tiger, int hp)

@@ -59,10 +59,10 @@ internal static class HulaoActivityUiChecks
                     new GeneralPortraitViewModel(id).Image is not null),
                 "The actual Hulao boss and all three form aliases must load the existing attributed Shen Lu Bu portrait.");
             Program.Render(root, 1440, 880, Path.Combine(output, "158-hulao-table.png"));
-            vm.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
             var saved = SnapshotJson.Serialize(Program.Engine(vm).CreateSnapshot(0));
             vm.SelectedTableMode = vm.TableModes.Single(mode => mode.ModeId == "team:standard-2v2");
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             Program.Assert(!vm.HasSaveError && Program.Engine(vm).ModeId == "activity:hulao-2022" &&
                 vm.SelectedStartingTeam.TeamId == "team:allies" && vm.WindowTitle.Contains("虎牢关") &&
                 vm.TableModeText.Contains("第 1/2 阶段") && vm.TableModeText.Contains("洗牌 0/2") &&

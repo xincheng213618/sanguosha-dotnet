@@ -240,9 +240,9 @@
                             <TextBlock Text="点击手牌 → 选择目标 → 确认出牌" Style="{StaticResource GuideSubheading}" Margin="0,3,0,8" />
                             <TextBlock Text="再次点击已选手牌或目标可以取消。中央的响应、技能和目标组合按钮会直接提交完整选择。" Style="{StaticResource GuideBody}" />
                             <TextBlock Text="常用快捷键" Style="{StaticResource GuideSubheading}" />
-                            <TextBlock Text="F1　打开或关闭指南&#10;Esc　关闭最上层面板，或取消选择&#10;Enter　确认当前出牌或弃牌&#10;Ctrl + Enter　结束出牌阶段&#10;1–9　选择对应位置的手牌（须可选）&#10;Ctrl + F　在自选武将、武将图鉴或指南中搜索&#10;F5　保存到独立手动存档&#10;Ctrl + M　切换游戏静音" Style="{StaticResource GuideBody}" LineHeight="28" />
+                            <TextBlock Text="F1　打开或关闭指南&#10;Esc　关闭最上层面板，或取消选择&#10;Enter　确认当前出牌或弃牌&#10;Ctrl + Enter　结束出牌阶段&#10;1–9　选择对应位置的手牌（须可选）&#10;Ctrl + F　在自选武将、武将图鉴或指南中搜索&#10;F5　保存山河图征程进度&#10;Ctrl + M　切换游戏静音" Style="{StaticResource GuideBody}" LineHeight="28" />
                             <TextBlock Text="自动保存与继续" Style="{StaticResource GuideSubheading}" />
-                            <TextBlock Text="游戏操作会自动保存。可在「战报 / 存档」手动保存或读取，下次启动时点击「继续上次对局」。读取会替换当前牌局，手动存档独立保留。" Style="{StaticResource GuideBody}" />
+                            <TextBlock Text="山河图自动保存征程进度；战败或退出后从当前关卡开头重试，不恢复手牌和回合。已通关与领奖的进度保留，主动结束征程才会放弃整次进度。其他模式每次独立新开，完成后保留游戏记录，不提供恢复存档。" Style="{StaticResource GuideBody}" />
                             <TextBlock Text="开局、指南和需要你决定的询问都会暂停自动行动。关闭指南后，仍按你原来的自动推进设置继续，不会替你选牌或提交响应。" Style="{StaticResource GuideBody}" Margin="0,15,0,0" />
                         </StackPanel>
                     </ScrollViewer>

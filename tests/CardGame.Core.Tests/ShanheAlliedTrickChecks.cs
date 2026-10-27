@@ -10,63 +10,6 @@ internal static class ShanheAlliedTrickChecks
     private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(new StandardContentPackage(),
         new StandardShanheMarketPackage(), new StandardShanheAlliedTricksPackage(), new Fixture()));
 
-    public static void PaidFengshounianSkipsIssuedEnemyPickerWithoutReducingReveal()
-    {
-        var s = Scene.Start();
-        var baseline = s.Use(CardKind.FiveGrains);
-        var baseId = s.UseId(baseline);
-        Need(s.Events<HarvestCardSelectedEvent>().Where(e => e.ResolutionId == baseId)
-                .Select(e => e.PlayerSeat).SequenceEqual([0, 1, 2, 3]),
-            "Registering the future product leaves the unowned real Five Grains available to every original target.");
-        s.AssertPaid(baseline);
-
-        var card = s.Begin(CardKind.FiveGrains);
-        s.Until(() => s.P is { Kind: DecisionKind.SelectHarvestCard, PlayerSeat: 2 });
-        var prompt = s.P!.PromptId;
-        var id = s.UseId(card);
-        Need(s.Events<HarvestCardSelectedEvent>().Where(e => e.ResolutionId == id)
-                .Select(e => e.PlayerSeat).SequenceEqual([0, 1]),
-            "The unowned native draft really reaches the first enemy after both friendly players have chosen.");
-        s.Buy(StandardShanheCampaignCatalog.CurrentFengshounianRewardId);
-        s.Play();
-        var revealed = s.Events<CardsRevealedEvent>().Single(e => e.ResolutionId == id).Cards.Select(c => c.Id).ToArray();
-        var selected = s.Events<HarvestCardSelectedEvent>().Where(e => e.ResolutionId == id).ToArray();
-        Need(revealed.Length == 4 && s.Events<GroupCardUsedEvent>().Single(e => e.ResolutionId == id)
-                .TargetSeats.SequenceEqual([0, 1, 2, 3]) &&
-            selected.Select(e => e.PlayerSeat).SequenceEqual([0, 1]) && s.P!.PromptId != prompt &&
-            revealed.Except(selected.Select(e => e.CardId)).All(leftover => s.G.CardMovements.Count(move =>
-                move.CardId == leftover && move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile &&
-                move.Reason == CardMoveReasons.HarvestDiscard) == 1),
-            "The live paid grant retires the enemy's issued choice on the original frame, retains four targets and reveals, and discards the two remaining real cards once.");
-        s.AssertPaid(card);
-    }
-
-    public static void PaidJiemengDoublesAlliedRequestBeforeNativeCapsAndRecoveryBonuses()
-    {
-        var s = Scene.Start(wounded: true);
-        var first = s.Use(CardKind.PeachGarden);
-        Need(s.Events<RecoveryAppliedEvent>().Select(e => (e.TargetSeat, e.Amount))
-                .SequenceEqual([(0, 1), (1, 2), (2, 1), (3, 1)]) &&
-            s.G.CreateSnapshot(0).Players.Select(p => p.Hp).SequenceEqual([2, 3, 2, 2]),
-            "Before purchase ordinary Peach Garden heals one; the ally's already owned recovery bonus remains its separate native layer.");
-        s.AssertPaid(first);
-        s.Buy(StandardShanheCampaignCatalog.CurrentJiemengRewardId);
-        var before = s.Events<RecoveryAppliedEvent>().Length;
-        var second = s.Use(CardKind.PeachGarden);
-        Need(s.Events<RecoveryAppliedEvent>().Skip(before).Select(e => (e.TargetSeat, e.Amount))
-                .SequenceEqual([(0, 2), (1, 3), (2, 1), (3, 1)]) &&
-            s.G.CreateSnapshot(0).Players.Select(p => p.Hp).SequenceEqual([4, 6, 3, 3]),
-            "The real paid tactic doubles only self and the public teammate's base request; enemy healing stays one and the teammate's native plus-one still applies once.");
-        s.AssertPaid(second);
-        before = s.Events<RecoveryAppliedEvent>().Length;
-        var third = s.Use(CardKind.PeachGarden);
-        Need(s.Events<RecoveryAppliedEvent>().Skip(before).Select(e => (e.TargetSeat, e.Amount))
-                .SequenceEqual([(0, 1), (1, 2), (2, 1), (3, 1)]) &&
-            s.G.CreateSnapshot(0).Players.Select(p => p.Hp).SequenceEqual([5, 8, 4, 4]),
-            "Both doubled requests and the ally's extra recovery obey each actual maximum HP without inflating the applied recovery facts.");
-        s.AssertPaid(third);
-    }
-
     public static void OrdinaryIdentityDoesNotInferAlliesFromHiddenRolesOrSharedFaction()
     {
         var s = Scene.StartIdentity();

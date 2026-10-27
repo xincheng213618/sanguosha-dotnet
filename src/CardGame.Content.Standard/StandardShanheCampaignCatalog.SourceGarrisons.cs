@@ -56,8 +56,8 @@ public static partial class StandardShanheCampaignCatalog
         { StoryText = "西凉校尉率精锐部众拦路，军医和护卫紧守阵脚。" };
         return new(id, region.Name + " · 精锐军营（本地）", ShanheNodeKind.EliteBattle, [nextId], [encounter], rewards)
         {
-            ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle, CategorizedRewards = true,
-            PrimaryTacticRarity = 2, PrimarySkillRarity = 2, RewardSkipGold = 100,
+            ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle, CategorizedRewards = true, AutomaticRewardCategory = true,
+            PrimaryTacticRarity = 2, PrimarySkillRarity = region.ChapterNumber >= 2 ? 3 : 2, PrimaryCardRarity = 2, RewardSkipGold = 100,
             StoryText = encounter.StoryText,
             Description = "获得200铜币并选择稀有战法或技能奖励，随后继续本章路线。"
         };

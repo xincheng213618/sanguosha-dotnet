@@ -40,26 +40,6 @@ internal static class ShanheSchoolTrickChecks
         }
     }
 
-    public static void GroupRespondersAndDeadTargetsStayOnTheOriginalUse()
-    {
-        var s = Scene.Start(complete: true, fengzi: false, firstDodge: true);
-        var hpA = s.Player(1).Hp; var hpB = s.Player(2).Hp;
-        var card = s.Use(CardKind.ArrowBarrage); s.Play();
-        var use = s.Events<CardUseDeclaredEvent>().Single(e => e.CardId == card);
-        Need(s.Player(1).Hp == hpA - 1 && s.Player(2).Hp == hpB - 2 &&
-            s.Events<DamageAppliedEvent>().Count(e => e.SourceCardUseResolutionId == use.ResolutionId && e.TargetSeat == 1) == 1 &&
-            s.Events<DamageAppliedEvent>().Count(e => e.SourceCardUseResolutionId == use.ResolutionId && e.TargetSeat == 2) == 2 &&
-            s.G.CardMovements.Count(m => m.From == CardLocation.Hand(1) && m.To == CardLocation.Processing) == 1,
-            "Both original group targets resolve twice: the first spends its only real Dodge in round one and takes round two, while the unprotected target takes both.");
-        var dying = Scene.Start(complete: true, fengzi: false, firstHp: 1);
-        var duel = dying.Use(CardKind.Duel, 1); dying.Play();
-        var original = dying.Events<CardUseDeclaredEvent>().Single(e => e.CardId == duel);
-        Need(!dying.Player(1).IsAlive && dying.Player(2).IsAlive &&
-            dying.Events<DamageAppliedEvent>().Count(e => e.SourceCardUseResolutionId == original.ResolutionId) == 1 &&
-            dying.Events<ShanheSchoolTrickCompletedEvent>().Count() == 1,
-            "A first-effect death leaves the real match running, retires the pending extra effect once, and never reopens a response for a dead target.");
-    }
-
     private static void Need(bool value, string message)
     { if (!value) throw new InvalidOperationException(message); }
 

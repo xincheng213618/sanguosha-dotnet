@@ -40,7 +40,7 @@ internal static class ParticipantPromptUiChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(autoAdvance: false, seed: game.Seed, showSetup: true,
             saveStore: store, useExpandedContent: false, contentRegistry: registry) { IsMotionEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         game = Program.Engine(model);
         var host = Host(model);
@@ -84,11 +84,11 @@ internal static class ParticipantPromptUiChecks
             game.Events.Count(e => e.Payload is MouChenLinInvitationAnswerEvent a && a.FrameId == frameId) == 2,
             "The human's native Give must finish once before saving with one real NPC still unanswered.");
 
-        model.SaveGameCommand.Execute(null);
+        LegacySaveFixtures.Save(model);
         Program.Assert(!model.HasSaveError && store.Read(GameSaveSlot.Manual).Checkpoint.Revision == game.Revision, model.SaveStatus);
         var detached = game;
         var detachedRevision = detached.Revision;
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         game = Program.Engine(model);
         host = Host(model);

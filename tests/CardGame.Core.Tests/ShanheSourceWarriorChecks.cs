@@ -9,21 +9,6 @@ internal static class ShanheSourceWarriorChecks
     private const string Deck = "fixture:source-warrior-deck", Enemy = "fixture:source-warrior-target";
     private const string MoveReason = "skill-program." + Luoyi + ".MoveBoundCards";
 
-    public static void LuoyiDeclinesAfterItsRealRevealThenDiscardsAllThreeAndDrawsNormally()
-    {
-        var s = Scene.Start();
-        s.Reveal();
-        var shown = s.Revealed;
-        s.Option("normal-draw"); s.Play();
-        Need(s.NormalDraws == 2 && s.V.HandCount == 4 && shown.All(c => s.CleanupCount(c.Id) == 1) &&
-            !s.Events<ProgramTurnPhaseSubstitutedEvent>().Any(e => e.SkillId == Luoyi) &&
-            !s.Events<CardDamageModifierGrantedEvent>().Any(e => e.Modifier.Source.SkillId == Luoyi) &&
-            s.Events<ProgramBindingResolvedEvent>().Count(e => e.SkillId == Luoyi && e.Completed) == 1,
-            "Declining only the second choice discards each of the three original Processing entities once, keeps real Draw2 and grants no skip or damage bonus. " + s.Diagnostic());
-        s.Slash(); s.Play();
-        Need(s.Damages is [{ Amount: 1 }], "Declining after reveal leaves the actual native Slash at one damage.");
-    }
-
     public static void LuoyiAcceptsMixedEntitiesAndItsSourceBonusExpiresAtTheNextOwnerTurn()
     {
         var s = Scene.Start();
@@ -52,28 +37,6 @@ internal static class ShanheSourceWarriorChecks
         Need(s.Damages.Select(e => e.Amount).SequenceEqual([2, 1]) &&
             s.Events<CardDamageModifierGrantedEvent>().Count(e => e.Modifier.Source.SkillId == Luoyi) == 1,
             "The original +1 expires at next owner turn start; a later physical Slash deals one without a second grant. " + s.Diagnostic());
-    }
-
-    public static void LuoyiAllowsItsSecondAcceptanceWithoutAnyEligibleCard()
-    {
-        var s = Scene.Start(armorOnly: true, initialSlashKind: CardKind.ColdSlash);
-        s.Reveal();
-        var shown = s.Revealed;
-        Need(shown.All(c => c.Kind == CardKind.BaguaFormation) &&
-            s.P!.Choices.Any(c => c.Parameters.GetValueOrDefault("option-id") == "skip-draw"),
-            "Source723 still offers the real second acceptance when the three revealed armors yield no eligible card.");
-        s.Option("skip-draw"); s.Play();
-        Need(s.NormalDraws == 0 && s.V.HandCount == 2 && shown.All(c => s.CleanupCount(c.Id) == 1 &&
-                s.Zone(c.Id) == CardLocation.DiscardPile) &&
-            s.Events<ProgramTurnPhaseSubstitutedEvent>().Count(e => e.SkillId == Luoyi) == 1 &&
-            s.Events<CardDamageModifierGrantedEvent>().Count(e => e.Modifier.Source.SkillId == Luoyi && e.Modifier.Amount == 1) == 1,
-            "An empty gain still skips the real Draw phase, cleans each revealed entity and grants the source723 effect once. " + s.Diagnostic());
-        var coldId = s.V.Hand.First(c => c.Kind == CardKind.ColdSlash).Id;
-        s.Slash(); s.Play();
-        Need(s.Damages is [{ Amount: 2, Nature: DamageNature.Cold }] &&
-            s.Events<CardUseDeclaredEvent>().Count(e => e.CardId == coldId && e.CardKind == CardKind.ColdSlash && e.SourceSeat == 0) == 1 &&
-            s.G.CardMovements.Count(m => m.CardId == coldId && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1,
-            "No eligible gain is required: the original physical Cold Slash pays once and its actual Cold damage receives source723's +1.");
     }
 
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }

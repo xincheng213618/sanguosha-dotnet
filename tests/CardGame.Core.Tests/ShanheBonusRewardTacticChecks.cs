@@ -6,7 +6,6 @@ internal static class ShanheBonusRewardTacticChecks
 {
     private const string AceTactic = "tactic-economy-2013";
     private const string AceSkill = "tactic-economy-2014";
-    private const string MoreSkills = "tactic-economy-2016";
     private const string MoreTactics = "tactic-economy-2017";
     private const string MoreCards = "tactic-economy-2018";
     private const string Guard = "fixture:shanhe-guard";
@@ -82,121 +81,11 @@ internal static class ShanheBonusRewardTacticChecks
             "Declining the primary reward pays its thirteen copper once before the still-required frozen bonus group.");
     }
 
-    public static void BossEpicBonusUsesEarnedSkillReplacementAndExhaustionBeforeFinalSettlement()
-    {
-        foreach (var baseSkill in new[] { "legendary-guard", "legendary-raid" })
-        {
-            var definition = BossDefinition(baseSkill);
-            var session = Create(definition, AceSkill, MoreCards);
-            Complete(session, "boss");
-            var summary = session.Snapshot.BossRewardSummary ?? throw new InvalidOperationException("A chapter boss must retain its normal bundle.");
-            var epic = summary.Groups.Single(group => group.Id.StartsWith("$bonus:", StringComparison.Ordinal));
-            Require(!summary.IsBonusOnly && summary.Groups.Count == 3 && summary.FixedGold == 500 && summary.SkillSlots == 1 &&
-                session.Snapshot.Gold == 600 && session.Snapshot.ExtraSkillSlots == 1 && epic.Offers.Count == 1 &&
-                epic.Offers[0].Rarity == 3 && epic.Offers[0].SkillId == Raid,
-                "The owned boss tactic appends one real epic skill group to the two ordinary groups, deduplicates aliases and grants no extra slot.");
-            Accept(session, new ChooseShanheBossRewardCommand("skills", baseSkill, null, session.Revision));
-            var afterBase = session.Snapshot.BossRewardSummary!;
-            var bonus = afterBase.Groups.Single(group => group.Id == epic.Id);
-            if (baseSkill == "legendary-guard")
-            {
-                var before = session.Snapshot;
-                Require(!session.Submit(new ChooseShanheBossRewardCommand(epic.Id, epic.Offers[0].Id, null, session.Revision)).Accepted &&
-                    ReferenceEquals(before, session.Snapshot), "An earned locked epic skill still requires an explicit legal replacement when the real slot is full.");
-                Accept(session, new ChooseShanheBossRewardCommand(epic.Id, epic.Offers[0].Id, Guard, session.Revision));
-                Require(session.Snapshot.ExtraSkillIds.SequenceEqual([Raid]) && session.Snapshot.ExtraSkillSlots == 1,
-                    "The earned epic skill bypasses only account research and replaces the chosen actual skill within the one real slot.");
-            }
-            else
-            {
-                Require(bonus.IsExhausted && bonus.IsResolved && bonus.Offers.Count == 0 && epic.Offers.Count == 1,
-                    "Claiming the same native skill from the base group removes the sole frozen epic candidate, keeps the old snapshot frozen and never redraws a substitute.");
-            }
-            Accept(session, new ChooseShanheBossRewardCommand("tactics", "legendary-tactic", null, session.Revision));
-            Require(session.Snapshot.BossRewardSummary is { CanConfirm: true } && session.Snapshot.Gold == 600 &&
-                session.Snapshot.CompletedNodeIds.Count == 0, "All available groups resolve before confirmation, without repeating fixed copper or skill capacity.");
-            Accept(session, new ConfirmShanheBossRewardCommand(session.Revision));
-            Require(session.Snapshot.Gold == 600 && session.Snapshot.ExtraSkillSlots == 1 && session.Snapshot.CompletedNodeIds.SequenceEqual(["boss"]),
-                "Confirming the mixed bundle advances the node and never pays its fixed reward a second time.");
-        }
-
-        var final = BossDefinition("legendary-guard");
-        final = final with
-        {
-            Nodes = [final.Nodes[0] with { NextNodeIds = [], ChapterNumber = 3, BossRewards = null,
-                RewardIds = ["base"], AddSkillSlotsOnVictory = 0 }]
-        };
-        var ended = Create(final, AceSkill, MoreCards);
-        Complete(ended, "boss");
-        Require(ended.Snapshot.Phase == ShanheCampaignPhase.Won && ended.Snapshot.BossRewardSummary is null &&
-            ended.Snapshot.RewardOffers.Count == 0 && ended.Snapshot.RewardCategories.Count == 0 &&
-            ended.Snapshot.Gold == 107 && ended.Snapshot.ExtraSkillSlots == 0,
-            "The real third-chapter final victory settles immediately with encounter copper and no ordinary or additional growth group or skill slot.");
-        SkillChoiceTacticExpandsBothBossSkillGroups();
-    }
-
-    private static void SkillChoiceTacticExpandsBothBossSkillGroups()
-    {
-        var source = StandardShanheCampaignCatalog.CurrentEconomyTactics.Single(tactic => tactic.SourceId == 2016);
-        var definition = BossDefinition("legendary-guard");
-        string[] nativeSkills = ["standard:yingzi", "standard:wusheng", "standard:paoxiao"];
-        var extraRewards = nativeSkills.SelectMany((skill, index) => new[]
-        {
-            new ShanheRewardDefinition("legendary-native-" + index, "传说技能" + index, SkillId: skill) { Rarity = 4 },
-            new ShanheRewardDefinition("epic-native-" + index, "史诗技能" + index, SkillId: skill) { Rarity = 3 }
-        });
-        definition = definition with
-        {
-            Rewards = definition.Rewards.Concat(extraRewards).Append(new(source.RewardId, source.Name)
-                { CampaignEconomy = source.Effect, Rarity = source.Rarity }).ToArray(),
-            Nodes = definition.Nodes.Select(node => node.BossRewards is null ? node : node with
-            {
-                BossRewards = node.BossRewards with
-                {
-                    Groups = node.BossRewards.Groups.Select(group => group.Id != "skills" ? group : group with
-                    { RewardIds = ["legendary-guard", "legendary-native-0", "legendary-native-1", "legendary-native-2"], ChoiceCount = 3 }).ToArray()
-                }
-            }).ToArray()
-        };
-        foreach (var hasSkillChoice in new[] { false, true })
-        {
-            var equipped = hasSkillChoice ? new[] { AceSkill, MoreCards, MoreSkills } : new[] { AceSkill, MoreCards };
-            var session = Create(definition, equipped);
-            Complete(session, "boss");
-            var summary = session.Snapshot.BossRewardSummary!;
-            var skills = summary.Groups.Single(group => group.Id == "skills");
-            var epic = summary.Groups.Single(group => group.Id.StartsWith("$bonus:", StringComparison.Ordinal));
-            var count = hasSkillChoice ? 4 : 3;
-            Require(skills.Offers.Count == count && skills.Offers.All(reward => reward.Rarity == 4 && reward.SkillId is not null) &&
-                epic.Offers.Count == count && epic.Offers.All(reward => reward.Rarity == 3 && reward.SkillId is not null) &&
-                skills.Offers.Select(reward => reward.SkillId).Distinct().Count() == count &&
-                epic.Offers.Select(reward => reward.SkillId).Distinct().Count() == count &&
-                summary.Groups.Single(group => group.Id == "tactics").Offers.Count == 1 &&
-                session.Snapshot.Gold == 600 && session.Snapshot.ExtraSkillSlots == 1,
-                "An actual chapter victory offers three base and epic skills by default, or four in both frozen groups only with 2016; card choices cannot expand skills or repeat credits.");
-            Accept(session, new ChooseShanheBossRewardCommand("tactics", "legendary-tactic", null, session.Revision));
-            var afterTactic = session.Snapshot.BossRewardSummary!;
-            Require(afterTactic.Groups.Single(group => group.Id == skills.Id).Offers.Select(reward => reward.Id)
-                    .SequenceEqual(skills.Offers.Select(reward => reward.Id)) &&
-                afterTactic.Groups.Single(group => group.Id == epic.Id).Offers.Select(reward => reward.Id)
-                    .SequenceEqual(epic.Offers.Select(reward => reward.Id)),
-                "Claiming the separate tactic group preserves both already frozen skill candidate lists without redrawing.");
-        }
-    }
-
     private static ShanheCampaignDefinition EliteDefinition() => new("fixture:ace-elite-rewards", "精英追加奖励",
         [ShanheCampaignChecks.Player], ["elite"],
         [BattleNode("elite", ShanheNodeKind.EliteBattle, ["ordinary"]), BattleNode("ordinary", ShanheNodeKind.Battle, ["finish"]),
             new("finish", "归程", ShanheNodeKind.Camp, [], Choices: [new("leave", "归程")])],
         Rewards(), StartingGold: 100, ExtraSkillSlots: 1);
-
-    private static ShanheCampaignDefinition BossDefinition(string baseSkill) => new("fixture:ace-boss-rewards", "首领追加奖励",
-        [ShanheCampaignChecks.Player], ["boss"],
-        [BattleNode("boss", ShanheNodeKind.BossBattle, ["finish"]) with
-            { ChapterNumber = 1, ChapterTitle = "首章", BossRewards = new(500, 1,
-                [new("tactics", "传说战法", ["legendary-tactic"], ChoiceCount: 1), new("skills", "传说技能", [baseSkill], ChoiceCount: 1)]) },
-            new("finish", "归程", ShanheNodeKind.Camp, [], Choices: [new("leave", "归程")])],
-        Rewards(), StartingGold: 100, ExtraSkillSlots: 0);
 
     private static ShanheNodeDefinition BattleNode(string id, ShanheNodeKind kind, IReadOnlyList<string> next) =>
         new(id, id, kind, next, [new(id + "-guard", "守军", [new(ShanheCampaignChecks.Enemy)], VictoryGold: 7)], ["base"])

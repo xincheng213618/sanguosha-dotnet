@@ -10,7 +10,6 @@ internal static class SkillProgramSelectedJudgmentChecks
     private const string ClubTriggerId = "club-recover-damage";
     private const string JudgmentReason = "skill.selected-judgment-test.leiji";
 
-
     internal static void SelectedSubjectDamageAndReplay()
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new FixturePackage());
@@ -81,7 +80,6 @@ internal static class SkillProgramSelectedJudgmentChecks
                     .Count(item => item.SkillId == ProgramId && item.TargetSeat == targetSeat) == 1,
             "The selected subject, final-result cursor, damage and resumed Dodge response must replay exactly.");
     }
-
 
     private static GameEngine FindActivationBoundary(
         ContentRegistry registry,
@@ -157,7 +155,6 @@ internal static class SkillProgramSelectedJudgmentChecks
         throw new InvalidOperationException("The selected-judgment fixture did not reach human play.");
     }
 
-
     private static void FinishResolution(GameEngine game)
     {
         for (var step = 0; step < 96; step++)
@@ -222,56 +219,6 @@ internal static class SkillProgramSelectedJudgmentChecks
         }
     }
 
-    private sealed class OrderingFixturePackage : IGameContentPackage
-    {
-        internal const string ModeId = "identity:judgment-ordering-5";
-        internal const string OwnerGeneralId = "judgment-ordering-test:owner";
-        private const string ReplacementProgramId = "judgment-ordering-test:replace";
-        private static readonly string[] OtherGeneralIds =
-            Enumerable.Range(1, 4).Select(index => $"judgment-ordering-test:other-{index}").ToArray();
-
-        public PackageManifest Manifest { get; } = new(
-            "judgment-replacement-ordering-fixture", new Version(1, 0, 0),
-            [new PackageDependency("standard", new Version(1, 11, 0))]);
-
-        public void Register(IContentRegistryBuilder builder)
-        {
-            var catalog = SkillProgramCatalog.Load(OrderingRules, OrderingPresentation);
-            foreach (var program in catalog.Programs.Values.OrderBy(item => item.Id, StringComparer.Ordinal))
-                builder.AddSkill(new ContentSkillDefinition(program.Id,
-                    catalog.Presentations[program.Id].Name,
-                    catalog.Presentations[program.Id].Description)
-                { Program = program });
-            builder.AddGeneral(new ContentGeneralDefinition(
-                OwnerGeneralId, "改判顺序测试", "zhang_jiao", ProgramId, "qun", BaseHp: 4,
-                AdditionalSkillIds: [ReplacementProgramId]));
-            foreach (var id in OtherGeneralIds)
-                builder.AddGeneral(new ContentGeneralDefinition(
-                    id, "改判顺序陪测", "cao_cao", ReplacementProgramId, "wei", BaseHp: 4));
-            var physicalCards = Enumerable.Range(0, 60).SelectMany(_ => new[]
-            {
-                new ContentDeckPhysicalCard("standard:slash", Suit.Spade, 7),
-                new ContentDeckPhysicalCard("standard:dodge", Suit.Spade, 2)
-            }).ToArray();
-            builder.AddDeck(new ContentDeckRecipe("judgment-ordering-test:deck", "改判顺序夹具", 4, 2, [])
-            {
-                PhysicalCards = physicalCards
-            });
-            builder.AddMode(new ContentModeDefinition(
-                ModeId, "改判顺序测试", 5, 5,
-                new Dictionary<string, int>
-                {
-                    [nameof(Role.Lord)] = 1,
-                    [nameof(Role.Loyalist)] = 1,
-                    [nameof(Role.Rebel)] = 2,
-                    [nameof(Role.Renegade)] = 1
-                },
-                DeckId: "judgment-ordering-test:deck",
-                GeneralCandidateCount: 5,
-                GeneralPoolIds: [OwnerGeneralId, .. OtherGeneralIds]));
-        }
-    }
-
     private static GameCheckpoint RoundTrip(GameCheckpoint checkpoint) =>
         GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(checkpoint));
 
@@ -317,36 +264,6 @@ internal static class SkillProgramSelectedJudgmentChecks
           },
           "selected-judgment-test:observer":{
             "name":"发起者过滤陪测","description":"只有自己发起的指定原因判定才会订阅。"
-          }
-        }}
-        """;
-
-    private const string OrderingRules = """
-        {"schemaVersion":62,"skills":[
-          {"id":"selected-judgment-test:leiji","revision":1,"minimumRulesVersion": 171,"modifiers":[],"viewAs":[],"activations":[],"contributions":[],"triggers":[
-            {"id":"after-dodge","window":"cardResponseAccepted","ownerRelation":"actor","cardKinds":["dodge"],
-             "optional":true,"effects":[
-              {"op":"selectTarget","target":"owner","targetKind":"otherLiving"},
-              {"op":"startJudgment","target":"selectedTarget","judgmentReason":"skill.judgment-ordering-test","resultBind":"judgment-card","visibility":"public"},{"op":"moveBoundCards","target":"owner","sourceBind":"judgment-card","destination":"discardPile"}
-             ]}
-          ]},
-          {"id":"judgment-ordering-test:replace","revision":1,"minimumRulesVersion": 171,"modifiers":[],"viewAs":[],"activations":[],"contributions":[],"triggers":[
-            {"id":"replace","window":"judgmentReplacing","subject":"any","excludedReasons":[],
-             "optional":true,"effects":[
-              {"op":"replaceJudgment","target":"owner","zones":["hand"],"suits":["spade","club"],
-               "oldCardDestination":"discardPile"}
-             ]}
-          ]}
-        ]}
-        """;
-
-    private const string OrderingPresentation = """
-        {"schemaVersion":3,"skills":{
-          "selected-judgment-test:leiji":{
-            "name":"改判顺序判定发起","description":"打出闪后选择另一名角色判定。"
-          },
-          "judgment-ordering-test:replace":{
-            "name":"改判顺序候选","description":"用黑色手牌替换任意角色的判定牌。"
           }
         }}
         """;

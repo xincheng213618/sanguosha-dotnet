@@ -19,15 +19,15 @@ public sealed partial class MainViewModel
     private bool _disposed;
     private bool _hasAutomaticSave;
     private bool _hasManualSave;
-    private string _saveStatus = "行动后自动保存；也可手动保存当前牌局。";
+    private string _saveStatus = "本模式每次独立开局；结束后保留战绩，不保存续玩进度。";
     private string _automaticSaveText = string.Empty;
     private string _manualSaveText = string.Empty;
     private bool _hasSaveError;
-    private bool _loadFailed;
 
     public bool HasAutomaticSave { get => _hasAutomaticSave; private set => SetProperty(ref _hasAutomaticSave, value); }
     public bool HasManualSave { get => _hasManualSave; private set => SetProperty(ref _hasManualSave, value); }
     public bool HasAnySave => HasAutomaticSave || HasManualSave;
+    public bool CanSaveShanheProgress => HasShanheSession && (IsShanheOpen || IsShanheBattleSession) && !IsTutorialActive;
     public string SaveStatus
     {
         get => _saveStatus;
@@ -43,9 +43,11 @@ public sealed partial class MainViewModel
     private void InitializePersistence(IGameSaveStore? saveStore)
     {
         _saveStore = saveStore ?? new FileGameSaveStore();
-        SaveGameCommand = new RelayCommand(() => { if (!IsTutorialActive) SaveCurrentGame(GameSaveSlot.Manual); }, () => !IsTutorialActive);
-        LoadManualGameCommand = new RelayCommand(() => { if (!IsTutorialActive) LoadGame(GameSaveSlot.Manual, wushuang: IsWushuangTable); }, () => HasManualSave && !IsTutorialActive);
-        ContinueGameCommand = new RelayCommand(() => ContinueAutomaticGame(), () => HasAutomaticSave && !IsTutorialActive);
+        SaveGameCommand = new RelayCommand(() => { if (CanSaveShanheProgress) SaveShanheProgress(); }, () => CanSaveShanheProgress);
+        // Ordinary matches retain history, but no longer expose resumable saves.
+        // Keep the checkpoint readers below for legacy validation and diagnostics.
+        LoadManualGameCommand = new RelayCommand(() => { }, () => false);
+        ContinueGameCommand = new RelayCommand(() => { }, () => false);
         _saveTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromSeconds(1) };
         _saveTimer.Tick += OnSaveTick;
         RefreshSaveSlots();
@@ -106,7 +108,7 @@ public sealed partial class MainViewModel
 
     private void QueueAutoSave()
     {
-        if (_initializing || _disposed || !_sessionActivated || IsTutorialActive) return;
+        if (_initializing || _disposed || !_sessionActivated || IsTutorialActive || !IsShanheBattleSession) return;
         _autoSavePending = true;
         // Coalesce at most one second of commands without starving saves during continuous AI play.
         if (_saveTimer is { IsEnabled: false }) _saveTimer.Start();
@@ -131,34 +133,9 @@ public sealed partial class MainViewModel
     private bool SaveCurrentGame(GameSaveSlot slot)
     {
         if (IsShanheBattleSession) return SaveShanheProgress();
-        try
-        {
-            FlushWushuangClock();
-            FlushNianClock();
-            var save = new GameSaveFile(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow,
-                IsAutoAdvance, _game.CreateCheckpoint())
-            { PlaybackSpeedId = SelectedPlaybackSpeed.Id,
-                CustomGenerals = HasCustomGenerals(_game.ContentRegistry) ? _activeCustomGenerals : null };
-            (IsWushuangTable ? _wushuangSaveStore! : _saveStore).Write(slot, save);
-            if (slot == GameSaveSlot.Automatic) _autoSavePending = false;
-            RefreshSaveSlots();
-            RefreshWushuangSaveSlot();
-            if (slot == GameSaveSlot.Manual) _loadFailed = false;
-            if (!_loadFailed)
-            {
-                HasSaveError = false;
-                SaveStatus = $"{(IsWushuangTable ? "单骑无双独立存档 · " : string.Empty)}{(slot == GameSaveSlot.Automatic ? "已自动保存" : "已手动保存")} · {save.SavedAtUtc.ToLocalTime():HH:mm:ss}";
-            }
-            return true;
-        }
-        catch (Exception exception) when (IsSaveException(exception))
-        {
-            HasSaveError = true;
-            SaveStatus = _game.IsFaulted
-                ? "保存已暂停：牌局因结算异常停止，已有存档未被覆盖。请读取此前存档恢复。"
-                : $"保存失败：{ReadableSaveError(exception)} 当前牌局仍可继续，可稍后重试。";
-            return false;
-        }
+        _autoSavePending = false;
+        _saveTimer?.Stop();
+        return true;
     }
 
     private void ContinueAutomaticGame(bool wushuang = false)
@@ -170,7 +147,7 @@ public sealed partial class MainViewModel
 
     private void LoadGame(GameSaveSlot slot, bool wushuang = false)
     {
-        SaveShanheBeforeOrdinaryGame();
+        if (!SaveShanheBeforeOrdinaryGame()) return;
         try
         {
             var save = (wushuang ? _wushuangSaveStore! : _saveStore).Read(slot);
@@ -222,7 +199,6 @@ public sealed partial class MainViewModel
             IsNewGameSetupOpen = false;
             IsHelpOpen = false;
             IsLogOpen = false;
-            _loadFailed = false;
             HasSaveError = false;
             SaveStatus = $"已恢复{(slot == GameSaveSlot.Automatic ? "自动" : "手动")}存档 · {save.SavedAtUtc.ToLocalTime():MM-dd HH:mm}";
             _autoSavePending = true;
@@ -250,7 +226,6 @@ public sealed partial class MainViewModel
             IsNewGameSetupOpen = false;
             IsHelpOpen = false;
             IsLogOpen = false;
-            _loadFailed = true;
             HasSaveError = true;
             SaveStatus = $"读取失败：{ReadableSaveError(exception)} 已初始化新牌局，原存档未被覆盖。";
         }
@@ -350,30 +325,20 @@ public sealed partial class MainViewModel
 
     private void ResetPersistenceMessage()
     {
-        _loadFailed = false;
         HasSaveError = false;
-        SaveStatus = "对局会自动保存；F5 可独立手动保存。";
+        SaveStatus = "本模式每次独立开局；结束后保留战绩，不保存续玩进度。";
     }
 
     private void RefreshSaveSlots()
     {
-        try
-        {
-            var automatic = _saveStore.GetSavedAt(GameSaveSlot.Automatic);
-            var manual = (IsWushuangTable ? _wushuangSaveStore! : _saveStore).GetSavedAt(GameSaveSlot.Manual);
-            HasAutomaticSave = automatic is not null;
-            HasManualSave = manual is not null;
-            AutomaticSaveText = automatic is { } autoTime ? $"自动保存 · {autoTime.ToLocalTime():MM-dd HH:mm}" : "暂无自动存档";
-            ManualSaveText = manual is { } manualTime ? $"{(IsWushuangTable ? "单骑无双 · " : string.Empty)}手动保存 · {manualTime.ToLocalTime():MM-dd HH:mm}" : "暂无手动存档";
-            RaisePropertyChanged(nameof(HasAnySave));
-            ((RelayCommand)ContinueGameCommand).NotifyCanExecuteChanged();
-            ((RelayCommand)LoadManualGameCommand).NotifyCanExecuteChanged();
-        }
-        catch (Exception exception) when (IsSaveException(exception))
-        {
-            HasSaveError = true;
-            SaveStatus = $"无法访问存档：{ReadableSaveError(exception)}";
-        }
+        // Do not probe or modify legacy match saves. Only expeditions can resume.
+        HasAutomaticSave = HasManualSave = false;
+        AutomaticSaveText = ManualSaveText = "本模式不提供续玩存档。";
+        RaisePropertyChanged(nameof(HasAnySave));
+        (ContinueGameCommand as RelayCommand)?.NotifyCanExecuteChanged();
+        (LoadManualGameCommand as RelayCommand)?.NotifyCanExecuteChanged();
+        RaisePropertyChanged(nameof(CanSaveShanheProgress));
+        (SaveGameCommand as RelayCommand)?.NotifyCanExecuteChanged();
     }
 
     private static bool IsSaveException(Exception exception) => exception is IOException or InvalidDataException or UnauthorizedAccessException

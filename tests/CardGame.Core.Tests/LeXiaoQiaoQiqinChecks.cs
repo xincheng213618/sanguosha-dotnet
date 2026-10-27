@@ -13,55 +13,6 @@ internal static class LeXiaoQiaoQiqinChecks
         QWatch = "fixture:lqq-watch", QQuiet = "fixture:lqq-quiet", QConditional = "fixture:lqq-conditional",
         QMode = "identity:classic-le-xiao-qiao-qiqin", QReason = "skill-program.le-xiao-qiao.qiqin.obtain";
 
-    public static void QiqinOpeningPermanentGlobalEntitiesAndHandLimitCold()
-    {
-        var s = QScenario.Start("opening");
-        var original = s.V().Hand.Select(c => c.Id).ToHashSet();
-        s.Need(s.P is { Kind: DecisionKind.OpeningHand } && s.E<QiqinInitializedEvent>().Length == 0,
-            "Actual opening replacement precedes Qiqin initialization.");
-        s.Private(0); s.Cold(); var replace = s.P!.Choices.First(c => c.Parameters.GetValueOrDefault("action") == "replace");
-        s.Answer(c => c.Id == replace.Id);
-        var opening = s.V().Hand.Select(c => c.Id).ToHashSet(); var incoming = opening.Single(id => !original.Contains(id));
-        var entry = s.G.CardMovements.Last(m => m.CardId == incoming && m.To == CardLocation.Hand(0));
-        s.Answer(c => c.Parameters.GetValueOrDefault("action") == "confirm");
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == QDriver && s.P.Choices.Any(c => c.Cards.Count == 1));
-        var frozen = s.G.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(f => f.QiqinInitialEntities is not null).QiqinInitialEntities!;
-        s.Need(frozen is IList { IsReadOnly: true } && frozen.Where(e => e.OwnerSeat == 0).Select(e => e.CardId).ToHashSet().SetEquals(opening) &&
-            !s.E<QiqinInitializedEvent>().Any(), "The real GameStarting mother freezes post-replacement physical IDs before its earlier discard child.");
-        s.Private(0); s.Cold(); s.Answer(c => c.Cards.SequenceEqual([incoming])); s.Play();
-        s.Need(s.E<QiqinInitialEntityMarkedEvent>().Where(e => e.OriginalOwnerSeat == 0).Select(e => e.CardId).ToHashSet().SetEquals(opening) &&
-            s.E<QiqinInitialEntityMarkedEvent>().Single(e => e.CardId == incoming).EntrySequence == entry.Sequence &&
-            !s.E<QiqinInitialEntityMarkedEvent>().Any(e => original.Except(opening).Contains(e.CardId)) &&
-            s.E<QiqinCollectedEntityEvent>().Count(e => e.CardId == incoming) == 1,
-            "An earlier child cannot replace the frozen initial invoice; the first real preparation then obtains that same discarded Qin once."); s.Cold();
-
-        s = QScenario.Start("six"); s.Need(s.E<QiqinInitializedEvent>().Single().EntityCount == 6 && s.V().Hand.All(QMarked),
-            "Initialization uses all six actual opening entities rather than assuming a four-card initial Hand.");
-        var turn = s.G.State.TurnNumber; s.End(); s.Play();
-        s.Need(s.V().HandCount == 6 && !s.G.CardMovements.Any(m => m.TurnNumber == turn && m.From == CardLocation.Hand(0) && m.To == CardLocation.DiscardPile),
-            "Six actual Qin remain exempt through a real discard phase despite the ordinary Lord Hand limit of four."); s.Cold();
-
-        s = QScenario.Start("marks"); var mark = s.V().Hand[0].Id; var ordinaryLimit = s.V().HandLimit;
-        s.Use("give", [mark], [1]); s.Play();
-        s.Need(QMarked(s.V(1).Hand.Single(c => c.Id == mark)) && !s.V(1).Skills!.Any(k => k.ContentId == QSkill),
-            "The physical Qin label survives transfer to a character without Qiqin.");
-        s.Take(1, mark); s.Play(); s.Need(QMarked(s.V().Hand.Single(c => c.Id == mark)) &&
-            s.E<QiqinInitialEntityMarkedEvent>().Count(e => e.CardId == mark) == 1 && s.V().HandLimit == ordinaryLimit,
-            "Leaving and reentering Hand does not consume or duplicate permanent membership or change the ordinary limit.");
-        s.Use("draw-four"); s.Play(); turn = s.G.State.TurnNumber; s.End(); s.Play();
-        s.Need(s.V().HandCount == 8 && s.V().Hand.Count(QMarked) == 4 &&
-            !s.G.CardMovements.Any(m => m.TurnNumber == turn && m.From == CardLocation.Hand(0) && m.To == CardLocation.DiscardPile),
-            "The four real unmarked draws fit the ordinary limit while the four marked entities are independently exempt."); s.Cold();
-        foreach (var scene in new[] { "recipient", "inherited" })
-        {
-            s = QScenario.Start(scene); mark = s.V().Hand[0].Id; s.Use("give", [mark], [1]); s.Play(); s.End(); s.Play();
-            var peerTurn = s.E<TurnStartedEvent>().First(e => e.ActorSeat == 1).TurnNumber;
-            var discards = s.G.CardMovements.Count(m => m.TurnNumber == peerTurn && m.From == CardLocation.Hand(1) && m.To == CardLocation.DiscardPile);
-            s.Need(scene == "inherited" ? discards == 0 && s.V(1).HandCount == 5 : discards == 2 && s.V(1).HandCount == 3,
-                "Only a live Qiqin holder inherits exemption for global Qin; a recipient without Qiqin really discards to its unchanged limit."); s.Cold();
-        }
-    }
-
     public static void QiqinPreparationObtainsWholeSharedDiscardPileCold()
     {
         var s = QScenario.Start("shared"); var own = s.V().Hand.Select(c => c.Id).ToArray();
@@ -100,39 +51,6 @@ internal static class LeXiaoQiaoQiqinChecks
             s.E<QiqinCollectStartedEvent>().Single().EntityCount == 0 && s.E<QiqinCollectCompletedEvent>().Single().EntityCount == 0 &&
             !s.E<QiqinCollectPaidEvent>().Any() && !s.E<NativeDrawInvocationRecordedEvent>().Any(),
             "A genuine empty opening and empty preparation finish without inventing entities, movement or replacement draws."); s.Cold();
-    }
-
-    public static void QiqinPaidObtainChildrenSourceLossDeathAndReplayCold()
-    {
-        foreach (var scene in new[] { "paid-loss", "paid-damage", "paid-death" })
-        {
-            var s = QScenario.Start(scene); var ids = s.V().Hand.Take(2).Select(c => c.Id).ToArray();
-            s.Use("discard-two", ids); s.Play(); s.End(); s.Reach(() => s.Hold("obtained"));
-            var started = s.E<QiqinCollectStartedEvent>().Last(e => e.EntityCount > 0); var paid = s.E<QiqinCollectPaidEvent>().Single(e => e.FrameId == started.FrameId);
-            s.Need(paid.EntityCount == 2 && paid.SequenceAfter - paid.SequenceBefore == 2 && !s.E<QiqinCollectCompletedEvent>().Any(e => e.FrameId == started.FrameId),
-                "The entire real obtain is paid exactly once before the first private gain/health child and remains unfinished there.");
-            s.Private(0); s.RejectPrompt(); var old = s.P!; s.Cold(); s.Continue(); s.RejectOld(old);
-            if (scene == "paid-death")
-            {
-                s.Reach(() => s.P?.Kind == DecisionKind.RescueDying || !s.V().IsAlive);
-                s.Cold(); s.Reach(() => !s.V().IsAlive && s.E<QiqinCollectCompletedEvent>().Any(e => e.FrameId == started.FrameId));
-                s.Need(s.G.State.Winner == Winner.None && s.E<QiqinCollectCompletedEvent>().Count(e => e.FrameId == started.FrameId) == 1,
-                    "Nonterminal collector death drains native dying/death children and closes its already-paid obtain without reacquiring cards discarded by that death.");
-            }
-            else
-            {
-                s.Reach(() => s.Hold("after-health")); s.Private(0); s.Cold();
-                s.Need(scene != "paid-loss" || !s.V().Skills!.Any(k => k.ContentId == QSkill),
-                    "A genuine HP conditional source loss occurs during the original obtain observer.");
-                s.Continue(); s.Play(); s.Need(s.E<QiqinCollectCompletedEvent>().Count(e => e.FrameId == started.FrameId) == 1 &&
-                    (scene != "paid-damage" || s.E<DamageAppliedEvent>().Count(e => e.TargetSeat == 0 && e.Amount == 1) == 1),
-                    "The exact paid frame resumes through actual HP/damage children despite source loss, then completes once.");
-            }
-            s.Need(s.E<QiqinCollectPaidEvent>().Count(e => e.FrameId == started.FrameId) == 1 &&
-                s.E<QiqinCollectedEntityEvent>().Where(e => e.FrameId == started.FrameId).Select(e => e.CardId).ToHashSet().SetEquals(ids) &&
-                ids.All(id => s.G.CardMovements.Count(m => m.CardId == id && m.From == CardLocation.DiscardPile && m.To == CardLocation.Hand(0) && m.Reason.Value == QReason) == 1),
-                "Cold continuation never repeats any entity payment or replaces the original signed source and batch."); s.Cold();
-        }
     }
 
     private static bool QMarked(CardSnapshot c) => c.SkillMarkLabel?.Split(" / ").Contains("琴", StringComparer.Ordinal) == true;

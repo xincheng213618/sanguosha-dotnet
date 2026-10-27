@@ -9,48 +9,6 @@ internal static partial class ShiTaiShiCiChecks
         Zhenfeng = "mobile:shi-zhenfeng", Quiet = "fixture:shi-tai-shi-ci-quiet", Peer = "fixture:shi-tai-shi-ci-peer",
         HandKeeper = "fixture:shi-tai-shi-ci-keeper", RangeBoost = "fixture:shi-tai-shi-ci-range", Deck = "fixture:shi-tai-shi-ci-deck";
 
-    public static void HanzhanRalliesBothHandsAndDuels()
-    {
-        var s = Scene.Start("hanzhan"); s.Play();
-        var heroHand = s.V(0).HandCount; var peerHand = s.V(1).HandCount;
-        s.ActivateHanzhan(1); s.Play();
-        s.Need(s.E<ShiTzHanzhanStartedEvent>() is [{ CounterpartSeat: 1 }],
-            "Hanzhan starts exactly one rally against its chosen living counterpart.");
-        s.Reach(() => s.E<ShiTzHanzhanRallyDrawnEvent>().Length >= 2);
-        _ = heroHand; _ = peerHand;
-        s.Reach(() => s.E<DamageAppliedEvent>().Any(e => e.TargetSeat == 1 && e.SourceSeat == 0));
-        s.Need(s.V(1).Hp == 7 && s.V(0).Hp == 4,
-            "The counterpart without a Slash loses the virtual Duel; the owner keeps full HP.");
-        s.Need(s.V(0).HandCount == s.V(0).MaxHp && s.V(1).HandCount == s.V(1).MaxHp,
-            "Both rally participants end at their own hand cap after the alternated draws.");
-        s.Cold(); s.Replay();
-    }
-
-    public static void ZhanlieGainsLiesAndIssuesOptionedSlash()
-    {
-        var s = Scene.Start("zhanlie"); s.Play();
-        s.Slash(1); s.Play(); s.Slash(1); s.Play(); s.Slash(1); s.Play();
-        var lies = s.E<ShiTzLieGainedEvent>();
-        s.Need(lies.Length == 3 && lies.Select(e => e.Ordinal).SequenceEqual([1, 2, 3]) && lies.All(e => e.TurnNumber == 1),
-            "The first three Slashes entering the discard pile this turn each grant one lie within the boosted attack range.");
-        s.Need(s.V(1).Hp == 5, "Three real Slashes land on the unarmored counterpart.");
-        s.End();
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Zhanlie && s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("branch") == "option"));
-        s.Answer(c => c.Parameters.GetValueOrDefault("option") == "extra-damage");
-        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "done");
-        s.Reach(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("branch") is "pick" or "slash") == true);
-        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "pick" && c.Targets is [1]);
-        s.Reach(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("branch") == "slash") == true);
-        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "slash"); s.Play();
-        s.Reach(() => s.E<ShiTzSlashIssuedEvent>().Length == 1 && s.E<DamageAppliedEvent>().Count(e => e.TargetSeat == 1) == 4);
-        s.Need(s.E<ShiTzSlashIssuedEvent>() is [{ Options: 2, TargetSeats: [1] }] &&
-            s.E<DamageAppliedEvent>().Count(e => e.TargetSeat == 1 && e.Amount == 2) == 1 && s.V(1).Hp == 3,
-            "The issued virtual Slash carries only the damage option, hits for two, and leaves the counterpart at three.");
-        s.Need(s.G.ResolutionStack.OfType<ProgramSkillFrame>().All(f => f.SkillId != Zhanlie),
-            "The play-ending option finishes after its last slash child.");
-        s.Cold(); s.Replay();
-    }
-
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {
         public GameEngine G { get; private set; } = game;

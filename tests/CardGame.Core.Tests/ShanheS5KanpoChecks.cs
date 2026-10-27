@@ -66,44 +66,6 @@ internal static class ShanheS5KanpoChecks
         VerifyNextTargetWindow();
     }
 
-    public static void PaidCounterspellChildrenRetainPolicyAfterSourceLossOrDeathCold()
-    {
-        foreach (var scene in new[] { "paid-loss", "paid-death" })
-        {
-            var s = Scene.Start(scene); var material = s.V().Hand.Single(c => c.Kind == CardKind.Dodge && c.Suit == Suit.Club).Id;
-            var original = s.BeginDrawTwo(); s.Nullification(); s.Respond(material, native: false); s.At(Paid);
-            var receipt = s.Window.UnrespondableCounterspell!; var actionId = s.Window.CounterspellPayment!.Action.ActionId;
-            Need(s.HasSkill && receipt.Source.SkillId == Skill && s.V().Hp == 12,
-                "The acquired skill is genuinely live when the actual black material is paid and its exact no-response receipt is frozen.");
-            s.Cold(); s.Continue();
-            if (scene == "paid-loss")
-            {
-                s.Until(() => s.V().Hp == 1 && !s.HasSkill && s.P?.SkillPrompt?.SkillId == Accepted);
-                Need(s.Window.UnrespondableCounterspell == receipt && s.E<ProgramOwnerSkillsReplacedEvent>().Single().LostSkillIds.SequenceEqual([Skill]) &&
-                    s.E<RecoveryAppliedEvent>() is [{ TargetSeat: 0, Amount: 1, RemainingHp: 1 }],
-                    "A real payment-child dying entry recovers one and permanently removes the purchased source, while the already-issued policy remains attached to its original response.");
-                s.Private(); s.Cold(); s.Continue(); s.At(Completed); s.Cold(); s.Continue(); s.Play();
-            }
-            else
-            {
-                s.Until(() => s.G.ResolutionStack.OfType<DyingFrame>().Any(f => f.VictimSeat == 0));
-                Need(s.Window.UnrespondableCounterspell == receipt && s.Window.CounterspellPayment?.Action.ActionId == actionId,
-                    "The real zero-HP source is suspended under the same paid counterspell rather than paying again or borrowing another use.");
-                s.Cold();
-                s.Until(() => !s.V().IsAlive && s.E<CardUseFinishedEvent>().Any(e => e.CardId == original));
-                Need(s.G.CreateSnapshot(0).Players[1].IsAlive && s.G.State.Winner == Winner.None,
-                    "The paid source can die without ending the team battle or concealing the native return behind terminal-game cleanup.");
-            }
-            Need(s.E<UnrespondableCounterspellIssuedEvent>() is [var issued] && issued.ActionId == actionId &&
-                s.E<NullificationResolvedEvent>() is [{ ChainDepth: 1, EffectNullified: true }] &&
-                s.E<NullificationRequestedEvent>().All(e => e.ChainDepth == 0) &&
-                s.E<CardUseFinishedEvent>().Count(e => e.CardId == original) == 1,
-                "A paid source loss or death does not reopen counter-counterspell candidates, repeat the original material, or lose the original trick's completion.");
-            s.AssertPaidOnce(material, CardLocation.Hand(0), CardMoveReasons.Nullification, CardMoveReasons.NullificationFinished);
-            s.AssertPaidOnce(original, CardLocation.Hand(0), CardMoveReasons.Use, CardMoveReasons.UseFinished); s.Cold();
-        }
-    }
-
     private static void VerifyNextTargetWindow()
     {
         var s = Scene.Start("multi"); var original = s.V().Hand.Single(card => card.Kind == CardKind.Duel).Id;

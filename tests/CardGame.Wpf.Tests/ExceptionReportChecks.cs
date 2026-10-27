@@ -1,3 +1,4 @@
+using CardGame.Wpf.Persistence;
 using System.IO;
 using System.Reflection;
 using CardGame.Core;
@@ -16,7 +17,7 @@ internal static class ExceptionReportChecks
         using var vm = new MainViewModel(false, 337, false, saves,
             exceptionReportStore: new FileGameExceptionReportStore(logs));
         Program.StartLordFixture(vm);
-        vm.SaveGameCommand.Execute(null);
+        LegacySaveFixtures.Save(vm);
         Program.Assert(vm.FlushPendingSave(), vm.SaveStatus);
         var saved = saves.Read(CardGame.Wpf.Persistence.GameSaveSlot.Manual);
         var writes = saves.WriteCount;
@@ -50,12 +51,12 @@ internal static class ExceptionReportChecks
             File.Exists(Path.Combine(directory, "player-snapshot.json")) &&
             !File.Exists(Path.Combine(directory, "capture-errors.txt")), "A normal fault must capture all diagnostic components.");
 
-        vm.SaveGameCommand.Execute(null);
+        LegacySaveFixtures.Save(vm);
         Program.Assert(saves.WriteCount == writes && ReferenceEquals(saved, saves.Read(CardGame.Wpf.Persistence.GameSaveSlot.Manual)) &&
             Directory.GetDirectories(logs).Length == 1, "A failed save or outer UI catch must not overwrite saves or duplicate the incident.");
         var originalFiles = Directory.GetFiles(directory).ToDictionary(file => Path.GetFileName(file)!, File.ReadAllText);
         Program.StartLordFixture(vm);
-        vm.SaveGameCommand.Execute(null);
+        LegacySaveFixtures.Save(vm);
         Program.Assert(!Program.Engine(vm).IsFaulted && originalFiles.All(file =>
             File.ReadAllText(Path.Combine(directory, file.Key!)) == file.Value), "Starting and saving another match must leave all previous evidence unchanged.");
         FailNextSelection(vm);

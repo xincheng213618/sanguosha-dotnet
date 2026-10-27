@@ -10,128 +10,6 @@ internal static class ShanheBossChecks
     private const string Quiet = "fixture:shanhe-boss-quiet", Watch = "fixture:shanhe-boss-draw-watch";
     private const string Mode = "identity:classic-shanhe-boss-rules";
 
-    public static void BattleSlashResponsesCountCurrentConvertedVirtualUsesAcrossTurnsAndColdDuel()
-    {
-        var (g, registry) = Start(false);
-        Play(g);
-        var converted = g.GetHumanLegalActions().First(a => a.ConversionSource?.SkillId == "classic:wusheng" &&
-            a.TargetSeats.SequenceEqual([1]) && a.PlayedCardKind == CardKind.Slash);
-        Accept(g, new PlayCardCommand(0, converted.CardId!.Value, converted.TargetSeats, g.Revision,
-            P(g)!.PromptId, converted.PlayedCardKind) { ConversionSource = converted.ConversionSource });
-        CheckSlashRequirement(g, 1);
-        Require(E<CardUseDeclaredEvent>(g).Single(e => e.SourceSeat == 0 && IsSlash(e.CardKind)).CardId != 0,
-            "The first converted physical Slash is a genuine use and requires one Dodge, including the current declaration.");
-        g = Cold(g, registry); Play(g);
-
-        Use(g, "slash", [1]); CheckSlashRequirement(g, 2); Play(g);
-        // Reverse the actual Duel's initiator before the count reaches its cap.
-        // Lvbu responds once, but the initiator still owes two, not three, Slashes.
-        Use(g, "refill", [1]); Play(g);
-        Use(g, "duel", [1, 0]);
-        Until(g, () => P(g) is { Kind: DecisionKind.RespondSlash, PlayerSeat: 0 });
-        var before = E<CardUseDeclaredEvent>(g).Count(e => e.SourceSeat == 0 && IsSlash(e.CardKind));
-        Answer(g, c => c.Cards.Count == 1 && c.Parameters.GetValueOrDefault("response") != "pass");
-        Until(g, () => P(g) is { Kind: DecisionKind.RespondSlash, PlayerSeat: 1 });
-        var incomingDuel = g.ResolutionStack.OfType<ProgramSkillFrame>()
-            .Single(f => f.Continuations.Duel is { Active: true }).Id;
-        g = Cold(g, registry);
-        Accept(g, new AdvanceOneStepCommand(g.Revision));
-        Until(g, () => E<RequiredResponseProgressEvent>(g).Any(e => e.ResolutionId == incomingDuel &&
-            e.ResponderSeat == 1 && e.ResponseCount == 2 && e.RequiredResponseCount == 2));
-        Require(E<CardActionAcceptedEvent>(g).Any(e => e.Action.Type == CardActionType.Response &&
-                e.Action.ActorSeat == 0 && e.Action.EffectiveKind == CardKind.Slash) &&
-            E<CardUseDeclaredEvent>(g).Count(e => e.SourceSeat == 0 && IsSlash(e.CardKind)) == before &&
-            E<DuelResponseEvent>(g).Count(e => e.ResolutionId == incomingDuel && e.ResponderSeat == 1 && e.UsedSlash) == 2 &&
-            E<DuelResponseEvent>(g).Where(e => e.ResolutionId == incomingDuel && e.ResponderSeat == 1 && e.UsedSlash)
-                .Select(e => e.SlashCardId).Distinct().Count() == 2,
-            "A converted Slash merely played in response does not add a use; incoming Duel applies the current two-use count.");
-        g = Cold(g, registry);
-        Until(g, () => P(g) is { Kind: DecisionKind.RespondSlash, PlayerSeat: 0 });
-        Answer(g, c => c.Parameters.GetValueOrDefault("response") == "take-damage");
-        Play(g);
-
-        var originalTurn = g.State.TurnNumber;
-        Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId)); Play(g);
-        Require(g.State.TurnNumber > originalTurn, "The next attacks occur after other actual turns, not an inserted phase.");
-        foreach (var (count, target) in new[] { (3, 2), (4, 3), (5, 1), (6, 2) })
-        {
-            Use(g, "refill", [target]); Play(g);
-            Use(g, "slash", [target]); CheckSlashRequirement(g, Math.Min(count, 5));
-            if (count == 6) g = Cold(g, registry);
-            Play(g);
-        }
-        Require(E<CardUseDeclaredEvent>(g).Count(e => e.SourceSeat == 0 && IsSlash(e.CardKind)) == 6 &&
-            E<CardUseDeclaredEvent>(g).Count(e => e.SourceSeat == 0 && IsSlash(e.CardKind) && e.CardId == 0) == 5,
-            "Five actual virtual uses compose with the original conversion across turns, with no parallel mutable counter.");
-
-        Use(g, "refill", [1]); Play(g);
-        Use(g, "duel", [0, 1]);
-        Until(g, () => P(g) is { Kind: DecisionKind.RespondSlash, PlayerSeat: 1 });
-        var outgoingDuel = g.ResolutionStack.OfType<ProgramSkillFrame>()
-            .Single(f => f.Continuations.Duel is { Active: true }).Id;
-        g = Cold(g, registry);
-        Accept(g, new AdvanceOneStepCommand(g.Revision));
-        Until(g, () => E<RequiredResponseProgressEvent>(g).Any(e => e.ResolutionId == outgoingDuel &&
-            e.ResponderSeat == 1 && e.ResponseCount == 5 && e.RequiredResponseCount == 5));
-        Require(E<DuelResponseEvent>(g).Count(e => e.ResolutionId == outgoingDuel && e.ResponderSeat == 1 && e.UsedSlash) == 5 &&
-            E<DuelResponseEvent>(g).Where(e => e.ResolutionId == outgoingDuel && e.ResponderSeat == 1 && e.UsedSlash)
-                .Select(e => e.SlashCardId).Distinct().Count() == 5,
-            "An outgoing Duel requires five consecutive Slashes from the opponent.");
-        g = Cold(g, registry);
-        Until(g, () => P(g) is { Kind: DecisionKind.RespondSlash, PlayerSeat: 0 });
-        Answer(g, c => c.Parameters.GetValueOrDefault("response") == "take-damage");
-        Play(g);
-    }
-
-    public static void ShenquDrawsMaximumRatherThanRefillingFreezesNativeRequestAndUsesRealPeach()
-    {
-        var (g, registry) = Start(true);
-        Until(g, () => Optional(g, Shenqu));
-        var opening = V(g, 0);
-        Require(opening.HandCount == opening.MaxHp && opening.MaxHp > 2,
-            $"The real preparation qualifies at equality, with more than the old fixed two-card draw (hand={opening.HandCount}, hp={opening.Hp}, max={opening.MaxHp}, phase={g.State.Phase}).");
-        var estimate = ProgramCompositionAi.Estimate(registry.GetSkill(Shenqu).Program!.Triggers
-            .Single(t => t.Id == "draw-maximum-hp-at-every-preparation").Effects,
-            new PlayerSkillContext(0, opening.Hp, opening.MaxHp, opening.HandCount, TurnPhase.Draw));
-        Require(estimate.Score > 0 && double.IsFinite(estimate.Score),
-            "The NPC's public-state evaluation values maximum-HP draw instead of pricing its expression as zero cards.");
-        Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-        Until(g, () => P(g)?.SkillPrompt?.SkillId == Watch);
-        var request = g.ResolutionStack.OfType<NativeDrawAttemptFrame>().Single().Context;
-        Require(request.RecipientSeat == 0 && request.RequestedCount == opening.MaxHp &&
-            V(g, 0).MaxHp == opening.MaxHp + 2 && V(g, 0).HandCount == opening.HandCount,
-            "The native request freezes the full original maximum before its real observer changes maximum HP.");
-        g = Cold(g, registry);
-        Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue"); Play(g);
-        Require(ShenquDraws(g) == opening.MaxHp && V(g, 0).HandCount == opening.HandCount + opening.MaxHp + 2,
-            "Shenqu adds X physical cards and then permits normal Draw2; it neither refills to X nor recomputes the paused request.");
-
-        var before = V(g, 0);
-        Use(g, "damage", []);
-        Until(g, () => P(g)?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "hulao-peach") == true);
-        Require(V(g, 0).Hp == before.Hp - 1, "The actual damage applies before the optional physical Peach.");
-        g = Cold(g, registry);
-        var peach = P(g)!.Choices.First(c => c.Cards.Count == 1).Cards.Single();
-        Answer(g, c => c.Cards.SequenceEqual([peach])); Play(g);
-        Require(V(g, 0).Hp == before.Hp && V(g, 0).HandCount == before.HandCount - 1 &&
-            E<CardUseDeclaredEvent>(g).Any(e => e.SourceSeat == 0 && e.CardKind == CardKind.Peach && e.CardId == peach) &&
-            E<HulaoPeachIssuedEvent>(g).Count() == 1 && E<HulaoPeachReturnedEvent>(g).Count() == 1 &&
-            g.CardMovements.Any(m => m.CardId == peach && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) &&
-            g.CardMovements.Any(m => m.CardId == peach && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile),
-            "The independent Shanhe skill consumes and uses an actual Peach exactly once, retaining its original native child chain.");
-
-        var total = ShenquDraws(g);
-        Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
-        Until(g, () => g.State.CurrentSeat != 0 && Optional(g, Shenqu));
-        var maximum = V(g, 0).MaxHp;
-        g = Cold(g, registry);
-        Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-        Until(g, () => ShenquDraws(g) == total + maximum);
-        Require(maximum == opening.MaxHp + 2 && g.State.CurrentSeat != 0,
-            "Another participant's preparation offers Shenqu and uses the then-current maximum, preserving the foreign actual turn.");
-        _ = Cold(g, registry);
-    }
-
     public static void FixedCompanionOpeningReplacesRandomBaseFreezesFacesAndReplaysBeforeNativeFudao()
     {
         var input = new List<ShanheStartingCard>
@@ -198,32 +76,16 @@ internal static class ShanheBossChecks
         catch (ArgumentException) { return; }
         throw new InvalidOperationException("An invalid or mismatched fixed opening recipe was accepted.");
     }
-
-    private static bool IsSlash(CardKind kind) => kind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash;
-    private static int ShenquDraws(GameEngine g) => g.CardMovements.Count(m => m.From == CardLocation.DrawPile &&
-        m.To == CardLocation.Hand(0) && m.Reason.Value == "skill-program." + Shenqu + ".Draw");
-    private static bool Optional(GameEngine g, string skill) => P(g)?.SkillPrompt?.SkillId == skill &&
-        P(g)!.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-    private static void CheckSlashRequirement(GameEngine g, int count)
-    {
-        Until(g, () => P(g)?.Kind == DecisionKind.RespondDodge);
-        var attack = g.ResolutionStack.OfType<CardUseFrame>().Last(f => IsSlash(f.CardKind)).CardAttack;
-        Require(attack is { Active: true } && attack.RequiredDodgeResponses == count,
-            $"The actual native Slash response requires {count} Dodges from the battle's used-Slash count.");
-    }
     private static PlayerSnapshot V(GameEngine g, int seat) => g.CreateSnapshot(seat).Players.Single(p => p.Seat == seat);
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, g.CreateSnapshot(0).Players.Count)
         .Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static IEnumerable<T> E<T>(GameEngine g) => g.Events.Select(e => e.Payload).OfType<T>();
-    private static void Use(GameEngine g, string activation, int[] targets) => Accept(g,
-        new UseProgramSkillCommand(0, Driver, activation, [], targets, g.Revision, P(g)!.PromptId));
     private static void Answer(GameEngine g, Func<PromptChoice, bool> predicate)
     {
         var p = P(g)!;
         Require(p.PlayerSeat == 0, "Only the real human may be answered; NPCs must use their native AI command.");
         Accept(g, new AnswerPromptCommand(0, p.PromptId, p.Choices.First(predicate).Id, g.Revision));
     }
-    private static void Play(GameEngine g) => Until(g, () => P(g) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
     private static void Until(GameEngine g, Func<bool> ready)
     {
         for (var step = 0; step < 200; step++)

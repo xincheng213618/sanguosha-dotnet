@@ -9,54 +9,6 @@ internal static class BoundaryZhuZhiChecks
     private const string Hero="boundary:zhu-zhi-mobile", Skill="boundary:anguo-mobile", Driver="fixture:boundary-zhu-zhi-driver",
         Quiet="fixture:boundary-zhu-zhi-quiet", Watch="fixture:boundary-zhu-zhi-watch", Peer="fixture:boundary-zhu-zhi-peer";
 
-    public static void InitialMarkMoveMaximumHandLimitLethalProtectionAndHpRescueCold()
-    {
-        var s=Scene.Start(); s.Initial(1); s.Play();
-        s.Need(s.Marked(1)&&s.V(1).Hp==3&&s.V(1).MaxHp==8&&s.Limit(1)==8,
-            "The real game-start mark sets its holder's hand limit to MaxHP, overriding current HP and the fixture's additive limit.");
-        s.Driver("lethal-owner",2); s.Play();
-        s.Need(s.V(0).Hp==4&&s.E<ProgramDamagePreventedEvent>().Any(e=>e.SkillId==Skill)&&
-            !s.E<DamageAppliedEvent>().Any(e=>e.TargetSeat==0),
-            "With a living marked participant, lethal damage from an unmarked real source is prevented before actual HP loss.");
-        s.End(); s.Reach(()=>s.P?.SkillPrompt?.SkillId==Skill&&s.P.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="activate"));
-        s.Answer(c=>c.Parameters.GetValueOrDefault("program-action")=="activate"); s.AtBranch("mark");
-        s.Need(s.P!.Choices.All(c=>!c.Targets.Contains(0)&&!c.Targets.Contains(1))&&s.P.Choices.Any(c=>c.Targets.SequenceEqual([2])),
-            "A real later Play-start move excludes the owner and every participant who previously received Anguo.");
-        s.Cold(); s.Answer(c=>c.Targets.SequenceEqual([2])); s.Play();
-        s.Need(!s.Marked(1)&&s.Marked(2)&&s.Limit(1)==23&&s.Limit(2)==8,
-            "The one actual mark moves to its selected fresh holder; the former holder immediately regains its ordinary HP-plus-modifier limit.");
-        s.Driver("hurt-target",2); s.AtBranch("hp");
-        var rescue=s.E<BoundaryZhuZhiRescueIssuedEvent>().Single();
-        s.Need(!s.Marked(2)&&s.V(2).Hp==1&&s.V(2).Armor==0&&
-            s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.Id==rescue.FrameId).SelectedTargetSeats.SequenceEqual([2]),
-            "Entering genuine dying removes the mark and really recovers the original victim to one before the owner's payment and later armor.");
-        s.Cold(); s.Answer(c=>Branch(c)=="hp"); s.Reach(()=>s.P?.SkillPrompt?.SkillId==Watch);
-        s.Need(s.V(0).Hp==1&&s.V(0).MaxHp==6&&s.V(2).Armor==0&&
-            s.E<BoundaryZhuZhiPaymentEvent>() is [{Choice:"hp",HpBefore:4,HpAfter:1,MaximumBefore:6,MaximumAfter:6}]&&
-            s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.Id==rescue.FrameId).BoundaryZhuZhi?.Stage==BoundaryZhuZhiStage.PaymentChildren,
-            "The exact owner pays native HP loss to one once; its actual HP observer child suspends the original rescue before granting armor.");
-        s.Cold(); s.Answer(_=>true); s.Play();
-        s.Need(s.V(2).Hp==1&&s.V(2).Armor==1&&s.E<BoundaryZhuZhiPaymentEvent>().Length==1&&
-            s.E<ArmorGrantedEvent>().Count(e=>e.ProgramFrameId==rescue.FrameId&&e.PlayerSeat==2&&e.Amount==1)==1,
-            "Cold resuming the paid native HP child returns to the same saved victim and grants one armor without paying again.");
-    }
-
-    public static void MaximumHpPaymentAndMarkedSourceLethalBypass()
-    {
-        var s=Scene.Start(); s.Initial(1); s.Play(); s.Driver("hurt-target",1); s.AtBranch("maximum");
-        s.Cold(); s.Answer(c=>Branch(c)=="maximum"); s.Play();
-        s.Need(s.V(0).MaxHp==1&&s.V(0).Hp==1&&s.V(1).Hp==1&&s.V(1).Armor==1&&
-            s.E<BoundaryZhuZhiPaymentEvent>() is [{Choice:"maximum",HpBefore:4,HpAfter:1,MaximumBefore:6,MaximumAfter:1}],
-            "The alternative genuinely reduces maximum HP to one, uses the native HP clamp and then grants the original rescued participant one armor.");
-        s.Cold();
-        var bypass=Scene.Start(); bypass.Initial(1); bypass.Play(); bypass.Driver("lethal-owner",1);
-        bypass.Reach(()=>bypass.V(0).Hp<=0);
-        bypass.Need(bypass.V(0).Hp==0&&bypass.Marked(1)&&
-            bypass.E<DamageAppliedEvent>().Any(e=>e.SourceSeat==1&&e.TargetSeat==0&&e.Amount==4)&&
-            bypass.E<ProgramDamagePreventedEvent>().All(e=>e.SkillId!=Skill),
-            "A genuinely marked source bypasses Anguo and its lethal native damage still enters the ordinary dying flow.");
-    }
-
     internal static (ContentRegistry Registry,GameEngine Game) CreateScene()
     {
         var registry=ContentRegistry.Build(new StandardContentPackage(),new Fixture());

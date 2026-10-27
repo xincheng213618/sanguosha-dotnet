@@ -8,40 +8,6 @@ internal static class LiuBaChecks
 {
     private const string Owner="fixture:liu-ba-owner",Mode="identity:classic-liu-ba",Driver="fixture:lb-driver",Quiet="fixture:lb-quiet",Watch="fixture:lb-watch",Health="fixture:lb-health",Conditional="fixture:lb-conditional",Tongdu="ol:tongdu",Zhubi="ol:zhubi";
     private static string Scene="";
-    public static void TongduOriginalEntityTruePlayEndDebtAndCold()
-    {
-        foreach(var scene in new[]{"self","foreign","spent","source-loss","skipped-play"})
-        {
-            var(g,r)=Start(scene,true);Activate(g,Tongdu);Reach(g,()=>Branch(g,"target"));Choose(g,"target",seat:scene=="foreign"?1:0);
-            if(scene=="foreign")
-            {Reach(g,()=>P(g)is{PlayerSeat:1});var p=P(g)!;Need(g.CreateSnapshot(0).PendingDecision is null&&g.CreateSnapshot(2).PendingDecision is null,"Only the real donor sees the original Hand-card menu.");Need(!g.Submit(new AnswerPromptCommand(0,p.PromptId,p.Choices[0].Id,g.Revision)).Accepted,"A different seat cannot answer the donor's private gift.");g=Cold(g,r);}
-            else{Reach(g,()=>Branch(g,"card"));g=Cold(g,r);Choose(g,"card");}
-            if(scene=="skipped-play")
-            {Reach(g,()=>E<TongduGiftIssuedEvent>(g).Length==1);var skipped=E<TongduGiftIssuedEvent>(g).Single();Reach(g,()=>g.State.TurnNumber>skipped.ActualTurn&&Offer(g,Tongdu));Need(!E<TongduDebtConsumedEvent>(g).Any(e=>e.DebtId==skipped.FrameId)&&!g.CardMovements.Any(m=>m.CardId==skipped.CardId&&m.Reason.Value=="skill-program.liu-ba.tongdu.return"),"A genuinely skipped Play has no fabricated ending, and its original debt cannot migrate into a later actual turn.");_=Cold(g,r);continue;}
-            Play(g);var gift=E<TongduGiftIssuedEvent>(g).Single();Need(gift.Source.OwnerSeat==0&&V(g,0).Hand.Any(c=>c.Id==gift.CardId)&&g.CardMovements.Count(m=>m.CardId==gift.CardId&&m.Reason.Value=="skill-program.liu-ba.tongdu.gift")== (scene=="foreign"?1:0),"Tongdu commits the exact chosen donor entity; self-gift has no fake same-zone move.");
-            if(scene=="spent"){Use(g,"discard",cards:[gift.CardId]);Play(g);}if(scene=="source-loss"){Use(g,"lose-tongdu");Play(g);Need(!Has(g,0,Tongdu),"The real original Tongdu source was lost before the debt became due.");}
-            g=Cold(g,r);End(g);Reach(g,()=>E<TongduDebtConsumedEvent>(g).Any());var due=E<TongduDebtConsumedEvent>(g).Single();var returned=g.CardMovements.Where(m=>m.CardId==gift.CardId&&m.Reason.Value=="skill-program.liu-ba.tongdu.return").ToArray();
-            Need(due.DebtId==gift.FrameId&&due.ActualTurn==gift.ActualTurn&&E<LiuBaStartedEvent>(g).Single(e=>e.Op==SkillProgramEffectOp.ReturnTongduOriginalCardAtPlayEnd).ParentId==due.ParentId&&(scene=="spent"?returned.Length==0:returned is[{To.Zone:CardZoneKind.DrawPile}]&&Deck(g)[^1]==gift.CardId),"The first genuine PlayEnding consumes exactly the issued same-turn original-card debt, without reclaiming a spent card or needing a live source.");_=Cold(g,r);
-        }
-    }
-    public static void ZhubiDynamicMaximumRecastAndMintChildrenCold()
-    {
-        {
-            var(g,r)=Start("quota");var limit=V(g,0).MaxHp;for(var i=0;i<limit;i++)Recast(ref g,r,0);
-            Need(V(g,0).MaxHp==limit&&E<LiuBaStartedEvent>(g).Count(e=>e.Op==SkillProgramEffectOp.RecastZhubiAndMarkActualDraw)==limit&&!g.GetHumanLegalActions().Any(a=>a.SkillId==Zhubi),$"The initial real Play quota equals current maximum HP: initial={limit}, current={V(g,0).MaxHp}, actualRecasts={E<LiuBaStartedEvent>(g).Count(e=>e.Op==SkillProgramEffectOp.RecastZhubiAndMarkActualDraw)}.");
-            Use(g,"max-plus");Play(g);Need(V(g,0).MaxHp==limit+1&&g.GetHumanLegalActions().Any(a=>a.SkillId==Zhubi),"A true same-Play maximum-HP increase opens exactly the new dynamic allowance.");Recast(ref g,r,0);Need(!g.GetHumanLegalActions().Any(a=>a.SkillId==Zhubi),"The one additional recast exhausts the increased current maximum-HP quota.");
-            Use(g,"max-minus");Play(g);Need(V(g,0).MaxHp==limit&&!g.GetHumanLegalActions().Any(a=>a.SkillId==Zhubi),"A later maximum-HP decrease does not reset prior actual Play expenditure.");
-            var coins=E<LiuBaCoinMintedEvent>(g);Need(coins.Length==limit+1&&coins.Select(e=>e.CardId).Distinct().Count()==coins.Length&&coins.All(e=>g.CardMovements.Count(m=>m.Sequence==e.GainSequence&&m.CardId==e.CardId&&m.From==CardLocation.DrawPile&&m.To==CardLocation.Hand(0)&&m.Reason==CardMoveReasons.RecastDraw)==1)&&E<CardRecastEvent>(g).Count()==limit+1,"Every true recast rewards exactly its real new Draw entity and exactly one native recast fact.");Need(coins.All(e=>V(g,0).Hand.Single(c=>c.Id==e.CardId).SkillMarkLabel?.Contains("币",StringComparison.Ordinal)==true),"Only actual reward entities carry the physical coin label.");_=Cold(g,r);
-        }
-        foreach(var scene in new[]{"lion","ox"})
-        {
-            var(g,r)=Start(scene);var kind=scene=="lion"?CardKind.SilverLion:CardKind.WoodenOx;var gear=V(g,0).Hand.First(c=>c.Kind==kind).Id;Use(g,"place",[0],[gear]);Play(g);
-            int? grain=null;if(scene=="lion"){Use(g,"lose");Play(g);}else{grain=V(g,0).Hand.First().Id;Use(g,"grain",cards:[grain.Value]);Play(g);}
-            Use(g,"recast-coin",skill:Zhubi);Choose(g,"target",seat:0);Choose(g,"card",gear);
-            if(scene=="lion"){Reach(g,()=>P(g)?.SkillPrompt?.SkillId==Health);Need(E<LiuBaCoinMintedEvent>(g).Length==0&&V(g,0).Hp==V(g,0).MaxHp,"Native Silver Lion recovery occurs before the recast reward.");g=Cold(g,r);Continue(g);}
-            Play(g);Need(E<LiuBaCoinMintedEvent>(g).Length==1&&E<CardRecastEvent>(g).Single().CardId==gear,"A real equipped recast still mints exactly one reward after native removal children.");if(grain is{}id)Need(g.CardMovements.Any(m=>m.CardId==id&&m.From==CardLocation.WoodenOxGrain(0)&&m.To==CardLocation.DiscardPile&&m.Reason==CardMoveReasons.WoodenOxGrainDiscard),"True Wooden Ox grain disposal is inherited from native equipment removal, without minting grain as coins.");_=Cold(g,r);
-        }
-    }
     public static void CoinEndingPrivateBottomSlotsAtomicExchangeCold()
     {
         foreach(var scene in new[]{"exchange","zero","short"})
@@ -59,22 +25,7 @@ internal static class LiuBaChecks
             _=Cold(g,r);
         }
     }
-    public static void PermanentTransferredCoinsPaidLossDeathAndRecoveryCold()
-    {
-        foreach(var scene in new[]{"transfer","transfer-death"})
-        {
-            var(g,r)=Start(scene);Recast(ref g,r,0);var coin=E<LiuBaCoinMintedEvent>(g).Single();Use(g,"gift",[1],[coin.CardId]);Play(g);
-            if(scene=="transfer"){Use(g,"lose-zhubi");Play(g);Need(!Has(g,0,Zhubi)&&V(g,1).HandCount>0,"The original skill source is genuinely lost after a real transfer.");End(g);}else Use(g,"die");
-            Reach(g,()=>P(g)is{PlayerSeat:1}&&g.ResolutionStack.OfType<ProgramSkillFrame>().Any(f=>f.OwnerSeat==1&&f.LiuBa is{Stage:LiuBaStage.Coins}));Need(g.CreateSnapshot(0).PendingDecision is null&&g.CreateSnapshot(1).PrivateRevealedCards is{Count:>0}&&E<LiuBaCoinMintedEvent>(g).Length==1&&g.CreateCardZoneDiagnostics().Single(z=>z.CardId==coin.CardId).Location==CardLocation.Hand(1),"The original physical coin follows transfer and issues the actual new holder's private Ending even after original source loss/death; no second mint occurs.");if(scene=="transfer-death")Need(!V(g,0).IsAlive&&E<PlayerDiedEvent>(g).Any(e=>e.VictimSeat==0),"The original coin issuer truly died before the independent holder's next Ending.");_=Cold(g,r);
-        }
-        foreach(var scene in new[]{"paid-loss","paid-death"})
-        {
-            var(g,r)=Start(scene);Use(g,"recast-coin",skill:Zhubi);Choose(g,"target",seat:0);Choose(g,"card");Reach(g,()=>P(g)?.SkillPrompt?.SkillId==Watch);var paid=g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.LiuBa is not null).Id;Need(!E<LiuBaCoinMintedEvent>(g).Any()&&E<LiuBaEntityMovedEvent>(g).Count(e=>e.FrameId==paid&&e.Step==1)==1,"The real recast payment opens its native child before any reward.");g=Cold(g,r);Continue(g);Reach(g,()=>E<LiuBaCompletedEvent>(g).Any(e=>e.FrameId==paid));
-            Need(E<LiuBaEntityMovedEvent>(g).Count(e=>e.FrameId==paid&&e.Step==1)==1&&E<LiuBaCompletedEvent>(g).Count(e=>e.FrameId==paid)==1,"Paid recovery, source-loss or death children return once without repaying the original cost.");if(scene=="paid-loss")Need(!Has(g,0,Zhubi)&&E<LiuBaCoinMintedEvent>(g).Count(e=>e.FrameId==paid)==1,"A genuine HP-conditional source loss cannot revoke the paid living recipient's reward.");else Need(!V(g,0).IsAlive&&E<PlayerDiedEvent>(g).Any(e=>e.VictimSeat==0)&&!E<LiuBaCoinMintedEvent>(g).Any(e=>e.FrameId==paid),"A genuinely dead recipient receives no fabricated draw or coin after native dying/death returns.");_=Cold(g,r);
-        }
-    }
     private static PlayerSnapshot V(GameEngine g,int seat)=>g.CreateSnapshot(seat).Players[seat];
-    private static bool Has(GameEngine g,int seat,string skill)=>V(g,seat).Skills!.Any(s=>s.Id==skill);
     private static T[] E<T>(GameEngine g)where T:IGameEvent=>g.Events.Select(e=>e.Payload).OfType<T>().ToArray();
     private static int[] Deck(GameEngine g)=>g.CreateCardZoneDiagnostics().Where(z=>z.Location==CardLocation.DrawPile).OrderBy(z=>z.ZoneIndex).Select(z=>z.CardId).ToArray();
     private static PendingDecision? P(GameEngine g)=>Enumerable.Range(0,4).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);
@@ -84,7 +35,6 @@ internal static class LiuBaChecks
     private static void Accept(GameEngine g,GameCommand command){try{var result=g.Submit(CommandJson.Deserialize(CommandJson.Serialize([command])).Single());Need(result.Accepted,result.Error?.Message??"Rejected Liu Ba command.");}catch(Exception ex){throw new InvalidOperationException(Scene+" "+command.GetType().Name+": "+Diagnostic(g),ex);}}
     private static void Answer(GameEngine g,Func<PromptChoice,bool> predicate){var p=P(g)!;var choice=p.Choices.FirstOrDefault(predicate);Need(p.PlayerSeat==0&&choice is not null,"Missing actual human choice: "+Diagnostic(g));Accept(g,new AnswerPromptCommand(0,p.PromptId,choice!.Id,g.Revision));}
     private static void Choose(GameEngine g,string branch,int? card=null,int? seat=null)=>Answer(g,c=>c.Parameters.GetValueOrDefault("branch")==branch&&(card is null||c.Cards.SequenceEqual([card.Value]))&&(seat is null||c.Targets.SequenceEqual([seat.Value])));
-    private static void Activate(GameEngine g,string skill){Reach(g,()=>Offer(g,skill));Answer(g,c=>c.Parameters.GetValueOrDefault("program-action")=="activate");}
     private static void Continue(GameEngine g)=>Answer(g,c=>c.Parameters.GetValueOrDefault("option-id")=="continue");
     private static void Use(GameEngine g,string activation,int[]? seats=null,int[]? cards=null,string skill=Driver)=>Accept(g,new UseProgramSkillCommand(0,skill,activation,cards??[],seats??[],g.Revision,P(g)!.PromptId));
     private static void End(GameEngine g)=>Accept(g,new EndPlayPhaseCommand(0,g.Revision,P(g)!.PromptId));

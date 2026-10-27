@@ -205,7 +205,7 @@ internal static class AutomaticTargetSelectionChecks
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
         try
         {
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Program.Assert(!model.HasSaveError && Boundary(Program.Engine(model)) == Boundary(game),
                 "Actual manual load must preserve the native fixture's complete committed boundary: " + model.SaveStatus);
             return (model, registry);

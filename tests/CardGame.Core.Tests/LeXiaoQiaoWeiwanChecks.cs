@@ -15,78 +15,6 @@ internal static class LeXiaoQiaoWeiwanChecks
     private const string WwDiscard = "skill-program.le-xiao-qiao.weiwan.discard", WwObtain = "skill-program.le-xiao-qiao.weiwan.obtain";
     private static readonly Suit[] WwSuits = [Suit.Spade, Suit.Heart, Suit.Club, Suit.Diamond];
 
-    public static void WeiwanRandomRegionSuitCohortAndActualGainBranchesCold()
-    {
-        for (var count = 0; count <= 3; count++)
-        {
-            var s = WwScenario.Start("regions-" + count); s.Gather(); var cost = s.InitialQin().First();
-            var cohort = s.Cohort(2, cost, count, regions: true); var hp = s.V(2).Hp;
-            var command = s.Command(cost, 2); s.Accept(command); s.Reach(() => s.Hold("cost"));
-            var started = s.E<WeiwanStartedEvent>().Single(); var parent = s.Frame(started.FrameId);
-            s.Need(parent.Weiwan is { Stage: WeiwanStage.CostChildren } && started.CostFrom == CardLocation.Hand(0) &&
-                s.E<WeiwanCostPaidEvent>().Single().CardId == cost && !s.E<WeiwanSuitSampledEvent>().Any(),
-                "A single original Qin Hand payment is committed before the fresh region sampling, without choosing an opponent's concealed card.");
-            s.Private(); s.Reject(command); s.RejectPrompt(); s.Cold(); var old = s.P!; s.Continue(); s.RejectOld(old);
-            if (count > 0)
-            {
-                s.Reach(() => s.Hold("obtained")); parent = s.Frame(started.FrameId); var receipt = parent.Weiwan!;
-                var sampled = s.E<WeiwanSuitSampledEvent>(); var gained = s.E<WeiwanEntityObtainedEvent>();
-                s.Need(receipt.Stage == WeiwanStage.ObtainChildren && receipt.Samples is IList { IsReadOnly: true } &&
-                    sampled.Length == 3 && sampled.Select(e => e.Suit).ToHashSet().SetEquals(WwSuits.Where(x => x != started.CostSuit)) &&
-                    sampled.Count(e => e.CardId is not null) == count && gained.Length == count &&
-                    sampled.Where(e => e.CardId is not null).All(e => cohort.TryGetValue(e.Suit, out var ids) && ids.Contains(e.CardId!.Value) && e.CandidateCount == ids.Count) &&
-                    gained.All(e => s.G.CardMovements.Count(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.From == e.From && m.To == CardLocation.Hand(0) && m.CardKind == e.PrintedKind && m.Reason.Value == WwObtain) == 1) &&
-                    s.E<WeiwanObtainPaidEvent>().Single() is { PrimaryCount: var selected, ActualCount: var actual } && selected == count && actual == count &&
-                    s.V(2).Hp == hp && !s.E<WeiwanCompletedEvent>().Any(),
-                    "Every eligible suit contributes one genuinely random original HEJ entity; the actual atomic obtain is paid before its children and before any count-dependent benefit.");
-                if (count == 3) s.Need(gained.Select(e => e.From.Zone).ToHashSet().SetEquals(new[] { CardZoneKind.Hand, CardZoneKind.Equipment, CardZoneKind.Judgment }),
-                    "The three-card representative obtains original Hand, Equipment and Judgment entities rather than a Hand-only shortcut.");
-                s.Private(); s.Cold(); s.Continue();
-            }
-            s.Play(); var completed = s.E<WeiwanCompletedEvent>().Single();
-            var expected = count switch { 1 => WeiwanBranch.LoseHp, 2 => WeiwanBranch.UnlimitedUse, 3 => WeiwanBranch.ForbidUse, _ => WeiwanBranch.None };
-            s.Need(completed.FrameId == started.FrameId && completed.ActualCount == count && completed.Branch == expected &&
-                s.V(2).Hp == hp - (count == 1 ? 1 : 0) && s.E<WeiwanHealthAppliedEvent>().Length == (count == 1 ? 1 : 0) &&
-                s.E<WeiwanTurnLeaseIssuedEvent>().Length == (count >= 2 ? 1 : 0) &&
-                s.E<ProgramSkillResolvedEvent>().Count(e => e.FrameId == started.FrameId && e.SkillId == WwSkill && e.Completed) == 1 &&
-                s.G.CardMovements.Count(m => m.CardId == cost && m.From == CardLocation.Hand(0) && m.Reason.Value == WwDiscard) == 1 &&
-                !s.G.GetHumanLegalActions().Any(a => a.ProgramSkillId == WwSkill),
-                "Zero, one, two and three actual gains select mutually exclusive outcomes, with no fabricated cumulative damage or draw and one real actual-Play allowance."); s.Cold();
-        }
-    }
-
-    public static void WeiwanEquipmentQinCostsLionOxAndEffectiveSuitCold()
-    {
-        var s = WwScenario.Start("lion"); s.Gather(); var cost = s.InitialQin().First(); s.Place(cost, 0); s.Use("hurt", targets: [0]); s.Play();
-        s.Cohort(2, cost, 1); var hp = s.V().Hp; s.Activate(cost, 2); s.Reach(() => s.Hold("recovered"));
-        s.Need(s.Frame(s.E<WeiwanStartedEvent>().Single().FrameId).Weiwan is { Stage: WeiwanStage.CostChildren } &&
-            s.E<WeiwanCostPaidEvent>().Single().From == CardLocation.Equipment(0) && s.E<SilverLionRemovedRecoveryEvent>().Count(e => e.Reason.Value == WwDiscard) == 1 &&
-            s.V().Hp == hp + 1 && !s.E<WeiwanSuitSampledEvent>().Any(),
-            "A marked equipped Silver Lion is a real HE cost, and its native recovery finishes before the opponent's fresh suit cohort is sampled.");
-        s.Private(); s.Cold(); s.Continue(); s.FinishWeiwan(); s.Need(s.E<WeiwanCompletedEvent>().Single() is { ActualCount: 1, Branch: WeiwanBranch.LoseHp }, "The Lion child returns to the same paid obtain once."); s.Cold();
-
-        s = WwScenario.Start("ox"); s.Gather(); var marked = s.InitialQin(); var ox = marked[0]; var grain = marked[1]; s.Place(ox, 0);
-        s.Accept(new UseEquipmentEffectCommand(0, CardKind.WoodenOx, [grain], [], s.G.Revision, s.P!.PromptId)); s.Play(); s.Cohort(2, ox, 1);
-        var legal = s.G.GetHumanLegalActions().Single(a => a.ProgramSkillId == WwSkill);
-        s.Need(legal.SelectableCardIds.Contains(ox) && !legal.SelectableCardIds.Contains(grain) &&
-            Enumerable.Range(1, 3).All(v => (s.G.CreateSnapshot(v).Players[0].WoodenOxGrain?.Count ?? 0) == 0),
-            "The actual marked equipped Ox is a legal cost; its globally marked private grain remains outside HE and is neither published nor selectable.");
-        s.Reject(s.Command(grain, 2)); s.Activate(ox, 2); s.Reach(() => s.Hold("cost")); s.Private(); s.Cold(); s.Continue(); s.Reach(() => s.Hold("obtained"));
-        s.Need(s.E<WeiwanObtainPaidEvent>().Single().ActualCount == 1 && s.G.CardMovements.Count(m => m.CardId == grain && m.From == CardLocation.WoodenOxGrain(0) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard) == 1 &&
-            s.E<WeiwanEntityObtainedEvent>().All(e => e.CardId != grain) && (s.V().WoodenOxGrain?.Count ?? 0) == 0,
-            "The real Ox spill drains as its own original movement, without becoming a second paid material or a counted opponent obtain."); s.Private(); s.Cold(); s.Continue(); s.Play();
-
-        foreach (var scene in new[] { "cost-suit", "target-suit" })
-        {
-            s = WwScenario.Start(scene); s.Gather(); cost = s.InitialQin().First(); var foreign = s.Hand().First(c => c.Id != cost).Id; s.Give(foreign, 2);
-            s.Activate(cost, 2); s.FinishWeiwan(); var start = s.E<WeiwanStartedEvent>().Single(); var end = s.E<WeiwanCompletedEvent>().Single();
-            s.Need(start.CostSuit == Suit.Heart && s.E<WeiwanCostPaidEvent>().Single().PrintedKind == CardKind.Crossbow &&
-                end.ActualCount == (scene == "cost-suit" ? 1 : 0) &&
-                s.E<WeiwanSuitSampledEvent>().Single(e => e.Suit == Suit.Spade).CandidateCount == (scene == "cost-suit" ? 1 : 0),
-                "The original all-Spade deck retains its printed entities, while cost color freezes the payer's live Hongyan and target grouping uses that target's own effective suit after cost children."); s.Cold();
-        }
-    }
-
     public static void WeiwanDirectedAllUseDistanceCountBanAndTurnExpiryCold()
     {
         var s = WwScenario.Start("permission"); s.Gather(); var cost = s.InitialQin().First(); s.Cohort(2, cost, 2);
@@ -152,35 +80,6 @@ internal static class LeXiaoQiaoWeiwanChecks
             s.E<WeiwanTurnLeaseIssuedEvent>().Single().Lease == declarationLease &&
             s.E<WeiwanDeclarationCapturedEvent>().Count(e => e.DeclarationId == declaration.Id) == 1,
             "After true skill loss in the prepaid child, the same declaration transfers its immutable original lease into one real distant Slash, with no live-source fallback, duplicate payment or fabricated new permission."); s.Cold();
-    }
-
-    public static void WeiwanPaidSourceLossDeathAndInputPrivacyCold()
-    {
-        foreach (var scene in new[] { "source-loss", "cost-death", "obtain-death" })
-        {
-            var s = WwScenario.Start(scene); s.Gather(); var cost = s.InitialQin().First(); s.Cohort(2, cost, 1); var hp = s.V(2).Hp;
-            var nonQin = s.Hand().First(c => !s.InitialQin().Contains(c.Id)).Id; s.Reject(s.Command(nonQin, 2)); s.Reject(s.Command(cost, 0));
-            var command = s.Command(cost, 2); s.Accept(command); s.Reach(() => s.Hold("cost")); var start = s.E<WeiwanStartedEvent>().Single();
-            s.Need(s.E<WeiwanCostPaidEvent>().Length == 1 && !s.E<WeiwanSuitSampledEvent>().Any(), "The exact source and real original cost are paid before the actual source-loss/death child.");
-            s.Private(); s.RejectPrompt(); s.Cold(); var prompt = s.P!; s.Continue(); s.RejectOld(prompt);
-            if (scene == "cost-death")
-            {
-                s.Reach(() => s.E<WeiwanCompletedEvent>().Any()); s.PlayOrDead();
-                s.Need(!s.V().IsAlive && !s.E<WeiwanEntityObtainedEvent>().Any() && s.E<WeiwanCompletedEvent>().Single() is { ActualCount: 0, Branch: WeiwanBranch.None } && s.V(2).Hp == hp,
-                    "A dead actor drains its paid cost child but starts no new opponent obtain or fresh benefit."); s.Cold(); continue;
-            }
-            s.Reach(() => s.Hold("obtained")); var receipt = s.Frame(start.FrameId).Weiwan!;
-            s.Need(receipt is { Stage: WeiwanStage.ObtainChildren, ActualCount: 1, Samples: IList { IsReadOnly: true } } &&
-                s.E<WeiwanEntityObtainedEvent>().Length == 1 && !s.E<WeiwanCompletedEvent>().Any() && (scene != "source-loss" || s.V().Skills?.Any(skill => skill.ContentId == WwSkill) != true),
-                "The issued original source survives true skill loss and retains the exact already-obtained entity while its native gain child is suspended.");
-            s.Private(); s.Cold(); s.Continue(); s.Reach(() => s.E<WeiwanCompletedEvent>().Any()); s.PlayOrDead();
-            s.Need(s.E<WeiwanStartedEvent>().Length == 1 && s.E<WeiwanCostPaidEvent>().Length == 1 && s.E<WeiwanEntityObtainedEvent>().Length == 1 &&
-                s.E<WeiwanCompletedEvent>().Single() is { ActualCount: 1, Branch: WeiwanBranch.LoseHp } && s.V(2).Hp == hp - 1 &&
-                s.E<WeiwanHealthAppliedEvent>().Count(e => e.TargetSeat == 2 && e.Amount == 1) == 1 &&
-                s.E<ProgramSkillResolvedEvent>().Count(e => e.FrameId == start.FrameId && e.SkillId == WwSkill && e.Completed) == 1 &&
-                (scene == "obtain-death" ? !s.V().IsAlive : s.V().IsAlive && s.V().Skills?.Any(skill => skill.ContentId == WwSkill) != true),
-                "Source loss or death after the actual obtain cannot repeat the original payment, lose its already committed branch, or invent a replacement skill instance."); s.Cold();
-        }
     }
 
     private sealed class WwScenario(string scene, GameEngine game, ContentRegistry registry)

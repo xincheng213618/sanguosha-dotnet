@@ -79,7 +79,6 @@ internal static class SkillProgramJudgmentTriggerChecks
             "A completed final-judgment trigger must replay without repeating its effects.");
     }
 
-
     private static GameEngine FindProgramBoundary(ContentRegistry registry)
     {
         for (var seed = 1; seed <= 512; seed++)

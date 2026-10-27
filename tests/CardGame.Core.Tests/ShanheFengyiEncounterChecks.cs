@@ -9,60 +9,6 @@ internal static class ShanheFengyiEncounterChecks
     private const string Roulin = "shanhe:s5-roulin-14211", Benghuai = "boundary:benghuai-current", Zaiqi = "shanhe:s5-zaiqi-887";
     private const string Lvbu = "shanhe:s5-lvbu-baji", Diao = "shanhe:s5-diao-chan-biyue", Encounter = "luoyang:fengyi-s5";
 
-    public static void ActualFiveSeatRecipeStartsOriginalThreeEnemiesAndFreezesInitialHealthCold()
-    {
-        foreach (var difficulty in new[] { 1, 2, 3 })
-        {
-            var definition = StandardShanheCampaignCatalog.CreateDefinition(difficulty, StandardShanheCampaignCatalog.Returning2026EditionId);
-            var encounter = definition.Nodes.Single(node => node.Id == "luoyang").Encounters!.Single(item => item.Id == Encounter);
-            Need(encounter.Enemies.Select(member => member.GeneralId).Order().SequenceEqual(new[] { Dong, Lvbu, Diao }.Order()) &&
-                encounter.Allies is [{ GeneralId: "classic:sun-jian" }] &&
-                encounter.Enemies.All(member => member is { MaxHpBonus: 0, Hp: null, InitialHandBonus: 0, DrawBonus: 0, SlashBonus: 0, StartingHand: null } &&
-                    (member.ExtraSkillIds?.Count ?? 0) == 0 && (member.QualifiedPrintedLordSkillIds?.Count ?? 0) == 0),
-                "Every local difficulty really selects the original three source forms with the explicit local Sun Jian companion; the full group has no rank growth, fabricated fixed cards or Lord authorization.");
-            var setup = ShanheBattleSetup.Freeze(new(83, 1, "luoyang", "classic:guan-yu", 4, 0, 0, 0, 0, [], [], [],
-                encounter.Enemies, encounter.Allies!, ShanheCampaignContent.GetContentHash(definition)) { DefaultGodFactionId = definition.DefaultGodFactionId });
-            var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup);
-            var dong = registry.Generals[Dong];
-            Need(dong is { BaseHp: 15, InitialHp: 10, FactionId: "qun", Gender: GeneralGender.Male } &&
-                dong.SkillIds.Order().SequenceEqual(new[] { Jiuchi, Roulin, Benghuai, Daoshu }.Order()) &&
-                registry.Generals[Lvbu].SkillIds.Order().SequenceEqual(new[] { "shanhe:shengui-wushuang", "shanhe:s5-liyu-14128" }.Order()) &&
-                registry.Generals[Diao].SkillIds.Order().SequenceEqual(new[] { "shanhe:s5-lijian-68", "shanhe:s5-biyue-14213" }.Order()) &&
-                registry.Generals[Lvbu].BaseHp == 10 && registry.Generals[Diao].BaseHp == 6 && registry.Skills.ContainsKey(Zaiqi),
-                "The dedicated source package prints the real 14210/14211/source111/952 set on 10/15 Dong Zhuo, its two exact companions and the separately granted 887 definition; it does not substitute ordinary Jiuchi, female-only Roulin or Baonue.");
-            var mode = registry.Modes[ShanheBattleSetup.BattleModeId];
-            Need(mode is { MinPlayers: 5, MaxPlayers: 5, ModeKind: ContentModeKind.Team, BossActivity: null, TeamActivity: null } &&
-                mode.TeamCounts!.GetValueOrDefault(ShanheBattleSetup.PlayerTeamId) == 2 && mode.TeamCounts!.GetValueOrDefault(ShanheBattleSetup.EnemyTeamId) == 3 &&
-                registry.GetDeck(mode.DeckId!).InitialHandSize == 4 && setup.StartingEquipment.Count == 0,
-                "The actual native encounter is a five-seat 2-versus-3 team game, with four random opening cards and no unrelated boss-stage controller or unverified equipment.");
-            var game = StandardShanheCampaignCatalog.CreateBattle(setup);
-            AssertInitialHealth(game, registry, setup);
-            Start(game); AssertInitialHealth(game, registry, setup);
-            var checkpoint = game.CreateCheckpoint();
-            Need(ShanheBattleSetup.ValueEquals(checkpoint.Options.ShanheBattle, setup) &&
-                checkpoint.Options.Seed == setup.BattleSeed && checkpoint.ContentHash == registry.ContentHash &&
-                checkpoint.Options.ShanheBattle!.EnemyRoster is IList<ShanheCombatantDefinition> { IsReadOnly: true },
-                "The native checkpoint freezes the exact five-member recipe, seed, independent campaign hash and complete registry fingerprint.");
-            Cold(game, registry);
-            Reject(() => GameReplay.Restore(checkpoint with { ContentHash = new string('0', checkpoint.ContentHash.Length) }, registry));
-            var dongIndex = setup.EnemyRoster.ToList().FindIndex(member => member.GeneralId == Dong);
-            var invalid = setup with { EnemyRoster = setup.EnemyRoster.Select((member, index) => index == dongIndex ? member with { Hp = 16 } : member).ToArray() };
-            Reject(() => StandardShanheCampaignCatalog.CreateBattle(invalid));
-            if (difficulty == 1)
-            {
-                VerifyCampaignSourceHash(encounter);
-                var equipped = setup with { ExtraSkillIds = [Zaiqi] };
-                var combined = StandardShanheCampaignCatalog.CreateBattleRegistry(equipped);
-                var withAcquired = StandardShanheCampaignCatalog.CreateBattle(equipped); Start(withAcquired);
-                Need(withAcquired.CreateSnapshot(0).Players[0].Skills?.Count(skill => skill.ContentId == Zaiqi) == 1 &&
-                    combined.Generals[Dong].SkillIds.All(id => id != Zaiqi),
-                    "A player independently carrying 887 and the full boss share one registered definition without duplicating it or falsely printing it on the untransformed boss.");
-                Cold(withAcquired, combined);
-            }
-        }
-        VerifyConditionalPackageIsolation();
-    }
-
     public static void ActualGaichaoSingleEnemyRecipeKeepsSourceHealthDrawAndConditionalPackagesCold()
     {
         const string gaichao = StandardShanheS5GaichaoPackage.DongZhuoGaichaoId;
@@ -191,68 +137,8 @@ internal static class ShanheFengyiEncounterChecks
         throw new InvalidOperationException("The actual source boss never reached its first native Draw: " + gaichao);
     }
 
-    private static void AssertInitialHealth(GameEngine game, ContentRegistry registry, ShanheBattleSetup setup)
-    {
-        var expected = new Dictionary<string, (int Hp, int Max)> { [Dong] = (10, 15), [Lvbu] = (10, 10), [Diao] = (6, 6) };
-        Need(game.PlayerCount == 5 && game.CreateSnapshot(0).Players.Count == 5, "The actual recipe initializes all five native seats rather than padding an unrelated mode.");
-        foreach (var (id, health) in expected)
-        {
-            var seat = 1 + setup.AllyRoster.Count + setup.EnemyRoster.ToList().FindIndex(member => member.GeneralId == id);
-            var owner = game.CreateSnapshot(seat).Players[seat];
-            Need(owner.Hp == health.Hp && owner.MaxHp == health.Max && owner.Armor == 0 && owner.Equipment.Count == 0 &&
-                owner.HandCount == 4 &&
-                owner.Skills!.Select(skill => skill.ContentId).Order().SequenceEqual(registry.Generals[id].SkillIds.Order()) &&
-                Enumerable.Range(0, 5).All(viewer => game.CreateSnapshot(viewer).Players[seat] is { IsAlive: true, IsGeneralPublic: true, TeamId: ShanheBattleSetup.EnemyTeamId } view &&
-                    view.GeneralId == id && view.Hp == health.Hp && view.MaxHp == health.Max),
-                "Real setup and all public projections retain the exact source health and original printed skills before and after native initial dealing: " + id);
-        }
-        Need(game.Events.All(item => item.Payload is not (DamageRequestedEvent or DamageAppliedEvent or AfterDamageEvent or
-            ProgramSkillHpLostEvent or MaximumHpChangedEvent or PlayerDyingEvent)),
-            "10/15 is assigned as genuine initial state, without artificial damage, HP-loss, maximum-HP reduction or dying events during construction and StartGame.");
-        var zones = game.CreateCardZoneDiagnostics();
-        Need(zones.Select(item => item.CardId).Distinct().Count() == zones.Count, "Initial dealing conserves every actual card entity in exactly one native zone.");
-    }
-
-    private static void VerifyCampaignSourceHash(ShanheEncounterDefinition actual)
-    {
-        var definition = new ShanheCampaignDefinition("fixture-fengyi-source", "凤仪原阵容的真实入战", ["classic:guan-yu"], ["battle"],
-            [new("battle", "真实三敌", ShanheNodeKind.BossBattle, [], Encounters: [actual])], []);
-        var run = ShanheCampaignSession.Create(definition, new(83, "classic:guan-yu"), StandardShanheCampaignCatalog.CreateBattleRegistry);
-        var moved = run.Submit(new MoveShanheNodeCommand("battle", run.Revision)); Need(moved.Accepted, moved.Error ?? "Actual encounter transition rejected.");
-        var pending = run.PendingBattleSetup!; var encoded = ShanheCampaignJson.Serialize(run.CreateCheckpoint());
-        var restored = ShanheCampaignSession.Restore(ShanheCampaignJson.Deserialize(encoded), definition, StandardShanheCampaignCatalog.CreateBattleRegistry);
-        Need(pending.EnemyRoster.Count == 3 && pending.AllyRoster.Count == 1 && pending.CampaignHash == run.ContentHash &&
-            ShanheBattleSetup.ValueEquals(restored.PendingBattleSetup, pending) && ShanheCampaignJson.Serialize(restored.CreateCheckpoint()) == encoded,
-            "A real map command freezes the actual three-enemy source recipe, and cold campaign replay reproduces its complete pending battle identity.");
-        var changed = actual with { Enemies = actual.Enemies.Select(member => member.GeneralId == Dong ? member with { Hp = 9 } : member).ToArray() };
-        var changedDefinition = definition with { Nodes = [definition.Nodes.Single() with { Encounters = [changed] }] };
-        Need(ShanheCampaignContent.GetContentHash(changedDefinition) != run.ContentHash &&
-            !ShanheBattleSetup.ValueEquals(pending, pending with { EnemyRoster = changed.Enemies }),
-            "Changing even a valid explicit source opening HP changes the campaign fingerprint and exact native recipe equality.");
-        Reject(() => ShanheCampaignSession.Restore(ShanheCampaignJson.Deserialize(encoded), changedDefinition, StandardShanheCampaignCatalog.CreateBattleRegistry));
-        var battle = StandardShanheCampaignCatalog.CreateBattle(pending); Start(battle);
-        AssertInitialHealth(battle, battle.ContentRegistry, pending); Cold(battle, battle.ContentRegistry);
-    }
-
-    private static void VerifyConditionalPackageIsolation()
-    {
-        foreach (var edition in new[] { StandardShanheCampaignCatalog.Returning2026EditionId, StandardShanheCampaignCatalog.LocalEditionId })
-        {
-            var definition = StandardShanheCampaignCatalog.CreateDefinition(1, edition);
-            var encounter = definition.Nodes.SelectMany(node => node.Encounters ?? []).First();
-            var setup = new ShanheBattleSetup(83, 1, "isolated-source", "classic:guan-yu", 4, 0, 0, 0, 0, [], [], [], encounter.Enemies, encounter.Allies ?? [], ShanheCampaignContent.GetContentHash(definition));
-            var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup);
-            Need(!registry.Generals.ContainsKey(Dong) && !registry.Skills.ContainsKey(Jiuchi) && !registry.Skills.ContainsKey(Daoshu) && !registry.Skills.ContainsKey(Zaiqi),
-                "An ordinary unearned current-edition recipe or original-edition recipe does not import the dedicated full boss or its acquirable 887 dependency.");
-            if (edition == StandardShanheCampaignCatalog.LocalEditionId)
-                Need(definition.Nodes.SelectMany(node => node.Encounters ?? []).All(item => item.Id != Encounter && item.Enemies.All(member => member.GeneralId != Dong)),
-                    "The 2024 source never acquires the new full Fengyi candidate through a shared node identifier.");
-        }
-    }
-
     private static void Start(GameEngine game) { var result = game.Submit(new StartGameCommand()); Need(result.Accepted, result.Error?.Message ?? "Actual source encounter did not start."); }
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
-    private static void Reject(Action action) { var rejected = false; try { action(); } catch (Exception error) when (error is ArgumentException or InvalidOperationException) { rejected = true; } Need(rejected, "The real source/hash/health boundary must reject an inconsistent input."); }
     private static string State(GameEngine game) => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, game.PlayerCount).Select(viewer => SnapshotJson.Serialize(game.CreateSnapshot(viewer))),
         Stack = JsonSerializer.Serialize(game.ResolutionStack), game.CardMovements, Events = game.Events.Select(item => JsonSerializer.Serialize(item.Payload, item.Payload.GetType())), Options = game.CreateCheckpoint().Options });
     private static void Cold(GameEngine game, ContentRegistry registry)

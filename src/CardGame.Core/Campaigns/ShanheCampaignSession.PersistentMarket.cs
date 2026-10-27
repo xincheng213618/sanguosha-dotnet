@@ -198,14 +198,16 @@ public sealed partial class ShanheCampaignSession
             ShopCardPurchases = state.ShopCardPurchases, ShopSkillPurchases = state.ShopSkillPurchases
         });
 
-    private RunState ReadMarketTransfer(RunState state, ShanheBattleMarketTransfer value)
+    private RunState ReadMarketTransfer(RunState state, ShanheBattleMarketTransfer value, ShanheBattleMarketSetup? replayedMarket = null)
     {
         var transfer = ShanheBattleMarketTransfer.Freeze(value);
         ShanheCampaignContent.ValidateMarketResources(transfer);
-        var expectedHash = _battleMarketSession ? ContentHash : ShanheCampaignContent.GetContentHash(CreateMarketDefinition(state));
+        var expectedHash = replayedMarket is not null ? ShanheCampaignContent.GetContentHash(replayedMarket.Definition)
+            : _battleMarketSession ? ContentHash : ShanheCampaignContent.GetContentHash(CreateMarketDefinition(state));
         var hasNode = _nodes.TryGetValue(transfer.MarketNodeId, out var node);
+        var quotedNode = replayedMarket is null ? node : replayedMarket.Definition.Nodes.SingleOrDefault(item => item.Id == transfer.MarketNodeId);
         Require(transfer.MarketContentHash == expectedHash && hasNode &&
-            node!.Kind == ShanheNodeKind.Shop && transfer.ChapterNumber > 0 &&
+            node!.Kind == ShanheNodeKind.Shop && quotedNode?.Kind == ShanheNodeKind.Shop && transfer.ChapterNumber > 0 &&
             (_battleMarketSession || transfer.MarketNodeId == state.MarketNodeId && transfer.ChapterNumber == state.MarketChapterNumber),
             "The market transfer belongs to a different chapter or catalogue.");
         // A live purchase may finish while its owner is still dying. Campaign
@@ -229,7 +231,7 @@ public sealed partial class ShanheCampaignSession
         Require(counts.All(count => count is >= 0 and <= MaximumCommands) &&
             transfer.ShopRefreshCount == transfer.ShopFreeRefreshCount + transfer.ShopPaidRefreshCount &&
             transfer.ShopStock.Select(choice => choice.Id).Distinct(StringComparer.Ordinal).Count() == transfer.ShopStock.Count &&
-            transfer.ShopStock.All(choice => !choice.LeavesNode && (node!.Choices ?? []).Any(authored =>
+            transfer.ShopStock.All(choice => !choice.LeavesNode && (quotedNode!.Choices ?? []).Any(authored =>
                 authored.RewardId == choice.RewardId && authored.GoldCost == choice.GoldCost && authored.HpCost == choice.HpCost)) &&
             transfer.StartingEquipment.Select(card => EquipmentCatalog.Get(card.Kind).Slot).Distinct().Count() == transfer.StartingEquipment.Count,
             "Invalid market shelf or transaction counters.");

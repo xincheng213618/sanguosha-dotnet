@@ -72,7 +72,12 @@ public sealed partial class MainViewModel
             if (ActiveShanheBossRewardGroup is null) _shanheBossRewardGroupId = null;
             foreach (var group in summary.Groups)
                 ShanheBossRewardGroups.Add(new(group.Id, group.Name, group.IsSkipped ? $"已换取 {group.SkipGold} 铜币" : group.SelectedReward?.Name ?? (group.IsExhausted ? "暂无可领取奖励" : $"{group.Offers.Count} 选 一"),
-                    group.IsResolved, group.Id == _shanheBossRewardGroupId, state.Revision));
+                    group.IsResolved, group.Id == _shanheBossRewardGroupId, state.Revision)
+                {
+                    Artworks = group.IsSkipped ? [] : group.SelectedReward is { } selected
+                        ? [CreateShanheRewardArtwork(selected)]
+                        : group.Offers.Take(3).Select(reward => CreateShanheRewardArtwork(reward, isPreview: true)).ToArray()
+                });
             if (ActiveShanheBossRewardGroup is { } active)
                 foreach (var reward in active.Offers)
                 {
@@ -94,4 +99,7 @@ public sealed partial class MainViewModel
     }
 }
 
-public sealed record ShanheBossRewardGroup(string Id, string Name, string SelectedName, bool IsResolved, bool IsSelected, long Revision);
+public sealed record ShanheBossRewardGroup(string Id, string Name, string SelectedName, bool IsResolved, bool IsSelected, long Revision)
+{
+    public IReadOnlyList<ShanheRewardArtwork> Artworks { get; init; } = [];
+}

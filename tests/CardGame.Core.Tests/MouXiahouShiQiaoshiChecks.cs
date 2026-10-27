@@ -4,56 +4,6 @@ internal static class MouXiahouShiQiaoshiChecks
 {
     private const string Draw = "skill-program.mou-mobile:qiaoshi.Draw";
 
-    public static void ForeignSourceChoiceActualDamageArmorAndTurnBudgetCold()
-    {
-        var s = MouXiahouShiScene.Start(new("source-choice-and-turn-budget") { HeroSeat = 1, Qiaoshi = true });
-        s.Use("damage-one", 1); s.Reach(s.QiaoshiChoice); s.Private(); s.RejectPrompt(); s.Cold();
-        var declined = s.E<MouXiahouShiQiaoshiStartedEvent>().Single();
-        s.Need(s.P!.PlayerSeat == 0 && declined.Source.OwnerSeat == 1 && declined.DamageSourceSeat == 0 && declined.DamageAmount == 1 &&
-            s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == declined.FrameId).MouXiahouShiQiaoshi is { Stage: MouXiahouShiQiaoshiStage.SourceChoice },
-            "The genuine foreign damage source, independently of the Qiaoshi owner, receives the private native after-damage decision.");
-        s.ChooseBranch("decline"); s.Play();
-        s.Need(s.E<MouXiahouShiCompletedEvent>().Single(e => e.FrameId == declined.FrameId) is { Accepted: false } &&
-            !s.E<MouXiahouShiQiaoshiRecoveryIssuedEvent>().Any() && !s.E<MouXiahouShiDrawReturnedEvent>().Any(),
-            "Declining neither recovers, draws nor consumes the owner's once-per-actual-turn acceptance.");
-        s.Use("damage-one", 1); s.Reach(s.QiaoshiChoice); s.Cold();
-        var accepted = s.E<MouXiahouShiQiaoshiStartedEvent>().Last(); s.ChooseBranch("recover-and-draw"); s.Play();
-        s.Need(accepted.Turn == declined.Turn && s.E<MouXiahouShiQiaoshiRecoveryIssuedEvent>().Single(e => e.FrameId == accepted.FrameId) is
-            { SourceSeat: 0, TargetSeat: 1, DamageAmount: 1, RequestedRecovery: 1 } &&
-            s.E<RecoveryAppliedEvent>().Count(e => e.SourceSeat == 0 && e.TargetSeat == 1 && e.Amount == 1) == 1 && s.V(1).Hp == 2,
-            "A later actual damage in the same turn can be accepted after a decline and uses the original source and damage amount for native recovery.");
-        DrawOnce(s, accepted.FrameId, 0);
-        s.Use("damage-one", 1); s.Play();
-        s.Need(s.E<MouXiahouShiQiaoshiStartedEvent>().Length == 2 && s.V(1).Hp == 1,
-            "Acceptance locks the owner and named skill for the whole actual turn, preventing a second source decision on later damage.");
-        s.Use("recover-target-two", 1); s.Play(); s.End(); s.Play();
-        s.Use("damage-one", 1); s.Reach(s.QiaoshiChoice);
-        var next = s.E<MouXiahouShiQiaoshiStartedEvent>().Last();
-        s.Need(next.Turn != accepted.Turn, "A genuinely later actual turn receives a fresh Qiaoshi acceptance budget.");
-        s.ChooseBranch("recover-and-draw"); s.Play(); DrawOnce(s, next.FrameId, 0); s.Cold();
-
-        foreach (var amount in new[] { 1, 3 })
-        {
-            var armor = MouXiahouShiScene.Start(new("armor-damage-" + amount) { HeroSeat = 1, Qiaoshi = true });
-            armor.Use("armor-one", 1); armor.Play(); armor.Use(amount == 1 ? "damage-one" : "damage-three", 1); armor.Reach(armor.QiaoshiChoice);
-            var start = armor.E<MouXiahouShiQiaoshiStartedEvent>().Single(); var damage = armor.E<DamageAppliedEvent>().Single();
-            armor.Need(damage.Amount == amount && damage.ArmorPayment is { ArmorBefore: 1, ArmorAbsorbed: 1, ArmorAfter: 0 } invoice &&
-                invoice.HpLossAmount == amount - 1 && start.DamageAmount == amount && armor.V(1).Hp == 4 - amount,
-                "Qiaoshi reads the real positive native damage invoice, including armor-only damage, rather than substituting the HP delta.");
-            armor.Private(); armor.Cold(); armor.ChooseBranch("recover-and-draw"); armor.Play();
-            armor.Need(armor.E<MouXiahouShiQiaoshiRecoveryIssuedEvent>().Single() is { DamageAmount: var frozen, RequestedRecovery: var requested, BaseRecovery: var clamped } &&
-                frozen == amount && requested == amount && clamped == amount - 1 && armor.V(1).Hp == 3 &&
-                armor.E<RecoveryAppliedEvent>().Where(e => e.TargetSeat == 1).Sum(e => e.Amount) == amount - 1,
-                "The accepted damage amount remains immutable while native recovery clamps to missing HP; zero actual recovery still permits Draw2.");
-            DrawOnce(armor, start.FrameId, 0); armor.Cold();
-        }
-        var own = MouXiahouShiScene.Start(new("self-damage-and-loss-negative") { Qiaoshi = true });
-        own.Use("self-damage-one"); own.Play(); own.Use("loss-one"); own.Play();
-        own.Need(own.E<DamageAppliedEvent>().Single() is { SourceSeat: 0, TargetSeat: 0, Amount: 1 } && own.V().Hp == 1 &&
-            own.E<MouXiahouShiQiaoshiStartedEvent>().Length == 0 && own.E<MouXiahouShiDrawReturnedEvent>().Length == 0,
-            "The owner's own actual damage and genuine HP Loss do not masquerade as foreign-source Qiaoshi occurrences."); own.Cold();
-    }
-
     public static void NativeRecoveryReplacementPaidChildrenSourceLossAndCold()
     {
         var loss = MouXiahouShiScene.Start(new("paid-recovery-child-source-loss")

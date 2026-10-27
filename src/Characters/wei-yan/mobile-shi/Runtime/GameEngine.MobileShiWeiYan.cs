@@ -180,7 +180,21 @@ public sealed partial class GameEngine
             var backwater = branch == "backwater";
             ReplaceRuntimeTop(f = f with { MobileShiWeiYan = r with { Stage = backwater ? 4 : 8 } });
             if (branch == "recover" || backwater) new ProgramSkillHost(this).Recover(f.Id, f.OwnerSeat, f.OwnerSeat, 1, null, null);
-            if (branch == "draw" || backwater) DrawProgramCards(f.Id, f.OwnerSeat, 1, null, null, SkillProgramCardSetVisibility.Private, CardMoveReasons.Draw);
+            if (branch == "draw" || backwater)
+            {
+                var before = _movementSequence;
+                DrawProgramCards(f.Id, f.OwnerSeat, 1, null, null, SkillProgramCardSetVisibility.Private, CardMoveReasons.Draw);
+                f = GetActiveProgramFrame(f.Id);
+                ReplaceRuntimeTop(f = f with { MobileShiWeiYan = f.MobileShiWeiYan! with
+                {
+                    KuangguDraw = new(f.OwnerSeat, 1, null, before, _movementSequence, null)
+                    {
+                        ActualDrawIds = _cardMovements.Where(move => move.Sequence > before && move.Sequence <= _movementSequence &&
+                            move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(f.OwnerSeat) && move.Reason == CardMoveReasons.Draw)
+                            .Select(move => move.CardId).ToArray()
+                    }
+                } });
+            }
             ContinueMobileShiWeiYan(f.Id); return;
         }
         var idToDiscard = selected.Cards.Count == 1 ? selected.Cards[0] :
@@ -195,6 +209,15 @@ public sealed partial class GameEngine
         TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
         TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
         TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+
+    private bool MobileShiKuangguThresholdDrawMatches(ProgramSkillFrame producer, NativeDrawInvocationProof proof) =>
+        producer.SkillId is ShiWyKuanggu or ShiWyKuanggu2 && producer.TriggerId is not null &&
+        producer.MobileShiWeiYan is { Operation: "kuanggu", Stage: 4 or 8, KuangguDraw: { } paid } &&
+        GetProgramTrigger(producer).Effects is [{ Op: SkillProgramEffectOp.ResolveMobileShiKuanggu }] &&
+        producer.InstructionIndex == 1 && paid.RecipientSeat == producer.OwnerSeat && proof.OwnerSeat == producer.OwnerSeat &&
+        paid.RequestedCount == 1 && proof.RequestedCount == 1 && proof.Reason == CardMoveReasons.Draw &&
+        paid.AttemptFrameId is null && paid.Replacement is null && proof.SequenceBefore == paid.SequenceBefore &&
+        proof.SequenceAfter == paid.SequenceAfter && proof.Materials.Select(material => material.CardId).SequenceEqual(paid.ActualDrawIds);
 
     private void ContinueMobileShiWeiYan(long id)
     {

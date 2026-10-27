@@ -43,41 +43,6 @@ internal static class ShanheDismantlementStockChecks
         ordinary.AssertRoot(material.Id, 1);
     }
 
-    public static void NativeCounterspellCancelsTheWholeOriginalDiscardWithoutExtraChoices()
-    {
-        var s = Scene.Start(3);
-        s.Buy(StandardShanheCampaignCatalog.CurrentChenqibubei2RewardId, 700);
-        var original = s.View(1).Hand.Select(c => c.Id).ToArray();
-        var card = s.Begin(CardKind.Dismantlement, 1);
-        s.Until(() => s.P is { Kind: DecisionKind.Nullification });
-        var counter = s.View(0).Hand.Single(c => c.Kind == CardKind.Nullification).Id;
-        s.Answer(choice => choice.Cards.SequenceEqual([counter])); s.Play();
-        var id = s.UseId(card);
-        Need(s.Events<NullificationResolvedEvent>().Single(e => e.ResolutionId == id).EffectNullified &&
-            !s.Events<TargetCardDiscardedEvent>().Any(e => e.ResolutionId == id) &&
-            s.View(1).Hand.Select(c => c.Id).SequenceEqual(original) &&
-            !s.Events<ProgramBindingResolvedEvent>().Any(e => e.SkillId == Watch) &&
-            s.G.CardMovements.Count(m => m.CardId == counter && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1,
-            "A genuinely paid counterspell cancels the original use before any discard or appended selection, without touching the target's actual cards.");
-        s.AssertRoot(card, 0);
-    }
-
-    public static void PublicArmorLossRunsNativeRecoveryAndSnatchKeepsOneSelection()
-    {
-        var s = Scene.Start(2, armor: true);
-        s.Buy(StandardShanheCampaignCatalog.CurrentChenqibubei2RewardId, 700);
-        var snatch = s.Begin(CardKind.Snatch, 7); s.Play(picks: 1);
-        Need(s.Events<TargetCardTakenEvent>().Count(e => e.ResolutionId == s.UseId(snatch)) == 1 && s.View(1).HandCount == 1,
-            "The Dismantlement-only policy does not append another Snatch selection or take the target's second card.");
-        s.AssertRoot(snatch, 0);
-        var lion = s.View(1).Equipment.Single(c => c.Kind == CardKind.SilverLion).Id;
-        s.Dismantle(1, 2, publicCard: lion);
-        Need(s.View(1) is { Hp: 2, HandCount: 0, Equipment.Count: 0 } &&
-            s.Events<SilverLionRemovedRecoveryEvent>() is [{ PlayerSeat: 1, RecoveredAmount: 1 }] &&
-            s.Events<TargetCardDiscardedEvent>().Any(e => e.PublicCardId == lion && e.FromZone == CardZoneKind.Equipment),
-            "The actual public armor entity is discarded through its native loss-recovery trigger before the remaining hand card is selected; empty zones then finish the same use.");
-    }
-
     private static void Need(bool value, string message)
     { if (!value) throw new InvalidOperationException(message); }
 

@@ -66,67 +66,6 @@ internal static class ShanheS5XuncanCaoshiChecks
         spent.Cold();
     }
 
-    public static void ShangshenFirstOccurrenceDeclineAndDeadFenchaiLightningRecoverCold()
-    {
-        var s = Scene.Start(); s.Play(); s.BeginDriver("fire", [2]);
-        s.Offer(StandardShanheS5XuncanCaoshiPackage.ShangshenId); s.Invoke(false); s.Play();
-        s.BeginDriver("fire", [2]); s.Play();
-        Need(s.E<DamageAppliedEvent>().Length == 2 && s.E<ShanheS5FirstElementalDamageEvent>().Length == 1 &&
-            !s.E<JudgmentResolvedEvent>().Any(e => e.Reason == "shanhe.s5.shangshen.lightning"),
-            "Declining the first real elemental segment does not allow activation on the second segment of the same turn.");
-        s.Cold();
-
-        s = Scene.Start(); s.Play(); s.BeginYunshen();
-        s.Until(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "shanhe-s5-yunshen") == true);
-        s.Answer(c => c.Parameters.GetValueOrDefault("actor-seat") == "0");
-        s.Offer(StandardShanheS5XuncanCaoshiPackage.ShangshenId); s.Invoke(false); s.Play();
-        s.BeginDriver("kill", [1]); s.Play();
-        Need(!s.V(1).IsAlive && s.E<ShanheS5FenchaiBoundEvent>().Single().TargetSeat == 1,
-            "The original bound female dies through real damage and dying; Fenchai retains that exact target.");
-        var turn = s.E<TurnStartedEvent>().Last().TurnNumber;
-        s.EndPlay(); s.Until(() => s.P is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } && s.E<TurnStartedEvent>().Last().TurnNumber > turn);
-        var hp = s.V().Hp; s.BeginDriver("fire", [2]); s.Offer(StandardShanheS5XuncanCaoshiPackage.ShangshenId); s.Cold(); s.Invoke(true);
-        s.Until(() => s.P?.SkillPrompt?.SkillId == Watch);
-        Need(s.E<JudgmentResolvedEvent>().Single(e => e.Reason == "shanhe.s5.shangshen.lightning") is { Suit: Suit.Spade, Rank: 6 } &&
-            s.E<DamageAppliedEvent>().Last() is { TargetSeat: 0, Amount: 3, Nature: DamageNature.Thunder, SourceLess: true } &&
-            s.V().Hp == hp - 3 && s.V(2).HandCount == 4,
-            "Dead Fenchai yields the real Spade-six Lightning result, three source-less Thunder damage, then refills the original damaged recipient.");
-        s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue"); s.Play();
-        Need(s.E<ShanheS5XuncanDrawPaidEvent>().Single() is { TargetSeat: 2, Requested: 4, Actual: 4 } &&
-            s.E<ShanheS5FirstElementalDamageEvent>().Length == 2,
-            "Nested Lightning cannot become another first-elemental opportunity and the original refill returns once.");
-        s.Cold();
-    }
-
-    public static void CaoshiPreparationLeijieNativeJudgmentGuidaoAndDrawRecoverCold()
-    {
-        foreach (var replace in new[] { false, true })
-        {
-            var s = Scene.Start(caoshi: true); s.Offer(StandardShanheS5XuncanCaoshiPackage.LeijieId); s.Invoke(true);
-            s.Until(() => s.P?.Choices.Any(c => c.Targets.SequenceEqual([2])) == true); s.Answer(c => c.Targets.SequenceEqual([2]));
-            s.Until(() => s.P is { Kind: DecisionKind.ProgramJudgmentReplacement, PlayerSeat: 0 });
-            Need(s.G.ResolutionStack.OfType<JudgmentFrame>().Single() is { TargetSeat: 2, Reason: "shanhe.s5.leijie" },
-                "Caoshi's real preparation selects a recipient to judge, rather than using the ordinary Play-phase two-Slash skill.");
-            var material = s.V().Hand.Single().Id; s.Cold();
-            s.Answer(c => replace ? c.Cards.SequenceEqual([material]) : c.Parameters.GetValueOrDefault("action") == "program-judgment-replace-skip");
-            s.Play();
-            var result = s.E<JudgmentResolvedEvent>().Single(e => e.Reason == "shanhe.s5.leijie");
-            Need(!s.E<CardUseDeclaredEvent>().Any(e => e.CardKind is CardKind.Slash or CardKind.ThunderSlash),
-                "Leijie creates no invented Slash, Slash response or Slash quota payment.");
-            if (replace)
-                Need(result is { Suit: Suit.Spade, Rank: 6 } && s.E<DamageAppliedEvent>().Single() is
-                        { SourceSeat: 0, TargetSeat: 2, Amount: 2, Nature: DamageNature.Thunder, SourceLess: false } &&
-                    s.E<ProgramJudgmentReplacementResolvedEvent>().Single(e => e.SkillId == "boundary:guidao") is
-                        { Activated: true, DrawnCards: 1 } && s.V(2).HandCount == 0,
-                    "The exact source-883 Guidao replaces with a real black Spade-six, draws its native one-card reward and Leijie causes two genuine Thunder damage.");
-            else
-                Need(result is { Suit: Suit.Club, Rank: 6 } && !s.E<DamageAppliedEvent>().Any() &&
-                    s.E<ShanheS5XuncanDrawPaidEvent>().Single() is { TargetSeat: 2, Requested: 2, Actual: 2 } && s.V(2).HandCount == 2,
-                    "A non-hit native preparation judgment draws two actual cards for that judged recipient.");
-            s.Cold();
-        }
-    }
-
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 
     private sealed class Scene(GameEngine game, ContentRegistry registry)

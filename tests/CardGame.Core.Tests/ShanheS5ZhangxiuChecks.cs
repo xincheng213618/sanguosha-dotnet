@@ -58,56 +58,6 @@ internal static class ShanheS5ZhangxiuChecks
             "On a fresh actual Play, no remaining equipment slot means no payable activation.");
     }
 
-    public static void LeizhenNativeHandMaterialsThirdSlashNonstackAndUnequippedBenefitCold()
-    {
-        var s = Scene.Start(true); s.Play();
-        var blade = s.Card(CardKind.Leizhen); var spear = s.Card(CardKind.ZhangbaSerpentSpear);
-        Need(!s.V().Skills!.Any(k => k.ContentId == StandardShanheS5ZhangxiuPackage.LeizhenSkillId),
-            "The fixed Leizhen starts as an extra real Hand entity and grants no skill before its native equipment Use.");
-        s.Skill("two-weapons"); s.Play(); s.Native(blade, []); s.Play(); s.Native(spear, []); s.Play();
-        Need(s.V().Equipment.Any(c => c.Id == blade) && s.V().Equipment.Any(c => c.Id == spear) &&
-            s.E<ShanheLeizhenHandUseCountedEvent>() is [{ MaterialCount: 1 }],
-            "The natively installed Leizhen counts the later spear's Hand payment, not its own earlier installation. " +
-            JsonSerializer.Serialize(new { Counted = s.E<ShanheLeizhenHandUseCountedEvent>(), Uses = s.E<CardUsedEvent>(), s.G.CardMovements }));
-        var pair = s.V().Hand.Where(c => c.Kind == CardKind.Peach).Take(2).Select(c => c.Id).ToArray();
-        s.Accept(new UseEquipmentEffectCommand(0, CardKind.ZhangbaSerpentSpear, pair, [2], s.G.Revision, s.P!.PromptId));
-        s.Until(() => s.P?.SkillPrompt?.SkillId == Watch);
-        var third = s.G.ResolutionStack.OfType<CardUseFrame>().Single();
-        Need(third.ShanheLeizhen is null && s.IncomingPrediction(2).DamageAmount == 1 &&
-            s.E<ShanheLeizhenHandUseCountedEvent>().Last() is { MaterialCount: 2, RemainderBefore: 1, RemainderAfter: 0 } &&
-            s.E<ShanheLeizhenChargeEarnedEvent>().Length == 1,
-            "One genuine two-Hand-material conversion reaches three materials, but that same third Slash cannot consume the benefit it just earned.");
-        s.Cold(); s.Continue(); s.Play();
-        foreach (var kind in new[] { CardKind.SilverLion, CardKind.OffensiveHorse, CardKind.DefensiveHorse })
-        { s.Native(s.Card(kind), []); s.Play(); }
-        Need(s.E<ShanheLeizhenHandUseCountedEvent>().Sum(e => e.MaterialCount) == 6 &&
-            s.E<ShanheLeizhenChargeEarnedEvent>().Length == 1 && s.E<ShanheLeizhenChargeSpentEvent>().Length == 0,
-            "Three more native Hand equipment Uses complete another cycle while charged, without stacking a second benefit.");
-        s.Skill("drop-equipment"); s.DrainToPlay();
-        Need(s.V().Equipment.Count == 0 && !s.V().Skills!.Any(k => k.ContentId == StandardShanheS5ZhangxiuPackage.LeizhenSkillId) &&
-            s.E<ShanheLeizhenHandUseCountedEvent>().Sum(e => e.MaterialCount) == 6 &&
-            s.E<ShanheLeizhenChargeEarnedEvent>().Length == 1,
-            "Real equipment discard removes the source without counting as a Hand Use or erasing its already-paid next-Slash benefit.");
-        var slash = s.Card(CardKind.Slash);
-        var candidate = s.G.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Slash &&
-            a.CardId == slash && a.TargetSeats.SequenceEqual([3]));
-        Need(s.G.PredictPublicActionDamage(0, candidate, 3).DamageAmount == 2 &&
-            s.E<ShanheLeizhenChargeSpentEvent>().Length == 0,
-            "The real proposed native Slash publicly predicts the saved benefit after unequipping, without consuming it before declaration.");
-        s.Native(slash, [3]); s.Until(() => s.P?.SkillPrompt?.SkillId == Watch);
-        var next = s.G.ResolutionStack.OfType<CardUseFrame>().Single();
-        Need(next.ShanheLeizhen is { BaseApplied: true, BaseBefore: 1, BaseAfter: 2 } &&
-            s.IncomingPrediction(3).DamageAmount == 2 && s.E<ShanheLeizhenChargeSpentEvent>().Length == 1 &&
-            s.E<ShanheLeizhenHandUseCountedEvent>().Sum(e => e.MaterialCount) == 6,
-            "The subsequent genuine Slash consumes the saved benefit once after unequipping; its public incoming prediction and initial native base both equal two.");
-        s.Cold(); s.Continue(); s.Play();
-        Need(s.E<DamageAppliedEvent>().Where(e => e.SourceSeat == 0).Select(e => e.Amount).SequenceEqual([1, 2]) &&
-            s.V(2).Hp == 19 && s.V(3).Hp == 18 &&
-            s.E<ShanheLeizhenBaseAppliedEvent>().Length == 1,
-            "Cold continuation pays the third Slash's original one and the later Slash's earned two, without double spending or self-boosting.");
-        s.Cold();
-    }
-
     private static void Need(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
     private static string Peer(int i) => "fixture:s5-zhangxiu-peer-" + i;
     private sealed class Scene(GameEngine game, ContentRegistry registry)

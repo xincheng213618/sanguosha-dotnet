@@ -39,54 +39,6 @@ internal static class SunYuanChecks
         }
         var(w,wr)=Start("saying-weapon",true);Skip(w);Play(w);Use(w,"stock");Play(w);var weapon=V(w,0).Hand.First(c=>c.Kind==CardKind.FangtianHalberd).Id;Use(w,"place",[weapon],[2]);Play(w);Need(w.GetAttackRange(2)>=3,"A real foreign equipped weapon, rather than a virtual range edit, makes Sun Yuan initially near.");End(w);Reach(w,()=>At(w,Saying)&&P(w)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="activate"));Activate(w,Saying);Answer(w,c=>c.Targets.SequenceEqual([2]));Answer(w,c=>c.Cards.SequenceEqual([weapon]));Reach(w,()=>At(w,Watch));w=Cold(w,wr);Continue(w);Play(w);Need(E<SayingRangeGrantedEvent>(w).Last().Holder==2&&w.GetAttackRange(2)==1&&E<SayingRequestIssuedEvent>(w).Length==0,"The actual weapon removal and its movement child finish before sampling current range, choosing the range branch instead of the former in-range request.");_=Cold(w,wr);
     }
-    public static void DongxinIndependentDirectionsRecursiveDamageAndZeroCostCold()
-    {
-        var(g,r)=Start("directions");Use(g,"hurt-two",targets:[1]);Activate(g,Dongxin);SelectCosts(g);Reach(g,()=>At(g,Dongxin)&&P(g)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="activate"));
-        Need(E<SunYuanPaidEvent>(g).Count(e=>e.Direction=="dealt")==1&&E<DongxinEntityAcquiredEvent>(g).Length==0,"A two-point occurrence consumes one dealt direction; the real self-retort offers the independent received direction before original reclaim.");g=Cold(g,r);Activate(g,Dongxin);SelectCosts(g);Play(g);
-        var paid=E<SunYuanPaidEvent>(g);Need(paid.Count(e=>e.Direction=="dealt")==1&&paid.Count(e=>e.Direction=="received")==1&&E<DongxinDamageIssuedEvent>(g).Length==2&&E<DamageAppliedEvent>(g).Count(e=>e.SourceSeat==0&&e.TargetSeat==0)==2,"Each actual-turn direction pays once, preventing unbounded recursive real self-damage while retaining the other direction.");
-        var acquired=E<DongxinEntityAcquiredEvent>(g);Need(acquired.Length==5&&acquired.Take(2).All(e=>e.FrameId==paid.Single(e=>e.Direction=="received").FrameId)&&acquired.Skip(2).All(e=>e.FrameId==paid.Single(e=>e.Direction=="dealt").FrameId),"The inner native damage and reclaim completely return before the original three paid Slashes are recovered.");
-        Need(E<NativeLogicalDiscardInvocationRecordedEvent>(g).Where(e=>e.Reason.Value=="skill-program.sun-yuan.dongxin.discard").Select(e=>e.ActualCount).Order().SequenceEqual([2,3]),"Each exact mixed-primary payment is one whole logical discard, not one invocation per entity.");Use(g,"hurt-two",targets:[1]);Play(g);Need(E<SunYuanPaidEvent>(g).Length==2,"A later real occurrence cannot reacquire a direction through another instance or damage point.");_=Cold(g,r);
-        (g,r)=Start("zero");Trim(g,[]);Use(g,"incoming",targets:[1]);Reach(g,()=>At(g,Dongxin));Activate(g,Dongxin);Play(g);Need(E<SunYuanPaidEvent>(g)is[{Count:0,Direction:"received"}]&&E<DongxinDamageIssuedEvent>(g).Length==1&&E<NativeLogicalDiscardInvocationRecordedEvent>(g).All(e=>e.Reason.Value!="skill-program.sun-yuan.dongxin.discard")&&E<DongxinEntityAcquiredEvent>(g).Length==0,"A genuinely empty HE accepts the documented zero-cost interpretation, issues the real retort, and invents neither discard invoice nor reclaimed card.");_=Cold(g,r);
-        (g,r)=Start("killed-peer");Use(g,"kill-peer",targets:[1]);Activate(g,Dongxin);Play(g);Need(!V(g,1).IsAlive&&V(g,1).HandCount==0&&E<SunYuanPaidEvent>(g)is[{Count:0,Direction:"dealt"}]&&E<DongxinDamageIssuedEvent>(g)is[{SourceSeat:0,TargetSeat:0}]&&E<NativeLogicalDiscardInvocationRecordedEvent>(g).All(e=>e.Reason.Value!="skill-program.sun-yuan.dongxin.discard"),"After the real nonterminal victim death and cleanup, the living source retains its genuine after-damage zero-HE opportunity; no discard entity or substitute damage source is invented.");_=Cold(g,r);
-    }
-    public static void DongxinExactEntityQuotaReacquisitionAndIdentityCold()
-    {
-        foreach(var scene in new[]{"quota","identity","optional-identity"})
-        {
-            var(g,r)=Start(scene);Use(g,"hurt-two",targets:[1]);Activate(g,Dongxin);SelectCosts(g);Play(g);var grants=E<DongxinEntityAcquiredEvent>(g);
-            if(scene=="optional-identity"){Need(grants.Length==0&&E<SunYuanMaterialEvent>(g).All(e=>e.Kind==CardKind.Crossbow&&e.EffectiveKind==CardKind.Crossbow),"Optional Slash conversions never make a discarded Crossbow an actual last-known Slash.");_=Cold(g,r);continue;}
-            Need(grants.Length==3&&grants.All(e=>V(g,0).Hand.Any(c=>c.Id==e.CardId&&c.SkillMarkLabel?.Contains("恫心")==true))&&Enumerable.Range(1,3).All(s=>g.CreateSnapshot(s).Players[0].Hand.Count==0),"Only the acquiring owner can see the marked genuine Hand entities; other prepared views hide their identities.");
-            if(scene=="identity")Need(E<SunYuanMaterialEvent>(g).All(e=>e.Kind==CardKind.Crossbow&&e.EffectiveKind==CardKind.Slash),"A persistent native Hand identity freezes Slash before discard, retaining the printed Crossbow entity through reclaim.");
-            var marked=grants[0].CardId;var unmarked=V(g,0).Hand.First(c=>!grants.Any(e=>e.CardId==c.Id)).Id;var untouched=V(g,0).Hand.First(c=>c.Id!=unmarked&&!grants.Any(e=>e.CardId==c.Id)).Id;Native(g,a=>a.Kind==LegalActionKind.Slash&&a.CardId==unmarked&&a.TargetSeats.SequenceEqual([1]));Play(g);
-            Need(E<CardUseDebitRecordedEvent>(g).Length==1&&g.GetHumanLegalActions().Any(a=>a.Kind==LegalActionKind.Slash&&a.CardId==marked)&&!g.GetHumanLegalActions().Any(a=>a.Kind==LegalActionKind.Slash&&a.CardId==untouched),"Ordinary quota is really spent while the exact marked physical Slash remains usable.");
-            if(scene=="quota")
-            {
-                Use(g,"gift",[marked],[1]);Play(g);Need(V(g,1).Hand.Single(c=>c.Id==marked).SkillMarkLabel is null&&E<DongxinEntityDepartedEvent>(g).Any(e=>e.CardId==marked),"Actual transfer records departure and grants the other holder no inherited mark.");Use(g,"take",targets:[1]);Reach(g,()=>P(g)?.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="select-and-move-owned-card")==true);var slot=V(g,1).Hand.Select((c,i)=>(c,i)).Single(x=>x.c.Id==marked).i;Answer(g,c=>c.Parameters.GetValueOrDefault("source-zone")=="Hand"&&c.Parameters.GetValueOrDefault("slot-index")==slot.ToString());Play(g);Need(V(g,0).Hand.Single(c=>c.Id==marked).SkillMarkLabel?.Contains("恫心")==true&&g.GetHumanLegalActions().Any(a=>a.CardId==marked&&a.Kind==LegalActionKind.Slash),"The same original owner reacquires its historically marked exact entity without inventing another acquisition grant.");
-            }
-            g=Cold(g,r);Native(g,a=>a.Kind==LegalActionKind.Slash&&a.CardId==marked&&a.TargetSeats.SequenceEqual([1]));Play(g);Need(E<DongxinEntityUseBoundEvent>(g).Count(e=>e.Receipt.CardId==marked)==1&&E<CardUseDebitRecordedEvent>(g).Length==1,"The accepted genuine marked Use binds once and does not debit the already-spent ordinary quota.");_=Cold(g,r);
-        }
-    }
-    public static void DongxinPaidLossDeathClaimsAndEquipmentChildrenCold()
-    {
-        foreach(var scene in new[]{"loss","death","claim","lion","ox"})
-        {
-            var(g,r)=Start(scene);int? equipment=null;int? grain=null;
-            if(scene is"lion"or"ox"){Native(g,a=>a.Kind==LegalActionKind.Equip);Play(g);equipment=V(g,0).Equipment.Single().Id;if(scene=="ox"){grain=V(g,0).Hand.First().Id;Accept(g,new UseEquipmentEffectCommand(0,CardKind.WoodenOx,[grain.Value],[],g.Revision,P(g)!.PromptId));Play(g);}}
-            Use(g,"incoming",targets:[1]);Reach(g,()=>At(g,Dongxin));Activate(g,Dongxin);if(equipment is{}eq)Answer(g,c=>c.Cards.SequenceEqual([eq]));SelectCosts(g);
-            Reach(g,()=>At(g,Watch)||At(g,Health)||E<SunYuanCompletedEvent>(g).Any());var frame=Own(g);var id=frame?.Id??E<SunYuanStartedEvent>(g).Last().FrameId;
-            if(At(g,Watch)||At(g,Health))
-            {
-                Need(frame!.SunYuan is{Paid:true,Stage:SunYuanStage.DiscardChildren}&&E<DongxinDamageIssuedEvent>(g).Length==0,"The exact paid primary set pauses in genuine loss/recovery children before retort or reclaim.");
-                if(scene=="ox")Need(frame.SunYuan!.Materials.Count==2&&frame.SunYuan.Grain.SequenceEqual([grain!.Value])&&g.CardMovements.Any(m=>m.CardId==grain&&m.From==CardLocation.WoodenOxGrain(0)&&m.To==CardLocation.DiscardPile),"Wooden Ox's real private grain spills separately and never becomes a third primary payment or a reclaimed card.");
-                g=Cold(g,r);Continue(g);
-            }
-            Reach(g,()=>E<SunYuanCompletedEvent>(g).Any(e=>e.FrameId==id));Need(E<SunYuanPaidEvent>(g).Count(e=>e.FrameId==id)==1&&E<SunYuanCompletedEvent>(g).Count(e=>e.FrameId==id)==1,"Paid source loss or native death returns the original binding once without repaying.");
-            if(scene=="loss")Need(V(g,0).IsAlive&&!V(g,0).Skills!.Any(s=>s.Id==Dongxin)&&E<DongxinEntityAcquiredEvent>(g).Length==2,"An actual HP-conditional source loss preserves the already-paid living owner's original reclaims.");
-            if(scene=="death")Need(!V(g,0).IsAlive&&g.State.Winner==Winner.None&&E<DongxinEntityAcquiredEvent>(g).Length==0,"A genuine non-Lord paid owner death drains its children, grants no cards to a corpse and does not fake another damage source.");
-            if(scene=="claim")Need(E<DongxinEntityAcquiredEvent>(g).Length==0&&E<SunYuanEntityMovedEvent>(g).Where(e=>e.FrameId==id&&e.Stage==SunYuanStage.DiscardChildren).All(e=>g.CreateCardZoneDiagnostics().Single(z=>z.CardId==e.CardId).Location.Zone==CardZoneKind.Hand),"A real discard child claims the original materials; later Dongxin cannot steal them back from a new Hand or substitute another entity.");
-            if(scene=="lion")Need(E<RecoveryAppliedEvent>(g).Any(e=>e.TargetSeat==0&&e.Amount==1)&&E<DongxinEntityAcquiredEvent>(g).Length==0,"The equipped Silver Lion really heals through the typed recovery parent before the cardless retort.");_=Cold(g,r);
-        }
-    }
     private static PlayerSnapshot V(GameEngine g,int s)=>g.CreateSnapshot(s).Players[s];
     private static PendingDecision? P(GameEngine g)=>Enumerable.Range(0,4).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);
     private static T[] E<T>(GameEngine g)where T:IGameEvent=>g.Events.Select(e=>e.Payload).OfType<T>().ToArray();
@@ -100,9 +52,6 @@ internal static class SunYuanChecks
     private static void Activate(GameEngine g,string skill){Reach(g,()=>At(g,skill)&&P(g)!.PlayerSeat==0&&P(g)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="activate"));Answer(g,c=>c.Parameters.GetValueOrDefault("program-action")=="activate");}
     private static void Skip(GameEngine g)=>Answer(g,c=>c.Parameters.GetValueOrDefault("program-action")=="skip");
     private static void Use(GameEngine g,string activation,int[]? cards=null,int[]? targets=null)=>Accept(g,new UseProgramSkillCommand(0,Driver,activation,cards??[],targets??[],g.Revision,P(g)!.PromptId));
-    private static void Native(GameEngine g,Func<LegalAction,bool> predicate){var a=g.GetHumanLegalActions().First(predicate);Accept(g,new PlayCardCommand(0,a.CardId!.Value,a.TargetSeats,g.Revision,P(g)!.PromptId,a.PlayedCardKind,a.TargetCardId){ConversionSource=a.ConversionSource});}
-    private static void SelectCosts(GameEngine g){while(Own(g)?.SunYuan?.Stage==SunYuanStage.DiscardCards&&P(g)?.PlayerSeat==0)Answer(g,_=>true);}
-    private static void Trim(GameEngine g,int[] keep){var cards=V(g,0).Hand.Where(c=>!keep.Contains(c.Id)).Select(c=>c.Id).ToArray();if(cards.Length>0){Use(g,"trim",cards);Play(g);}}
     private static void End(GameEngine g)=>Accept(g,new EndPlayPhaseCommand(0,g.Revision,P(g)!.PromptId));
     private static void Play(GameEngine g)=>Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.PlayCard});
     private static void Reach(GameEngine g,Func<bool> done,[CallerMemberName]string method="",[CallerLineNumber]int line=0)

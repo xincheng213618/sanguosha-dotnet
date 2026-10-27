@@ -17,7 +17,7 @@ internal static class BaguaResponseUiChecks
             store.Write(GameSaveSlot.Manual, new(1, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
             using var model = new MainViewModel(autoAdvance: false, seed: game.Seed, showSetup: true,
                 saveStore: store, useExpandedContent: false, contentRegistry: registry) { IsMotionEnabled = false };
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             var engine = Program.Engine(model);
             var hp = engine.CreateSnapshot(0).Players[0].Hp;
             var window = new MainWindow(model);

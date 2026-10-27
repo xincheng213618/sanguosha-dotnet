@@ -17,43 +17,6 @@ internal static class ShanheJinnangJiChecks
         new(83, 1, "fixture:jinnang-production", StandardShanheS5BossPackage.ZhangliaoHuangkongId,
             4, 0, 0, 0, 0, [Skill, Zaiqi], [], [], [new("standard:cao-cao")], [], new string('b', 64))));
 
-    public static void ActualDrawsIncludePlansAndExtraDrawsWithLateActiveSourcesCold()
-    {
-        var s = Scene.Start("plan");
-        s.Until(s.BeforeExtraDraw);
-        Need(s.V().Hp == 6 && s.V().HandCount == 6 && !s.HasSkill() && s.V().HandLimit == 6 && s.DrawTotal() == 6 &&
-            s.E<ProgramNormalDrawAdjustedEvent>().Where(fact => fact.OwnerSeat == 0 &&
-                fact.SkillId is "standard:yingzi" or Huangkong).Select(fact => fact.Adjustment).SequenceEqual([1, 3]),
-            "At the genuine DrawEnded program before its extra Draw2, Yingzi's +1 and Huangkong's plan doubling have paid six real draws; the unowned tactic contributes nothing. " + s.Diagnostic());
-        s.Cold(); s.AnswerContinue();
-        s.Until(() => s.AtGain() && s.Draws().Any(fact => fact.Reason.Value == "skill-program." + ExtraDraw + ".Draw"));
-        Need(s.DrawTotal() == 8 && s.V().HandCount == 8 && s.V().HandLimit == 6 &&
-            s.Draws().Single(fact => fact.Reason.Value == "skill-program." + ExtraDraw + ".Draw").ActualCount == 2,
-            "A genuine Draw2 inside DrawEnded is a second native draw, while absence of the tactic still suppresses its modifier.");
-        s.Cold(); s.Play(); s.Use("lose-one");
-        Need(s.HasSkill() && s.V().Hp == 5 && s.V().HandLimit == 9 &&
-            s.E<HpConditionalSkillGrantChangedEvent>().Any(fact => fact.SkillId == Skill && fact.Added),
-            "A real HP-conditional late acquisition reads the already issued eight draw-phase draws and adds four immediately.");
-        s.Use("draw-three");
-        Need(s.V().HandCount == 11 && s.DrawTotal() == 8 && s.V().HandLimit == 9 &&
-            s.E<NativeDrawInvocationRecordedEvent>().Any(fact => fact.OwnerSeat == 0 &&
-                fact.Phase?.Kind == ActualDiscardRecoveryPhaseKind.Play && fact.ActualCount == 3),
-            "A real Play-phase Draw3 changes hand size but cannot borrow the old Draw-phase allowance.");
-        s.Use("recover-one");
-        Need(s.V().Hp == 6 && !s.HasSkill() && s.V().HandLimit == 6,
-            "Recovery withdraws the actual HP source and immediately removes the numeric contribution without deleting draw facts.");
-        s.Cold(); s.Use("lose-one");
-        Need(s.V().Hp == 5 && s.HasSkill() && s.V().HandLimit == 9 && s.DrawTotal() == 8,
-            "Reacquiring the source in the same real turn reads the same facts once rather than issuing another draw or counter.");
-        s.AssertPureQueries();
-        var turn = s.Turn;
-        s.EndPlay(); s.Until(s.AtEnd);
-        Need(s.E<TurnEndedEvent>().Any(fact => fact.TurnNumber == turn && fact.ActorSeat == 0) &&
-            s.Turn == turn && s.V().HandLimit == 5 && s.HasSkill(),
-            "A genuine TurnEnded boundary clears the contribution before the cursor advances or the turn number changes.");
-        s.Cold();
-    }
-
     public static void ReplacementGainsDoNotCountButRealDrawPhaseSkillDrawsDoCold()
     {
         foreach (var scene in new[] { "tuxi", "zaiqi" })

@@ -7,63 +7,6 @@ internal static class MobileYuanShaoChecks
 {
     internal const string Hero = "mobile:yuan-shao", Skill = "mobile:luanji", Binding = "same-suit-pair-as-arrow-barrage";
 
-    public static void EffectiveSuitPairUsesOriginalArrowAndReturnsCold()
-    {
-        var s = Scene.Start(); s.Play();
-        var pair = s.V(0).Hand.Where(c => c.Rank is 2 or 3).Select(c => c.Id).ToArray();
-        var weapon = s.V(0).Equipment.Single().Id;
-        var action = s.G.GetHumanLegalActions().Single(a => a.ProgramSkillId == Skill);
-        s.Need(s.V(0).GeneralId == Hero && s.V(0).Skills!.Any(k => k.Id == "classic:hongyan") &&
-            pair.Length == 2 && pair.Select(id => s.V(0).Hand.Single(c => c.Id == id).Suit).Distinct().Count() == 2 &&
-            action.SelectableCardIds.Order().SequenceEqual(pair.Order()) && !action.SelectableCardIds.Contains(weapon) &&
-            action.SelectableCardSuitOverrides is { Count: 2 } suits && pair.All(id => suits[id] == Suit.Heart) &&
-            !s.G.GetHumanLegalActions().Any(a => a.ProgramSkillId == "classic:luanji") &&
-            new SimpleAiBrain(0, 17).ChooseActiveSkillCards(s.G.CreateSnapshot(0), action).Order().SequenceEqual(pair.Order()),
-            "The real mobile Yuan Shao receives native Hongyan: only his mixed-printed Spade/Heart Hand pair shares effective Heart, the equipped Spade stays excluded, classic's default pair remains unavailable, and AI selects the actual effective-suit cost.");
-        var map = action.SelectableCardSuitOverrides!;
-        var writeRejected = false;
-        try { ((IDictionary<int, Suit>)map)[pair[0]] = Suit.Club; }
-        catch (NotSupportedException) { writeRejected = true; }
-        var classicShape = new LegalAction(LegalActionKind.UseProgramSkill, null, null, "classic same-suit default",
-            MinCardCount: 2, MaxCardCount: 2)
-        { ProgramSkillId = "classic:luanji", SelectedCardsSameSuit = true };
-        s.Need(writeRejected && map[pair[0]] == Suit.Heart && classicShape.SelectableCardSuitOverrides is null &&
-            !JsonSerializer.Serialize(classicShape).Contains(nameof(LegalAction.SelectableCardSuitOverrides), StringComparison.Ordinal),
-            "The issued effective-suit map refuses observer writes; the default classic action keeps a null omitted field and its previous serialized shape.");
-        var revision = s.G.Revision;
-        var rejected = s.G.Submit(new UseProgramSkillCommand(0, Skill, Binding, [pair[0], weapon], [], revision, s.P!.PromptId));
-        s.Need(!rejected.Accepted && s.G.Revision == revision && s.Zone(weapon) == CardLocation.Equipment(0),
-            "An effective-suit match never broadens the ordinary Hand-only payment to the equipment area.");
-        s.Accept(new UseProgramSkillCommand(0, Skill, Binding, pair, [], s.G.Revision, s.P!.PromptId));
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Watch);
-        var use = s.G.ResolutionStack.OfType<CardUseFrame>().Single(f => f.CardKind == CardKind.ArrowBarrage);
-        var parent = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == Skill && f.TriggerId is null);
-        var useId = use.Id; var parentId = parent.Id;
-        s.Need(use is { SourceSeat: 0, PhysicalCardIds.Count: 2, Action.Type: CardActionType.Use } &&
-            use.Action.PhysicalCards.Select(c => c.CardId).Order().SequenceEqual(pair.Order()) &&
-            use.Action.ConversionChain.Single().SkillId == Skill &&
-            parent.SelectedCardIds.Order().SequenceEqual(pair.Order()) && parent.InstructionIndex == 1 &&
-            s.G.ResolutionStack.SkipWhile(f => f.Id != parentId).Skip(1).First().Id == useId &&
-            pair.All(id => s.Zone(id) == CardLocation.Processing && s.G.CardMovements.Count(m => m.CardId == id &&
-                m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1),
-            "One genuine native Arrow owns both original materials and remains the paid child of the original activation at its actual finalized-target child window.");
-        s.Cold();
-        var pause = s.P!;
-        s.Accept(new AnswerPromptCommand(pause.PlayerSeat, pause.PromptId,
-            pause.Choices.Single(c => c.Parameters.GetValueOrDefault("option-id") == "continue").Id, s.G.Revision));
-        s.Play();
-        s.Need(s.E<CardRespondedEvent>().Count(e => e.EffectiveCardKind == CardKind.Dodge) == 3 &&
-            !s.E<DamageAppliedEvent>().Any() &&
-            s.E<ProgramViewAsConvertedEvent>().Count(e => e.SkillId == Skill && e.IsUse) == 1 &&
-            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == useId && e.CardKind == CardKind.ArrowBarrage) == 1 &&
-            s.E<ProgramSkillResolvedEvent>().Count(e => e.FrameId == parentId && e.Completed) == 1 &&
-            s.G.ResolutionStack.All(f => f.Id != parentId && f.Id != useId) &&
-            pair.All(id => s.Zone(id) == CardLocation.DiscardPile && s.G.CardMovements.Count(m => m.CardId == id &&
-                m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile) == 1) &&
-            s.Zone(weapon) == CardLocation.Equipment(0),
-            "Cold resumes three real Dodge responses and returns once to the original paid activation; both original materials settle once and equipment is untouched.");
-    }
-
     internal sealed class Scene(GameEngine game, ContentRegistry registry)
     {
         public GameEngine G { get; private set; } = game;

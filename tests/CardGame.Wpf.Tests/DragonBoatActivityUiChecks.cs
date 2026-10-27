@@ -64,9 +64,9 @@ internal static class DragonBoatActivityUiChecks
                 !vm.ToggleGeneralRosterCommand.CanExecute(null) && !vm.CanExpandGeneralRoster,
                 "The true six-candidate draft must render exactly the projected same-team candidates and hide the inapplicable expanded-roster action.");
             Program.Render(root, 1440, 880, Path.Combine(output, "181-dragon-boat-shared-candidates.png"));
-            vm.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
             var draftJson = SnapshotJson.Serialize(game.CreateSnapshot(0));
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             game = Program.Engine(vm);
             Program.Assert(!vm.HasSaveError && SnapshotJson.Serialize(game.CreateSnapshot(0)) == draftJson &&
                 vm.DragonBoatTeammateChoices.Select(choice => choice.GeneralId).SequenceEqual(draft.GeneralIds),
@@ -88,12 +88,12 @@ internal static class DragonBoatActivityUiChecks
                 vm.AliveText.Contains("六名AI对手") && vm.IsDragonBoatGuide && !vm.IsTeamGuide && !vm.IsIdentityGuide,
                 "The live eight-seat race must keep one AI ally, six opponents, five-tier health/hands and private teammate hands while rendering the real four-team standings.");
             Program.Render(root, 1440, 880, Path.Combine(output, "182-dragon-boat-eight-seats.png"));
-            vm.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
             var saved = SnapshotJson.Serialize(game.CreateSnapshot(0));
             using var restored = new MainViewModel(false, 17, true, store, contentRegistry:
                 ComposedSkillContentRegistry.CreateShowcase())
                 { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-            restored.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(restored);
             Program.Assert(!restored.HasSaveError && restored.IsDragonBoatActivityTable &&
                 restored.SelectedStartingTeam.TeamId == "team:qun" && restored.StartingTeams.Count == 4 &&
                 restored.Seats.Count == 8 && SnapshotJson.Serialize(Program.Engine(restored).CreateSnapshot(0)) == saved,
@@ -125,7 +125,7 @@ internal static class DragonBoatActivityUiChecks
         var history = new MemoryMatchHistoryStore();
         using var vm = new MainViewModel(false, 17, true, store, historyStore: history, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         var window = new MainWindow(vm);
         window.ApplyTemplate();
         var root = (FrameworkElement)window.Content;
@@ -145,9 +145,9 @@ internal static class DragonBoatActivityUiChecks
                 vm.DragonBoatStandings.Single(team => team.TeamId == "team:shu").ArrivalText.Contains("第1位") &&
                 second.ArrivalText.Contains("第2位") && game.Events.Count(entry => entry.Payload is DragonBoatTreasureChangedEvent) == 2,
                 "Two real native damage sources must update public treasure counts and preserve their true first-arrival ordering at the same score.");
-            vm.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
             var live = SnapshotJson.Serialize(game.CreateSnapshot(0));
-            vm.LoadManualGameCommand.Execute(null); game = Program.Engine(vm);
+            LegacySaveFixtures.Load(vm); game = Program.Engine(vm);
             Program.Assert(!vm.HasSaveError && SnapshotJson.Serialize(game.CreateSnapshot(0)) == live &&
                 vm.DragonBoatStandings.Select(team => team.Rank).SequenceEqual([1, 2, 3, 4]),
                 "Cold recovery between actual turns must preserve live four-team scores and arrival ranks.");
@@ -179,7 +179,7 @@ internal static class DragonBoatActivityUiChecks
             catch (TargetInvocationException error) when (error.InnerException is InvalidDataException) { rejected = true; }
             Program.Assert(rejected, "The persisted public team report must reject corrupt duplicate ranks rather than display a fabricated four-way first place.");
             Program.Render(root, 1440, 880, Path.Combine(output, "183-dragon-boat-ranked-report.png"));
-            vm.SaveGameCommand.Execute(null); vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm); LegacySaveFixtures.Load(vm);
             Program.Assert(!vm.HasSaveError && vm.GameOutcomeTitle == "同船第 3 名" && vm.MatchHistory.Count == 1 &&
                 vm.CompletedMatch!.DragonBoatRankingText == summary.DragonBoatRankingText,
                 "Loading a completed two-round race must restore exact team standings without recording another match.");

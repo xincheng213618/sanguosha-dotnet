@@ -93,7 +93,7 @@ internal static class ResponseConversionSelectionChecks
                     Program.Assert(!model.HasSelection && !model.CanConfirmSelected && model.HandResponseExtraChoices.Count == 0 &&
                         !model.HumanEquipmentSlots.Any(slot => slot.IsSelectable || slot.IsSelected) && game.Revision == revision,
                         "Esc/cancel must exit the conversion while leaving the original response unanswered.");
-                    model.LoadManualGameCommand.Execute(null);
+                    LegacySaveFixtures.Load(model);
                     game = Program.Engine(model);
                     Program.Assert(!model.HasSaveError && !model.HasSelection && model.HandResponseExtraChoices.Count == 0 &&
                         !model.CanConfirmSelected && game.Revision == revision,
@@ -271,7 +271,7 @@ internal static class ResponseConversionSelectionChecks
                             Program.Assert(!model.HasSelection && !Weapon().IsSelected && !model.IsCardPaymentSelectionPending,
                                 "Re-clicking the selected weapon must return to ordinary Slash selection.");
                             WeaponClick();
-                            model.LoadManualGameCommand.Execute(null);
+                            LegacySaveFixtures.Load(model);
                             game = Program.Engine(model);
                             Program.Assert(!model.HasSelection && !Weapon().IsSelected && model.HandResponseExtraChoices.Count == 0,
                                 "Reloading a pending response must not restore an uncommitted equipment draft.");
@@ -338,7 +338,7 @@ internal static class ResponseConversionSelectionChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, checkpoint));
         var model = new MainViewModel(false, 31, true, store, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         return model;
     }

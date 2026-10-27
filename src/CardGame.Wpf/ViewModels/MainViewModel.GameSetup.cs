@@ -442,6 +442,7 @@ public sealed partial class MainViewModel
     private void OpenGameSetup()
     {
         if (IsTutorialActive) return;
+        if (IsShanheBattleSession) { LeaveShanheExpedition(); return; }
         IsLogOpen = false;
         IsHelpOpen = false;
         IsNewGameSetupOpen = true;

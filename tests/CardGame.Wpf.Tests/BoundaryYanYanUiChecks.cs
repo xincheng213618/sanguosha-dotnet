@@ -1,3 +1,4 @@
+using CardGame.Wpf.Persistence;
 using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -22,7 +23,7 @@ internal static class BoundaryYanYanUiChecks
             { ConversionSource = action.ConversionSource, AdditionalConversionSources = action.AdditionalConversionSources });
         ShiFifthBatchUiChecks.Reach(game, () => game.CreateSnapshot(0).PendingDecision?.SkillPrompt?.SkillId == skill);
         ShiFifthBatchUiChecks.Refresh(model);
-        model.SaveGameCommand.Execute(null); model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model); game = Program.Engine(model);
         using var host = new NativeResponseStatusChecks.NativeHost(model);
         Program.Render(host.Root, 1120, 740, null);
         chip = model.HumanSkillCards.Single(item => item.ContentId == skill);

@@ -60,7 +60,7 @@ public sealed partial class GameEngine
         var skipped = delayedEffects.HasFlag(DelayedTurnEffects.SkipDrawPhase);
         if (_resolutionStack.Count != 0 || _pendingDecision is not null || !owner.IsAlive || _winner != Winner.None ||
             !(skipped && (_contentRegistry.ProgramDependencies.HasTriggerWindow(SkillProgramTriggerWindow.DrawPhaseSkipped) || TracksShanheS5PhaseSkips || TracksBoundaryZhuHuanPhaseSkips) ||
-              !skipped && (TracksActualPhaseEnds || HasIssuedExtraDrawMarker(owner.Seat) ||
+              !skipped && (TracksActualPhaseEnds || TracksNativeDrawThresholds || HasIssuedExtraDrawMarker(owner.Seat) ||
                   _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveGangshuAttributeIncrement)))) return false;
         var inherited = Array.AsReadOnly(_pendingCardsMovedBatches.Where(batch => batch.ParentFrameId is null &&
             batch.TurnNumber == _turnNumber && batch.Movements.Count > 0 && batch.Movements.All(m =>

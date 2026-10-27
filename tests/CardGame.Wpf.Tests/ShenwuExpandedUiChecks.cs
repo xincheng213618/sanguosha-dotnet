@@ -44,10 +44,10 @@ internal static partial class ShenwuActivityUiChecks
                     .All(player => player.Skills!.Any(skill => skill.ContentId == "shenwu:kunshou")),
                 "Chosen tier is used by the actual six-seat table and every enemy has the fifth-tier awakening.");
             Program.Render(root, 1440, 880, Path.Combine(output, "shenwu-2020-tier-five-table.png"));
-            vm.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm);
             var snapshot = SnapshotJson.Serialize(game.CreateSnapshot(0));
             vm.SelectedTableMode = vm.TableModes.Single(mode => mode.ModeId == "activity:shenwu-2017");
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             Program.Assert(!vm.HasSaveError && Program.Engine(vm).ModeId == "activity:shenwu-2020-tier-5" &&
                 vm.SelectedTableMode.ModeId == "activity:shenwu-2020-tier-5" && SnapshotJson.Serialize(Program.Engine(vm).CreateSnapshot(0)) == snapshot,
                 "Cross-version restore retains the saved tier, native grants and exact battle.");

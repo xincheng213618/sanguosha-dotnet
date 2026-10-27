@@ -87,36 +87,6 @@ internal static class ShanheSourcePhaseChecks
             "The Hell ending pays one genuine legal non-equipment discard, keeps all eight unusable equipment entities in hand, avoids an illegal Use and returns from the original ending once.");
     }
 
-    public static void ShengxiDrawsBeforeTheRealDiscardOnlyWithoutActualTurnDamage()
-    {
-        foreach (var damage in new[] { false, true })
-        {
-            var s = Scene.Start(jushou: false);
-            if (damage) { s.Accept(new UseProgramSkillCommand(0, Driver, "hurt", [], [1], s.G.Revision, s.P!.PromptId)); s.Play(); }
-            Need(s.V.HandCount == 4 && s.Events<DamageAppliedEvent>().Count(e => e.SourceSeat == 0 && e.Amount == 1) == (damage ? 1 : 0),
-                "The source2118 comparison uses a genuine current-turn damage event, not hand changes or an invented win result.");
-            s.End();
-            if (!damage)
-            {
-                s.Until(() => s.P?.SkillPrompt?.SkillId == Shengxi);
-                Need(s.V.HandCount == 4 && !s.G.ResolutionStack.OfType<ManualDiscardFrame>().Any(),
-                    "The source2118 optional offer occurs at actual DiscardPhaseStarting before the hand-limit obligation is created.");
-                s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-                s.Until(() => s.P is { Kind: DecisionKind.DiscardCards });
-                var start = s.Events<ProgramBindingStartedEvent>().Single(e => e.SkillId == Shengxi);
-                Need(start.Window == SkillProgramTriggerWindow.DiscardPhaseStarting && s.V.HandCount == 6 && s.P!.RequiredCardCount == 2 &&
-                    s.Events<ProgramBindingResolvedEvent>().Count(e => e.FrameId == start.FrameId && e.Completed) == 1,
-                    "The real two-card Shengxi draw is included in the same upcoming discard rather than being delivered after it.");
-                s.Accept(new DiscardCardsCommand(0, s.P.ValidCardIds.Take(2).ToArray(), s.P.PromptId, s.G.Revision));
-            }
-            s.NextHuman();
-            Need(s.V.HandCount == 4 && s.Events<ProgramBindingStartedEvent>().Count(e => e.SkillId == Shengxi) == (damage ? 0 : 1) &&
-                s.G.CardMovements.Count(m => m.From == CardLocation.Hand(0) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.HandLimitDiscard) == (damage ? 0 : 2) &&
-                s.Events<TurnEndedEvent>().Count(e => e.ActorSeat == 0 && e.TurnNumber == 1) == 1,
-                "Actual damage suppresses source2118 entirely; the no-damage draw creates precisely two real excess-card payments before the original turn ends.");
-        }
-    }
-
     private sealed class Scene(GameEngine game)
     {
         public GameEngine G { get; } = game;

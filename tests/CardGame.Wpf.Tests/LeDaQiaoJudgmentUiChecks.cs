@@ -48,7 +48,7 @@ internal static class LeDaQiaoJudgmentUiChecks
         var root = (FrameworkElement)window.Content;
         try
         {
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Program.Assert(!model.HasSaveError && Views(Program.Engine(model)).SequenceEqual(Views(prepared)), model.SaveStatus);
             ClickChoice(model, root, choice => choice.Parameters.GetValueOrDefault("program-action") == "activate");
             var game = Program.Engine(model);
@@ -83,9 +83,9 @@ internal static class LeDaQiaoJudgmentUiChecks
             var checkpointViews = Views(game);
             var revision = game.Revision;
             var commands = game.AcceptedCommands.Count;
-            model.SaveGameCommand.Execute(null);
+            LegacySaveFixtures.Save(model);
             Program.Assert(!model.HasSaveError, model.SaveStatus);
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             game = Program.Engine(model);
             Program.Assert(!model.HasSaveError && game.Revision == revision && Views(game).SequenceEqual(checkpointViews) &&
                 game.ResolutionStack.OfType<ProgramSkillFrame>().Last().ZixiPlacement?.Entities.Count == 2,
@@ -118,8 +118,8 @@ internal static class LeDaQiaoJudgmentUiChecks
             model.SelectSkillChoiceCommand.Execute(current);
             Program.Assert(game.Revision == revision + 1 && Views(game).SequenceEqual(finishedViews),
                 "The completed prompt cannot answer a consecutive decision or pay the same original entities again.");
-            model.SaveGameCommand.Execute(null);
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(model);
+            LegacySaveFixtures.Load(model);
             game = Program.Engine(model);
             Program.Assert(!model.HasSaveError && Views(game).SequenceEqual(finishedViews), model.SaveStatus);
             AssertPaid(game, original, draft.Id, registry);

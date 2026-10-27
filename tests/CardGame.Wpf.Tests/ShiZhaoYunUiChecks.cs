@@ -28,7 +28,7 @@ internal static class ShiZhaoYunUiChecks
         using var model = new MainViewModel(false, 83, true, store, contentRegistry: registry,
             historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore())
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         var game = Program.Engine(model);
         Program.Assert(Boundary(game) == Boundary(prepared), "Loading the real unlocked scene must preserve its native committed boundary.");

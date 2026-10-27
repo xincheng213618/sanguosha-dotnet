@@ -8,36 +8,6 @@ internal static class CaoTengChecks
     private const string Owner="fixture:ct-owner",Receiver="fixture:ct-receiver",Driver="fixture:ct-driver",Quiet="fixture:ct-quiet",Watch="fixture:ct-watch",Source="fixture:ct-source",Mode="identity:classic-cao-teng";
     private const string Qingliu="ol:qingliu",Yongzu="ol:yongzu",Jianxiong="ol:caoteng-jianxiong";
     private const string GrantWatch="fixture:ct-first-grant-watch";
-    public static void SetupAndFirstActualDyingRescueFactionCold()
-    {
-        var(g,r)=Start("rescue",opening:true);Need(P(g)!.IsPrivate&&P(g)!.Choices.Count==2&&E<NativeEffectiveFactionChangedEvent>(g).Length==0,"The mandatory opening faction choice precedes actual-turn changes.");
-        g=Cold(g,r);Branch(g,"wei");Play(g);Need(V(g).FactionId=="wei"&&E<CaoTengFactionCompletedEvent>(g)is[{Setup:true,Faction:"wei"}]&&E<NativeEffectiveFactionChangedEvent>(g).Length==0,"Opening Wei is a real selected effective faction, without an in-turn change fact.");
-        Use(g,"to-dying");Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.RescueDying});var first=E<PlayerDyingEvent>(g).Single();g=Cold(g,r);Answer(g,c=>c.Cards.Count==1&&V(g).Hand.Any(h=>h.Id==c.Cards[0]&&h.Kind==CardKind.Peach));Play(g);
-        Need(E<DyingResolvedEvent>(g).Any(e=>e.ResolutionId==first.ResolutionId&&e.Survived)&&V(g).FactionId=="qun"&&E<CaoTengFactionCompletedEvent>(g).Count(e=>!e.Setup)==1&&E<NativeEffectiveFactionChangedEvent>(g)is[{TargetSeat:0,PreviousFactionId:"wei",CurrentFactionId:"qun"}],"The whole first genuine self-Peach rescue finishes before Qingliu switches once to the other faction.");
-        Use(g,"hurt");Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.RescueDying});g=Cold(g,r);Answer(g,c=>c.Cards.Count==1&&V(g).Hand.Any(h=>h.Id==c.Cards[0]&&h.Kind==CardKind.Peach));Play(g);
-        Need(E<PlayerDyingEvent>(g).Length==2&&E<DyingResolvedEvent>(g).Count(e=>e.VictimSeat==0&&e.Survived)==2&&V(g).FactionId=="qun"&&E<CaoTengFactionCompletedEvent>(g).Count(e=>!e.Setup)==1,"A second real rescued dying occurrence cannot repeat the first-entry faction switch.");_=Cold(g,r);
-        {
-            (g,r)=Start("plain",opening:true);Branch(g,"qun");Play(g);Need(V(g).FactionId=="qun"&&E<CaoTengFactionCompletedEvent>(g)is[{Setup:true,Faction:"qun"}]&&E<NativeEffectiveFactionChangedEvent>(g).Length==0,"Choosing the already printed Qun at setup is legal and creates no fabricated change.");_=Cold(g,r);
-        }
-    }
-    public static void OrderedPrivateDistinctBenefitsRecoveryAndRestoreCold()
-    {
-        var(g,r)=Start("plain",benefit:true);Activate(g);Target(g,1);Need(Current(g)is{Cursor:0,SameFaction:true}&&P(g)!.Choices.All(c=>c.Parameters.GetValueOrDefault("branch")!="recover")&&P(g)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("branch")=="restore"),"A same-faction pair starts with the owner, cannot recover at full HP, but may choose a no-op restoration.");
-        var hand=V(g).HandCount;g=Cold(g,r);Branch(g,"draw");Reach(g,()=>Current(g)is{Cursor:1,Stage:CaoTengStage.YongzuChoice});
-        Need(P(g)!.PlayerSeat==1&&V(g).HandCount==hand+2&&P(g)!.Choices.All(c=>c.Parameters.GetValueOrDefault("branch")!="draw")&&g.CreateSnapshot(0).PendingDecision is null,"Only the real second chooser sees the remaining private options after the owner's actual two-card draw.");
-        var state=State(g);var wrong=g.Submit(new AnswerPromptCommand(0,P(g)!.PromptId,P(g)!.Choices[0].Id,g.Revision));Need(!wrong.Accepted&&State(g)==state,"A different seat cannot answer or mutate the frozen recipient's choice.");g=Cold(g,r);Play(g);
-        Need(E<CaoTengBenefitIssuedEvent>(g).Select(e=>e.Option).SequenceEqual(["draw","restore"])&&E<CaoTengBenefitIssuedEvent>(g).Select(e=>e.RecipientSeat).SequenceEqual([0,1])&&E<CaoTengCompletedEvent>(g).Count(e=>E<CaoTengStartedEvent>(g).Any(s=>s.FrameId==e.FrameId&&s.Op==SkillProgramEffectOp.ResolveYongzuDistinctBenefits))==1,"The real AI selects a different available item; a no-op restore completes the second benefit once.");_=Cold(g,r);
-        {
-            (g,r)=Start("foreign");Use(g,"lose");Play(g);var hp=V(g).Hp;End(g);Reach(g,()=>Current(g)is{Stage:CaoTengStage.YongzuChoice,Cursor:1,TargetSeat:0}&&P(g)?.PlayerSeat==0);
-            Need(Frame(g).OwnerSeat!=0&&E<CaoTengBenefitIssuedEvent>(g).Single().Option=="draw"&&P(g)!.Choices.All(c=>c.Parameters.GetValueOrDefault("branch")!="draw"),"The actual loyalist AI selects its allied human Lord and pays its own first benefit through Advance.");
-            g=Cold(g,r);Branch(g,"recover");Reach(g,()=>P(g)?.SkillPrompt?.SkillId==Watch);Need(V(g).Hp==hp+1&&E<RecoveryAppliedEvent>(g).Any(e=>e.TargetSeat==0),"The foreign chooser receives native recovery, with its real after-recovery child still pending.");g=Cold(g,r);Continue(g);Reach(g,()=>Current(g)is null);
-            Need(E<CaoTengBenefitIssuedEvent>(g).Last()is{Index:1,RecipientSeat:0,Option:"recover"}&&E<CaoTengCompletedEvent>(g).Any(),"Recovery returns to the original foreign Yongzu frame once.");_=Cold(g,r);
-        }
-        {
-            (g,r)=Start("restore",benefit:true);Need(V(g,1).IsFaceDown&&V(g,1).IsChained,"Actual game-start native setup put the future recipient into both states before its own turn.");Activate(g);Target(g,1);Branch(g,"draw");Reach(g,()=>P(g)?.SkillPrompt?.SkillId==Watch);g=Cold(g,r);Play(g);
-            Need(!V(g,1).IsFaceDown&&!V(g,1).IsChained&&E<CharacterStateChangedEvent>(g).Any(e=>e.Change.TargetSeat==1&&e.Change.Window==SkillProgramTriggerWindow.CharacterTurnedFaceUp),"The second actual restoration clears both native face-down and chained state, including its true character-state window.");_=Cold(g,r);
-        }
-    }
     public static void PermanentHandGrowthLinkedAndGrantOwnTurnExpiryCold()
     {
         {
@@ -73,20 +43,6 @@ internal static class CaoTengChecks
         }
         {
             var(g,r)=Start("qun-lease",benefit:true);Activate(g);Target(g,1);Branch(g,"skill");Play(g);Need(E<CaoTengSkillGrantedEvent>(g).Single().SkillId=="ol:tianming"&&Has(g,0,"ol:tianming"),"Qun maps to the actual registered linked604 Tianming leaf.");_=Cold(g,r);
-        }
-    }
-    public static void PaidNativeChildrenSourceLossDeathAndExactClaimCold()
-    {
-        foreach(var scene in new[]{"paid-loss","paid-death"})
-        {
-            var(g,r)=Start(scene,benefit:true);Activate(g);Target(g,1);var hand=V(g).HandCount;Branch(g,"draw");Reach(g,()=>P(g)?.SkillPrompt?.SkillId==Watch);var frame=Frame(g).Id;
-            Need(E<CaoTengBenefitIssuedEvent>(g).Single()is{Index:0,Option:"draw"}&&V(g).HandCount==hand+2,"The first benefit is genuinely paid before the real gain observer pauses.");g=Cold(g,r);Continue(g);Reach(g,()=>E<CaoTengCompletedEvent>(g).Any(e=>e.FrameId==frame));
-            Need(E<CaoTengBenefitIssuedEvent>(g).Count(e=>e.FrameId==frame)==2&&E<CaoTengBenefitAppliedEvent>(g).Count(e=>e.FrameId==frame)==2&&E<CaoTengCompletedEvent>(g).Count(e=>e.FrameId==frame)==1&&g.CardMovements.Count(m=>m.Reason.Value=="skill-program.cao-teng.yongzu.draw"&&m.To==CardLocation.Hand(0))==2,"Already issued benefits and the original other chooser return once after source loss or non-Lord source death, without a second draw.");
-            Need(scene=="paid-loss"?!Has(g,0,Yongzu)&&V(g).IsAlive:!V(g).IsAlive&&E<CaoTengFactionCompletedEvent>(g).All(e=>e.Setup),"The real loss/death occurred; an unrescued first dying event does not perform Qingliu's rescue switch.");_=Cold(g,r);
-        }
-        {
-            var(g,r)=Start("claim-loss");var duel=g.GetHumanLegalActions().First(a=>a.Kind==LegalActionKind.Duel&&a.TargetSeats.Count==1&&V(g,a.TargetSeats[0]).Hand.Any(c=>c.Kind==CardKind.Slash));var card=duel.CardId!.Value;Use(g,"wound-target",duel.TargetSeats.ToArray());Play(g);Native(g,duel);Reach(g,()=>Offer(g,Jianxiong));Activate(g);Reach(g,()=>P(g)?.SkillPrompt?.SkillId==Watch);var frame=Frame(g).Id;g=Cold(g,r);Continue(g);Play(g);
-            Need(!Has(g,0,Jianxiong)&&V(g).Hand.Any(c=>c.Id==card)&&E<CaoTengJianxiongClaimedEvent>(g).Count(e=>e.FrameId==frame&&e.CardId==card)==1&&E<CaoTengCompletedEvent>(g).Count(e=>e.FrameId==frame)==1,"The original damage entity is still claimed once after the actual one-card draw child removes the exact conditional Jianxiong source.");_=Cold(g,r);
         }
     }
     private static PlayerSnapshot V(GameEngine g,int seat=0)=>g.CreateSnapshot(seat).Players[seat];

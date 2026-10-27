@@ -36,7 +36,7 @@ internal static class WumiaoFloodUiChecks
         var root = (FrameworkElement)window.Content;
         try
         {
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Program.Assert(!model.HasSaveError, model.SaveStatus);
             var game = Program.Engine(model);
             var action = game.GetHumanLegalActions().First(item => item.Kind == LegalActionKind.WumiaoFlood &&

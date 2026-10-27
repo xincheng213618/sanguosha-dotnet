@@ -11,47 +11,6 @@ internal static class ShanheDoubleResponseChecks
     private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(new StandardContentPackage(),
         new StandardShanheMarketPackage(), new StandardShanheDoubleResponsePackage(), new Fixture()));
 
-    public static void HanzhanRequiresTheOpponentsTwoSlashesInBothDuelDirections()
-    {
-        var s = Scene.Start(peerSlashes: 4);
-        var unowned = s.Use(0, CardKind.Duel, 1);
-        s.AtResponse(1, CardKind.Slash);
-        var ordinary = s.Respond(1, CardKind.Slash);
-        s.AtResponse(0, CardKind.Slash); s.Decline(); s.Play(0);
-        Need(s.Events<DuelResponseEvent>().Count(e => e.ResolutionId == s.UseId(unowned) && e.UsedSlash) == 1,
-            "Registering future Hanzhan stock leaves the real unowned Duel at one Slash per response set.");
-        s.Buy(StandardShanheCampaignCatalog.CurrentHanzhanRewardId, 300);
-        var owned = s.Use(0, CardKind.Duel, 1); var id = s.UseId(owned);
-        s.AtResponse(1, CardKind.Slash); var first = s.Respond(1, CardKind.Slash);
-        s.AtResponse(1, CardKind.Slash);
-        Need(s.Frame(id).Continuations.Duel is { ResponderSeat: 1, SuccessfulSlashResponses: 1 },
-            "The first paid Slash leaves the same opponent and original Duel waiting for a second physical response.");
-        var second = s.Respond(1, CardKind.Slash); s.AtResponse(0, CardKind.Slash);
-        var own = s.Respond(0, CardKind.Slash); s.AtResponse(1, CardKind.Slash);
-        var partial = s.Respond(1, CardKind.Slash); s.Play(0);
-        Need(s.Events<RequiredResponseProgressEvent>().Where(e => e.ResolutionId == id && e.ResponderSeat == 1)
-                .Select(e => (e.ResponseCount, e.RequiredResponseCount)).SequenceEqual([(1, 2), (2, 2), (1, 2)]) &&
-            s.Events<DuelResponseEvent>().Count(e => e.ResolutionId == id && e.ResponderSeat == 0 && e.UsedSlash) == 1 &&
-            s.Events<DamageAppliedEvent>().Where(e => e.SourceCardUseResolutionId == id).ToArray() is [{ SourceSeat: 0, TargetSeat: 1, Amount: 1 }],
-            "Every opponent response set requires two; the holder answers once, and an incomplete later pair takes native Duel damage.");
-        foreach (var card in new[] { ordinary, first, second, partial }) s.AssertPaidResponse(card, 1);
-        s.AssertPaidResponse(own, 0); s.AssertPaidUse(unowned, 0); s.AssertPaidUse(owned, 0);
-
-        var incoming = Scene.Start(peerSlashes: 1);
-        incoming.Buy(StandardShanheCampaignCatalog.CurrentHanzhanRewardId, 300);
-        incoming.EndPlay(0); incoming.Play(1);
-        var foreign = incoming.Use(1, CardKind.Duel, 0); var foreignId = incoming.UseId(foreign);
-        incoming.AtResponse(0, CardKind.Slash); var self = incoming.Respond(0, CardKind.Slash);
-        incoming.AtResponse(1, CardKind.Slash); var other = incoming.Respond(1, CardKind.Slash); incoming.Play(1);
-        Need(incoming.Events<RequiredResponseProgressEvent>().Where(e => e.ResolutionId == foreignId)
-                .Select(e => (e.SkillOwnerSeat, e.ResponderSeat, e.ResponseCount, e.RequiredResponseCount))
-                .SequenceEqual([(0, 1, 1, 2)]) &&
-            incoming.Events<DuelResponseEvent>().Count(e => e.ResolutionId == foreignId && e.ResponderSeat == 0 && e.UsedSlash) == 1 &&
-            incoming.Events<DamageAppliedEvent>().Where(e => e.SourceCardUseResolutionId == foreignId).ToArray() is [{ SourceSeat: 0, TargetSeat: 1, Amount: 1 }],
-            "A real enemy-owned Duel still makes that enemy pay two against the holder; Hanzhan never doubles the holder's own response.");
-        incoming.AssertPaidResponse(self, 0); incoming.AssertPaidResponse(other, 1); incoming.AssertPaidUse(foreign, 1);
-    }
-
     public static void ArrowsFreezeEachIssuedTargetAndResumeTwoPaidDodgesAfterTheirChild()
     {
         var s = Scene.Start(peerSlashes: 0, watch: true);

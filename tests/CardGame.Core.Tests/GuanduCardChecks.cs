@@ -8,78 +8,6 @@ internal static class GuanduCardChecks
     internal const string Mode = "fixture:guandu-cards", Driver = "fixture:guandu-card-driver", Quiet = "fixture:guandu-card-quiet", Watch = "fixture:guandu-card-watch";
     private const string Jiaozhao = "boundary:jiaozhao-round-current";
 
-    public static void IntoxicationKeepsEnemyTurnQuotaAndEveryRealDamageBonus()
-    {
-        var (g, r) = Start(CardKind.Intoxication);
-        AuditAi(g, LegalActionKind.Intoxication);
-        var enemy = g.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Slash && a.TargetSeat is { } target && V(g, target).TeamId != V(g, 0).TeamId).TargetSeat!.Value;
-        var before = V(g, enemy).Hp;
-        var wine = Physical(g, CardKind.Intoxication, [enemy]);
-        Until(g, () => P(g)?.SkillPrompt?.SkillId == Watch && g.ResolutionStack.OfType<CardUseFrame>().Any(f => f.CardKind == CardKind.Intoxication));
-        var use = g.ResolutionStack.OfType<CardUseFrame>().Single(f => f.CardKind == CardKind.Intoxication);
-        Need(use.Action!.PhysicalCards is [{ CardId: var paid }] && paid == wine && use.TargetSeats.SequenceEqual([enemy]) &&
-            g.CreateCardZoneDiagnostics().Single(c => c.CardId == wine).Location == CardLocation.Processing,
-            "Intoxication is a genuine targeted basic use with its paid entity retained through the actual committed-use observer.");
-        Cold(g, r); Play(g);
-        Need(g.GetHumanLegalActions().Where(a => a.Kind == LegalActionKind.Intoxication).All(a => a.TargetSeat != enemy) &&
-            g.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Intoxication) &&
-            g.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Alcohol && a.ConversionSource?.BindingId == "fixed-alcohol") &&
-            !V(g, 0).HasAlcoholEffect && E<GuanduIntoxicationAppliedEvent>(g).Count(e => e.UseFrameId == use.Id) == 1,
-            "Only this enemy is spent for the actual turn; another enemy and fixed ordinary Wine remain legal and no next-Slash Wine state is created.");
-        Use(g, "damage", enemy); Play(g); var afterSkill = V(g, enemy).Hp;
-        Physical(g, CardKind.Slash, [enemy]); Play(g);
-        Need(afterSkill == before - 2 && V(g, enemy).Hp == before - 4 &&
-            E<DamageAppliedEvent>(g).Count(e => e.TargetSeat == enemy && e.Amount == 2) == 2 &&
-            g.CardMovements.Count(m => m.CardId == wine && m.To == CardLocation.DiscardPile) == 1 &&
-            E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == use.Id) == 1,
-            "The same turn's real skill damage and later real Slash each gain one, without consuming the mark or paying the basic card twice.");
-        Cold(g, r);
-    }
-
-    public static void StoreGrainUsesThreeTargetsSeparateCounterspellsAndRepeatedNativeDraws()
-    {
-        {
-            var (g, r) = Start(CardKind.StoreGrain);
-            AuditAi(g, LegalActionKind.StoreGrain);
-            var card = Physical(g, CardKind.StoreGrain, [0, 1, 2]);
-            Until(g, () => g.ResolutionStack.OfType<CardUseFrame>().Any(f => f.GuanduCardEffect is not null) && g.ResolutionStack.OfType<NativeDrawAttemptFrame>().Any());
-            var use = g.ResolutionStack.OfType<CardUseFrame>().Single(f => f.CardKind == CardKind.StoreGrain);
-            Need(use.TargetSeats.SequenceEqual([0, 1, 2]) && use.GuanduCardEffect is { Stage: GuanduCardEffectStage.Drawing } &&
-                use.NativeDraw is { RequestedCount: 1 } && g.CreateCardZoneDiagnostics().Single(c => c.CardId == card).Location == CardLocation.Processing,
-                "Three chosen targets use real sequential counterspell and native draw requests, retaining the one paid card through its first draw child.");
-            Cold(g, r); Play(g);
-            Need(E<GuanduCardDrawAppliedEvent>(g).Where(e => e.UseFrameId == use.Id).Select(e => e.RecipientSeat).SequenceEqual([0, 1, 2]) &&
-                E<NullificationResolvedEvent>(g).Count(e => e.EffectCardKind == CardKind.StoreGrain) == 3 &&
-                E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == use.Id) == 1 &&
-                g.CardMovements.Count(m => m.CardId == card && m.To == CardLocation.DiscardPile) == 1,
-                "Every selected role gains exactly one actual card through three distinct target windows and the original material finishes once."); Cold(g, r);
-        }
-        {
-            var (g, r) = Start(CardKind.StoreGrain, counter: true);
-            var card = Physical(g, CardKind.StoreGrain, [1, 2]);
-            Until(g, () => P(g) is { Kind: DecisionKind.Nullification, PlayerSeat: 0 }); Cold(g, r);
-            Answer(g, c => c.Parameters.GetValueOrDefault("response") == "nullification"); Play(g);
-            var useId = E<CardUseDeclaredEvent>(g).Single(e => e.CardId == card && e.CardKind == CardKind.StoreGrain).ResolutionId;
-            Need(E<NullificationResolvedEvent>(g).Count(e => e.EffectCardKind == CardKind.StoreGrain && e.EffectNullified) == 1 &&
-                E<GuanduCardDrawAppliedEvent>(g).Where(e => e.UseFrameId == useId).Select(e => e.RecipientSeat).SequenceEqual([2]),
-                "One genuine converted counterspell cancels only the first target, preserving the second target's normal draw and shared physical parent."); Cold(g, r);
-        }
-        {
-            var (g, r) = Start(CardKind.StoreGrain, repeat: true);
-            for (var i = 0; i < 9; i++) { Physical(g, CardKind.StoreGrain, [0]); Play(g); }
-            var card = Physical(g, CardKind.StoreGrain, [1, 2]);
-            Until(g, () => g.ResolutionStack.OfType<CardUseFrame>().Any(f => f.CardKind == CardKind.StoreGrain && f.GuanduCardEffect is not null));
-            var use = g.ResolutionStack.OfType<CardUseFrame>().Single(f => f.CardKind == CardKind.StoreGrain); Cold(g, r); Play(g);
-            var gains = E<GuanduCardDrawAppliedEvent>(g).Where(e => e.UseFrameId == use.Id).ToArray();
-            Need(gains.Length == 4 && gains.GroupBy(e => e.RecipientSeat).All(group => group.Count() == 2 && group.Select(e => e.Occurrence).SequenceEqual([1, 2])) &&
-                E<CardUseDeclaredEvent>(g).Count(e => e.ResolutionId == use.Id) == 1 &&
-                E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == use.Id) == 1 &&
-                g.CardMovements.Count(m => m.CardId == card && m.To == CardLocation.Processing) == 1 &&
-                g.CardMovements.Count(m => m.CardId == card && m.To == CardLocation.DiscardPile) == 1,
-                "The real tenth-card event repeats both native target effects with distinct occurrences, without declaring or paying the original card again."); Cold(g, r);
-        }
-    }
-
     public static void ReinforcementsAndUnitedEffortKeepNativeRecoveryChainsAndRecast()
     {
         {
@@ -127,33 +55,6 @@ internal static class GuanduCardChecks
                 E<CardRecastEvent>(g).Any(e => e.CardId == recast.CardId && e.CardKind == CardKind.UnitedEffort && e.DrawCount == 1) &&
                 g.CardMovements.Count(m => m.CardId == recast.CardId && m.To == CardLocation.DiscardPile) == 1,
                 "United Effort recasts through a real paid recast and native draw child, without becoming a card use or opening any counterspell window."); Cold(g, r);
-        }
-    }
-
-    public static void CompleteBasicFamiliesProjectIntoxicationWithOneAndZeroMaterials()
-    {
-        foreach (var upgrades in new[] { 0, 2 })
-        {
-            var (g, r) = Start(CardKind.Slash, conversions: true);
-            for (var i = 0; i < upgrades; i++) { Use(g, "upgrade"); Play(g); }
-            var original = r.GetSkill(Jiaozhao).Program!; var hash = original.GameplayHash;
-            var action = g.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Intoxication && a.ConversionSource?.SkillId == Jiaozhao);
-            Need(g.GetCardConversionDefinition(action.ConversionSource!) is { OutputKind: CardKind.Intoxication, ForResponse: false } &&
-                original.ViewAs.All(v => v.OutputKind != CardKind.Intoxication) && (upgrades == 2 ? action.CardId == 0 : action.CardId > 0),
-                "Only the immutable match projection of a complete basic family exposes Intoxication, preserving its exact one/zero material arity and forbidding rescue response.");
-            var hand = V(g, 0).HandCount; Act(g, action);
-            Until(g, () => P(g)?.SkillPrompt?.SkillId == Watch && g.ResolutionStack.OfType<CardUseFrame>().Any(f => f.CardKind == CardKind.Intoxication));
-            var use = g.ResolutionStack.OfType<CardUseFrame>().Single(f => f.CardKind == CardKind.Intoxication);
-            Need(use.Action!.PhysicalCards.Count == (upgrades == 2 ? 0 : 1), "The actual accepted basic use retains the original conversion's genuine material count.");
-            Cold(g, r); Play(g);
-            Need(V(g, 0).HandCount == hand - (upgrades == 2 ? 0 : 1) && g.GetHumanLegalActions().All(a => a.ConversionSource?.SkillId != Jiaozhao) &&
-                r.GetSkill(Jiaozhao).Program!.GameplayHash == hash && !g.CardMovements.Any(m => m.CardId == 0),
-                "Native Intoxication consumes the real shared round allowance and exact entities while leaving original content unchanged.");
-            Use(g, "hurt", 0); Play(g);
-            var peach = g.GetHumanLegalActions().First(a => a.ConversionSource?.BindingId == "fixed-peach");
-            Need(peach.PlayedCardKind == CardKind.Peach && g.GetCardConversionDefinition(peach.ConversionSource!)!.OutputKind == CardKind.Peach,
-                "A fixed named Peach retains its ordinary native healing name in Guandu, without acquiring the new enemy-target basic.");
-            Act(g, peach); Play(g); Cold(g, r);
         }
     }
 

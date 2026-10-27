@@ -42,6 +42,8 @@ internal sealed partial class StandardModeSetupFeature
                 CardKind.PeachGarden or CardKind.Lightning => CardKind.Reinforcements,
                 CardKind.BarbarianAssault => CardKind.UnitedEffort, _ => card.Kind
             } }).ToArray());
+        if (_options.ShanheBattle is not null) cards = Array.AsReadOnly(cards
+            .Where(card => !EquipmentCatalog.IsEquipment(card.Kind)).ToArray());
         return cards;
     }
 

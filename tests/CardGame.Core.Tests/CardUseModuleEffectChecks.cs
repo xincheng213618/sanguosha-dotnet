@@ -4,7 +4,6 @@ internal static class CardUseModuleEffectChecks
 {
     private const string SkillId = "fixture:card-use-effects";
 
-
     public static void TurnStateUsesActionSemanticsStableOrderAndExpiration()
     {
         var state = new TurnCardUseEffectStore();

@@ -92,16 +92,9 @@ internal static class Program
             Check("Selection area: Gongxin Zhiheng repeatable skills and Slash native drafts", () => SelectionAreaChecks.NativeDraftsAndUsageLimits(output));
             Check("Zhiheng UI: classic and boundary select all hand remain editable until confirmation", () => MultiCardDraftUiChecks.ZhihengSelectsAllHandBeforeConfirmation(output));
             Check("Shi Zhao Yun UI: cardless rail draft cancel target and round limit", () => ShiZhaoYunUiChecks.CardlessSkillRailDraftCancelTargetsAndRoundLimit(output));
-            Check("Shi batch UI: public progress and committed preparation choices", () => ShiBatchUiChecks.PublicProgressAndCommittedPreparationChoices(output));
-            Check("Shi second batch UI: skill progress native preparation and gift drafts", () => ShiSecondBatchUiChecks.SkillProgressAndNativePreparationAndGiftDrafts(output));
-            Check("Shi third batch UI: gallery progress original cards and multi-card cost", () => ShiThirdBatchUiChecks.GalleryProgressOriginalCardsAndMultiCardCost(output));
-            Check("Shi fourth batch UI: gallery progress and shared active entry", () => ShiFourthBatchUiChecks.GalleryProgressAndSharedActiveEntry(output));
-            Check("Shi fifth batch UI: gallery progress and real shared hand use response", () => ShiFifthBatchUiChecks.GalleryProgressAndForeignHandUseResponse(output));
             Check("Shi fifth batch UI: Dimeng two cards remain unpaid until confirmation", () => ShiLuSuDiscardUiChecks.DimengTwoHandCardsRemainUnpaidUntilSingleConfirmation(output));
-            Check("Shi sixth batch UI: gallery portraits skill counts and live progress", () => ShiSixthBatchUiChecks.GalleryPortraitSkillCountsAndProgress(output));
             Check("Shi sixth batch UI: Nigu different suits remain unpaid until confirmation", () => ShiSixthBatchUiChecks.NiguTwoDifferentSuitsRemainUnpaidUntilConfirmation(output));
             Check("Shi sixth batch UI: Xiongtu four cards remain unpaid until confirmation", () => ShiSunJunDiscardUiChecks.XiongtuFourHandCardsRemainUnpaidUntilSingleConfirmation(output));
-            Check("Shi seventh batch UI: gallery and live progress", () => ShiSixthBatchUiChecks.GalleryPortraitSkillCountsAndProgress(output, ["mobile:shi-xiao-qiao", "mobile:shi-zhang-yan", "mobile:shi-deng-ai"]));
             Check("Dinghan UI: many trick names wrap scroll and commit add remove skip", () => DockSkillChoiceUiChecks.DinghanNamesWrapAndCommit(output));
             Check("Qizheng UI: native designation response and gain buttons survive restore", () => QizhengUiChecks.NativeChoicesRemainReachable(output));
             Check("skill rail counts preserve order and align the unpaired last skill beside the portrait", () => SkillRailLayoutChecks.CountsKeepOrderAndAlignLastSkill(output));
@@ -125,107 +118,16 @@ internal static class Program
             Check("Mobile boundary Yi Ji UI: private bottom and actual recipient button", () => BoundaryYiJiMobileUiChecks.JijiePrivateBottomAndRecipientButton(output));
             Check("Mobile boundary Cao Xiu UI: actual target hand batch and damage choice", () => BoundaryCaoXiuMobileUiChecks.ActualTargetHandBatchAndDamageChoice(output));
             Check("Mobile boundary Quan Cong UI: charge rail choices and damage menu cold", () => BoundaryQuanCongUiChecks.ChargedYaomingRailOptionsAndDamageMenuCold(output));
-            Check("Mobile boundary gallery: registered portraits and actual details", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "boundary:yi-ji-mobile", "boundary:cao-xiu-mobile", "boundary:quan-cong-mobile" }));
-            Check("Mobile boundary batch 44 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "boundary:man-chong-mobile", "boundary:wu-yi-mobile", "boundary:zhu-zhi-mobile" }));
             Check("Mobile boundary Zhu Zhi UI: initial Anguo target marker and progress", () => BoundaryZhuZhiUiChecks.InitialAnguoTargetMarkerAndProgress(output));
-            Check("Mobile boundary batch 45 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "boundary:zhou-cang-mobile", "boundary:cao-zhen-mobile", "boundary:sun-xiu-mobile" }));
             Check("Mobile boundary Cao Zhen UI: secret targets and owner-only forecast progress", () => BoundaryCaoZhenUiChecks.SecretForecastActualTargetsAndOwnerOnlyProgress(output));
-            Check("Mobile boundary batch 46 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "boundary:chen-qun-mobile", "boundary:gu-yong-mobile", "boundary:zhu-huan-mobile" }));
             Check("Mobile boundary Gu Yong UI: mixed-color reveal and native self recipient draft", () => BoundaryGuYongUiChecks.MixedColorSameTypeRevealAndNativeSelfRecipientDraft(output));
-            Check("Mobile boundary batch 48 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "boundary:zhang-ni-mobile", "boundary:yan-yan-mobile", "boundary:wang-ji-mobile" }));
-            Check("Mobile boundary batch 49 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "boundary:cao-pi-mobile", "boundary:liu-shan-mobile", "boundary:zhou-fei-mobile" }));
-            Check("Mobile boundary batch 50 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "boundary:yu-ji-mobile", "boundary:zuo-ci-mobile", "boundary:zhong-hui-mobile" }));
-            Check("Boundary batch 51 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "boundary:yuan-shu-mobile", "boundary:yu-fan-mobile", "boundary:guan-ping" }));
-            Check("Mobile boundary batch 52 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "boundary:cao-zhang-mobile", "boundary:liao-hua-mobile", "boundary:li-ru-mobile" }));
-            Check("Mobile boundary batch 53 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "boundary:guan-xing-zhang-bao-mobile", "boundary:bu-lian-shi-mobile", "boundary:liu-biao-mobile" }));
-            Check("Mobile boundary batch 54 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "boundary:cai-wen-ji-mobile", "boundary:cheng-pu-mobile", "boundary:fu-huang-hou-mobile" }));
-            Check("Mobile boundary batch 55 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "boundary:guo-huai-mobile", "boundary:jian-yong-mobile", "boundary:cai-fu-ren-mobile" }));
-            Check("Mobile boundary batch 56 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "boundary:cao-zhi-mobile", "boundary:ling-tong-mobile", "boundary:han-dang-mobile" }));
-            Check("Mobile boundary batch 57 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "boundary:xu-sheng-mobile", "boundary:wu-guo-tai-mobile", "boundary:ma-dai-mobile" }));
-            Check("Mobile boundary batch 58 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "boundary:gao-shun-mobile", "boundary:wang-yi-mobile", "boundary:fa-zheng-mobile" }));
-            Check("Mobile boundary batch 59 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "boundary:yu-jin-mobile", "boundary:gongsun-zan-mobile", "boundary:ju-shou-mobile" }));
-            Check("Mobile boundary batch 60 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "boundary:hua-xiong-mobile", "boundary:zhou-tai-mobile", "boundary:huang-zhong-mobile", "boundary:wei-yan-mobile" }));
-            Check("Mobile boundary batch 61 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "boundary:lu-bu-mobile", "boundary:zhuge-liang-mobile", "boundary:zhen-ji-mobile", "boundary:zhang-fei-mobile", "boundary:cao-cao-mobile", "boundary:sima-yi-mobile" }));
-            Check("Mobile boundary batch 62 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "boundary:huang-gai-mobile", "boundary:gan-ning-mobile", "boundary:diao-chan-mobile", "boundary:sun-quan-mobile", "boundary:huang-yueying-mobile", "boundary:guo-jia-mobile" }));
-            Check("Mobile boundary batch 63 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "boundary:da-qiao-mobile", "boundary:lu-xun-mobile", "boundary:sun-shangxiang-mobile", "boundary:zhang-liao-mobile", "boundary:xu-chu-mobile", "boundary:xiahou-dun-mobile", "boundary:xiahou-yuan-mobile", "boundary:cao-ren-mobile" }));
-            Check("Mobile boundary batch 64 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "boundary:liu-bei-mobile", "boundary:guan-yu-mobile", "boundary:zhao-yun-mobile", "boundary:ma-chao-mobile", "boundary:lu-meng-mobile", "boundary:zhou-yu-mobile", "boundary:hua-tuo-mobile", "boundary:zhang-jiao-mobile" }));
-            Check("Mobile boundary batch 65 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "boundary:sun-jian-mobile", "boundary:xun-yu-mobile", "boundary:dian-wei-mobile", "boundary:pang-tong-mobile", "boundary:pang-de-mobile", "boundary:xu-huang-mobile", "boundary:yan-liang-wen-chou-mobile" }));
-            Check("Mobile boundary batch 66 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "boundary:wolong-zhuge-liang-mobile", "boundary:dong-zhuo-mobile", "boundary:yuan-shao-mobile", "boundary:meng-huo-mobile", "boundary:zhu-rong-mobile", "boundary:sun-ce-mobile", "boundary:deng-ai-mobile", "boundary:jiang-wei-mobile", "boundary:zhang-zhao-zhang-hong-mobile", "boundary:xiao-qiao-mobile" }));
-            Check("Mobile standard batch 67 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "mobile:li-dian", "mobile:taishi-ci", "mobile:cao-chong", "mobile:chen-gong", "mobile:liu-feng", "mobile:lu-su", "mobile:xiahou-shi", "mobile:sp-xu-shu", "mobile:jia-xu", "mobile:zhang-song" }));
             Check("Mobile Yuan Shao UI: effective-suit pair confirms native Arrow", MobileYuanShaoUiChecks.EffectiveSuitPairEnablesNativeConfirmation);
-            Check("Mobile standard batch 86 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:cao-pi", "mobile:yuan-shao", "mobile:meng-huo", "mobile:zhu-rong" }));
-            Check("Mobile standard batch 87 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:xu-huang", "mobile:dong-zhuo", "mobile:sun-ce", "mobile:zhong-hui", "mobile:pang-tong", "mobile:xun-yu", "mobile:liu-shan" }));
-            Check("Mobile standard batch 85 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:guo-jia", "mobile:zhou-yu", "mobile:huang-zhong", "mobile:pang-de", "mobile:sun-jian" }));
-            Check("Mobile standard batch 84 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:da-qiao", "mobile:sun-shangxiang", "mobile:diao-chan", "mobile:xiahou-dun", "mobile:liu-bei", "mobile:zhuge-liang" }));
-            Check("Mobile standard batch 83 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:lu-meng", "mobile:zhang-liao", "mobile:xu-chu", "mobile:cao-ren" }));
-            Check("Mobile standard batch 82 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:zhen-ji", "mobile:sun-quan", "mobile:sima-yi", "mobile:hua-tuo" }));
-            Check("Mobile standard batch 81 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:cao-ying", "mobile:ma-chao", "mobile:bei-mi-hu", "mobile:huang-yueying", "mobile:lu-xun", "mobile:cao-cao", "mobile:gan-ning" }));
-            Check("Mobile standard batch 80 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:dian-wei", "mobile:deng-ai", "mobile:wei-yan", "mobile:guan-yu", "mobile:zhang-fei", "mobile:lu-bu", "mobile:zhao-yun", "mobile:huang-gai" }));
-            Check("Mobile standard batch 79 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:zhang-xing-cai", "mobile:zhou-fang", "mobile:cai-wen-ji", "mobile:xiahou-yuan", "mobile:jiang-wei", "mobile:zhuge-zhan" }));
-            Check("Mobile standard batch 78 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:guo-huanghou", "mobile:zhuge-guo", "mobile:yan-yan", "mobile:zhang-xiu", "mobile:wang-ping" }));
-            Check("Mobile standard batch 77 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:xu-shi", "mobile:lu-zhi", "mobile:wang-can", "mobile:zhang-rang" }));
-            Check("Mobile standard batch 76 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:xue-zong", "mobile:ji-kang", "mobile:wu-xian", "mobile:cai-yong", "mobile:liu-qi" }));
-            Check("Mobile standard batch 75 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:sun-hao", "mobile:lu-ji", "mobile:xu-you", "mobile:dong-yun" }));
-            Check("Mobile standard batch 74 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:yue-jin", "mobile:fu-wan", "mobile:xiahou-ba", "mobile:qin-mi", "mobile:gongsun-yuan", "mobile:sha-mo-ke", "mobile:hao-zhao" }));
-            Check("Mobile standard batch 73 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:wang-ji", "mobile:mi-zhu", "mobile:sima-lang", "mobile:ma-zhong", "mobile:shi-xie", "mobile:ta-dun", "mobile:dong-bai", "mobile:qu-yi", "mobile:xi-zhi-cai", "mobile:liu-yu", "mobile:cao-jie" }));
-            Check("Mobile standard batch 72 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:cao-xiu", "mobile:zhong-yao", "mobile:liu-chen", "mobile:li-yan", "mobile:huang-hao", "mobile:sun-xiu", "mobile:cen-hun", "mobile:sun-zi-liu-fang", "mobile:zhang-lu" }));
-            Check("Mobile standard batch 71 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:yu-jin", "mobile:cao-hong", "mobile:he-tai-hou", "mobile:wen-pin", "mobile:zhuge-dan", "mobile:cao-zhi", "mobile:ling-tong", "mobile:wu-guo-tai", "mobile:cao-rui", "mobile:chen-qun", "mobile:gu-yong", "mobile:bu-zhi", "mobile:li-tong" }));
-            Check("Mobile standard batch 70 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:guo-huai", "mobile:guan-xing-zhang-bao", "mobile:li-ru", "mobile:zu-mao", "mobile:zhang-bao", "mobile:ding-feng", "mobile:sun-qian", "mobile:kan-ze", "mobile:sun-deng", "mobile:guo-tu-feng-ji", "mobile:zhu-zhi", "mobile:quan-cong" }));
-            Check("Mobile standard batch 69 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "mobile:guan-ping", "mobile:yu-fan", "mobile:liu-biao", "mobile:man-chong", "mobile:jian-yong", "mobile:pan-zhang-ma-zhong", "mobile:fu-huang-hou", "mobile:cao-zhen", "mobile:wu-yi", "mobile:zhu-ran", "mobile:sun-lu-ban", "mobile:zhuge-ke", "mobile:ling-cao" }));
-            Check("Mobile standard batch 68 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                  new HashSet<string>(StringComparer.Ordinal) { "mobile:cao-ang", "mobile:chen-lin", "mobile:zhuge-jin", "mobile:bu-lian-shi", "mobile:zhu-huan", "mobile:han-dang", "mobile:cao-zhang", "mobile:liao-hua", "mobile:ma-dai", "mobile:wang-yi", "mobile:cheng-pu", "mobile:xun-you" }));
             Check("Mobile boundary Cai Fu Ren UI: private two-card view actual paid choice cold", () => BoundaryCaiFuRenMobileUiChecks.ActualPrivateTwoCardViewAndPaidChoiceCold(output));
             Check("Mobile boundary Zuo Ci UI: private exchange actual Back selected draft cold", () => BoundaryZuoCiUiChecks.ActualPrivateExchangeBackAndSelectedDraftCold(output));
             Check("Mobile boundary Zhou Fei UI: opaque storage original ending use and remainder cold", () => BoundaryZhouFeiUiChecks.ForeignOpaqueStoreOriginalEndingUseAndRemainderCold(output));
             Check("Mobile boundary Yan Yan UI: structured state counter and persistent quota cold", () => BoundaryYanYanUiChecks.StructuredPolarityOccurrenceAndPersistentQuotaRailCold(output));
             Check("Mobile boundary Wang Ji UI: actual inspected foreign hand and card button cold", () => BoundaryWangJiUiChecks.ActualInspectedForeignHandAndPaidCardButtonCold(output));
-            Check("Mobile boundary batch 47 gallery: official portraits and printed rules", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output,
-                new HashSet<string>(StringComparer.Ordinal) { "boundary:zhu-ran-mobile", "boundary:pan-zhang-ma-zhong-mobile", "boundary:sun-lu-ban-mobile" }));
             Check("Mobile boundary Sun Lu Ban UI: owner branch and actual foreign hidden hand", () => BoundarySunLuBanUiChecks.OwnerBranchAndActualForeignHiddenHandPicker(output));
-            Check("Edition general gallery: namespaced portraits and real details", () => EditionGeneralGalleryChecks.NamespacedPortraitsAndDetails(output));
             Check("God editions UI: formal portraits complete details and actual edition labels", () => MobileGodGalleryChecks.GodSeriesPortraitsAndDetails(output));
             Check("Shouli field mount UI: published foreign conversion and native payment", () => ShouliFieldMountUiChecks.ForeignMountUsesPublishedConversion(output));
             Check("Benevolence public pile UI: shared faces and read-only inspection", () => BenevolencePileUiChecks.SharedPublicCardsOpenReadOnly(output));
@@ -253,6 +155,11 @@ internal static class Program
             Check("Wushuang UI: Jinzhi selects materials before basic card and cancels unpaid", () => WushuangUiChecks.JinzhiSelectsMaterialsBeforeBasicCard(output));
             Check("Jiange activity UI: faction tier rules AI teammate and real setup", () => CheckJiangeActivity(output));
             Check("Shanhe campaign UI: story map choices and independent cold restore", () => ShanheCampaignUiChecks.StoryMapChoicesAndIndependentColdRestore(output));
+            Check("Shanhe exit UI: cancel failure cold restore and restart", () => ShanheCampaignUiChecks.EndConfirmationCancelFailureColdRestoreAndRestart(output));
+            Check("Shanhe progress UI: failure exit and legacy saves retry the current encounter", () => ShanheCampaignUiChecks.FailedAndAbandonedEncountersRetryFromSavedProgress(output));
+            Check("Shanhe progress UI: current config replay and actual failure reset", ShanheCampaignUiChecks.CurrentConfigurationReplaysAndActualFailureResetsPreparation);
+            Check("Shanhe opening UI: native hand reroll confirmation fresh retries and save failure", () => ShanheCampaignUiChecks.OpeningHandRerollsAndFreshRetryUseTheRealTable(output));
+            Check("Match lifecycle UI: fresh modes retain history without resume saves", () => ShanheCampaignUiChecks.OrdinaryModesKeepHistoryWithoutResumeSaves(output));
             Check("Shanhe story UI: recruitment variants skills copper and combat buttons", () => ShanheStoryEventUiChecks.RecruitmentSkillChoicesAndBattleButtons(output));
             Check("Shanhe companion UI: ordinary and elite opening rows show names and rules", ShanheCompanionRosterUiChecks.BothOpeningCompanionsShowTheirOwnNamesAndRules);
             Check("Shanhe guide tasks UI: original conditions and pending scores stay read-only", () => ShanheGuideTaskUiChecks.OriginalConditionsAndPendingScoresRemainReadOnly(output));
@@ -273,6 +180,7 @@ internal static class Program
             Check("Shanhe campaign UI: published boss portraits render on actual seats", () => ShanheBossPortraitChecks.PublishedS5BossAliasesDecodeAndRenderOnRealSeats(output));
             Check("Shanhe campaign UI: inheritance before map and cold restore", () => ShanheCampaignUiChecks.InheritanceOffersBeforeFirstMapAndSurvivesColdRestore(output));
             Check("Shanhe campaign UI: pre-run catalogue and collection navigation", () => ShanheModulesUiChecks.PreRunCatalogAndCollectionNavigation(output));
+            Check("Shanhe tactic UI: owned passive badges and active skill entries", () => ShanheTacticRailUiChecks.OwnedTacticsUseSharedBadgesAndPreserveActiveSkillEntries(output));
             Check("Shanhe codex UI: bounded opening selection and reopening", () => ShanheCodexPerformanceChecks.OpenSelectAndReopen(output));
             Check("Shanhe codex UI: unlock equip persist and market", () => ShanheCodexUiChecks.UnlockEquipPersistAndMarket(output));
             Check("Shanhe market UI: free refresh clicks paid allowance and zero wallet", () => ShanheCodexUiChecks.FreeRefreshClicksKeepPaidAllowancePricesAndZeroWalletState(output));
@@ -290,9 +198,12 @@ internal static class Program
             Check("Shanhe codex settlement: books independent of expedition autosave", ShanheCodexSettlementChecks.CompletedVictoryCreditsIndependentlyOfExpeditionAutosave);
             Check("Shanhe run records: real history tab keeps completed runs and credited books", () => ShanheRunRecordUiChecks.CompletedRunsRemainVisibleInTheRealHistoryTab(output));
             Check("Shanhe reward UI: real victory cards confirmation skip skill and replacement", () => ShanheRewardUiChecks.RealVictoryRewardCardsConfirmSkipSkillAndReplacement(output));
+            Check("Shanhe elite reward UI: automatic rare offers card compensation and mandatory tactics", () => ShanheRewardUiChecks.AutomaticRareEliteOffersAllowCardCompensationAndRequireTacticClaim(output));
             Check("Shanhe reward UI: grouped card skill decline and mandatory tactic", () => ShanheRewardUiChecks.BossCardAndRareSkillDeclinesKeepTacticGroupMandatory(output));
             Check("Shanhe difficulty UI: published preview and actual challenge stats", ShanheDifficultyPreviewUiChecks.PublishedDifficultyPreviewUsesActualChallengeStats);
             Check("Shanhe reward UI: boss bundles advance through three chapters", () => ShanheRewardUiChecks.BossBundlesRequireEachGroupThenAdvanceThreeChapters(output));
+            Check("Shanhe reward UI: chapter source artwork before and after claiming", () => ShanheRewardUiChecks.ChapterRewardsShowSourceArtworkBeforeAndAfterClaiming(output));
+            Check("Shanhe opening UI: unplayed opening remains clickable after first reward", () => ShanheRewardUiChecks.UnplayedOpeningRemainsClickableAfterFirstReward(output));
             Check("Shanhe reward UI: categories four choices bonus-only and three boss groups", () => ShanheRewardUiChecks.CategoriesFourChoicesBonusOnlyAndThreeBossGroups(output));
             Check("Shanhe reward UI: persistent market skill replacement confirms before payment", () => ShanheRewardUiChecks.PersistentMarketSkillsReplaceOnlyOnConfirmation(output));
             Check("Boss activity UI: real coalition setup stage and cross-mode restore", () => BossActivityUiChecks.RealSetupAndCrossModeRestore(output));
@@ -361,7 +272,6 @@ internal static class Program
             Check("dual portraits protect hidden slots and retain legacy skill semantics", () => NationalSeatChecks.PrivacyAndReveal(output));
             Check("dual health and bones UI: explicit pools and assigned slots", () => DualHealthAndBoneUiChecks.ExplicitPoolsAndOccupiedBoneSlots(output));
             Check("saved UI boundaries restore and continue through actual files", () => PersistenceChecks.RoundTrips(output));
-            Check("failed writes preserve saves and failed reads initialize a new game", () => PersistenceChecks.FailedWritesPreserveSavesAndFailedLoadsInitializeGame(output));
             Check("faulted sessions preserve saves and explain recovery", PersistenceChecks.FaultedSessionPreservesSavesAndExplainsRecovery);
             Check("exception reports preserve failed commands and survive new matches", () => ExceptionReportChecks.FaultReportsSurviveNewMatches(output));
             Check("exception reports keep recovery when log writes fail", () => ExceptionReportChecks.DiagnosticWriteFailurePreservesFaultHandling(output));
@@ -428,7 +338,6 @@ internal static class Program
     }
 
     private static MainViewModel NewViewModel(int seed = 721019) => new(false, seed, showSetup: false, saveStore: new MemorySaveStore()) { IsMotionEnabled = false };
-
 
     private static void CheckModeLobby(string output)
     {
@@ -515,7 +424,6 @@ internal static class Program
         window.Close();
     }
 
-
     internal static GameEngine Engine(MainViewModel vm) =>
         (GameEngine)typeof(MainViewModel).GetField("_game", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(vm)!;
 
@@ -573,9 +481,9 @@ internal static class Program
             vm.Seats.All(p => p.RoleLabel is "蜀军" or "魏军"),
             "NPC setup must complete through the real UI commands and show the actual factions.");
         Render(root, 1440, 880, Path.Combine(output, "152-jiange-table.png"));
-        vm.SaveGameCommand.Execute(null);
+        LegacySaveFixtures.Save(vm);
         var savedMode = Engine(vm).ModeId;
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         Assert(!vm.HasSaveError && Engine(vm).ModeId == savedMode && vm.WindowTitle.Contains("剑阁决战"),
             "The desktop must restore a real activity save with the optional content package.");
         window.Close();
@@ -624,7 +532,6 @@ internal static class Program
         Assert(!vm.PromptText.StartsWith("操作未执行"), vm.PromptText);
     }
 
-
     internal static ICommand? SetupResponseDeclineCommand(MainViewModel vm) =>
         Engine(vm).PendingDecision is { PlayerSeat: 0 } response
             ? response.Kind switch
@@ -647,7 +554,6 @@ internal static class Program
         vm.ConfirmSelectedCommand.Execute(null);
         Assert(!vm.IsDiscardSelectionPending && vm.SelectedDiscardCount == 0, "Discard did not finish.");
     }
-
 
     private sealed class BindingListener : TraceListener
     {

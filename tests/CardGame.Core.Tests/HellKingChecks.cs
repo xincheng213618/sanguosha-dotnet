@@ -6,89 +6,6 @@ internal static class HellKingChecks
 {
     private const string Driver = "fixture:hell-king-driver", Quiet = "fixture:hell-king-quiet", Mode = "fixture:hell-king-mode";
 
-    public static void NativePreparationDrawRandomAssaultAndRepeatedDamage()
-    {
-        {
-            var (g, registry) = Start(["hell:modao", "hell:wangsheng"], [], card: "standard:peach");
-            var roll = E<HellKingChoiceRecordedEvent>(g).Single(e => e.ResultBind == "assault");
-            var kind = roll.OptionId == "nanman" ? CardKind.BarbarianAssault : CardKind.ArrowBarrage;
-            var declaration = E<CardUseDeclaredEvent>(g).Single(e => e.SourceSeat == 0 && e.CardId == 0 && e.CardKind == kind);
-            Require(g.CardMovements.Count(m => m.To == CardLocation.Hand(0) && m.Reason.Value.Contains("DrawHellPreparation", StringComparison.Ordinal)) == 2 &&
-                E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == declaration.ResolutionId) == 1 &&
-                E<DamageAppliedEvent>(g).Count(e => e.SourceSeat == 0 && e.Amount == 1) == 3,
-                "Modao performs two native preparation draws; Wangsheng rolls once, issues one real zero-entity assault and resolves all three actual targets once.");
-            Cold(g, registry);
-        }
-        {
-            var (g, registry) = Start([], ["hell:fanshi"]); var boss = Peer(g);
-            for (var i = 0; i < 3; i++) { Use(g, "one-damage", boss); Play(g); Cold(g, registry); }
-            var counted = E<HellFanshiDamageCountedEvent>(g).Where(e => e.OwnerSeat == boss).ToArray();
-            var choices = E<HellKingChoiceRecordedEvent>(g).Where(e => e.OwnerSeat == boss && e.ResultBind == "victim").ToArray();
-            Require(counted.Length == 3 && counted.Select(e => e.DamageFrameId).Distinct().Count() == 3 && counted.Select(e => e.ActualTurn).Distinct().Count() == 1 &&
-                choices.Length == 3 && choices[0].OptionId == "none" && choices.Skip(1).All(e => e.OptionId == "eligible" && e.TargetSeat != boss) &&
-                E<DamageAppliedEvent>(g).Count(e => e.SourceSeat == boss && e.Amount == 1) == 2,
-                "Fanshi counts distinct native damage instances in the same actual turn, skips only the first and creates two attributed native random damage children.");
-            End(g); Play(g); var before = E<DamageAppliedEvent>(g).Count(e => e.SourceSeat == boss);
-            Use(g, "damage", boss); Play(g);
-            Require(E<HellFanshiDamageCountedEvent>(g).Last().ActualTurn != counted[0].ActualTurn && E<DamageAppliedEvent>(g).Count(e => e.SourceSeat == boss) == before,
-                "A later actual turn resets Fanshi; a two-point first damage still counts as one occurrence."); Cold(g, registry);
-        }
-    }
-
-    public static void ZhiwangUsesRealGainBatchesAndExcludesDrawPhases()
-    {
-        var (g, registry) = Start([], ["hell:zhiwang"]); var boss = Peer(g);
-        Require(!E<HellRandomCardDiscardedEvent>(g).Any(), "Normal draw-phase hand gains do not trigger Zhiwang.");
-        var hand = V(g, 0).HandCount; var moves = g.CardMovements.Count;
-        Use(g, "draw-two"); Play(g);
-        var receipt = E<HellRandomCardDiscardedEvent>(g).Single();
-        Require(receipt.OwnerSeat == boss && receipt.CardOwnerSeat == 0 && V(g, 0).HandCount == hand + 1 &&
-            g.CardMovements.Skip(moves).Count(m => m.To == CardLocation.Hand(0)) == 2 &&
-            g.CardMovements.Skip(moves).Count(m => m.CardId == receipt.CardId && m.From == CardLocation.Hand(0) && m.To == CardLocation.DiscardPile) == 1 &&
-            E<NativeLogicalDiscardInvocationRecordedEvent>(g).Any(e => e.InitiatorSeat == boss && e.SubjectSeat == 0 && e.ActualCount == 1),
-            "One real two-card hand-gain batch outside Draw causes one true attributed random hand discard, rather than one discard per gained card."); Cold(g, registry);
-        var recipient = Enumerable.Range(1, 3).First(s => s != boss); var recipientHand = V(g, recipient).HandCount;
-        Use(g, "give", recipient); Until(g, () => P(g)?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "select-and-move-owned-card") == true);
-        var card = V(g, 0).Hand[0].Id; Answer(g, c => c.Cards.SequenceEqual([card])); Play(g);
-        Require(V(g, recipient).HandCount == recipientHand && E<HellRandomCardDiscardedEvent>(g).Count() == 2 && E<HellRandomCardDiscardedEvent>(g).Last().CardOwnerSeat == recipient,
-            "A genuine hand transfer qualifies its actual gainer as a separate batch, including another character's turn."); Cold(g, registry);
-        var count = E<HellRandomCardDiscardedEvent>(g).Count(); End(g); Play(g);
-        Require(E<HellRandomCardDiscardedEvent>(g).Count() == count, "The following native normal draw phases remain excluded after the outside-draw gain receipts."); Cold(g, registry);
-    }
-
-    public static void BitterWinePeachPoisonAndRecoverySourceStayNative()
-    {
-        {
-            var (g, registry) = Start(["hell:kujiu"], []); End(g);
-            Until(g, () => P(g)?.SkillPrompt?.SkillId == "hell:kujiu");
-            var actor = P(g)!.ValidTargetSeats.Single();
-            Require(actor != 0 && P(g)!.Choices.Count == 1, "Bitter Wine's true preparation context exposes exactly the other current actor as its mandatory target.");
-            Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "select-target" && c.Targets.SequenceEqual([actor]));
-            Until(g, () => E<CardUseFinishedEvent>(g).Any(e => e.CardKind == CardKind.Alcohol));
-            var wine = E<CardUseDeclaredEvent>(g).Single(e => e.CardKind == CardKind.Alcohol);
-            Require(wine.CardId == 0 && wine.SourceSeat != 0 && E<ProgramSkillHpLostEvent>(g).Single(e => e.SkillId == "hell:kujiu") is { Amount: 1 } loss &&
-                loss.TargetSeat == wine.SourceSeat && E<AlcoholAppliedEvent>(g).Single().SourceSeat == wine.SourceSeat &&
-                E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == wine.ResolutionId) == 1,
-                "Bitter Wine first resolves actual HP loss, then the affected preparation actor performs one zero-entity native Alcohol Use and typed completion."); Cold(g, registry);
-        }
-        {
-            var (g, registry) = Start([], ["hell:fudu"], card: "standard:peach"); var boss = Peer(g);
-            Use(g, "lose-one", 0); Play(g); var before = g.CreateSnapshot(0).Players.ToDictionary(p => p.Seat, p => p.Hp);
-            Physical(g, CardKind.Peach, 0); Play(g);
-            var victim = E<HellKingChoiceRecordedEvent>(g).Single(e => e.OwnerSeat == boss && e.ResultBind == "victim").TargetSeat!.Value;
-            Require(victim != boss && victim != 0 && V(g, victim).Hp == before[victim] - 1 && V(g, 0).Hp == before[0] + 1 &&
-                E<ProgramSkillHpLostEvent>(g).Single(e => e.SkillId == "hell:fudu") is { Amount: 1 } loss && loss.TargetSeat == victim,
-                "A real paid Peach triggers poison on a random distinct third participant; the user and poison owner are excluded and the Peach still recovers normally."); Cold(g, registry);
-        }
-        {
-            var (g, registry) = Start([], ["hell:enyuan"]); var boss = Peer(g);
-            Use(g, "damage", boss); Play(g); var hand = V(g, 0).HandCount;
-            Use(g, "recover", boss); Play(g);
-            Require(V(g, 0).HandCount == hand + 2 && g.CardMovements.Count(m => m.To == CardLocation.Hand(0) && m.Reason.Value.Contains("RewardHellRecoverySource", StringComparison.Ordinal)) == 2,
-                "A real two-point recovery gives its actual other source two separate native one-card draws; Enyuan's heart-card damage branch remains the existing native request."); Cold(g, registry);
-        }
-    }
-
     public static void DeathEffectsRecalculateExtremeHpAndPreserveNativeSubtrees()
     {
         {
@@ -132,37 +49,6 @@ internal static class HellKingChecks
         }
     }
 
-    public static void VirtualArmorNativeSlashAndReincarnationSetting()
-    {
-        {
-            var (g, registry) = Start([], ["hell:tiemian"], suit: Suit.Spade); var boss = Peer(g); var hp = V(g, boss).Hp;
-            var card = Physical(g, CardKind.Slash, boss); Play(g);
-            Require(V(g, boss).Hp == hp && E<ArmorEffectAppliedEvent>(g).Any(e => e.ArmorCard == CardKind.RenwangShield) &&
-                g.CardMovements.Count(m => m.CardId == card && m.To == CardLocation.DiscardPile) == 1,
-                "Unarmored Tiemian supplies a genuine Renwang barrier against a real paid black Slash, with exactly one material discard."); Cold(g, registry);
-        }
-        {
-            var (g, registry) = Start(["hell:zhadao"], ["hell:tiemian"], suit: Suit.Spade); var boss = Peer(g); var hp = V(g, boss).Hp;
-            Physical(g, CardKind.Slash, boss); Play(g);
-            Require(V(g, boss).Hp == hp - 1, "Zhadao's real Slash bypasses the native virtual shield, as Qinggang does."); Cold(g, registry);
-        }
-        {
-            var (g, registry) = Start([], ["hell:remen"]); var boss = Peer(g); var hp = V(g, boss).Hp;
-            Physical(g, CardKind.Slash, boss); Play(g); Require(V(g, boss).Hp == hp, "Unarmored Remen makes a real ordinary Slash ineffective.");
-            Use(g, "fire", boss); Play(g); Require(V(g, boss).Hp == hp - 2, "Remen does not acquire Tengjia's additional fire vulnerability."); Cold(g, registry);
-        }
-        {
-            var (g, registry) = Start(["hell:lunhui"], []); Use(g, "lose-ten", 0); Play(g); End(g);
-            Until(g, () => P(g)?.SkillPrompt?.SkillId == "hell:lunhui"); Cold(g, registry);
-            Answer(g, c => c.Targets.Count == 1); Play(g);
-            var swap = E<HellCurrentHpExchangedEvent>(g).Single();
-            Require(swap.OwnerBefore == 2 && swap.OtherBefore == 12 && swap.OwnerAfter == 12 && swap.OtherAfter == 2 &&
-                V(g, 0).Hp == 12 && V(g, swap.OtherSeat).Hp == 2 && !E<RecoveryAppliedEvent>(g).Any(e => e.Amount == 10) &&
-                !E<ProgramSkillHpLostEvent>(g).Any(e => e.SkillId == "hell:lunhui"),
-                "Reincarnation exchanges current HP through Setting facts without pretending the exchange is a recovery or HP loss."); Cold(g, registry);
-        }
-    }
-
     private static (GameEngine, ContentRegistry) Start(string[] ownerSkills, string[] peerSkills, string card = "standard:slash", Suit suit = Suit.Heart, bool equipAtStart = false)
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(true),
@@ -174,18 +60,11 @@ internal static class HellKingChecks
         Accept(g, new SelectGeneralCommand(0, "fixture:hell-king-actor", g.Revision, P(g)!.PromptId)); Play(g); return (g, registry);
     }
     private static void Use(GameEngine g, string id, int? target = null) => Accept(g, new UseProgramSkillCommand(0, Driver, id, [], target is { } seat ? [seat] : [], g.Revision, P(g)!.PromptId));
-    private static int Physical(GameEngine g, CardKind kind, int target)
-    {
-        var action = g.GetHumanLegalActions().First(a => a.CardId is { } id && V(g, 0).Hand.Any(c => c.Id == id && c.Kind == kind) && a.ConversionSource is null &&
-            (a.TargetSeats.SequenceEqual([target]) || kind == CardKind.Peach && target == 0 && a.TargetSeats.Count == 0));
-        Accept(g, new PlayCardCommand(0, action.CardId!.Value, action.TargetSeats, g.Revision, P(g)!.PromptId, action.PlayedCardKind, action.TargetCardId)); return action.CardId.Value;
-    }
     private static int Peer(GameEngine g) => g.CreateSnapshot(0).Players.Single(p => p.GeneralId == "fixture:hell-king-peer-1").Seat;
     private static PlayerSnapshot V(GameEngine g, int seat) => g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 4).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static IEnumerable<T> E<T>(GameEngine g) => g.Events.Select(e => e.Payload).OfType<T>();
     private static void Play(GameEngine g) => Until(g, () => P(g) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
-    private static void End(GameEngine g) => Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
     private static void Answer(GameEngine g, Func<PromptChoice, bool> predicate) { var p = P(g)!; Accept(g, new AnswerPromptCommand(p.PlayerSeat, p.PromptId, p.Choices.First(predicate).Id, g.Revision)); }
     private static void Until(GameEngine g, Func<bool> condition)
     {

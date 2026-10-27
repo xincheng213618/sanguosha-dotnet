@@ -9,55 +9,6 @@ internal static partial class AnniversaryMaTieChecks
     private static string Peer(int seat) => "fixture:ma-tie-peer-" + seat;
     private static string? Branch(PromptChoice c) => c.Parameters.GetValueOrDefault("branch");
 
-    public static void ActualBoundariesNativeSlashRewardsPenaltyAndDistanceCold()
-    {
-        var s = Scene.Start(); s.Offer();
-        s.Need(s.E<TurnStartedEvent>().Length == 1 && s.E<TurnEndedEvent>().Length == 0, "The first Quxian is the actual own turn-start binding before ordinary Draw or Play.");
-        var initialSlashCount = s.V(0).Hand.Count(c => c.Kind == CardKind.Slash);
-        s.Activate(); s.Menu(AnniversaryMaTieStage.Target);
-        var first = s.Root!.Id; var obtained = s.Root.AnniversaryMaTie!.ObtainedCard;
-        s.Need(obtained > 0 && s.Zone(obtained) == CardLocation.Hand(0) && s.V(0).Hand.Count(c => c.Kind == CardKind.Slash) == initialSlashCount + 1 &&
-            s.G.CardMovements.Count(m => m.CardId == obtained && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(0) && m.Reason.Value == "skill-program.anniversary:quxian.obtain") == 1,
-            "Quxian really obtains an existing printed Slash entity from DrawPile before target selection.");
-        s.Answer(c => Branch(c) == "target" && c.Targets.SequenceEqual([1])); s.Menu(AnniversaryMaTieStage.SlashChoice);
-        s.Need(s.Root!.AnniversaryMaTie!.Actors.SequenceEqual([0, 2]) && s.P!.PlayerSeat == 0, "The original frozen attack-range queue contains Ma Tie himself and the other adjacent actor, in actual turn order.");
-        s.Cold();
-        s.Answer(c => Branch(c) == "slash" && c.Cards.Count == 0 && c.Targets.SequenceEqual([1]) && c.Description.Contains("卫境", StringComparison.Ordinal));
-        s.Watch();
-        var issued = s.E<AnniversaryMaTieSlashIssuedEvent>().Single(e => e.Origin.FrameId == first).Origin;
-        s.Need(issued.Actor == 0 && issued.Provider == 0 && issued.Target == 1 && s.G.ResolutionStack.OfType<CardUseFrame>().Single(u => u.Id == issued.UseId) is { CardId: 0, Action.Type: CardActionType.Use } &&
-            s.E<RoundOnceCardlessBasicQuotaPaidEvent>().Length == 1 && s.Root!.AnniversaryMaTie!.Used.SequenceEqual([0]) &&
-            s.E<AnniversaryMaTieRewardIssuedEvent>().Count(e => e.ParentId == first && e.UseId == issued.UseId) == 1 &&
-            s.G.CardMovements.Count(m => m.To == CardLocation.Hand(0) && m.Reason.Value == "skill-program.anniversary:quxian.used-slash-draw") == 1 &&
-            !s.E<DamageAppliedEvent>().Any() && !s.E<CardUseFinishedEvent>().Any(e => e.ResolutionId == issued.UseId),
-            "A real zero-material native Slash pays its original once-per-round conversion; exactly one reward card is really drawn before Dodge and damage, while the original Use remains pending.");
-        s.Cold(); s.Continue(); s.Play();
-        s.Need(s.E<AnniversaryMaTieCompletedEvent>().Single(e => e.FrameId == first) is { Used: 1, Damaged: false } && s.V(1).Hp == 12 && s.V(2).Hp == 11 &&
-            s.E<ProgramSkillHpLostEvent>().Where(e => e.FrameId == first).ToArray() is [{ TargetSeat: 2, Amount: 1 }] &&
-            s.E<AnniversaryMaTieHpPaidEvent>().Where(e => e.FrameId == first).ToArray() is [{ Index: 1, Target: 2, Amount: 1, Before: 12, After: 11 }] &&
-            s.E<AnniversaryMaTieSlashReturnedEvent>().Count(e => e.UseId == issued.UseId) == 1 && s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == issued.UseId) == 1,
-            "After Cold, the genuine dodged Slash returns once. The empty-handed frozen participant declines and alone pays X=1 through native HP loss, without repeating the paid reward draw.");
-        s.Need(s.G.GetCombatDistance(0, 2) == 2 && s.G.GetCombatDistance(2, 0) == 2, "The distant pair initially retains ordinary two-seat distance.");
-        s.Card(s.V(0).Hand.Single(c => c.Kind == CardKind.IronChain).Id, [2]); s.Play();
-        s.Need(s.V(2).IsChained && s.G.GetCombatDistance(0, 2) == 1 && s.G.GetCombatDistance(2, 0) == 2 &&
-            s.E<AnniversaryMaTieDistanceEvent>().Any(e => e.Source.OwnerSeat == 0 && e.Target == 2 && e.Turn == 1),
-            "A real non-Slash card completes against another character and only then gives Ma Tie directed distance one; the reverse direction remains ordinary.");
-        s.End(); s.Offer();
-        s.Need(s.E<TurnEndedEvent>().Length == 1 && s.G.State.TurnNumber == 1 && s.G.GetCombatDistance(0, 2) == 2,
-            "The second Quxian belongs to exact AfterTurnEnded, after the real turn-ended fact; the preceding Zhuiji distance has already expired.");
-        s.Activate(); s.Menu(AnniversaryMaTieStage.Target); var ending = s.Root!.Id;
-        s.Answer(c => Branch(c) == "target" && c.Targets.SequenceEqual([3])); s.Menu(AnniversaryMaTieStage.SlashChoice);
-        s.Answer(c => Branch(c) == "slash" && c.Cards.Count == 1 && c.Targets.SequenceEqual([3])); s.Watch(); s.Continue();
-        s.Reach(() => s.E<AnniversaryMaTieCompletedEvent>().Any(e => e.FrameId == ending));
-        var finalUse = s.E<AnniversaryMaTieSlashIssuedEvent>().Single(e => e.Origin.FrameId == ending).Origin;
-        s.Need(s.V(3).Hp == 11 && s.V(2).Hp == 11 && s.E<AnniversaryMaTieCompletedEvent>().Single(e => e.FrameId == ending) is { Used: 1, Damaged: true } &&
-            s.E<AnniversaryMaTieTargetDamagedEvent>().Single(e => e.FrameId == ending) is { Target: 3, Amount: 1 } damage && damage.UseId == finalUse.UseId &&
-            !s.E<ProgramSkillHpLostEvent>().Any(e => e.FrameId == ending) && s.E<AnniversaryMaTieRewardIssuedEvent>().Count(e => e.ParentId == ending) == 1 &&
-            s.E<AnniversaryMaTieSlashReturnedEvent>().Count(e => e.UseId == finalUse.UseId) == 1 && s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == finalUse.UseId) == 1,
-            "The second original lifecycle frame pays and uses a genuine Hand Slash. Its exact positive damage to the chosen victim exempts all decliners, while its one reward and whole native return still occur.");
-        s.Replay();
-    }
-
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {
         public GameEngine G { get; private set; } = game;

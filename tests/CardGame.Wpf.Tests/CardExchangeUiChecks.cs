@@ -89,7 +89,7 @@ internal static class CardExchangeUiChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         var model = new MainViewModel(false, 31, true, store, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null); Assert(!model.HasSaveError, model.SaveStatus); return model;
+        LegacySaveFixtures.Load(model); Assert(!model.HasSaveError, model.SaveStatus); return model;
     }
     private static void Reach(MainViewModel model, ContentRegistry registry, Func<bool> ready)
     {

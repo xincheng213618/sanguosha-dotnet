@@ -42,7 +42,8 @@ public static partial class StandardShanheCampaignCatalog
             _ => true
         })
             .ToDictionary(binding => binding.BattleId);
-        var chapterBundle = template.Nodes.Single(node => node.Id == "huaxiong").BossRewards;
+        var chapterBundles = template.Nodes.Where(node => node.BossRewards is not null)
+            .GroupBy(node => node.ChapterNumber).ToDictionary(group => group.Key, group => group.First().BossRewards);
         var normalRewards = template.Rewards.Where(reward => reward.OpeningCompanionPool is null &&
                 reward.Rarity is 1 or 2)
             .Select(reward => reward.Id).ToArray();
@@ -77,7 +78,7 @@ public static partial class StandardShanheCampaignCatalog
                 nodes.Add(new(Source2026CityNodeId(city.SourceCityId), name, ShanheNodeKind.Battle,
                     [region.ChapterNumber == 3 ? storyId : campId], ordinary, normalRewards)
                 {
-                    ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle, CategorizedRewards = true,
+                    ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle, CategorizedRewards = true, AutomaticRewardCategory = true,
                     EliteUpgradeNodeId = eliteId,
                     PrimaryTacticRarity = 1, PrimarySkillRarity = region.ChapterNumber >= 2 ? 2 : 1, RewardSkipGold = 100,
                     StoryText = "驻军拦住去路。击败敌人后继续行军。",
@@ -107,7 +108,7 @@ public static partial class StandardShanheCampaignCatalog
                 region.ChapterNumber == 3 ? [] : [storyId], bosses, [])
             {
                 ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle,
-                BossRewards = region.ChapterNumber < 3 ? chapterBundle : null,
+                BossRewards = region.ChapterNumber < 3 ? chapterBundles[region.ChapterNumber] : null,
                 StoryText = "驻守" + region.Name + "的首领已经现身。击败全部敌军才能继续前进。",
                 Description = "关底采用已支持的来源阵容；有第二阶段时须将其一并击败。"
             });

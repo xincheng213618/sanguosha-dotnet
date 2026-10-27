@@ -32,7 +32,7 @@ internal static class CustomGeneralSessionChecks
             custom.Portrait.ArtworkId == "classic:zhao-yun" && custom.SkillName.Contains("咆哮", StringComparison.Ordinal) &&
             custom.SkillName.Contains("会话摸牌", StringComparison.Ordinal) && custom.SkillName.Contains("会话回复", StringComparison.Ordinal),
             "Full roster must preview the custom general, inherited skill, both authored skills and chosen portrait without committing a selection.");
-        vm.SaveGameCommand.Execute(null);
+        LegacySaveFixtures.Save(vm);
         Need(!vm.HasSaveError, vm.SaveStatus);
         var draftSave = saves.Read(GameSaveSlot.Manual);
         var originalHash = originalGame.ContentRegistry.ContentHash;
@@ -66,7 +66,7 @@ internal static class CustomGeneralSessionChecks
             Program.Engine(vm).CreateCheckpoint().Options.HumanRole == Role.Loyalist,
             "Changing the current opening identity must rebuild with the active original registry, not import the recently edited library.");
 
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         Need(!vm.HasSaveError && State(vm) == draftState && Program.Engine(vm).ContentRegistry.ContentHash == originalHash,
             "The original pre-selection custom save must restore through the real manual-load command.");
         OpenRoster(vm);
@@ -76,7 +76,7 @@ internal static class CustomGeneralSessionChecks
         Need(Program.Engine(vm).CreateSnapshot(0).Players.Single(p => p.Seat == 0).GeneralId == GeneralId &&
             vm.Seats.Single(s => s.Seat == 0) is { HasPortrait: true, Portrait.ArtworkId: "classic:zhao-yun" },
             "Confirming the published custom choice must commit the real custom general and keep its active portrait.");
-        vm.SaveGameCommand.Execute(null);
+        LegacySaveFixtures.Save(vm);
         Need(!vm.HasSaveError, vm.SaveStatus);
         var selectedSave = saves.Read(GameSaveSlot.Manual);
         var selectedState = State(vm);
@@ -97,12 +97,12 @@ internal static class CustomGeneralSessionChecks
         OpenRoster(vm);
         Need(vm.CustomGeneralChoices.All(c => c.GeneralId != GeneralId), "The deleted custom general must be absent from the next game's full roster.");
 
-        vm.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(vm);
         Need(!vm.HasSaveError && State(vm) == selectedState &&
             Program.Engine(vm).ContentRegistry.ContentHash == selectedSave.Checkpoint.ContentHash &&
             Program.Engine(vm).ContentRegistry.Generals[GeneralId].Name == OriginalName && library.Read().Generals.Count == 0,
             "A selected custom match must recover its exact state and fingerprint even after its authoring entry is deleted.");
-        vm.SaveGameCommand.Execute(null);
+        LegacySaveFixtures.Save(vm);
         Need(!vm.HasSaveError && saves.Read(GameSaveSlot.Manual).CustomGenerals!.Generals.Single().Name == OriginalName,
             "Saving the restored custom session must retain its active snapshot instead of reading the now-empty editor library.");
 
@@ -114,7 +114,7 @@ internal static class CustomGeneralSessionChecks
         {
             saves.Write(GameSaveSlot.Manual, invalid);
             var writes = saves.WriteCount;
-            vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(vm);
             Need(vm.HasSaveError && vm.SaveStatus.Contains("读取失败", StringComparison.Ordinal) &&
                 !Program.Engine(vm).IsFaulted && Program.Engine(vm).AcceptedCommands is [StartGameCommand] &&
                 vm.FlushPendingSave() && saves.WriteCount == writes && ReferenceEquals(saves.Read(GameSaveSlot.Manual), invalid),

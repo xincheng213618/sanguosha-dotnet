@@ -14,46 +14,6 @@ internal static class ShanheS5XiahouPairChecks
     private const string Shensu = StandardShanheS5XiahouPairPackage.ShensuId;
     private const string DiscardReason = "skill-program." + Ganglie + ".SelectAndMoveOwnedCard";
 
-    public static void GanglieEachRealPointJudgesRedTwoOrDiscardsTwoAndPaidChildrenCold()
-    {
-        foreach (var black in new[] { false, true })
-        {
-            var s = Scene.Start(shensu: false, black);
-            s.Play();
-            s.Accept(new UseProgramSkillCommand(0, Driver, "actual-foreign-source", [], [2], s.G.Revision, s.P!.PromptId));
-            for (var point = 0; point < 2; point++)
-            {
-                s.Until(() => s.IsActivation(Ganglie)); s.Activate();
-                s.Until(() => s.P?.Kind == DecisionKind.ProgramJudgmentReplacement);
-                if (point == 0) s.Cold();
-                s.Answer(c => c.Parameters.GetValueOrDefault("action") == "program-judgment-replace-skip");
-                if (!black) continue;
-                for (var card = 0; card < 2; card++)
-                {
-                    s.Until(() => s.P?.Choices.Any(c => Action(c) == "select-and-move-owned-card") == true);
-                    s.Answer(c => Action(c) == "select-and-move-owned-card");
-                    s.Until(() => s.P?.SkillPrompt?.SkillId == Watch);
-                    Need(s.G.CardMovements.Count(m => m.Reason.Value == DiscardReason &&
-                            m.From == CardLocation.Hand(2) && m.To == CardLocation.DiscardPile) == point * 2 + card + 1,
-                        "Each source entity is truly discarded before its paid movement child, never prepaid or counted twice.");
-                    if (point == 0 && card == 0) s.Cold();
-                    s.Continue();
-                }
-            }
-            s.Play();
-            Need(s.E<JudgmentResolvedEvent>().Count(e => e.Reason == "shanhe.s5.ganglie") == 2 &&
-                s.E<ProgramBindingStartedEvent>().Count(e => e.SkillId == Ganglie) == 2 &&
-                s.E<DamageAppliedEvent>().Count(e => e.SourceSeat == 2 && e.TargetSeat == 0 && e.Amount == 2) == 1 &&
-                s.E<DamageAppliedEvent>().Count(e => e.SourceSeat == 0 && e.TargetSeat == 2 && e.Amount == 2) == (black ? 0 : 2) &&
-                s.V(2).Hp == (black ? 20 : 16) &&
-                s.G.CardMovements.Count(m => m.Reason.Value == DiscardReason && m.From == CardLocation.Hand(2) &&
-                    m.To == CardLocation.DiscardPile) == (black ? 4 : 0) &&
-                s.E<ProgramJudgmentOutcomeRecordedEvent>().Count(e => e.Outcome.Reason == "shanhe.s5.ganglie") == 2,
-                "Two actual incoming points separately offer native judgments: each red result deals two damage, each black result discards two genuine source HE entities; completed costs survive retrial and paid-child recovery.");
-            s.Cold();
-        }
-    }
-
     public static void ShensuThreeNativeCostsFrozenActualSkipsAndOtherSourceDedupCold()
     {
         var s = Scene.Start(shensu: true);

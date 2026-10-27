@@ -17,7 +17,7 @@ internal static class BenevolencePileUiChecks
         using var model = new MainViewModel(false, scenario.Game.Seed, true, store, contentRegistry: scenario.Registry,
             historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore())
             { IsMotionEnabled = false, IsSoundEnabled = false, IsDeveloperView = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         var game = Program.Engine(model);
         var initial = game.CreateSnapshot(0);

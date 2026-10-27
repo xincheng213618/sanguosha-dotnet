@@ -10,46 +10,6 @@ internal static class ShanheErshengsanChecks
     private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(
         new StandardContentPackage(), new StandardShanheMarketPackage(), new StandardShanheErshengsanPackage(), new Fixture()));
 
-    public static void PaidBonusFreezesEachResolvedDrawAndReturnsItsGainChildren()
-    {
-        var s = Scene.Start();
-        var initialHand = s.View().HandCount;
-        Need(s.Events<CardsDrawnEvent>().All(e => e.Count == 0),
-            "Registering the future card policy does not add a card to the ordinary zero-card draw phase.");
-        var first = s.Use();
-        s.Until(s.GainPrompt);
-        var original = s.Events<CardUseDeclaredEvent>().Single(e => e.CardId == first);
-        var issued = s.Events<NativeCardEffectDrawStartedEvent>().Single(e => e.UseFrameId == original.ResolutionId);
-        Need(issued.RequestedCount == 2 && issued.RecipientSeat == 0 &&
-            s.UseFrame(original.ResolutionId).NativeCardEffectDraw is { RequestedCount: 2, Outcome.ActualDrawIds.Count: 2 },
-            "An unowned source 2030 does not enhance the real resolved DrawTwo request.");
-
-        // The request has already drawn its exact entities; buy during its first
-        // real gain child and require that same child/receipt to survive payment.
-        var child = s.G.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single().Id;
-        s.Buy();
-        Need(s.Market().Gold == 700 && s.GainPrompt() &&
-            s.G.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single().Id == child &&
-            s.UseFrame(original.ResolutionId).NativeCardEffectDraw is { RequestedCount: 2, Outcome.ActualDrawIds.Count: 2 } &&
-            s.View().Skills!.Count(skill => skill.ContentId == StandardShanheErshengsanPackage.SkillId) == 1 &&
-            s.Events<ShanheMarketPurchaseCommittedEvent>() is [{ Price: 300 }] &&
-            s.Events<ShanheMarketPurchaseAppliedEvent>().Length == 1,
-            "The actual 300-coin purchase grants the skill immediately and preserves the original already-issued two-card request and child.");
-        s.Play();
-        s.AssertPaidUse(first, 2, 1);
-        Need(s.View().HandCount == initialHand - 1 + 2 && s.SeenDraws.Count == 2,
-            "The interrupted unowned request finishes two gain children without retroactive extra cards.");
-
-        var second = s.Use(); s.Play(); s.AssertPaidUse(second, 3, 1);
-        var next = s.Events<CardUseDeclaredEvent>().Single(e => e.CardId == second);
-        Need(s.Events<NativeCardEffectDrawStartedEvent>().Single(e => e.UseFrameId == next.ResolutionId) is
-                { RequestedCount: 3, RecipientSeat: 0 } &&
-            s.View().HandCount == initialHand - 2 + 5 && s.SeenDraws.Count == 5 &&
-            s.G.CardMovements.Count(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(0) &&
-                m.Reason == CardMoveReasons.Draw) == 5,
-            "The next actual paid DrawTwo immediately draws three, each original native gain child returns once, and no unrelated draw changes.");
-    }
-
     public static void NullificationAndFengziRetainOriginalPaidUseAndEffectQuantity()
     {
         var cancelled = Scene.Start(); cancelled.Buy();

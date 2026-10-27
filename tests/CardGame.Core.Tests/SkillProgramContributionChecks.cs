@@ -7,7 +7,6 @@ internal static class SkillProgramContributionChecks
     private const string BoundarySkillId = "scenario:boundary-huangtian";
     private const string BindingId = "contribute";
 
-
     public static void CrossOwnerFiltersLedgerAndReplay()
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new FixturePackage());
@@ -74,7 +73,6 @@ internal static class SkillProgramContributionChecks
                 replay.Events.Select(item => item.Payload).OfType<ProgramSkillContributionResolvedEvent>()
                     .Count(item => item.ProviderSeat == 0 && item.SkillId == BoundarySkillId) == 1,
             "A completed contribution and its phase ledger must rebuild exactly from the accepted command journal.");
-
 
         var lordProvider = CreateGame(registry, game.Seed, Role.Lord);
         Require(lordProvider.Submit(new StartGameCommand()).Accepted &&

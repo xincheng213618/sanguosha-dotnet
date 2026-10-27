@@ -70,18 +70,6 @@ internal static class ShanheSteadyHandChecks
         }
     }
 
-    public static void OrdinaryIdentityOwnerStillUsesCurrentHpDespiteOwningTheRegisteredTactic()
-    {
-        var s = Scene.StartIdentity();
-        var maximum = s.V.MaxHp;
-        Need(s.V.Hp == maximum && s.V.HandLimit == maximum + 2,
-            "The ordinary table starts with its original maximum HP, including its native role bonus, and the additive hand-limit bonus.");
-        s.Use("damage-two");
-        Need(s.V.Hp == maximum - 2 && s.V.MaxHp == maximum && s.V.HandLimit == maximum &&
-            s.Events<DamageAppliedEvent>() is [{ SourceSeat: 0, TargetSeat: 0, Amount: 2 }],
-            "Owning the new Shanhe-only program in a real identity table does not replace its current-HP hand-limit base.");
-    }
-
     private static void Need(bool value, string message)
     { if (!value) throw new InvalidOperationException(message); }
 

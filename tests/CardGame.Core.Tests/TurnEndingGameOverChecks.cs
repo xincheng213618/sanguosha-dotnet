@@ -179,5 +179,3 @@ internal static class TurnEndingGameOverChecks
     }
 }
 
-
-

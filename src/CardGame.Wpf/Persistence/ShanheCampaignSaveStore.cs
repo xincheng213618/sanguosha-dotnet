@@ -6,10 +6,11 @@ using CardGame.Core.Campaigns;
 
 namespace CardGame.Wpf.Persistence;
 
-/// <summary>The campaign journal and its current battle are replaced as one local file.</summary>
+/// <summary>Persists expedition progress. Battle is retained only for reading legacy files.</summary>
 public sealed record ShanheCampaignSaveFile(
     int FormatVersion, DateTimeOffset SavedAtUtc, int Difficulty,
-    ShanheCampaignCheckpoint Campaign, GameCheckpoint? Battle = null)
+    ShanheCampaignCheckpoint Campaign,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] GameCheckpoint? Battle = null)
 {
     public const int CurrentFormatVersion = 1;
 }

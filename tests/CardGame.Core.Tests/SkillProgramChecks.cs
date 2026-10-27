@@ -136,7 +136,6 @@ internal static class SkillProgramChecks
             "conditional selectedTarget requires its matching judgment outcome branch");
     }
 
-
     public static void ConfiguredActiveSequenceIsAtomicAndReplayable()
     {
         var registry = ComposedSkillContentRegistry.CreateShowcase();
@@ -182,7 +181,6 @@ internal static class SkillProgramChecks
             "The accepted configured active sequence must replay to the same state.");
     }
 
-
     public static void ProgramHashControlsCheckpointCompatibility()
     {
         var original = BuildHashRegistry(RulesA, PresentationA);
@@ -214,7 +212,6 @@ internal static class SkillProgramChecks
         RequireThrows<InvalidOperationException>(() => GameReplay.Restore(checkpoint, changedRules));
     }
 
-
     public static void ProgramPausedDyingAndConsumedSelection()
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new DyingProgramPackage());
@@ -234,7 +231,6 @@ internal static class SkillProgramChecks
                     item.From != CardLocation.DrawPile || item.To != CardLocation.Hand(0)),
             "A selected Peach spent on rescue must cancel later discard and draw steps.");
     }
-
 
     private static GameEngine FindStartedGame(
         ContentRegistry registry,

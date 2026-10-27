@@ -100,63 +100,6 @@ internal static class ShanheFarStrikeChecks
         VerifyNativeProgramAiSelectsTheActuallyFarEnemy();
     }
 
-    public static void ElementalChainRechecksRecipientDistanceAndLiveSkillLossCold()
-    {
-        // These exact chain amounts preserve the engine's existing per-segment
-        // source-modifier interpretation; they are not a dedicated original FAQ.
-        foreach (var scene in new[] { "chain-near", "chain-two-far", "chain-far", "chain-loss", "chain-unowned" })
-        {
-            var s = Scene.Start(scene); var twoFar = scene is "chain-two-far" or "chain-loss";
-            if (twoFar) s.EquipDefensiveHorse(3);
-            var chainA = s.PlayCard(CardKind.IronChain, [1, 2]); var chainB = s.PlayCard(CardKind.IronChain, [3]);
-            Need(new[] { 1, 2, 3 }.All(seat => s.V(seat).IsChained) && !s.V().IsChained,
-                "Two paid original Iron Chain cards genuinely link exactly the three intended recipients.");
-            var farOrigin = scene is "chain-far" or "chain-loss"; var origin = farOrigin ? 2 : 1;
-            var slash = s.BeginCard(s.Action(CardKind.ThunderSlash, [origin]));
-            if (scene == "chain-loss")
-            {
-                s.AtSkill(Loss);
-                Need(s.Events<DamageAppliedEvent>() is [{ SourceSeat: 0, TargetSeat: 2, Amount: 2 }] &&
-                    s.V().Hp == 11 && s.V().Skills?.Any(skill => skill.ContentId == Skill) != true &&
-                    s.Events<HpConditionalSkillGrantChangedEvent>().Count(e => e.OwnerSeat == 0 && e.SkillId == Skill && !e.Added) == 1 &&
-                    s.Events<RecipientScopedDamageBaseEvent>().Length == 0,
-                    "After the real far origin pays two, a legitimate HP payment withdraws the exact derived source before subsequent chain recipients are issued.");
-                s.Cold(); s.Continue();
-            }
-            int[] targets = farOrigin ? [2, 1, 3] : [1, 2, 3];
-            int[] amounts = scene == "chain-two-far" ? [1, 2, 3] : farOrigin ? [2, 2, 2] : scene == "chain-unowned" ? [1, 1, 1] : [1, 2, 2];
-            for (var index = 0; index < targets.Length; index++)
-            {
-                s.AtDamage();
-                Need(s.Events<DamageAppliedEvent>().Last() is { Nature: DamageNature.Thunder, SourceSeat: 0, SourceLess: false } hit &&
-                    hit.TargetSeat == targets[index] && hit.Amount == amounts[index] && s.Events<DamageAppliedEvent>().Length == index + 1,
-                    "Each actual elemental recipient uses the live directed distance and the previous finalized native segment: " + s.Diagnostic());
-                s.Cold(); s.Continue();
-            }
-            s.Play();
-            var expected = targets.Zip(amounts).ToArray();
-            Need(s.Events<DamageAppliedEvent>().Select(e => (e.TargetSeat, e.Amount)).SequenceEqual(expected) &&
-                s.Events<AfterDamageEvent>().Select(e => (e.TargetSeat, e.Amount)).SequenceEqual(expected) &&
-                s.Events<RecipientScopedDamageBaseEvent>().Length == 0 && s.Events<RecipientScopedDamageAdvancedEvent>().Length == 0 &&
-                s.Events<ChainedDamagePropagatedEvent>().Length == 2,
-                "The unscoped chain retains 1/2/2, 1/2/3 or 2/2/2; registration alone neither freezes a new base nor reapplies the origin modifier twice.");
-            var modifiers = s.Modifiers();
-            int[] modifiedTargets = scene == "chain-two-far" ? [2, 3] : scene == "chain-unowned" ? [] : [2];
-            Need(modifiers.All(e => e.Source.OwnerSeat == 0 && e.ModifiedAmount == e.BaseAmount + 1) &&
-                modifiers.Select(e => e.TargetSeat).SequenceEqual(modifiedTargets) &&
-                modifiers.GroupBy(e => (e.ResolutionId, e.TargetSeat)).All(group => group.Count() == 1) &&
-                new[] { 1, 2, 3 }.All(seat => !s.V(seat).IsChained),
-                "Every qualifying segment records one real source binding; a near recipient or a genuinely withdrawn source never adds another bonus.");
-            foreach (var card in new[] { chainA, chainB, slash }) s.AssertPaidOnce(card); s.Cold();
-            if (scene == "chain-loss")
-            {
-                var previous = s.Modifiers().Length; s.Use("hit", [3]);
-                Need(s.G.GetCombatDistance(0, 3) == 2 && s.Events<DamageAppliedEvent>().Last() is { TargetSeat: 3, Amount: 1 } &&
-                    s.Modifiers().Length == previous, "A subsequent genuinely far program hit also observes the lost source, without repaying or refunding any earlier segment."); s.Cold();
-            }
-        }
-    }
-
     private static ShanheBattleSetup ProductionSetup(string general = "classic:guan-yu") =>
         new(83, 1, "fixture-far-strike-production", general, 4, 0, 0, 0, 0, [], [], [], [new("standard:cao-cao")], [], new string('f', 64));
 

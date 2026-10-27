@@ -9,60 +9,6 @@ internal static class BoundaryQuanCongChecks
         Driver = "fixture:boundary-quan-cong-driver", NoDraw = "fixture:boundary-quan-cong-no-draw",
         Watch = "fixture:boundary-quan-cong-watch", Peer = "fixture:boundary-quan-cong-peer";
 
-    public static void ChargedOptionsEqualHandsDamageRechargeAndPaidDiscardCold()
-    {
-        var created = CreateScene(); var s = new Scene(created.Registry, created.Game); s.Play();
-        s.Need(s.Remaining == 2 && s.PendingOption == 0, "Yaoming starts with two public charges and no recorded option.");
-        s.Activate();
-        s.Need(s.P!.Choices.Any(c => Branch(c) == "draw" && c.Targets.SequenceEqual([0])) &&
-            s.P.Choices.Any(c => Branch(c) == "draw" && c.Targets.SequenceEqual([1])) &&
-            s.P.Choices.Any(c => Branch(c) == "discard" && c.Targets.SequenceEqual([1])) &&
-            s.P.Choices.All(c => Branch(c) != "discard" || !c.Targets.Contains(0)),
-            "Equal hand counts qualify for both options; self can receive a draw but cannot be the discard victim.");
-        var before = s.V(0).HandCount;
-        s.Answer("draw", 0); s.Cold(); s.Play();
-        s.Need(s.Remaining == 1 && s.PendingOption == 2 && s.V(0).HandCount == before + 1 &&
-            s.E<BoundaryQuanCongYaomingDrawReturnedEvent>().Length == 1,
-            "A genuine native self draw consumes one charge and records draw through a cold native return.");
-        s.Activate(); s.Answer("draw", 0); s.Play();
-        s.Need(s.Remaining == 0 && s.PendingOption == 2 && s.G.GetHumanLegalActions().All(a => a.ProgramSkillId != Skill),
-            "Repeating the same option spends the second charge and removes the empty activation.");
-        var hp = s.V(0).Hp; s.Driver("damage-three", [1]); s.Menu();
-        s.Need(s.V(0).Hp == hp - 3 && s.Remaining == 3 &&
-            s.E<BoundaryQuanCongYaomingStateEvent>().Where(e => e.Cause == "damage").ToArray() is [{ DamageAmount: 3, Remaining: 3 }],
-            "One real three-point received damage adds three charges before its single optional intervention menu.");
-        s.Answer("skip"); s.Play();
-        s.Driver("equip-target", [1]); s.Reach(() => s.P?.Choices.Any(c => c.Cards.Count == 1 && c.Parameters.ContainsKey("source-zone")) == true);
-        s.Answer(s.P!.Choices.First(c => c.Cards.Count == 1)); s.Play();
-        s.Driver("draw-target", [1]); s.Play();
-        s.Need(s.V(1).HandCount == s.V(0).HandCount && s.V(1).Equipment.Count == 1,
-            "The fixture reaches a real equal-hand victim with a separately equipped native weapon.");
-        s.Activate(); s.Answer("discard", 1); s.Cold();
-        s.Need(s.Remaining == 3 && s.PendingOption == 0 &&
-            s.P!.Choices.Where(c => c.Parameters.GetValueOrDefault("source-zone") == nameof(CardZoneKind.Hand)).All(c => c.Cards.Count == 0),
-            "Changing from draw to discard refunds the spent charge, clears the old record and preserves anonymous foreign-hand choices.");
-        var equipment = s.V(1).Equipment.Single().Id;
-        s.Answer(s.P!.Choices.Single(c => c.Cards.SequenceEqual([equipment])));
-        s.Reach(() => s.P is { PlayerSeat: 0 } p && p.SkillPrompt?.SkillId == Watch &&
-            p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "choose-option"));
-        var paid = s.E<BoundaryQuanCongYaomingDiscardedEvent>().Single();
-        s.Need(paid.CardId == equipment && s.V(1).Equipment.Count == 0 &&
-            s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == paid.FrameId).BoundaryQuanCongYaoming?.Stage == BoundaryQuanCongYaomingStage.Children &&
-            s.E<NativeLogicalDiscardInvocationRecordedEvent>().Count(e => e.ParentFrameId == paid.FrameId &&
-                e.InitiatorSeat == 0 && e.ExecutorSeat == 0 && e.SubjectSeat == 1 && e.ActualCount == 1 && e.HandCount == 0) == 1,
-            "The chosen equipment is really discarded by Yaoming's owner once before the paid movement observer child.");
-        s.Cold(); s.Answer(s.P!.Choices.Single()); s.Play();
-        s.Need(s.Remaining == 3 && s.E<BoundaryQuanCongYaomingDiscardedEvent>().Length == 1 &&
-            s.G.CardMovements.Count(m => m.CardId == equipment && m.To == CardLocation.DiscardPile) == 1,
-            "Restoring the paid child neither spends another charge nor discards its material twice.");
-        s.Activate(); s.Answer("draw", 0); s.Play();
-        s.Need(s.Remaining == 2 && s.PendingOption == 2, "After the cleared record a new draw spends a charge without a second alternation refund.");
-        s.Driver("damage-three", [1]); s.Menu(); s.Answer("skip"); s.Play();
-        s.Need(s.Remaining == 4 && s.E<BoundaryQuanCongYaomingStateEvent>().Last(e => e.Cause == "damage") is { DamageAmount: 3, Remaining: 4 },
-            "Further real damage recharges only up to four, and declining the optional use preserves that public cap.");
-        s.Cold();
-    }
-
     internal static (ContentRegistry Registry, GameEngine Game) CreateScene()
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());

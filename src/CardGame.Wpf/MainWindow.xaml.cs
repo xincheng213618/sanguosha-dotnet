@@ -819,8 +819,6 @@ public partial class MainWindow : Window
             () => !viewModel.HasWushuangSaveAccessError && viewModel.IsLobbyConfigurationOpen == configuration &&
                 viewModel.IsModeConfigurationOpen == modeStep && ReferenceEquals(viewModel.SelectedTableMode, mode),
             () => !configuration ? LobbyHome.WushuangSaveAccessFocusTarget :
-                viewModel.IsWushuangModeSelection && modeStep && WushuangContinueButton.IsVisible ? WushuangContinueButton :
-                viewModel.IsWushuangModeSelection && modeStep && WushuangLoadManualButton.IsVisible ? WushuangLoadManualButton :
                 modeStep ? StartNewGameButton : ModeGroupChoices);
     }
 

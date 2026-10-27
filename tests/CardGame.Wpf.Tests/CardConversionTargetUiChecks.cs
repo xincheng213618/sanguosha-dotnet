@@ -111,7 +111,7 @@ internal static class CardConversionTargetUiChecks
                 long retiredRevision = -1;
                 foreach (var route in new[] { "button", "Enter" })
                 {
-                    model.LoadManualGameCommand.Execute(null);
+                    LegacySaveFixtures.Load(model);
                     var game = Program.Engine(model);
                     var card = model.Hand.First(item => item.Kind == CardKind.IronChain);
                     var native = game.GetHumanLegalActions().Where(action => action.CardId == card.Id).ToArray();
@@ -294,7 +294,7 @@ internal static class CardConversionTargetUiChecks
                     "A native declared Iron Chain must retain its exact portrait draft without offering nonexistent Recast in controls/hint/guide.");
                 var retiredCombo = AoeChoice(model, card.Id, aoe);
                 var oldComboButton = BoundButton(root, model.SelectTargetCombinationChoiceCommand, retiredCombo);
-                model.LoadManualGameCommand.Execute(null);
+                LegacySaveFixtures.Load(model);
                 game = Program.Engine(model);
                 card = model.Hand.Single(item => item.Id == card.Id);
                 aoe = game.GetHumanLegalActions().Single(action => action.CardId == card.Id &&
@@ -495,7 +495,7 @@ internal static class CardConversionTargetUiChecks
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
         try
         {
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Program.Assert(!model.HasSaveError && Views(Program.Engine(model)).SequenceEqual(Views(game)),
                 "The actual manual-load command must restore every player-safe fixture view.");
             return (model, registry);

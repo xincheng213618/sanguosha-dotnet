@@ -10,14 +10,45 @@ internal static class ShanheStartingResourceChecks
     private const string BoardWatch = "fixture:starting-resource-board-watch";
     private const string Owner = "fixture:starting-resource-owner", Enemy = "fixture:starting-resource-enemy", Deck = "fixture:starting-resource-deck";
 
+    public static void OpeningEquipmentDeckAndStolenWeaponStayNativeForward()
+    {
+        var s = Scene.Start(true, extra: [new(CardKind.Snatch, Suit.Spade, 3)],
+            enemyEquipment: [new(CardKind.QinggangSword, Suit.Spade, 6)]);
+        s.Play();
+        var initialWeapon = s.Initial(true, 0);
+        var enemyWeapon = s.V(1).Equipment.Single().Id;
+        Need(s.V().Equipment.Count == 2 && s.Zone(initialWeapon) == CardLocation.Equipment(0) &&
+            s.V().Hand.All(card => card.Id != initialWeapon) &&
+            s.G.CardMovements.Any(move => move.CardId == initialWeapon && move.From == CardLocation.OutsideGame &&
+                move.To == CardLocation.Equipment(0) && move.Reason == CardMoveReasons.EquipmentEnter) &&
+            s.G.CreateCardZoneDiagnostics().Where(card => card.Location == CardLocation.DrawPile)
+                .All(card => !EquipmentCatalog.IsEquipment(card.CardKind)),
+            "Player loadout equipment is installed directly, enemy equipment stays real, and the initial Shanhe deck contains no equipment.");
+        var snatch = s.Initial(false, 6);
+        s.Card(snatch, [1], targetCardId: enemyWeapon); s.Play();
+        Need(s.Zone(enemyWeapon) == CardLocation.Hand(0) && s.V(1).Equipment.Count == 0,
+            "A real Snatch acquires the original enemy weapon instead of blocking equipment gains or generating a replacement.");
+        s.Card(enemyWeapon, []); s.Play();
+        Need(s.Zone(enemyWeapon) == CardLocation.Equipment(0) && s.Zone(initialWeapon) == CardLocation.DiscardPile,
+            "The stolen weapon can be used normally and replaces the original player weapon through native equipment movement.");
+        for (var draw = 0; draw < 4; draw++) { s.Use("drain-deck"); s.Play(); }
+        Need(s.Zone(initialWeapon) == CardLocation.OutsideGame &&
+            s.G.CardMovements.Any(move => move.CardId == initialWeapon && move.From == CardLocation.DiscardPile &&
+                move.To == CardLocation.OutsideGame && move.Reason.Value == "shanhe.deck.exclude-equipment") &&
+            s.G.CardMovements.Where(move => move.From == CardLocation.DrawPile && move.To.Zone == CardZoneKind.Hand)
+                .All(move => !EquipmentCatalog.IsEquipment(move.CardKind)) &&
+            s.Zone(enemyWeapon) == CardLocation.Equipment(0),
+            "Exhausting the deck excludes discarded equipment before recycling while retaining the genuinely stolen and installed weapon.");
+    }
+
     public static void NewResourcesUseConversionDodgeAndEquipmentExitCold()
     {
         var s = Scene.Start(true); s.Play();
         var gear = s.Initial(true, 0); var draw = s.Initial(false, 0); var converted = s.Initial(false, 1); var dodge = s.Initial(false, 2);
         var recast = s.Initial(false, 3); var discard = s.Initial(false, 4); var delayed = s.Initial(false, 5);
-        Need(s.V().Equipment.Count == 0 && s.V().Hand.Any(c => c.Id == gear) && s.V(1).Hand.Count == 1 &&
+        Need(s.V().Equipment.Count == 2 && s.V().Hand.All(c => c.Id != gear) && s.V(1).Hand.Count == 1 &&
             s.G.CreateSnapshot(1).Players[0].Hand.Count == 0 && !SnapshotJson.Serialize(s.G.CreateSnapshot(1)).Contains(nameof(ShanheStartingResourceCreatedEvent), StringComparison.Ordinal),
-            "New-contract resources start as real private hand entities, including the supplied equipment; enemy fixed hand stays separate from provenance facts.");
+            "Initial cards remain private hand entities and supplied equipment is installed directly; enemy fixed hand stays separate from provenance facts.");
         s.Card(draw, []); s.Until(() => s.At(UseWatch));
         Need(s.Zone(draw) == CardLocation.OutsideGame && s.E<ShanheStartingResourceDestroyedEvent>().Single().CardId == draw &&
             s.G.CardMovements.Count(m => m.CardId == draw && m.From == CardLocation.Processing && m.To == CardLocation.OutsideGame && m.Reason == CardMoveReasons.UseFinished) == 1,
@@ -31,13 +62,16 @@ internal static class ShanheStartingResourceChecks
         var normal = s.V().Hand.First(c => c.Kind == CardKind.Dodge && !s.E<ShanheStartingResourceCreatedEvent>().Any(e => e.CardId == c.Id)).Id;
         s.Card(normal, [1], conversion: true); s.Play();
         Need(s.Zone(normal) == CardLocation.DiscardPile, "A naturally drawn card with the same printed kind and conversion follows the ordinary discard cycle.");
-        s.Card(gear, []); s.Play(); Need(s.Zone(gear) == CardLocation.Equipment(0), "The supplied equipment installs through a genuine native equipment Use and remains on the field.");
-        s.Use("equip", [], [0]); s.Play(); Need(s.Zone(gear) == CardLocation.OutsideGame && s.E<ShanheStartingResourceDestroyedEvent>().Count(e => e.CardId == gear) == 1,
-            "Replacing a genuinely used supplied equipment card moves only that exact old equipment entity outside."); s.Cold();
-        var armor = s.Initial(true, 1); s.Card(armor, []); s.Play(); s.Use("discard-board");
+        s.Use("discard-board");
+        s.Until(() => s.P!.Choices.Any(c => c.Cards.SequenceEqual([gear]))); s.Answer(c => c.Cards.SequenceEqual([gear]));
+        s.Until(() => s.At(BoardWatch));
+        Need(s.Zone(gear) == CardLocation.DiscardPile && s.E<ShanheStartingResourceDestroyedEvent>().All(e => e.CardId != gear),
+            "Directly installed equipment follows normal equipment departure; it is excluded only if the discard pile is recycled.");
+        s.Cold(); s.Continue(); s.Play();
+        var armor = s.Initial(true, 1); s.Use("discard-board");
         s.Until(() => s.P!.Choices.Any(c => c.Cards.SequenceEqual([armor]))); s.Answer(c => c.Cards.SequenceEqual([armor])); s.Until(() => s.At(BoardWatch));
-        Need(s.Zone(armor) == CardLocation.OutsideGame && s.E<ProgramBindingStartedEvent>().Count(e => e.SkillId == BoardWatch) == 1,
-            "Discarding a genuinely used initial armor remains one real discard-only CardsLost occurrence with its original Equipment source despite the final Outside destination.");
+        Need(s.Zone(armor) == CardLocation.DiscardPile && s.E<ProgramBindingStartedEvent>().Count(e => e.SkillId == BoardWatch) == 2,
+            "Discarding directly installed armor remains one real discard-only CardsLost occurrence with its original Equipment source.");
         s.Cold(); s.Continue(); s.Play();
         s.Use("discard", [discard]); s.Play(); s.Accept(new RecastCardCommand(0, recast, s.G.Revision, s.P!.PromptId)); s.Play();
         Need(s.Zone(discard) == CardLocation.DiscardPile && s.Zone(recast) == CardLocation.DiscardPile &&
@@ -99,9 +133,10 @@ internal static class ShanheStartingResourceChecks
         public void Continue() => Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
         public void End() => Accept(new EndPlayPhaseCommand(0, G.Revision, P!.PromptId));
         public void Use(string activation, IReadOnlyList<int>? cards = null, IReadOnlyList<int>? targets = null) => Accept(new UseProgramSkillCommand(0, Driver, activation, cards ?? [], targets ?? [], G.Revision, P!.PromptId));
-        public void Card(int id, IReadOnlyList<int> targets, bool conversion = false)
+        public void Card(int id, IReadOnlyList<int> targets, bool conversion = false, int? targetCardId = null)
         {
-            var a = G.GetHumanLegalActions().First(a => a.CardId == id && (a.ConversionSource is not null) == conversion && a.TargetSeats.SequenceEqual(targets));
+            var a = G.GetHumanLegalActions().First(a => a.CardId == id && (a.ConversionSource is not null) == conversion &&
+                a.TargetSeats.SequenceEqual(targets) && (targetCardId is null || a.TargetCardId == targetCardId));
             Accept(new PlayCardCommand(0, id, targets, G.Revision, P!.PromptId, a.PlayedCardKind, a.TargetCardId) { ConversionSource = a.ConversionSource, AdditionalConversionSources = a.AdditionalConversionSources });
         }
         public void Play() => Until(() => P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
@@ -123,13 +158,15 @@ internal static class ShanheStartingResourceChecks
             var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), registry);
             Need(State(G) == State(restored), "Cold replay retains the exact origin entities, native payment/cleanup/response frame, all views and movement prefix."); G = restored;
         }
-        public static Scene Start(bool contract, bool claim = false)
+        public static Scene Start(bool contract, bool claim = false, IReadOnlyList<ShanheStartingCard>? extra = null,
+            IReadOnlyList<ShanheStartingCard>? enemyEquipment = null)
         {
             var r = ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(true), new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(), new Fixture(claim));
             ShanheStartingCard[] cards = claim ? [new(CardKind.Slash, Suit.Heart, 9)] :
                 [new(CardKind.DrawTwo, Suit.Heart, 1), new(CardKind.Dodge, Suit.Heart, 2), new(CardKind.Dodge, Suit.Spade, 3), new(CardKind.IronChain, Suit.Club, 4), new(CardKind.Peach, Suit.Heart, 5), new(CardKind.Lightning, Suit.Heart, 6)];
-            var setup = new ShanheBattleSetup(83, 1, "fixture:starting-resources", Owner, 20, 0, 0, 0, 0, [], cards,
-                claim ? [] : [new(CardKind.Crossbow, Suit.Spade, 1), new(CardKind.BaguaFormation, Suit.Club, 2)], [new(Enemy) { StartingHand = [new(CardKind.Slash, Suit.Spade, 7)] }], [], new string('a', 64))
+            var setup = new ShanheBattleSetup(83, 1, "fixture:starting-resources", Owner, 20, 0, 0, 0, 0, [], [.. cards, .. (extra ?? [])],
+                claim ? [] : [new(CardKind.Crossbow, Suit.Spade, 1), new(CardKind.BaguaFormation, Suit.Club, 2)],
+                [new(Enemy) { StartingHand = [new(CardKind.Slash, Suit.Spade, 7)], StartingEquipment = enemyEquipment }], [], new string('a', 64))
             { StartingResourcesExpireOnUse = contract };
             var g = GameEngine.CreateStandard(new() { Seed = setup.BattleSeed, PlayerCount = 2, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,
                 ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup, UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 6,
@@ -148,6 +185,7 @@ internal static class ShanheStartingResourceChecks
                 {"id":"fixture:starting-resource-driver","revision":1,"modifiers":[{"id":"slashes","query":"slashLimit","operation":"add","value":8,"priority":0},{"id":"hands","query":"handLimit","operation":"add","value":20,"priority":0}],"activations":[
                   {"id":"discard","minCards":1,"maxCards":1,"sourceZones":["hand"],"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"discardSelected","target":"owner","amount":1}]},
                   {"id":"equip","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"useRandomDeckEquipment","target":"owner","resultBind":"equipped"}]},
+                  {"id":"drain-deck","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"draw","target":"owner","amount":20}]},
                   {"id":"discard-board","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"zones":["equipment"],"count":1,"destination":"discardPile","awaitMovementTriggers":true}]},
                   {"id":"take","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"selectedTarget"},"zones":["hand"],"count":1,"destination":"ownerHand"}]}]},
                 {"id":"fixture:starting-resource-use-watch","revision":1,"triggers":[{"id":"native-use-tail","window":"cardUseCompleted","ownerRelation":"actor","optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"seen","options":[{"id":"continue"}]}]}]},

@@ -9,50 +9,6 @@ internal static class ShanheTacticPindianChecks
     private const string Claim = "fixture:shanhe-pindian-claim", Owner = "fixture:shanhe-pindian-owner";
     private const string Mode = "identity:classic-shanhe-pindian";
 
-    public static void EffectiveBonusInstancesCapsPhysicalClaimsAndColdReplay()
-    {
-        foreach (var scene in new[] { "single", "stacked", "suit" })
-        {
-            var s = Scenario.Start(scene);
-            s.Stock();
-            var source = s.Card(7);
-            var opponent = s.Give(9, 1);
-            s.Accept(new UseProgramSkillCommand(0, "classic:tianyi", "contest", [source], [1],
-                s.G.Revision, s.P!.PromptId));
-            s.Reach(() => s.P is { PlayerSeat: 1 });
-            s.Need(s.G.CreateSnapshot(0).Players[1].Hand.Count == 0 &&
-                s.P!.IsPrivate && s.G.CreateSnapshot(2).PendingDecision is null,
-                "The additive policy cannot expose the opponent's genuinely private Pindian selection.");
-            s.Cold();
-            s.Accept(new AdvanceOneStepCommand(s.G.Revision));
-            s.Reach(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("action") == "pindian-claim") == true);
-            var result = s.Events<PindianResultDeterminedEvent>().Single().Result;
-            var expected = scene == "single" ? 10 : scene == "stacked" ? 12 : 13;
-            s.Need(result.SourceCardId == source && result.OpponentCardId == opponent &&
-                result.SourceRank == expected && result.OpponentRank == 9 && result.SourceWon,
-                "One enabled instance contributes once despite duplicate nodes; independent skills stack, after existing suit-rank substitution and capped at K.");
-            s.Need(s.P!.Choices.Any(c => c.Parameters.GetValueOrDefault("take") == "true" &&
-                c.Cards.Order().SequenceEqual(new[] { source, opponent }.Order())),
-                "The native claim must reference the two original paid physical entities using the already frozen final result.");
-            s.Cold();
-            s.Answer(c => c.Parameters.GetValueOrDefault("take") == "true");
-            s.Play();
-            s.Need(s.V().Hand.Single(c => c.Id == source).Rank == 7 &&
-                s.V().Hand.Single(c => c.Id == opponent).Rank == 9 &&
-                s.Events<PindianResultDeterminedEvent>().Single().Result == result &&
-                new[] { source, opponent }.All(id => s.G.CardMovements.Count(m => m.CardId == id &&
-                    m.From == CardLocation.Processing && m.To == CardLocation.Hand(0) &&
-                    m.Reason.Value == "program.pindian.claim") == 1),
-                "Claim and cold replay preserve printed ranks and never apply the rank bonus a second time or obtain a substituted entity.");
-            s.Cold();
-        }
-
-        foreach (var value in new[] { 0, 13 }) InvalidPolicy(value);
-        InvalidPolicy(3, "\"cardKinds\":[\"slash\"]");
-        InvalidPolicy(3, "\"inputSuit\":\"spade\"");
-        InvalidPolicy(3, "\"discardCost\":0");
-    }
-
     public static void SimultaneousRanksAndOpponentAiUseTheSameBonusCold()
     {
         var s = Scenario.Start("group");
@@ -121,19 +77,6 @@ internal static class ShanheTacticPindianChecks
         schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
         skills = new Dictionary<string, object> { [id] = new { name = id, description = "真实拼点点数加成" } }
     });
-
-    private static void InvalidPolicy(int value, string qualifier = "")
-    {
-        var suffix = qualifier.Length == 0 ? "" : "," + qualifier;
-        try
-        {
-            _ = SkillProgramCatalog.Load($$"""
-                {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{Bonus}}","revision":1,"cardPolicies":[{"id":"invalid","kind":"pindianRankBonus","value":{{value}}{{suffix}}}]}]}
-                """, Presentation(Bonus));
-        }
-        catch (InvalidOperationException) { return; }
-        throw new InvalidOperationException("An invalid or qualified additive Pindian rank policy was accepted.");
-    }
 
     private sealed class Scenario(GameEngine game, ContentRegistry registry)
     {

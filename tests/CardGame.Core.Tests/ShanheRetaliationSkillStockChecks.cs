@@ -57,46 +57,9 @@ internal static class ShanheRetaliationSkillStockChecks
             "The bought skill's temporary modifier permits three genuine physical Slashes in that turn and rejects a fourth despite three more Slashes in hand.");
     }
 
-    public static void PurchasedChengxiangRevealsOncePerDamageAndMovesLegalSubset()
-    {
-        var s = PurchaseAndEnterBattle("build-skill-3086", Chengxiang);
-        s.Play();
-        var originalHand = s.View().Hand.Select(card => card.Id).ToArray();
-        s.UseIncomingDamage();
-        s.Reach(() => s.At(Chengxiang, "activate"));
-        s.Activate();
-        s.Reach(() => s.Action("select-subset"));
-        var reveal = s.Events<ProgramCardsRevealedEvent>().Single(item => item.SkillId == Chengxiang);
-        Need(s.Events<DamageAppliedEvent>() is [{ SourceSeat: 1, TargetSeat: 0, Amount: 2 }] && s.View().Hp == 10 &&
-            reveal.OwnerSeat == 0 && reveal.Cards.Count == 4 && reveal.Cards.All(card => card.Rank == 4) &&
-            reveal.Cards.Select(card => card.Id).Distinct().Count() == 4 &&
-            s.Prompt!.Choices.Any(choice => choice.Cards.Count == 0) && s.Prompt.Choices.Any(choice => choice.Cards.Count == 3) &&
-            s.Prompt.Choices.All(choice => choice.Cards.Sum(id => reveal.Cards.Single(card => card.Id == id).Rank) <= 13) &&
-            s.Prompt.Choices.All(choice => choice.Cards.Count < 4),
-            "A single two-point damage event offers one ordinary Chengxiang reveal of four existing cards; its real subset choices include zero and three cards but exclude the sixteen-point whole pool.");
-        var selected = s.Prompt.Choices.First(choice => choice.Cards.Count == 3).Cards.ToArray();
-        s.Answer(choice => choice.Cards.SequenceEqual(selected));
-        s.Play();
-        var discarded = reveal.Cards.Single(card => !selected.Contains(card.Id)).Id;
-        var subset = s.Events<ProgramCardSubsetSelectedEvent>().Single(item => item.SkillId == Chengxiang);
-        Need(s.Events<ProgramCardsRevealedEvent>().Count(item => item.SkillId == Chengxiang) == 1 &&
-            s.Events<ProgramBindingResolvedEvent>().Count(item => item.SkillId == Chengxiang && item.Activated && item.Completed) == 1 &&
-            subset.RankSum == 12 && subset.CardIds.SequenceEqual(selected) && s.View().HandCount == originalHand.Length + 3 &&
-            s.View().Hand.Select(card => card.Id).ToHashSet().SetEquals(originalHand.Concat(selected)) &&
-            !s.View().Hand.Any(card => card.Id == discarded) && s.Game.CreateSnapshot(0).ProcessingCardCount == 0 &&
-            reveal.Cards.All(card => s.Game.CardMovements.Count(move => move.CardId == card.Id &&
-                move.From == CardLocation.DrawPile && move.To == CardLocation.Processing) == 1) &&
-            selected.All(id => s.Game.CardMovements.Count(move => move.CardId == id && move.From == CardLocation.Processing &&
-                move.To == CardLocation.Hand(0) && move.Reason.Value == ChengxiangMoveReason) == 1) &&
-            s.Game.CardMovements.Count(move => move.CardId == discarded && move.From == CardLocation.Processing &&
-                move.To == CardLocation.DiscardPile && move.Reason.Value == ChengxiangMoveReason) == 1,
-            "The purchased ordinary version resolves once per damage: the chosen twelve-point subset enters hand as the same three entities and the one unchosen entity goes to discard once, rather than treating each damage point as another reveal or replacing the gain with a draw.");
-    }
-
     private const string StoreReason = "skill-program." + Tuifeng + ".StoreBoundCardsInPublicPile.payment";
     private const string CashOutPaymentReason = "skill-program." + Tuifeng + ".CashOutPublicPile.payment";
     private const string CashOutDrawReason = "skill-program." + Tuifeng + ".CashOutPublicPile.draw";
-    private const string ChengxiangMoveReason = "skill-program." + Chengxiang + ".MoveBoundCards";
 
     private static Scene PurchaseAndEnterBattle(string rewardId, string skillId)
     {

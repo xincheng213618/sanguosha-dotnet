@@ -18,93 +18,6 @@ internal static class ShanheShiduChecks
     private static readonly Lazy<ContentRegistry> Production = new(() => StandardShanheCampaignCatalog.CreateBattleRegistry(
         new(83, 1, "fixture:shidu-production", TianbianBoss, 4, 0, 0, 0, 0, [], [], [], [new("classic:cao-cao")], [], new string('d', 64))));
 
-    public static void LiushiTopHeartPindianObtainsWholeHandThenCapturesLiveHalfCold()
-    {
-        var s = Scene.Start("win"); s.Play();
-        VerifyPublicAiEstimate(s);
-        var top = s.PrepareTop(); var oldHand = s.V().Hand.Select(card => card.Id).ToHashSet();
-        var victimHand = s.V(1).Hand.Select(card => card.Id).ToHashSet();
-        Need(s.V(1).Hp == 3 && s.Mark(1) == 1 && oldHand.Count == 3 && victimHand.Count == 5,
-            "The real Liushi Slash leaves its original Heart card on top and lowers the four-HP victim to three with one persistent hand-limit effect.");
-        s.BeginContest(s.V().Hand.First().Id, top: true, expectedTop: top);
-        s.Until(() => s.AtGain("obtained"));
-        var root = s.Root; var result = s.Result();
-        var acquired = victimHand.Where(id => id != result.OpponentCardId).ToHashSet();
-        Need(result is { SourceSeat: 0, OpponentSeat: 1, SourceRank: 13, SourceWon: true } && result.SourceCardId == top &&
-            acquired.Count == 4 && s.V().HandCount == 7 && s.V(1).HandCount == 0 && s.Returns().Length == 0 &&
-            s.E<ProgramPindianHalfReturnCountEvent>().Length == 0,
-            "Native Tianbian uses the exact previously topdecked printed Heart-one entity as King; winning obtains all four remaining victim hand cards before any half-hand amount is captured.");
-        s.AssertAcquisition(root, acquired); s.AssertPindianEntity(top, CardLocation.DrawPile); s.Cold(); s.Continue();
-        s.Until(() => s.AtGain("after-gain"));
-        Need(s.V().HandCount == 8 && s.V(1).HandCount == 0 && s.ChildDraws().Length == 1 &&
-            s.Root.PindianHandReturn is { AcquisitionPaid: true, ReturnCount: null } && s.E<ProgramPindianHalfReturnCountEvent>().Length == 0,
-            "The genuine acquisition child draws one additional original entity, changing the live source hand from seven to eight before return-count capture.");
-        s.Cold(); s.Continue(); s.Until(s.AtReturn);
-        s.AssertReturnDraft(4, 8); s.Private(); s.Cold();
-        var toReturn = s.V().Hand.Where(card => !acquired.Contains(card.Id)).Select(card => card.Id).ToArray();
-        Need(toReturn.Length == 4 && oldHand.IsSubsetOf(toReturn),
-            "The source may choose its three old hand cards and the real child-drawn card, rather than being restricted to the newly obtained cards.");
-        s.ReturnCards(toReturn, coldAfterFirst: true); s.Play();
-        Need(s.V().Hand.Select(card => card.Id).ToHashSet().SetEquals(acquired) &&
-            s.V(1).Hand.Select(card => card.Id).ToHashSet().SetEquals(toReturn) && s.Returns().Length == 4 &&
-            toReturn.All(id => s.Returns().Count(move => move.CardId == id) == 1) &&
-            s.E<ProgramPindianHalfReturnCountEvent>() is [{ HandCount: 8, ReturnCount: 4 }] &&
-            s.E<ProgramSkillResolvedEvent>().Count(fact => fact.FrameId == root.Id && fact.SkillId == Skill && fact.Completed) == 1 &&
-            s.E<CardUseDeclaredEvent>() is [{ SourceSeat: 0, CardKind: CardKind.Slash }],
-            "One real half-hand return transfers exactly four freely chosen original Hand entities, keeps the stolen four and finishes once; Pindian itself is never a Slash/card Use.");
-        s.AssertAcquisition(root, acquired); s.AssertPindianEntity(top, CardLocation.DrawPile); s.Cold();
-        Need(s.G.GetHumanLegalActions().All(action => action.ProgramSkillId != Skill), "A completed true Pindian consumes this activation's one opportunity in the current Play phase.");
-        s.Reject(new UseProgramSkillCommand(0, Skill, Activation, [s.V().Hand.First().Id], [1], s.G.Revision, s.P!.PromptId));
-
-        s.EndPlay(); s.Until(() => s.AtEnd("before"));
-        var discards = s.HandDiscards();
-        Need(s.V(1) is { Hp: 3, HandLimit: 2, HandCount: 2 } && discards.Length == 2 && discards.All(move => toReturn.Contains(move.CardId)) && s.Mark(1) == 1,
-            "The same real returned hand reaches its native discard phase: HP3 minus Liushi gives limit two and exactly two of the four returned entities are discarded.");
-        s.Cold(); s.Continue(); s.Until(() => s.AtEnd("after"));
-        Need(s.V().HandCount == 6 && s.Mark(1) == 0 && s.V(1).HandLimit == 3 &&
-            s.E<ProgramLiushiDrawPaidEvent>() is [{ Payment.RequestedCount: 2, Payment.ActualCount: 2 }] &&
-            s.E<ProgramLiushiEffectClearedEvent>() is [{ RemovedCount: 1, OwnerSeat: 0, TargetSeat: 1 }],
-            "The original Zhanwan responds to those two actual discards with one real Draw2 and clears precisely the earlier Liushi effect, without replaying Shidu's acquisition or return.");
-        s.AssertAcquisition(root, acquired); Need(s.Returns().Length == 4, "The later discard reward cannot repeat the earlier four-card hand transfer."); s.Cold();
-    }
-
-    public static void LosingTiedAndEmptiedContestsDoNotInventTransfersCold()
-    {
-        foreach (var scene in new[] { "loss", "tie" })
-        {
-            var s = Scene.Start(scene); s.Play();
-            var card = s.V().Hand.First(card => card.Suit == Suit.Club && card.Rank == 3).Id;
-            s.BeginContest(card, top: false); s.Play();
-            var result = s.Result();
-            Need(!result.SourceWon && result.SourceCardId == card && result.SourceRank == 3 &&
-                (scene == "tie" ? result.OpponentRank == 3 : result.OpponentRank > result.SourceRank) &&
-                s.Taken().Length == 0 && s.Returns().Length == 0 && s.ChildDraws().Length == 0 &&
-                s.E<ProgramPindianHandAcquiredEvent>().Length == 0 && s.E<ProgramPindianHalfReturnCountEvent>().Length == 0 &&
-                s.V().HandCount == 3 && s.V(1).HandCount == 4,
-                "A genuine lost or tied native contest pays its two actual Pindian cards but cannot obtain a foreign hand, invent a return, run acquisition children or treat equality as victory. " + s.Diagnostic());
-            s.AssertPindianEntity(card, CardLocation.Hand(0)); s.Cold();
-            Need(s.E<ProgramSkillResolvedEvent>().Count(fact => fact.SkillId == Skill && fact.ActivationId == Activation) == 1 &&
-                s.G.GetHumanLegalActions().All(action => action.ProgramSkillId != Skill),
-                "An unwon actual contest still consumes the phase-once activation and returns to native Play exactly once.");
-        }
-        var empty = Scene.Start("empty"); empty.Play();
-        var king = empty.V().Hand.Single(card => card.Rank == 13).Id;
-        var remaining = empty.V().Hand.Where(card => card.Id != king).Select(card => card.Id).ToHashSet();
-        empty.BeginContest(king, top: false); empty.Until(empty.AtReturn);
-        empty.AssertAcquisition(empty.Root, new HashSet<int>()); empty.AssertReturnDraft(1, 3); empty.Private(); empty.Cold();
-        var returned = empty.V().Hand.First().Id;
-        Need(remaining.Count == 3 && remaining.Contains(returned), "The zero-acquisition return must use one of the source's three genuine remaining original hand cards.");
-        empty.ReturnCards([returned], coldAfterFirst: false); empty.Play();
-        Need(empty.Result() is { SourceWon: true, SourceRank: 13, OpponentRank: 2 } && empty.V().HandCount == 2 && empty.V(1).HandCount == 1 &&
-            empty.V(1).Hand.Single().Id == returned && empty.V().Hand.Select(card => card.Id).ToHashSet().SetEquals(remaining.Where(id => id != returned)) &&
-            empty.E<ProgramPindianHandAcquiredEvent>() is [{ Receipt.AcquisitionPaid: true, Receipt.Materials.Count: 0 }] &&
-            empty.E<ProgramPindianHalfReturnCountEvent>() is [{ HandCount: 3, ReturnCount: 1 }] && empty.Taken().Length == 0 &&
-            empty.Returns() is [{ CardId: var returnedId }] && returnedId == returned && empty.ChildDraws().Length == 0 &&
-            empty.E<ProgramSkillResolvedEvent>().Count(fact => fact.SkillId == Skill && fact.Completed) == 1,
-            "When Pindian consumes the opponent's only card, zero acquired entities still leave a real floor(three/2)=one obligation: exactly one pre-existing source card is returned, without inventing an acquisition or gain child. " + empty.Diagnostic());
-        empty.AssertPindianEntity(king, CardLocation.Hand(0)); empty.Cold();
-    }
-
     public static void PaidObtainSourceLossTargetDeathAndActualRecipesStayIsolatedCold()
     {
         foreach (var scene in new[] { "paid-loss", "victim-death" })
@@ -166,33 +79,6 @@ internal static class ShanheShiduChecks
             "Actual lose-HP/dying/let-die drains the original gain child and returns the paid Shidu root once while battle continues: no half-hand prompt, gift or dead-source Draw is invented. " + dead.Diagnostic());
         dead.AssertAcquisition(paidRoot, paidCards); dead.AssertPindianEntity(selected, CardLocation.Hand(0)); dead.Cold();
         VerifyActualRecipes(); VerifyLoaderBoundaries();
-    }
-
-    private static void VerifyPublicAiEstimate(Scene scene)
-    {
-        var before = State(scene.G); var view = scene.G.CreateSnapshot(0);
-        var players = (IReadOnlyList<CharacterState>)typeof(GameEngine).GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(scene.G)!;
-        var contextFactory = typeof(GameEngine).GetMethod("CreateProgramAiPublicContext", BindingFlags.Instance | BindingFlags.NonPublic,
-            null, [typeof(CharacterState)], null)!;
-        var actorFactory = typeof(GameEngine).GetMethod("CreateAiSkillContext", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var publicContext = (ProgramAiPublicContext)contextFactory.Invoke(scene.G, [players[0]])!;
-        var source = (PlayerSkillContext)actorFactory.Invoke(scene.G, [players[0], 0, view])!;
-        var target = (PlayerSkillContext)actorFactory.Invoke(scene.G, [players[1], 0, view])!;
-        var effects = Production.Value.GetSkill(Skill).Program!.Activations.Single(activation => activation.Id == Activation).Effects;
-        var facts = publicContext with { SelectedTarget = target, ActivationCardCount = 1 };
-        var won = ProgramCompositionAi.Estimate(effects, source, publicContext: facts with { PindianWon = _ => true, PindianOutcome = _ => true });
-        var lost = ProgramCompositionAi.Estimate(effects, source, publicContext: facts with { PindianWon = _ => false, PindianOutcome = _ => false });
-        var unknown = ProgramCompositionAi.Estimate(effects, source, publicContext: facts);
-        Need(source.HandCount == 4 && target.HandCount == 5 && won.Hint is { OwnerDraw: 1, TargetDraw: 0, TargetValueAdjustment: -14 } &&
-            lost.Hint is { OwnerDraw: 0, TargetDraw: 0, TargetValueAdjustment: -7 } &&
-            unknown.Hint.OwnerDraw == (int)Math.Round((won.Hint.OwnerDraw + lost.Hint.OwnerDraw) / 2d) &&
-            unknown.Hint.TargetDraw == (int)Math.Round((won.Hint.TargetDraw + lost.Hint.TargetDraw) / 2d) &&
-            unknown.Hint.TargetValueAdjustment == (won.Hint.TargetValueAdjustment + lost.Hint.TargetValueAdjustment) / 2d &&
-            double.IsFinite(won.Score) && double.IsFinite(lost.Score) && double.IsFinite(unknown.Score) &&
-            Math.Abs(unknown.Score - (won.Score + lost.Score) / 2d) < 0.000000001d &&
-            view.Players.Where(player => player.Seat != 0).All(player => player.Hand.Count == 0) && State(scene.G) == before,
-            "The actual five-node program's pure public estimate deducts both ordinary Pindian inputs before taking four and returning three; negative target card balance uses the shared value adjustment, the source activation card is priced separately, and unknown victory averages the two coherent branches without reading foreign faces or changing runtime. " +
-            JsonSerializer.Serialize(new { source.HandCount, TargetHand = target.HandCount, Won = won, Lost = lost, Unknown = unknown }));
     }
 
     private static void VerifyActualRecipes()

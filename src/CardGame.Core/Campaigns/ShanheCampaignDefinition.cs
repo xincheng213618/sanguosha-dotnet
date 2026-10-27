@@ -114,7 +114,7 @@ public sealed record ShanheBattleSetup(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool RebirthAvailable { get; init; }
 
-    /// <summary>Initial cards and equipment enter hand and leave play instead of their ordinary post-use discard.</summary>
+    /// <summary>Initial hand resources leave play instead of their ordinary post-use discard. Starting equipment is installed directly.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool StartingResourcesExpireOnUse { get; init; }
 
@@ -124,7 +124,12 @@ public sealed record ShanheBattleSetup(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ShanheBattleMarketSetup? MarketSetup { get; init; }
 
-    public int BattleSeed => DeriveSeed(RunSeed, NodeId, EncounterOrdinal);
+    /// <summary>Zero preserves historical recipes; each issued challenge owns a new deterministic shuffle.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int AttemptNumber { get; init; }
+
+    public int BattleSeed => AttemptNumber == 0 ? DeriveSeed(RunSeed, NodeId, EncounterOrdinal)
+        : DeriveSeed(DeriveSeed(RunSeed, NodeId, EncounterOrdinal), "challenge", AttemptNumber);
 
     public static bool ValueEquals(ShanheBattleSetup? left, ShanheBattleSetup? right) =>
         left is null || right is null ? left is null && right is null :
@@ -133,6 +138,7 @@ public sealed record ShanheBattleSetup(
     public static ShanheBattleSetup Freeze(ShanheBattleSetup setup)
     {
         ArgumentNullException.ThrowIfNull(setup);
+        if (setup.AttemptNumber < 0) throw new ArgumentException("A battle attempt cannot be negative.", nameof(setup));
         if (setup.ExtraSkillSlots is < 0 or > 8)
             throw new ArgumentException("Campaign extra skill capacity must be between zero and eight.", nameof(setup));
         if (setup.SourceDifficultyId is < 1 or > 25) throw new ArgumentException("Unknown source battle difficulty.", nameof(setup));
@@ -284,12 +290,18 @@ public sealed record ShanheNodeDefinition(
     /// <summary>Choose a reward category before revealing its frozen candidate offer.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool CategorizedRewards { get; init; }
+    /// <summary>The location's seed determines its reward category before the battle.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool AutomaticRewardCategory { get; init; }
     /// <summary>Base tactic-offer quality; zero retains unrestricted historical sampling. Promotions use the full reward pool.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int PrimaryTacticRarity { get; init; }
     /// <summary>Base skill-offer quality; zero retains unrestricted historical sampling.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int PrimarySkillRarity { get; init; }
+    /// <summary>Base card/equipment-offer quality; zero retains unrestricted historical sampling.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int PrimaryCardRarity { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int ChapterNumber { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -320,6 +332,11 @@ public sealed partial record ShanheCampaignDefinition(
     public string VictoryText { get; init; } = "";
     public string DefeatText { get; init; } = "";
     public bool RandomStartingNode { get; init; }
+    /// <summary>Retains unlocked, unvisited locations until the expedition advances to the next chapter.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool AllowChapterDetours { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ShanheShopRarityPolicy? ShopRarityPolicy { get; init; }
     /// <summary>Applies the initial-resource contract to every battle in this expedition; false preserves legacy recipes.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool StartingResourcesExpireOnUse { get; init; }

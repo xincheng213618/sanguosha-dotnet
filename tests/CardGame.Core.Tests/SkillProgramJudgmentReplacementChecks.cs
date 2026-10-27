@@ -120,7 +120,6 @@ internal static class SkillProgramJudgmentReplacementChecks
         AssertAiReplacementAndReplay(registry);
     }
 
-
     private static (GameEngine Game, int EquipmentId) FindBoundary(ContentRegistry registry)
     {
         for (var seed = 1; seed <= 512; seed++)
@@ -337,56 +336,6 @@ internal static class SkillProgramJudgmentReplacementChecks
         }
     }
 
-    private sealed class BaguaFixturePackage : IGameContentPackage
-    {
-        internal const string ModeId = "identity:program-guidao-bagua-5";
-        internal const string OwnerGeneralId = "program-guidao-bagua:owner";
-        private const string SkillId = "program-guidao-bagua:guidao";
-        private static readonly string[] OtherGeneralIds =
-            Enumerable.Range(1, 4).Select(index => $"program-guidao-bagua:other-{index}").ToArray();
-
-        public PackageManifest Manifest { get; } = new(
-            "program-guidao-bagua-fixture", new Version(1, 0, 0),
-            [new PackageDependency("standard", new Version(1, 11, 0))]);
-
-        public void Register(IContentRegistryBuilder builder)
-        {
-            var catalog = SkillProgramCatalog.Load(BaguaRules, BaguaPresentation);
-            builder.AddSkill(new ContentSkillDefinition(SkillId, "鬼道来源装备测试", "以黑色牌替换判定牌。")
-            {
-                Program = catalog.Programs[SkillId]
-            });
-            builder.AddGeneral(new ContentGeneralDefinition(
-                OwnerGeneralId, "鬼道八卦测试", "zhang_jiao", SkillId, "qun", BaseHp: 4));
-            foreach (var id in OtherGeneralIds)
-                builder.AddGeneral(new ContentGeneralDefinition(
-                    id, "八卦陪测", "cao_cao", "standard:none", "wei", BaseHp: 4));
-            var physicalCards = Enumerable.Range(0, 40).SelectMany(_ => new[]
-            {
-                new ContentDeckPhysicalCard("standard:bagua", Suit.Spade, 2),
-                new ContentDeckPhysicalCard("standard:slash", Suit.Club, 7),
-                new ContentDeckPhysicalCard("standard:slash", Suit.Spade, 9)
-            }).ToArray();
-            builder.AddDeck(new ContentDeckRecipe(
-                "program-guidao-bagua:deck", "鬼道八卦来源装备夹具", 4, 2, [])
-            {
-                PhysicalCards = physicalCards
-            });
-            builder.AddMode(new ContentModeDefinition(
-                ModeId, "鬼道八卦来源装备测试", 5, 5,
-                new Dictionary<string, int>
-                {
-                    [nameof(Role.Lord)] = 1,
-                    [nameof(Role.Loyalist)] = 1,
-                    [nameof(Role.Rebel)] = 2,
-                    [nameof(Role.Renegade)] = 1
-                },
-                DeckId: "program-guidao-bagua:deck",
-                GeneralCandidateCount: 5,
-                GeneralPoolIds: [OwnerGeneralId, .. OtherGeneralIds]));
-        }
-    }
-
     private static void Require(bool condition, string message)
     {
         if (!condition) throw new InvalidOperationException(message);
@@ -415,51 +364,10 @@ internal static class SkillProgramJudgmentReplacementChecks
         ]}
         """;
 
-    private const string InvalidOrderV4 = """
-        {"schemaVersion":62,"skills":[{"id":"invalid:order","revision":1,"triggers":[{
-          "id":"replace","window":"judgmentReplacing","subject":"owner","excludedReasons":[],
-          "optional":true,"effects":[
-            {"op":"draw","target":"owner","amount":1,"replacementSuits":["spade"],
-             "minimumReplacementRank":2,"maximumReplacementRank":9},
-            {"op":"replaceJudgment","target":"owner","zones":["hand"],"suits":["spade"],
-             "oldCardDestination":"discardPile"}
-          ]}]}]}
-        """;
-
-    private const string InvalidFollowUpV4 = """
-        {"schemaVersion":62,"skills":[{"id":"invalid:follow-up","revision":1,"triggers":[{
-          "id":"replace","window":"judgmentReplacing","subject":"owner","excludedReasons":[],
-          "optional":true,"effects":[
-            {"op":"replaceJudgment","target":"owner","zones":["hand"],"suits":["spade"],
-             "oldCardDestination":"discardPile"},
-            {"op":"obtainOpponentHandCard","target":"owner","amount":1}
-          ]}]}]}
-        """;
-
     private const string Presentation = """
         {"schemaVersion":3,"skills":{
           "judgment-replace-test:both":{
             "name":"改判交换测试","description":"测试旧判定牌去向与提交牌条件效果。"
-          }
-        }}
-        """;
-
-    private const string BaguaRules = """
-        {"schemaVersion":62,"skills":[
-          {"id":"program-guidao-bagua:guidao","revision":1,"triggers":[
-            {"id":"replace","window":"judgmentReplacing","subject":"any","excludedReasons":[],
-             "optional":true,"effects":[
-              {"op":"replaceJudgment","target":"owner","zones":["hand","equipment"],
-               "suits":["spade","club"],"oldCardDestination":"ownerHand"}
-             ]}
-          ]}
-        ]}
-        """;
-
-    private const string BaguaPresentation = """
-        {"schemaVersion":3,"skills":{
-          "program-guidao-bagua:guidao":{
-            "name":"鬼道来源装备测试","description":"以黑色牌替换判定牌。"
           }
         }}
         """;

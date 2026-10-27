@@ -38,7 +38,7 @@ internal static class MultiTargetSlashUiChecks
                 // A one-target use remains optional even when the same card can hit more people.
                 foreach (var targetCount in new[] { 1, scenario.Material == "halberd" ? 3 : 2 })
                 {
-                    model.LoadManualGameCommand.Execute(null);
+                    LegacySaveFixtures.Load(model);
                     Program.Assert(!model.HasSaveError, model.SaveStatus);
                     var game = Program.Engine(model);
                     var action = game.GetHumanLegalActions().First(item => item.Kind == LegalActionKind.Slash &&

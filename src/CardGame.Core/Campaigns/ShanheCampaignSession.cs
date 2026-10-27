@@ -21,6 +21,7 @@ public sealed partial class ShanheCampaignSession
     private RunState _state;
     private ShanheCampaignSnapshot _snapshot;
     private bool _submitting;
+    private bool _replayingJournal;
 
     public ShanheCampaignDefinition Definition { get; }
     public string ContentHash { get; }
@@ -39,6 +40,7 @@ public sealed partial class ShanheCampaignSession
         public int Gold { get; init; }
         public int ExtraSkillSlots { get; init; }
         public bool RebirthUsed { get; init; }
+        public bool EndedByPlayer { get; init; }
         public ShanheTacticBonuses Bonuses { get; init; } = new();
         public IReadOnlyList<string> ExtraSkillIds { get; init; } = Array.Empty<string>();
         public IReadOnlyList<string> TacticIds { get; init; } = Array.Empty<string>();
@@ -66,7 +68,7 @@ public sealed partial class ShanheCampaignSession
     }
 
     private ShanheCampaignSession(ShanheCampaignDefinition definition, ShanheCampaignOptions options,
-        Func<ShanheBattleSetup, ContentRegistry> battleRegistryFactory)
+        Func<ShanheBattleSetup, ContentRegistry> battleRegistryFactory, string? savedCampaignHash = null)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(battleRegistryFactory);
@@ -75,7 +77,10 @@ public sealed partial class ShanheCampaignSession
         Definition = ShanheCampaignContent.FreezeAndValidate(definition);
         Require(options.SourceDifficultyId == Definition.SourceDifficultyId,
             "The selected source difficulty must match the authored campaign recipe.");
-        ContentHash = ShanheCampaignContent.GetContentHash(Definition);
+        // Existing battle journals retain their expedition identity. Changes to
+        // current map/shop descriptions are checked by command replay, not a
+        // whole-definition fingerprint gate.
+        ContentHash = savedCampaignHash ?? ShanheCampaignContent.GetContentHash(Definition);
         ShanheCampaignContent.Require(Definition.PlayerGeneralIds.Contains(options.PlayerGeneralId, StringComparer.Ordinal), "The selected general is not available in this campaign.");
         _options = options with { };
         _battleRegistryFactory = battleRegistryFactory;
@@ -176,17 +181,23 @@ public sealed partial class ShanheCampaignSession
             checkpoint.Commands is null || checkpoint.Commands.Count > MaximumCommands ||
             checkpoint.Revision != checkpoint.Commands.Count || checkpoint.Revision < 0)
             throw new ArgumentException("Campaign checkpoint metadata is invalid.", nameof(checkpoint));
-        var session = Create(definition, checkpoint.Options, battleRegistryFactory);
+        ShanheCampaignContent.Require(checkpoint.CampaignHash is { Length: 64 } && checkpoint.CampaignHash.All(Uri.IsHexDigit),
+            "Campaign checkpoint fingerprint metadata is invalid.");
+        var session = new ShanheCampaignSession(definition, checkpoint.Options, battleRegistryFactory, checkpoint.CampaignHash);
         if (!string.Equals(checkpoint.CampaignId, session.Definition.Id, StringComparison.Ordinal) ||
-            !string.Equals(checkpoint.CampaignHash, session.ContentHash, StringComparison.Ordinal) ||
             !string.Equals(checkpoint.TacticAcquisitionHash, session.TacticAcquisitionHash, StringComparison.Ordinal) ||
             (checkpoint.PlayerGeneralIds is { } savedRoster && !savedRoster.SequenceEqual(session.Definition.PlayerGeneralIds, StringComparer.Ordinal)))
             throw new ArgumentException("Campaign checkpoint content fingerprint does not match.", nameof(checkpoint));
-        foreach (var command in checkpoint.Commands)
+        session._replayingJournal = true;
+        try
         {
-            var result = session.Submit(command);
-            if (!result.Accepted) throw new InvalidOperationException($"Campaign replay command {session.Revision} was rejected: {result.Error}");
+            foreach (var command in checkpoint.Commands)
+            {
+                var result = session.Submit(command);
+                if (!result.Accepted) throw new InvalidOperationException($"Campaign replay command {session.Revision} was rejected: {result.Error}");
+            }
         }
+        finally { session._replayingJournal = false; }
         return session;
     }
 
@@ -238,6 +249,15 @@ public sealed partial class ShanheCampaignSession
                 BuyShanheMarketItemCommand purchase => PreparePersistentMarketPurchase(_state, purchase.ChoiceId, purchase.ReplaceSkillId),
                 RefreshShanheShopCommand => HasPersistentMarket ? RefreshPersistentMarket(_state) : RefreshShop(_state),
                 CompleteShanheBattleCommand battle => CompleteBattle(battle),
+                BeginShanheBattleAttemptCommand => BeginBattleAttempt(),
+                EndShanheExpeditionCommand => ClearPrimaryRewardState(_state) with
+                {
+                    Phase = ShanheCampaignPhase.Lost, EndedByPlayer = true,
+                    AvailableNodeIds = [], BattleSetup = null, BattleProfileNodeId = null,
+                    BossRewardGroups = [], PendingBonusRewardGroups = [],
+                    OpeningDraftTacticIds = [], OpeningSkillOfferIds = [], OpeningResumeNodeIds = [],
+                    StoryEventId = null, StoryChoices = []
+                },
                 _ => throw new ArgumentException("Unsupported campaign command.")
             };
             next = EnsurePersistentMarket(next);
@@ -271,7 +291,9 @@ public sealed partial class ShanheCampaignSession
 
     private ShanheEncounterDefinition SelectEncounter(ShanheNodeDefinition node, int ordinal)
     {
-        var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, node.Id, ordinal));
+        // A detour changes battle order, not the story already previewed at a location.
+        var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, node.Id,
+            Definition.AllowChapterDetours ? 1 : ordinal));
         return node.Encounters![random.Next(node.Encounters.Count)];
     }
 
@@ -340,6 +362,15 @@ public sealed partial class ShanheCampaignSession
         return state with { Phase = ShanheCampaignPhase.Battle, EncounterOrdinal = ordinal, EncounterId = encounter.Id, BattleSetup = setup };
     }
 
+    private RunState BeginBattleAttempt()
+    {
+        Require(_state.Phase == ShanheCampaignPhase.Battle && _state.BattleSetup is not null,
+            "There is no pending encounter to challenge.");
+        var setup = _state.BattleSetup!;
+        return _state with { BattleSetup = ShanheBattleSetup.Freeze(setup with
+            { AttemptNumber = checked(setup.AttemptNumber + 1) }) };
+    }
+
     private RunState CompleteBattle(CompleteShanheBattleCommand command)
     {
         Require(_state.Phase == ShanheCampaignPhase.Battle && _state.BattleSetup is not null, "There is no pending campaign battle.");
@@ -347,11 +378,21 @@ public sealed partial class ShanheCampaignSession
         var checkpoint = GameCheckpointJson.Deserialize(command.CheckpointJson);
         var setup = _state.BattleSetup!;
         var battleOptions = checkpoint.Options ?? throw new ArgumentException("The battle checkpoint has no setup options.");
+        var recordedSetup = battleOptions.ShanheBattle;
         Require(battleOptions.HumanSeat == 0 &&
             battleOptions.PlayerCount == 1 + setup.EnemyRoster.Count + setup.AllyRoster.Count &&
             battleOptions.Seed == setup.BattleSeed && checkpoint.ModeId == ShanheBattleSetup.BattleModeId &&
             battleOptions.ModeId == ShanheBattleSetup.BattleModeId &&
-            ShanheBattleSetup.ValueEquals(battleOptions.ShanheBattle, setup), "The battle belongs to a different encounter or expedition.");
+            recordedSetup is not null && recordedSetup.RunSeed == setup.RunSeed &&
+            recordedSetup.NodeId == setup.NodeId && recordedSetup.EncounterOrdinal == setup.EncounterOrdinal &&
+            recordedSetup.AttemptNumber == setup.AttemptNumber && recordedSetup.PlayerGeneralId == setup.PlayerGeneralId &&
+            recordedSetup.CampaignHash == setup.CampaignHash &&
+            (_replayingJournal || ShanheBattleSetup.ValueEquals(recordedSetup, setup)),
+            "The battle belongs to a different encounter or expedition.");
+        // A completed match carries its actual market inputs. Replaying those
+        // inputs validates payment and card movements; later map/shop metadata
+        // must not rewrite the recorded match before that validation.
+        setup = recordedSetup!;
         Require(checkpoint.Commands is { Count: <= 100_000 }, "The battle checkpoint has too many commands.");
         var registry = _battleRegistryFactory(setup) ?? throw new InvalidOperationException("The battle registry factory returned null.");
         Require(battleOptions.DeckId is null || battleOptions.DeckId == registry.Modes[ShanheBattleSetup.BattleModeId].DeckId,
@@ -370,7 +411,7 @@ public sealed partial class ShanheCampaignSession
         {
             var transfer = battle.CreateShanheMarketTransfer();
             Require(transfer is not null, "The independently replayed battle lost its persistent market.");
-            completedMarket = ReadMarketTransfer(_state, transfer!);
+            completedMarket = ReadMarketTransfer(_state, transfer!, setup.MarketSetup);
         }
         // Character skills may change maximum health within this battle. Only campaign
         // tactic bonuses persist between encounters; remaining health is capped at that
@@ -400,18 +441,29 @@ public sealed partial class ShanheCampaignSession
         // Completing the final encounter ends the expedition immediately. It must
         // not fall through to ordinary battle loot after its boss bundle is gone.
         if (node.NextNodeIds.Count == 0 && node.ChapterNumber >= 3) return FinishNode(state);
+        return BeginBattlePrimaryRewards(state, node);
+    }
+
+    private RunState BeginBattlePrimaryRewards(RunState state, ShanheNodeDefinition node)
+    {
         state = state with { PendingBonusRewardGroups = BuildBonusRewardGroups(state, node) };
         if (node.BossRewards is not null) return PromoteBattlePrimaryRewards(BeginBossRewards(state, node), node);
         var rewards = (node.RewardIds ?? []).Where(id => IsPrimaryRewardRarity(node, _rewards[id]) && (node.IsStoryBattle
             ? CanApplyBossReward(state, _rewards[id]) : CanReceiveReward(state, _rewards[id]))).ToList();
+        var automaticCategory = AutomaticRewardCategory(node);
+        if (automaticCategory is { } automatic)
+            rewards = rewards.Where(id => RewardCategory(_rewards[id]) == automatic)
+                .DistinctBy(id => RewardAcquisitionIdentity(_rewards[id])).ToList();
         if (rewards.Count == 0) return BeginPendingBonusRewardsOrFinish(state);
-        if (node.CategorizedRewards) return PromoteBattlePrimaryRewards(BeginCategorizedRewards(state, node, rewards), node);
+        if (node.CategorizedRewards && !node.AutomaticRewardCategory)
+            return PromoteBattlePrimaryRewards(BeginCategorizedRewards(state, node, rewards), node);
         var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, node.Id + ":rewards", state.EncounterOrdinal));
         random.Shuffle(rewards);
         return PromoteBattlePrimaryRewards(state with
         {
             Phase = ShanheCampaignPhase.Reward,
-            RewardOfferIds = ShanheCampaignContent.Freeze(rewards.Take(node.RewardChoiceCount))
+            RewardOfferIds = ShanheCampaignContent.Freeze(rewards.Take(automaticCategory is { } category
+                ? CategorizedRewardChoiceCount(state, category, node.RewardChoiceCount) : node.RewardChoiceCount))
         }, node);
     }
 
@@ -549,11 +601,20 @@ public sealed partial class ShanheCampaignSession
     {
         var node = _nodes[state.CurrentNodeId!];
         var nextNodes = ResolveVisibleNodeIds(node.NextNodeIds);
+        var completed = ShanheCampaignContent.Freeze(state.CompletedNodeIds.Append(node.Id));
+        if (Definition.AllowChapterDetours && nextNodes.Count > 0)
+        {
+            var chapter = nextNodes.Min(id => _nodes[id].ChapterNumber);
+            var visited = completed.ToHashSet(StringComparer.Ordinal);
+            var unlocked = Definition.StartingNodeIds.Concat(completed.SelectMany(id => _nodes[id].NextNodeIds));
+            nextNodes = ShanheCampaignContent.Freeze(ResolveVisibleNodeIds(unlocked)
+                .Where(id => _nodes[id].ChapterNumber == chapter && !visited.Contains(id)));
+        }
         return ClearPrimaryRewardState(state) with
         {
             Phase = nextNodes.Count == 0 ? ShanheCampaignPhase.Won : ShanheCampaignPhase.Map,
             AvailableNodeIds = nextNodes, BossRewardGroups = [], PendingBonusRewardGroups = [], BattleSetup = null, BattleProfileNodeId = null,
-            CompletedNodeIds = ShanheCampaignContent.Freeze(state.CompletedNodeIds.Append(node.Id))
+            CompletedNodeIds = completed
         };
     }
 
@@ -579,6 +640,7 @@ public sealed partial class ShanheCampaignSession
                 : Definition.IntroText,
             state.Phase == ShanheCampaignPhase.Won ?
                 state.CurrentNodeId is { } endingNode && !string.IsNullOrEmpty(_nodes[endingNode].VictoryText) ? _nodes[endingNode].VictoryText : Definition.VictoryText
+                : state.EndedByPlayer ? "已主动结束本次征程，可重新选将出征。"
                 : state.Phase == ShanheCampaignPhase.Lost ? Definition.DefeatText : "")
         {
             CurrentBattleNode = CurrentBattleNode(state),
@@ -719,7 +781,7 @@ public sealed partial class ShanheCampaignSession
             random.Shuffle(candidates);
             // Prefer new faces on refresh when the real catalogue has enough stock.
             if (state.ShopRefreshCount > 0) candidates = candidates.OrderBy(reward => previous.Contains(reward.Id)).ToList();
-            foreach (var reward in candidates.Take(checked(5 + ExtraShopStock(state))))
+            foreach (var reward in SelectShopStockRewards(state, node, candidates, checked(5 + ExtraShopStock(state)), random))
             {
                 var authored = node.Choices!.First(choice => choice.RewardId == reward.Id && HasShopStockPrice(choice));
                 stock.Add(new($"$shop:{state.ShopRefreshCount}:{reward.Id}", reward.Name, authored.GoldCost,

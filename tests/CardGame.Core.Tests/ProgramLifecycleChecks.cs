@@ -6,8 +6,6 @@ internal static class ProgramLifecycleChecks
 {
     private const int HumanSeat = 0;
 
-
-
     public static void RejectsCardBindingsAcrossDetachedPhaseBoundary()
     {
         var rules = Rules("""
@@ -26,7 +24,6 @@ internal static class ProgramLifecycleChecks
         }
         throw new InvalidOperationException("A phase insertion with live card bindings must fail at content load time.");
     }
-
 
     public static void MissingConditionalBindingsCancelWithoutLeakingCards()
     {
@@ -75,8 +72,6 @@ internal static class ProgramLifecycleChecks
                     .All(move => !move.Reason.Value.Contains("skill-program", StringComparison.Ordinal)),
             "Program disposal must move only its own bound cards, never the parent attack card.");
     }
-
-
 
     private static void AdvanceUntilProgramResolved(GameEngine game)
     {
@@ -163,7 +158,6 @@ internal static class ProgramLifecycleChecks
         {{occurrence}}"priority":0,"effects":[{{effects}}]}],"contributions":[],"cardIdentities":[]}]}
         """;
     }
-
 
     private const string Presentation =
         "{\"schemaVersion\":3,\"skills\":{\"fixture:lifecycle\":{\"name\":\"Lifecycle\",\"description\":\"Fixture\"}}}";

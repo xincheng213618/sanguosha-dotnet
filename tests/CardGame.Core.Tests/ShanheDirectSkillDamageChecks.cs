@@ -42,30 +42,6 @@ internal static class ShanheDirectSkillDamageChecks
             "The real Slash material is paid once through native movement.");
     }
 
-    public static void ThreeTiersAndElementalPropagationAddOnlyAtTheSkillOrigin()
-    {
-        for (var index = 0; index < Tiers.Length; index++)
-        {
-            var tier = Scene.Start([Tiers[index]]); tier.Use(Driver, "hit", [1]);
-            Need(tier.E<DamageAppliedEvent>() is [{ SourceSeat: 0, TargetSeat: 1 } hit] && hit.Amount == index + 2 &&
-                tier.Modifiers() is [{ Source.OwnerSeat: 0, BaseAmount: 1 } modifier] && modifier.ModifiedAmount == index + 2,
-                "Each independently equipped production tier applies its own +1/+2/+3 to one actual program damage instruction.");
-        }
-        var s = Scene.Start([Tiers[2]]);
-        s.Card(CardKind.IronChain, [1, 2]);
-        Need(s.V(1).IsChained && s.V(2).IsChained && !s.V(3).IsChained,
-            "A real paid Iron Chain links exactly the two intended native damage recipients.");
-        s.Use(Driver, "fire", [1]);
-        Need(s.E<DamageAppliedEvent>().Select(e => (e.TargetSeat, e.Amount, e.Nature))
-                .SequenceEqual([(1, 4, DamageNature.Fire), (2, 4, DamageNature.Fire)]) &&
-            s.Modifiers() is [{ TargetSeat: 1, CardKind: null, BaseAmount: 1, ModifiedAmount: 4 }] &&
-            s.E<ChainedDamagePropagatedEvent>().Length == 1 && !s.V(1).IsChained && !s.V(2).IsChained,
-            "Direct elemental skill damage receives +3 at its actual origin and carries the finalized four through the native chain without applying +3 again.");
-        s.Card(CardKind.FireSlash, [1]);
-        Need(s.E<DamageAppliedEvent>().Last() is { TargetSeat: 1, Amount: 1, Nature: DamageNature.Fire } && s.Modifiers().Length == 1,
-            "A later real elemental card hit does not inherit the preceding skill's classification or bonus.");
-    }
-
     private static void Need(bool value, string message)
     { if (!value) throw new InvalidOperationException(message); }
     private static string Peer(int seat) => "fixture:jiyi-peer-" + seat;

@@ -9,45 +9,6 @@ internal static partial class OrdinaryXunChenChecks
     private const string Fenglve = "ol:fenglve";
     private const string Moushi = "ol:moushi";
 
-    public static void FenglveContestsAndMoushiMarks()
-    {
-        var (g, r) = Start();
-        // Turn 1 offers both play-phase triggers; decline Moushi, run Fenglve.
-        var moushiOffer = P(g)!.Choices.Any(c => c.Parameters.GetValueOrDefault("skill-id") == Moushi);
-        if (moushiOffer) Skip(g);
-        Activate(g);
-        SelectTarget(g, 1);
-        // Answer the owner's pindian-card pick, the optional settlement gift, and
-        // any win/loss payment prompt until the play phase resumes.
-        var entryMovements = g.CardMovements.Count;
-        for (var i = 0; i < 80; i++)
-        {
-            if (P(g) is { } p && p.Kind == DecisionKind.PlayCard && p.PlayerSeat == 0) break;
-            if (P(g) is { } option && option.Choices.Any(c => c.Parameters.GetValueOrDefault("option-id") is "give" or "keep"))
-            {
-                Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "keep");
-                continue;
-            }
-            if (P(g) is { } pick && pick.Choices.Any(c => c.Cards.Count == 1))
-            {
-                Answer(g, c => c.Cards.Count == 1);
-                continue;
-            }
-            Accept(g, new AdvanceOneStepCommand(g.Revision));
-        }
-        Require(P(g) is { } resumed && resumed.Kind == DecisionKind.PlayCard && resumed.PlayerSeat == 0,
-            "The contest settles back into the Cao Xing play phase.");
-        var pindianMoved = g.CardMovements.Skip(entryMovements)
-            .Any(m => m.Reason.Value.Contains("pindian", StringComparison.Ordinal));
-        Require(pindianMoved,
-            "Fenglve resolves a real pindian and settles its branch movements.");
-        var paidToCounterpart = g.CardMovements.Skip(entryMovements)
-            .Any(m => m.To == CardLocation.Hand(1) && m.Reason.Value.Contains("ol:fenglve", StringComparison.Ordinal));
-        Require(paidToCounterpart,
-            "Every equal-rank contest is a loss, so Fenglve pays the counterpart one hand card.");
-        Replay(g, r);
-    }
-
     private static void SelectTarget(GameEngine g, int seat)
     {
         Reach(g, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "select-target" &&

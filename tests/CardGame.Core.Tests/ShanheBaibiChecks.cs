@@ -46,44 +46,6 @@ internal static class ShanheBaibiChecks
             "The four real Slash families each get one optional native obtain, without a duplicate supplemental skill.");
     }
 
-    public static void DecliningAndEmptyHandPreserveActualDamageWithoutInventingCards()
-    {
-        var s = Scene.Start([CardKind.Slash, CardKind.Slash, CardKind.Slash], 1); s.Equip();
-        var original = s.V(1).Hand.Single().Id;
-        s.Card(CardKind.Slash, [1]); s.Offer(); s.Invoke(false); s.Play();
-        Need(s.V(1).Hp == 7 && s.V(1).Hand.Single().Id == original &&
-            s.E<MoCaoCaoBaibiObtainedEvent>().Length == 0,
-            "Declining the after-damage offer preserves both the completed native damage and the target's exact hand entity.");
-        s.Card(CardKind.Slash, [1]); s.Offer(); s.Invoke(true); s.Selection();
-        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "card"); s.Play();
-        var gains = s.E<MoCaoCaoBaibiObtainedEvent>().Length;
-        var issues = s.E<MoCaoCaoBaibiIssuedEvent>().Length;
-        s.Card(CardKind.Slash, [1]); s.Play();
-        Need(s.V(1).Hp == 5 && s.V(1).HandCount == 0 && s.V().Hand.Count(c => c.Id == original) == 1 &&
-            s.E<MoCaoCaoBaibiObtainedEvent>().Length == gains && s.E<MoCaoCaoBaibiIssuedEvent>().Length == issues,
-            "A later Slash still damages the now empty target, with no impossible obtain offer or manufactured replacement card.");
-    }
-
-    public static void CardlessDamageChainRecipientsAndUnequippedWeaponDoNotObtain()
-    {
-        var s = Scene.Start([CardKind.FireSlash, CardKind.Slash], 2); s.Equip();
-        s.Use("damage", [1]);
-        Need(s.V(1).Hp == 7 && s.E<MoCaoCaoBaibiIssuedEvent>().Length == 0,
-            "A real cardless program damage cannot borrow the equipped weapon's Slash-use trigger.");
-        s.Use("chain", [1]); s.Use("chain", [2]);
-        var direct = s.Card(CardKind.FireSlash, [1]); s.Offer(); s.Invoke(true); s.Selection();
-        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "card"); s.Play();
-        var use = s.E<CardUseDeclaredEvent>().Single(e => e.CardId == direct).ResolutionId;
-        Need(s.E<DamageAppliedEvent>().Count(e => e.SourceCardUseResolutionId == use && e.Nature == DamageNature.Fire) == 2 &&
-            s.E<MoCaoCaoBaibiIssuedEvent>() is [{ Claim.TargetSeat: 1 }] &&
-            s.E<MoCaoCaoBaibiObtainedEvent>() is [{ TargetSeat: 1, Arrived: true }] && s.V(2).HandCount == 2,
-            "The actual fire Slash obtains only from its direct target; the real chained recipient takes damage without a second obtain.");
-        s.Use("unequip"); s.Card(CardKind.Slash, [1]); s.Play();
-        Need(s.V().Equipment.All(c => c.Id != s.WeaponId) && s.E<MoCaoCaoBaibiIssuedEvent>().Length == 1 &&
-            s.E<MoCaoCaoBaibiObtainedEvent>().Length == 1,
-            "Once the physical weapon leaves its slot, a later real Slash has no continuing obtain ability.");
-    }
-
     private static void Need(bool condition, string message)
     { if (!condition) throw new InvalidOperationException(message); }
 

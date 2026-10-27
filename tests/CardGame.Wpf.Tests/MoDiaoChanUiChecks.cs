@@ -37,7 +37,7 @@ internal static class MoDiaoChanUiChecks
         using var model = new MainViewModel(false, 7, true, store, contentRegistry: registry,
             historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore())
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         var game = Program.Engine(model);
         hint = game.CreateSnapshot(0).PendingDecision!.ForcedHandSelection!;

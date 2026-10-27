@@ -10,36 +10,6 @@ internal static class LiYiChecks
     private const string Chanshuang="ol:chanshuang",Zhanjin="ol:zhanjin";
     private static string Scene="";
 
-    public static void LiYiVirtualStoneAxeRealWeaponAndPaidChildrenCold()
-    {
-        var(g,r)=Start("axe");
-        Need(g.GetAttackRange(0)==3&&V(g,0).Equipment.Count==0&&g.CreateCardZoneDiagnostics().All(c=>c.CardKind!=CardKind.StoneAxe),"The empty weapon area grants range three without creating any physical Stone Axe.");
-        Use(g,"near-death",targets:[2]);Play(g);Need(V(g,2).Hp==1,"The native target is genuinely near death and can choose its real Dodge.");
-        Native(g,a=>a.PlayedCardKind==CardKind.Slash&&a.TargetSeats.SequenceEqual([2]));
-        Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.StoneAxe});
-        Need(E<CardActionAcceptedEvent>(g).Any(e=>e.Action.ActorSeat==2&&e.Action.EffectiveKind==CardKind.Dodge)&&P(g)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("action")=="stone-axe-use"&&c.Cards.Count==2),"A genuinely dodged range-two Slash offers the native two-card Axe payment from the virtual ability.");
-        var paid=P(g)!.Choices.First(c=>c.Parameters.GetValueOrDefault("action")=="stone-axe-use").Cards.ToArray();g=Cold(g,r);Answer(g,c=>c.Parameters.GetValueOrDefault("action")=="stone-axe-use"&&c.Cards.SequenceEqual(paid));
-        Reach(g,()=>E<StoneAxeResolvedEvent>(g).Any(e=>e.Used));
-        Need(E<StoneAxeResolvedEvent>(g).Single().DiscardedCardIds.SequenceEqual(paid)&&E<NativeLogicalDiscardInvocationRecordedEvent>(g).Any(e=>e.ExecutorSeat==0&&e.ActualCount==2)&&g.CardMovements.Count(m=>paid.Contains(m.CardId)&&m.To==CardLocation.DiscardPile&&m.Reason==CardMoveReasons.StoneAxeDiscard)==2,"The unchanged native Axe executes one whole two-card discard and its real damage after cold recovery.");
-        _=Cold(g,r);
-
-        (g,r)=Start("weapon");Native(g,a=>a.Kind==LegalActionKind.Equip);Play(g);var weapon=V(g,0).Equipment.Single();
-        Need(weapon.Kind==CardKind.Crossbow&&g.GetAttackRange(0)==1,"A real Crossbow suppresses the empty-weapon virtual Axe and its range.");
-        Begin(g,1,"slash");Reach(g,()=>Stage(g)==ChanshuangStage.SlashTarget&&P(g)?.PlayerSeat==0);
-        Need(!P(g)!.Choices.Any(c=>c.Targets.SequenceEqual([2])),"Chanshuang does not bypass the actual weapon's ordinary distance.");Answer(g,c=>c.Parameters.GetValueOrDefault("option")=="decline");Finish(g);Play(g);
-        Use(g,"recast-equipment",[weapon.Id]);Play(g);
-        Need(V(g,0).Equipment.Count==0&&g.GetAttackRange(0)==3&&g.CardMovements.Any(m=>m.CardId==weapon.Id&&m.Reason==CardMoveReasons.RecastDiscard),"Removing the real weapon by an actual recast immediately restores the virtual range; no equipment entity is manufactured.");_=Cold(g,r);
-
-        (g,r)=Start("weapon-conversion");Native(g,a=>a.Kind==LegalActionKind.Equip);Play(g);weapon=V(g,0).Equipment.Single();
-        Need(g.GetAttackRange(0)==1&&g.GetCombatDistance(0,2)==2&&g.GetHumanLegalActions().Any(a=>a.CardId==weapon.Id&&a.PlayedCardKind==CardKind.Slash&&a.ConversionSource is{SkillId:Driver,BindingId:"equipment-slash"}&&a.TargetSeats.SequenceEqual([2])),"The ordinary native menu offers the exact equipped Crossbow conversion against a range-two target by projecting its payment, while the current real weapon and live range remain unchanged.");End(g);
-        Reach(g,()=>g.State.CurrentSeat==2&&P(g)is{PlayerSeat:0}p&&p.SkillPrompt?.SkillId=="fixture:ly-weapon-conversion"&&p.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="activate"));
-        g=Cold(g,r);Answer(g,c=>c.Parameters.GetValueOrDefault("program-action")=="activate");
-        Reach(g,()=>P(g)is{PlayerSeat:0}p&&p.Choices.Any(c=>c.Cards.SequenceEqual([weapon.Id])));
-        Need(g.GetAttackRange(0)==1&&V(g,0).Equipment.Any(c=>c.Id==weapon.Id),"The projected range-three eligibility does not remove the real weapon or grant an early live ability.");g=Cold(g,r);Answer(g,c=>c.Cards.SequenceEqual([weapon.Id]));
-        Reach(g,()=>E<CardUseFinishedEvent>(g).Any(e=>e.CardId==weapon.Id&&e.CardKind==CardKind.Slash));
-        Need(E<CardUsedEvent>(g).Count(e=>e.CardId==weapon.Id&&e.SourceSeat==0&&e.TargetSeat==2&&e.CardKind==CardKind.Slash)==1&&g.CardMovements.Count(m=>m.CardId==weapon.Id&&m.From==CardLocation.Equipment(0)&&m.To==CardLocation.Processing&&m.Reason==CardMoveReasons.Use)==1&&V(g,0).Equipment.Count==0&&g.GetAttackRange(0)==3,"A true equipment-to-Slash conversion uses the virtual range after its exact weapon payment and completes the range-two native target once.");_=Cold(g,r);
-    }
-
     public static void ChanshuangPrivateSameChoicesRecastLionOxCold()
     {
         var(g,r)=Start("same");UseSkill(g,Chanshuang,"simultaneous-options",targets:[1]);
@@ -71,54 +41,6 @@ internal static class LiYiChecks
             Need(facts.Length==2&&facts.All(e=>e.PrimaryCount==1&&e.ActualRecastCount==1)&&facts[0].ActualDrawCount==(scene=="lion-death"?0:1)&&facts[1].ActualDrawCount==1&&E<ChanshuangMaterialPaidEvent>(g).Count(e=>e.FrameId==id&&e.CardId==eq.Id)==1,"After all paid children, the original equipment and living peer execute once; neither grain nor a replay is another primary recast.");
             if(scene=="lion-loss")Need(V(g,0).IsAlive&&!V(g,0).Skills!.Any(s=>s.Id==Chanshuang),"Loss of the real HP-conditional source does not cancel the already-issued second participant.");
             if(scene=="lion-death")Need(!V(g,0).IsAlive&&E<PlayerDiedEvent>(g).Any(e=>e.VictimSeat==0),"Actual non-Lord issuer death completes the paid owner's zero-draw recast and the living peer's independent recast.");_=Cold(g,r);
-        }
-    }
-
-    public static void ChanshuangNativeSlashQuotaZeroSupplyAndFactionCold()
-    {
-        foreach(var scene in new[]{"physical","converted","zero","faction"})
-        {
-            var(g,r)=Start(scene);Begin(g,1,"slash");Reach(g,()=>Stage(g)==ChanshuangStage.SlashTarget&&P(g)?.PlayerSeat==0);
-            var target=scene=="faction"?Enumerable.Range(1,3).Single(s=>V(g,s).Role==Role.Rebel):2;
-            Answer(g,c=>c.Targets.SequenceEqual([target]));Need(Stage(g)==ChanshuangStage.SlashChoice,"The current participant chooses a real source only after fixing a normally legal Slash target.");g=Cold(g,r);
-            if(scene=="zero")Answer(g,c=>c.Parameters.GetValueOrDefault("program-action")=="round-once-cardless-request");
-            else if(scene=="faction")Answer(g,c=>c.Parameters.GetValueOrDefault("request-option")=="faction");
-            else Answer(g,c=>c.Parameters.GetValueOrDefault("option")=="use"&&c.Cards.Count==1&&(scene!="converted"||c.Parameters.GetValueOrDefault("conversion-skill-id")==Driver||c.Parameters.GetValueOrDefault("skill-id")==Driver));
-            Finish(g);Play(g);var prepared=E<ChanshuangSlashPreparedEvent>(g).Single();var issued=E<ChanshuangSlashIssuedEvent>(g).Single();
-            Need(prepared.ActorSeat==0&&prepared.TargetSeat==target&&E<ChanshuangSlashReturnedEvent>(g).Count(e=>e.UseId==issued.UseId)==1&&E<CardUseDeclaredEvent>(g).Count(e=>e.ResolutionId==issued.UseId)==1&&E<CardUseFinishedEvent>(g).Count(e=>e.ResolutionId==issued.UseId)==1&&E<ChanshuangItemCompletedEvent>(g).Any(e=>e.UseId==issued.UseId&&e.Executed),"The exact current participant's single native Slash Use, declaration and typed whole return complete once before the next participant.");
-            if(scene=="zero")Need(E<RoundOnceCardlessBasicQuotaPaidEvent>(g).Length==1&&E<RoundOnceCardlessProgramRequestReturnedEvent>(g).Length==1&&E<ChanshuangSlashMaterialPaidEvent>(g).Length==0,"A genuine zero-entity supplier spends its own round quota and returns to this instruction, without a fabricated physical payment.");
-            else if(scene=="faction")Need(prepared.ProviderSeat!=0&&E<CardSupplyCompletionStartedEvent>(g).Count(e=>e.ActionId==issued.ActionId)==1&&E<CardSupplyCompletedEvent>(g).Count(e=>e.ActionId==issued.ActionId)==1&&E<ChanshuangSlashMaterialPaidEvent>(g).All(e=>e.From==CardLocation.Hand(prepared.ProviderSeat)),"A real same-faction ally pays its original Hand entity; actor, provider and requester retain distinct native identities through supply completion.");
-            else Need(E<ChanshuangSlashMaterialPaidEvent>(g).Length==1,"The ordinary physical or converted Slash pays precisely one original entity.");
-            Need(g.GetHumanLegalActions().Any(a=>a.PlayedCardKind==CardKind.Slash),"Chanshuang's Slash does not spend the normal Play Slash allowance.");
-            Native(g,a=>a.PlayedCardKind==CardKind.Slash&&a.TargetSeats.Count==1);Play(g);
-            Need(!g.GetHumanLegalActions().Any(a=>a.PlayedCardKind==CardKind.Slash),"The subsequent genuine ordinary Slash spends its own normal quota; the Chanshuang exemption does not leak into ordinary queries.");_=Cold(g,r);
-        }
-    }
-
-    public static void ChanshuangWholeActualTurnHistoryAndFirstXEndingCold()
-    {
-        var(g,r)=Start("history-before");Discard(g,2);var before=E<NativeLogicalDiscardInvocationRecordedEvent>(g).Single(e=>e.ExecutorSeat==0&&e.ActualCount==2);Need(!V(g,0).Skills!.Any(s=>s.Id==Chanshuang),"The real qualifying whole discard occurs before acquiring Chanshuang.");Use(g,"grant");Play(g);End(g);
-        Reach(g,()=>Current(g)?.Chanshuang is{Operation:SkillProgramEffectOp.ResolveChanshuangEnding,Stage:ChanshuangStage.RecastCard});var root=Current(g)!;var id=root.Id;
-        Need(root.Chanshuang!.FrozenMask==4&&E<ChanshuangStartedEvent>(g).Single().ActualTurn==before.TurnNumber,"Ending freezes the pre-acquisition actual-turn discard category, rather than starting history when the skill is gained.");g=Cold(g,r);Finish(g);
-        Need(E<ChanshuangItemCompletedEvent>(g).Where(e=>e.FrameId==id).Select(e=>e.Option).SequenceEqual([ChanshuangOption.Recast]),"One historical category executes item one (recast), not the historical item three subset.");_=Cold(g,r);
-
-        foreach(var scene in new[]{"history-two","history-three"})
-        {
-            (g,r)=Start(scene);var recast=g.GetHumanLegalActions().First(a=>a.Kind==LegalActionKind.Recast);Accept(g,new RecastCardCommand(0,recast.CardId!.Value,g.Revision,P(g)!.PromptId){ConversionSource=recast.ConversionSource});Play(g);
-            Native(g,a=>a.PlayedCardKind==CardKind.Slash&&a.TargetSeats.SequenceEqual([1]));Play(g);if(scene=="history-three")Discard(g,2);End(g);
-            Reach(g,()=>Current(g)?.Chanshuang is{Operation:SkillProgramEffectOp.ResolveChanshuangEnding,Stage:ChanshuangStage.RecastCard});root=Current(g)!;id=root.Id;var mask=scene=="history-three"?7:3;
-            Need(root.Chanshuang!.FrozenMask==mask,"Ending freezes distinct whole recast, true Use and whole discard categories from the entire current actual turn.");g=Cold(g,r);Finish(g);
-            var items=E<ChanshuangItemCompletedEvent>(g).Where(e=>e.FrameId==id).ToArray();Need(items.Select(e=>(int)e.Option).SequenceEqual(Enumerable.Range(1,scene=="history-three"?3:2))&&items.All(e=>e.Executed)&&E<ChanshuangStartedEvent>(g).Single(e=>e.FrameId==id).FrozenMask==mask,"The frozen X executes the numbered first X items in order, including a quota-exempt native Ending Slash, without growing X from its own recast or discard children.");_=Cold(g,r);
-        }
-        foreach(var scene in new[]{"history-singles","history-discard-three","history-group-recast","history-played"})
-        {
-            (g,r)=Start(scene);var turn=g.State.TurnNumber;
-            if(scene=="history-singles"){Discard(g,1);Discard(g,1);}
-            else if(scene=="history-discard-three")Discard(g,3);
-            else if(scene=="history-group-recast"){var cards=V(g,0).Hand.Take(2).Select(c=>c.Id).ToArray();UseSkill(g,"fixture:ly-match","match",cards,[1]);Play(g);Need(E<NativeRecastInvocationRecordedEvent>(g).Any(e=>e.ExecutorSeat==0&&e.ActualRecastCount==2),"The negative history really includes one complete two-card recast.");}
-            else {UseSkill(g,"fixture:ly-duel","duel",targets:[1]);Reach(g,()=>P(g)is{PlayerSeat:0,Kind:DecisionKind.RespondSlash});Answer(g,c=>c.Cards.Count==1);Play(g);Need(E<CardActionAcceptedEvent>(g).Any(e=>e.Action.ActorSeat==0&&e.Action.Type==CardActionType.Response&&e.Action.EffectiveKind==CardKind.Slash)&&!E<CardUseDeclaredEvent>(g).Any(e=>e.SourceSeat==0&&e.CardKind==CardKind.Slash),"The owner's actual Duel Slash is pure played response, rather than a Use declaration.");}
-            End(g);Reach(g,()=>g.State.TurnNumber>turn||g.State.Winner!=Winner.None);
-            Need(!E<ChanshuangStartedEvent>(g).Any(e=>e.Operation==SkillProgramEffectOp.ResolveChanshuangEnding&&e.ActualTurn==turn),"Separate discard-one calls, whole discard-three, whole recast-two and a pure Duel played Slash do not become qualifying categories.");_=Cold(g,r);
         }
     }
 

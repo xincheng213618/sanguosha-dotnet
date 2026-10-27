@@ -27,7 +27,7 @@ internal static class BattleLogUiChecks
         using var model = new MainViewModel(false, 31, true, store,
             historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore())
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError && model.HumanPlayer?.Seat == 0, model.SaveStatus);
         var actors = model.Seats.OrderBy(seat => seat.DisplaySeatNumber).ToArray();
         var human = actors.Single(seat => seat.IsHuman);
@@ -160,7 +160,7 @@ internal static class BattleLogUiChecks
                 model.FilteredBattleLog.All(entry => !entry.Message.Contains("不可见将名", StringComparison.Ordinal) &&
                     !entry.ParticipantNames.Contains("不可见将名")),
                 "Named log projection must not expose a concealed general even when a diagnostic snapshot contains its name.");
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Program.Assert(!model.HasSaveError && model.SelectedBattleLogSeat == "all" &&
                 model.SelectedBattleLogCategory == "all" && model.FilteredBattleLog.All(entry => entry.Sequence < first) &&
                 model.FilteredBattleLog.Where(entry => entry.ActorSeat == human.Seat || entry.TargetSeat == human.Seat)

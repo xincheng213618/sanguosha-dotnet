@@ -223,7 +223,6 @@ internal static class SkillProgramExecutorChecks
             "invalid operation");
     }
 
-
     public static void ActiveActivationContractsRejectInvalidDefinitionsAndPreserveOrder()
     {
         const string orderedPair =
@@ -276,7 +275,6 @@ internal static class SkillProgramExecutorChecks
             second.Replace("\"usesPerTurn\":1", "\"usesPerTurn\":2", StringComparison.Ordinal)),
             "usageGroup");
     }
-
 
     private static SkillProgram ProgramWithActivations(string activations)
     {

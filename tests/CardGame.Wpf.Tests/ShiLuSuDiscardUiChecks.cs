@@ -1,3 +1,4 @@
+using CardGame.Wpf.Persistence;
 using CardGame.Core;
 using CardGame.Wpf.ViewModels;
 
@@ -28,7 +29,7 @@ internal static class ShiLuSuDiscardUiChecks
         Program.Assert(model.HasDockSkillChoices, "The native post-exchange discard branch remains available in the real action dock.");
         model.DockSkillChoiceCommand.Execute(model.DockSkillChoices.Single(c => Branch(c) == "discard"));
         var frame = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == Dimeng).Id;
-        model.SaveGameCommand.Execute(null); model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model); game = Program.Engine(model);
         Program.Assert(!model.HasSaveError && model.IsOwnedCardSelectionPending && !model.IsCardPaymentSelectionPending &&
             game.CreateSnapshot(0).PendingDecision is { RequiredCardCount: 2, MinimumCardCount: 2 } &&
             game.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == Dimeng).Id == frame,
@@ -59,7 +60,7 @@ internal static class ShiLuSuDiscardUiChecks
             game.Events.Select(e => e.Payload).OfType<ShiLsDiscardPaidEvent>().Single() is { Count: 2 } payment && payment.FrameId == frame &&
             model.Hand.All(c => !c.IsSelected) && !model.HumanSkillCards.Single(s => s.ContentId == Dimeng).IsAvailable,
             "One primary confirmation pays the exact two original hand entities in one logical discard and spends Dimeng once.");
-        model.SaveGameCommand.Execute(null); model.LoadManualGameCommand.Execute(null); game = Program.Engine(model);
+        LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model); game = Program.Engine(model);
         Program.Assert(!model.HasSaveError && game.CardMovements.Count(m => m.Reason.Value == DiscardReason) == 2 &&
             game.Events.Select(e => e.Payload).OfType<ShiLsDiscardPaidEvent>().Count() == 1 &&
             game.Events.Select(e => e.Payload).OfType<NativeLogicalDiscardInvocationRecordedEvent>().Count(e => e.Reason.Value == DiscardReason) == 1 &&

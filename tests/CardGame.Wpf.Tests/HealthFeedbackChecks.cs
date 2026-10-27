@@ -209,7 +209,7 @@ internal static class HealthFeedbackChecks
         using var model = new MainViewModel(autoAdvance: false, seed: 1, showSetup: true, saveStore: store,
             useExpandedContent: false, contentRegistry: registry)
         { IsMotionEnabled = true, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Assert(!model.HasSaveError && model.BattleCues.Count == 0, model.SaveStatus);
         var game = Engine(model);
         Assert(game.PlayerCount == playerCount && model.Seats.Count == playerCount,
@@ -612,7 +612,7 @@ internal static class HealthFeedbackChecks
         using var model = new MainViewModel(autoAdvance: false, seed: 31, showSetup: true, saveStore: store,
             useExpandedContent: false, contentRegistry: registry)
         { IsMotionEnabled = true, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Assert(!model.HasSaveError && model.BattleCues.Count == 0, model.SaveStatus);
         game = Engine(model);
         using var host = new NativeResponseStatusChecks.NativeHost(model);
@@ -741,7 +741,7 @@ internal static class HealthFeedbackChecks
                 System.Windows.Automation.AutomationProperties.GetName(healthRail) == $"{recovered.Hp}/{recovered.MaxHp}",
                 $"The real portrait icons are missing or detached from current committed public HP: icons={control.Visibility}/{control.ActualWidth}/{control.Items.Count}, " +
                 $"rail={healthRail.Visibility}/{healthRail.ActualHeight}/{System.Windows.Automation.AutomationProperties.GetName(healthRail)}, HP={recovered.Hp}/{recovered.MaxHp}.");
-            vm.SaveGameCommand.Execute(null); vm.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(vm); LegacySaveFixtures.Load(vm);
             Render(root, 1120, 740, Path.Combine(output, "health-native-recovery-loaded.png"));
             var loaded = Engine(vm);
             Assert(layer.ActiveEffectCount == 0 && !vm.HasSaveError && loaded.AcceptedCommands.Count == accepted &&

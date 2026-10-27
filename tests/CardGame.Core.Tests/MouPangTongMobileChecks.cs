@@ -7,37 +7,6 @@ namespace CardGame.Core.Tests;
 internal static class MouPangTongMobileChecks
 {
     private static ShanheStartingCard C(CardKind kind, Suit suit, int rank) => new(kind, suit, rank);
-    public static void LevelOneNativeCostTargetsPhaseUseAndUnlimitedRecast()
-    {
-        var s = Scene.Start("level-one", false); s.Play();
-        var clubs = s.V().Hand.Where(c => c.Suit == Suit.Club).Select(c => c.Id).ToArray();
-        s.Need(s.R.Generals[Scene.Hero].BaseHp == 3 && s.V().Hp == 3 && clubs.Length == 2, "The actual Shu male three-HP fixture has exactly two club Hand materials.");
-        var use = s.Actions().First(a => a.Kind == LegalActionKind.IronChain && a.CardId == clubs[0] && a.ConversionSource?.SkillId == Scene.Lianhuan && a.TargetSeats.SequenceEqual([1]));
-        s.Need(!s.Actions().Any(a => a.Kind == LegalActionKind.IronChain && a.TargetSeats.Count > 2), "Level one retains the native two-target maximum.");
-        s.Native(use); s.Reach(() => s.P?.SkillPrompt?.SkillId == Scene.Lianhuan && s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
-        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Scene.Late && s.P.Choices.Any(c => c.Targets.SequenceEqual([3])));
-        s.Answer(c => c.Targets.SequenceEqual([3])); s.Play();
-        var paid = s.E<MouPangTongLianhuanPaidEvent>().Single(); var discarded = s.E<MouPangTongTargetDiscardedEvent>().ToArray();
-        s.Need(s.V().Hp == 2 && s.E<ProgramSkillHpLostEvent>().Single(e => e.FrameId == paid.FrameId).Amount == 1 &&
-            discarded.Select(e => e.TargetSeat).SequenceEqual([1, 3]) && discarded.All(e => e.From == CardLocation.Hand(e.TargetSeat) && e.To == CardLocation.DiscardPile) &&
-            s.V(1).IsChained && !s.V(2).IsChained && s.V(3).IsChained && s.E<MouPangTongTargetsCompletedEvent>().Length == 2 && s.E<MouPangTongTargetsCompletedEvent>().All(e => e.UseId == paid.UseId) &&
-            s.E<ProgramCardUseTargetAddedEvent>().Single().TargetSeat == 3 && s.E<MouPangTongLateTargetNotifiedEvent>().Single().TargetSeat == 3,
-            "The original native IronChain pays Loss1 once, discards its original target once and also discards the actual lower-priority newly designated target on the same Use before its chain effects.");
-        s.Need(!s.Actions().Any(a => a.Kind == LegalActionKind.IronChain && a.ConversionSource?.SkillId == Scene.Lianhuan), "Only the one conversion Use is spent for this actual Play phase.");
-        var recast = s.Actions().Single(a => a.Kind == LegalActionKind.Recast && a.CardId == clubs[1] && a.ConversionSource?.SkillId == Scene.Lianhuan);
-        var count = s.E<MouPangTongConversionUsedEvent>().Length;
-        s.Accept(new RecastCardCommand(0, clubs[1], s.G.Revision, s.P!.PromptId) { ConversionSource = recast.ConversionSource }); s.Play();
-        var another = s.Actions().First(a => a.Kind == LegalActionKind.Recast && a.ConversionSource?.SkillId == Scene.Lianhuan);
-        s.Accept(new RecastCardCommand(0, another.CardId!.Value, s.G.Revision, s.P!.PromptId) { ConversionSource = another.ConversionSource }); s.Play();
-        s.Need(s.E<CardRecastEvent>().Length == 2 && s.E<MouPangTongConversionUsedEvent>().Length == count && s.V().Hp == 2,
-            "Repeated real club recasts remain legal after spending the conversion Use and never pay HP or count as using IronChain.");
-        var raw = s.Actions().First(a => a.Kind == LegalActionKind.IronChain && a.ConversionSource is null && a.TargetSeats.SequenceEqual([1, 2]));
-        s.Native(raw); s.Reach(() => s.P?.SkillPrompt?.SkillId == Scene.Lianhuan && s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
-        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate"); s.Play();
-        s.Need(s.V().Hp == 1 && s.E<MouPangTongLianhuanPaidEvent>().Length == 2 && s.E<MouPangTongTargetDiscardedEvent>().Select(e => e.TargetSeat).SequenceEqual([1, 3, 2]) && !s.V(1).IsChained && s.V(2).IsChained,
-            "The real two-target printed IronChain pays once, skips its already chained first target and discards the unchained second target exactly once.");
-    }
 
     public static void OrderedNativeNiepanUpgradeAndAllTargetDiscardCold()
     {

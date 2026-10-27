@@ -153,7 +153,6 @@ internal static partial class IceSwordChecks
 
     }
 
-
     private static bool IsDiscard(PromptChoice choice) =>
         choice.Parameters.GetValueOrDefault("action") == "ice-sword-discard";
 

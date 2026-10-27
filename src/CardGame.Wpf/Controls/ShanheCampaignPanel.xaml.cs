@@ -60,6 +60,11 @@ public partial class ShanheCampaignPanel : UserControl
     private void CampaignPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (_observedModel is null) return;
+        if (e.PropertyName == nameof(MainViewModel.IsShanheEndConfirmationOpen))
+        {
+            Dispatcher.BeginInvoke(() => FocusCampaign(), System.Windows.Threading.DispatcherPriority.DataBind);
+            return;
+        }
         if (e.PropertyName == nameof(MainViewModel.IsShanheCodexPickerOpen))
         {
             if (_observedModel.IsShanheCodexPickerOpen)
@@ -108,12 +113,16 @@ public partial class ShanheCampaignPanel : UserControl
             }
             return;
         }
-        if (e.PropertyName == nameof(MainViewModel.IsShanheRunInProgress) && _observedModel.IsShanheRunInProgress)
+        if (e.PropertyName == nameof(MainViewModel.IsShanheRunInProgress))
+        {
             ShanheSetupOverlay.Visibility = Visibility.Collapsed;
+            if (!_observedModel.IsShanheRunInProgress) ShanheJourneyTabs.SelectedIndex = 0;
+        }
     }
 
     public void FocusCampaign()
     {
+        if (ShanheEndConfirmation.Visibility == Visibility.Visible) { ShanheCancelEndButton.Focus(); return; }
         if (ShanheSettlementHost.Visibility == Visibility.Visible) { ShanheSettlementHost.FocusSettlement(); return; }
         if (ShanheSkillReplacementOverlay.Visibility == Visibility.Visible)
             (DescendantButtons(ShanheSkillReplacementRows).FirstOrDefault(button => button.IsEnabled) ?? ShanheCancelSkillReplacementButton).Focus();
@@ -123,12 +132,14 @@ public partial class ShanheCampaignPanel : UserControl
             (DescendantButtons(ShanheRewardCardRows).FirstOrDefault(button => button.IsEnabled) ?? ShanheConfirmRewardButton).Focus();
         else if (ShanheEncounterOverlay.Visibility == Visibility.Visible) ShanheChallengeButton.Focus();
         else if (ShanheRulesOverlay.Visibility == Visibility.Visible) ShanheRulesCloseButton.Focus();
-        else if (ShanheSetupOverlay.Visibility == Visibility.Visible) ShanheGeneralSearchBox.Focus();
+        else if (ShanheSetupOverlay.Visibility == Visibility.Visible) FocusGeneralSelection();
         else ShanheCloseButton.Focus();
     }
 
     public bool HandleEscape()
     {
+        if (DataContext is MainViewModel { IsShanheEndConfirmationOpen: true } ending)
+        { ending.CancelEndShanheCommand.Execute(null); return true; }
         if (ModalFocus.HasOpenDropDown(this)) return true;
         if (ShanheCodexHost.HandleEscape()) return true;
         if (DataContext is MainViewModel { IsShanheSettlementOpen: true } settlement)
@@ -165,7 +176,13 @@ public partial class ShanheCampaignPanel : UserControl
         _focusBeforeSetup = Keyboard.FocusedElement;
         model.PrepareShanheGeneralSelection();
         ShanheSetupOverlay.Visibility = Visibility.Visible;
-        ShanheGeneralSearchBox.Focus();
+        FocusGeneralSelection();
+    }
+
+    private void FocusGeneralSelection()
+    {
+        if (DataContext is MainViewModel { IsShanheFreeGeneralSelection: true }) ShanheGeneralSearchBox.Focus();
+        else ShanheGeneralSelector.Focus();
     }
 
     private void PrepareCodex(object sender, RoutedEventArgs e)

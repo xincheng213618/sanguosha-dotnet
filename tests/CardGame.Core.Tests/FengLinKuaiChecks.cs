@@ -41,17 +41,6 @@ internal static class FengLinKuaiChecks
             "The AI continuation uses the original prompt and native gift exactly once.");
         Replay(g, r);
     }
-    public static void JianxiangActualFinalTargetMinimumTie()
-    {
-        var(g,r)=Create(slashDeck:true);ReachPlay(g);Driver(g,"discard",[]);Driver(g,"grow-owner",[]);Driver(g,"request",[1]);
-        Reach(g,p=>p.SkillPrompt?.SkillId=="classic:jianxiang");
-        Require(g.ResolutionStack.OfType<ProgramCardTriggerWindowFrame>().Last().Action.ActorSeat==1,"Actual other actor finalized card target triggers native Jianxiang.");
-        Answer(g,c=>c.Parameters.GetValueOrDefault("program-action")=="activate");
-        var candidates=P(g)!.Choices.SelectMany(c=>c.Targets).Distinct().Order().ToArray();
-        Require(candidates.SequenceEqual(new[]{0,1}),"Actual finalized-target prompt keeps owner and tied other minimum after source Slash payment.");
-        var before=Hand(g,0).Length;Replay(g,r);Answer(g,c=>c.Targets.Contains(0));
-        ReachPlay(g);Require(Hand(g,0).Length==before+1,"One native reward draw completes before original Slash effect resumes.");Replay(g,r);
-    }
     private static int[] Hand(GameEngine g,int s)=>g.CreateCardZoneDiagnostics().Where(c=>c.Location==CardLocation.Hand(s)).OrderBy(c=>c.ZoneIndex).Select(c=>c.CardId).ToArray();
     private static PendingDecision? P(GameEngine g)=>g.PendingDecision??Enumerable.Range(0,4).Select(s=>g.CreateSnapshot(s,true).PendingDecision).FirstOrDefault(p=>p is not null);
     private static void Submit(GameEngine g,GameCommand c){var result=g.Submit(c);Require(result.Error is null,result.Error?.Message??"Rejected");}

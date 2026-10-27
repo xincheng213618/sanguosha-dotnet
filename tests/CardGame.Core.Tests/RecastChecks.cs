@@ -69,7 +69,6 @@ internal static class RecastChecks
             "Recast did not return to the same player's play phase.");
     }
 
-
     private static string State(GameEngine game) => SnapshotJson.Serialize(game.CreateSnapshot(0, true));
     private static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
 }

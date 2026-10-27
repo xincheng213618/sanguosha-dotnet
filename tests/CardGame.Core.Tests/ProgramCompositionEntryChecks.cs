@@ -6,10 +6,6 @@ internal static class ProgramCompositionEntryChecks
 {
     private const int Human = 0;
 
-
-
-
-
     internal static void UseActivation(GameEngine game, string skillId)
     {
         var play = game.PendingDecision ?? throw new InvalidOperationException("Play prompt missing.");

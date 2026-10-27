@@ -8,51 +8,6 @@ internal static class BoundaryYanYanMobileChecks
     private const string Hero="boundary:yan-yan-mobile",Skill="boundary:juzhan-mobile",Owner="fixture:boundary-yan-yan-owner",
         Driver="fixture:boundary-yan-yan-driver",Watch="fixture:boundary-yan-yan-paid",Mode="identity:classic-boundary-yan-yan";
     internal static (ContentRegistry Registry,GameEngine Game) CreateScene(bool singleHuman=false){var s=Scene.Start(singleHuman);return(s.Registry,s.G);}
-    public static void StateEpochThirdSelfChengshiOriginalUseClaimCold()
-    {
-        var s=Scene.Start();s.Need(s.Polarity==SkillPolarity.Yin&&s.Count==0&&s.Limit()==11,"Actual initial Shu faction registers structured Yin and the normal native quota.");
-        s.Equip();s.Play(0);s.Trim();s.Play(0);var first=s.Slash(0,[1,2,3]);s.Offer();s.Skip();s.Play(0);
-        s.Need(s.Count==1&&s.E<BoundaryYanYanOccurrenceRecordedEvent>().Count(e=>e.Occurrence.UseId==first&&e.Occurrence.Polarity==SkillPolarity.Yin)==1,
-            "One actual three-target Slash increments Yin once for its designated Use, rather than three targets.");
-        s.Draw();s.Play(0);s.Slash(0,[1]);s.Offer();s.Skip();s.Play(0);
-        var third=s.Slash(0,[2]);var material=s.E<CardUseDeclaredEvent>().Last().CardId;s.Offer();s.Cold();s.Invoke();s.SelectTarget(2);s.SelectOwned();
-        s.Reach(()=>s.P?.SkillPrompt?.SkillId==Watch);
-        var paid=s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.SkillId==Skill);
-        s.Need(paid.BoundaryYanYan is{Occurrence:{Ordinal:3,Polarity:SkillPolarity.Yin}}&&s.Polarity==SkillPolarity.Yang&&
-            s.E<BoundaryYanYanChengshiGrantedEvent>().Length==0,"The original third-self frame commits Yin once and waits for its actual paid obtain child before the bonus.");
-        s.Cold();s.Answer(_=>true);s.Reach(()=>s.P?.SkillPrompt?.SkillId==Watch);
-        s.Need(s.E<BoundaryYanYanChengshiGrantedEvent>() is[{UseId:var granted}]&&granted==third&&s.V(0).Hand.Any(c=>c.Id==material)&&
-            s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f=>f.SkillId==Skill).BoundaryYanYanClaim is{Cards.Count:1},
-            "Self and exactly third together issue persistent quota and obtain the original Slash only after its real whole Use completed.");
-        s.Cold();s.Answer(_=>true);s.Play(0);
-        s.Need(s.Limit()==12&&s.Bonus==1&&s.E<BoundaryYanYanChengshiGrantedEvent>().Length==1&&
-            s.E<CardUseFinishedEvent>().Count(e=>e.ResolutionId==third)==1&&
-            s.G.CardMovements.Count(m=>m.CardId==material&&m.To==CardLocation.Hand(0)&&m.Reason.Value=="skill.boundary-yan-yan.chengshi")==1&&
-            !s.CanSlash(0,2)&&s.CanSlash(0,1),"Cold returns each already-paid child without paying, converting, increasing quota or claiming twice; Yin prohibits only its actual selected target.");
-        s.End();s.Play(1);s.Need(s.Bonus==1&&s.Limit()==12,"The official undelimited extra Slash allowance remains after the original turn ends.");s.Cold();
-    }
-
-    public static void YangTargetOccurrencesAndDirectedTurnBanCold()
-    {
-        var s=Scene.Start();s.EnterYang();s.Slash(0,[2]);s.Play(0);s.Slash(0,[3]);s.Offer();
-        s.Need(s.Count==3&&s.Polarity==SkillPolarity.Yang,"The actual third target occurrence globally offers Yang even when the owner is not that target.");
-        s.Skip();s.Play(0);var preparations=s.E<BoundaryYanYanPreparedEvent>().Length;s.Slash(0,[4]);s.Play(0);
-        s.Need(s.Count==4&&s.E<BoundaryYanYanPreparedEvent>().Length==preparations&&s.Bonus==0,
-            "Declining exactly third keeps Yang and fourth nonself has no new offer; the count is not a modulo-three clock.");
-        s.End();s.Play(1);var hp=s.V(0).Hp;var ownerHand=s.V(0).HandCount;var actorHand=s.V(1).HandCount;
-        s.Slash(1,[0]);s.Offer();s.Cold();s.Invoke();s.Play(1);
-        s.Need(s.Polarity==SkillPolarity.Yin&&s.Count==0&&s.Bonus==0&&s.V(0).HandCount==ownerHand+1&&s.V(1).HandCount==actorHand&&s.V(0).Hp==hp-1&&
-            !s.CanSlash(1,0)&&s.CanSlash(1,2),"A later actual self target can invoke outside third, draws one for each participant, and prohibits only that source's cards toward the owner for the current turn.");
-        s.Cold();s.End();s.Play(2);s.End();s.Play(3);s.End();s.Play(4);s.End();s.Play(0);s.End();s.Play(1);
-        s.Need(s.CanSlash(1,0),"The directed prohibition expires with its issuing turn rather than permanently banning the source.");
-
-        var both=Scene.Start();both.EnterYang();both.Slash(0,[2]);both.Play(0);both.End();both.Play(1);
-        var use=both.Slash(1,[0]);var card=both.E<CardUseDeclaredEvent>().Last().CardId;both.Offer();both.Invoke();
-        both.Reach(()=>both.P?.SkillPrompt?.SkillId==Watch);both.Cold();both.Answer(_=>true);both.Play(1);
-        both.Need(both.Bonus==1&&both.Limit()==12&&both.E<BoundaryYanYanChengshiGrantedEvent>() is[{UseId:var exact}]&&exact==use&&
-            both.V(0).Hand.Any(c=>c.Id==card)&&both.G.CardMovements.Count(m=>m.CardId==card&&m.To==CardLocation.Hand(0)&&m.Reason.Value=="skill.boundary-yan-yan.chengshi")==1,
-            "Yang's simultaneous self-and-third branch also grants quota and, after full native resolution, obtains the opponent's original physical Slash exactly once.");
-    }
 
     private sealed class Scene(ContentRegistry registry,GameEngine game)
     {

@@ -55,7 +55,7 @@ internal static class RevealedSubsetUiChecks
         var cancelPrompt = game.CreateSnapshot(0).PendingDecision!;
         var stale = model.PublicRevealedCards.First();
         ClickCard(host, stale.Id);
-        model.SaveGameCommand.Execute(null); model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model);
         game = Program.Engine(model);
         Program.Assert(model.IsRevealedSubsetSelectionPending && !model.HasSelection &&
             !model.SelectRevealedCardCommand.CanExecute(stale), "Cold reload retires old faces and clears the uncommitted local draft.");
@@ -239,7 +239,7 @@ internal static class RevealedSubsetUiChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         var model = new MainViewModel(false, 31, true, store, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         return model;
     }

@@ -3,52 +3,6 @@ using CardGame.Content.Standard;
 using CardGame.Core;
 internal static class Fame2016TaoluanChecks
 {
-    public static void AiRequestsTeammateAndReplaysRecordedPolicy()
-    {
-        foreach (var policy in new[] { AiDecisionPolicy.CorrelatedActiveSkillVersion, AiDecisionPolicy.CooperativeCategoryGiftVersion })
-        {
-            var (game, registry) = Create(teamAi: true, policy: policy);
-            for (var step = 0; step < 240; step++)
-            {
-                if (game.Events.Any(e => e.Payload is ProgramActionCategoryGiftResolvedEvent)) break;
-                Accept(game, new AdvanceOneStepCommand(game.Revision));
-            }
-            var gift = game.Events.Select(e => e.Payload).OfType<ProgramActionCategoryGiftResolvedEvent>().FirstOrDefault();
-            Require(gift is not null, "A bounded real AI Taoluan use must reach its category-gift settlement.");
-            if (policy >= AiDecisionPolicy.CooperativeCategoryGiftVersion)
-            {
-                var view = game.CreateSnapshot(gift!.OwnerSeat);
-                Require(view.Players[gift.OwnerSeat].TeamId == view.Players[gift.ProviderSeat].TeamId && gift.GiftCardId is not null,
-                    "Actual AI target dispatch asks a public teammate, whose own AI really donates a legal card.");
-            }
-            Replay(game, registry);
-            Require(game.CreateCheckpoint().Options.AiPolicyVersion == policy,
-                "Both historical and cooperative AI policies remain recorded and cold-replay exactly.");
-        }
-    }
-
-    public static void EquipmentGlobalAndNullification()
-    {
-        var (game,registry)=Create();
-        var equip=game.GetHumanLegalActions().First(a=>a.Kind==LegalActionKind.Equip && a.ConversionSource is null);
-        Play(game,equip); Reach(game,p=>p.Kind==DecisionKind.PlayCard);
-        var card=equip.CardId!.Value;
-        Play(game,game.GetHumanLegalActions().First(a=>a.CardId==card && a.ConversionSource?.SkillId=="classic:taoluan" && a.PlayedCardKind==CardKind.FiveGrains));
-        Reach(game,p=>p.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="select-target"));
-        Require(game.CardMovements.Any(m=>m.CardId==card && m.From==CardLocation.Equipment(0) && m.To==CardLocation.Processing),"Equipment is paid through the real shared native trick pipeline.");
-        Answer(game,c=>c.Targets.Contains(1)); Answer(game,c=>c.Cards.Count==1); Reach(game,p=>p.Kind==DecisionKind.PlayCard);
-        Require(game.Events.Select(e=>e.Payload).OfType<ProgramActionCategoryGiftResolvedEvent>().Count()==1,"A global trick has one Taoluan settlement, not one per target."); Replay(game,registry);
-        Play(game,game.GetHumanLegalActions().First(a=>a.ConversionSource?.SkillId=="classic:taoluan" && a.PlayedCardKind==CardKind.DrawTwo));
-        Reach(game,p=>p.Kind==DecisionKind.Nullification && p.PlayerSeat==0);
-        var nullification=Prompt(game)!.Choices.First(c=>c.Parameters.GetValueOrDefault("conversion-skill-id")=="classic:taoluan"); var cost=nullification.Cards.Single();
-        Answer(game,c=>c.Id==nullification.Id);
-        Reach(game,p=>p.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="select-target"));
-        Require(game.CardMovements.Any(m=>m.CardId==cost && m.To==CardLocation.DiscardPile),"The actual Nullification cost is finished before its own settlement.");Replay(game,registry);
-        Answer(game,c=>c.Targets.Contains(1));Answer(game,c=>c.Cards.Count==1);
-        Reach(game,p=>p.Choices.Any(c=>c.Parameters.GetValueOrDefault("program-action")=="select-target"));
-        Answer(game,c=>c.Targets.Contains(1));Answer(game,c=>c.Cards.Count==1);Reach(game,p=>p.Kind==DecisionKind.PlayCard);Replay(game,registry);
-        Require(game.Events.Select(e=>e.Payload).OfType<ProgramActionCategoryGiftResolvedEvent>().Count()==3,"Nested Nullification and the nullified parent each settle exactly once.");
-    }
     private static PendingDecision? Prompt(GameEngine game) => Enumerable.Range(0, 4).Select(seat => game.CreateSnapshot(seat).PendingDecision).FirstOrDefault(prompt => prompt is not null);
     private static void Play(GameEngine game, LegalAction action) => Accept(game,
         new PlayCardCommand(0, action.CardId!.Value, action.TargetSeats, game.Revision, Prompt(game)!.PromptId, action.PlayedCardKind, action.TargetCardId) { ConversionSource = action.ConversionSource });

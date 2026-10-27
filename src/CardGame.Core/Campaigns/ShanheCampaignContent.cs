@@ -20,6 +20,7 @@ public static partial class ShanheCampaignContent
         UniqueIds(definition.StartingNodeIds, "entry node");
         Require(definition.StartingGold is >= 0 and <= 1_000_000 && definition.ExtraSkillSlots is >= 0 and <= 8, "Invalid starting gold or skill capacity.");
         ValidateBonuses(definition.StartingBonuses);
+        ValidateShopRarityPolicy(definition.ShopRarityPolicy);
         Require(definition.Nodes!.All(n => n is not null) && definition.Rewards!.All(r => r is not null), "Content entries cannot be null.");
         UniqueIds(definition.Nodes.Select(n => n.Id), "node");
         UniqueIds(definition.Rewards.Select(r => r.Id), "reward");
@@ -62,10 +63,13 @@ public static partial class ShanheCampaignContent
             Require((node.RewardIds ?? []).All(rewardIds.Contains), "A node references an unknown reward.");
             var battle = IsBattle(node.Kind);
             Require(node.PrimaryTacticRarity is >= 0 and <= 4 && node.PrimarySkillRarity is >= 0 and <= 4 &&
-                (battle || node.PrimaryTacticRarity == 0 && node.PrimarySkillRarity == 0),
+                node.PrimaryCardRarity is >= 0 and <= 4 &&
+                (battle || node.PrimaryTacticRarity == 0 && node.PrimarySkillRarity == 0 && node.PrimaryCardRarity == 0),
                 "Only battle nodes may set a bounded primary reward quality.");
             Require(!node.IsStoryBattle || battle, "A story battle must use a battle node kind.");
             Require(battle || !node.CategorizedRewards, "Only battle nodes may offer categorized rewards.");
+            Require(!node.AutomaticRewardCategory || battle && node.CategorizedRewards,
+                "An automatic category requires a categorized battle reward.");
             Require(node.RewardSkipGold is >= 0 and <= 100_000 && (battle || node.RewardSkipGold == 0),
                 "Only battle nodes can grant bounded reward-skip compensation.");
             Require(battle ? node.Encounters is { Count: > 0 and <= 64 } && (node.Choices?.Count ?? 0) == 0 :

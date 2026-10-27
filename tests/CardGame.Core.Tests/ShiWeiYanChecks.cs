@@ -81,6 +81,60 @@ internal static class ShiWeiYanChecks
         s.Replay();
     }
 
+    public static void KuangguDrawThresholdReturnsToOriginalSlashCold()
+    {
+        var s = Scene.Start(4, drawThreshold: true);
+        s.ZhuangshiPrompt();
+        var discarded = s.V(0).Hand.First(card => card.Kind == CardKind.Dodge).Id;
+        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "card-" + discarded);
+        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "hp-2");
+        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "pay");
+        s.Play(); s.PauseKuanggu = true; s.Slash(3);
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == Kuanggu);
+        s.Answer(c => Key(c) == "activate");
+        s.Reach(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("branch") == "draw") == true);
+        var hand = s.V(0).HandCount;
+        var original = s.G.ResolutionStack.OfType<CardUseFrame>().Last().Id;
+        var inventory = s.G.CreateCardZoneDiagnostics().Select(card => card.CardId).Order().ToArray();
+        s.Cold();
+        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "draw");
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == Kuanggu && s.P.Choices.Any(c => Key(c) == "activate"));
+        s.Need(s.E<NativeDrawThresholdTargetChosenEvent>() is [{ Source.SkillId: StandardShanheDrawThresholdPackage.ShenlongBaiwei2SkillId }] &&
+            s.V(0).HandCount == hand + 1 && !s.E<CardUseFinishedEvent>().Any(e => e.ResolutionId == original),
+            "Kuanggu's sixth real draw must issue one nested tactic damage before the original Slash finishes.");
+        s.Cold();
+        s.Answer(c => Key(c) == "skip");
+        s.PauseKuanggu = false; s.Play();
+        s.Need(!s.G.IsFaulted && s.V(0).HandCount == hand + 1 &&
+            s.E<NativeDrawThresholdTargetChosenEvent>().Length == 1 &&
+            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == original) == 1 &&
+            s.E<ProgramBindingResolvedEvent>().Count(e => e.SkillId == StandardShanheDrawThresholdPackage.ShenlongBaiwei2SkillId && e.Completed) == 1 &&
+            !s.G.ResolutionStack.Any(f => f is ProgramSkillFrame or DamageFrame) &&
+            inventory.SequenceEqual(s.G.CreateCardZoneDiagnostics().Select(card => card.CardId).Order()),
+            "Both paid returns must complete once, retire the prompt and conserve every physical card without redrawing.");
+        s.Replay();
+    }
+
+    public static void DrawPhaseThresholdKillAllowsKuangguAndMissionCold()
+    {
+        var s = Scene.Start(4, drawThreshold: true, drawPhaseKill: true);
+        s.PauseKuanggu = true;
+        s.Reach(() => s.P?.SkillPrompt?.SkillId is Kuanggu or Kuanggu2);
+        s.Need(s.G.State.Phase == TurnPhase.Draw && s.E<CardUseDeclaredEvent>().Length == 0 &&
+            s.E<NativeDrawThresholdTargetChosenEvent>().Length == 1,
+            "A genuine normal Draw can deal tactic damage and offer Kuanggu before any card is used.");
+        s.Answer(c => Key(c) == "activate");
+        var hand = s.V(0).HandCount;
+        s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "draw");
+        s.Cold(); s.PauseKuanggu = false; s.ZhuangshiPrompt();
+        s.Need(s.E<PlayerDiedEvent>() is [{ KillerSeat: 0 }] &&
+            s.E<MobileShiWeiYanMissionEvent>() is [{ Succeeded: true }] && s.HasSkill(Kuanggu2) &&
+            s.V(0).HandCount == hand + 1 && s.E<CardUseDeclaredEvent>().Length == 0 &&
+            s.E<NativeDrawThresholdTargetChosenEvent>().Length == 1 && !s.G.IsFaulted,
+            "Draw-phase lethal damage, its Kuanggu draw and the genuine kill mission finish before the first play phase without duplication.");
+        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "decline"); s.Play(); s.Replay();
+    }
+
     private static string? Key(PromptChoice c) => c.Parameters.GetValueOrDefault("program-action");
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {
@@ -111,6 +165,8 @@ internal static class ShiWeiYanChecks
                 if (P is { } p)
                 {
                     if (p.Kind == DecisionKind.SelectFaction) { Answer(_ => true); continue; }
+                    if (p.Kind == DecisionKind.RescueDying && G.ResolutionStack.OfType<DyingFrame>().Last().VictimSeat != 0)
+                    { Answer(c => c.Parameters.GetValueOrDefault("response") is "pass" or "let-die"); continue; }
                     if (p.SkillPrompt?.SkillId is Kuanggu or Kuanggu2 && !PauseKuanggu)
                     { Answer(c => Key(c) == "skip" || c.Parameters.GetValueOrDefault("branch") == "cancel"); continue; }
                     if (p.SkillPrompt?.SkillId == Yinzhan) { Answer(c => c.Parameters.GetValueOrDefault("branch") == "discard"); continue; }
@@ -129,19 +185,23 @@ internal static class ShiWeiYanChecks
         private void Accept(GameCommand command) { var r = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([command])).Single()); Need(r.Accepted, r.Error?.Message ?? "The native command was rejected."); }
         private string State() => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, 4).Select(i => SnapshotJson.Serialize(G.CreateSnapshot(i))).ToArray(), Frames = G.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())).ToArray(), Events = G.Events.Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray(), G.CardMovements, Commands = CommandJson.Serialize(G.AcceptedCommands) });
         private string Dump() => JsonSerializer.Serialize(new { G.State.TurnNumber, G.State.CurrentSeat, P, Players = Enumerable.Range(0, 4).Select(i => new { Seat = i, V(i).Hp, V(i).HandCount }), Last = G.Events.TakeLast(5).Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())).ToArray() });
-        public static Scene Start(int hp)
+        public static Scene Start(int hp, bool drawThreshold = false, bool drawPhaseKill = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+            var packages = new List<IGameContentPackage> { new StandardContentPackage(), new Fixture(drawThreshold, drawPhaseKill) };
+            if (drawThreshold) packages.Add(new StandardShanheDrawThresholdPackage());
+            var registry = ContentRegistry.Build(packages.ToArray());
             ShanheStartingCard[] opening = [new(CardKind.Slash, Suit.Spade, 3), new(CardKind.Slash, Suit.Heart, 4), new(CardKind.Slash, Suit.Club, 5), new(CardKind.Slash, Suit.Diamond, 6), new(CardKind.Peach, Suit.Heart, 7), new(CardKind.Peach, Suit.Heart, 8), new(CardKind.Dodge, Suit.Club, 9), new(CardKind.DrawTwo, Suit.Spade, 10)];
-            var roster = Enumerable.Range(1, 3).Select(seat => new ShanheCombatantDefinition(Peer, Hp: seat == 1 ? 2 : 4)
+            var roster = Enumerable.Range(1, 3).Select(seat => new ShanheCombatantDefinition(Peer, Hp: drawPhaseKill ? 1 : seat == 1 ? 2 : 4)
                 { StartingHand = Enumerable.Range(0, 8).Select(i => new ShanheStartingCard(CardKind.Dodge, Suit.Club, i + 1)).ToArray() }).ToArray();
-            var setup = new ShanheBattleSetup(615, 1, "shi-wei-yan-" + hp, Hero, hp, 0, 0, 0, 0, [Driver], opening, [], roster, [], new string('b', 64));
+            var setup = new ShanheBattleSetup(615, 1, "shi-wei-yan-" + hp, Hero, hp, 0, 0, 0, 0, [Driver], opening,
+                drawThreshold ? [new(CardKind.OffensiveHorse, Suit.Heart, 5)] : [], roster, [], new string('b', 64))
+                { TacticSkillIds = drawThreshold ? [StandardShanheDrawThresholdPackage.ShenlongBaiwei2SkillId] : [] };
             var g = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,
                 ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup, UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 10 }, registry);
             var s = new Scene(g, registry); s.Accept(new StartGameCommand()); return s;
         }
     }
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool drawThreshold, bool drawPhaseKill) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-shi-wei-yan", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
@@ -149,9 +209,10 @@ internal static class ShiWeiYanChecks
             // Load the real passive fact consumer without adding it to the table.
             // The native invoice stays demand-driven, as in a game containing Yangwei.
             CharacterFixtureContent.Register(b, Hero, "mou:hua-xiong-ol");
+            var openingDraw = drawThreshold ? ",{\"id\":\"opening-five\",\"window\":\"gameStarting\",\"subject\":\"owner\",\"optional\":false,\"effects\":[{\"op\":\"draw\",\"target\":\"owner\",\"amount\":5}]}" : "";
             var rules = $$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
-              {"id":"{{Driver}}","revision":1,"modifiers":[{"id":"keep-hand","query":"handLimit","operation":"add","value":20,"priority":0}],"triggers":[{"id":"no-draw","window":"drawPhaseStarting","subject":"owner","optional":false,"isSkillInvocation":false,"effects":[{"op":"adjustNormalDraw","target":"owner","amount":-2}]}]},
+              {"id":"{{Driver}}","revision":1,"modifiers":[{"id":"keep-hand","query":"handLimit","operation":"add","value":20,"priority":0}],"triggers":[{"id":"no-draw","window":"drawPhaseStarting","subject":"owner","optional":false,"isSkillInvocation":false,"effects":[{"op":"adjustNormalDraw","target":"owner","amount":{{(drawPhaseKill ? -1 : -2)}}}]}{{openingDraw}}]},
               {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"no-draw","window":"drawPhaseStarting","subject":"owner","optional":false,"isSkillInvocation":false,"effects":[{"op":"adjustNormalDraw","target":"owner","amount":-2}]},{"id":"no-play","window":"afterNormalDraw","subject":"owner","optional":false,"isSkillInvocation":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}
             ]}
             """;
@@ -159,7 +220,7 @@ internal static class ShiWeiYanChecks
             var catalog = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = p }));
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description) { Program = program, ProgramPresentation = catalog.Presentations[id] });
             b.AddGeneral(new(Peer, "同桌", "", Quiet, "wei", 4));
-            b.AddDeck(new(Deck, "固定真实牌堆", 0, 0, []) { PhysicalCards = Enumerable.Range(0, 80).Select(_ => new ContentDeckPhysicalCard("standard:dodge", Suit.Club, 7)).ToArray() });
+            b.AddDeck(new(Deck, "固定真实牌堆", 0, drawPhaseKill ? 2 : 0, []) { PhysicalCards = Enumerable.Range(0, 80).Select(_ => new ContentDeckPhysicalCard("standard:dodge", Suit.Club, 7)).ToArray() });
             b.AddMode(new(ShanheBattleSetup.BattleModeId, "势魏延真实支付及使命", 4, 4, new Dictionary<string, int>(), Deck, GeneralPoolIds: [Hero, Peer], ModeKind: ContentModeKind.Team,
                 TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 1, [ShanheBattleSetup.EnemyTeamId] = 3 }));
         }

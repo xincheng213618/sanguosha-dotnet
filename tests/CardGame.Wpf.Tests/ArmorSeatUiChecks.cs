@@ -35,7 +35,7 @@ internal static class ArmorSeatUiChecks
         store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
         using var model = new MainViewModel(false, 83, true, store, contentRegistry: registry)
         { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         game = Program.Engine(model);
         var window = new MainWindow(model);
@@ -72,7 +72,7 @@ internal static class ArmorSeatUiChecks
                     Badge(seat).Visibility == Visibility.Collapsed && AutomationProperties.GetName(SeatButton(seat)) == model.Seats.Single(item => item.Seat == seat).Name) &&
                 new[] { 2, 3 }.All(seat => Badge(seat).Visibility == Visibility.Visible && model.Seats.Single(item => item.Seat == seat).Armor == 6),
                 "Spending the final four points must hide both local and opponent Armor badges and retire their accessibility value without hiding other seats' unspent Armor.");
-            model.SaveGameCommand.Execute(null); model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model);
             Program.Render(root, 1440, 880, null);
             Program.Assert(!model.HasSaveError && new[] { 0, 1 }.All(seat => Badge(seat).Visibility == Visibility.Collapsed) &&
                 model.Seats.Where(seat => seat.Seat is 2 or 3).All(seat => seat.Armor == 6),
@@ -93,7 +93,7 @@ internal static class ArmorSeatUiChecks
                 "A real seven-point HP loss from five HP must expose the genuine negative dying state before rescue or death is advanced.");
             typeof(MainViewModel).GetMethod("Refresh", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(model, [game.CreateSnapshot(0)]);
             AssertNegativeHealth();
-            model.SaveGameCommand.Execute(null); model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model);
             game = Program.Engine(model);
             Program.Assert(!model.HasSaveError && game.CreateSnapshot(0).Players.Single(player => player.Seat == 0).Hp == -2,
                 "Cold desktop restoration preserves the same real negative HP instead of raising it to zero.");

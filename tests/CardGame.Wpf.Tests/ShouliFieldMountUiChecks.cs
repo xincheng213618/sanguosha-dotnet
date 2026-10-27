@@ -15,7 +15,7 @@ internal static class ShouliFieldMountUiChecks
         using var model = new MainViewModel(false, scenario.Game.Seed, true, store,
             contentRegistry: scenario.Registry, historyStore: new MemoryMatchHistoryStore(),
             preferencesStore: new MemoryPlayerPreferencesStore()) { IsMotionEnabled = false, IsSoundEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         Program.Assert(!model.HasSaveError, model.SaveStatus);
         var game = Program.Engine(model);
         var foreign = game.CreateSnapshot(0).Players[1].Equipment.Single();

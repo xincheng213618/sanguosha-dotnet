@@ -52,7 +52,6 @@ internal static class ProgramCompositionContextChecks
             "can be consumed only once");
     }
 
-
     private static SkillProgram Load(string rules)
     {
         using var document = JsonDocument.Parse(rules);

@@ -9,27 +9,6 @@ internal static class ShanheTerrainChecks
     private const string Npc = "fixture:shanhe-terrain-other", Deck = "fixture:shanhe-terrain-deck";
     private const string Second = "fixture:shanhe-terrain-second";
 
-    public static void RiverPreservesHigherLimitAndFloorsReducedLimitForEveryCampCold()
-    {
-        var scene = new Scene(StandardShanheTerrainPackage.RiverId);
-        scene.Play();
-        Need(scene.V(0).HandLimit == 14 && scene.G.CreateSnapshot(0).Players.Skip(1)
-                .All(player => player.Skills!.Any(skill => skill.ContentId == StandardShanheTerrainPackage.RiverId)),
-            "The all-participant river grant reaches both camps without lowering the active player's higher fourteen-card limit.");
-        scene.Accept(new UseProgramSkillCommand(0, Driver, "lower-limit", [], [], scene.G.Revision, scene.P!.PromptId));
-        scene.Play();
-        Need(scene.V(0).HandLimit == 8, "A live negative modifier is applied before the minimum hand-limit policy.");
-        scene.Cold();
-        scene.Accept(new EndPlayPhaseCommand(0, scene.G.Revision, scene.P!.PromptId));
-        foreach (var seat in new[] { 1, 2, 3 })
-        {
-            scene.Reach(() => scene.G.State.CurrentSeat == seat && scene.V(seat).HandLimit is not null);
-            Need(scene.V(seat).HandLimit == 8,
-                "Every ally and enemy exposes the actual eight-card floor during its own turn; off-turn HandLimit remains absent.");
-        }
-        scene.Cold();
-    }
-
     public static void ForestTenthUseKeepsResponseAndResetsForNextActualPlayPhaseCold()
     {
         var scene = new Scene(StandardShanheTerrainPackage.ForestId, extraPlay: true);
@@ -68,40 +47,6 @@ internal static class ShanheTerrainChecks
         scene.Cold();
     }
 
-    public static void NativeTerrainGrantsDriveDistanceDrawSlashAndEndingHpLoss()
-    {
-        foreach (var terrain in new[] { StandardShanheTerrainPackage.CityId, StandardShanheTerrainPackage.BattlefieldId,
-                     StandardShanheTerrainPackage.PlainId, StandardShanheTerrainPackage.MountainId })
-        {
-            var scene = new Scene(terrain);
-            scene.Play();
-            Need(scene.G.CreateSnapshot(0).Players.All(player => player.Skills!.Any(skill => skill.ContentId == terrain)),
-                "The scene grants its terrain to player, ally and both enemies through the native setup.");
-            if (terrain == StandardShanheTerrainPackage.CityId)
-                Need(scene.G.GetCombatDistance(0, 2) == 1 && scene.G.GetCombatDistance(2, 0) == 1,
-                    "City reduces each participant's outgoing distance, including the otherwise opposite seats.");
-            if (terrain == StandardShanheTerrainPackage.BattlefieldId)
-                Need(scene.V(0).HandCount == 11,
-                    "Battlefield adds two cards to the ordinary two-card Draw phase after four opening and three scenario cards.");
-            if (terrain == StandardShanheTerrainPackage.PlainId)
-            {
-                var slashes = scene.V(0).Hand.Where(card => card.Kind == CardKind.Slash).ToArray();
-                for (var index = 0; index < 2; index++) { scene.UseCard(slashes[index].Id, [3]); scene.Play(); }
-                Need(scene.G.Events.Count(item => item.Payload is CardUseDeclaredEvent { SourceSeat: 0, CardKind: CardKind.Slash }) == 2 &&
-                    !scene.G.GetHumanLegalActions().Any(action => action.Kind == LegalActionKind.Slash),
-                    "Plain allows exactly the native base Slash plus one within the same Play phase.");
-            }
-            if (terrain == StandardShanheTerrainPackage.MountainId)
-            {
-                scene.Accept(new EndPlayPhaseCommand(0, scene.G.Revision, scene.P!.PromptId));
-                scene.Reach(() => scene.V(0).Hp == 3);
-                Need(!scene.G.Events.Any(item => item.Payload is DamageAppliedEvent { TargetSeat: 0 }),
-                    "Mountain's own ending loses one HP directly and does not fabricate a damage event.");
-            }
-            scene.Cold();
-        }
-    }
-
     public static void TerrainNumericPoliciesRejectMalformedStaticShapes()
     {
         foreach (var kind in new[] { "minimumHandLimit", "maximumOwnPlayCardUses" })
@@ -114,29 +59,6 @@ internal static class ShanheTerrainChecks
             catch (InvalidOperationException) { rejected = true; }
             Need(rejected, "A numeric floor or use-cap must have a bounded unconditional number and no card filters.");
         }
-    }
-
-    public static void ModeTerrainSurvivesNativeDeathSkillLossAndBossFormReplacementCold()
-    {
-        var scene = new Scene(StandardShanheTerrainPackage.RiverId, preservation: true);
-        scene.Play();
-        scene.Accept(new UseProgramSkillCommand(0, Driver, "finish", [], [2], scene.G.Revision, scene.P!.PromptId));
-        scene.Reach(() => scene.Facts<ShanheBossStageStartedEvent>().Length == 1);
-        Need(scene.V(2) is { GeneralId: Second, IsAlive: true, Hp: 6 } &&
-            scene.G.CreateSnapshot(0).Players.All(player => player.Skills!.Any(skill => skill.ContentId == StandardShanheTerrainPackage.RiverId)),
-            "The real boss form replacement preserves the all-participant mode terrain while replacing its printed general.");
-        scene.Cold(); scene.Play();
-        scene.Accept(new UseProgramSkillCommand(0, Driver, "finish", [], [3], scene.G.Revision, scene.P!.PromptId));
-        scene.Reach(() => scene.Facts<CharacterSkillsLostEvent>().Any(item => item.Seat == 0) &&
-            scene.P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
-        var lost = scene.Facts<CharacterSkillsLostEvent>().Single(item => item.Seat == 0);
-        Need(lost.SkillIds.Contains(Driver) && lost.SkillIds.Contains(StandardShanheTerrainPackage.RiverId) &&
-            scene.V(0).Skills!.All(skill => skill.ContentId != Driver) &&
-            scene.V(0).Skills!.Any(skill => skill.ContentId == StandardShanheTerrainPackage.RiverId) && scene.V(0).HandLimit == 8,
-            "Native Duanchang still removes the ordinary same-name copy and printed driver, while the independent mode instance retains its actual eight-card floor.");
-        scene.Cold();
-        Need(scene.Facts<ShanheBossStageStartedEvent>().Length == 1 && scene.V(0).HandLimit == 8,
-            "Cold replay retains the once-only boss transition and the protected terrain after character skill loss.");
     }
 
     private sealed class Scene

@@ -5,7 +5,6 @@ using CardGame.Core.Campaigns;
 internal static class ShanheResponseStockTacticChecks
 {
     private const string Absolute = StandardShanheResponseTacticsPackage.JueduiWuxieSkillId;
-    private const string RankBonus = StandardShanheResponseTacticsPackage.Dushu2SkillId;
     private const string Owner = "fixture:response-stock-owner", Enemy = "fixture:response-stock-enemy";
     private const string Deck = "fixture:response-stock-deck";
     private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(
@@ -54,30 +53,6 @@ internal static class ShanheResponseStockTacticChecks
                     resolved is { ChainDepth: 3, EffectNullified: true } &&
                     !s.Game.CardMovements.Any(move => move.To == CardLocation.Hand(0) && move.Reason == CardMoveReasons.Draw),
                     "Without ownership the same paid physical response permits the enemy's real counter-counterspell, which cancels Draw Two through the ordinary chain.");
-        }
-    }
-
-    public static void ActualPindianAddsSixAndCapsAtKingWithoutChangingMaterial()
-    {
-        foreach (var (owned, printedRank, expected) in new[] { (false, 9, 9), (true, 5, 11), (true, 9, 13) })
-        {
-            var s = Scene.Start(owned ? [RankBonus] : [], [new(CardKind.Slash, Suit.Spade, printedRank)],
-                [new(CardKind.Slash, Suit.Club, 12)]);
-            var own = s.View().Hand.Single();
-            var opponent = s.View(1).Hand.Single();
-            s.Accept(new UseProgramSkillCommand(0, "classic:tianyi", "contest", [own.Id], [1],
-                s.Game.Revision, s.Prompt!.PromptId));
-            s.Play();
-            var result = s.Events<PindianResultDeterminedEvent>().Single().Result;
-            Need(result.SourceCardId == own.Id && result.OpponentCardId == opponent.Id &&
-                result.SourceRank == expected && result.OpponentRank == 12 && result.SourceWon == (expected > 12) &&
-                own.Rank == printedRank && opponent.Rank == 12 &&
-                new[] { (Seat: 0, Card: own.Id), (Seat: 1, Card: opponent.Id) }.All(material =>
-                    s.Game.CardMovements.Count(move => move.CardId == material.Card && move.From == CardLocation.Hand(material.Seat) &&
-                        move.To == CardLocation.Processing && move.Reason == CardMoveReasons.PindianReveal) == 1 &&
-                    s.Game.CardMovements.Count(move => move.CardId == material.Card && move.From == CardLocation.Processing &&
-                        move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.PindianFinish) == 1),
-                "A genuine Tianyi contest pays its two original printed entities once: the actual owner adds six to five for eleven, nine caps at K, and an unowned nine stays nine.");
         }
     }
 

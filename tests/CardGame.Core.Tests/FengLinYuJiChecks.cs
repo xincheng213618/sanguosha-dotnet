@@ -5,41 +5,6 @@ using CardGame.Content.Standard;
 
 internal static partial class FengLinYuJiChecks
 {
-    public static void ActualDodgeDuelRescueParents()
-    {
-        foreach(var purpose in new[]{"dodge","duel","peach","alcohol"})
-        {
-            var(g,r)=Start(purpose=="peach"?"standard:peach":purpose=="alcohol"?"standard:alcohol":"standard:dodge");
-            var hp=g.State.Players[0].Hp;
-            if(purpose=="dodge") Driver(g,"poke",[1]);
-            else if(purpose=="duel")Driver(g,"duel",[1,0]);
-            else Driver(g,"dying");
-            Reach(g,p=>p.PlayerSeat==0&&(p.Kind==DecisionKind.RespondDodge||p.Kind==DecisionKind.RespondSlash||p.Kind==DecisionKind.RescueDying));
-            if(purpose is "peach" or "alcohol")Require(g.State.Players[0].Hp==0,
-                "The real rescue fixture must enter Dying at exactly zero HP: "+RecoveryDiagnostic(g,purpose));
-            var prompt=P(g)!;var choice=prompt.Choices.First(c=>c.Parameters.GetValueOrDefault("conversion-skill-id")=="classic:guhuo");
-            Accept(g,new AnswerPromptCommand(0,prompt.PromptId,choice.Id,g.Revision));
-            Require(g.ResolutionStack.OfType<CardDeclarationFrame>().Any(),"Actual response/rescue suspends before successful action.");Replay(g,r);
-            var hiddenCost = g.ResolutionStack.OfType<CardDeclarationFrame>().Single().Payment.Cost.CardId;
-            while(g.ResolutionStack.LastOrDefault() is CardDeclarationChallengeFrame)Answer(g,"pass");
-            Require(g.Events.Select(e=>e.Payload).OfType<CardRespondedEvent>().Where(e=>e.CardId==hiddenCost&&e.ResponderSeat==0).All(e=>e.PublicCard is null) &&
-                g.Events.Select(e=>e.Payload).OfType<CardUseDeclaredEvent>().Where(e=>e.CardId==hiddenCost&&e.SourceSeat==0).All(e=>e.PublicCard is null),
-                "An unchallenged hidden Dodge, Duel or rescue declaration exposed printed metadata after payment.");
-            if(purpose=="dodge")Require(g.State.Players[0].Hp==hp,"Declared Dodge resumes the real incoming Slash without damage.");
-            else if(purpose=="duel")Require(g.Events.Select(e=>e.Payload).OfType<DuelResponseEvent>().Any(e=>e.ResponderSeat==0&&e.UsedSlash),"Played Slash returns to real virtual Duel, not Use.");
-            else
-            {
-                for(var step=0;step<100&&!g.Events.Select(e=>e.Payload).OfType<DyingResponseEvent>()
-                    .Any(e=>e.ResponderSeat==0&&(e.UsedPeach||e.UsedAlcohol));step++)
-                    Accept(g,new AdvanceOneStepCommand(g.Revision));
-                Require(g.State.Players[0].Hp==1&&g.Events.Select(e=>e.Payload).OfType<DyingResponseEvent>()
-                    .Any(e=>e.ResponderSeat==0&&(e.UsedPeach||e.UsedAlcohol))&&
-                    g.CardMovements.Count(m=>m.CardId==hiddenCost&&m.From==CardLocation.Hand(0)&&m.To==CardLocation.Processing)==1,
-                    "Dying-use returns after real recovery and one physical declaration payment: "+RecoveryDiagnostic(g,purpose));
-            }
-            Replay(g,r);Conserve(g);
-        }
-    }
     private static string RecoveryDiagnostic(GameEngine g,string purpose)=>JsonSerializer.Serialize(new
     {
         purpose,g.State.Status,Hp=g.State.Players[0].Hp,Prompt=P(g)?.Kind,

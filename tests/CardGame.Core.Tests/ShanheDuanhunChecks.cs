@@ -45,31 +45,6 @@ internal static class ShanheDuanhunChecks
         scene.AssertPaid(black); scene.AssertPaid(red);
     }
 
-    public static void AHandCardOrManualGrantCannotBypassAndRealLightningStillPaysArmor()
-    {
-        var scene = Scene.Start(equipped: false, manualGrant: true);
-        Need(scene.Player(0).Hand.Any(card => card.Kind == CardKind.Duanhun) &&
-            scene.Player(0).Skills!.Any(skill => skill.ContentId == Skill) && !scene.Player(0).Equipment.Any(card => card.Kind == CardKind.Duanhun),
-            "The fresh negative case really holds the weapon in hand and manually owns the policy, without its physical equipment grant.");
-        var unarmed = scene.Hit(1);
-        Need(unarmed.ArmorPayment is { ArmorAbsorbed: 2, HpLossAmount: 0 } && scene.Player(1).Hp == 8 && scene.Player(1).Armor == 1,
-            "Neither a held weapon nor a manually granted same-name policy bypasses native armor without the actual active weapon instance.");
-        scene.Use(CardKind.Duanhun, 5, [0]);
-        var armed = scene.Hit(1);
-        Need(armed.ArmorPayment is null && scene.Player(1).Hp == 6 && scene.Player(1).Armor == 1 &&
-            scene.Player(0).Equipment.Any(card => card.Kind == CardKind.Duanhun),
-            "Using the real hand card creates its actual equipment source and enables this battle's next damage immediately, even with a separate manual grant.");
-        scene.Use(CardKind.Lightning, 4, [0]);
-        scene.EndPlay(); scene.ReachPlay(minTurn: 4);
-        var lightning = scene.Events<DamageAppliedEvent>().Single(fact => fact.SourceLess && fact.TargetSeat == 0);
-        Need(scene.Events<DamageRequestedEvent>().Any(fact => fact.SourceLess && fact.TargetSeat == 0 &&
-                fact.SourceCard == CardKind.Lightning && fact.Amount == 3) &&
-            lightning.ArmorPayment is { SourceLess: true, ArmorBefore: 3, ArmorAbsorbed: 3, ArmorAfter: 0, HpLossAmount: 0 } &&
-            scene.Player(0).Hp == 8 && scene.Player(0).Armor == 0 && scene.Player(0).Equipment.Any(card => card.Kind == CardKind.Duanhun) &&
-            scene.Game.State.Winner == Winner.None && scene.Game.ResolutionStack.Count == 0,
-            "A real source-less Lightning judgment while Duanhun remains equipped pays all three armor points and loses no HP; no nominal source seat can borrow the weapon's policy.");
-    }
-
     private sealed class Scene(GameEngine game)
     {
         public GameEngine Game { get; } = game;

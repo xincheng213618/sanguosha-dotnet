@@ -35,7 +35,7 @@ internal static class AutomaticRescuePassChecks
         Save(unavailable);
         using var model = new MainViewModel(false, prepared.Seed, true, store, contentRegistry: registry)
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         var retired = Program.Engine(model);
         var retiredBoundary = Boundary(retired);
         Program.Assert(!model.HasSaveError && !model.IsAutoAdvance && retired.PendingDecision?.PromptId == unavailablePrompt.PromptId,
@@ -44,7 +44,7 @@ internal static class AutomaticRescuePassChecks
         // Replace the engine before that queued callback runs. The old game's public
         // prompt remains valid in its own engine and must still never be answered.
         Save(available);
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         var replacement = Program.Engine(model);
         var replacementBoundary = Boundary(replacement);
         Pump();
@@ -53,7 +53,7 @@ internal static class AutomaticRescuePassChecks
             "A deferred rescue pass must not answer either a retired engine or its replacement's legal rescue prompt.");
 
         Save(unavailable);
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         var actual = Program.Engine(model);
         var promptBeforePump = actual.CreateSnapshot(0).PendingDecision!;
         var expected = GameReplay.Restore(unavailable, registry);

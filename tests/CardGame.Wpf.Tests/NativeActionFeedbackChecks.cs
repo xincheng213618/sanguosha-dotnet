@@ -32,7 +32,7 @@ internal static class NativeActionFeedbackChecks
                 model.IsSoundEnabled = model.IsMusicEnabled = false;
                 foreach (var selected in new[] { false, true })
                 {
-                    model.LoadManualGameCommand.Execute(null);
+                    LegacySaveFixtures.Load(model);
                     var game = Engine(model);
                     var prompt = model.ChoiceSnapshot.PendingDecision!;
                     var checkpoint = game.CreateCheckpoint();
@@ -143,7 +143,7 @@ internal static class NativeActionFeedbackChecks
             using var model = new MainViewModel(false, prefix.Seed, true, store, useExpandedContent: false,
                 contentRegistry: registry, historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore())
                 { IsMotionEnabled = true, IsSoundEnabled = false, IsMusicEnabled = false };
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             Assert(!model.HasSaveError && model.BattleCues.Count == 0 && model.CanStepAi,
                 "The native Slash sample must restore before its actual declaration without replaying old effects.");
             using var host = new NativeResponseStatusChecks.NativeHost(model);
@@ -482,7 +482,7 @@ internal static class NativeActionFeedbackChecks
                 using var model = new MainViewModel(false, prefix.Seed, true, store, useExpandedContent: false,
                     contentRegistry: registry, historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore())
                     { IsMotionEnabled = true, IsSoundEnabled = false, IsMusicEnabled = false };
-                model.LoadManualGameCommand.Execute(null);
+                LegacySaveFixtures.Load(model);
                 Assert(!model.HasSaveError && model.BattleCues.Count == 0 && model.CanStepAi,
                     "The native group sample must restore immediately before its actual public inquiry.");
                 using var host = new NativeResponseStatusChecks.NativeHost(model);
@@ -625,7 +625,7 @@ internal static class NativeActionFeedbackChecks
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
         foreach (var selected in new[] { false, true })
         {
-            model.LoadManualGameCommand.Execute(null);
+            LegacySaveFixtures.Load(model);
             var game = Engine(model);
             var before = Boundary(game);
             var checkpoint = game.CreateCheckpoint();
@@ -664,7 +664,7 @@ internal static class NativeActionFeedbackChecks
         using var model = new MainViewModel(false, source.Seed, true, store, useExpandedContent: false,
             contentRegistry: registry, historyStore: new MemoryMatchHistoryStore(), preferencesStore: new MemoryPlayerPreferencesStore())
             { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        model.LoadManualGameCommand.Execute(null);
+        LegacySaveFixtures.Load(model);
         var game = Engine(model);
         var before = Boundary(game);
         var window = new MainWindow(model);

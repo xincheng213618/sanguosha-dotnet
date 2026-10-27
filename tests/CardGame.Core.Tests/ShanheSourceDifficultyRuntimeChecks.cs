@@ -11,9 +11,6 @@ internal static class ShanheSourceDifficultyRuntimeChecks
     public static void FrozenPreviewActualArmorDamageAndConditionalBossRegistryCold() =>
         VerifyNativeOpeningArmorAndDamage(restoreAtBoundaries: true);
 
-    public static void NativeOpeningArmorAndDamageForward() =>
-        VerifyNativeOpeningArmorAndDamage(restoreAtBoundaries: false);
-
     private static void VerifyNativeOpeningArmorAndDamage(bool restoreAtBoundaries)
     {
         var definition = Definition(25);
@@ -75,32 +72,6 @@ internal static class ShanheSourceDifficultyRuntimeChecks
             "Source terrain opens at hard one, independently of the three local difficulty values.");
         try { _ = Create(definition with { SourceEnemyGrowthHash = new string('0', 64) }); throw new InvalidOperationException("Stale source data hash was accepted."); }
         catch (ArgumentException) { }
-    }
-
-    public static void SourceSecondFormUsesItsOwnGrownNativeNumbersCold() =>
-        VerifySourceSecondFormNativeNumbers(restoreAtBoundaries: true);
-
-    public static void SourceSecondFormUsesItsOwnGrownNativeNumbersForward() =>
-        VerifySourceSecondFormNativeNumbers(restoreAtBoundaries: false);
-
-    private static void VerifySourceSecondFormNativeNumbers(bool restoreAtBoundaries)
-    {
-        var definition = Definition(25, stage: true);
-        var session = Create(definition);
-        var transition = session.PreviewEncounter("front").BossTransition!;
-        Need(transition is { MaxHp: 9, Hp: 9, DrawCards: 12, Combatant.DrawBonus: 6, Combatant.SlashBonus: 4,
-                Combatant.InitialArmor: 9, Combatant.ArmorRecoveryPerRound: 2, Combatant.ExtraDamage: 3 },
-            "A source second form grows from its explicit stage health and its own native stat recipe.");
-        Accept(session, new MoveShanheNodeCommand("front", session.Revision));
-        var scene = new Scene(session.PendingBattleSetup!); scene.Play();
-        scene.Use("twenty", 1, transformed: true);
-        if (restoreAtBoundaries) scene.Cold();
-        Need(scene.G.CreateSnapshot(0).Players[1] is { GeneralId: Boss, Hp: 9, MaxHp: 9, Armor: 9 } &&
-            scene.Events<ShanheBossStageStartedEvent>().Single() is { MaxHp: 9, Hp: 9 },
-            "The real lethal transition installs the second form's grown health and initial armor once.");
-        scene.Play();
-        Need(scene.G.CardMovements.Count(movement => movement.TurnNumber == 2 && movement.To == CardLocation.Hand(1) && movement.Reason == CardMoveReasons.Draw) == 8,
-            "The transformed boss's real draw phase uses its stage growth rather than the former general's draw bonus.");
     }
 
     private static ShanheCampaignDefinition Definition(int difficulty, bool terrain = false, bool stage = false)

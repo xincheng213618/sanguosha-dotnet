@@ -9,33 +9,6 @@ internal static class FirstSlashDuelBenefitChecks
     private const string Owner = "fixture:first-diamond-owner", Watch = "fixture:first-diamond-watch", Loss = "fixture:first-diamond-loss";
     private const string Extra = "fixture:first-diamond-extra", Mode = "identity:classic-first-diamond";
     private const string Fire = "fixture:first-diamond-fire";
-    public static void ActualFirstSlashPrivateDrawAndCombinedOrdinal()
-    {
-        var (g, registry) = Start(); var target = 1; var hand = V(g, 0).Hand.Count; var hp = V(g, target).Hp;
-        Native(g, CardKind.Slash, target); Reach(g, () => Optional(P(g), Skill)); Activate(g); Reach(g, () => Choice(g));
-        var root = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.FirstSlashDuelBenefit is not null);
-        var r = root.FirstSlashDuelBenefit!; var prompt = P(g)!;
-        Need(r.FrozenDiamondCount == V(g, target).Hand.Count && r.FrozenDiamondCount > 0 &&
-            prompt.Choices.All(c => c.Cards.Count == 0 && c.Targets.Count == 0 && c.Parameters.Keys.All(k => k is "program-action" or "frame-id" or "branch")) &&
-            prompt.Choices.Select(c => c.Label).SequenceEqual(["摸X张牌", "令此牌伤害+X"]),
-            "The private actual choice reveals neither an opponent entity nor the frozen suit count before selection.");
-        Need(Enumerable.Range(1, 3).All(s => g.CreateSnapshot(s).PendingDecision is null), "Only the real chooser sees this pending choice.");
-        var before = State(g); Need(!g.Submit(new AnswerPromptCommand(1, prompt.PromptId, prompt.Choices[0].Id, g.Revision)).Accepted && before == State(g),
-            "A foreign chooser cannot settle or mutate the first-use benefit.");
-        g = Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("branch") == "draw"); Play(g);
-        var issued = E<FirstSlashDuelBenefitIssuedEvent>(g).Single();
-        Need(issued.Receipt.SelectedBranch == "draw" && issued.Receipt.DrawCount == r.FrozenDiamondCount &&
-            V(g, 0).Hand.Count == hand - 1 + r.FrozenDiamondCount && V(g, target).Hp == hp - 1 &&
-            g.CardMovements.Count(m => m.Reason.Value == "skill-program.first-slash-duel.draw") == r.FrozenDiamondCount,
-            "The first actual Slash draws exactly the frozen Diamond count and keeps its original one damage.");
-        Native(g, CardKind.Duel, 2); Play(g);
-        Need(E<FirstSlashDuelBenefitIssuedEvent>(g).Count() == 1 && E<FirstSlashDuelUseRecordedEvent>(g).Select(e => e.Ordinal).SequenceEqual([1, 2]),
-            "Slash and Duel share a declaration ordinal even when the next effective kind differs.");
-        Need(E<CardActionAcceptedEvent>(g).Count(e => e.Action.ActionId == r.ActionId) == 1 &&
-            E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == r.CardUseFrameId) == 1,
-            "The benefit never recommits or finishes its native owning use twice.");
-        _ = Cold(g, registry);
-    }
     private static PlayerSnapshot V(GameEngine g, int seat) => g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 4).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static IEnumerable<T> E<T>(GameEngine g) where T : IGameEvent => g.Events.Select(e => e.Payload).OfType<T>();

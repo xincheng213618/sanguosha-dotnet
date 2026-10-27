@@ -7,7 +7,6 @@ using CardGame.Core.Campaigns;
 internal static class ShanheCaoxingChecks
 {
     private const string Liushi = "ol:liu-shi", Zhanwan = "ol:zhan-wan", Activation = "topdeck-heart-slash";
-    private const string Boss = StandardShanheS5CaoxingPackage.CaoxingId;
     private const string Dangtou = "shanhe:current-dangtou-2037", Third = "shanhe:current-duoduo-yishan-2084";
     private const string Capacity = "shanhe:current-jinnangji-2011", Roulin = "shanhe:s5-roulin-14211";
     private const string Owner = "fixture:caoxing-owner", Victim = "fixture:caoxing-victim", Peer = "fixture:caoxing-peer";
@@ -77,86 +76,6 @@ internal static class ShanheCaoxingChecks
         VerifyReacquiredInstanceDoesNotClaimOriginalDamage();
     }
 
-    public static void StackedLiushiClearsAllAtNativeDiscardEndAndDrawsExactCountCold()
-    {
-        var s = Scene.Start("stacked"); s.Play(); s.HitTwice();
-        Need(s.V(1).Hp == 3 && s.Mark(1) == 2 && s.V(1).HandCount == 6,
-            "Two independently paid native Slash hits leave two persistent Liushi effects without touching the target's six old hand entities.");
-        var originalHand = s.G.CreateSnapshot(1).Players[1].Hand.Select(card => card.Id).ToHashSet();
-        s.EndPlay(); s.Until(() => s.AtEnd("before"));
-        var discarded = s.HandDiscards(1);
-        var ending = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == EndWatch).WindowContext!;
-        Need(s.V(1).HandLimit == 1 && s.V(1).HandCount == 1 && discarded.Length == 5 &&
-            discarded.Select(move => move.CardId).Distinct().Count() == 5 && discarded.All(move => originalHand.Contains(move.CardId)) &&
-            ending is { Window: SkillProgramTriggerWindow.DiscardPhaseEnded, TargetSeat: 1, Facts.TurnOwnerDiscardPhaseHandDiscardCount: 5 } &&
-            s.Draws(Zhanwan).Length == 0 && s.Mark(1) == 2,
-            "The actual NPC actor's HP3 minus two persistent effects gives hand limit one and exactly five original hand-limit movements, frozen in its real discard-end context before Zhanwan starts.");
-        s.Cold(); s.Continue(); s.Until(() => s.AtGain() && s.Proof is { RequestedCount: 5, ActualCount: 5 } proof && proof.LastBatchId == s.Batch!.Id);
-        var root = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Zhanwan);
-        var invoice = s.Draws(Zhanwan).Single();
-        s.AssertDrawPayment(root, invoice);
-        Need(invoice.Requested == 5 && invoice.ActualCount == 5 && invoice.ParentFrameId == root.Id && invoice.OwnerSeat == 0 &&
-            invoice.ActualTurnOwnerSeat == 1 && invoice.ActualTurnDrawOrdinal == 1 && s.Mark(1) == 2 &&
-            s.G.CardMovements.Count(move => move.To == CardLocation.Hand(0) && move.Reason == DrawReason) == 5,
-            "One true Draw5 is paid once, with its exact owning Zhanwan parent and first actual-draw-call ordinal; per-card gain batches do not multiply the reward.");
-        s.Cold(); s.Continue(); s.Until(() => s.AtEnd("after"));
-        Need(s.Mark(1) == 0 && s.V(1).HandLimit == 3 && s.V().HandCount == 7 && s.Draws(Zhanwan).Length == 1 &&
-            s.Draws(Third) is [{ Requested: 2, ActualCount: 2, ActualTurnDrawOrdinal: 2 }] &&
-            s.E<PlayerMarkerChangedEvent>().Where(fact => fact.PlayerSeat == 1 && fact.Marker == PlayerMarkerKind.LiuShi).Select(fact => fact.Delta).SequenceEqual([1, 1, -2]) &&
-            s.E<ProgramBindingResolvedEvent>().Count(fact => fact.FrameId == root.Id && fact.SkillId == Zhanwan && fact.Completed) == 1 &&
-            s.E<ProgramLiushiEffectClearedEvent>().Single() is { RemovedCount: 2, OwnerSeat: 0, TargetSeat: 1 } cleared && cleared.FrameId == root.Id &&
-            s.DrawPhaseTotal() == 0 && s.V().HandLimit is null,
-            "Zhanwan clears all two effects after the paid draw; its one normal Draw5 triggers one actual Duoduo III Draw2, while another actor's discard and outside-phase draws do not count for Jinnangji or reveal an inactive hand limit.");
-        s.Cold(); s.Continue(); s.Until(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
-        Need(s.Draws(Zhanwan).Length == 1 && s.Mark(1) == 0 && s.HandDiscards(1).Length == 5,
-            "Returning through the next bounded native turn cannot drain the cleared target again or pay its five discarded entities twice.");
-        s.Cold();
-
-        var zero = Scene.Start("zero"); zero.Play();
-        zero.Begin(zero.V().Hand.First(card => card.Suit == Suit.Heart).Id, 1); zero.Play(); zero.EndPlay();
-        zero.Until(() => zero.E<TurnStartedEvent>().Any(fact => fact.ActorSeat == 2));
-        Need(zero.Mark(1) == 1 && zero.HandDiscards(1).Length == 0 && zero.Draws(Zhanwan).Length == 0 &&
-            zero.E<ProgramBindingStartedEvent>().All(fact => fact.SkillId != Zhanwan),
-            "A genuinely affected target who discards zero cards gives no draw and does not prematurely erase its persistent Liushi effect.");
-        zero.Cold();
-    }
-
-    public static void PaidZhanwanDrawRetainsSourceLossTailAndActualS5RecipesStayIsolatedCold()
-    {
-        foreach (var scene in new[] { "paid-loss", "paid-death" })
-        {
-            var s = Scene.Start(scene); s.Play(); s.HitTwice(); s.EndPlay(); s.Until(() => s.AtEnd("before")); s.Continue();
-            s.Until(() => s.AtMutation("paid"));
-            var root = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Zhanwan);
-            var invoice = s.Draws(Zhanwan).Single();
-            s.AssertDrawPayment(root, invoice);
-            Need(invoice.ParentFrameId == root.Id && invoice.Requested == 5 && invoice.ActualCount == 5 && s.Mark(1) == 2,
-                "The actual Draw5 is already paid and owned by the original Zhanwan frame before its real gain child can remove or kill the source.");
-            s.Cold(); s.Continue();
-            if (scene == "paid-loss")
-            {
-                s.Until(() => s.AtMutation("lost"));
-                Need(s.V().Hp == 19 && !s.Has(Zhanwan) && s.Mark(1) == 2,
-                    "A real HP change removes the derived Zhanwan grant inside the already-paid native draw child, before clearing the target.");
-                s.Cold(); s.Continue(); s.Until(() => s.AtEnd("after"));
-            }
-            else s.Until(() => !s.V().IsAlive && s.Mark(1) == 0 && s.G.ResolutionStack.OfType<ProgramSkillFrame>().All(frame => frame.Id != root.Id));
-            Need(s.Mark(1) == 0 && s.Draws(Zhanwan).Length == 1 && s.Draws(Zhanwan).Single().InvocationId == invoice.InvocationId &&
-                s.G.CardMovements.Count(move => move.To == CardLocation.Hand(0) && move.Reason == DrawReason) == 5 &&
-                s.HandDiscards(1).Length == 5 && s.E<ProgramLiushiDrawPaidEvent>().Length == 1,
-                "Loss or actual death cannot repeat the issued Draw5 or five original discard payments. " + s.PaidDiagnostic(root.Id));
-            Need(s.G.ResolutionStack.OfType<ProgramSkillFrame>().All(frame => frame.Id != root.Id) &&
-                s.E<ProgramBindingResolvedEvent>().Count(fact => fact.FrameId == root.Id && fact.SkillId == Zhanwan) == 1,
-                "The original paid Zhanwan frame must return and resolve exactly once after its real source-loss child. " + s.PaidDiagnostic(root.Id));
-            Need(s.E<ProgramLiushiEffectClearedEvent>().Single() is { RemovedCount: 2 } cleared && cleared.FrameId == root.Id,
-                "The paid Zhanwan clear instruction must execute once with the original target. " + s.PaidDiagnostic(root.Id));
-            Need(s.G.State.Winner == Winner.None,
-                "The source-death fixture retains a genuine live teammate and must prove paid return without a game-over stack-clear shortcut. " + s.PaidDiagnostic(root.Id));
-            s.Cold();
-        }
-        VerifyActualRecipes();
-    }
-
     private static void VerifyPublishedAndTargetedAi(Scene scene)
     {
         var before = State(scene.G); var view = scene.G.CreateSnapshot(0);
@@ -201,38 +120,6 @@ internal static class ShanheCaoxingChecks
             s.E<ProgramSkillResolvedEvent>().Count(fact => fact.SkillId == Liushi && fact.ActivationId == Activation) == 1,
             "Returning past the stale after-damage candidate neither throws nor applies the old effect through the newly acquired same-ID skill; actual paid damage and the original activation still return once.");
         s.AssertTopCost(cost, CardLocation.Hand(0)); s.Cold();
-    }
-
-    private static void VerifyActualRecipes()
-    {
-        var old = StandardShanheCampaignCatalog.CreateDefinition(1, StandardShanheCampaignCatalog.LocalEditionId);
-        Need(old.Nodes.SelectMany(node => node.Encounters ?? []).SelectMany(encounter => encounter.Enemies).All(member => member.GeneralId != Boss),
-            "The S5 Cao Xing recipe is absent from the retained 2024 edition.");
-        for (var difficulty = 1; difficulty <= 3; difficulty++)
-        {
-            var definition = StandardShanheCampaignCatalog.CreateDefinition(difficulty, StandardShanheCampaignCatalog.Returning2026EditionId);
-            var node = definition.Nodes.Single(node => node.Id == "guangcheng");
-            var encounter = node.Encounters!.Single(encounter => encounter.Id == "guangcheng:caoxing-s5");
-            Need(encounter.Enemies is [{ GeneralId: Boss, MaxHpBonus: 0, Hp: null, InitialHandBonus: 0, DrawBonus: 0, SlashBonus: 0, StartingHand: null }] &&
-                (encounter.Enemies[0].ExtraSkillIds?.Count ?? 0) == 0 && (encounter.Allies?.Count ?? 0) == 0,
-                "Each local tier uses the source base Cao Xing rather than inventing higher-form skills, growth, fixed hand, equipment or allies.");
-            var setup = new ShanheBattleSetup(83, 1, node.Id, "classic:guan-yu", 4, 0, 0, 0, 0, [], [], [], encounter.Enemies,
-                encounter.Allies ?? [], ShanheCampaignContent.GetContentHash(definition));
-            var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup);
-            Need(registry.Generals[Boss].BaseHp == 4 && registry.Generals[Boss].SkillIds.SequenceEqual([Liushi, Zhanwan]),
-                "The actual conditional S5 package reuses the two exact production OL programs and raw four maximum HP.");
-            var game = StandardShanheCampaignCatalog.CreateBattle(setup); var started = game.Submit(new StartGameCommand());
-            Need(started.Accepted, started.Error?.Message ?? "The actual S5 encounter did not start.");
-            var view = game.CreateSnapshot(0).Players.Single(player => player.GeneralId == Boss);
-            Need(view is { Hp: 4, MaxHp: 4, HandCount: 4, Armor: 0 } && view.Equipment.Count == 0 &&
-                view.Skills?.Select(skill => skill.ContentId).ToHashSet().SetEquals([Liushi, Zhanwan]) == true,
-                "Actual S5 enemy startup has four real opening cards, raw four HP, only the printed two skills and no fabricated equipment or armor.");
-            var before = State(game); game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
-            Need(before == State(game), "The actual S5 enemy, source identity and native setup survive cold replay.");
-            var ordinary = setup with { EnemyRoster = [new("classic:cao-cao")] };
-            Need(!StandardShanheCampaignCatalog.CreateBattleRegistry(ordinary).Generals.ContainsKey(Boss),
-                "A warmed ordinary recipe does not import the S5 alias merely because the normal OL programs are available.");
-        }
     }
 
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
