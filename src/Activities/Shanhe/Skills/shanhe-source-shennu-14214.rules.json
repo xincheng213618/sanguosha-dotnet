@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "shanhe:source-shennu-14214", "revision": 1,
+      "triggers": [
+        { "id": "actual-damage-received", "window": "damageAppliedBeforeDying", "subject": "owner",
+          "damageOccurrence": "perDamage", "optional": false,
+          "effects": [{ "op": "resolveShanheSourceShennu", "target": "owner" }] }
+      ] }
+  ]
+}

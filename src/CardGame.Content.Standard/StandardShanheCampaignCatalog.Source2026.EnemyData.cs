@@ -272,6 +272,10 @@ public static partial class StandardShanheCampaignCatalog
             [
                 new(4872, 5, 5, 2, 4, 0, 0, 0, 5, 0, false, [new(5, new(0, 0, 1, 1, 0, 0, 0))]),
             ],
+            [268701] =
+            [
+                new(4871, 20, 20, 2, 4, 0, 0, 0, 5, 0, false, [new(5, new(0, 0, 1, 1, 0, 0, 0))]),
+            ],
         });
 
     private static ShanheEncounterDefinition WithSource2026EnemyData(ShanheEncounterDefinition encounter, int sourceGroupId)

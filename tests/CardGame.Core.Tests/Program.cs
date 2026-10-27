@@ -617,6 +617,8 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe source Zhangyan: medium map lethal stage and native turn", ShanheSourceZhangYanStageChecks.Source2653MediumRouteLethalTransitionStartsTheRealZhangYanTurn),
     ("Shanhe source Zhangyan: higher cumulative skills physical armor and native stage", ShanheSourceZhangYanHighStageChecks.HigherSource2653KeepsCumulativeSkillsAndRealSanshouAcrossItsNativeStage),
     ("Shanhe source Dongdang: native opening entry interrupts and starts boss first", ShanheSourceDongdangChecks.ActualOpeningEntryConsumesItsNativeInstanceAndStartsBossFirst),
+    ("Shanhe source Shennu stage: actual high map native transformation and gear", ShanheSourceShenNuStageChecks.ActualSource2687EntersItsTwentyHpShenNuStageWithCumulativeGear),
+    ("Shanhe source Shennu: actual damage source HP draws and owned anger settlement", ShanheSourceShennuChecks.ActualDamageEarnsOneNuDrawsRealSourceHpAndOnlyCompletedOutgoingDamageClears),
     ("Shanhe Sanshou armor: physical grant effectiveness removal and printed skill", ShanheSanshouArmorChecks.PhysicalArmorGrantPreventsOnlyWhileEffectiveAndLeavesPrintedSanshouAlone),
     ("Shanhe Sanshou market: source price paid hand card and native equip during play", ShanheSanshouMarketChecks.PaidSourceArmorJoinsCurrentHandThenEquipsThroughItsNativeUse),
     ("Shanhe source Biri: fire prevention atomic recovery and child returns", ShanheSourceBiriChecks.FirePreventionUsesAtomicRecoveryResultBeforeHealthAndDrawChildren),

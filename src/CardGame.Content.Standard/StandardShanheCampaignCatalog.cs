@@ -375,6 +375,8 @@ public static partial class StandardShanheCampaignCatalog
             ids.Contains(StandardShanheS5MoushiPackage.ShenpeiId, StringComparer.Ordinal);
         var s5HanEmperors = RequiresThreeBossRegistry(requirements, StandardShanheS5HanEmperorsPackage.LiuxieId,
             StandardShanheS5HanEmperorsPackage.ShiyuanId) || ids.Contains(StandardShanheS5HanEmperorsPackage.LiubianId, StringComparer.Ordinal);
+        var sourceShenNu = RequiresThreeBossRegistry(requirements,
+            StandardShanheSourceShenNuStagePackage.GeneralId, StandardShanheSourceShenNuStagePackage.SkillId);
         var sourceZhangYan = RequiresThreeBossRegistry(requirements,
             StandardShanheSourceZhangYanPackage.ZhangniujiaoMediumId,
             StandardShanheSourceZhangYanPackage.YanyuSkillId,
@@ -477,6 +479,7 @@ public static partial class StandardShanheCampaignCatalog
             (s5HanEmperors ? "/s5-han-emperors-2643" : "") +
             (s5Xuncan ? "/s5-xuncan-caoshi-2657" : "") +
             (sourceZhangYan ? "/source-zhangyan-265301" : "") +
+            (sourceShenNu ? "/source-shennu-268701" : "") +
             (s5Simayi ? "/s5-simayi-2677" : "") +
             (s5Dianwei ? "/s5-dianwei-weizi-2650" : "") +
             (s5Xiahou ? "/s5-xiahou-pair-2651" : "") +
@@ -633,6 +636,7 @@ public static partial class StandardShanheCampaignCatalog
             if (s5HanEmperors) packages.Add(new StandardShanheS5HanEmperorsPackage());
             if (s5Xuncan) packages.Add(new StandardShanheS5XuncanCaoshiPackage());
             if (sourceZhangYan) packages.Add(new StandardShanheSourceZhangYanPackage());
+            if (sourceShenNu) packages.Add(new StandardShanheSourceShenNuStagePackage());
             if (ids.Any(id => id is StandardShanheS5SunJianWuguotaiPackage.SunjianId or StandardShanheS5SunJianWuguotaiPackage.WuguotaiId))
                 packages.Add(new StandardShanheS5SunJianWuguotaiPackage());
             if (ids.Contains(StandardShanheS5DongZhuoBasePackage.DongzhuoId, StringComparer.Ordinal))

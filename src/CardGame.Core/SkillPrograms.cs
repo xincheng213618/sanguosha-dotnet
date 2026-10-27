@@ -1142,6 +1142,7 @@ public enum SkillProgramEffectOp
     ReviveShanheRoundAllies = 62045,
     ResolveShanheSourceYanyu = 62046,
     PreventShanheSourceFireRecoverDraw = 62047,
+    ResolveShanheSourceShennu = 62048,
     CollectPublicPile = 780,
     GrantNextCardTargetAdjustment = 782,
     GrantNextActualUseTargetAdjustment = 4700,
@@ -6085,7 +6086,7 @@ public sealed class SkillProgramCatalog
               damageOccurrence == SkillProgramDamageOccurrence.PerDamage &&
               effects is [{ Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.Owner, Amount: 1,
                   NumberExpression: null, Condition.Kind: SkillProgramConditionKind.Always }]) &&
-            effects.Any(effect => effect.Op is not (SkillProgramEffectOp.ChangeAttributedMarker or SkillProgramEffectOp.DrawByDamageCardColor or SkillProgramEffectOp.KillRoundFocusSlashVictim or SkillProgramEffectOp.RecordAnniversaryGuanYuNightmare) ||
+            effects.Any(effect => effect.Op is not (SkillProgramEffectOp.ChangeAttributedMarker or SkillProgramEffectOp.DrawByDamageCardColor or SkillProgramEffectOp.KillRoundFocusSlashVictim or SkillProgramEffectOp.RecordAnniversaryGuanYuNightmare or SkillProgramEffectOp.ResolveShanheSourceShennu) ||
                                   effect.Target != SkillProgramEffectTarget.Owner))
             Fail(path + ".effects", "damageAppliedBeforeDying supports only owner attributed-marker records");
         if (effects.Any(effect => ContainsCardUseColorCondition(effect.Condition)) && !isCardActionWindow)

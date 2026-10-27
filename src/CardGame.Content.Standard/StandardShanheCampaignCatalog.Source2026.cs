@@ -39,7 +39,6 @@ public static partial class StandardShanheCampaignCatalog
         var bindings = Source2026BossBindings.Where(binding => binding.BattleId switch
         {
             2653 => sourceDifficultyId < 3 || sourceDifficultyId >= 6 && sourceDifficultyId <= Source2026ZhangYanMaximumSupportedDifficultyId,
-            2687 => sourceDifficultyId < 3,
             _ => true
         })
             .ToDictionary(binding => binding.BattleId);
@@ -129,6 +128,7 @@ public static partial class StandardShanheCampaignCatalog
                 "首领从已支持的来源基础阵容中选取；普通3起接入已实现的原二阶段。" +
                 "暴怒战神在困难起获得神威、炼狱再获神戟；神鬼无前在噩梦起使用动态无双、炼狱再获神躯；董旻在噩梦起获得篡朝。" +
                 "黄巾余匪分为张牛角与张燕两阶段。" +
+                "改朝罪魁被击败后，篡天恶魂继续应战。" +
                 "各档均可直接选择；本地以每场战斗的序号作日数，体力成长同时增加体力上限，" +
                 "护甲从第二轮起按每轮回复量补充至上限，已有护甲超过上限时不倒扣。" +
                 "普通档前战后回复1点体力、关底后回复2点；中等1起取消自动战后回复，困难1起启用原地点地形。",
@@ -251,6 +251,7 @@ public static partial class StandardShanheCampaignCatalog
         2653 when difficulty >= 6 => Source2026ZhangYanTransition(difficulty),
         2670 => new(0, "ol:niu-fu", 5, 5, 4) { Combatant = Source2026StageCombatant(267001, "ol:niu-fu") },
         2671 => Source2026DongMinTransition(difficulty),
+        2687 => Source2026ShenNuTransition(difficulty),
         _ => null
     };
 
@@ -299,6 +300,18 @@ public static partial class StandardShanheCampaignCatalog
         {
             Combatant = Source2026StageCombatant(265301, generalId),
             StartingEquipment = difficulty >= 11 ? [new(CardKind.ShanheSanshou, Suit.Heart, 12)] : []
+        };
+    }
+
+    private static ShanheBossTransition Source2026ShenNuTransition(int difficulty)
+    {
+        var generalId = StandardShanheSourceShenNuStagePackage.GeneralId;
+        var equipment = new List<ShanheStartingCard>();
+        if (difficulty >= 11) equipment.Add(new(CardKind.ShuraInfernoHalberd, Suit.Heart, 12));
+        if (difficulty >= 16) equipment.Add(new(CardKind.LionBelt, Suit.Club, 2));
+        return new(0, generalId, 20, 20, 4)
+        {
+            Combatant = Source2026StageCombatant(268701, generalId), StartingEquipment = equipment.ToArray()
         };
     }
 }

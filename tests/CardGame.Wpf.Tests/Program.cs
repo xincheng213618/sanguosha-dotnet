@@ -78,6 +78,7 @@ internal static class Program
             Check("active effect badges restore actual duration and clear consumed facts", () => ActiveEffectUiChecks.LiveEffectsRestoreAndExpire(output));
             Check("Equipment slots UI: abolished slots remain visible and restore", () => EquipmentSlotUiChecks.AbolishedSlotsRemainVisibleAndRestore(output));
             Check("Shanhe Xingtian artwork: existing face and equipment icon", () => ShanheXingtianArtworkChecks.ExistingAxeAssetsDecodeAndRenderInEquipmentSlot(output));
+            Check("Shanhe Sanshou artwork: original armor and halberd faces with printed titles", () => ShanheSanshouArtworkChecks.PublicCatalogueFaceLoadsAndUsesItsPrintedTitle(output));
             Check("table shortcuts execute once per key press and preserve modal drafts", TableShortcutChecks.SinglePressActions);
             Check("table modal focus follows startup and current visible panels", () => ModalFocusChecks.StartupAndModalTransitions(output));
             Check("table overlays cover elevated badges and restore pointer input", () => TableOverlayNavigationChecks.ModalsCoverElevatedBadges(output));

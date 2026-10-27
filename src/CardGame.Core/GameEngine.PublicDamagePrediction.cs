@@ -180,6 +180,8 @@ public sealed partial class GameEngine
         if (!finalized)
             additional = checked(additional + ShanheS5JiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards) +
                 ClassicJiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards));
+        if (!finalized && !sourceLess && !chain)
+            additional = checked(additional + ShanheShennuPublicDamageBonus(view, sourceSeat, sourceLess, chain, issuedAttack));
         if (!finalized && issuedAttack is null && cardUse && !sourceLess && !chain)
             additional = checked(additional + WangongPublicProposedBonus(view, sourceSeat, kind));
         if (!finalized && (issuedAttack is not null || cardUse))

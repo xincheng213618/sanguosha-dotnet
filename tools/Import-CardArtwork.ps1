@@ -26,7 +26,14 @@ function Get-VerifiedSource([string]$Name, [string]$Url, [string]$Hash, [string]
     $uri = [Uri]$Url
     $official = $uri.Host -in @('sanguosha.com', 'www.sanguosha.com', 'web.sanguosha.com')
     $attributedWiki = $SourceKind -ceq 'communityIllustration' -and $uri.Host -ceq 'patchwiki.biligame.com' -and $uri.AbsolutePath.StartsWith('/images/msgs/', [StringComparison]::Ordinal)
-    if ($uri.Scheme -ne 'https' -or -not ($official -or $attributedWiki)) {
+    $publicCatalogue = $SourceKind -ceq 'publicCatalogueCardFace' -and $uri.Host -ceq 's.xiaochao.org' -and
+        $uri.IsDefaultPort -and -not $uri.UserInfo -and -not $uri.Query -and -not $uri.Fragment -and
+        $uri.AbsolutePath -cmatch '^/data/images/[a-f0-9]{24}\.png$'
+    if ($publicCatalogue -and ($Hash -notmatch '^[A-Fa-f0-9]{64}$' -or
+        -not $Hash.StartsWith([IO.Path]::GetFileNameWithoutExtension($uri.AbsolutePath), [StringComparison]::OrdinalIgnoreCase))) {
+        throw "Public catalogue image name must match its SHA-256 prefix: $Url"
+    }
+    if ($uri.Scheme -ne 'https' -or -not ($official -or $attributedWiki -or $publicCatalogue)) {
         throw "Unexpected authenticated artwork host: $Url"
     }
     $path = Join-Path $SourceDirectory $Name
@@ -97,6 +104,23 @@ foreach ($entry in $entries) {
             ($entry.kind -and ($generated.PixelWidth -ne 186 -or $generated.PixelHeight -ne 260))) {
             throw "Invalid existing project artwork dimensions: $($entry.file)"
         }
+        continue
+    }
+    if ($entry.sourceKind -ceq 'publicCatalogueCardFace') {
+        if (-not $entry.kind -or $entry.source.rankSuitBakedIn -ne $false -or
+            $entry.source.originalSize.Count -ne 2 -or $entry.source.originalSize[0] -ne 186 -or $entry.source.originalSize[1] -ne 260 -or
+            $entry.transform.mode -cne 'copy' -or $entry.transform.outputSize.Count -ne 2 -or
+            $entry.transform.outputSize[0] -ne 186 -or $entry.transform.outputSize[1] -ne 260 -or
+            $entry.sha256 -ine $entry.source.imageSha256) {
+            throw "Invalid original public catalogue face mapping: $($entry.file)"
+        }
+        $sourcePath = Get-VerifiedSource "$($entry.kind)-original.png" $entry.source.imageUrl $entry.source.imageSha256 $entry.sourceKind
+        $original = Read-ArtworkBitmap $sourcePath
+        if ($original.PixelWidth -ne 186 -or $original.PixelHeight -ne 260) {
+            throw "Public catalogue face dimensions changed: $($entry.kind)"
+        }
+        # Preserve the exact original complete PNG, including its printed name.
+        $prepared[$entry.file] = $sourcePath
         continue
     }
     if ($entry.sourceKind -cnotin @('officialCardFace', 'officialIllustration', 'communityIllustration') -or -not $entry.kind -or

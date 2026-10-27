@@ -154,6 +154,7 @@ public enum DamageNature
 /// </summary>
 public enum PlayerMarkerKind
 {
+    ShanheSourceNu = 62048,
     MobileBoundaryAnguo = 53200,
     AnniversaryHuCheErZhong = 49500,
     AnniversaryLeiBoSilei = 49800,
@@ -260,6 +261,7 @@ public static class PlayerMarkerCatalog
 {
     public static string GetDisplayName(PlayerMarkerKind marker) => marker switch
     {
+        PlayerMarkerKind.ShanheSourceNu => "怒",
         PlayerMarkerKind.MobileBoundaryAnguo => "安国",
         PlayerMarkerKind.MuShunJin => "劲",
         PlayerMarkerKind.XiahouJieLie => "裂",

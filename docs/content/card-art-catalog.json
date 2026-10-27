@@ -644,6 +644,25 @@
       "sha256": "7A8C999CFA651D7C1DDCBE6DDF257580E69CADC26CC04D3B1881F1A22C54A61F"
     },
     {
+      "kind": "ShanheSanshou",
+      "file": "ShanheSanshou.png",
+      "sourceKind": "publicCatalogueCardFace",
+      "source": {
+        "pageUrl": "https://s.xiaochao.org/data/cards.json",
+        "catalogueCardId": 4061,
+        "imageUrl": "https://s.xiaochao.org/data/images/b82d9ccf44e19a7b160c1a00.png",
+        "imageSha256": "B82D9CCF44E19A7B160C1A00E150AEC283CC88FD71ABC82AAECC54BF762C674B",
+        "originalSize": [186, 260],
+        "rankSuitBakedIn": false
+      },
+      "transform": {
+        "mode": "copy",
+        "outputSize": [186, 260]
+      },
+      "sha256": "B82D9CCF44E19A7B160C1A00E150AEC283CC88FD71ABC82AAECC54BF762C674B",
+      "notes": "Unmodified complete face from public catalogue card4061. Its original printed title, armor illustration and equipment label are retained. The upstream official frame identity is not established; this catalogue URL is not labelled official. Runtime suit/rank remain separate. No equipment strip is synthesized."
+    },
+    {
       "kind": "GeneralWeapon",
       "file": "GeneralWeapon.png",
       "sourceKind": "projectGenerated",
@@ -704,18 +723,22 @@
     {
       "kind": "WushuangHalberd",
       "file": "WushuangHalberd.png",
-      "sourceKind": "projectGenerated",
+      "sourceKind": "publicCatalogueCardFace",
       "source": {
-        "generator": "tools/Build-HulaoCardArtwork.ps1",
-        "generatorSha256": "94570089D1BB9B7CEFAC6146C450BB8DD37E11B5FB85209B956F09E436C65B33",
-        "originalSize": [
-          186,
-          260
-        ],
+        "pageUrl": "https://s.xiaochao.org/data/cards.json",
+        "catalogueCardId": 4026,
+        "catalogueAliasCardId": 4197,
+        "imageUrl": "https://s.xiaochao.org/data/images/0ecbb32fc66c2c3be8c682a2.png",
+        "imageSha256": "0ECBB32FC66C2C3BE8C682A2DFBA2D09F2CC46E58D275253BA5C399971E32642",
+        "originalSize": [186, 260],
         "rankSuitBakedIn": false
       },
-      "sha256": "AAC6B7D2E1AD5B4735E711A9D105339AF917BF8B52CDE4321EF79184E76D900F",
-      "notes": "Original project-drawn Hulao symbol and KaiTi label; not official game artwork. Rank and suit remain runtime overlays."
+      "transform": {
+        "mode": "copy",
+        "outputSize": [186, 260]
+      },
+      "sha256": "0ECBB32FC66C2C3BE8C682A2DFBA2D09F2CC46E58D275253BA5C399971E32642",
+      "notes": "Unmodified complete public catalogue face shared by cards4026/4197. Exact name and on-Slash damage choice match local WushuangHalberd; the printed attack range4 matches native equipment range4. Original title, weapon art, range and equipment label are retained without baked suit/rank. Official upstream frame identity is not established. Existing project equipment strip is retained separately."
     },
     {
       "kind": "PurpleGoldCrown",
