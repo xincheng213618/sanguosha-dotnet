@@ -752,7 +752,11 @@ public sealed partial record CardUseFrame(
 public sealed record SequentialTrickUse(LegalActionKind ActionKind, int? FirstTargetCardId, CardKind? RequiredCardKind);
 
 /// <summary>The revealed card becomes public only after the target chooses it.</summary>
-public sealed record FireAttackSelectionState(int? RevealedCardId);
+public sealed record FireAttackSelectionState(int? RevealedCardId)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? RevealedPaymentCardId { get; init; }
+}
 
 public sealed record ResponseWindowFrame(
     long Id,

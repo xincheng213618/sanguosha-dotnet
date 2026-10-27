@@ -194,7 +194,9 @@ public sealed partial class GameEngine
 
     private void RefreshShanheMarketSuspendedPrompt(ShanheMarketDiscardQuote? discardQuote)
     {
+        if (RefreshShanheAlliedHarvestSelection()) return;
         if (RefreshShanheMarketDiscardPrompt(discardQuote)) return;
+        if (RefreshRevealedFireAttackPaymentPrompt()) return;
         if (_pendingDecision is not { } pending || pending.PlayerSeat != 0) return;
         var actor = _players[0];
         if (pending.Kind is DecisionKind.RespondDodge or DecisionKind.RespondSlash)

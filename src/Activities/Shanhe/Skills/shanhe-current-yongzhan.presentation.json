@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:current-yongzhan-2174": { "name": "勇战Ⅰ", "description": "你脱离濒死时，对所有敌方造成1点伤害。" },
+    "shanhe:current-yongzhan-2175": { "name": "勇战Ⅱ", "description": "你脱离濒死时，对所有敌方造成2点伤害。" }
+  }
+}

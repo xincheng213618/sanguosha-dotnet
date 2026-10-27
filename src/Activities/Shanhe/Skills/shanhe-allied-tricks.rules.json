@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:current-fengshounian-2241", "revision": 1,
+      "cardPolicies": [
+        { "id": "public-allied-pickers", "kind": "alliedHarvestOnly", "cardKinds": ["fiveGrains"] }
+      ]
+    },
+    {
+      "id": "shanhe:current-jiemeng-2243", "revision": 1,
+      "cardPolicies": [
+        { "id": "public-allied-recovery", "kind": "alliedPeachGardenDoubleRecovery", "cardKinds": ["peachGarden"] }
+      ]
+    }
+  ]
+}

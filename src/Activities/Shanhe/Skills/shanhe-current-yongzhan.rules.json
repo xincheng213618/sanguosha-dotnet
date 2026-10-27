@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:current-yongzhan-2174",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "survived-dying-enemies",
+          "window": "dyingExited",
+          "subject": "owner",
+          "optional": false,
+          "effects": [
+            { "op": "selectAllPublicTeamTargets", "target": "owner", "targetKind": "publicTeamEnemies", "allowEmpty": true },
+            { "op": "damageParticipants", "target": "selectedTargets", "amount": 1, "nature": "normal" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shanhe:current-yongzhan-2175",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "survived-dying-enemies",
+          "window": "dyingExited",
+          "subject": "owner",
+          "optional": false,
+          "effects": [
+            { "op": "selectAllPublicTeamTargets", "target": "owner", "targetKind": "publicTeamEnemies", "allowEmpty": true },
+            { "op": "damageParticipants", "target": "selectedTargets", "amount": 2, "nature": "normal" }
+          ]
+        }
+      ]
+    }
+  ]
+}

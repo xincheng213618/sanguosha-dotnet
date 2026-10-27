@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:current-xuyan-2004", "revision": 1,
+    "cardPolicies": [{ "id": "reveal-matching-payment", "kind": "revealFireAttackPayment", "cardKinds": ["fireAttack"] }]
+  }]
+}

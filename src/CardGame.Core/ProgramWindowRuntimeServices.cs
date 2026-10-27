@@ -20,6 +20,7 @@ internal interface IProgramWindowReturnQueries : IProgramSelectionQuery
     bool IsCurrentYanPuDyingExitEdge();
     bool IsWushuangDyingExitReturn(ProgramSkillFrame frame);
     bool IsHappyGuanYuDyingExitReturn(ProgramSkillFrame frame);
+    bool IsShanheYongzhanDyingExitReturn(ProgramSkillFrame frame);
     bool MountObserverCandidateMatches(ProgramSkillFrame frame, ProgramTriggerCandidate candidate);
     SkillProgramTrigger GetProgramTrigger(ProgramSkillFrame frame);
     bool ValidBeiMiHuPreludeLifecycleWindow(ProgramLifecycleTriggerWindowFrame frame);
@@ -53,6 +54,7 @@ public sealed partial class GameEngine
         public bool IsCurrentYanPuDyingExitEdge() => engine.IsYanPuDyingExitEdge(engine._resolutionStack.Count - 1);
         public bool IsWushuangDyingExitReturn(ProgramSkillFrame frame) => engine.IsWushuangDyingExitReturn(frame);
         public bool IsHappyGuanYuDyingExitReturn(ProgramSkillFrame frame) => engine.IsHappyGuanYuDyingExitReturn(frame);
+        public bool IsShanheYongzhanDyingExitReturn(ProgramSkillFrame frame) => engine.IsShanheYongzhanDyingExitReturn(frame);
         public bool MountObserverCandidateMatches(ProgramSkillFrame frame, ProgramTriggerCandidate candidate) =>
             RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(frame, candidate);
         public SkillProgramTrigger GetProgramTrigger(ProgramSkillFrame frame) => engine.GetProgramTrigger(frame);

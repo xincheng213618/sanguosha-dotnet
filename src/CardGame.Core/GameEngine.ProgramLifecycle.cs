@@ -2434,7 +2434,7 @@ public sealed partial class GameEngine
                  IsYanPuDrawContext(candidate, context) || IsGuanduForeignDrawContext(candidate, context) || IsShiGyDrawContext(candidate, context)) && _phase == TurnPhase.Draw,
             SkillProgramTriggerWindow.HappyGuardRemoved => IsHappyDianWeiElaiCandidate(candidate, context),
             SkillProgramTriggerWindow.HappyPlanSettled => CanRunHappyPangTongSettled(candidate, context),
-            SkillProgramTriggerWindow.DyingExited => IsMouJiangWeiFuzhanExitContext(candidate, context) || IsYanPuDyingExitContext(candidate, context) || IsCaoTengQingliuDyingExitContext(candidate, context) || IsWushuangDyingExitContext(candidate, context) || IsHappyGuanYuDyingExitContext(candidate, context),
+            SkillProgramTriggerWindow.DyingExited => IsMouJiangWeiFuzhanExitContext(candidate, context) || IsYanPuDyingExitContext(candidate, context) || IsCaoTengQingliuDyingExitContext(candidate, context) || IsWushuangDyingExitContext(candidate, context) || IsHappyGuanYuDyingExitContext(candidate, context) || IsShanheYongzhanDyingExitContext(candidate, context),
             SkillProgramTriggerWindow.CardEffectBeforeApply => CanRunCardEffectCandidate(candidate, context),
             SkillProgramTriggerWindow.AfterTurnEnded =>
                 CanRunAfterTurnEndedCandidate(candidate, context, trigger),

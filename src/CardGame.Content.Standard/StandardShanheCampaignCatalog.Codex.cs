@@ -94,7 +94,8 @@ public static partial class StandardShanheCampaignCatalog
             .Append(new(108, "chapter-skill-3038"))
             .Append(new(105, CurrentInterest2RewardId))
             .Append(new(35, CurrentFarStrikeRewardId))
-            .Append(new(28, CurrentQinmianRewardId)).ToDictionary(pair => pair.Key, pair => pair.Value)));
+            .Append(new(28, CurrentQinmianRewardId))
+            .Append(new(144, CurrentYongzhan2RewardId)).ToDictionary(pair => pair.Key, pair => pair.Value)));
 
     /// <summary>Adds the opt-in codex pool without altering the historical default campaign definition.</summary>
     public static ShanheCampaignDefinition CreateCodexDefinition(int difficulty, string editionId)

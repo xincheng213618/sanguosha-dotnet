@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:current-xuyan-2004": { "name": "虚焰", "description": "你使用【火攻】时，将弃置同花色手牌改为展示。" }
+  }
+}

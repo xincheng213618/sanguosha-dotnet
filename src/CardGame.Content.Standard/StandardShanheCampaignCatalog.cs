@@ -236,6 +236,10 @@ public static partial class StandardShanheCampaignCatalog
         var trickResponseTactics = RequiresCurrentTrickResponseRegistry(requirements);
         var qianlongTactic = RequiresCurrentQianlongRegistry(requirements);
         var multiTargetTrickTactics = RequiresCurrentMultiTargetTrickRegistry(requirements);
+        var xuyanTactic = RequiresCurrentXuyanRegistry(requirements);
+        var alliedTrickTactics = RequiresCurrentAlliedTrickRegistry(requirements);
+        var yongzhanTactics = RequiresCurrentYongzhanRegistry(requirements);
+        var qiaoquHaoduoTactic = RequiresCurrentQiaoquHaoduoRegistry(requirements);
         var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
@@ -395,6 +399,10 @@ public static partial class StandardShanheCampaignCatalog
             (trickResponseTactics ? "/current-trick-response" : "") +
             (qianlongTactic ? "/current-qianlong" : "") +
             (multiTargetTrickTactics ? "/current-multi-target-tricks" : "") +
+            (xuyanTactic ? "/current-xuyan" : "") +
+            (alliedTrickTactics ? "/current-allied-tricks" : "") +
+            (yongzhanTactics ? "/current-yongzhan" : "") +
+            (qiaoquHaoduoTactic ? "/current-qiaoqu-haoduo" : "") +
             (wealthTactics ? "/current-wealth-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
@@ -507,6 +515,10 @@ public static partial class StandardShanheCampaignCatalog
             if (trickResponseTactics) packages.Add(new StandardShanheTrickResponsePackage());
             if (qianlongTactic) packages.Add(new StandardShanheQianlongPackage());
             if (multiTargetTrickTactics) packages.Add(new StandardShanheMultiTargetTricksPackage());
+            if (xuyanTactic) packages.Add(new StandardShanheXuyanPackage());
+            if (alliedTrickTactics) packages.Add(new StandardShanheAlliedTricksPackage());
+            if (yongzhanTactics) packages.Add(new StandardShanheYongzhanPackage());
+            if (qiaoquHaoduoTactic) packages.Add(new StandardShanheQiaoquHaoduoPackage());
             if (reactionTactics)
             {
                 packages.Add(new StandardShanheArmorTacticsPackage());

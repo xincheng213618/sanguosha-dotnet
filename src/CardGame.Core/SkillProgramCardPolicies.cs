@@ -30,6 +30,9 @@ public enum SkillProgramCardPolicyKind
     AlcoholKingIdentityRank = 4902, ForeignTurnAlcoholUseProhibition = 4903,
     ClaimedEntitiesFaceDownUse = 4500,
     RandomRevealColorFireAttack = 4400, UnrespondableNullification = 4401,
+    RevealFireAttackPayment = 4402,
+    AlliedHarvestOnly = 4403,
+    AlliedPeachGardenDoubleRecovery = 4404,
     CannotNullifyOwnOrdinaryTrick = 8102,
     // Value 0 prohibits all others; value 1 limits this policy to distance one.
     ProhibitOthersResponse = 5724,

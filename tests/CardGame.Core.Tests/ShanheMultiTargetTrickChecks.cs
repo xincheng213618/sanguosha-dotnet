@@ -9,7 +9,53 @@ internal static class ShanheMultiTargetTrickChecks
     private const string Conversion = "fixture:multi-trick-peach-duel";
     private const string Owner = "fixture:multi-trick-owner", Peer = "fixture:multi-trick-peer", Deck = "fixture:multi-trick-deck";
     private static readonly Lazy<ContentRegistry> Registry = new(() => ContentRegistry.Build(new StandardContentPackage(),
-        new StandardShanheMarketPackage(), new StandardShanheMultiTargetTricksPackage(), new Fixture()));
+        new StandardShanheMarketPackage(), new StandardShanheMultiTargetTricksPackage(), new StandardShanheXuyanPackage(), new Fixture()));
+
+    public static void PaidXuyanRevealsSameSuitPaymentAndReturnsFromNativeRevealChildren()
+    {
+        var s = Scene.Start(xuyan: true);
+        var originalCost = s.Hand(0).Single(card => card.Kind == CardKind.Slash).Id;
+        var retainedCost = s.Hand(0).Single(card => card.Kind == CardKind.IronChain && card.Suit == Suit.Spade).Id;
+        var first = s.BeginFirePayment();
+        Need(s.P!.Prompt.Contains("弃置", StringComparison.Ordinal), "Unowned stock leaves ordinary Fire Attack's real discard cost.");
+        s.PayFire(originalCost);
+        Need(!s.Hand(0).Any(card => card.Id == originalCost) && s.G.CardMovements.Count(move => move.CardId == originalCost &&
+            move.Reason == CardMoveReasons.FireAttackDiscardFinished) == 1 &&
+            s.Events<DamageAppliedEvent>().Single(fact => fact.SourceCardUseResolutionId == first).Amount == 1,
+            "Before buying the tactic the same native Fire Attack really discards its same-suit payment and applies one damage.");
+
+        var second = s.BeginFirePayment();
+        s.Buy(StandardShanheCampaignCatalog.CurrentXuyanRewardId, 300, resumePlay: false);
+        Need(s.P is { Kind: DecisionKind.FireAttackDiscard, PlayerSeat: 0 } &&
+            s.P.Prompt.Contains("展示", StringComparison.Ordinal) && s.P.Choices.Any(choice => choice.Cards.SequenceEqual([retainedCost])),
+            "Buying Xuyan while the native payment is pending refreshes that same owning use to a real reveal choice.");
+        s.PayFire(retainedCost);
+        var history = s.G.Events.Select(item => item.Payload).ToArray();
+        var revealedIndex = Array.FindIndex(history, fact => fact is CardsRevealedEvent reveal &&
+            reveal.ResolutionId == second && reveal.Cards.Any(card => card.Id == retainedCost));
+        var benefitIndex = Array.FindIndex(history, fact => fact is MouXiaoQiaoOlDrawReturnedEvent { Requested: 1, Actual: 1 });
+        var damageIndex = Array.FindIndex(history, fact => fact is DamageAppliedEvent damage && damage.SourceCardUseResolutionId == second);
+        Need(revealedIndex >= 0 && benefitIndex > revealedIndex && damageIndex > benefitIndex &&
+            s.Hand(0).Any(card => card.Id == retainedCost) && !s.G.CardMovements.Any(move => move.CardId == retainedCost &&
+                move.From == CardLocation.Hand(0)) && s.G.CreateSnapshot(0).Players[2].Hp == 28 &&
+            s.Events<FireAttackResolvedEvent>().Single(fact => fact.ResolutionId == second).MatchingDiscardCardId == retainedCost,
+            "The exact retained hand card is publicly revealed; its genuine Jueyan draw child returns before Fire Attack damage, with no discarded substitute.");
+
+        var third = s.BeginFirePayment();
+        s.PayFire(retainedCost);
+        Need(s.Hand(0).Any(card => card.Id == retainedCost) && s.Events<CardsRevealedEvent>()
+                .Count(fact => fact.Cards.Any(card => card.Id == retainedCost)) == 2 &&
+            s.Events<MouXiaoQiaoOlDrawReturnedEvent>().Length == 1 && s.G.CreateSnapshot(0).Players[2].Hp == 27,
+            "A later original Fire Attack can reveal the same retained payment again; its first-suit reward cannot be paid twice.");
+        foreach (var use in new[] { first, second, third })
+        {
+            var declared = s.Events<CardUseDeclaredEvent>().Single(fact => fact.ResolutionId == use);
+            Need(s.Events<CardUseFinishedEvent>().Count(fact => fact.ResolutionId == use) == 1 &&
+                s.G.CardMovements.Count(move => move.CardId == declared.CardId && move.From == CardLocation.Hand(0) && move.To == CardLocation.Processing) == 1 &&
+                s.G.CardMovements.Count(move => move.CardId == declared.CardId && move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile) == 1,
+                "Every actual Fire Attack still pays and finishes its original entity exactly once.");
+        }
+    }
 
     public static void PaidHengjiangUsesOneChainWithIndependentCountersAndKeepsRecast()
     {
@@ -159,12 +205,13 @@ internal static class ShanheMultiTargetTrickChecks
             Need(!result.Accepted && G.Revision == revision && G.CardMovements.Count == moves && Hand(0).Any(c => c.Id == card.Id),
                 "Registering the future product cannot authorize forged extra targets or consume its real card.");
         }
-        public void Buy(string reward, int price)
+        public void Buy(string reward, int price, bool resumePlay = true)
         {
             var market = G.CreateShanheMarketSnapshot(0)!;
             var item = market.ShopItems.Single(i => i.Reward?.Id == reward);
             Need(item.GoldCost == price, "The actual product retains its source price.");
-            Accept(new CardGame.Core.BuyShanheMarketItemCommand(0, item.ChoiceId, null, G.Revision)); Play();
+            Accept(new CardGame.Core.BuyShanheMarketItemCommand(0, item.ChoiceId, null, G.Revision));
+            if (resumePlay) Play();
             Need(G.CreateShanheMarketSnapshot(0)!.Gold == market.Gold - price &&
                 Events<ShanheMarketPurchaseCommittedEvent>().Single().Price == price &&
                 Events<ShanheMarketPurchaseAppliedEvent>().Single().RewardId == reward,
@@ -178,6 +225,32 @@ internal static class ShanheMultiTargetTrickChecks
                 action.PlayedCardKind, action.TargetCardId) { ConversionSource = action.ConversionSource }); Play(counterTarget);
             return card.Id;
         }
+        public long BeginFirePayment()
+        {
+            var card = Hand(0).First(item => item.Kind == CardKind.FireAttack);
+            var action = G.GetHumanLegalActions().Single(item => item.CardId == card.Id && item.TargetSeats.SequenceEqual([2]));
+            Accept(new PlayCardCommand(0, card.Id, [2], G.Revision, P!.PromptId, action.PlayedCardKind));
+            for (var step = 0; step < 100; step++)
+            {
+                if (P is { Kind: DecisionKind.FireAttackDiscard, PlayerSeat: 0 })
+                    return Events<CardUseDeclaredEvent>().Single(fact => fact.CardId == card.Id).ResolutionId;
+                if (P is { } prompt)
+                {
+                    var choice = prompt.Kind == DecisionKind.FireAttackReveal
+                        ? prompt.Choices.Single(item => item.Cards.Count == 1 && Hand(2).Any(revealed => revealed.Id == item.Cards[0] && revealed.Suit == Suit.Spade))
+                        : prompt.Choices.Single(item => item.Parameters.GetValueOrDefault("response") == "pass");
+                    Accept(new AnswerPromptCommand(prompt.PlayerSeat, prompt.PromptId, choice.Id, G.Revision));
+                }
+                else Accept(new AdvanceOneStepCommand(G.Revision));
+            }
+            throw new InvalidOperationException("Native Fire Attack did not reach its original payment window.");
+        }
+        public void PayFire(int cardId)
+        {
+            var prompt = P!;
+            var choice = prompt.Choices.Single(item => item.Cards.SequenceEqual([cardId]));
+            Accept(new AnswerPromptCommand(0, prompt.PromptId, choice.Id, G.Revision)); Play();
+        }
         public void AssertPaid(int card)
         {
             var use = Events<CardUseDeclaredEvent>().Single(e => e.CardId == card);
@@ -187,22 +260,26 @@ internal static class ShanheMultiTargetTrickChecks
                 Events<NullificationRespondedEvent>().Single(e => e.ResolutionId == use.ResolutionId) is { TargetSeat: 1, EffectNullified: true },
                 "All target windows retain one original declared use, one material payment and one final completion.");
         }
-        public static Scene Start(bool converted = false)
+        public static Scene Start(bool converted = false, bool xuyan = false)
         {
             ShanheRewardDefinition[] rewards =
             [new(StandardShanheCampaignCatalog.CurrentHengjiangRewardId, "横江锁")
                 { TacticSkillId = StandardShanheMultiTargetTricksPackage.HengjiangSkillId, Rarity = 3 },
              new(StandardShanheCampaignCatalog.CurrentDantiaowangRewardId, "单挑王")
                 { TacticSkillId = StandardShanheMultiTargetTricksPackage.DantiaowangSkillId, Rarity = 2 },
-             new("cards", "真实锦囊", StartingCards:
+             new(StandardShanheCampaignCatalog.CurrentXuyanRewardId, "虚焰")
+                { TacticSkillId = StandardShanheXuyanPackage.SkillId, Rarity = 2 },
+             new("cards", "真实锦囊", SkillId: xuyan ? "mou-ol:jueyan" : null, StartingCards:
                 [new(CardKind.IronChain, Suit.Club, 1), new(CardKind.IronChain, Suit.Spade, 2),
                  new(CardKind.Duel, Suit.Heart, 3), new(CardKind.Nullification, Suit.Club, 4), new(CardKind.Slash, Suit.Spade, 5),
-                 .. (converted ? new[] { new ShanheStartingCard(CardKind.Peach, Suit.Heart, 10) } : [])])];
+                 .. (converted ? new[] { new ShanheStartingCard(CardKind.Peach, Suit.Heart, 10) } : []),
+                 .. (xuyan ? Enumerable.Range(10, 3).Select(rank => new ShanheStartingCard(CardKind.FireAttack, Suit.Heart, rank)) : [])])];
             var definition = new ShanheCampaignDefinition("fixture:multi-tricks", "多目标原生锦囊", [Owner], ["cards"],
                 [new("cards", "实体补给", ShanheNodeKind.Event, ["shop", "battle"], Choices: [new("take", "领取", RewardId: "cards")]),
                  new("shop", "集市", ShanheNodeKind.Shop, ["battle"], Choices:
                     [new("chain", "横江锁", 500, RewardId: rewards[0].Id, LeavesNode: false),
-                     new("duel", "单挑王", 300, RewardId: rewards[1].Id, LeavesNode: false)]),
+                     new("duel", "单挑王", 300, RewardId: rewards[1].Id, LeavesNode: false),
+                     new("xuyan", "虚焰", 300, RewardId: rewards[2].Id, LeavesNode: false)]),
                  new("battle", "敌友", ShanheNodeKind.Battle, [],
                     [new("peers", "实际敌友", [new(Peer) { StartingHand = [new(CardKind.Slash, Suit.Club, 8), new(CardKind.Slash, Suit.Spade, 9)] },
                         new(Peer) { StartingHand = [] }], Allies: [new(Peer) { StartingHand = [] }])])], rewards, StartingGold: 1000);
@@ -229,6 +306,7 @@ internal static class ShanheMultiTargetTrickChecks
         public PackageManifest Manifest { get; } = new("fixture:multi-target-tricks", new(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
+            CharacterFixtureContent.Register(builder, "mou:xiao-qiao-ol");
             builder.AddModeFeatureFactory(new HumanSetupFactory());
             builder.AddModeFeatureFactory(new HumanProfileFactory());
             var conversion = SkillProgramCatalog.Load($$"""

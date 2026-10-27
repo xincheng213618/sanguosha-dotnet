@@ -24,6 +24,10 @@ public static partial class StandardShanheCampaignCatalog
         definition = WithCurrentTrickResponseTactics(definition);
         definition = WithCurrentQianlongTactic(definition);
         definition = WithCurrentMultiTargetTrickTactics(definition);
+        definition = WithCurrentXuyanTactic(definition);
+        definition = WithCurrentAlliedTrickTactics(definition);
+        definition = WithCurrentYongzhanTactics(definition);
+        definition = WithCurrentQiaoquHaoduoTactic(definition);
         return WithCurrentGuandaoTactic(definition);
     }
 

@@ -5659,7 +5659,7 @@ public sealed partial class GameEngine
             revealed.Suit));
         AddLog(
             "CardRevealed",
-            $"{target.Name} 展示了【{revealed.DisplayName}】（{revealed.Suit}），等待攻击者弃置同花色手牌。",
+            $"{target.Name} 展示了【{revealed.DisplayName}】（{revealed.Suit}），等待攻击者{(FireAttackPaymentIsReveal(pending.SourceSeat) ? "展示" : "弃置")}同花色手牌。",
             target.Seat,
             pending.SourceSeat);
         if (TryBeginPublicHandRevealWindow(pending.Id, PublicHandRevealReturnKind.FireAttack)) return;
@@ -5688,10 +5688,11 @@ public sealed partial class GameEngine
             return;
         }
 
+        var paymentVerb = FireAttackPaymentIsReveal(source.Seat) ? "展示" : "弃置";
         _pendingDecision = new PendingDecision(
             DecisionKind.FireAttackDiscard,
             source.Seat,
-            $"目标展示了【{revealed.DisplayName}】（{revealed.Suit}），请选择一张同花色手牌弃置，或放弃造成火焰伤害。",
+            $"目标展示了【{revealed.DisplayName}】（{revealed.Suit}），请选择一张同花色手牌{paymentVerb}，或放弃造成火焰伤害。",
             matchingCards.Select(card => card.Id).ToArray(),
             [],
             source.Seat,
@@ -5701,7 +5702,7 @@ public sealed partial class GameEngine
             Choices = matchingCards
                 .Select(card => new PromptChoice(
                     new ChoiceId($"fire-attack.discard.card-{card.Id}"),
-                    $"弃置【{card.DisplayName}】（{card.RankText}），造成 1 点火焰伤害。",
+                    $"{paymentVerb}【{card.DisplayName}】（{card.RankText}），造成 1 点火焰伤害。",
                     [card.Id],
                     [],
                     new Dictionary<string, string>
@@ -5711,7 +5712,7 @@ public sealed partial class GameEngine
                     }))
                 .Append(new PromptChoice(
                     new ChoiceId("fire-attack.skip"),
-                    "不弃置同花色牌，火攻不造成伤害。",
+                    $"不{paymentVerb}同花色牌，火攻不造成伤害。",
                     [],
                     [],
                     new Dictionary<string, string>
@@ -5762,7 +5763,7 @@ public sealed partial class GameEngine
                 CausedDamage: false));
             AddLog(
                 "CardEffect",
-                $"{source.Name} 未弃置同花色牌，{target.Name} 的【火攻】未造成伤害。",
+                $"{source.Name} 未{(FireAttackPaymentIsReveal(source.Seat) ? "展示" : "弃置")}同花色牌，{target.Name} 的【火攻】未造成伤害。",
                 source.Seat,
                 target.Seat);
             var effectCard = GetFireAttackEffectCard(pending);
@@ -5772,12 +5773,16 @@ public sealed partial class GameEngine
             return;
         }
 
-        var revealInstead = HasWushuangTactic(source.Seat, 2004);
+        var revealInstead = FireAttackPaymentIsReveal(source.Seat);
         if (revealInstead)
-            AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(pending.Id, [ToSnapshot(matchingDiscard)]));
-        var poisonPaymentSequenceBefore = _movementSequence;
-        if (!revealInstead)
         {
+            pending = SetFireAttackSelection(pending.Id, pending.FireAttackSelection! with { RevealedPaymentCardId = matchingDiscard.Id });
+            AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(pending.Id, [ToSnapshot(matchingDiscard)]));
+            if (TryBeginPublicHandRevealWindow(pending.Id, "native-fire-attack-payment")) return;
+            ContinueRevealedFireAttackPayment(pending);
+            return;
+        }
+        var poisonPaymentSequenceBefore = _movementSequence;
         var logicalDiscard = CaptureNativeLogicalDiscardInvocation(source.Seat, source.Seat,
             [matchingDiscard.Id], CardMoveReasons.FireAttackDiscard, pending.Id);
         MoveCard(
@@ -5791,37 +5796,8 @@ public sealed partial class GameEngine
             CardLocation.DiscardPile,
             CardMoveReasons.FireAttackDiscardFinished);
         CompleteNativeLogicalDiscardInvocation(logicalDiscard);
-        }
-        if (!revealInstead && TryBeginWenhePoisonFireAttackPayment(pending, revealed, matchingDiscard, poisonPaymentSequenceBefore)) return;
-        AdvanceEventRulesAndQueueFact(new FireAttackResolvedEvent(
-            pending.Id,
-            source.Seat,
-            target.Seat,
-            revealed.Id,
-            revealed.Suit,
-            matchingDiscard.Id,
-            CausedDamage: true));
-        AddLog(
-            "CardEffect",
-            $"{source.Name} {(revealInstead ? "展示" : "弃置")}【{matchingDiscard.DisplayName}】，{target.Name} 受到 1 点火焰伤害。",
-            source.Seat,
-            target.Seat);
-
-        var attackCard = GetFireAttackEffectCard(pending);
-        SetFireAttackSelection(pending.Id, null);
-        var attack = new CardAttackHandle(this,
-            pending.Id,
-            source.Seat,
-            target.Seat,
-            (IsMouDcZeroUse(pending.Id) || IsMouZyZeroFireUse(pending.Id) || IsProgramVirtualOrdinaryTrickUse(pending.Id) || IsTieredRoundZeroFireAttackUse(pending.Id) || IsMouZhijueZeroUse(pending.Id) || IsDiouZeroUse(pending.Id) || IsMouXqJueyanUse(pending.Id) || IsQinLangXianyingUse(pending.Id)) ? null : attackCard,
-            damageAmount: 1,
-            playedCardKind: CardKind.FireAttack,
-            physicalCards: GetCardUsePhysicalCards(pending.Id));
-        ActiveCardAttack = attack;
-        if (!ApplyAttackDamage(attack))
-        {
-            CompleteAttack(attack);
-        }
+        if (TryBeginWenhePoisonFireAttackPayment(pending, revealed, matchingDiscard, poisonPaymentSequenceBefore)) return;
+        CompleteNativeFireAttackPayment(pending, revealed, matchingDiscard, revealInstead: false);
     }
 
     private Card GetFireAttackRevealedCard(CardUseFrame pending)
@@ -5863,6 +5839,7 @@ public sealed partial class GameEngine
         while (group.TargetIndex < group.TargetSeats.Count &&
                (!_players[group.TargetSeats[group.TargetIndex]].IsAlive ||
                 IsCardEffectIneffective(group.ResolutionId, group.TargetSeats[group.TargetIndex]) ||
+                ShanheAlliedHarvestProhibited(group, group.TargetSeats[group.TargetIndex]) ||
                 (HasWushuangTactic(group.SourceSeat, 2241) && group.TargetSeats[group.TargetIndex] != group.SourceSeat) ||
                 (IsLeChengyanEffectUse(group.ResolutionId) || IsTianChouShandaoUse(group.ResolutionId) || IsQinLangXianyingUse(group.ResolutionId) || IsAnniversaryYangBiaoFiveGrainsUse(group.ResolutionId)) && group.RevealedCardIds.Count == 0))
         {
@@ -5926,7 +5903,7 @@ public sealed partial class GameEngine
         }
 
         if (group.TargetIndex >= group.TargetSeats.Count ||
-            group.TargetSeats[group.TargetIndex] != picker.Seat)
+            group.TargetSeats[group.TargetIndex] != picker.Seat || ShanheAlliedHarvestProhibited(group, picker.Seat))
         {
             throw new InvalidOperationException("The selected FiveGrains picker is not current.");
         }
@@ -6039,7 +6016,8 @@ public sealed partial class GameEngine
             !IsCardEffectIneffective(group.ResolutionId, target.Seat) &&
             HappyQiaoAnyWounded(target.Seat))
         {
-            var requestedRecovery = HasWushuangTactic(group.SourceSeat, 2243) && target.Seat == group.SourceSeat ? 2 : 1;
+            var requestedRecovery = ShanheAlliedPeachGardenRecovery(group, target.Seat,
+                HasWushuangTactic(group.SourceSeat, 2243) && target.Seat == group.SourceSeat ? 2 : 1);
             var recoveryAmount = HasHappyQiaoHealth(target.Seat) ? requestedRecovery : Math.Min(target.MaxHp - target.Hp, requestedRecovery);
             if (TryQueueRecoveryReplacement(group.ResolutionId, group.SourceSeat, target.Seat, recoveryAmount,
                 new(RecoveryAttemptProducer.GroupCard)))
@@ -15881,13 +15859,19 @@ public sealed partial class GameEngine
         var sourceAndTarget = new[] { attack.SourceSeat, attack.TargetSeat }.Distinct();
         var owners = HasPublicEnemyParticipantDamageModifiers
             ? _players.Where(player => player.IsAlive).Select(player => player.Seat) : sourceAndTarget;
+        var borrowedOwner = BorrowedSwordSlashDamageModifierOwner(attack);
+        if (borrowedOwner is { } borrower && _players[borrower].IsAlive)
+            owners = owners.Append(borrower).Distinct();
         return owners
             .SelectMany(seat => GetSkillBindingShard(_players[seat]).ProgramInstances
                 .Where(instance => IsShanheSchoolSkillQualified(seat, instance.SkillId))
                 .SelectMany(instance => instance.Program.DamageModifiers.Select(modifier =>
                     (seat, instance, modifier))))
             .Where(item => !item.modifier.CapsToAmount && (!cardDamageOnly || item.modifier.DamageLayer == SkillProgramDamageLayer.CardDamage) && (
-                item.modifier.SourceScope == SkillProgramDamageModifierSourceScope.AllLivingSkillOwners
+                item.modifier.SourceScope == SkillProgramDamageModifierSourceScope.BorrowedSwordUseOwner
+                ? borrowedOwner == item.seat && _players[item.seat].IsAlive &&
+                  attack.EffectiveCardKind is { } borrowedKind && ProgramCardKindMatch.MatchesDamageModifier(item.modifier, borrowedKind)
+                : item.modifier.SourceScope == SkillProgramDamageModifierSourceScope.AllLivingSkillOwners
                 ? item.modifier.Condition == SkillProgramDamageModifierCondition.BothParticipantsPublicEnemiesOfOwner &&
                   !attack.IsSourceLess && attack.SourceSeat != attack.TargetSeat &&
                   PublicTeamEnemy(item.seat, _players[attack.SourceSeat]) && PublicTeamEnemy(item.seat, _players[attack.TargetSeat])

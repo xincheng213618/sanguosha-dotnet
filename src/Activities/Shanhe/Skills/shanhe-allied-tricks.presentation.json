@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:current-fengshounian-2241": { "name": "丰收年", "description": "你使用的【五谷丰登】仅友方角色可以获得牌。" },
+    "shanhe:current-jiemeng-2243": { "name": "结盟", "description": "你使用的【桃园结义】友方角色回复双倍体力。" }
+  }
+}

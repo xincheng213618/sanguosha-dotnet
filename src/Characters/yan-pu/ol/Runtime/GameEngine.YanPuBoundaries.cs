@@ -80,7 +80,7 @@ public sealed partial class GameEngine
               _contentRegistry.ProgramDependencies.HasTriggerWindow(SkillProgramTriggerWindow.DyingExited) || IsWushuangMode)) return false;
         var facts = _players.Where(p => p.IsAlive).ToDictionary(p => p.Seat, CaptureProgramTriggerFacts);
         var candidates = _players.Where(p => p.IsAlive).SelectMany(p => CollectProgramTriggerCandidates(p, SkillProgramTriggerWindow.DyingExited))
-            .Where(c => GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.DrawDyingExitRoundDistance or SkillProgramEffectOp.ResolveQingliuFactionChoice or SkillProgramEffectOp.ResolveMouJiangWeiFuzhan }] || IsWushuangDyingExitCandidate(c, dying.VictimSeat) || IsHappyGuanYuDyingExitCandidate(c, dying.VictimSeat))
+            .Where(c => GetProgramTrigger(c).Effects is [{ Op: SkillProgramEffectOp.DrawDyingExitRoundDistance or SkillProgramEffectOp.ResolveQingliuFactionChoice or SkillProgramEffectOp.ResolveMouJiangWeiFuzhan }] || IsWushuangDyingExitCandidate(c, dying.VictimSeat) || IsHappyGuanYuDyingExitCandidate(c, dying.VictimSeat) || IsShanheYongzhanDyingExitCandidate(c, dying.VictimSeat))
             .OrderBy(c => RelativeTableOrder(_currentSeat, c.OwnerSeat)).ThenByDescending(c => c.Priority).ToArray();
         if (candidates.Length == 0) return false;
         var ret = new YanPuDyingExitReturn(dying.FrameId, dying.ParentFrameId, dying.VictimSeat, dying.Continuation, _roundNumber, _turnNumber, _currentSeat);

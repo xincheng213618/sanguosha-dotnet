@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:current-qiaoqu-haoduo-2244",
+      "revision": 1,
+      "damageModifiers": [
+        {
+          "id": "borrowed-sword-slash-damage",
+          "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"],
+          "amount": 1,
+          "condition": "always",
+          "sourceScope": "borrowedSwordUseOwner",
+          "damageLayer": "cardDamage"
+        }
+      ]
+    }
+  ]
+}

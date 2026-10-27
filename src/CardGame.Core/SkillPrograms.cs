@@ -217,7 +217,7 @@ public enum SkillProgramTurnOwnerScope { Own = 0, OtherLiving = 1, OwnOrPrevious
 }
 public enum SkillProgramDiscardOwnerScope { Other = 0, Own = 1 }
 public enum SkillProgramDamageModifierExpiration { CurrentTurnEnd = 0, NextOwnerTurnStart = 1 }
-public enum SkillProgramDamageModifierSourceScope { OwnerUsed = 0, DamageSource = 1, DamageParticipant = 2, AllLivingSkillOwners = 3 }
+public enum SkillProgramDamageModifierSourceScope { OwnerUsed = 0, DamageSource = 1, DamageParticipant = 2, AllLivingSkillOwners = 3, BorrowedSwordUseOwner = 4 }
 public enum SkillProgramDamageLayer { AdditionalDamage = 0, CardDamage = 1 }
 public enum SkillProgramDamageAmountExpression { Literal = 0, CompletedRoundCount = 1 }
 public enum SkillProgramDamageModifierCondition
@@ -4070,13 +4070,21 @@ public sealed class SkillProgramCatalog
              requiredKinds.Count != 0 || value != 0 || inputSuit is not null || outputSuit is not null || ownerRole is not null || factionId is not null ||
              OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
             Fail(path, "Cannot-nullify ordinary tricks require genuine non-delayed trick kinds and no other qualifiers; counterspells use their paid node policy.");
-        if (kind is SkillProgramCardPolicyKind.RandomRevealColorFireAttack or SkillProgramCardPolicyKind.UnrespondableNullification)
+        if (kind is SkillProgramCardPolicyKind.RandomRevealColorFireAttack or SkillProgramCardPolicyKind.UnrespondableNullification or
+            SkillProgramCardPolicyKind.RevealFireAttackPayment or SkillProgramCardPolicyKind.AlliedHarvestOnly or
+            SkillProgramCardPolicyKind.AlliedPeachGardenDoubleRecovery)
         {
-            var required = kind == SkillProgramCardPolicyKind.RandomRevealColorFireAttack ? CardKind.FireAttack : CardKind.Nullification;
+            var required = kind switch
+            {
+                SkillProgramCardPolicyKind.UnrespondableNullification => CardKind.Nullification,
+                SkillProgramCardPolicyKind.AlliedHarvestOnly => CardKind.FiveGrains,
+                SkillProgramCardPolicyKind.AlliedPeachGardenDoubleRecovery => CardKind.PeachGarden,
+                _ => CardKind.FireAttack
+            };
             if (!cardKinds.SequenceEqual([required]) || requiredKinds.Count != 0 || value != 0 ||
                 inputSuit is not null || outputSuit is not null || ownerRole is not null || factionId is not null ||
                 OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always)
-                Fail(path, "Issued Fire Attack/counterspell policies require their exact kind and no other qualifiers.");
+                Fail(path, "Native trick policies require their exact card kind and no other qualifiers.");
         }
         if (kind == SkillProgramCardPolicyKind.MinimumSlashResponseAtDistanceOne &&
             (!ProgramCardKindMatch.IsFullSlashFamily(cardKinds) ||
@@ -4161,6 +4169,7 @@ public sealed class SkillProgramCatalog
             ? EnumValue<SkillProgramDamageModifierSourceScope>(node, "sourceScope", path)
             : SkillProgramDamageModifierSourceScope.OwnerUsed;
         var capsToAmount = node.TryGetProperty("capsToAmount", out _) && RequiredBool(node, "capsToAmount", path);
+        var borrowedSwordOwner = scope == SkillProgramDamageModifierSourceScope.BorrowedSwordUseOwner;
         var unconditionalTargetCap = capsToAmount && condition == SkillProgramDamageModifierCondition.Always &&
             scope == SkillProgramDamageModifierSourceScope.DamageParticipant;
         var unconditionalSourceDamage = !capsToAmount && condition == SkillProgramDamageModifierCondition.Always &&
@@ -4275,12 +4284,17 @@ public sealed class SkillProgramCatalog
             if (scope != SkillProgramDamageModifierSourceScope.DamageParticipant)
                 Fail(path + ".sourceScope", "face-state damage modifiers require damageParticipant");
         }
-        else if (scope != SkillProgramDamageModifierSourceScope.OwnerUsed && !unconditionalTargetCap && !unconditionalSourceDamage &&
+        else if (scope != SkillProgramDamageModifierSourceScope.OwnerUsed && !borrowedSwordOwner && !unconditionalTargetCap && !unconditionalSourceDamage &&
                  condition is not (SkillProgramDamageModifierCondition.DamageSourceAttackRangeBelowThree or
                      SkillProgramDamageModifierCondition.DamageSourceAttackRangeAboveThree))
             Fail(path + ".sourceScope", "card damage modifiers require ownerUsed");
         var damageLayer = node.TryGetProperty("damageLayer", out _)
             ? EnumValue<SkillProgramDamageLayer>(node, "damageLayer", path) : SkillProgramDamageLayer.AdditionalDamage;
+        if (borrowedSwordOwner && (condition != SkillProgramDamageModifierCondition.Always || capsToAmount ||
+            !ProgramCardKindMatch.IsFullSlashFamily(kinds) || damageLayer != SkillProgramDamageLayer.CardDamage ||
+            node.EnumerateObject().Any(property => property.Name is not
+                ("id" or "sourceScope" or "condition" or "cardKinds" or "amount" or "damageLayer" or "capsToAmount"))))
+            Fail(path, "Borrowed Sword use-owner damage requires an unconditional uncapped card-damage bonus for the full Slash family.");
         if (condition == SkillProgramDamageModifierCondition.OwnerUsedHeartSlash &&
             (scope != SkillProgramDamageModifierSourceScope.OwnerUsed || damageLayer != SkillProgramDamageLayer.CardDamage ||
                 !ProgramCardKindMatch.IsFullSlashFamily(kinds) || capsToAmount))
@@ -4298,8 +4312,9 @@ public sealed class SkillProgramCatalog
         if (condition == SkillProgramDamageModifierCondition.OwnerMaximumHandCurrentRound &&
             (amount != 1 || capsToAmount || damageLayer != SkillProgramDamageLayer.AdditionalDamage))
             Fail(path, "maximum-hand round damage requires amount 1, additionalDamage and no cap");
-        if (damageLayer == SkillProgramDamageLayer.CardDamage && (scope != SkillProgramDamageModifierSourceScope.OwnerUsed || capsToAmount))
-            Fail(path + ".damageLayer", "card damage requires an uncapped owner-used card modifier");
+        if (damageLayer == SkillProgramDamageLayer.CardDamage &&
+            (scope is not (SkillProgramDamageModifierSourceScope.OwnerUsed or SkillProgramDamageModifierSourceScope.BorrowedSwordUseOwner) || capsToAmount))
+            Fail(path + ".damageLayer", "card damage requires an uncapped owner-used or Borrowed Sword use-owner modifier");
         if ((condition is SkillProgramDamageModifierCondition.BothParticipantsPublicEnemiesOfOwner or
                 SkillProgramDamageModifierCondition.OwnerActualTurnTrickUseOrdinalWithinLimit) &&
             damageLayer != SkillProgramDamageLayer.AdditionalDamage)
@@ -5984,7 +5999,8 @@ public sealed class SkillProgramCatalog
                  { Op: SkillProgramEffectOp.MoveBoundCards }] ||
              !optional && subject == SkillProgramTriggerSubject.Owner && condition.Kind == SkillProgramTriggerConditionKind.Always &&
              effects is [{ Op: SkillProgramEffectOp.ResolveWushuangCombatTactic, Amount: 2174 or 2175 }] &&
-             skillId == $"wushuang:tactic-{effects[0].Amount}");
+             skillId == $"wushuang:tactic-{effects[0].Amount}" ||
+             Campaigns.ShanheYongzhanPrograms.IsTriggerShape(skillId, id, window, subject, optional, condition, effects));
         if (window is SkillProgramTriggerWindow.DyingEntered or SkillProgramTriggerWindow.DyingExited && !awaitedDyingExit &&
             (optional || effects.Any(effect => effect.Op != SkillProgramEffectOp.Draw || effect.Target != SkillProgramEffectTarget.Owner ||
                 effect.NumberExpression is not null || effect.Condition.Kind != SkillProgramConditionKind.Always)))
