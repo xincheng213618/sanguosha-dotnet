@@ -702,6 +702,38 @@
       "notes": "Unmodified complete public catalogue card4153 face, retaining its Gouxiang title, original illustration and equipment label without baked suit/rank. Its name and suit-or-rank Dodge hand-claim rule match the local armor. Catalogue physical card20833 is not equated with source20883; the official upstream frame is unconfirmed. No equipment strip is synthesized."
     },
     {
+      "kind": "Duanhun",
+      "file": "Duanhun.png",
+      "sourceKind": "publicCatalogueCardFace",
+      "source": {
+        "pageUrl": "https://s.xiaochao.org/data/cards.json",
+        "catalogueCardId": 4144,
+        "imageUrl": "https://s.xiaochao.org/data/images/b7847c951231f17d1ceeed00.png",
+        "imageSha256": "B7847C951231F17D1CEEED009CD9D5A1FC3E1F855315E9256E1E2A6F7CC723C7",
+        "originalSize": [186, 260],
+        "rankSuitBakedIn": false
+      },
+      "transform": { "mode": "copy", "outputSize": [186, 260] },
+      "sha256": "B7847C951231F17D1CEEED009CD9D5A1FC3E1F855315E9256E1E2A6F7CC723C7",
+      "notes": "Unmodified complete public catalogue4144 Duanhun face with its original printed title, range2 and equipment label. No baked rank/suit; catalogue20824 is not equated with source20836. Official upstream frame and equipment strip are unconfirmed."
+    },
+    {
+      "kind": "KunlunMirror",
+      "file": "KunlunMirror.png",
+      "sourceKind": "publicCatalogueCardFace",
+      "source": {
+        "pageUrl": "https://s.xiaochao.org/data/cards.json",
+        "catalogueCardId": 4145,
+        "imageUrl": "https://s.xiaochao.org/data/images/ddbec2890a883d37318273e7.png",
+        "imageSha256": "DDBEC2890A883D37318273E7C96EEA7276DBA343AC02317B7DEFF36ED2A58C16",
+        "originalSize": [186, 260],
+        "rankSuitBakedIn": false
+      },
+      "transform": { "mode": "copy", "outputSize": [186, 260] },
+      "sha256": "DDBEC2890A883D37318273E7C96EEA7276DBA343AC02317B7DEFF36ED2A58C16",
+      "notes": "Unmodified complete public catalogue4145 Kunlun Mirror face. Its original printed title, illustration and equipment label remain; no baked rank/suit. Catalogue20825 is not equated with source20841, whose slot is Treasure. Official upstream frame and equipment strip are unconfirmed."
+    },
+    {
       "kind": "GeneralWeapon",
       "file": "GeneralWeapon.png",
       "sourceKind": "projectGenerated",

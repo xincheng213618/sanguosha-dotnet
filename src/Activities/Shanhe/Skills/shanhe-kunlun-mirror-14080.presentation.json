@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:kunlun-mirror-14080": {
+      "name": "昆仑镜",
+      "description": "锁定技，当你受到锦囊牌的伤害后，防止同名锦囊牌本局对你造成的伤害。"
+    }
+  }
+}

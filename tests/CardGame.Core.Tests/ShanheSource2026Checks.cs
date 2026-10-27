@@ -52,10 +52,9 @@ internal static class ShanheSource2026Checks
                 all.Where(encounter => encounter.SourceBattleId == 2397).All(encounter => encounter.SourceVisibleEnemyCount == 1 && encounter.Enemies.Count == 5),
                 "Every genuinely selectable Luoyang ordinary city may contain Mulu; four hidden source minions do not inflate the visible-enemy multiplier.");
             if (difficulty >= 16)
-                Need(all.Count(encounter => encounter.SourceBattleId is >= 2632 and <= 2687) == 55 &&
-                    all.All(encounter => encounter.SourceBattleId is not 2684) &&
+                Need(all.Count(encounter => encounter.SourceBattleId is >= 2632 and <= 2687) == 56 &&
                     all.Count(encounter => encounter.BossTransition is not null) == 6,
-                    "The high-tier route exposes all fourteen regions with fifty-five supported base groups and six known playable stage transitions.");
+                    "The high-tier route exposes all fourteen regions with fifty-six supported base groups and six known playable stage transitions.");
         }
         Need(!StandardShanheCampaignCatalog.IsSource2026Campaign("shanhe:zhuhou-source-2026-11", 1) &&
             !StandardShanheCampaignCatalog.IsSource2026Campaign("shanhe:zhuhou-1", 11) &&

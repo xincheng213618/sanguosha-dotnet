@@ -91,7 +91,8 @@ public sealed partial class GameEngine
     private void FinishSingleBasicCardUseCost(CardUseFrame use, Card card)
     {
         if (HasUnstartedExtraCardEffect(use.Id)) return;
-        if (card.Id == 0 && card.Kind == CardKind.Alcohol && IsMouDongZhuoOlWine(use.Id)) return;
+        if (card.Id == 0 && card.Kind == CardKind.Alcohol &&
+            (IsMouDongZhuoOlWine(use.Id) || IsShanheSourceMouWine(use.Id))) return;
         // A copied Zhijue card has no material; its ID zero must not move a real card.
         if (card.Id == 0 && card.Kind == use.CardKind && IsMouZhijueZeroUse(use.Id)) return;
         if (card.Id == 0 && use.CardKind == CardKind.Alcohol && IsIssuedWeijieUse(use)) return;

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:kunlun-mirror-14080",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "remember-real-trick-damage", "window": "damageAppliedBeforeDying", "subject": "owner",
+          "damageOccurrence": "perDamage", "optional": false,
+          "effects": [{"op": "resolveKunlunMirror", "target": "owner"}]
+        },
+        {
+          "id": "prevent-remembered-trick", "window": "beforeDamageApplied", "subject": "damageTarget", "optional": false,
+          "effects": [{"op": "resolveKunlunMirror", "target": "owner"}, {"op": "preventCurrentDamage", "target": "owner"}]
+        }
+      ]
+    }
+  ]
+}

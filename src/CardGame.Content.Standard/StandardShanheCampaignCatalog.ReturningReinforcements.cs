@@ -39,12 +39,13 @@ public static partial class StandardShanheCampaignCatalog
                     }, new(StandardShanheLocalTroopPackage.GuardId, MaxHpBonus: growth, Hp: 6 + growth,
                         InitialHandBonus: growth)], [], VictoryGold: 200, HealAfterVictory: 2)
                 { StoryText = "荀彧以三点体力、护甲和卫士迎战。驱虎借拼点对手造成伤害，节命可为同伴补牌。" }),
+            "luoyang" => Add(node, ReturningMouDongZhuoEncounter(growth)),
             _ => node
         }).ToArray();
         return WithReturningNativeBossStages(ShanheCampaignContent.FreezeAndValidate(definition with
         {
             Nodes = nodes,
-            IntroText = definition.IntroText + "\n第二章新增徐盛、孙策、狂暴枪王与荀彧卫队；黄巾余匪接入张燕阶段，西凉霸主接入篡天恶魂。"
+            IntroText = definition.IntroText + "\n第二章新增徐盛、孙策、狂暴枪王与荀彧卫队；黄巾余匪接入张燕阶段，西凉霸主接入篡天恶魂。洛阳另有逆京枭雄。"
         }), difficulty);
 
         ShanheCombatantDefinition Leader(string generalId, int baseHp, IReadOnlyList<ShanheStartingCard> equipment) =>
@@ -55,6 +56,27 @@ public static partial class StandardShanheCampaignCatalog
         {
             Encounters = node.Encounters!.Concat(encounters).ToArray(),
             Description = node.Description + "另有" + string.Join("、", encounters.Select(encounter => encounter.Name)) + "。"
+        };
+    }
+
+    private static ShanheEncounterDefinition ReturningMouDongZhuoEncounter(int growth)
+    {
+        var hp = 20 + 4 * growth;
+        var general = StandardShanheSourceMouDongZhuoPackage.GeneralId;
+        var second = StandardShanheSourceShenNuStagePackage.GeneralId;
+        return new("luoyang:mou-dongzhuo-source-native", "逆京枭雄 · 谋董卓与篡天恶魂",
+            [new(general, MaxHpBonus: 4 * growth, Hp: hp, InitialHandBonus: 1 + growth, DrawBonus: 1 + growth)
+            {
+                StartingCards = [new(CardKind.KunlunMirror, Suit.Spade, 12), new(CardKind.Duanhun, Suit.Spade, 5)]
+            }], [], VictoryGold: 200, HealAfterVictory: 2)
+        {
+            BossTransition = new(0, second, hp, hp, 3 + growth)
+            {
+                Combatant = new(second, MaxHpBonus: 4 * growth, Hp: hp, DrawBonus: 1 + growth, SlashBonus: 1),
+                StartingEquipment = [new(CardKind.ShuraInfernoHalberd, Suit.Heart, 12), new(CardKind.LionBelt, Suit.Club, 2)]
+            },
+            StoryText = $"谋董卓以{hp}点体力迎战，携带昆仑镜与断魂。凶逆迫使其他角色弃五张同花色牌，否则降低体力上限；执柄惩罚同一回合连续使用黑色牌。" +
+                $"击败后，篡天恶魂以{hp}点体力接战。"
         };
     }
 }

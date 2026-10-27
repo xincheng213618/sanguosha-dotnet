@@ -368,6 +368,12 @@ public static partial class StandardShanheCampaignCatalog
         var gouXiangArmor = ShanheRecipeCards(setup).Any(card => card.Kind == CardKind.GouXiang) ||
             extraSkills.Contains(StandardShanheGouXiangArmorPackage.SkillId) ||
             setup.TacticSkillIds.Contains(StandardShanheGouXiangArmorPackage.SkillId, StringComparer.Ordinal);
+        var duanhun = ShanheRecipeCards(setup).Any(card => card.Kind == CardKind.Duanhun) ||
+            extraSkills.Contains(StandardShanheDuanhunPackage.SkillId) ||
+            setup.TacticSkillIds.Contains(StandardShanheDuanhunPackage.SkillId, StringComparer.Ordinal);
+        var kunlunMirror = ShanheRecipeCards(setup).Any(card => card.Kind == CardKind.KunlunMirror) ||
+            extraSkills.Contains(StandardShanheKunlunMirrorPackage.SkillId) ||
+            setup.TacticSkillIds.Contains(StandardShanheKunlunMirrorPackage.SkillId, StringComparer.Ordinal);
         var s5Zhangliao = RequiresThreeBossRegistry(requirements, StandardShanheS5BossPackage.ZhangliaoBaseId,
             StandardShanheS5BossPackage.TuxiId);
         var s5MaSiblings = s5MaPair || RequiresThreeBossRegistry(requirements, StandardShanheS5MaSiblingsPackage.MachaoId,
@@ -390,6 +396,9 @@ public static partial class StandardShanheCampaignCatalog
             StandardShanheSourceSunCePackage.HunziSkillId, StandardShanheSourceSunCePackage.YinghunSkillId);
         var sourceXunYu = RequiresThreeBossRegistry(requirements, StandardShanheSourceXunYuPackage.GeneralId,
             StandardShanheSourceXunYuPackage.QuhuSkillId);
+        var sourceMouDongZhuo = RequiresThreeBossRegistry(requirements, StandardShanheSourceMouDongZhuoPackage.GeneralId,
+            StandardShanheSourceMouDongZhuoPackage.XiongniSkillId, StandardShanheSourceMouDongZhuoPackage.FengshangSkillId,
+            StandardShanheSourceMouDongZhuoPackage.ZhibingSkillId, StandardShanheSourceMouDongZhuoPackage.ZhixiSkillId);
         var sourceZhangYan = sourceQiangWang || RequiresThreeBossRegistry(requirements,
             StandardShanheSourceZhangYanPackage.ZhangniujiaoMediumId,
             StandardShanheSourceZhangYanPackage.YanyuSkillId,
@@ -496,9 +505,12 @@ public static partial class StandardShanheCampaignCatalog
             (sourceQiangWang ? "/source-qiangwang-2669" : "") +
             (blackLightArmor ? "/black-light-armor-6011" : "") +
             (gouXiangArmor ? "/gouxiang-armor-14088" : "") +
+            (duanhun ? "/duanhun-14079" : "") +
+            (kunlunMirror ? "/kunlun-mirror-14080" : "") +
             (sourceXuSheng ? "/source-xusheng-2635" : "") +
             (sourceSunCe ? "/source-sunce-2655" : "") +
             (sourceXunYu ? "/source-xunyu-2675" : "") +
+            (sourceMouDongZhuo ? "/source-mou-dongzhuo-2684" : "") +
             (s5Simayi ? "/s5-simayi-2677" : "") +
             (s5Dianwei ? "/s5-dianwei-weizi-2650" : "") +
             (s5Xiahou ? "/s5-xiahou-pair-2651" : "") +
@@ -648,6 +660,8 @@ public static partial class StandardShanheCampaignCatalog
             if (sourceSanshou) packages.Add(new StandardShanheSanshouArmorPackage());
             if (blackLightArmor) packages.Add(new StandardShanheBlackLightArmorPackage());
             if (gouXiangArmor) packages.Add(new StandardShanheGouXiangArmorPackage());
+            if (duanhun) packages.Add(new StandardShanheDuanhunPackage());
+            if (kunlunMirror) packages.Add(new StandardShanheKunlunMirrorPackage());
             if (ids.Contains(StandardShanheS5ZhangniujiaoPackage.ZhangniujiaoId, StringComparer.Ordinal))
                 packages.Add(new StandardShanheS5ZhangniujiaoPackage());
             if (ids.Any(id => id is StandardShanheS5LvBuBasePackage.LvBuFiveId or StandardShanheS5LvBuBasePackage.LvBuFourId))
@@ -662,6 +676,7 @@ public static partial class StandardShanheCampaignCatalog
             if (sourceXuSheng) packages.Add(new StandardShanheSourceXuShengPackage());
             if (sourceSunCe) packages.Add(new StandardShanheSourceSunCePackage());
             if (sourceXunYu) packages.Add(new StandardShanheSourceXunYuPackage());
+            if (sourceMouDongZhuo) packages.Add(new StandardShanheSourceMouDongZhuoPackage());
             if (ids.Any(id => id is StandardShanheS5SunJianWuguotaiPackage.SunjianId or StandardShanheS5SunJianWuguotaiPackage.WuguotaiId))
                 packages.Add(new StandardShanheS5SunJianWuguotaiPackage());
             if (ids.Contains(StandardShanheS5DongZhuoBasePackage.DongzhuoId, StringComparer.Ordinal))

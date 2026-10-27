@@ -130,6 +130,8 @@ public enum CardKind
     ShanRangZhaoShu = 20331,
     ShanheSanshou = 20336,
     BlackLightArmor = 20722,
+    Duanhun = 20836,
+    KunlunMirror = 20841,
     GouXiang = 20883
 }
 

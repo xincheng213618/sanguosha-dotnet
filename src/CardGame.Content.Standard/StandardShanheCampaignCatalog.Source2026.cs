@@ -211,7 +211,8 @@ public static partial class StandardShanheCampaignCatalog
         new(2677, "luoyang:simayi-s5", "司马隐谋"), new(2678, "huanyuan:caoren-zhaoyun-s5", "双雄际会"),
         new(2679, "huanyuan:cao-wei-pioneers-s5", "曹魏先驱"), new(2680, "hulao:gaoshun-s5", "陷阵高顺"),
         new(2681, "huanyuan:gongsun-zan-zhaoyun-s5", "白马从龙"), new(2682, "dagu:zuoci-huatuo-s5", "奇人异士"),
-        new(2683, "huanyuan:taoyuan-s5", "桃园三英"), new(2685, "luoyang:dongshi-s5", "董氏乱朝"),
+        new(2683, "huanyuan:taoyuan-s5", "桃园三英"),
+        new(2684, "luoyang:mou-dongzhuo-source-native", "逆京枭雄"), new(2685, "luoyang:dongshi-s5", "董氏乱朝"),
         new(2686, "luoyang:fengyi-s5", "凤仪情仇"), new(2687, "luoyang:gaichao-s5", "西凉霸主")
     });
 
@@ -220,6 +221,11 @@ public static partial class StandardShanheCampaignCatalog
     {
         var original = templates[binding.TemplateEncounterId];
         var enemies = original.Enemies;
+        if (binding.BattleId == 2684)
+            enemies = [new(StandardShanheSourceMouDongZhuoPackage.GeneralId)
+            {
+                StartingCards = [new(CardKind.KunlunMirror, Suit.Spade, 12), new(CardKind.Duanhun, Suit.Spade, 5)]
+            }];
         if (binding.BattleId == 2635)
             enemies = [new(difficulty >= 6 ? StandardShanheSourceXuShengPackage.MediumGeneralId :
                 StandardShanheSourceXuShengPackage.BaseGeneralId)

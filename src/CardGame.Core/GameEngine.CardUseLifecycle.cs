@@ -124,6 +124,7 @@ public sealed partial class GameEngine
         if (ContinueGuanduIntoxicationUse(frameId, continuation)) return;
         if (ContinueDyingSuitsPeach(frameId, continuation)) return;
         if (ContinueMouDongZhuoOlWine(frameId, continuation) || ContinueHuanpeiSimpleUse(frameId, continuation) || ContinueDiouSimpleUse(frameId, continuation) || ContinueMouXqJueyanSimpleUse(frameId, continuation)) return;
+        if (ContinueShanheSourceMouWine(frameId, continuation)) return;
         if (ContinueMouZuifengAlcoholUse(frameId, continuation)) return;
         if (ContinueWeijieSimpleUse(frameId, continuation)) return;
         if (ContinueTieredRoundZeroSimpleUse(frameId, continuation)) return;

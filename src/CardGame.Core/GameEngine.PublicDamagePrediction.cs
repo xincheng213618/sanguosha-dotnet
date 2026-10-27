@@ -208,7 +208,8 @@ public sealed partial class GameEngine
             full = Math.Min(1, full);
         if (!fixedWushuang && !finalized && FindPassiveProgramDamageCap(targetState, sourceLess ? null : sourceSeat, targetVisible) is { } damageCap)
             full = Math.Min(damageCap.Cap, full);
-        var bypass = sourceSeat != targetSeat && HasNativeDamageArmorPolicy(sourceSeat, sourceLess,
+        var bypass = DuanhunBypassesNativeDamageArmor(sourceSeat, sourceLess, sourceVisible) ||
+            sourceSeat != targetSeat && HasNativeDamageArmorPolicy(sourceSeat, sourceLess,
             SkillProgramCardPolicyKind.BypassOtherParticipantArmor, sourceVisible);
         var armorMultiplier = HasNativeDamageArmorPolicy(sourceSeat, sourceLess,
             SkillProgramCardPolicyKind.DoubleArmorDamage, sourceVisible) ? 2 : 1;

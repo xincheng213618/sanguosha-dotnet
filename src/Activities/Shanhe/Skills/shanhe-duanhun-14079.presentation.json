@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:duanhun-14079": {
+      "name": "断魂",
+      "description": "攻击范围：2。锁定技，你造成的伤害无视护甲。"
+    }
+  }
+}

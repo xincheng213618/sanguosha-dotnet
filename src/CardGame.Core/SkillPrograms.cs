@@ -1146,6 +1146,10 @@ public enum SkillProgramEffectOp
     HoldShanheSourcePojunHand = 62049,
     DamageShanheQuhuOpponentMaximumHp = 62050,
     ResolveGouXiangResponse = 62052,
+    ResolveShanheSourceXiongni = 62053,
+    ResolveShanheSourceFengshang = 62054,
+    ResolveShanheSourceZhibing = 62055,
+    ResolveKunlunMirror = 62056,
     CollectPublicPile = 780,
     GrantNextCardTargetAdjustment = 782,
     GrantNextActualUseTargetAdjustment = 4700,
@@ -6089,7 +6093,7 @@ public sealed class SkillProgramCatalog
               damageOccurrence == SkillProgramDamageOccurrence.PerDamage &&
               effects is [{ Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.Owner, Amount: 1,
                   NumberExpression: null, Condition.Kind: SkillProgramConditionKind.Always }]) &&
-            effects.Any(effect => effect.Op is not (SkillProgramEffectOp.ChangeAttributedMarker or SkillProgramEffectOp.DrawByDamageCardColor or SkillProgramEffectOp.KillRoundFocusSlashVictim or SkillProgramEffectOp.RecordAnniversaryGuanYuNightmare or SkillProgramEffectOp.ResolveShanheSourceShennu) ||
+            effects.Any(effect => effect.Op is not (SkillProgramEffectOp.ChangeAttributedMarker or SkillProgramEffectOp.DrawByDamageCardColor or SkillProgramEffectOp.KillRoundFocusSlashVictim or SkillProgramEffectOp.RecordAnniversaryGuanYuNightmare or SkillProgramEffectOp.ResolveShanheSourceShennu or SkillProgramEffectOp.ResolveKunlunMirror) ||
                                   effect.Target != SkillProgramEffectTarget.Owner))
             Fail(path + ".effects", "damageAppliedBeforeDying supports only owner attributed-marker records");
         if (effects.Any(effect => ContainsCardUseColorCondition(effect.Condition)) && !isCardActionWindow)

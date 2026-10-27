@@ -428,6 +428,14 @@ public static class CardCatalog
                 CardKind.GouXiang, "钩镶", "装备牌",
                 "锁定技，你使用同花色或同点数的闪响应杀后，获得对方随机一张手牌。",
                 AiPlayValue: 36, AiResponseValue: 0, HandKeepValue: 43),
+            [CardKind.Duanhun] = new(
+                CardKind.Duanhun, "断魂", "装备牌",
+                "攻击范围2。锁定技，你造成的伤害无视护甲。",
+                AiPlayValue: 40, AiResponseValue: 0, HandKeepValue: 45),
+            [CardKind.KunlunMirror] = new(
+                CardKind.KunlunMirror, "昆仑镜", "装备牌",
+                "锁定技，当你受到锦囊牌的伤害后，防止同名锦囊牌本局对你造成的伤害。",
+                AiPlayValue: 38, AiResponseValue: 0, HandKeepValue: 45),
             [CardKind.XingtianAxe] = new(
                 CardKind.XingtianAxe, "刑天破军斧", "装备牌",
                 "攻击范围 4，单一目标用牌后可弃两张牌，令其本回合不能使用或打出手牌且防具失效。",

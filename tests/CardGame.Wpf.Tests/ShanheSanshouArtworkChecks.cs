@@ -19,6 +19,10 @@ internal static class ShanheSanshouArtworkChecks
             Path.Combine(output, "black-light-armor-original-card-face.png"));
         CheckOriginalFace(CardKind.GouXiang, "钩镶", "828B194F65658419932CE796C700793CCDE2F7A3B998E79F4552C989124CC032",
             Path.Combine(output, "gouxiang-original-card-face.png"));
+        CheckOriginalFace(CardKind.Duanhun, "断魂", "B7847C951231F17D1CEEED009CD9D5A1FC3E1F855315E9256E1E2A6F7CC723C7",
+            Path.Combine(output, "duanhun-original-card-face.png"));
+        CheckOriginalFace(CardKind.KunlunMirror, "昆仑镜", "DDBEC2890A883D37318273E7C96EEA7276DBA343AC02317B7DEFF36ED2A58C16",
+            Path.Combine(output, "kunlun-mirror-original-card-face.png"));
         Program.Assert(CardArt.GetEquipment(CardKind.ShanheSanshou) is null &&
             CardArt.GetEquipment(CardKind.WushuangHalberd) is BitmapSource &&
             ReferenceEquals(CardArt.GetEquipment(CardKind.WushuangHalberd), AssetImages.Load("Assets/Cards/equip-WushuangHalberd.png")) &&
@@ -27,6 +31,10 @@ internal static class ShanheSanshouArtworkChecks
         Program.Assert(CardArt.GetEquipment(CardKind.BlackLightArmor) is null && CardArt.GetEquipment(CardKind.GouXiang) is null &&
             EquipmentCatalog.Get(CardKind.BlackLightArmor).Slot == EquipmentSlot.Armor && EquipmentCatalog.Get(CardKind.GouXiang).Slot == EquipmentSlot.Armor,
             "Both original public armour faces keep their real armor identities and the existing equipment text fallback without a synthesized strip.");
+        Program.Assert(CardArt.GetEquipment(CardKind.Duanhun) is null && CardArt.GetEquipment(CardKind.KunlunMirror) is null &&
+            EquipmentCatalog.Get(CardKind.Duanhun) is { Slot: EquipmentSlot.Weapon, WeaponAttackRange: 2, IgnoresArmor: false } &&
+            EquipmentCatalog.Get(CardKind.KunlunMirror).Slot == EquipmentSlot.Treasure,
+            "The original new faces retain Duanhun's range2 weapon and Kunlun Mirror's Treasure slot, with text fallback for unknown equipment strips.");
     }
 
     private static void CheckOriginalFace(CardKind kind, string name, string hash, string output)

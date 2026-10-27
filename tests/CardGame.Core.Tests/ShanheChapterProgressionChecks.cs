@@ -27,7 +27,7 @@ internal static class ShanheChapterProgressionChecks
             var recipes = final.Encounters!;
             Need(recipes.All(encounter => encounter.BossTransition is { EnemyIndex: 0 }) &&
                 recipes.Where(encounter => encounter.Id != "luoyang:dong-clan-screenshot")
-                    .All(encounter => encounter.BossTransition?.DrawCards == (encounter.Id == "luoyang:gaichao-s5" ? 4 : 3)) &&
+                    .All(encounter => encounter.BossTransition?.DrawCards == (encounter.Id is "luoyang:gaichao-s5" or "luoyang:mou-dongzhuo-source-native" ? 4 : 3)) &&
                 recipes.Single(encounter => encounter.Id == final.Id + ":chapter-single").Enemies.Count == 1 &&
                 recipes.Single(encounter => encounter.Id == final.Id + ":chapter-warband").Enemies.Count == 6 &&
                 recipes.Single(encounter => encounter.Id == final.Id + ":chapter-encirclement") is { Enemies.Count: 7, Allies.Count: 0 } &&

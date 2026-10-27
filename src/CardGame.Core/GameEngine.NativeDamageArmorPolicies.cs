@@ -6,10 +6,12 @@ public sealed partial class GameEngine
         SkillProgramCardPolicyKind kind, IReadOnlySet<string>? visibleSkillIds = null) =>
         !sourceLess && IsValidPlayerSeat(sourceSeat) && _players[sourceSeat].IsAlive &&
         CardPolicies(_players[sourceSeat], kind)
-            .Any(binding => visibleSkillIds is null || visibleSkillIds.Contains(binding.Source.SkillId));
+            .Any(binding => (visibleSkillIds is null || visibleSkillIds.Contains(binding.Source.SkillId)) &&
+                (binding.Source.SkillId != DuanhunSkillId || IsActiveDuanhunPolicySource(sourceSeat, binding.Source)));
 
     private bool BypassesNativeDamageArmor(IDamageAttempt attack) =>
-        WushuangArmorBypass(attack) || attack.SourceSeat != attack.TargetSeat &&
+        WushuangArmorBypass(attack) || DuanhunBypassesNativeDamageArmor(attack.SourceSeat, attack.IsSourceLess) ||
+        attack.SourceSeat != attack.TargetSeat &&
         HasNativeDamageArmorPolicy(attack.SourceSeat, attack.IsSourceLess,
             SkillProgramCardPolicyKind.BypassOtherParticipantArmor);
 
