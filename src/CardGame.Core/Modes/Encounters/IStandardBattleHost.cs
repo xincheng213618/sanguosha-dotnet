@@ -20,6 +20,7 @@ public interface IStandardBattleHost
     StandardBattlePlayerFacts Player(int seat);
     bool IsWounded(int seat);
     bool HasEffectiveSkill(int seat, string skillId);
+    CardConversionSource? ActiveShanheDongdangSource(int seat) => null;
     ShenwuBattleDraftFacts? ShenwuDraft();
     void GrantSkill(int seat, SkillGrant grant);
     void PublishShanheStartingResourceOrigins();

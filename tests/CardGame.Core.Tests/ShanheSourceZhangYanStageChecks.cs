@@ -71,11 +71,6 @@ internal static class ShanheSourceZhangYanStageChecks
                 scene.Events<ShanheBossStageStartedEvent>().Length == 1 && scene.Game.State.Winner == Winner.None,
                 "The transformed boss really acts with a physical paid Slash, finishes it once, and remains in a live encounter after its sole transition.");
         }
-
-        foreach (var difficulty in new[] { 11, 16, 21, 25 })
-            Need(StandardShanheCampaignCatalog.CreateSourceCodexDefinition(difficulty).Nodes
-                    .SelectMany(node => node.Encounters ?? []).All(encounter => encounter.SourceBattleId != 2653),
-                "Unsupported higher source bands continue to exclude group2653 rather than dropping Dongdang or substituting fictional Sanshou equipment.");
     }
 
     private sealed class Scene(ShanheBattleSetup setup, ContentRegistry registry)

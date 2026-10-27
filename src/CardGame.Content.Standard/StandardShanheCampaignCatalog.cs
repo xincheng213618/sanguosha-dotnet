@@ -359,6 +359,9 @@ public static partial class StandardShanheCampaignCatalog
             setup.TacticSkillIds.Concat(setup.ExtraSkillIds)
                 .Concat(setup.AllyRoster.Concat(setup.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
                 .Contains(StandardShanheXingtianPackage.SkillId, StringComparer.Ordinal);
+        var sourceSanshou = ShanheRecipeCards(setup).Any(card => card.Kind == CardKind.ShanheSanshou) ||
+            extraSkills.Contains(StandardShanheSanshouArmorPackage.SkillId) ||
+            setup.TacticSkillIds.Contains(StandardShanheSanshouArmorPackage.SkillId, StringComparer.Ordinal);
         var s5Zhangliao = RequiresThreeBossRegistry(requirements, StandardShanheS5BossPackage.ZhangliaoBaseId,
             StandardShanheS5BossPackage.TuxiId);
         var s5MaSiblings = s5MaPair || RequiresThreeBossRegistry(requirements, StandardShanheS5MaSiblingsPackage.MachaoId,
@@ -375,9 +378,13 @@ public static partial class StandardShanheCampaignCatalog
         var sourceZhangYan = RequiresThreeBossRegistry(requirements,
             StandardShanheSourceZhangYanPackage.ZhangniujiaoMediumId,
             StandardShanheSourceZhangYanPackage.YanyuSkillId,
-            StandardShanheSourceZhangYanPackage.BiriSkillId) ||
+            StandardShanheSourceZhangYanPackage.BiriSkillId,
+            StandardShanheSourceZhangYanPackage.DongdangSkillId) ||
             ids.Any(id => id is StandardShanheSourceZhangYanPackage.ZhangYanBaseId or
-                StandardShanheSourceZhangYanPackage.ZhangYanMediumId);
+                StandardShanheSourceZhangYanPackage.ZhangYanMediumId or
+                StandardShanheSourceZhangYanPackage.ZhangniujiaoHardId or
+                StandardShanheSourceZhangYanPackage.ZhangniujiaoNightmareId or
+                StandardShanheSourceZhangYanPackage.ZhangYanHardId);
         var s5Xuncan = sourceZhangYan || RequiresThreeBossRegistry(requirements, StandardShanheS5XuncanCaoshiPackage.XuncanId,
             StandardShanheS5XuncanCaoshiPackage.YunshenId, StandardShanheS5XuncanCaoshiPackage.ShangshenId,
             StandardShanheS5XuncanCaoshiPackage.FenchaiId, StandardShanheS5XuncanCaoshiPackage.LeijieId) ||
@@ -477,6 +484,7 @@ public static partial class StandardShanheCampaignCatalog
             (s5Zuoci ? "/s5-zuoci-huatuo-2682" : "") +
             (s5CaoWei ? "/s5-cao-wei-2679" : "") +
             (s5Xingtian ? "/s5-xingtian-20766" : "") +
+            (sourceSanshou ? "/source-sanshou-20776-20777" : "") +
             (s5Zhangliao ? "/s5-zhangliao-722" : "") +
             (s5Zaiqi ? "/s5-zaiqi-887" : "") +
             (setup.RebirthAvailable ? "/rank-five-rebirth" : "") +
@@ -615,6 +623,7 @@ public static partial class StandardShanheCampaignCatalog
             if (s5Zuoci) packages.Add(new StandardShanheS5ZuociHuatuoPackage());
             if (s5CaoWei) packages.Add(new StandardShanheS5CaoWeiPioneersPackage());
             if (s5Xingtian) packages.Add(new StandardShanheXingtianPackage());
+            if (sourceSanshou) packages.Add(new StandardShanheSanshouArmorPackage());
             if (ids.Contains(StandardShanheS5ZhangniujiaoPackage.ZhangniujiaoId, StringComparer.Ordinal))
                 packages.Add(new StandardShanheS5ZhangniujiaoPackage());
             if (ids.Any(id => id is StandardShanheS5LvBuBasePackage.LvBuFiveId or StandardShanheS5LvBuBasePackage.LvBuFourId))

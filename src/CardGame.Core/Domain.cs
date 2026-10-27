@@ -127,7 +127,8 @@ public enum CardKind
     Leizhen = 59400,
     DagongChe = 43500,
     MantianGuohai = 47700,
-    ShanRangZhaoShu = 20331
+    ShanRangZhaoShu = 20331,
+    ShanheSanshou = 20336
 }
 
 public enum Suit

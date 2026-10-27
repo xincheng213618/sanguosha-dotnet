@@ -92,7 +92,7 @@ public sealed partial class GameEngine
     }
     private SkillProgramStepOutcome ResolveAnniversarySanshou(ProgramSkillFrame f, SkillProgramEffect e)
     {
-        if (f.SkillId is not (AnniversarySanshou or HappyZhangJiaoSanshou) || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, TargetSeat: var victim } || victim != f.OwnerSeat)
+        if (!IsNativeSanshouSkill(f.SkillId) || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, TargetSeat: var victim } || victim != f.OwnerSeat)
             throw new InvalidOperationException("Sanshou requires its original damage-target window.");
         if (e.SourceBind is null)
         {
@@ -228,7 +228,7 @@ public sealed partial class GameEngine
         if (r.Source != AnniversaryZjSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != 1 ||
             !Enum.IsDefined(r.Stage) || r.Cursor < 0 || r.Cursor > r.Targets.Count || r.Targets.Count > 3 || r.Targets.Distinct().Count() != r.Targets.Count ||
             r.Targets.Any(s => !IsValidPlayerSeat(s) || s == f.OwnerSeat) || r.Cards.Distinct().Count() != r.Cards.Count || r.Before < 0 || r.After < r.Before ||
-            (r.Stage == AnniversaryZhangJiaoStage.SanshouSnapshot ? f.SkillId is not (AnniversarySanshou or HappyZhangJiaoSanshou) || f.InstructionIndex is < 1 or > 3 || r.Op != SkillProgramEffectOp.ResolveAnniversaryZhangJiaoSanshou : f.InstructionIndex != r.InstructionIndex) ||
+            (r.Stage == AnniversaryZhangJiaoStage.SanshouSnapshot ? !IsNativeSanshouSkill(f.SkillId) || f.InstructionIndex is < 1 or > 3 || r.Op != SkillProgramEffectOp.ResolveAnniversaryZhangJiaoSanshou : f.InstructionIndex != r.InstructionIndex) ||
             r.Op == SkillProgramEffectOp.ResolveAnniversaryZhangJiaoYizhao && (f.SkillId is not (AnniversaryYizhao or HappyZhangJiaoYizhao) || r.Rank <= 0 || r.MarkerAfter != r.MarkerBefore + r.Rank || r.Cards.Count > 1) ||
             r.Op == SkillProgramEffectOp.ResolveAnniversaryZhangJiaoSijun && (f.SkillId is not (AnniversarySijun or HappyZhangJiaoSijun) || r.MarkerBefore <= 0 || r.Rank is not (0 or 36)) ||
             r.Op == SkillProgramEffectOp.ResolveAnniversaryZhangJiaoTianjie && f.SkillId is not (AnniversaryTianjie or HappyZhangJiaoTianjie) ||

@@ -189,6 +189,7 @@ public static partial class StandardShanheCampaignCatalog
                 ["codex-card-4004"] = new(4004, 200, 2, "装备", CardKind.QinggangSword, Suit.Spade, 6),
                 ["codex-card-4008"] = new(4008, 100, 1, "装备", CardKind.QilinBow, Suit.Heart, 5),
                 ["codex-card-4059"] = new(4059, 600, 4, "装备", CardKind.ShanheXingtianAxe, Suit.Heart, 5),
+                ["codex-98"] = new(4061, 600, 4, "装备", CardKind.ShanheSanshou, Suit.Heart, 12),
                 ["codex-card-4076"] = new(4076, 250, 3, "牌", CardKind.Peach, Suit.Club, 8),
                 ["codex-card-4092"] = new(4092, 150, 1, "牌", CardKind.FiveGrains, Suit.Club, 5),
                 ["codex-card-4107"] = new(4107, 200, 2, "牌", CardKind.Lightning, Suit.Heart, 1)

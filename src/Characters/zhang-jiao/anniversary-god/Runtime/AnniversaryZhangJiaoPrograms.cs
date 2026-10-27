@@ -82,7 +82,7 @@ internal static class AnniversaryZhangJiaoComposition
                 p.Triggers.All(t => !t.Optional && t.IsSkillInvocation && One(t, SkillProgramEffectOp.ResolveAnniversaryZhangJiaoYizhao)) &&
                 p.Triggers.Count(t => t.Window == SkillProgramTriggerWindow.CardUseCommitted && t.OwnerRelation == SkillProgramCardActionOwnerRelation.Actor) == 1 &&
                 p.Triggers.Count(t => t.Window == SkillProgramTriggerWindow.CardResponseAccepted && t.OwnerRelation == SkillProgramCardActionOwnerRelation.Actor) == 1,
-            "anniversary-god:sanshou" or "happy:sanshou" => p.Triggers is [{ Window: SkillProgramTriggerWindow.BeforeDamageApplied, Optional: true, IsSkillInvocation: true,
+            "anniversary-god:sanshou" or "happy:sanshou" or "shanhe:sanshou-armor-3278" => p.Triggers is [{ Window: SkillProgramTriggerWindow.BeforeDamageApplied, Optional: true, IsSkillInvocation: true,
                 Effects: [{ Op: SkillProgramEffectOp.ResolveAnniversaryZhangJiaoSanshou, SourceBind: null },
                     { Op: SkillProgramEffectOp.RevealTopCards, Amount: 3, ResultBind: "sanshou-top", Visibility: SkillProgramCardSetVisibility.Public },
                     { Op: SkillProgramEffectOp.ResolveAnniversaryZhangJiaoSanshou, SourceBind: "sanshou-top" },

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:sanshou-armor-3278": {
+      "name": "三首",
+      "description": "当你受到伤害时，你可以亮出牌堆顶三张牌，若包含本回合未使用过的类型，你防止此伤害。"
+    }
+  }
+}

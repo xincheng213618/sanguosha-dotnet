@@ -37,6 +37,8 @@ public static partial class StandardShanheCampaignCatalog
             "当其他角色使用牌指定你为唯一目标后，你可以判定，若结果为红桃，此牌对你无效。"),
         CodexEquipment(66, "仁王盾", CardKind.RenwangShield, "锁定技，黑色【杀】对你无效。"),
         CodexEquipment(88, "虚妄之冕", CardKind.DelusionCrown, "锁定技，摸牌阶段，你多摸两张牌。你的手牌上限-1。"),
+        CodexEquipment(98, "三首", CardKind.ShanheSanshou,
+            "当你受到伤害时，你可以亮出牌堆顶三张牌，若包含本回合未使用过的类型，你防止此伤害。"),
         CodexEquipment(101, "鬼龙斩月刀", CardKind.GhostDragonCrescentBlade, "锁定技，你使用的红色【杀】不能被【闪】响应。"),
         CodexEquipment(115, "国风玉袍", CardKind.NationalStyleRobe, "锁定技，你不能成为其他角色使用普通锦囊牌的目标。")
     });

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "shanhe:sanshou-armor-3278", "revision": 1, "triggers": [
+      { "id": "three-types", "window": "beforeDamageApplied", "subject": "damageTarget", "optional": true, "priority": 0,
+        "effects": [
+          { "op": "resolveAnniversaryZhangJiaoSanshou", "target": "owner" },
+          { "op": "revealTopCards", "target": "owner", "amount": 3, "resultBind": "sanshou-top", "visibility": "public" },
+          { "op": "resolveAnniversaryZhangJiaoSanshou", "target": "owner", "sourceBind": "sanshou-top" },
+          { "op": "moveBoundCards", "target": "owner", "sourceBind": "sanshou-top", "destination": "discardPile" }
+        ] }
+    ] }
+  ]
+}

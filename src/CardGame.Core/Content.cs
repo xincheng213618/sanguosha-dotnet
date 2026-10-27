@@ -416,6 +416,10 @@ public static class CardCatalog
                 CardKind.Leizhen, "雷震", "装备牌",
                 "攻击范围2。锁定技，每使用三张手牌后，下一张杀造成的伤害+1（无法叠加）。",
                 AiPlayValue: 40, AiResponseValue: 0, HandKeepValue: 43),
+            [CardKind.ShanheSanshou] = new(
+                CardKind.ShanheSanshou, "三首", "装备牌",
+                "当你受到伤害时，你可以亮出牌堆顶三张牌，若包含本回合未使用过的类型，你防止此伤害。",
+                AiPlayValue: 35, AiResponseValue: 0, HandKeepValue: 45),
             [CardKind.XingtianAxe] = new(
                 CardKind.XingtianAxe, "刑天破军斧", "装备牌",
                 "攻击范围 4，单一目标用牌后可弃两张牌，令其本回合不能使用或打出手牌且防具失效。",
