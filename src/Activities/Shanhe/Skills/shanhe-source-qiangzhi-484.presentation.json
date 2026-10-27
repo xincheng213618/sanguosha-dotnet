@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-qiangzhi-484": {
+      "name": "强识",
+      "description": "出牌阶段开始时，你可以展示一名其他角色一张手牌，然后当你本阶段使用与展示牌类型相同的牌时，你可以摸一张牌。",
+      "booleanStates": {
+        "shown-basic": {
+          "trueText": "本阶段已展示基本牌",
+          "falseText": "未展示基本牌"
+        },
+        "shown-trick": {
+          "trueText": "本阶段已展示锦囊牌",
+          "falseText": "未展示锦囊牌"
+        },
+        "shown-equipment": {
+          "trueText": "本阶段已展示装备牌",
+          "falseText": "未展示装备牌"
+        }
+      }
+    }
+  }
+}

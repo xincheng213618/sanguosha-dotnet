@@ -613,6 +613,7 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe source Warrior: empty eligible set still allows skip", ShanheSourceWarriorChecks.LuoyiAllowsItsSecondAcceptanceWithoutAnyEligibleCard),
     ("Shanhe source ordinary troops: source pools and both recommended entrypoints", ShanheSourceOrdinaryTroopChecks.SourcePoolsAndBothRecommendedEntrypointsRetainCompleteTieredRecipes),
     ("Shanhe source ordinary troops: real preview move opening projection", ShanheSourceOrdinaryTroopChecks.SourceAndLocalPreviewMoveAndStartUseOneProjectionAndRealOpeningEntities),
+    ("Shanhe source Xun Yue: native shown card and exact Play phase lifetime", ShanheSourceXunYueChecks.QiangzhiRevealsOneOriginalHandCardAndOnlyDrawsWithinItsSelectedPlayPhase),
     ("Shanhe source Mou Dong Zhuo: real five-card cost maximum HP and dying allocation wine", ShanheSourceMouDongZhuoChecks.FiveSuitPaymentMaximumHpAndUnrestrictedDyingAllocationUseOriginalChildrenAndWine),
     ("Shanhe source Mou Dong Zhuo: actual black-use thresholds and issued Zhixi", ShanheSourceMouDongZhuoChecks.TrueBlackUsesThresholdThreeSixNineGrantUseOnlyZhixiUntilActualTurnEnd),
     ("Shanhe Duanhun: real source damage self damage and armor equipment", ShanheDuanhunChecks.RealWeaponBypassesOtherAndSelfArmorWhileLeavingArmorEquipmentEffective),

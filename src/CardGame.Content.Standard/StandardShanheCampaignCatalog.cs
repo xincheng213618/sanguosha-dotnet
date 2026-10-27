@@ -406,6 +406,11 @@ public static partial class StandardShanheCampaignCatalog
         var sourceWarrior = RequiresThreeBossRegistry(requirements, StandardShanheSourceWarriorPackage.BaseId,
             StandardShanheSourceWarriorPackage.YoudiSkillId, StandardShanheSourceWarriorPackage.LuoyiSkillId) ||
             ids.Any(id => id is StandardShanheSourceWarriorPackage.HardId or StandardShanheSourceWarriorPackage.HellId);
+        var sourceQiangRaider = ids.Any(id => id is StandardShanheSourceQiangRaiderPackage.BaseId or
+            StandardShanheSourceQiangRaiderPackage.HardId or StandardShanheSourceQiangRaiderPackage.NightmareId);
+        var sourceXunYue = RequiresThreeBossRegistry(requirements, StandardShanheSourceXunYuePackage.BaseId,
+            StandardShanheSourceXunYuePackage.QiangzhiSkillId) ||
+            ids.Any(id => id is StandardShanheSourceXunYuePackage.HardId or StandardShanheSourceXunYuePackage.HellId);
         var sourceZhangYan = sourceQiangWang || RequiresThreeBossRegistry(requirements,
             StandardShanheSourceZhangYanPackage.ZhangniujiaoMediumId,
             StandardShanheSourceZhangYanPackage.YanyuSkillId,
@@ -521,6 +526,8 @@ public static partial class StandardShanheCampaignCatalog
             (sourceVeteran ? "/source-veteran-2474" : "") +
             (sourceWuhuanRider ? "/source-wuhuan-rider-2467" : "") +
             (sourceWarrior ? "/source-warrior-2487" : "") +
+            (sourceQiangRaider ? "/source-qiang-raider-2473" : "") +
+            (sourceXunYue ? "/source-xunyue-2480" : "") +
             (s5Simayi ? "/s5-simayi-2677" : "") +
             (s5Dianwei ? "/s5-dianwei-weizi-2650" : "") +
             (s5Xiahou ? "/s5-xiahou-pair-2651" : "") +
@@ -690,6 +697,8 @@ public static partial class StandardShanheCampaignCatalog
             if (sourceVeteran) packages.Add(new StandardShanheSourceVeteranPackage());
             if (sourceWuhuanRider) packages.Add(new StandardShanheSourceWuhuanRiderPackage());
             if (sourceWarrior) packages.Add(new StandardShanheSourceWarriorPackage());
+            if (sourceQiangRaider) packages.Add(new StandardShanheSourceQiangRaiderPackage());
+            if (sourceXunYue) packages.Add(new StandardShanheSourceXunYuePackage());
             if (ids.Any(id => id is StandardShanheS5SunJianWuguotaiPackage.SunjianId or StandardShanheS5SunJianWuguotaiPackage.WuguotaiId))
                 packages.Add(new StandardShanheS5SunJianWuguotaiPackage());
             if (ids.Contains(StandardShanheS5DongZhuoBasePackage.DongzhuoId, StringComparer.Ordinal))

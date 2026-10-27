@@ -4,7 +4,7 @@ using CardGame.Core.Campaigns;
 
 internal static class ShanheSourceOrdinaryTroopChecks
 {
-    private static readonly int[] Groups = [2474, 2467, 2487];
+    private static readonly int[] Groups = [2474, 2467, 2487, 2473, 2480];
 
     public static void SourcePoolsAndBothRecommendedEntrypointsRetainCompleteTieredRecipes()
     {
@@ -28,14 +28,15 @@ internal static class ShanheSourceOrdinaryTroopChecks
                         $"Source{group} must appear exactly once only in the actual open city pool; difficulty={difficulty}, city={city.SourceCityId}.");
                     if (matches.Length == 0) continue;
                     var encounter = matches[0]; var body = encounter.Enemies.Single();
+                    var baseHp = SourceBaseHp(group);
                     Need(encounter.SourceCityId == city.SourceCityId && encounter.SourceVisibleEnemyCount == 1 &&
                         encounter.BossTransition is null && (encounter.Allies?.Count ?? 0) == 0 &&
-                        body.GeneralId == General(group, difficulty) &&
-                        body is { Hp: 4, MaxHpBonus: 0, DrawBonus: 0, InitialHandBonus: 0, SlashBonus: 0,
+                        body.GeneralId == General(group, difficulty) && body.Hp == baseHp &&
+                        body is { MaxHpBonus: 0, DrawBonus: 0, InitialHandBonus: 0, SlashBonus: 0,
                             InitialArmor: 0, ArmorRecoveryPerRound: 0, ArmorRecoveryCap: 5, ExtraDamage: 0 } &&
                         body.SourceDifficultyAttributes is { Count: 0 } && body.StartingHand is null &&
                         (body.StartingCards?.Count ?? 0) == 0 && (body.StartingEquipment?.Count ?? 0) == 0,
-                        "The authored recipe is one complete soldier4861 at base4/4, draw2/hand4, without gear or a second local chapter bonus; source growth belongs to entry projection.");
+                        $"Source{group} retains its complete original{baseHp}/{baseHp}, draw2/hand4 member without gear or a second local chapter bonus; source growth belongs to entry projection.");
                 }
             }
             foreach (var group in Groups)
@@ -47,6 +48,9 @@ internal static class ShanheSourceOrdinaryTroopChecks
                     .Select(e => e.SourceCityId!.Value).Order().ToArray();
                 Need(actual.SequenceEqual(expected) && expected.Length > 0,
                     "The total recipe count follows currently open source regions, rather than prematurely requiring all56 cities at every tier.");
+                if (difficulty == 25 && (group is 2473 or 2480))
+                    Need(actual.Length == (group == 2473 ? 14 : 56),
+                        "With every source region open, the two new groups retain their actual14 and56 source-city memberships.");
             }
             var probe = new ShanheBattleSetup(83, 1, "fixture:ordinary-source-dependencies", "classic:guan-yu",
                 4, 0, 0, 0, 0, [], [], [], Groups.Select(group => new ShanheCombatantDefinition(General(group, difficulty))).ToArray(),
@@ -74,7 +78,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
             foreach (var (id, terrain) in sites)
             {
                 var node = definition.Nodes.Single(n => n.Id == id);
-                foreach (var group in Groups)
+                foreach (var group in Groups.Where(group => group != 2473))
                 {
                     var tier = LocalTier(group, difficulty);
                     var encounter = node.Encounters!.Single(e => e.Enemies.Count == 1 && e.Enemies[0].GeneralId == General(group, tier));
@@ -82,11 +86,32 @@ internal static class ShanheSourceOrdinaryTroopChecks
                     Need(encounter.SourceBattleId is null && encounter.SourceCityId is null && encounter.SourceVisibleEnemyCount is null &&
                         encounter.BossTransition is null && (encounter.Allies?.Count ?? 0) == 0 &&
                         encounter.TerrainSkillId == (difficulty == 3 ? terrain : null) &&
-                        body.Hp == 7 + 2 * growth && body.MaxHpBonus == 3 + 2 * growth &&
+                        body.Hp == 7 + 2 * growth && body.MaxHpBonus == 7 + 2 * growth - SourceBaseHp(group) &&
                         body.InitialHandBonus == 1 + growth && body.DrawBonus == 1 && body.SourceDifficultyAttributes is null &&
                         (body.StartingCards?.Count ?? 0) == 0 && (body.StartingEquipment?.Count ?? 0) == 0 &&
                         1 + encounter.Enemies.Count + (encounter.Allies?.Count ?? 0) <= 8,
-                        "All three complete local troop recipes survive both normal nodes and all five terrain clones, with local stats and no fabricated source identities.");
+                        "All four complete second-chapter local troop recipes survive both normal nodes and all five terrain clones, retaining each original body's own maximum HP and no fabricated source identities.");
+                }
+            }
+            foreach (var id in new[] { "hulao", "guangcheng", "hulao-start", "guangcheng-start" })
+            {
+                var node = definition.Nodes.Single(n => n.Id == id);
+                var encounter = node.Encounters!.Single(e => e.Enemies.Count == 1 &&
+                    e.Enemies[0].GeneralId == General(2473, LocalTier(2473, difficulty)));
+                var body = encounter.Enemies.Single();
+                Need(node.ChapterNumber == 1 && encounter.SourceBattleId is null && encounter.SourceCityId is null &&
+                    encounter.SourceVisibleEnemyCount is null && encounter.BossTransition is null &&
+                    (encounter.Allies?.Count ?? 0) == 0 && body.Hp == 4 + difficulty && body.MaxHpBonus == difficulty &&
+                    body.DrawBonus == difficulty && body.InitialHandBonus == 0 && body.SourceDifficultyAttributes is null &&
+                    body.StartingHand is null && (body.StartingCards?.Count ?? 0) == 0 &&
+                    (body.StartingEquipment?.Count ?? 0) == 0 && 1 + encounter.Enemies.Count <= 8,
+                    "The complete local Qiang raider survives both first-chapter routes and their random-opening copies, with its authored first-chapter growth and no second-chapter hand bonus or source labels.");
+                if (id.EndsWith("-start", StringComparison.Ordinal))
+                {
+                    var original = definition.Nodes.Single(n => n.Id == id[..^6]).Encounters!
+                        .Single(e => e.Enemies.Count == 1 && e.Enemies[0].GeneralId == body.GeneralId);
+                    Need(SameMembers(encounter.Enemies, original.Enemies),
+                        "Random-opening copies retain the actual source-body recipe rather than adding another local growth pass.");
                 }
             }
         }
@@ -95,24 +120,35 @@ internal static class ShanheSourceOrdinaryTroopChecks
     public static void SourceAndLocalPreviewMoveAndStartUseOneProjectionAndRealOpeningEntities()
     {
         var source = StandardShanheCampaignCatalog.CreateSourceCodexDefinition(25);
-        var cityNode = source.Nodes.First(n => n.Kind == ShanheNodeKind.Battle && n.Encounters!.Any(e => e.SourceBattleId == 2474));
-        var sourceEncounter = cityNode.Encounters!.Single(e => e.SourceBattleId == 2474);
-        EnterAndStart(source, cityNode, sourceEncounter, sourceBacked: true);
+        foreach (var group in new[] { 2474, 2480 })
+        {
+            var cityNode = source.Nodes.First(n => n.Kind == ShanheNodeKind.Battle && n.Encounters!.Any(e => e.SourceBattleId == group));
+            var sourceEncounter = cityNode.Encounters!.Single(e => e.SourceBattleId == group);
+            EnterAndStart(source, cityNode, sourceEncounter, group, 25);
+        }
 
         var local = StandardShanheCampaignCatalog.CreateCodexDefinition(3, StandardShanheCampaignCatalog.Returning2026EditionId);
         var localNode = local.Nodes.Single(n => n.Id == "dagu");
-        var localEncounter = localNode.Encounters!.Single(e => e.Enemies.Count == 1 &&
-            e.Enemies[0].GeneralId == StandardShanheSourceVeteranPackage.HellGeneralId);
-        EnterAndStart(local, localNode, localEncounter, sourceBacked: false);
+        foreach (var group in new[] { 2474, 2480 })
+        {
+            var tier = LocalTier(group, 3);
+            var localEncounter = localNode.Encounters!.Single(e => e.Enemies.Count == 1 && e.Enemies[0].GeneralId == General(group, tier));
+            EnterAndStart(local, localNode, localEncounter, group, tier, localDifficulty: 3);
+        }
+        var opening = local.Nodes.Single(n => n.Id == "hulao-start");
+        var raider = opening.Encounters!.Single(e => e.Enemies.Count == 1 &&
+            e.Enemies[0].GeneralId == StandardShanheSourceQiangRaiderPackage.NightmareId);
+        EnterAndStart(local, opening, raider, 2473, 16, localDifficulty: 3);
     }
 
     private static void EnterAndStart(ShanheCampaignDefinition definition, ShanheNodeDefinition node,
-        ShanheEncounterDefinition selected, bool sourceBacked)
+        ShanheEncounterDefinition selected, int group, int tier, int? localDifficulty = null)
     {
         // Admit a real later node as a fresh entry without manufacturing any wins.
         var entry = definition with
         {
-            StartingNodeIds = [.. definition.StartingNodeIds, node.Id], RandomStartingNode = false,
+            StartingNodeIds = definition.StartingNodeIds.Append(node.Id).Distinct(StringComparer.Ordinal).ToArray(),
+            RandomStartingNode = false,
             Nodes = definition.Nodes.Select(n => n.Id == node.Id ? n with { Encounters = [selected] } : n).ToArray()
         };
         var session = ShanheCampaignSession.Create(entry, new(83, "classic:guan-yu")
@@ -126,35 +162,43 @@ internal static class ShanheSourceOrdinaryTroopChecks
         var result = session.Submit(new MoveShanheNodeCommand(node.Id, session.Revision));
         Need(result.Accepted && session.PendingBattleSetup is not null, result.Error ?? "Cannot enter the actual ordinary troop recipe.");
         var setup = session.PendingBattleSetup!; var member = setup.EnemyRoster.Single();
+        var baseHp = SourceBaseHp(group);
         Need(SameMembers(setup.EnemyRoster, preview.Enemies) && setup.SourceDifficultyId == definition.SourceDifficultyId &&
             setup.EncounterOrdinal == ordinal + 1 && setup.BossTransition is null,
             "Move carries exactly the already-previewed troop and one actual encounter ordinal into its native battle.");
-        if (sourceBacked)
+        if (definition.SourceDifficultyId is { } sourceDifficulty)
         {
             var raw = selected.Enemies.Single();
-            var grown = StandardShanheSourceEnemyGrowth.Season5.Calculate(new(4, 2, 0, 0, 4, 0, 0),
-                new(25, setup.EncounterOrdinal, node.ChapterNumber, 1, ShanheSourceEncounterCategory.Ordinary),
+            var grown = StandardShanheSourceEnemyGrowth.Season5.Calculate(new(baseHp, 2, 0, 0, 4, 0, 0),
+                new(sourceDifficulty, setup.EncounterOrdinal, node.ChapterNumber, 1, ShanheSourceEncounterCategory.Ordinary),
                 raw.SourceDifficultyAttributes).Attributes;
-            Need(raw is { Hp: 4, MaxHpBonus: 0, InitialHandBonus: 0, DrawBonus: 0 } &&
-                member.Hp == grown.Hp && member.MaxHpBonus == grown.Hp - 4 &&
+            Need(raw.Hp == baseHp && raw is { MaxHpBonus: 0, InitialHandBonus: 0, DrawBonus: 0 } &&
+                member.Hp == grown.Hp && member.MaxHpBonus == grown.Hp - baseHp &&
                 member.InitialHandBonus == grown.StartingCards - 4 && member.DrawBonus == grown.Draw - 2 &&
                 member.SlashBonus == grown.ExtraSlash && member.InitialArmor == grown.Armor &&
                 member.ArmorRecoveryPerRound == grown.ArmorGain && member.ExtraDamage == grown.ExtraDamage &&
-                preview.SourceBattleId == 2474 && preview.SourceCityId == selected.SourceCityId,
-                "Only session entry projects the untouched original4/4,2/4 member with the real day, chapter, single visible enemy and source25 calculator.");
+                preview.SourceBattleId == group && preview.SourceCityId == selected.SourceCityId,
+                "Only session entry projects the untouched original body, draw2/hand4 member with the real day, chapter, single visible enemy and actual source-difficulty calculator.");
         }
         else
-            Need(member is { Hp: 11, MaxHpBonus: 7, InitialHandBonus: 3, DrawBonus: 1 } &&
+        {
+            Need(localDifficulty is >= 1 and <= 3, "A local opening retains its explicit local difficulty.");
+            var difficulty = localDifficulty!.Value; var growth = difficulty - 1;
+            var hp = group == 2473 ? 4 + difficulty : 7 + 2 * growth;
+            Need(member.Hp == hp && member.MaxHpBonus == hp - baseHp &&
+                member.InitialHandBonus == (group == 2473 ? 0 : 1 + growth) &&
+                member.DrawBonus == (group == 2473 ? difficulty : 1) && SameMembers([member], selected.Enemies) &&
                 member.SourceDifficultyAttributes is null && preview.SourceBattleId is null && preview.SourceCityId is null,
-                "Recommended local Hell keeps its authored11HP and local draw/hand bonuses without source growth.");
+                "Recommended local troops keep their authored chapter health, base-specific maximum HP and draw/hand bonuses without a source-growth pass.");
+        }
 
         var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup);
-        AssertGeneralAndPrograms(registry, 2474, 25);
+        AssertGeneralAndPrograms(registry, group, tier);
         var game = StandardShanheCampaignCatalog.CreateBattle(setup);
         Need(game.Submit(new StartGameCommand()).Accepted, "The exact production troop setup accepts native StartGame.");
         for (var step = 0; !(game.CreateSnapshot(0).PendingDecision is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } &&
                 game.ResolutionStack.Count == 0); step++)
-            Need(step < 120 && game.PendingDecision is null && game.State.Winner == Winner.None &&
+            Need(step < 120 && game.CreateSnapshot(0).PendingDecision is null && game.State.Winner == Winner.None &&
                 game.Submit(new AdvanceOneStepCommand(game.Revision)).Accepted,
                 "The ordinary troop must reach the first natural human Play without simulating enemy turns or inventing a result.");
         var enemySeat = 1 + setup.AllyRoster.Count;
@@ -165,20 +209,21 @@ internal static class ShanheSourceOrdinaryTroopChecks
         Need(game.State.TurnNumber == 1 && game.State.CurrentSeat == 0 && game.State.Winner == Winner.None &&
             game.CreateSnapshot(0).Players.Count == 1 + setup.AllyRoster.Count + setup.EnemyRoster.Count &&
             game.CreateSnapshot(0).Players.Count <= 8 && enemy.GeneralId == member.GeneralId &&
-            enemy.Hp == member.Hp && enemy.MaxHp == 4 + member.MaxHpBonus && enemy.Armor == member.InitialArmor &&
+            enemy.Hp == member.Hp && enemy.MaxHp == baseHp + member.MaxHpBonus && enemy.Armor == member.InitialArmor &&
             enemy.Equipment.Count == 0 && initial.Length == deck.InitialHandSize + member.InitialHandBonus &&
             initial.Select(m => m.CardId).Distinct().Count() == initial.Length &&
             initial.Select(m => m.CardId).Order().SequenceEqual(enemy.Hand.Select(c => c.Id).Order()) &&
-            enemy.Skills!.Count(s => s.ContentId == StandardShanheCampaignCatalog.S5ZaiqiSkillId) == 1 &&
+            ExpectedSkills(group, tier).All(id => enemy.Skills!.Count(s => s.ContentId == id) == 1) &&
             game.Events.Where(e => e.Payload is TurnStartedEvent).All(e => ((TurnStartedEvent)e.Payload).ActorSeat == 0),
-            "The real first opening uses prepared health once, deals each actual enemy entity once, installs the shared S5再起 once, and stops before an enemy turn.");
+            "The real first opening uses the prepared health and the selected body's own maximum once, deals each enemy entity once, installs each cumulative source skill once, and stops before an enemy turn.");
     }
 
     private static void AssertGeneralAndPrograms(ContentRegistry registry, int group, int difficulty)
     {
         var general = registry.Generals[General(group, difficulty)];
         var expected = ExpectedSkills(group, difficulty);
-        Need(general.BaseHp == 4 && general.InitialHp == 4 && registry.IsGeneralPlayable(general.Id) &&
+        var baseHp = SourceBaseHp(group);
+        Need(general.BaseHp == baseHp && general.InitialHp == baseHp && registry.IsGeneralPlayable(general.Id) &&
             general.SkillIds.Order().SequenceEqual(expected.Order()) &&
             expected.All(id => registry.GetSkill(id).Program is not null),
             "The actual factory loads the complete selected source tier and every executable skill dependency.");
@@ -191,7 +236,11 @@ internal static class ShanheSourceOrdinaryTroopChecks
 
     private static string[] ExpectedSkills(int group, int difficulty)
     {
-        var skills = new List<string> { group switch { 2474 => "classic:zhanjue", 2467 => "classic:huaiyi", _ => "ol:tuifeng" } };
+        var skills = new List<string> { group switch
+        {
+            2474 => "classic:zhanjue", 2467 => "classic:huaiyi", 2487 => "ol:tuifeng", 2473 => "ol:zhidao",
+            2480 => StandardShanheSourceXunYuePackage.QiangzhiSkillId, _ => throw new ArgumentOutOfRangeException(nameof(group))
+        } };
         if (group == 2474)
         {
             if (difficulty >= 6) skills.Add("classic:lianying");
@@ -204,10 +253,20 @@ internal static class ShanheSourceOrdinaryTroopChecks
             if (difficulty >= 11) skills.Add(StandardShanheSourceWuhuanRiderPackage.TuxiSkillId);
             if (difficulty >= 21) skills.Add(StandardShanheSourceWuhuanRiderPackage.JixiSkillId);
         }
-        else
+        else if (group == 2487)
         {
             if (difficulty >= 11) skills.Add(StandardShanheSourceWarriorPackage.YoudiSkillId);
             if (difficulty >= 21) skills.Add(StandardShanheSourceWarriorPackage.LuoyiSkillId);
+        }
+        else if (group == 2473)
+        {
+            if (difficulty >= 11) skills.Add("boundary:paoxiao");
+            if (difficulty >= 16) skills.Add("ol:sidao");
+        }
+        else if (group == 2480)
+        {
+            if (difficulty >= 11) skills.Add("ol:mingzhe");
+            if (difficulty >= 21) skills.Add("ol:yuxu");
         }
         return skills.ToArray();
     }
@@ -215,11 +274,24 @@ internal static class ShanheSourceOrdinaryTroopChecks
     {
         2474 => StandardShanheSourceVeteranPackage.GetGeneralId(difficulty),
         2467 => StandardShanheSourceWuhuanRiderPackage.GetGeneralId(difficulty),
-        _ => StandardShanheSourceWarriorPackage.GetGeneralId(difficulty)
+        2487 => StandardShanheSourceWarriorPackage.GetGeneralId(difficulty),
+        2473 => StandardShanheSourceQiangRaiderPackage.GetGeneralId(difficulty),
+        2480 => StandardShanheSourceXunYuePackage.GetGeneralId(difficulty),
+        _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
-    private static int LocalTier(int group, int difficulty) => group == 2474
-        ? difficulty switch { 1 => 6, 2 => 16, _ => 21 }
-        : difficulty switch { 1 => 1, 2 => 11, _ => 21 };
+    private static int LocalTier(int group, int difficulty) => group switch
+    {
+        2474 => difficulty switch { 1 => 6, 2 => 16, _ => 21 },
+        2473 => difficulty switch { 1 => 1, 2 => 11, _ => 16 },
+        2467 or 2487 or 2480 => difficulty switch { 1 => 1, 2 => 11, _ => 21 },
+        _ => throw new ArgumentOutOfRangeException(nameof(group))
+    };
+    private static int SourceBaseHp(int group) => group switch
+    {
+        2480 => 3,
+        2474 or 2467 or 2487 or 2473 => 4,
+        _ => throw new ArgumentOutOfRangeException(nameof(group))
+    };
     private static bool SameMembers(IReadOnlyList<ShanheCombatantDefinition> left, IReadOnlyList<ShanheCombatantDefinition> right) =>
         left.Select(m => (m.GeneralId, m.Hp, m.MaxHpBonus, m.InitialHandBonus, m.DrawBonus, m.SlashBonus,
                 m.InitialArmor, m.ArmorRecoveryPerRound, m.ArmorRecoveryCap, m.ExtraDamage))
