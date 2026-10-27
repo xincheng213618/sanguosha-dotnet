@@ -1980,6 +1980,7 @@ public enum SkillProgramNumberExpression
     CategoryTargetTurnUsage = 820, CurrentHp = 1020, SelectedTargetsHandGreaterThanLord = 1021,
     PhaseSkillUsage = 1022, EventMovedCardCount = 1700, CurrentTurnUsedCardCategoryCount = 4600, OwnerLostHpAtLeastOne = 7400,
     TurnOwnerDiscardPhaseHandDiscardCount = 3100, CurrentHandEmptyTwoOtherwiseOne = 8008,
+    OwnerLeastHandTwoOtherwiseOne = 239,
     EquipmentHalfCeilingPlusOne = 9000,
     EquipmentHalfFloorPlusOne = 74500,
     ActualTurnDeathBenefits = 4721,

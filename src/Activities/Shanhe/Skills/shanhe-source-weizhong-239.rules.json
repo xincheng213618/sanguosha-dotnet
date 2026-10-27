@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:source-weizhong-239", "revision": 1,
+    "triggers": [{
+      "id": "actual-maximum-hp-change-least-hand-draw", "window": "afterHealthChanged", "subject": "owner", "optional": false,
+      "hpChangeOccurrence": "perEvent",
+      "condition": { "kind": "healthChangeKindIs", "hpChangeKind": "maximumHp" },
+      "effects": [{ "op": "draw", "target": "owner", "numberExpression": "ownerLeastHandTwoOtherwiseOne" }]
+    }]
+  }]
+}

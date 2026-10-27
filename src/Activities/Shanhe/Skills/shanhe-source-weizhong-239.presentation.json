@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-weizhong-239": {
+      "name": "威重",
+      "description": "锁定技，当你的体力上限变化时，你摸一张牌，若你的手牌数全场最少，改为摸两张牌。"
+    }
+  }
+}

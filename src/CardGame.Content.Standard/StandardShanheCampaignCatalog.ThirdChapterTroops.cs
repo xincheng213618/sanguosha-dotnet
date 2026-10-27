@@ -22,7 +22,8 @@ public static partial class StandardShanheCampaignCatalog
                 1 + (tier >= 6 ? 1 : 0) + (tier >= 16 ? 1 : 0), []),
             Patrol(2495, StandardShanheSourceExecutionerPackage.GetGeneralId(tier), 4, 1, ExecutionerGear(tier)),
             ReturningMixedOrdinary(2465, difficulty, ThirdChapterPatrolNodeId + ":coalition-trio-2465-local", chapter: 3),
-            ReturningMixedOrdinary(2464, difficulty, ThirdChapterPatrolNodeId + ":demon-trio-2464-local", chapter: 3)
+            ReturningMixedOrdinary(2464, difficulty, ThirdChapterPatrolNodeId + ":demon-trio-2464-local", chapter: 3),
+            Patrol(2468, StandardShanheSourceZhangHePackage.GetGeneralId(tier), 4, 1 + (tier >= 21 ? 1 : 0), [])
         };
         var patrol = new ShanheNodeDefinition(ThirdChapterPatrolNodeId, "第三章 · 京畿巡军", ShanheNodeKind.Battle,
             camp.NextNodeIds, encounters, rewards)
@@ -41,7 +42,9 @@ public static partial class StandardShanheCampaignCatalog
         ShanheEncounterDefinition Patrol(int group, string general, int baseHp, int slashBonus,
             IReadOnlyList<ShanheStartingCard> cards) => new(ThirdChapterPatrolNodeId + ":troop-" + group,
                 OrdinaryTroopName(group), [new(general, MaxHpBonus: 10 + 3 * growth - baseHp,
-                    Hp: 10 + 3 * growth, InitialHandBonus: 2 + growth, DrawBonus: 2, SlashBonus: slashBonus)
+                    Hp: 10 + 3 * growth, InitialHandBonus: 2 + growth + Source2026EnemyDataByGroup[group].Single().TierAttributes
+                        .Where(a => a.DifficultyGroupId <= (tier + 4) / 5).Sum(a => a.Attributes.StartingCards),
+                    DrawBonus: 2, SlashBonus: slashBonus)
                     { StartingCards = cards }], [], VictoryGold: 200, HealAfterVictory: 1)
                 { StoryText = OrdinaryTroopStory(group) };
     }

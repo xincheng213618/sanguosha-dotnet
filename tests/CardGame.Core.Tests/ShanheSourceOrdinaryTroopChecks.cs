@@ -4,9 +4,9 @@ using CardGame.Core.Campaigns;
 
 internal static class ShanheSourceOrdinaryTroopChecks
 {
-    private static readonly int[] Groups = [2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495, 2457, 2498, 2451, 2500, 2454, 2456, 2458, 2461];
-    private static bool FirstChapter(int group) => group is 2473 or 2455 or 2459 or 2460 or 2457 or 2498 or 2454 or 2456 or 2458 or 2461;
-    private static bool ThirdChapter(int group) => group is 2493 or 2495;
+    private static readonly int[] Groups = [2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495, 2457, 2498, 2451, 2500, 2454, 2456, 2458, 2461, 2452, 2468, 2494];
+    private static bool FirstChapter(int group) => group is 2473 or 2455 or 2459 or 2460 or 2457 or 2498 or 2454 or 2456 or 2458 or 2461 or 2452;
+    private static bool ThirdChapter(int group) => group is 2493 or 2495 or 2468;
 
     public static void SourcePoolsAndBothRecommendedEntrypointsRetainCompleteTieredRecipes()
     {
@@ -132,7 +132,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
                 new[] { "luoyang", "suanzao", "henei", StandardShanheCampaignCatalog.ThirdChapterDongwuEliteId,
                     StandardShanheCampaignCatalog.MuluEncounterNodeId }.All(originalRoutes.Contains) &&
                 !patrol.NextNodeIds.Contains(camp.Id) && !patrol.NextNodeIds.Contains(patrol.Id) &&
-                patrol.Encounters is { Count: 4 },
+                patrol.Encounters is { Count: 5 },
                 "The optional third-chapter ordinary patrol preserves every existing final route, elite and Mulu detour without a cycle or a chapter-boss reward contract.");
             foreach (var group in Groups.Where(ThirdChapter))
             {
@@ -144,7 +144,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
                     encounter.SourceVisibleEnemyCount is null && encounter.BossTransition is null &&
                     (encounter.Allies?.Count ?? 0) == 0 && body.Hp == 10 + 3 * growth &&
                     body.MaxHpBonus == 10 + 3 * growth - SourceBaseHp(group) &&
-                    body.InitialHandBonus == 2 + growth && body.DrawBonus == 2 &&
+                    body.InitialHandBonus == LocalThirdChapterHand(group, difficulty) && body.DrawBonus == 2 &&
                     body.SlashBonus == LocalThirdChapterSlash(group, tier) && body.SourceDifficultyAttributes is null &&
                     body.StartingHand is null && (body.StartingEquipment?.Count ?? 0) == 0 &&
                     (body.StartingCards ?? []).SequenceEqual(ExpectedStartingCards(group, tier)) &&
@@ -158,7 +158,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
     public static void SourceAndLocalPreviewMoveAndStartUseOneProjectionAndRealOpeningEntities()
     {
         var source = StandardShanheCampaignCatalog.CreateSourceCodexDefinition(25);
-        foreach (var group in new[] { 2474, 2480, 2497, 2455, 2459, 2489, 2493, 2495, 2498, 2456, 2458, 2461 })
+        foreach (var group in new[] { 2474, 2480, 2497, 2455, 2459, 2489, 2493, 2495, 2498, 2456, 2458, 2461, 2452, 2468, 2494 })
         {
             var cityNode = source.Nodes.First(n => n.Kind == ShanheNodeKind.Battle && n.Encounters!.Any(e => e.SourceBattleId == group));
             var sourceEncounter = cityNode.Encounters!.Single(e => e.SourceBattleId == group);
@@ -172,7 +172,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
 
         var local = StandardShanheCampaignCatalog.CreateCodexDefinition(3, StandardShanheCampaignCatalog.Returning2026EditionId);
         var localNode = local.Nodes.Single(n => n.Id == "dagu");
-        foreach (var group in new[] { 2474, 2480, 2497, 2476 })
+        foreach (var group in new[] { 2474, 2480, 2497, 2476, 2494 })
         {
             var tier = LocalTier(group, 3);
             var localEncounter = localNode.Encounters!.Single(e => e.Enemies.Count == 1 && e.Enemies[0].GeneralId == General(group, tier));
@@ -188,7 +188,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
         var guard = opening.Encounters!.Single(e => e.Enemies.Count == 1 &&
             e.Enemies[0].GeneralId == StandardShanheSourceYulinGuardPackage.HellId);
         EnterAndStart(local, opening, guard, 2498, 21, localDifficulty: 3);
-        foreach (var group in new[] { 2456, 2458, 2461 })
+        foreach (var group in new[] { 2456, 2458, 2461, 2452 })
         {
             var tier = LocalTier(group, 3);
             var encounter = opening.Encounters!.Single(e => e.Enemies.Count == 1 && e.Enemies[0].GeneralId == General(group, tier));
@@ -248,7 +248,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
             var difficulty = localDifficulty!.Value; var growth = difficulty - 1;
             var hp = FirstChapter(group) ? LocalFirstChapterHp(group, difficulty) : ThirdChapter(group) ? 10 + 3 * growth : 7 + 2 * growth;
             Need(member.Hp == hp && member.MaxHpBonus == hp - baseHp &&
-                member.InitialHandBonus == (FirstChapter(group) ? LocalFirstChapterHand(group, difficulty) : ThirdChapter(group) ? 2 + growth : 1 + growth) &&
+                member.InitialHandBonus == (FirstChapter(group) ? LocalFirstChapterHand(group, difficulty) : ThirdChapter(group) ? LocalThirdChapterHand(group, difficulty) : 1 + growth) &&
                 member.DrawBonus == (FirstChapter(group) ? difficulty : ThirdChapter(group) ? 2 : 1) &&
                 (!ThirdChapter(group) || member.SlashBonus == LocalThirdChapterSlash(group, tier)) && SameMembers([member], selected.Enemies) &&
                 member.SourceDifficultyAttributes is null && preview.SourceBattleId is null && preview.SourceCityId is null,
@@ -319,6 +319,9 @@ internal static class ShanheSourceOrdinaryTroopChecks
             Need(general.CharacterId == (group is 2451 or 2500 or 2456
                     ? "character:shanhe-source-general-4871" : "character:shanhe-source-soldier-4861"),
                 "The new complete source groups retain their actual soldier4861 or general4871 bodies instead of adopting a same-name printed general.");
+        if (group is 2452 or 2468 or 2494)
+            Need(general.CharacterId == (group == 2452 ? "character:ma-mi-di" : group == 2468 ? "character:zhang-he" : "character:shanhe-source-soldier-4861"),
+                "The source520/357 characters and soldier4861 retain their own original bodies and selected cumulative skills.");
         if (group == 2474 && difficulty >= 21)
             Need(registry.Skills.Values.Count(s => s.Id == StandardShanheCampaignCatalog.S5ZaiqiSkillId) == 1 &&
                 general.SkillIds.Single(id => id == StandardShanheCampaignCatalog.S5ZaiqiSkillId) ==
@@ -353,6 +356,9 @@ internal static class ShanheSourceOrdinaryTroopChecks
             2476 => "boundary:changbiao-current", 2489 => "ol:chuanwu", 2493 => "ol:zhendu",
             2495 => StandardShanheSourceExecutionerPackage.YishiSkillId,
             2454 => StandardShanheSourceWhiteHorsePackage.XiyingSkillId,
+            2452 => StandardShanheSourceMaRiDiPackage.BingjieSkillId,
+            2468 => StandardShanheSourceZhangHePackage.ZhouxuanSkillId,
+            2494 => StandardShanheSourceVanguardPackage.QingxiSkillId,
             2456 => StandardShanheSourceCoalitionTrioPackage.DuliangSkillId,
             2458 => StandardShanheSourceDemonRaiderPackage.QiangxiSkillId,
             2461 => StandardShanheSourceDemonArcherPackage.GongqiSkillId,
@@ -425,6 +431,21 @@ internal static class ShanheSourceOrdinaryTroopChecks
             if (difficulty >= 11) skills.Add(StandardShanheSourceWhiteHorsePackage.QingjiaoSkillId);
             if (difficulty >= 21) skills.Add(StandardShanheSourceWhiteHorsePackage.YicongSkillId);
         }
+        else if (group == 2452)
+        {
+            if (difficulty >= 11) skills.Add(StandardShanheSourceMaRiDiPackage.ZhengdingSkillId);
+            if (difficulty >= 16) skills.Add(StandardShanheSourceMaRiDiPackage.WeizhongSkillId);
+            if (difficulty >= 21) skills.Add(StandardShanheSourceMaRiDiPackage.CaiwangSkillId);
+        }
+        else if (group == 2468)
+        {
+            if (difficulty >= 16) skills.Add(StandardShanheSourceZhangHePackage.WeijingSkillId);
+        }
+        else if (group == 2494)
+        {
+            if (difficulty >= 11) skills.Add(StandardShanheSourceVanguardPackage.DuoruiSkillId);
+            if (difficulty >= 16) skills.Add(StandardShanheSourceVanguardPackage.ZhuijiSkillId);
+        }
         else if (group == 2456)
         {
             if (difficulty >= 11)
@@ -468,6 +489,9 @@ internal static class ShanheSourceOrdinaryTroopChecks
     private static string General(int group, int difficulty) => group switch
     {
         2454 => StandardShanheSourceWhiteHorsePackage.GetGeneralId(difficulty),
+        2452 => StandardShanheSourceMaRiDiPackage.GetGeneralId(difficulty),
+        2468 => StandardShanheSourceZhangHePackage.GetGeneralId(difficulty),
+        2494 => StandardShanheSourceVanguardPackage.GetGeneralId(difficulty),
         2456 => StandardShanheSourceCoalitionTrioPackage.GetQuartermasterGeneralId(difficulty),
         2458 => StandardShanheSourceDemonRaiderPackage.GetGeneralId(difficulty),
         2461 => StandardShanheSourceDemonArcherPackage.GetGeneralId(difficulty),
@@ -494,18 +518,19 @@ internal static class ShanheSourceOrdinaryTroopChecks
     {
         2474 => difficulty switch { 1 => 6, 2 => 16, _ => 21 },
         2473 => difficulty switch { 1 => 1, 2 => 11, _ => 16 },
-        2467 or 2487 or 2480 or 2497 or 2455 or 2459 or 2460 or 2476 or 2489 or 2493 or 2495 or 2457 or 2498 or 2451 or 2500 or 2454 or 2456 or 2458 or 2461 => difficulty switch { 1 => 1, 2 => 11, _ => 21 },
+        2467 or 2487 or 2480 or 2497 or 2455 or 2459 or 2460 or 2476 or 2489 or 2493 or 2495 or 2457 or 2498 or 2451 or 2500 or 2454 or 2456 or 2458 or 2461 or 2452 or 2468 or 2494 => difficulty switch { 1 => 1, 2 => 11, _ => 21 },
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static int SourceBaseHp(int group) => group switch
     {
-        2480 or 2459 or 2493 or 2457 or 2500 or 2456 => 3,
-        2474 or 2467 or 2487 or 2473 or 2497 or 2455 or 2460 or 2476 or 2489 or 2495 or 2498 or 2451 or 2454 or 2458 or 2461 => 4,
+        2480 or 2459 or 2493 or 2457 or 2500 or 2456 or 2452 => 3,
+        2474 or 2467 or 2487 or 2473 or 2497 or 2455 or 2460 or 2476 or 2489 or 2495 or 2498 or 2451 or 2454 or 2458 or 2461 or 2468 or 2494 => 4,
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static IReadOnlyList<ShanheStartingCard> ExpectedStartingCards(int group, int difficulty)
     {
         if (group == 2495) return difficulty >= 21 ? [new(CardKind.HuxinMirror, Suit.Diamond, 2)] : [];
+        if (group == 2494) return [new(CardKind.FangtianHalberd, Suit.Heart, 12)];
         if (group != 2497) return [];
         var cards = new List<ShanheStartingCard> { new(CardKind.QinggangSword, Suit.Club, 6) };
         if (difficulty >= 11) cards.Add(new(CardKind.SilverLion, Suit.Diamond, 1));
@@ -518,10 +543,12 @@ internal static class ShanheSourceOrdinaryTroopChecks
         2498 => [new(4, new(StartingCards: 2))],
         2456 => [new(4, new(StartingCards: 1)), new(5, new(StartingCards: 2))],
         2458 => [new(3, new(Hp: 1)), new(5, new(Hp: 1))],
+        2452 => [new(5, new(Hp: 1))],
+        2468 => [new(3, new(StartingCards: 1)), new(5, new(StartingCards: 1, ExtraSlash: 1))],
         _ => []
     };
     private static int LocalFirstChapterHp(int group, int difficulty) =>
-        4 + difficulty + (group == 2458 ? (difficulty >= 2 ? 1 : 0) + (difficulty == 3 ? 1 : 0) : 0);
+        4 + difficulty + (group == 2458 ? (difficulty >= 2 ? 1 : 0) + (difficulty == 3 ? 1 : 0) : group == 2452 && difficulty == 3 ? 1 : 0);
     private static int LocalFirstChapterHand(int group, int difficulty) => group switch
     {
         2498 when difficulty == 3 => 2,
@@ -529,7 +556,9 @@ internal static class ShanheSourceOrdinaryTroopChecks
         _ => 0
     };
     private static int LocalThirdChapterSlash(int group, int sourceTier) => group == 2493
-        ? 1 + (sourceTier >= 6 ? 1 : 0) + (sourceTier >= 16 ? 1 : 0) : 1;
+        ? 1 + (sourceTier >= 6 ? 1 : 0) + (sourceTier >= 16 ? 1 : 0) : group == 2468 && sourceTier >= 21 ? 2 : 1;
+    private static int LocalThirdChapterHand(int group, int difficulty) =>
+        2 + difficulty - 1 + (group == 2468 ? (difficulty >= 2 ? 1 : 0) + (difficulty == 3 ? 1 : 0) : 0);
 
     private static void PreviewAndMovePatrolFromFreshCamp(ShanheCampaignDefinition definition,
         ShanheNodeDefinition camp, ShanheNodeDefinition patrol)

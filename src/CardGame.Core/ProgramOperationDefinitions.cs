@@ -484,7 +484,7 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
                  SkillProgramNumberExpression.CurrentAttackRange or SkillProgramNumberExpression.HandLimitMinusHandCount or SkillProgramNumberExpression.FourMinusHandCount or
                  SkillProgramNumberExpression.LostHpMinusHandCount or SkillProgramNumberExpression.SelectedTargetsHandGreaterThanLord or
                  SkillProgramNumberExpression.PhaseSkillUsage or SkillProgramNumberExpression.CurrentTurnUsedCardCategoryCount or SkillProgramNumberExpression.ActualTurnDeathBenefits or
-                 SkillProgramNumberExpression.TurnOwnerDiscardPhaseHandDiscardCount or SkillProgramNumberExpression.CurrentHandEmptyTwoOtherwiseOne or
+                 SkillProgramNumberExpression.TurnOwnerDiscardPhaseHandDiscardCount or SkillProgramNumberExpression.CurrentHandEmptyTwoOtherwiseOne or SkillProgramNumberExpression.OwnerLeastHandTwoOtherwiseOne or
                  SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne or SkillProgramNumberExpression.EquipmentHalfFloorPlusOne or SkillProgramNumberExpression.OwnerMaxHp or
                  SkillProgramNumberExpression.CurrentHp or SkillProgramNumberExpression.LiveOwnerLostHp or SkillProgramNumberExpression.BoundaryWangYiMijiCount)))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: draw accepts a constant or a supported public-state expression.");
@@ -519,6 +519,9 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
         if (expression == SkillProgramNumberExpression.CurrentHandEmptyTwoOtherwiseOne &&
             (target != SkillProgramEffectTarget.Owner || bind is not null || targetRef is not null || replacementSuits.Count != 0))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: empty-hand draw requires the owner and no binding or replacement filter.");
+        if (expression == SkillProgramNumberExpression.OwnerLeastHandTwoOtherwiseOne &&
+            (target != SkillProgramEffectTarget.Owner || bind is not null || targetRef is not null || replacementSuits.Count != 0))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: least-hand draw requires the owner and no binding or replacement filter.");
         if (expression is SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne or SkillProgramNumberExpression.EquipmentHalfFloorPlusOne &&
             (target != SkillProgramEffectTarget.Owner || bind is not null || targetRef is not null || replacementSuits.Count != 0))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: equipment half-count draw requires the owner and no binding or replacement filter.");
