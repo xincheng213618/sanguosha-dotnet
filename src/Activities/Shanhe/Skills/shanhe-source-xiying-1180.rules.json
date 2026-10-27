@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-xiying-1180",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "play-start-pay-and-demand",
+          "window": "playPhaseStarting",
+          "subject": "owner",
+          "optional": true,
+          "effects": [
+            {
+              "op": "resolveShanheSourceXiying",
+              "target": "owner"
+            }
+          ]
+        },
+        {
+          "id": "paid-play-ending-reward",
+          "window": "turnEnding",
+          "subject": "owner",
+          "optional": false,
+          "effects": [
+            {
+              "op": "resolveShanheSourceXiying",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

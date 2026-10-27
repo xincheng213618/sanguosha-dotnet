@@ -20,7 +20,8 @@ public static partial class StandardShanheCampaignCatalog
         {
             Patrol(2493, StandardShanheSourceWuqueAssassinPackage.GetGeneralId(tier), 3,
                 1 + (tier >= 6 ? 1 : 0) + (tier >= 16 ? 1 : 0), []),
-            Patrol(2495, StandardShanheSourceExecutionerPackage.GetGeneralId(tier), 4, 1, ExecutionerGear(tier))
+            Patrol(2495, StandardShanheSourceExecutionerPackage.GetGeneralId(tier), 4, 1, ExecutionerGear(tier)),
+            ReturningMixedOrdinary(2465, difficulty, ThirdChapterPatrolNodeId + ":coalition-trio-2465-local", chapter: 3)
         };
         var patrol = new ShanheNodeDefinition(ThirdChapterPatrolNodeId, "第三章 · 京畿巡军", ShanheNodeKind.Battle,
             camp.NextNodeIds, encounters, rewards)
@@ -28,7 +29,7 @@ public static partial class StandardShanheCampaignCatalog
             ChapterNumber = 3, ChapterTitle = "第三章 · 京畿巡军", CategorizedRewards = true,
             PrimaryTacticRarity = 2, PrimarySkillRarity = 2, RewardSkipGold = 100,
             StoryText = "京畿巡军封住去路。可先清剿巡军取得补给，再选择最终路线或挑战东吴精锐。",
-            Description = "可选前战，遭遇乌鹊暗杀者或校事典刑官。胜利获得200铜币和战利品，随后继续最终路线。"
+            Description = "可选前战，遭遇暗杀者、典刑官或联军三将。胜利后继续最终路线。"
         };
         return ShanheCampaignContent.FreezeAndValidate(definition with
         {

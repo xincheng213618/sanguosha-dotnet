@@ -88,7 +88,8 @@ public sealed partial class GameEngine
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GuanduGenerals.FreezeGuanduSeats(seats);
 
     private bool IsGuanduGeneralContextAllowed(string skillId, SkillProgramEffectOp operation) => IsGuanduActivity ||
-        _options.ShanheBattle is not null && skillId == "guandu:moushi" && operation == SkillProgramEffectOp.ResolveGuanduMoushi;
+        _options.ShanheBattle is not null && skillId == "guandu:moushi" && operation == SkillProgramEffectOp.ResolveGuanduMoushi ||
+        IsShanheSourceGrainContext(skillId, operation);
 
     private SkillProgramStepOutcome BeginGuanduGeneral(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {

@@ -12,7 +12,7 @@ public static partial class StandardShanheCampaignCatalog
     {
         var potential = StandardShanheSourceRouteCatalog.Season5.GetPotentialBattleIds(city.SourceCityId);
         foreach (var group in new[] { 2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495,
-                     2451, 2457, 2498, 2500 })
+                     2451, 2457, 2498, 2500, 2454 })
         {
             if (!potential.Contains(group)) continue;
             var general = OrdinaryTroopGeneral(group, difficulty);
@@ -22,6 +22,17 @@ public static partial class StandardShanheCampaignCatalog
             yield return WithSource2026EnemyData(new("source-city-" + city.SourceCityId + ":troop-" + group,
                 OrdinaryTroopName(group), [member], [],
                 VictoryGold: 200, HealAfterVictory: 1)
+            {
+                SourceBattleId = group, SourceCityId = city.SourceCityId,
+                TerrainSkillId = Source2026Terrain(city.SourceTerrainSkillId, difficulty),
+                StoryText = OrdinaryTroopStory(group)
+            }, group);
+        }
+        foreach (var group in new[] { 2465, 2499 })
+        {
+            if (!potential.Contains(group)) continue;
+            yield return WithSource2026EnemyData(new("source-city-" + city.SourceCityId + ":troop-" + group,
+                OrdinaryTroopName(group), MixedOrdinaryMembers(group, difficulty), [], VictoryGold: 200, HealAfterVictory: 1)
             {
                 SourceBattleId = group, SourceCityId = city.SourceCityId,
                 TerrainSkillId = Source2026Terrain(city.SourceTerrainSkillId, difficulty),
@@ -54,6 +65,7 @@ public static partial class StandardShanheCampaignCatalog
         var demon = StandardShanheSourceDemonAssassinPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
         var yulin = StandardShanheSourceYulinGuardPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
         var farmer = StandardShanheSourceAgricultureOfficerPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var whiteHorse = StandardShanheSourceWhiteHorsePackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
         return ShanheCampaignContent.FreezeAndValidate(definition with
         {
             Nodes = definition.Nodes.Select(node => node.Id is "hulao" or "guangcheng" ? node with
@@ -65,9 +77,10 @@ public static partial class StandardShanheCampaignCatalog
                     FirstChapter(node.Id + ":coalition-spy-2459-local", 2459, spy, baseHp: 3),
                     FirstChapter(node.Id + ":local-magnate-2460-local", 2460, magnate),
                     FirstChapter(node.Id + ":demon-assassin-2457-local", 2457, demon, baseHp: 3),
-                    FirstChapter(node.Id + ":yulin-guard-2498-local", 2498, yulin)
+                    FirstChapter(node.Id + ":yulin-guard-2498-local", 2498, yulin),
+                    FirstChapter(node.Id + ":white-horse-2454-local", 2454, whiteHorse)
                 }).ToArray(),
-                Description = node.Description + "另有羌人劫匪、联军斥候、联军细作、本地豪强、魔军刺客与羽林军在此游弋。"
+                Description = node.Description + "另有白马义从、联军斥候等边军在此游弋。"
             } : node.Id is not ("dagu" or "huanyuan") ? node : node with
             {
                 Encounters = node.Encounters!.Concat(new[]
@@ -83,7 +96,8 @@ public static partial class StandardShanheCampaignCatalog
                     Local(node.Id + ":linzhonggu-2476-local", OrdinaryTroopName(2476), linzhonggu, OrdinaryTroopStory(2476)),
                     Local(node.Id + ":xinping-2489-local", OrdinaryTroopName(2489), xinping, OrdinaryTroopStory(2489)),
                     Local(node.Id + ":buheng-2451-local", OrdinaryTroopName(2451), buheng, OrdinaryTroopStory(2451)),
-                    Local(node.Id + ":agriculture-officer-2500-local", OrdinaryTroopName(2500), farmer, OrdinaryTroopStory(2500), baseHp: 3)
+                    Local(node.Id + ":agriculture-officer-2500-local", OrdinaryTroopName(2500), farmer, OrdinaryTroopStory(2500), baseHp: 3),
+                    ReturningMixedOrdinary(2499, difficulty, node.Id + ":yulin-officer-2499-local", chapter: 2)
                 }).ToArray(),
                 Description = node.Description + "边军与地方兵马在此驻守。"
             }).ToArray()
@@ -104,6 +118,7 @@ public static partial class StandardShanheCampaignCatalog
 
     private static string OrdinaryTroopGeneral(int group, int difficulty) => group switch
     {
+        2454 => StandardShanheSourceWhiteHorsePackage.GetGeneralId(difficulty),
         2451 => StandardShanheSourceBuHengPackage.GetGeneralId(difficulty),
         2457 => StandardShanheSourceDemonAssassinPackage.GetGeneralId(difficulty),
         2498 => StandardShanheSourceYulinGuardPackage.GetGeneralId(difficulty),
@@ -125,6 +140,7 @@ public static partial class StandardShanheCampaignCatalog
     };
     private static string OrdinaryTroopName(int group) => group switch
     {
+        2454 => "白马义从", 2465 => "联军三将", 2499 => "山崖巧遇 · 羽林卫尉",
         2451 => "步珩", 2457 => "擒拿刺客 · 魔军刺客", 2498 => "羽林军", 2500 => "农都尉",
         2474 => "经验传承 · 百战老兵", 2467 => "乌桓贼匪 · 乌桓骑手", 2487 => "探听虚实 · 武卫兵",
         2473 => "趁人之危 · 羌人劫匪", 2480 => "空谈无益 · 荀悦",
@@ -136,6 +152,9 @@ public static partial class StandardShanheCampaignCatalog
     };
     private static string OrdinaryTroopStory(int group) => group switch
     {
+        2454 => "白马义从以袭营封锁对手，高档还能清剿换牌、义从策马。",
+        2465 => "细作与斥候结阵推进，督运使在后督粮、宿守接济友军。",
+        2499 => "羽林卫尉率羽林军列阵，高档兼有恪守减伤与卫境应变。",
         2451 => "步珩以镇骨调度双方手牌，高档还能生息补给、恪守减伤。",
         2457 => "魔军刺客凭判定潜袭封锁手牌，高档还会诱敌夺牌、遗毒追逼。",
         2498 => "羽林军据守补牌，高档还能恪守减伤、废除装备区后穷守。",

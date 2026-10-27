@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-cangchu-1182": {
+      "name": "仓储",
+      "description": "锁定技，游戏开始时，你获得3枚“粮”标记。当你受到1点火焰伤害后，你移除1枚“粮”。"
+    },
+    "shanhe:source-sushou-1183": {
+      "name": "宿守",
+      "description": "弃牌阶段开始时，你可以摸X+1张牌（X为“粮”的数量），然后可以交给任意名其他友方角色各一张牌。"
+    }
+  }
+}

@@ -4,8 +4,8 @@ using CardGame.Core.Campaigns;
 
 internal static class ShanheSourceOrdinaryTroopChecks
 {
-    private static readonly int[] Groups = [2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495, 2457, 2498, 2451, 2500];
-    private static bool FirstChapter(int group) => group is 2473 or 2455 or 2459 or 2460 or 2457 or 2498;
+    private static readonly int[] Groups = [2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495, 2457, 2498, 2451, 2500, 2454];
+    private static bool FirstChapter(int group) => group is 2473 or 2455 or 2459 or 2460 or 2457 or 2498 or 2454;
     private static bool ThirdChapter(int group) => group is 2493 or 2495;
 
     public static void SourcePoolsAndBothRecommendedEntrypointsRetainCompleteTieredRecipes()
@@ -132,7 +132,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
                 new[] { "luoyang", "suanzao", "henei", StandardShanheCampaignCatalog.ThirdChapterDongwuEliteId,
                     StandardShanheCampaignCatalog.MuluEncounterNodeId }.All(originalRoutes.Contains) &&
                 !patrol.NextNodeIds.Contains(camp.Id) && !patrol.NextNodeIds.Contains(patrol.Id) &&
-                patrol.Encounters is { Count: 2 },
+                patrol.Encounters is { Count: 3 },
                 "The optional third-chapter ordinary patrol preserves every existing final route, elite and Mulu detour without a cycle or a chapter-boss reward contract.");
             foreach (var group in Groups.Where(ThirdChapter))
             {
@@ -164,6 +164,11 @@ internal static class ShanheSourceOrdinaryTroopChecks
             var sourceEncounter = cityNode.Encounters!.Single(e => e.SourceBattleId == group);
             EnterAndStart(source, cityNode, sourceEncounter, group, 25);
         }
+        var nightmare = StandardShanheCampaignCatalog.CreateSourceCodexDefinition(16);
+        var nightmareCity = nightmare.Nodes.First(n => n.Kind == ShanheNodeKind.Battle &&
+            n.Encounters!.Any(e => e.SourceBattleId == 2498));
+        EnterAndStart(nightmare, nightmareCity,
+            nightmareCity.Encounters!.Single(e => e.SourceBattleId == 2498), 2498, 16);
 
         var local = StandardShanheCampaignCatalog.CreateCodexDefinition(3, StandardShanheCampaignCatalog.Returning2026EditionId);
         var localNode = local.Nodes.Single(n => n.Id == "dagu");
@@ -187,7 +192,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
         foreach (var group in Groups.Where(ThirdChapter))
         {
             var tier = LocalTier(group, 3);
-            var encounter = patrol.Encounters!.Single(e => e.Enemies.Single().GeneralId == General(group, tier));
+            var encounter = patrol.Encounters!.Single(e => e.Enemies.Count == 1 && e.Enemies[0].GeneralId == General(group, tier));
             EnterAndStart(local, patrol, encounter, group, tier, localDifficulty: 3);
         }
     }
@@ -328,6 +333,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
             2455 => "classic:dangxian", 2459 => "classic:qice", 2460 => "ol:shuzi",
             2476 => "boundary:changbiao-current", 2489 => "ol:chuanwu", 2493 => "ol:zhendu",
             2495 => StandardShanheSourceExecutionerPackage.YishiSkillId,
+            2454 => StandardShanheSourceWhiteHorsePackage.XiyingSkillId,
             2457 => StandardShanheSourceDemonAssassinPackage.QianxiSkillId,
             2498 => StandardShanheSourceYulinGuardPackage.JushouSkillId, 2451 => "classic:zhengu",
             2500 => StandardShanheSourceAgricultureOfficerPackage.TuntianSkillId,
@@ -392,6 +398,11 @@ internal static class ShanheSourceOrdinaryTroopChecks
             if (difficulty >= 6) skills.Add(StandardShanheSourceExecutionerPackage.HuanfuSkillId);
             if (difficulty >= 11) skills.Add("classic:junxing");
         }
+        else if (group == 2454)
+        {
+            if (difficulty >= 11) skills.Add(StandardShanheSourceWhiteHorsePackage.QingjiaoSkillId);
+            if (difficulty >= 21) skills.Add(StandardShanheSourceWhiteHorsePackage.YicongSkillId);
+        }
         else if (group == 2457)
         {
             if (difficulty >= 11) skills.Add(StandardShanheSourceDemonAssassinPackage.YoudiSkillId);
@@ -400,7 +411,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
         else if (group == 2498)
         {
             if (difficulty >= 11) skills.Add("shanhe:source-keshou-993");
-            if (difficulty >= 21) skills.Add("ol:qiongshou");
+            if (difficulty >= 16) skills.Add("ol:qiongshou");
         }
         else if (group == 2451)
         {
@@ -416,6 +427,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
     }
     private static string General(int group, int difficulty) => group switch
     {
+        2454 => StandardShanheSourceWhiteHorsePackage.GetGeneralId(difficulty),
         2474 => StandardShanheSourceVeteranPackage.GetGeneralId(difficulty),
         2467 => StandardShanheSourceWuhuanRiderPackage.GetGeneralId(difficulty),
         2487 => StandardShanheSourceWarriorPackage.GetGeneralId(difficulty),
@@ -439,13 +451,13 @@ internal static class ShanheSourceOrdinaryTroopChecks
     {
         2474 => difficulty switch { 1 => 6, 2 => 16, _ => 21 },
         2473 => difficulty switch { 1 => 1, 2 => 11, _ => 16 },
-        2467 or 2487 or 2480 or 2497 or 2455 or 2459 or 2460 or 2476 or 2489 or 2493 or 2495 or 2457 or 2498 or 2451 or 2500 => difficulty switch { 1 => 1, 2 => 11, _ => 21 },
+        2467 or 2487 or 2480 or 2497 or 2455 or 2459 or 2460 or 2476 or 2489 or 2493 or 2495 or 2457 or 2498 or 2451 or 2500 or 2454 => difficulty switch { 1 => 1, 2 => 11, _ => 21 },
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static int SourceBaseHp(int group) => group switch
     {
         2480 or 2459 or 2493 or 2457 or 2500 => 3,
-        2474 or 2467 or 2487 or 2473 or 2497 or 2455 or 2460 or 2476 or 2489 or 2495 or 2498 or 2451 => 4,
+        2474 or 2467 or 2487 or 2473 or 2497 or 2455 or 2460 or 2476 or 2489 or 2495 or 2498 or 2451 or 2454 => 4,
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static IReadOnlyList<ShanheStartingCard> ExpectedStartingCards(int group, int difficulty)
@@ -548,7 +560,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
 
     private static IReadOnlyList<int> ExactQiongshouOpeningDraw(GameEngine game, int group, int tier, int enemySeat)
     {
-        if (group != 2498 || tier < 21) return [];
+        if (group != 2498 || tier < 16) return [];
         const string skill = "ol:qiongshou";
         var start = game.Events.Select(e => e.Payload).OfType<ProgramBindingStartedEvent>()
             .Single(e => e.SkillId == skill && e.OwnerSeat == enemySeat && e.Window == SkillProgramTriggerWindow.GameStarting);

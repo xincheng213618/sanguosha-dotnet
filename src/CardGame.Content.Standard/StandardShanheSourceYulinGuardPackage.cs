@@ -17,8 +17,8 @@ public sealed class StandardShanheSourceYulinGuardPackage : IGameContentPackage
     public static string GetGeneralId(int difficulty) => difficulty switch
     {
         >= 1 and <= 10 => BaseId,
-        >= 11 and <= 20 => HardId,
-        >= 21 and <= 25 => HellId,
+        >= 11 and <= 15 => HardId,
+        >= 16 and <= 25 => HellId,
         _ => throw new ArgumentOutOfRangeException(nameof(difficulty))
     };
 

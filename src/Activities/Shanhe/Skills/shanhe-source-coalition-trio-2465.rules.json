@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-cangchu-1182",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "initial-three-grain",
+          "window": "gameStarting",
+          "subject": "owner",
+          "optional": false,
+          "effects": [
+            {
+              "op": "resolveGuanduCangchu",
+              "target": "owner"
+            }
+          ]
+        },
+        {
+          "id": "lose-one-grain-per-fire-damage-point",
+          "window": "afterDamageApplied",
+          "subject": "owner",
+          "damageOccurrence": "perDamagePoint",
+          "optional": false,
+          "condition": {
+            "kind": "damageNatureIs",
+            "damageNature": "fire"
+          },
+          "effects": [
+            {
+              "op": "resolveGuanduCangchu",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shanhe:source-sushou-1183",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "discard-start-draw-and-share-with-allies",
+          "window": "discardPhaseStarting",
+          "subject": "owner",
+          "turnOwnerScope": "own",
+          "optional": true,
+          "effects": [
+            {
+              "op": "resolveGuanduSushou",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

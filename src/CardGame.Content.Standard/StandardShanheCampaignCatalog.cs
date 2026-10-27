@@ -434,13 +434,24 @@ public static partial class StandardShanheCampaignCatalog
         var sourceBuHeng = RequiresThreeBossRegistry(requirements, StandardShanheSourceBuHengPackage.BaseId,
             StandardShanheSourceBuHengPackage.ShengxiSkillId) ||
             ids.Any(id => id is StandardShanheSourceBuHengPackage.HardId or StandardShanheSourceBuHengPackage.NightmareId);
-        var sourceYulinGuard = RequiresThreeBossRegistry(requirements, StandardShanheSourceYulinGuardPackage.BaseId,
+        var sourceYulinOfficer = ids.Any(id => id is StandardShanheSourceYulinOfficerPackage.BaseId or
+            StandardShanheSourceYulinOfficerPackage.HardId or StandardShanheSourceYulinOfficerPackage.HellId);
+        var sourceYulinGuard = sourceYulinOfficer || RequiresThreeBossRegistry(requirements, StandardShanheSourceYulinGuardPackage.BaseId,
             StandardShanheSourceYulinGuardPackage.JushouSkillId) ||
             ids.Any(id => id is StandardShanheSourceYulinGuardPackage.HardId or StandardShanheSourceYulinGuardPackage.HellId);
         var sourceAgricultureOfficer = RequiresThreeBossRegistry(requirements, StandardShanheSourceAgricultureOfficerPackage.BaseId,
             StandardShanheSourceAgricultureOfficerPackage.TuntianSkillId) ||
             ids.Any(id => id is StandardShanheSourceAgricultureOfficerPackage.HardId or StandardShanheSourceAgricultureOfficerPackage.HellId);
         var sourceKeshou = sourceBuHeng || sourceYulinGuard || extraSkills.Contains(StandardShanheSourceKeshouPackage.SkillId);
+        var sourceWhiteHorse = RequiresThreeBossRegistry(requirements, StandardShanheSourceWhiteHorsePackage.BaseId,
+            StandardShanheSourceWhiteHorsePackage.XiyingSkillId) ||
+            ids.Any(id => id is StandardShanheSourceWhiteHorsePackage.HardId or StandardShanheSourceWhiteHorsePackage.HellId);
+        var sourceCoalitionTrio = extraSkills.Contains(StandardShanheSourceCoalitionTrioPackage.CangchuSkillId) ||
+            extraSkills.Contains(StandardShanheSourceCoalitionTrioPackage.SushouSkillId) ||
+            ids.Any(id => id is StandardShanheSourceCoalitionTrioPackage.SpyBaseId or StandardShanheSourceCoalitionTrioPackage.SpyHardId or
+                StandardShanheSourceCoalitionTrioPackage.SpyNightmareId or StandardShanheSourceCoalitionTrioPackage.ScoutBaseId or
+                StandardShanheSourceCoalitionTrioPackage.ScoutHardId or StandardShanheSourceCoalitionTrioPackage.ScoutHellId or
+                StandardShanheSourceCoalitionTrioPackage.QuartermasterBaseId or StandardShanheSourceCoalitionTrioPackage.QuartermasterHardId);
         var sourceWuqueAssassin = sourceDemonAssassin || RequiresThreeBossRegistry(requirements, StandardShanheSourceWuqueAssassinPackage.BaseId,
             StandardShanheSourceWuqueAssassinPackage.YiduSkillId) ||
             ids.Any(id => id is StandardShanheSourceWuqueAssassinPackage.HardId or StandardShanheSourceWuqueAssassinPackage.HellId);
@@ -577,6 +588,9 @@ public static partial class StandardShanheCampaignCatalog
             (sourceYulinGuard ? "/source-yulin-guard-2498" : "") +
             (sourceAgricultureOfficer ? "/source-agriculture-officer-2500" : "") +
             (sourceKeshou ? "/source-keshou-993" : "") +
+            (sourceYulinOfficer ? "/source-yulin-officer-2499" : "") +
+            (sourceCoalitionTrio ? "/source-coalition-trio-2465" : "") +
+            (sourceWhiteHorse ? "/source-white-horse-2454" : "") +
             (sourceWuqueAssassin ? "/source-wuque-assassin-2493" : "") +
             (sourceExecutioner ? "/source-executioner-2495" : "") +
             (s5Simayi ? "/s5-simayi-2677" : "") +
@@ -761,6 +775,9 @@ public static partial class StandardShanheCampaignCatalog
             if (sourceKeshou) packages.Add(new StandardShanheSourceKeshouPackage());
             if (sourceBuHeng) packages.Add(new StandardShanheSourceBuHengPackage());
             if (sourceYulinGuard) packages.Add(new StandardShanheSourceYulinGuardPackage());
+            if (sourceYulinOfficer) packages.Add(new StandardShanheSourceYulinOfficerPackage());
+            if (sourceCoalitionTrio) packages.Add(new StandardShanheSourceCoalitionTrioPackage());
+            if (sourceWhiteHorse) packages.Add(new StandardShanheSourceWhiteHorsePackage());
             if (sourceAgricultureOfficer) packages.Add(new StandardShanheSourceAgricultureOfficerPackage());
             if (sourceWuqueAssassin) packages.Add(new StandardShanheSourceWuqueAssassinPackage());
             if (sourceDemonAssassin) packages.Add(new StandardShanheSourceDemonAssassinPackage());

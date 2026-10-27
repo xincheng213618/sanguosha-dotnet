@@ -1155,6 +1155,7 @@ public enum SkillProgramEffectOp
     ResolveSourceExecutionerYishi = 62059,
     ResolveSourceExecutionerHuanfu = 62060,
     ResolveShanheSourceKeshou = 62061,
+    ResolveShanheSourceXiying = 62063,
     CollectPublicPile = 780,
     GrantNextCardTargetAdjustment = 782,
     GrantNextActualUseTargetAdjustment = 4700,
