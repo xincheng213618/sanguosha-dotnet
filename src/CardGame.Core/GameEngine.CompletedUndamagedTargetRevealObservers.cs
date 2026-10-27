@@ -26,6 +26,7 @@ public sealed partial class GameEngine
             r.GameplayHash != f.GameplayHash || !Enum.IsDefined(r.Stage) || r.WindowFrameId != context.ParentFrameId ||
             CompletedUndamagedUse(context) is not { Action: { } action } use || !ExactCompletedUndamagedParent(f, context, use) ||
             use.Id != r.CardUseFrameId || action.ActionId != r.CardActionId || use.CardKind != r.EffectiveKind || use.SourceSeat != f.OwnerSeat ||
+            !CompletedUndamagedSourceUseQualifies(f.SkillId, use) ||
             !r.FinalTargets.SequenceEqual(use.TargetSeats) || r.EligibleTargets.Count == 0 ||
             r.EligibleTargets.Distinct().Count() != r.EligibleTargets.Count ||
             r.EligibleTargets.Any(s => !r.FinalTargets.Contains(s))) return false;

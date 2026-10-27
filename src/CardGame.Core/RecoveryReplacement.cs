@@ -492,6 +492,7 @@ public sealed partial class GameEngine
             case PostEventContinuation.WumiaoFlood: ContinueWumiaoFlood(continuation.ResumeFrameId!.Value); break;
             case PostEventContinuation.DragonBoatCardEffect: ContinueDragonBoatCardEffect(continuation.ResumeFrameId!.Value); break;
             case PostEventContinuation.ColorFireAttackPayment: ContinueColorFireAttackPayment(continuation.ResumeFrameId!.Value); break;
+            case PostEventContinuation.HuxinMirrorPlacement: ContinueHuxinMirrorPlacement(continuation.ResumeFrameId!.Value); break;
             case PostEventContinuation.EquipmentRecast: ContinueEquipmentRecast(continuation.ResumeFrameId!.Value); break;
             case PostEventContinuation.DrawPhaseObligation: AdvanceRuntimeFrame(continuation.ResumeFrameId!.Value); break;
             case PostEventContinuation.FactionRequestCost: ContinuePaidFactionRequestCost(continuation.ResumeFrameId!.Value); break;

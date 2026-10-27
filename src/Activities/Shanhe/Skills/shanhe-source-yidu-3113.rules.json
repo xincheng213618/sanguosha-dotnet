@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-yidu-3113",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "reveal-sole-undamaged-use-target",
+          "window": "cardUseCompleted",
+          "ownerRelation": "actor",
+          "includeResponseUses": false,
+          "optional": true,
+          "condition": {
+            "kind": "compare",
+            "left": { "kind": "cardUseDesignatedTargetCount" },
+            "operator": "equal",
+            "right": { "kind": "integerConstant", "value": 1 }
+          },
+          "effects": [
+            { "op": "revealUndamagedUseTargetHandAndDiscardSameColor", "target": "owner", "amount": 3 }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -475,7 +475,7 @@ internal static class RuntimeRules_Core_CommonRules
         movement.ResumeWenheCardEffectFrameId is not null ||
         movement.ResumeGuanduCardEffectFrameId is not null ||
         movement.ResumeWumiaoFloodFrameId is not null || movement.ResumeDragonBoatCardEffectFrameId is not null ||
-        movement.ResumeEquipmentRecastFrameId is not null || movement.ResumeColorFireAttackFrameId is not null ||
+        movement.ResumeHuxinMirrorPlacementFrameId is not null || movement.ResumeEquipmentRecastFrameId is not null || movement.ResumeColorFireAttackFrameId is not null ||
         movement.ResumeCounterspellPaymentFrameId is not null || movement.ResumeHistoricalEndingUseFrameId is not null || movement.ResumeGuoSiUseFrameId is not null || movement.ResumeDenglouUseFrameId is not null ||
         movement.ResumeRoundPileAlcoholUseFrameId is not null || movement.ResumeDrawPhaseObligationFrameId is not null || movement.ResumeManualDiscardFrameId is not null || movement.ResumeActualPhaseEndFrameId is not null ||
         movement.ResumeCardSupplyCompletionFrameId is not null || movement.ResumeResponseCompletionFrameId is not null ||

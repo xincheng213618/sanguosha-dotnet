@@ -11,12 +11,13 @@ public static partial class StandardShanheCampaignCatalog
         ShanheSourceRouteCityDefinition city, int difficulty)
     {
         var potential = StandardShanheSourceRouteCatalog.Season5.GetPotentialBattleIds(city.SourceCityId);
-        foreach (var group in new[] { 2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489 })
+        foreach (var group in new[] { 2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495 })
         {
             if (!potential.Contains(group)) continue;
             var general = OrdinaryTroopGeneral(group, difficulty);
             var member = new ShanheCombatantDefinition(general);
             if (group == 2497) member = member with { StartingCards = JiangdongVeteranGear(difficulty) };
+            if (group == 2495) member = member with { StartingCards = ExecutionerGear(difficulty) };
             yield return WithSource2026EnemyData(new("source-city-" + city.SourceCityId + ":troop-" + group,
                 OrdinaryTroopName(group), [member], [],
                 VictoryGold: 200, HealAfterVictory: 1)
@@ -104,6 +105,8 @@ public static partial class StandardShanheCampaignCatalog
         2460 => StandardShanheSourceLocalMagnatePackage.GetGeneralId(difficulty),
         2476 => StandardShanheSourceLinZhongGuPackage.GetGeneralId(difficulty),
         2489 => StandardShanheSourceXinPingPackage.GetGeneralId(difficulty),
+        2493 => StandardShanheSourceWuqueAssassinPackage.GetGeneralId(difficulty),
+        2495 => StandardShanheSourceExecutionerPackage.GetGeneralId(difficulty),
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static string OrdinaryTroopName(int group) => group switch
@@ -113,6 +116,7 @@ public static partial class StandardShanheCampaignCatalog
         2497 => "狭路相逢 · 江东老兵",
         2455 => "贪得无厌 · 联军斥候", 2459 => "暗中破坏 · 联军细作", 2460 => "巧破城楼 · 本地豪强",
         2476 => "林中鹘", 2489 => "辛评",
+        2493 => "乌鹊暗杀者", 2495 => "校事典刑官",
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static string OrdinaryTroopStory(int group) => group switch
@@ -128,6 +132,8 @@ public static partial class StandardShanheCampaignCatalog
         2460 => "本地豪强以束辎交换辎重，高档还能凭伪诚补牌、顺世增加下次摸牌、出杀次数与手牌上限。",
         2476 => "林中鹘以长标突击，高档还可用腹鳞留住回合内取得的手牌。",
         2489 => "辛评每次造成或受到伤害后，依次失去当前技能并摸牌，在回合结束后恢复。",
+        2493 => "乌鹊暗杀者以鸩毒扰乱出牌，高档还有遗毒与绝情，出杀次数逐档增加。",
+        2495 => "校事典刑官以义释夺牌、公清守御，高档可用宦浮下注、峻刑压制，并携带护心镜。",
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
 

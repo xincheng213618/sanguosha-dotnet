@@ -10,9 +10,13 @@ internal static class ShanheSanshouMarketChecks
             StandardShanheSanshouArmorPackage.SkillId, Suit.Heart, 12);
         CheckPaidEquipment("codex-card-4060", CardKind.ZhaoguMirror,
             StandardShanheZhaoguMirrorPackage.SkillId, Suit.Diamond, 1);
+        CheckPaidEquipment("codex-card-4044", CardKind.HuxinMirror,
+            StandardShanheHuxinMirrorPackage.SkillId, Suit.Club, 1, 200);
+        CheckPaidEquipment("codex-card-4055", CardKind.HuxinMirror,
+            StandardShanheHuxinMirrorPackage.SkillId, Suit.Club, 1);
     }
 
-    private static void CheckPaidEquipment(string rewardId, CardKind kind, string skillId, Suit suit, int rank)
+    private static void CheckPaidEquipment(string rewardId, CardKind kind, string skillId, Suit suit, int rank, int price = 600)
     {
         var source = StandardShanheCampaignCatalog.CreateSourceCodexDefinition(11);
         var metadata = StandardShanheCampaignCatalog.ShopMetadataByRewardId[rewardId];
@@ -24,7 +28,7 @@ internal static class ShanheSanshouMarketChecks
                     CardKind: CardKind.ShanheSanshou, Suit: Suit.Heart, Rank: 12 } &&
                 reward.StartingEquipment is [{ Kind: CardKind.ShanheSanshou, Suit: Suit.Heart, Rank: 12 }],
                 "The production codex node98 binds source4061 to the real epic600-coin HeartQ Sanshou equipment recipe.");
-        else
+        else if (kind == CardKind.ZhaoguMirror)
             Need(kind == CardKind.ZhaoguMirror && rewardId == "codex-card-4060" &&
                 metadata is { SourceRewardId: 4060, Price: 600, Rarity: 4, Kind: "装备",
                     CardKind: CardKind.ZhaoguMirror, Suit: Suit.Diamond, Rank: 1 } &&
@@ -32,6 +36,19 @@ internal static class ShanheSanshouMarketChecks
                 defaultUnlocked.Contains(rewardId, StringComparer.Ordinal) &&
                 !StandardShanheCampaignCatalog.CodexRewardIdsByNodeId.Values.Contains(rewardId, StringComparer.Ordinal),
                 "Source4060 is the real epic600-coin DiamondA mirror in the default stock, with no invented codex research node.");
+        else
+        {
+            var researched = rewardId == "codex-card-4044";
+            Need(kind == CardKind.HuxinMirror && (researched || rewardId == "codex-card-4055") &&
+                metadata.SourceRewardId == (researched ? 4044 : 4055) && metadata.Price == (researched ? 200 : 600) &&
+                metadata.Rarity == (researched ? 2 : 4) && metadata is
+                    { Kind: "装备", CardKind: CardKind.HuxinMirror, Suit: Suit.Club, Rank: 1 } &&
+                reward.StartingEquipment is [{ Kind: CardKind.HuxinMirror, Suit: Suit.Club, Rank: 1 }] &&
+                StandardShanheCampaignCatalog.CodexRewardIdsByNodeId[56] == "codex-card-4044" &&
+                defaultUnlocked.Contains(rewardId, StringComparer.Ordinal) == !researched &&
+                StandardShanheCampaignCatalog.CodexRewardIdsByNodeId.Values.Contains(rewardId, StringComparer.Ordinal) == researched,
+                "The real source4044 ClubA armor is researched at node56 for stock200/quality2; source4055 is the distinct default600/quality4 stock of the same physical rule.");
+        }
         var merchant = source.Nodes.First(node => node.Kind == ShanheNodeKind.Shop);
         var definition = source with
         {
@@ -55,14 +72,15 @@ internal static class ShanheSanshouMarketChecks
         var moved = session.Submit(new MoveShanheNodeCommand("battle", session.Revision));
         Need(moved.Accepted, moved.Error ?? "The persistent market must enter a real battle without visiting a shop node.");
         var setup = session.PendingBattleSetup!;
-        if (kind == CardKind.ZhaoguMirror)
+        if (kind is CardKind.ZhaoguMirror or CardKind.HuxinMirror)
         {
             var withoutMarket = StandardShanheCampaignCatalog.CreateBattleRegistry(setup with { MarketSetup = null });
             var withMarket = StandardShanheCampaignCatalog.CreateBattleRegistry(setup);
             Need(setup.StartingCards.Count == 0 && setup.StartingEquipment.Count == 0 &&
-                !withoutMarket.Cards.Values.Any(card => card.LegacyKind == CardKind.ZhaoguMirror) &&
+                !withoutMarket.Cards.Values.Any(card => card.LegacyKind == kind) &&
                 !withoutMarket.Skills.ContainsKey(skillId) &&
-                withMarket.Cards[StandardShanheZhaoguMirrorPackage.CardId].LegacyKind == CardKind.ZhaoguMirror &&
+                withMarket.Cards[kind == CardKind.ZhaoguMirror ? StandardShanheZhaoguMirrorPackage.CardId :
+                    StandardShanheHuxinMirrorPackage.CardId].LegacyKind == kind &&
                 withMarket.GetSkill(skillId).Program is not null,
                 "Only the real future market reward requires the mirror package: no owned starting recipe or skill supplies it before purchase.");
         }
@@ -83,7 +101,7 @@ internal static class ShanheSanshouMarketChecks
             "Discovering a future equipment dependency neither installs its entity nor grants its skill before payment.");
         var market = game.CreateShanheMarketSnapshot(0)!;
         var item = market.ShopItems.Single(candidate => candidate.Reward?.Id == rewardId);
-        Need(market.Gold == 2000 && item.GoldCost == 600, "The first real offer uses the exact source600 quote.");
+        Need(market.Gold == 2000 && item.GoldCost == price, "The first real offer uses its exact source quote.");
         var bought = game.Submit(new CardGame.Core.BuyShanheMarketItemCommand(0, item.ChoiceId, null, game.Revision));
         Need(bought.Accepted, bought.Error?.Message ?? "The real equipment offer must be purchasable during Play.");
         for (var step = 0; step < 120 && !PurchaseReturnedToPlay(); step++)
@@ -102,7 +120,8 @@ internal static class ShanheSanshouMarketChecks
             after.Hand.Count(card => card.Id == created.CardId) == 1,
             "The completed native purchase adds its entity to the current hand without automatically equipping or granting its equipment skill: " + PurchaseDiagnostic());
         var purchasedCard = after.Hand.Single(card => card.Id == created.CardId);
-        Need(game.CreateShanheMarketSnapshot(0)!.Gold == 1400 && paid is { Price: 600, GoldAfter: 1400 } && paid.RewardId == rewardId &&
+        Need(game.CreateShanheMarketSnapshot(0)!.Gold == 2000 - price && paid.Price == price &&
+            paid.GoldAfter == 2000 - price && paid.RewardId == rewardId &&
             purchasedCard.Kind == kind && purchasedCard.Suit == suit && purchasedCard.Rank == rank && purchasedCard.Id > 0 &&
             before.Hand.All(card => card.Id != purchasedCard.Id) &&
             game.CardMovements.Count(move => move.CardId == purchasedCard.Id && move.From == CardLocation.OutsideGame &&
@@ -111,9 +130,10 @@ internal static class ShanheSanshouMarketChecks
             created.CardId == purchasedCard.Id &&
             game.State.TurnNumber == turn && game.State.Phase == TurnPhase.Play &&
             game.PendingDecision is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } && game.ResolutionStack.Count == 0,
-            "One native600 payment creates the exact real equipment face in the current hand and returns to the same live Play without a second payment or a premature equipment grant.");
+            "One native payment creates the exact real equipment face in the current hand and returns to the same live Play without a second payment or a premature equipment grant.");
 
-        var equip = game.GetHumanLegalActions().Single(action => action.Kind == LegalActionKind.Equip && action.CardId == purchasedCard.Id);
+        var equip = game.GetHumanLegalActions().Single(action => action.Kind == LegalActionKind.Equip &&
+            action.CardId == purchasedCard.Id && (action.TargetSeats.Count == 0 || action.TargetSeats.SequenceEqual([0])));
         var used = game.Submit(new PlayCardCommand(0, purchasedCard.Id, equip.TargetSeats, game.Revision,
             game.PendingDecision!.PromptId, equip.PlayedCardKind, equip.TargetCardId)
         { ConversionSource = equip.ConversionSource, AdditionalConversionSources = equip.AdditionalConversionSources });
@@ -140,7 +160,7 @@ internal static class ShanheSanshouMarketChecks
             equipped.Skills!.Any(skill => skill.ContentId == skillId) &&
             game.Events.Select(envelope => envelope.Payload).OfType<ShanheMarketPurchaseCommittedEvent>().Count() == 1 &&
             game.Events.Select(envelope => envelope.Payload).OfType<ShanheMarketCardCreatedEvent>().Count() == 1 &&
-            game.CreateShanheMarketSnapshot(0)!.Gold == 1400 && game.State.TurnNumber == turn && game.State.Phase == TurnPhase.Play,
+            game.CreateShanheMarketSnapshot(0)!.Gold == 2000 - price && game.State.TurnNumber == turn && game.State.Phase == TurnPhase.Play,
             "The same paid equipment entity moves Hand→Processing→Equipment through one completed native use, gains its equipment skill and keeps the original Play without repaying or regenerating the card.");
         var continued = game.Submit(new EndPlayPhaseCommand(0, game.Revision, game.PendingDecision!.PromptId));
         Need(continued.Accepted, continued.Error?.Message ?? "The original Play remains usable after the paid equipment installation.");

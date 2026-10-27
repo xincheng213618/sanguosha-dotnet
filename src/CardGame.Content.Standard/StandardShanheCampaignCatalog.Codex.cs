@@ -114,7 +114,8 @@ public static partial class StandardShanheCampaignCatalog
         definition = WithThirdChapterEliteEncounters(definition, editionId);
         definition = WithGuideTerrain(definition, difficulty, editionId);
         definition = WithMuluEncounter(definition, difficulty, editionId);
-        return WithCurrentSchools(definition);
+        definition = WithReturningThirdChapterTroops(definition, difficulty, editionId);
+        return WithCurrentWolfBattles(WithCurrentSchools(definition));
     }
 
     private static ShanheCampaignDefinition WithCodexRewards(ShanheCampaignDefinition original, string editionId)

@@ -223,6 +223,9 @@ public sealed partial class GameEngine
             case PostEventContinuation.ColorFireAttackPayment:
                 ContinueColorFireAttackPayment(frame.ResumeFrameId!.Value);
                 break;
+            case PostEventContinuation.HuxinMirrorPlacement:
+                ContinueHuxinMirrorPlacement(frame.ResumeFrameId!.Value);
+                break;
             case PostEventContinuation.EquipmentRecast:
                 ContinueEquipmentRecast(frame.ResumeFrameId!.Value);
                 break;
@@ -253,6 +256,10 @@ public sealed partial class GameEngine
                     contexts.Any(context => context.ParentFrameId != movement.Id || context.MovementBatch != movement.Batch))
                     throw new InvalidOperationException("A movement window lost its frozen contexts.");
                 AssertWenhePoisonMovementWindow(movement);
+                if (movement.ResumeHuxinMirrorPlacementFrameId is { } placementId &&
+                    (parent is not HuxinMirrorPlacementFrame placementParent || placementParent.Id != placementId ||
+                     movement.Batch.ParentFrameId != placementId || movement.Batch.AwaitingProgramFrameId is not null))
+                    throw new InvalidOperationException("Huxin Mirror placement lost its original movement parent.");
                 if (movement.ResumeColdDamageReplacementFrameId is { } coldId &&
                     (parent is not ColdDamageReplacementFrame cold || cold.Id != coldId || movement.Batch.ParentFrameId != coldId || movement.Batch.AwaitingProgramFrameId is not null))
                     throw new InvalidOperationException("Cold damage lost its exact paid movement child.");
@@ -311,6 +318,7 @@ public sealed partial class GameEngine
                 PostEventContinuation.WumiaoFlood => parent is CardUseFrame flood && IsWumiaoFloodHpReturn(flood, hp),
                 PostEventContinuation.DragonBoatCardEffect => parent is CardUseFrame dragon && IsDragonBoatCardEffectHpReturn(dragon, hp),
                 PostEventContinuation.ColorFireAttackPayment => parent is CardUseFrame { ColorFireAttack.PaidCardId: not null } fire && fire.Id == hp.ResumeFrameId && hp.Change.ParentFrameId == fire.Id,
+                PostEventContinuation.HuxinMirrorPlacement => parent is HuxinMirrorPlacementFrame placement && placement.Id == hp.ResumeFrameId && hp.Change.ParentFrameId == placement.Id,
                 PostEventContinuation.EquipmentRecast => parent is EquipmentRecastFrame recast && recast.Id == hp.ResumeFrameId,
                 PostEventContinuation.DrawPhaseObligation => parent is DrawPhaseObligationFrame draw && draw.Id == hp.ResumeFrameId,
                 PostEventContinuation.DrawFundedDistinctBasic => IsDrawFundedDistinctBasicHpParent(parent, hp),

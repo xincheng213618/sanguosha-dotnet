@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:huxin-mirror-2055",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "pay-real-armor-to-prevent",
+          "window": "beforeDamageApplied",
+          "subject": "damageTarget",
+          "optional": true,
+          "effects": [
+            {
+              "op": "discardHuxinMirrorAndPreventDamage",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

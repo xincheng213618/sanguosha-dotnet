@@ -1,4 +1,5 @@
 using System.Globalization;
+using CardGame.Core.Campaigns;
 
 namespace CardGame.Core;
 
@@ -170,19 +171,31 @@ public sealed partial class GameEngine
         !CompleteProgramEventHistory().OfType<CompletedUndamagedUseDamageRecordedEvent>().Any(e =>
             e.CardUseFrameId == use.Id && e.TargetSeat == seat && e.Amount > 0)).ToArray();
 
+    private bool CompletedUndamagedSourceUseQualifies(string skillId, CardUseFrame use) =>
+        skillId != CompletedUndamagedTargetRevealComposition.ShanheSourceYiduSkillId ||
+        _modeDefinition.Id == ShanheBattleSetup.BattleModeId && _options.ShanheBattle is not null &&
+        use.TargetSeats.Count == 1 && use.Action is { } action &&
+        action.EffectiveDesignatedTargetSeats.Distinct().Count() == 1;
+
+    private static int CompletedUndamagedDiscardActor(ProgramSkillFrame frame, int target) =>
+        frame.SkillId == CompletedUndamagedTargetRevealComposition.ShanheSourceYiduSkillId ? target : frame.OwnerSeat;
+
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 1060)]
-    private bool CanOfferCompletedUndamagedTargetReveal(int owner, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
+    private bool CanOfferCompletedUndamagedTargetReveal(ProgramTriggerLegalityContext gate)
     {
+        var trigger = gate.Trigger;
         if (!trigger.Effects.Any(e => CompletedUndamagedTargetRevealComposition.IsOperation(e.Op))) return true;
+        var owner = gate.OwnerSeat;
         return _winner == Winner.None && _status != EngineStatus.Completed && IsValidPlayerSeat(owner) && _players[owner].IsAlive &&
-            CompletedUndamagedUse(context) is { } use && use.SourceSeat == owner && CompletedUndamagedEligibleTargets(use).Length > 0;
+            CompletedUndamagedUse(gate.Context) is { } use && use.SourceSeat == owner &&
+            CompletedUndamagedSourceUseQualifies(gate.SkillId, use) && CompletedUndamagedEligibleTargets(use).Length > 0;
     }
     private SkillProgramStepOutcome BeginCompletedUndamagedTargetReveal(ProgramSkillFrame supplied)
     {
         var f = GetActiveProgramFrame(supplied.Id);
         if (f.CompletedUndamagedTargetReveal is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context ||
             CompletedUndamagedUse(context) is not { Action: { } action } use || use.SourceSeat != f.OwnerSeat ||
-            !ExactCompletedUndamagedParent(f, context, use))
+            !ExactCompletedUndamagedParent(f, context, use) || !CompletedUndamagedSourceUseQualifies(f.SkillId, use))
             throw new InvalidOperationException("Completed-target reveal lost its original completed Use and current optional candidate.");
         if (_winner != Winner.None || !_players[f.OwnerSeat].IsAlive ||
             !HasRuntimeSkillInstance(_players[f.OwnerSeat], f.SkillId, f.SkillInstanceId)) return SkillProgramStepOutcome.Continue;
@@ -273,8 +286,10 @@ public sealed partial class GameEngine
         var revealed = cards.Select(c => { var suit = EffectiveSuit(_players[target], c); return new CompletedUndamagedRevealedMaterial(
             c.Id, c.Kind, selected.Single(m => m.CardId == c.Id).Slot, suit, CompletedUndamagedColor(suit)); }).ToArray();
         var same = revealed.Length > 0 && revealed.All(m => m.EffectiveColor == revealed[0].EffectiveColor);
-        // The owner of the effect discards the target's cards; protection is queried using that real actor.
-        var paid = same ? revealed.Where(m => !IsForeignEquipmentDiscardPrevented(f.OwnerSeat,
+        // Source3113 says the target discards its own cards. OL Yidu retains
+        // its original effect-owner discard; qualification uses the real actor.
+        var actor = CompletedUndamagedDiscardActor(f, target);
+        var paid = same ? revealed.Where(m => !IsForeignEquipmentDiscardPrevented(actor,
             hand.Single(c => c.Id == m.CardId), from, OwnedCardMoveIntent.Discard)).ToArray() : [];
         var before = CompletedUndamagedMovementSequence;
         ReplaceRuntimeTop(f = f with { CompletedUndamagedTargetReveal = r with { SelectionIssued = true,
@@ -338,14 +353,17 @@ public sealed partial class GameEngine
     private void ContinueCompletedTargetPublicReveal(ProgramSkillFrame f)
     {
         var r=f.CompletedUndamagedTargetReveal??throw new InvalidOperationException("Completed-target reveal lost its original native roster.");
-        var target=r.TargetSeat!.Value;var from=CardLocation.Hand(target);var paid=r.PaidMaterials.Where(m=>_cardZones.GetLocation(m.CardId)==from).ToArray();var before=_movementSequence;
+        var target=r.TargetSeat!.Value;var from=CardLocation.Hand(target);var actor=CompletedUndamagedDiscardActor(f,target);
+        var paid=r.PaidMaterials.Where(m=>_cardZones.GetLocation(m.CardId)==from &&
+            (f.SkillId!=CompletedUndamagedTargetRevealComposition.ShanheSourceYiduSkillId ||
+             !IsForeignEquipmentDiscardPrevented(actor,GetAdvancedCard(m.CardId),from,OwnedCardMoveIntent.Discard))).ToArray();var before=_movementSequence;
         ReplaceRuntimeTop(f=f with{CompletedUndamagedTargetReveal=r with{PaidMaterials=paid,SequenceBefore=before,SequenceAfter=before},PendingMovementContinuation=paid.Length>0?new(target,0,null):null});
         if (paid.Length == 0)
         { CompleteCompletedUndamagedTargetReveal(f); return; }
-        MoveProgramLogicalDiscard(f, f.OwnerSeat, paid.Select(m => m.CardId).ToArray(),
+        MoveProgramLogicalDiscard(f, actor, paid.Select(m => m.CardId).ToArray(),
             new(CompletedUndamagedDiscardReason(f)), (batch, records) =>
             {
-                foreach (var movement in records) RecordBianFuRenForeignDiscardProducer(movement,f.OwnerSeat,f.Id);
+                foreach (var movement in records) RecordBianFuRenForeignDiscardProducer(movement,actor,f.Id);
                 if (records.Count != paid.Length || !records.Select(m => m.CardId).SequenceEqual(paid.Select(m => m.CardId)) ||
                     records.Any(m => m.From != from || m.To != CardLocation.DiscardPile ||
                         paid.Single(c => c.CardId == m.CardId).PrintedKind != m.CardKind))

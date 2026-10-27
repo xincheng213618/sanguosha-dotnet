@@ -100,7 +100,7 @@ public sealed partial class GameEngine
         movement.ResumeGuanduCardEffectFrameId is null &&
         movement.ResumeWumiaoFloodFrameId is null &&
         movement.ResumeDragonBoatCardEffectFrameId is null &&
-        movement.ResumeEquipmentRecastFrameId is null && movement.ResumeColorFireAttackFrameId is null &&
+        movement.ResumeHuxinMirrorPlacementFrameId is null && movement.ResumeEquipmentRecastFrameId is null && movement.ResumeColorFireAttackFrameId is null &&
         movement.ResumeCounterspellPaymentFrameId is null && movement.ResumeHistoricalEndingUseFrameId is null && movement.ResumeGuoSiUseFrameId is null && movement.ResumeDenglouUseFrameId is null &&
         movement.ResumeShanheNullifiedClaimWindowId is null &&
         movement.ResumeRoundPileAlcoholUseFrameId is null && movement.ResumeDrawPhaseObligationFrameId is null && movement.ResumeManualDiscardFrameId is null &&

@@ -509,7 +509,7 @@ internal sealed partial class HealthContinuationRuntime
             movement.Id != batch.Id || batch.ParentFrameId != recovery.Id || batch.AwaitingProgramFrameId is not null ||
             movement.ResumeRecoveryReplacementFrameId != recovery.Id || movement.ResumeProgramFrameId is not null ||
             movement.ResumeDeclarationFrameId is not null || movement.ResumeDrawFundedDistinctBasicFrameId is not null ||
-            movement.ResumePaidCardUseFrameId is not null || movement.ResumeEquipmentRecastFrameId is not null ||
+            movement.ResumePaidCardUseFrameId is not null || movement.ResumeHuxinMirrorPlacementFrameId is not null || movement.ResumeEquipmentRecastFrameId is not null ||
             movement.ResumeSoleIncomingRangeDrawFrameId is not null ||
             movement.ResumeNativeCardEffectDrawFrameId is not null ||
             movement.ResumeColorFireAttackFrameId is not null || movement.ResumeCounterspellPaymentFrameId is not null ||

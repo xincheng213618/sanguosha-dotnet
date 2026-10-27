@@ -2398,6 +2398,15 @@ public sealed partial class SimpleAiBrain
 
         if (action.Kind == LegalActionKind.Equip)
         {
+            if (card.Kind == CardKind.HuxinMirror && action.TargetSeat is { } recipientSeat && recipientSeat != self.Seat)
+            {
+                var recipient = view.Players.Single(player => player.Seat == recipientSeat);
+                var friendly = GetHostility(view, selfRole, recipient) < 0;
+                var hasArmor = recipient.Equipment.Any(existingCard =>
+                    (existingCard.OccupiedEquipmentSlot ?? EquipmentCatalog.Get(existingCard.Kind).Slot) == EquipmentSlot.Armor);
+                return friendly ? (hasArmor ? 12d : 32d, "将护心镜置入友方公开装备区。")
+                    : (-100d, "保留护心镜以保护己方。");
+            }
             var equipment = EquipmentCatalog.Get(card.Kind);
             var existing = self.Equipment.FirstOrDefault(existingCard =>
                 (existingCard.OccupiedEquipmentSlot ?? EquipmentCatalog.Get(existingCard.Kind).Slot) == equipment.Slot);

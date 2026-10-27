@@ -133,6 +133,7 @@ public enum CardKind
     ZhaoguMirror = 20771,
     Duanhun = 20836,
     KunlunMirror = 20841,
+    HuxinMirror = 20746,
     GouXiang = 20883
 }
 

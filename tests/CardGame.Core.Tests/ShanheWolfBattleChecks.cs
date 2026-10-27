@@ -81,6 +81,7 @@ internal static class ShanheWolfBattleChecks
 
     public static void PublishedSourceChaptersUseEliteGrowthAndActualRareRewardPools()
     {
+        BothRecommendedEntriesUpgradeTheNewThirdChapterPatrol();
         var definition = StandardShanheCampaignCatalog.CreateSourceDefinition(11);
         var wolf = definition.Rewards.Single(reward => reward.Id == Wolf.RewardId);
         Need(wolf is { Rarity: 3, CampaignEconomy.UpgradeOrdinaryBattles: true } &&
@@ -148,6 +149,41 @@ internal static class ShanheWolfBattleChecks
                 PlanBonuses(session, profile) is [{ IsBonus: true, OfferIds: var bonusIds }] && bonusIds.Count > 0 &&
                 bonusIds.All(id => definition.Rewards.Single(reward => reward.Id == id) is { Rarity: 2 } reward && RewardCategory(reward) == ShanheRewardCategory.Tactic),
                 "Each published chapter exposes its actual rare tactic/skill loot and the existing real elite-bonus planner supplies eligible rare tactics.");
+        }
+    }
+
+    private static void BothRecommendedEntriesUpgradeTheNewThirdChapterPatrol()
+    {
+        foreach (var codex in new[] { false, true })
+        {
+            var definition = codex
+                ? StandardShanheCampaignCatalog.CreateCodexDefinition(2, StandardShanheCampaignCatalog.Returning2026EditionId)
+                : StandardShanheCampaignCatalog.CreateDefinition(2, StandardShanheCampaignCatalog.Returning2026EditionId);
+            var patrol = definition.Nodes.Single(node => node.Id == StandardShanheCampaignCatalog.ThirdChapterPatrolNodeId);
+            Need(patrol.Kind == ShanheNodeKind.Battle && patrol.EliteUpgradeNodeId == StandardShanheCampaignCatalog.ThirdChapterDongwuEliteId,
+                "Both recommended entrypoints register the same real third-chapter elite profile for the new ordinary patrol.");
+            var entry = definition with
+            {
+                StartingNodeIds = definition.StartingNodeIds.Append(patrol.Id).Distinct(StringComparer.Ordinal).ToArray(),
+                RandomStartingNode = false
+            };
+            var session = ShanheCampaignSession.Create(entry, new(71, "classic:guan-yu")
+                { EquippedTacticIds = [Wolf.RewardId] }, StandardShanheCampaignCatalog.CreateBattleRegistry);
+            var preview = PreviewUnchanged(session, patrol.Id);
+            Need(session.Snapshot.AvailableNodes.Single(node => node.Id == patrol.Id).Kind == ShanheNodeKind.EliteBattle &&
+                preview.SourceBattleId is null && preview.SourceCityId is null && preview.Enemies.Count == 3 &&
+                preview.Enemies.Select(member => member.GeneralId).SequenceEqual(new[]
+                {
+                    StandardShanheEliteDongwuPackage.HuangGaiId, StandardShanheEliteHandangPackage.HandangId,
+                    StandardShanheEliteDongwuPackage.ChengPuId
+                }),
+                "Owning Wolf Battles really upgrades the fresh patrol preview to the existing three-person elite instead of leaving codex entry ordinary.");
+            Move(session, patrol.Id);
+            Need(session.Snapshot.CurrentBattleNode is { Kind: ShanheNodeKind.EliteBattle, ChapterNumber: 3, BossRewards: null } actual &&
+                actual.Id == patrol.Id && actual.NextNodeIds.SequenceEqual(patrol.NextNodeIds) &&
+                SameRoster(preview.Enemies, session.PendingBattleSetup!.EnemyRoster) &&
+                session.PendingBattleSetup.SourceDifficultyId is null && session.Snapshot.Phase == ShanheCampaignPhase.Battle,
+                "The actual fresh Move locks that same elite roster and onward routes without a final-victory reward or fabricated battle result.");
         }
     }
 

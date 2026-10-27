@@ -3534,6 +3534,7 @@ public sealed partial class GameEngine
             ? action.TargetSeats : null;
         _selectedRedAdditionalTargetSource = action.ProgramActivationId == "red-additional-targets" &&
             _redAdditionalTargetGrants.TryGetValue(actor.Seat, out var redGrant) ? redGrant.Source : null;
+        if (TryPlaceHandHuxinMirror(actor, action)) return;
         SelectUseConversion(action);
         if (TryResolveMobileWumouUse(actor, action)) return;
         if (action.Kind == LegalActionKind.UseProgramSkill)
@@ -15235,7 +15236,9 @@ public sealed partial class GameEngine
         var originalPileActions = NativePublicPileOriginalPlayActions(actor, selectedPhysicalCardId);
         var allActions = originalPileActions.Count == 0 ? result : result.Concat(originalPileActions).ToArray();
         var projectedActions = ProjectMobileWumouActions(actor, allActions, selectedPhysicalCardId);
-        return ignoreForcedHandSelection ? projectedActions : _programPipelineHooks.FilterPlayPhaseActions(actor, projectedActions);
+        // Direct equipment placement is not a card use and does not inherit use-only prohibitions or declarations.
+        var withHuxinPlacement = projectedActions.Concat(HuxinMirrorPlacementActions(actor, allPhysicalCardCandidates)).ToArray();
+        return ignoreForcedHandSelection ? withHuxinPlacement : _programPipelineHooks.FilterPlayPhaseActions(actor, withHuxinPlacement);
     }
 
     private IReadOnlyList<CharacterState> GetFangtianOrderedSlashTargets(

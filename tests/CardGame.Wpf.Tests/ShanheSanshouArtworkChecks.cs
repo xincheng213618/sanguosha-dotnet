@@ -36,22 +36,24 @@ internal static class ShanheSanshouArtworkChecks
             EquipmentCatalog.Get(CardKind.Duanhun) is { Slot: EquipmentSlot.Weapon, WeaponAttackRange: 2, IgnoresArmor: false } &&
             EquipmentCatalog.Get(CardKind.KunlunMirror).Slot == EquipmentSlot.Treasure,
             "The original new faces retain Duanhun's range2 weapon and Kunlun Mirror's Treasure slot, with text fallback for unknown equipment strips.");
-        CheckMirrorFallback(Path.Combine(output, "shanhe-zhaogu-mirror-fallback.png"));
+        CheckMissingFace(CardKind.ZhaoguMirror, "照骨镜", EquipmentSlot.Treasure, "♦",
+            Path.Combine(output, "shanhe-zhaogu-mirror-fallback.png"));
+        CheckMissingFace(CardKind.HuxinMirror, "护心镜", EquipmentSlot.Armor, "♣",
+            Path.Combine(output, "shanhe-huxin-mirror-fallback.png"));
     }
 
-    private static void CheckMirrorFallback(string output)
+    private static void CheckMissingFace(CardKind kind, string name, EquipmentSlot slot, string suit, string output)
     {
-        var kind = CardKind.ZhaoguMirror;
         var info = CardCatalog.Get(kind);
         Program.Assert(CardArt.Get(kind) is null && CardArt.GetEquipment(kind) is null &&
-            !CardArt.NeedsRuntimeNameOverlay(kind) && info.DisplayName == "照骨镜" &&
-            EquipmentCatalog.Get(kind).Slot == EquipmentSlot.Treasure &&
+            !CardArt.NeedsRuntimeNameOverlay(kind) && info.DisplayName == name &&
+            EquipmentCatalog.Get(kind).Slot == slot &&
             new GuideCardEntry(info).Artwork is null,
             "Without a verified original face the mirror uses the existing text fallback, never another treasure's printed name or picture.");
         var model = new CardViewModel
         {
             Id = 9902, Kind = kind, Name = info.DisplayName, KindLabel = info.CategoryName,
-            SuitGlyph = "♦", Rank = "A", Description = info.Description, IsPlayable = true
+            SuitGlyph = suit, Rank = "A", Description = info.Description, IsPlayable = true
         };
         var control = new ContentControl
         {
@@ -65,8 +67,8 @@ internal static class ShanheSanshouArtworkChecks
             Program.Find<Grid>(control).Single(g => g.Name == "CardTextFallback") is { Visibility: Visibility.Visible } fallback &&
             Program.Find<TextBlock>(fallback).Any(t => t.Text == model.VerticalName && t.ActualHeight > 0) &&
             Program.Find<TextBlock>(control).Single(t => t.Name == "CardRank").Text == "A" &&
-            Program.Find<TextBlock>(control).Single(t => t.Name == "CardSuit").Text == "♦",
-            "The production face renders the actual mirror title and shop Diamond-A appearance through its normal missing-artwork fallback.");
+            Program.Find<TextBlock>(control).Single(t => t.Name == "CardSuit").Text == suit,
+            "The production face renders the actual title and shop suit and rank through its normal missing-artwork fallback.");
         control.Content = null;
     }
 

@@ -481,7 +481,11 @@ public sealed partial class GameEngine
                     owner.Seat, eventTarget, facts) with { OptionalChooserSeat = rewardChooser };
                 if (trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.GrantActorHandLimitPenalty) &&
                     !ShouldCollectActorHandLimitPenalty(action, owner.Seat, window)) continue;
-                if (!CanOfferCompletedUndamagedTargetReveal(owner.Seat, trigger, context)) continue;
+                if (trigger.Effects.Any(effect => CompletedUndamagedTargetRevealComposition.IsOperation(effect.Op)) &&
+                    !CanOfferCompletedUndamagedTargetReveal(new(owner, binding.Program,
+                        ProgramInstructionResolver.Default.Resolve(binding.Program, ProgramInstructionSourceKind.Trigger, trigger.Id),
+                        new(owner.Seat, binding.SkillId, trigger.Id, binding.SkillInstanceId, binding.Program.GameplayHash, trigger.Priority),
+                        context))) continue;
                 if (ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.DrawAfterPaidMeiYingConversion) &&
                     !CanOfferMeiYingConversionDraw(ToSharedCandidate(new(owner.Seat, eventTarget, binding.SkillId, trigger.Id,
                         binding.Program.GameplayHash, binding.SkillInstanceId, trigger.Priority, context)), trigger, context)) continue;

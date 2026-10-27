@@ -432,6 +432,10 @@ public static class CardCatalog
                 CardKind.Duanhun, "断魂", "装备牌",
                 "攻击范围2。锁定技，你造成的伤害无视护甲。",
                 AiPlayValue: 40, AiResponseValue: 0, HandKeepValue: 45),
+            [CardKind.HuxinMirror] = new(
+                CardKind.HuxinMirror, "护心镜", "装备牌",
+                "当你受到大于1点的伤害或致命伤害时，你可以将装备区里的护心镜置入弃牌堆，若如此做，防止此伤害。出牌阶段，你可以将手牌中的护心镜置于其他角色的装备区。",
+                AiPlayValue: 36, AiResponseValue: 0, HandKeepValue: 43),
             [CardKind.KunlunMirror] = new(
                 CardKind.KunlunMirror, "昆仑镜", "装备牌",
                 "锁定技，当你受到锦囊牌的伤害后，防止同名锦囊牌本局对你造成的伤害。",

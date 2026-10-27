@@ -64,6 +64,7 @@ internal interface ICompletedUndamagedTargetRevealProgramHost
 internal sealed class RevealUndamagedUseTargetHandAndDiscardSameColorDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.RevealUndamagedUseTargetHandAndDiscardSameColor;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLogicalDiscard);
     public override ISkillProgramEffectHandler Handler { get; } = new RevealUndamagedUseTargetHandAndDiscardSameColorHandler();
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, _) => { });
@@ -86,7 +87,19 @@ public sealed class RevealUndamagedUseTargetHandAndDiscardSameColorHandler : ISk
 }
 internal static class CompletedUndamagedTargetRevealComposition
 {
+    internal const string ShanheSourceYiduSkillId = "shanhe:source-yidu-3113";
     internal static bool IsOperation(SkillProgramEffectOp op) => op == SkillProgramEffectOp.RevealUndamagedUseTargetHandAndDiscardSameColor;
+
+    // The source3113 version is narrower than OL Yidu. Its one explicit
+    // actual-Use target-count condition must not change the ordinary program.
+    private static bool SupportedTriggerCondition(string skillId, SkillProgramTriggerCondition condition) =>
+        skillId == ShanheSourceYiduSkillId
+            ? condition is { Kind: SkillProgramTriggerConditionKind.Compare, Children.Count: 0,
+                Left.Kind: SkillProgramTriggerValueKind.CardUseDesignatedTargetCount,
+                Comparison: SkillProgramComparisonOperator.Equal,
+                Right: { Kind: SkillProgramTriggerValueKind.IntegerConstant, Value: 1 } }
+            : condition.Kind == SkillProgramTriggerConditionKind.Always;
+
     [ProgramCatalogValidation(130)]
     internal static void ValidateProgram(string path, SkillProgram program)
     {
@@ -95,10 +108,10 @@ internal static class CompletedUndamagedTargetRevealComposition
         foreach (var t in program.Triggers.Where(t => t.Effects.Any(e => IsOperation(e.Op))))
             if (t.Effects is not [{ Target: SkillProgramEffectTarget.Owner, Amount: 3, Condition.Kind: SkillProgramConditionKind.Always }] ||
                 t.Window != SkillProgramTriggerWindow.CardUseCompleted || t.OwnerRelation != SkillProgramCardActionOwnerRelation.Actor ||
-                !t.Optional || t.IncludeResponseUses || t.Condition.Kind != SkillProgramTriggerConditionKind.Always ||
+                !t.Optional || t.IncludeResponseUses || !SupportedTriggerCondition(program.Id, t.Condition) ||
                 t.UsageScope is not null || t.UsageLimit is not null || t.MarkerCost is not null || t.ChoiceGroup is not null ||
                 t.DynamicUsageLimit is not null || t.NamedUsageGroup is not null || t.SourceSkillId is not null || t.SourceViewAsId is not null ||
                 t.CardKinds.Count != 0 || t.CardCategories.Count != 0 || t.Suits.Count != 0 || t.OnlyDesignatedCardTargets || t.RequireNoCardConversion == true)
-                throw new InvalidOperationException($"Invalid skill program at {path}: completed-target reveal requires one unconditional unlimited optional actor Use-completion operation, without card or source filters.");
+                throw new InvalidOperationException($"Invalid skill program at {path}: completed-target reveal requires one unlimited optional actor Use-completion operation without card or source filters; only source3113 requires the exact sole-target comparison.");
     }
 }

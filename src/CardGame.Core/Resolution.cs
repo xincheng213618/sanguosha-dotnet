@@ -19,6 +19,7 @@ public static class JudgmentReasons
 public enum ResolutionFrameKind
 {
     ShanheMarketPurchase = 62030,
+    HuxinMirrorPlacement = 20746,
     DiscardPhaseEntry = 84700,
     HappyQiaoHealthChoice = 42400,
     MobileSimaRenjie = 40425,
@@ -134,6 +135,7 @@ internal interface IProgramChildResolutionFrame
 [JsonDerivedType(typeof(DamageTriggerWindowFrame), "damage-trigger-window")]
 [JsonDerivedType(typeof(RecoveryFrame), "recovery")]
 [JsonDerivedType(typeof(RecoveryReplacementFrame), "recovery-replacement")]
+[JsonDerivedType(typeof(HuxinMirrorPlacementFrame), "huxin-mirror-placement")]
 [JsonDerivedType(typeof(EquipmentRecastFrame), "equipment-recast")]
 [JsonDerivedType(typeof(DrawPhaseObligationFrame), "draw-phase-obligation")]
 [JsonDerivedType(typeof(ManualDiscardFrame), "manual-discard")]

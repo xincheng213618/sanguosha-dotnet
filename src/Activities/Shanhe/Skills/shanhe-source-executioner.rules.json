@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-yishi-611",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "prevent-slash-and-take",
+          "window": "beforeDamageApplied",
+          "subject": "damageSource",
+          "optional": true,
+          "effects": [
+            {
+              "op": "resolveSourceExecutionerYishi",
+              "target": "owner"
+            },
+            {
+              "op": "selectAndMoveOwnedCard",
+              "target": "owner",
+              "chooserRef": {
+                "kind": "owner"
+              },
+              "cardOwnerRef": {
+                "kind": "eventTarget"
+              },
+              "zones": [
+                "hand",
+                "equipment",
+                "judgment"
+              ],
+              "count": 1,
+              "destination": "ownerHand",
+              "skipIfNoCards": true,
+              "awaitMovementTriggers": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shanhe:source-huanfu-3156",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "actor-wager",
+          "window": "cardUseTargetsFinalized",
+          "ownerRelation": "actor",
+          "cardKinds": [
+            "slash",
+            "fireSlash",
+            "thunderSlash",
+            "coldSlash"
+          ],
+          "optional": true,
+          "effects": [
+            {
+              "op": "resolveSourceExecutionerHuanfu",
+              "target": "owner"
+            }
+          ]
+        },
+        {
+          "id": "target-wager",
+          "window": "cardUseTargetsFinalized",
+          "ownerRelation": "target",
+          "cardKinds": [
+            "slash",
+            "fireSlash",
+            "thunderSlash",
+            "coldSlash"
+          ],
+          "optional": true,
+          "effects": [
+            {
+              "op": "resolveSourceExecutionerHuanfu",
+              "target": "owner"
+            }
+          ]
+        },
+        {
+          "id": "settle-wager",
+          "window": "cardUseCompleted",
+          "ownerRelation": "observer",
+          "cardKinds": [
+            "slash",
+            "fireSlash",
+            "thunderSlash",
+            "coldSlash"
+          ],
+          "optional": false,
+          "effects": [
+            {
+              "op": "resolveSourceExecutionerHuanfu",
+              "target": "owner"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
