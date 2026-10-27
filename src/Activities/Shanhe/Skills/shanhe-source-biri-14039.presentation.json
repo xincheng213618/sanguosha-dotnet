@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-biri-14039": {
+      "name": "蔽日",
+      "description": "锁定技，防止你受到的火焰伤害，然后回复你防止伤害两倍的体力值并摸回复值的牌。"
+    }
+  }
+}

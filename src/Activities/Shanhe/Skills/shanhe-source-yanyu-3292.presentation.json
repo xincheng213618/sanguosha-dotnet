@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-yanyu-3292": {
+      "name": "炎狱",
+      "description": "锁定技，其他角色的准备阶段，其判定，若为红色，你对其造成1点火焰伤害并获得判定牌，然后重复此流程（每回合限三次）。"
+    }
+  }
+}

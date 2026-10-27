@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-biri-14039",
+      "revision": 1,
+      "triggers": [
+        { "id": "prevent-fire", "window": "beforeDamageApplied", "subject": "damageTarget", "optional": false,
+          "condition": { "kind": "damageNatureIs", "damageNature": "fire" },
+          "effects": [{ "op": "preventShanheSourceFireRecoverDraw", "target": "owner" }] }
+      ]
+    }
+  ]
+}

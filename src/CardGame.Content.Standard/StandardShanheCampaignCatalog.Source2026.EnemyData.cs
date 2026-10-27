@@ -260,6 +260,10 @@ public static partial class StandardShanheCampaignCatalog
             [
                 new(193, 3, 3, 2, 4, 0, 0, 0, 5, 0, false, [new(3, new(1, 0, 0, 0, 0, 0, 0)), new(5, new(0, 0, 1, 1, 0, 0, 0))]),
             ],
+            [265301] =
+            [
+                new(4872, 4, 4, 2, 4, 0, 0, 0, 5, 0, false, [new(3, new(0, 0, 0, 0, 5, 0, 0)), new(4, new(0, 2, 0, 0, 0, 0, 0)), new(5, new(0, 0, 1, 1, 0, 0, 0))]),
+            ],
             [267001] =
             [
                 new(655, 5, 5, 2, 4, 0, 0, 0, 5, 0, false, [new(3, new(0, 0, 0, 0, 5, 0, 0)), new(5, new(0, 0, 1, 1, 0, 0, 0))]),

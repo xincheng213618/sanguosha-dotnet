@@ -1140,6 +1140,8 @@ public enum SkillProgramEffectOp
     RecoverShanheShuanghun = 5412, RestoreShanheShuanghunUse = 5413,
     ReviveShanheMuluFollowers = 5420, FreezeShanheElephantRoundDamage = 5421,
     ReviveShanheRoundAllies = 62045,
+    ResolveShanheSourceYanyu = 62046,
+    PreventShanheSourceFireRecoverDraw = 62047,
     CollectPublicPile = 780,
     GrantNextCardTargetAdjustment = 782,
     GrantNextActualUseTargetAdjustment = 4700,

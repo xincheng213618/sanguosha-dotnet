@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:source-yanyu-3292", "revision": 1,
+    "triggers": [{
+      "id": "other-preparation-red-at-most-three", "window": "turnStartBeforeNormalFlow",
+      "subject": "owner", "turnOwnerScope": "otherLiving", "optional": false,
+      "effects": [
+        {"op":"selectTarget","target":"owner","targetKind":"currentTurnPlayer"},
+        {"op":"startJudgment","target":"selectedTarget","judgmentReason":"shanhe.source-yanyu-3292","resultBind":"judgment-0","outcomeBind":"outcome-0","visibility":"public"},
+        {"op":"resolveShanheSourceYanyu","target":"owner","sourceBind":"judgment-0","outcomeBind":"outcome-0"},
+        {"op":"startJudgment","target":"selectedTarget","judgmentReason":"shanhe.source-yanyu-3292","resultBind":"judgment-1","outcomeBind":"outcome-1","visibility":"public"},
+        {"op":"resolveShanheSourceYanyu","target":"owner","sourceBind":"judgment-1","outcomeBind":"outcome-1"},
+        {"op":"startJudgment","target":"selectedTarget","judgmentReason":"shanhe.source-yanyu-3292","resultBind":"judgment-2","outcomeBind":"outcome-2","visibility":"public"},
+        {"op":"resolveShanheSourceYanyu","target":"owner","sourceBind":"judgment-2","outcomeBind":"outcome-2"}
+      ]
+    }]
+  }]
+}

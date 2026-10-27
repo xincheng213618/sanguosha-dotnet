@@ -35,7 +35,12 @@ public static partial class StandardShanheCampaignCatalog
         var regionIds = regions.Select(region => region.SourceUniqueId).ToHashSet();
         var encounters = template.Nodes.SelectMany(node => node.Encounters ?? []).GroupBy(encounter => encounter.Id, StringComparer.Ordinal)
             .ToDictionary(group => group.Key, group => group.First(), StringComparer.Ordinal);
-        var bindings = Source2026BossBindings.Where(binding => sourceDifficultyId < 3 || binding.BattleId is not (2653 or 2687))
+        var bindings = Source2026BossBindings.Where(binding => binding.BattleId switch
+        {
+            2653 => sourceDifficultyId < 3 || sourceDifficultyId is >= 6 and <= 10,
+            2687 => sourceDifficultyId < 3,
+            _ => true
+        })
             .ToDictionary(binding => binding.BattleId);
         var chapterBundle = template.Nodes.Single(node => node.Id == "huaxiong").BossRewards;
         var normalRewards = template.Rewards.Where(reward => reward.OpeningCompanionPool is null &&
@@ -122,7 +127,7 @@ public static partial class StandardShanheCampaignCatalog
                 "普通驻军每章包含四种组合，第一章一至两敌、第二章两至三敌、第三章三至四敌；每区还可选择挑战精锐军营。" +
                 "首领从已支持的来源基础阵容中选取；普通3起接入已实现的原二阶段。" +
                 "暴怒战神在困难起获得神威、炼狱再获神戟；神鬼无前在噩梦起使用动态无双、炼狱再获神躯；董旻在噩梦起获得篡朝。" +
-                "缺失的首领与张牛角、改朝罪魁的未实现二阶段暂不进入相应候选。" +
+                "黄巾余匪在中等难度分为张牛角与张燕两阶段。" +
                 "各档均可直接选择；本地以每场战斗的序号作日数，体力成长同时增加体力上限，" +
                 "护甲从第二轮起按每轮回复量补充至上限，已有护甲超过上限时不倒扣。" +
                 "普通档前战后回复1点体力、关底后回复2点；中等1起取消自动战后回复，困难1起启用原地点地形。",
@@ -210,6 +215,11 @@ public static partial class StandardShanheCampaignCatalog
     {
         var original = templates[binding.TemplateEncounterId];
         var enemies = original.Enemies;
+        if (binding.BattleId == 2653 && difficulty is >= 6 and <= 10)
+            enemies = enemies.Select((enemy, index) => index == 0 ? enemy with
+            {
+                GeneralId = StandardShanheSourceZhangYanPackage.ZhangniujiaoMediumId
+            } : enemy).ToArray();
         if (difficulty >= 11 && (binding.BattleId is 2644 or 2645))
             enemies = enemies.Select((enemy, index) => index == 0 ? enemy with
             {
@@ -230,6 +240,10 @@ public static partial class StandardShanheCampaignCatalog
     {
         2644 => Source2026RageTransition(difficulty),
         2645 => Source2026ShenguiTransition(difficulty),
+        2653 when difficulty is >= 6 and <= 10 => new(0, StandardShanheSourceZhangYanPackage.ZhangYanMediumId, 4, 4, 4)
+        {
+            Combatant = Source2026StageCombatant(265301, StandardShanheSourceZhangYanPackage.ZhangYanMediumId)
+        },
         2670 => new(0, "ol:niu-fu", 5, 5, 4) { Combatant = Source2026StageCombatant(267001, "ol:niu-fu") },
         2671 => Source2026DongMinTransition(difficulty),
         _ => null
