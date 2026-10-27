@@ -21,6 +21,7 @@ internal static class ProgramCommittedUseContractChecks
             "A discovered character contract must validate its actual registered trigger.");
         ResponseOnlyConversionsRequireExplicitUseAdmission();
         SingleActionAdmissionKeepsExactContractValidation();
+        ShownCategoryResponseUsesKeepTheirOwnPlayAndSingleDrawGuards();
     }
 
     private static void ResponseOnlyConversionsRequireExplicitUseAdmission()
@@ -57,6 +58,29 @@ internal static class ProgramCommittedUseContractChecks
         try { _ = SkillProgramCatalog.Load(rules.ToJsonString(), presentation); }
         catch (InvalidOperationException) { return; }
         throw new InvalidOperationException("Registered single-action metadata must still validate the complete exact trigger shape.");
+    }
+
+    private static void ShownCategoryResponseUsesKeepTheirOwnPlayAndSingleDrawGuards()
+    {
+        var rules = JsonNode.Parse(ReadResource("shanhe-source-qiangzhi-484.rules.json"))!;
+        var presentation = ReadResource("shanhe-source-qiangzhi-484.presentation.json");
+        var admitted = SkillProgramCatalog.Load(rules.ToJsonString(), presentation).Programs["shanhe:source-qiangzhi-484"];
+        Require(admitted.Triggers.Single(t => t.Id == "draw-on-matching-category") is
+            { IncludeResponseUses: true, Optional: true, Effects: [{ Op: SkillProgramEffectOp.Draw, Amount: 1 }] },
+            "The displayed-category contract admits an actual matching response Use without changing its optional single draw.");
+        foreach (var mutation in Enumerable.Range(0, 3))
+        {
+            var copy = rules.DeepClone();
+            var trigger = copy["skills"]![0]!["triggers"]!.AsArray().Single(t =>
+                t!["id"]!.GetValue<string>() == "draw-on-matching-category")!;
+            if (mutation == 0) trigger["effects"]![0]!["amount"] = 2;
+            else if (mutation == 1) trigger["optional"] = false;
+            else trigger["condition"]!["children"]![1]!["kind"] = "always";
+            var rejected = false;
+            try { _ = SkillProgramCatalog.Load(copy.ToJsonString(), presentation); }
+            catch (InvalidOperationException) { rejected = true; }
+            Require(rejected, "Response-use admission cannot widen the amount, remove its choice, or escape the owner's actual Play phase.");
+        }
     }
 
     private static string ReadResource(string suffix)

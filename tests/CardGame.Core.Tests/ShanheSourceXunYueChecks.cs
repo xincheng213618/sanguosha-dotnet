@@ -48,6 +48,55 @@ internal static class ShanheSourceXunYueChecks
         Need(s.Draws == 1 && s.Events<ProgramCardsRevealedEvent>().Count(e => e.SkillId == Skill) == 1 &&
             s.BooleanStates.All(x => !x.Value),
             "A later real Play phase starts fresh: declining its reveal leaves a matching Basic use without an inherited offer or draw.");
+        NativeNullificationUseReturnsToItsOriginalTrick();
+    }
+
+    private static void NativeNullificationUseReturnsToItsOriginalTrick()
+    {
+        var s = Scene.Start(counterspell: true);
+        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
+        s.Until(() => s.P?.SkillPrompt?.SkillId == Skill && s.P.Choices.Any(c => c.Targets.SequenceEqual([1])));
+        s.Answer(c => c.Targets.SequenceEqual([1])); s.Play();
+        Need(s.Events<ProgramCardsRevealedEvent>().Single(e => e.SkillId == Skill).Cards is [{ Kind: CardKind.DrawTwo }] &&
+            s.BooleanStates.Single(x => x.StateId == "shown-trick").Value,
+            "A separate fresh source484 scene records the actual single opposing Trick entity for this Play phase.");
+
+        var duelId = s.Use(CardKind.Duel);
+        s.Until(() => s.IsInvocation);
+        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "skip");
+        s.Until(() => s.P is { Kind: DecisionKind.Nullification, PlayerSeat: 0 });
+        var parent = s.Events<CardUseDeclaredEvent>().Single(e => e.CardId == duelId);
+        var counterWindow = s.G.ResolutionStack.OfType<NullificationWindowFrame>().Single();
+        var nullificationId = s.V.Hand.Single(c => c.Kind == CardKind.Nullification).Id;
+        Need(counterWindow.ParentFrameId == parent.ResolutionId && s.Draws == 0,
+            "Declining the parent Duel's optional draw leaves its original native counterspell window and does not draw.");
+        s.Answer(c => c.Parameters.GetValueOrDefault("response") == "nullification" && c.Cards.SequenceEqual([nullificationId]));
+        s.Until(() => s.IsInvocation);
+        var responseWindow = s.G.ResolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(f =>
+            f.Action.EffectiveKind == CardKind.Nullification && f.CompletedResponseReturn is { IsCommitted: true });
+        Need(s.G.State.CurrentSeat == 0 && s.G.State.Phase == TurnPhase.Play && s.Draws == 0 &&
+            responseWindow.ParentFrameId == counterWindow.Id &&
+            responseWindow.CompletedResponseReturn is { Kind: ProgramCompletedResponseKind.Nullification } &&
+            responseWindow.Action is { Type: CardActionType.Response, ActorSeat: 0, ProviderSeat: 0, ResponderSeat: 0, RequesterSeat: null } &&
+            responseWindow.Action.PhysicalCards.Select(c => c.CardId).SequenceEqual([nullificationId]) &&
+            s.G.CardMovements.Count(m => m.CardId == nullificationId && m.From == CardLocation.Hand(0) &&
+                m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Nullification) == 1 &&
+            s.G.CardMovements.Count(m => m.CardId == nullificationId && m.From == CardLocation.Processing &&
+                m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.NullificationFinished) == 1 &&
+            s.Events<CardUseFinishedEvent>().All(e => e.ResolutionId != parent.ResolutionId),
+            "The matching response-use pays its real Nullification entity once, then source484 suspends that same committed response and original Duel before either returns.");
+        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate"); s.Play();
+        Need(s.Draws == 1 && s.Events<NullificationRespondedEvent>().Count(e =>
+                e.WindowFrameId == counterWindow.Id && e.NullificationCardId == nullificationId && e.ResponderSeat == 0) == 1 &&
+            s.Events<NullificationResolvedEvent>().Count(e => e.WindowFrameId == counterWindow.Id &&
+                e.ResolutionId == parent.ResolutionId && e.EffectCardId == duelId && e.EffectNullified) == 1 &&
+            s.Events<CardUseFinishedEvent>().Count(e => e.ResolutionId == parent.ResolutionId && e.CardId == duelId) == 1 &&
+            s.G.CardMovements.Count(m => m.CardId == duelId && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1 &&
+            s.G.CardMovements.Count(m => m.CardId == duelId && m.From == CardLocation.Processing &&
+                m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.UseFinished) == 1 &&
+            s.G.CardMovements.Count(m => m.CardId == nullificationId && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1 &&
+            !s.Events<DamageAppliedEvent>().Any() && !s.G.ResolutionStack.OfType<NullificationWindowFrame>().Any(),
+            "The real response-use draws exactly one and returns to resolve the same counterspell and cancel/finish its parent Duel, with no repeated payment or damage.");
     }
 
     private static void Need(bool condition, string text) { if (!condition) throw new InvalidOperationException(text); }
@@ -89,12 +138,14 @@ internal static class ShanheSourceXunYueChecks
         }
         private string Diagnostic() => JsonSerializer.Serialize(new
         { G.State.TurnNumber, G.State.CurrentSeat, G.State.Phase, Pending = P, Draws, Stack = G.ResolutionStack.Select(f => new { f.Id, Type = f.GetType().Name }) });
-        public static Scene Start()
+        public static Scene Start(bool counterspell = false)
         {
             var setup = new ShanheBattleSetup(71, 1, "fixture:source-xunyue", StandardShanheSourceXunYuePackage.BaseId,
                 3, 0, 0, 0, 0, [Ending],
-                [new(CardKind.Crossbow, Suit.Club, 5), new(CardKind.Slash, Suit.Heart, 7), new(CardKind.Slash, Suit.Club, 8)], [],
-                [new(Peer) { StartingHand = [new(CardKind.Dodge, Suit.Spade, 2), new(CardKind.Dodge, Suit.Club, 3)] }], [], new string('a', 64));
+                counterspell ? [new(CardKind.Duel, Suit.Spade, 1), new(CardKind.Nullification, Suit.Club, 12)] :
+                    [new(CardKind.Crossbow, Suit.Club, 5), new(CardKind.Slash, Suit.Heart, 7), new(CardKind.Slash, Suit.Club, 8)], [],
+                [new(Peer) { StartingHand = counterspell ? [new(CardKind.DrawTwo, Suit.Heart, 7)] :
+                    [new(CardKind.Dodge, Suit.Spade, 2), new(CardKind.Dodge, Suit.Club, 3)] }], [], new string('a', 64));
             var production = StandardShanheCampaignCatalog.CreateBattleRegistry(setup with
             { EnemyRoster = [new("classic:guan-yu")], ExtraSkillIds = [] });
             var registry = production.WithExtension(new Fixture(), mode => mode.Id == ShanheBattleSetup.BattleModeId

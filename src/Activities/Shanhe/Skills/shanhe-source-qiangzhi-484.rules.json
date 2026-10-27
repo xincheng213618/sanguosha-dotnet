@@ -130,6 +130,7 @@
           "id": "draw-on-matching-category",
           "window": "cardUseCommitted",
           "ownerRelation": "actor",
+          "includeResponseUses": true,
           "optional": true,
           "condition": {
             "kind": "all",
