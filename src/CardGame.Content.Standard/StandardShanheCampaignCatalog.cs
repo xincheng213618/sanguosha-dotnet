@@ -399,6 +399,13 @@ public static partial class StandardShanheCampaignCatalog
         var sourceMouDongZhuo = RequiresThreeBossRegistry(requirements, StandardShanheSourceMouDongZhuoPackage.GeneralId,
             StandardShanheSourceMouDongZhuoPackage.XiongniSkillId, StandardShanheSourceMouDongZhuoPackage.FengshangSkillId,
             StandardShanheSourceMouDongZhuoPackage.ZhibingSkillId, StandardShanheSourceMouDongZhuoPackage.ZhixiSkillId);
+        var sourceVeteran = RequiresSourceVeteranRegistry(requirements);
+        var sourceWuhuanRider = RequiresThreeBossRegistry(requirements, StandardShanheSourceWuhuanRiderPackage.BaseId,
+            StandardShanheSourceWuhuanRiderPackage.TuxiSkillId, StandardShanheSourceWuhuanRiderPackage.JixiSkillId) ||
+            ids.Any(id => id is StandardShanheSourceWuhuanRiderPackage.HardId or StandardShanheSourceWuhuanRiderPackage.HellId);
+        var sourceWarrior = RequiresThreeBossRegistry(requirements, StandardShanheSourceWarriorPackage.BaseId,
+            StandardShanheSourceWarriorPackage.YoudiSkillId, StandardShanheSourceWarriorPackage.LuoyiSkillId) ||
+            ids.Any(id => id is StandardShanheSourceWarriorPackage.HardId or StandardShanheSourceWarriorPackage.HellId);
         var sourceZhangYan = sourceQiangWang || RequiresThreeBossRegistry(requirements,
             StandardShanheSourceZhangYanPackage.ZhangniujiaoMediumId,
             StandardShanheSourceZhangYanPackage.YanyuSkillId,
@@ -511,6 +518,9 @@ public static partial class StandardShanheCampaignCatalog
             (sourceSunCe ? "/source-sunce-2655" : "") +
             (sourceXunYu ? "/source-xunyu-2675" : "") +
             (sourceMouDongZhuo ? "/source-mou-dongzhuo-2684" : "") +
+            (sourceVeteran ? "/source-veteran-2474" : "") +
+            (sourceWuhuanRider ? "/source-wuhuan-rider-2467" : "") +
+            (sourceWarrior ? "/source-warrior-2487" : "") +
             (s5Simayi ? "/s5-simayi-2677" : "") +
             (s5Dianwei ? "/s5-dianwei-weizi-2650" : "") +
             (s5Xiahou ? "/s5-xiahou-pair-2651" : "") +
@@ -677,6 +687,9 @@ public static partial class StandardShanheCampaignCatalog
             if (sourceSunCe) packages.Add(new StandardShanheSourceSunCePackage());
             if (sourceXunYu) packages.Add(new StandardShanheSourceXunYuPackage());
             if (sourceMouDongZhuo) packages.Add(new StandardShanheSourceMouDongZhuoPackage());
+            if (sourceVeteran) packages.Add(new StandardShanheSourceVeteranPackage());
+            if (sourceWuhuanRider) packages.Add(new StandardShanheSourceWuhuanRiderPackage());
+            if (sourceWarrior) packages.Add(new StandardShanheSourceWarriorPackage());
             if (ids.Any(id => id is StandardShanheS5SunJianWuguotaiPackage.SunjianId or StandardShanheS5SunJianWuguotaiPackage.WuguotaiId))
                 packages.Add(new StandardShanheS5SunJianWuguotaiPackage());
             if (ids.Contains(StandardShanheS5DongZhuoBasePackage.DongzhuoId, StringComparer.Ordinal))
@@ -734,9 +747,16 @@ public static partial class StandardShanheCampaignCatalog
             .Contains(CurrentFarStrikeSkillId, StringComparer.Ordinal);
 
     private static bool RequiresS5ZaiqiRegistry(ShanheBattleSetup setup) =>
-        RequiresFengyiBossRegistry(setup) || setup.TacticSkillIds.Concat(setup.ExtraSkillIds)
+        RequiresFengyiBossRegistry(setup) || RequiresSourceVeteranRegistry(setup) ||
+        setup.TacticSkillIds.Concat(setup.ExtraSkillIds)
             .Concat(setup.AllyRoster.Concat(setup.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .Contains(S5ZaiqiSkillId, StringComparer.Ordinal);
+
+    private static bool RequiresSourceVeteranRegistry(ShanheBattleSetup setup) => new[] { setup.PlayerGeneralId }
+            .Concat(setup.AllyRoster.Concat(setup.EnemyRoster).Select(member => member.GeneralId))
+            .Any(id => id is StandardShanheSourceVeteranPackage.BaseGeneralId or StandardShanheSourceVeteranPackage.MediumGeneralId or
+                StandardShanheSourceVeteranPackage.HardGeneralId or StandardShanheSourceVeteranPackage.NightmareGeneralId or
+                StandardShanheSourceVeteranPackage.HellGeneralId);
 
     private static bool RequiresCurrentJinnangJiRegistry(ShanheBattleSetup setup) =>
         setup.TacticSkillIds.Concat(setup.ExtraSkillIds)

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-youdi-488": {
+      "name": "诱敌",
+      "description": "结束阶段，你可以令一名其他角色弃置你一张牌，若不为【杀】，你获得其一张牌。"
+    }
+  }
+}

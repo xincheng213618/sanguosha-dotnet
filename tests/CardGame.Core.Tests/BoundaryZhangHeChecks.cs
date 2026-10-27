@@ -15,7 +15,10 @@ internal static class BoundaryZhangHeChecks
     private const string Mode = "identity:classic-boundary-zhang-he-fixture";
     private static PlayerMarkerKind Marker => Enum.Parse<PlayerMarkerKind>("Bian");
 
-    public static void JudgmentAndDrawSubstitutionPayAtTheirActualBoundaries()
+    public static void JudgmentAndDrawSubstitutionPayAtTheirActualBoundaries() => VerifyActualBoundaries(recoverAtBoundaries: true);
+    public static void JudgmentAndDrawSubstitutionPayAtTheirActualBoundariesForward() => VerifyActualBoundaries(recoverAtBoundaries: false);
+
+    private static void VerifyActualBoundaries(bool recoverAtBoundaries)
     {
         AssertNewOperationContracts();
         for (var targetCount = 0; targetCount <= 2; targetCount++)
@@ -27,12 +30,12 @@ internal static class BoundaryZhangHeChecks
                 "The actual game-start source grants two public change markers to all four views.");
             Answer(game, c => c.Parameters.GetValueOrDefault("program-action") == "skip");
             Reach(game, p => p.PlayerSeat == 0 && p.SkillPrompt?.SkillId == JudgeStarting);
-            Cold(game, registry); Continue(game);
+            if (recoverAtBoundaries) Cold(game, registry); Continue(game);
             ReachBinding(game, "skip-draw-and-take-hands");
             Answer(game, c => c.Parameters.GetValueOrDefault("program-action") == "skip");
             Reach(game, p => p.PlayerSeat == 0 && p.Choices.Any(c =>
                 c.Parameters.GetValueOrDefault("program-action") == "activate" && c.Parameters.GetValueOrDefault("skill-id") == "classic:tuxi"));
-            Cold(game, registry); Answer(game, c => c.Parameters.GetValueOrDefault("program-action") == "skip");
+            if (recoverAtBoundaries) Cold(game, registry); Answer(game, c => c.Parameters.GetValueOrDefault("program-action") == "skip");
             ReachPlay(game);
             Require(game.Events.Select(e => e.Payload).OfType<ProgramBindingStartedEvent>().Any(e => e.OwnerSeat == 0 && e.SkillId == JudgeStarting),
                 "Refusing the unpaid new substitution retains the real judgment-start benefit and the real Tuxi draw-start choice.");
@@ -47,7 +50,7 @@ internal static class BoundaryZhangHeChecks
             Require(judgmentBoundary.Window == SkillProgramTriggerWindow.JudgmentPhaseStarting &&
                 game.CreateSnapshot(0).Players[0].Judgment.Any(c => c.Id == delayed),
                 "The real delayed entity remains in judgment until the actual judgment-start choice.");
-            Activate(game, "skip-judgment"); ReachPayment(game); Private(game); Cold(game, registry);
+            Activate(game, "skip-judgment"); ReachPayment(game); Private(game); if (recoverAtBoundaries) Cold(game, registry);
             var cost = Prompt(game)!.Choices.First(c => c.Parameters.GetValueOrDefault("program-action") == "alternative-phase-cost-card").Cards.Single();
             var markerBefore = Markers(game); Reject(game);
             Answer(game, c => c.Parameters.GetValueOrDefault("program-action") == "alternative-phase-cost-card" && c.Cards.SequenceEqual([cost]));
@@ -63,12 +66,12 @@ internal static class BoundaryZhangHeChecks
             Require(drawBoundary.Window == SkillProgramTriggerWindow.DrawPhaseStarting,
                 "Draw substitution is offered by its own real phase-start frame after judgment returns.");
             var counts = game.State.Players.Select(p => p.HandCount).ToArray(); var gainedBefore = TakeFacts(game).Count;
-            Cold(game, registry); PayMarker(game); ReachTargets(game);
+            if (recoverAtBoundaries) Cold(game, registry); PayMarker(game); ReachTargets(game);
             Require(Markers(game) == markerBefore - 1 && game.State.Players[0].HandCount == counts[0] &&
                 Skips(game).Last() is { Window: SkillProgramTriggerWindow.DrawPhaseStarting, SkippedPhase: SkillProgramTurnPhase.Draw },
                 "The marker pays once and skips normal draw before any optional blind hand-card gain.");
             var selected = Prompt(game)!.Choices.First(c => c.Targets.Count == targetCount).Targets.ToArray();
-            Cold(game, registry); Answer(game, c => c.Targets.SequenceEqual(selected));
+            if (recoverAtBoundaries) Cold(game, registry); Answer(game, c => c.Targets.SequenceEqual(selected));
             if (targetCount > 0)
             {
                 Reach(game, p => p.PlayerSeat == 0 && p.SkillPrompt?.SkillId == Gain);
@@ -79,7 +82,7 @@ internal static class BoundaryZhangHeChecks
                     game.State.Players[0].HandCount == counts[0] + targetCount &&
                     selected.All(seat => game.State.Players[seat].HandCount == counts[seat] - 1),
                     "The mixed-source batch gains exactly one frozen actual entity from each selected hand before its child observer.");
-                MovementReturn(game, owner, receipt.CardIds, sourceHand: true); Private(game); Cold(game, registry); Continue(game);
+                MovementReturn(game, owner, receipt.CardIds, sourceHand: true); Private(game); if (recoverAtBoundaries) Cold(game, registry); Continue(game);
             }
             ReachPlay(game);
             Require(TakeFacts(game).Count == gainedBefore + 1 && TakeFacts(game).Last().CardCount == targetCount &&
@@ -95,7 +98,7 @@ internal static class BoundaryZhangHeChecks
             Require(game.Events.Select(e => e.Payload).OfType<ProgramAlternativePhaseCostPaidEvent>().Count(e =>
                 e.OwnerSeat == 0 && e.BindingId == "skip-draw-and-take-hands") == 1,
                 "The child-return chain cannot remove another marker or repay the earlier card.");
-            Cold(game, registry);
+            if (recoverAtBoundaries) Cold(game, registry);
         }
     }
 
@@ -119,6 +122,32 @@ internal static class BoundaryZhangHeChecks
         {
             var rejected = false; try { Load(item.Item1, item.Item2, item.Item3, item.Item4); } catch (InvalidOperationException) { rejected = true; }
             Require(rejected, "Alternative payment and history cannot escape their exact phase/window/order contracts.");
+        }
+        LoadRevealedChoice("drawPhaseStarting", "draw", revealFirst: true, conditional: true);
+        foreach (var item in new[] { ("judgmentPhaseStarting", "judgment", true, true),
+            ("drawPhaseStarting", "judgment", true, true), ("drawPhaseStarting", "draw", false, true),
+            ("drawPhaseStarting", "draw", true, false) })
+        {
+            var rejected = false;
+            try { LoadRevealedChoice(item.Item1, item.Item2, item.Item3, item.Item4); }
+            catch (InvalidOperationException) { rejected = true; }
+            Require(rejected, "A free starting skip requires its own exact Draw phase and a real conditional choice after public reveal.");
+        }
+
+        static void LoadRevealedChoice(string window, string phase, bool revealFirst, bool conditional)
+        {
+            var reveal = new { op = "revealTopCards", target = "owner", amount = 3, resultBind = "shown", visibility = "public" };
+            var choice = new { op = "chooseOption", target = "owner", resultBind = "draw-choice", options = new[] { new { id = "skip" }, new { id = "normal" } } };
+            var skip = new { op = "skipTurnPhases", target = "owner", phases = new[] { phase },
+                condition = conditional ? (object)new { kind = "choiceIs", sourceBind = "draw-choice", optionId = "skip" } : new { kind = "always" } };
+            var cleanup = new { op = "moveBoundCards", target = "owner", sourceBind = "shown", destination = "discardPile", awaitMovementTriggers = true };
+            object[] effects = revealFirst ? [reveal, choice, skip, cleanup] : [choice, reveal, skip, cleanup];
+            SkillProgramCatalog.Load(JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion,
+                skills = new[] { new { id = "fixture:revealed-draw-choice", revision = 1,
+                    triggers = new[] { new { id = "boundary", window, subject = "owner", optional = true, effects } } } } }),
+                JsonSerializer.Serialize(new { schemaVersion = 3, skills = new Dictionary<string, object>
+                    { ["fixture:revealed-draw-choice"] = new { name = "亮牌后选择", description = "亮牌后选择是否跳过当前摸牌",
+                        optionLabels = new Dictionary<string, string> { ["skip"] = "跳过摸牌", ["normal"] = "正常摸牌" } } } }));
         }
     }
     private static IReadOnlyList<ProgramRandomHandCardsTakenEvent> TakeFacts(GameEngine g) => g.Events.Select(e => e.Payload).OfType<ProgramRandomHandCardsTakenEvent>().Where(e => e.OwnerSeat == 0 && e.SkillId == Skill).ToArray();

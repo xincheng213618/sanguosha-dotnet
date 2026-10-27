@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:source-jixi-1600", "revision": 1,
+    "viewAs": [{
+      "id": "hand-trick-as-snatch", "inputKinds": [], "inputSuits": [], "inputCategories": ["trick"],
+      "sourceZones": ["hand"], "outputKind": "snatch", "forPlay": true, "forResponse": false
+    }]
+  }]
+}

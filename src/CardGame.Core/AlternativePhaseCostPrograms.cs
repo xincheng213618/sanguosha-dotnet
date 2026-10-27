@@ -61,8 +61,9 @@ internal static class AlternativePhaseCostCompositionContract
     {
         var payment = effects.Select((effect, index) => (effect, index)).Where(item => item.effect.Op == SkillProgramEffectOp.PayOwnedCardOrMarker).ToArray();
         if (window is SkillProgramTriggerWindow.JudgmentPhaseStarting or SkillProgramTriggerWindow.DrawPhaseStarting &&
-            effects.Any(e => e.Op == SkillProgramEffectOp.SkipTurnPhases) && payment.Length == 0)
-            throw new InvalidOperationException($"Invalid skill program at {path}: actual starting substitution requires an explicit alternative paid producer.");
+            effects.Any(e => e.Op == SkillProgramEffectOp.SkipTurnPhases) && payment.Length == 0 &&
+            !IsRevealedDrawChoice(effects, window, subject, turnOwnerScope))
+            throw new InvalidOperationException($"Invalid skill program at {path}: actual starting substitution requires an explicit alternative paid producer or an own revealed Draw choice.");
         if (payment.Length > 0)
         {
             var phase = window switch
@@ -81,6 +82,23 @@ internal static class AlternativePhaseCostCompositionContract
         if (effects.Any(e => e.Op == SkillProgramEffectOp.RecordEndHandCountAndGrantMarker) &&
             (window != SkillProgramTriggerWindow.TurnEnding || subject != SkillProgramTriggerSubject.Owner || turnOwnerScope != SkillProgramTurnOwnerScope.Own))
             throw new InvalidOperationException($"Invalid skill program at {path}: ending history requires its own ending boundary.");
+    }
+
+    private static bool IsRevealedDrawChoice(IReadOnlyList<SkillProgramEffect> effects,
+        SkillProgramTriggerWindow window, SkillProgramTriggerSubject? subject, SkillProgramTurnOwnerScope turnOwnerScope)
+    {
+        if (window != SkillProgramTriggerWindow.DrawPhaseStarting || subject != SkillProgramTriggerSubject.Owner ||
+            turnOwnerScope != SkillProgramTurnOwnerScope.Own) return false;
+        var skips = effects.Select((effect, index) => (effect, index))
+            .Where(item => item.effect.Op == SkillProgramEffectOp.SkipTurnPhases).ToArray();
+        if (skips.Length != 1 || !skips[0].effect.SkippedPhases.SequenceEqual([SkillProgramTurnPhase.Draw]) ||
+            skips[0].effect.Condition is not { Kind: SkillProgramConditionKind.ChoiceIs, SourceBind: { } bind, OptionId: { } option }) return false;
+        var choice = effects.Take(skips[0].index).Select((effect, index) => (effect, index))
+            .SingleOrDefault(item => item.effect.Op == SkillProgramEffectOp.ChooseOption && item.effect.ResultBind == bind);
+        return choice.effect is not null && choice.effect.Condition.Kind == SkillProgramConditionKind.Always &&
+            choice.effect.Options.Count >= 2 && choice.effect.Options.Any(candidate => candidate.Id == option) &&
+            effects.Take(choice.index).Any(effect => effect.Op == SkillProgramEffectOp.RevealTopCards &&
+                effect.Visibility == SkillProgramCardSetVisibility.Public && effect.Condition.Kind == SkillProgramConditionKind.Always);
     }
 }
 
@@ -241,11 +259,17 @@ public sealed partial class GameEngine
     private void RecordAlternativePhaseSkip(ProgramSkillFrame frame, IReadOnlyList<SkillProgramTurnPhase> phases)
     {
         var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!);
-        if (!plan.Instructions.Any(effect => effect.Op == SkillProgramEffectOp.PayOwnedCardOrMarker)) return;
+        var paidSubstitution = plan.Instructions.Any(effect => effect.Op == SkillProgramEffectOp.PayOwnedCardOrMarker);
+        // A choice made after a public reveal can skip the current Draw without
+        // a separate card/marker cost. It still owes the original lifecycle
+        // parent an actual substitution receipt; a future-phase flag is too late.
+        var currentDraw = frame.WindowContext?.Window == SkillProgramTriggerWindow.DrawPhaseStarting &&
+            phases.SequenceEqual([SkillProgramTurnPhase.Draw]);
+        if (!paidSubstitution && !currentDraw) return;
         if (frame.WindowContext is not { } context || _resolutionStack.Count < 2 ||
             _resolutionStack[^2] is not ProgramLifecycleTriggerWindowFrame parent || parent.Id != context.ParentFrameId ||
             parent.Window != context.Window || phases.Count != 1)
-            throw new InvalidOperationException("A paid actual phase skip lost its starting parent.");
+            throw new InvalidOperationException("An actual phase skip lost its starting parent.");
         ReplaceRuntimeFrame(parent.Id, parent with { ActualPhaseSubstitution = new(parent.Id, frame.Id,
             frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, _turnNumber, phases[0]) });
         foreach (var phase in phases) AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(frame.Id,

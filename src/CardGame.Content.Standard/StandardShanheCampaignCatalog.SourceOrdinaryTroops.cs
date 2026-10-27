@@ -1,0 +1,80 @@
+using CardGame.Core.Campaigns;
+
+namespace CardGame.Content.Standard;
+
+public static partial class StandardShanheCampaignCatalog
+{
+    // Pool membership is source-backed. Server premises and probabilities are
+    // unavailable, so admission alongside local fallback recipes is local policy.
+    private static IEnumerable<ShanheEncounterDefinition> Source2026KnownOrdinaryTroops(
+        ShanheSourceRouteCityDefinition city, int difficulty)
+    {
+        var potential = StandardShanheSourceRouteCatalog.Season5.GetPotentialBattleIds(city.SourceCityId);
+        foreach (var group in new[] { 2474, 2467, 2487 })
+        {
+            if (!potential.Contains(group)) continue;
+            var general = OrdinaryTroopGeneral(group, difficulty);
+            yield return WithSource2026EnemyData(new("source-city-" + city.SourceCityId + ":troop-" + group,
+                OrdinaryTroopName(group), [new(general)], [],
+                VictoryGold: 200, HealAfterVictory: 1)
+            {
+                SourceBattleId = group, SourceCityId = city.SourceCityId,
+                TerrainSkillId = Source2026Terrain(city.SourceTerrainSkillId, difficulty),
+                StoryText = OrdinaryTroopStory(group)
+            }, group);
+        }
+    }
+
+    private static ShanheCampaignDefinition WithReturningOrdinaryTroops(ShanheCampaignDefinition definition, int difficulty)
+    {
+        if (!definition.Id.StartsWith("shanhe:zhuhou-2026-", StringComparison.Ordinal) || definition.SourceDifficultyId is not null)
+            return definition;
+        if (difficulty is < 1 or > 3) throw new ArgumentOutOfRangeException(nameof(difficulty));
+        var growth = difficulty - 1;
+        // These are explicit local three-tier choices; they do not attach or
+        // relabel this campaign as one of the 25 source difficulties.
+        var veteran = StandardShanheSourceVeteranPackage.GetGeneralId(difficulty switch { 1 => 6, 2 => 16, _ => 21 });
+        var rider = StandardShanheSourceWuhuanRiderPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var warrior = StandardShanheSourceWarriorPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        return ShanheCampaignContent.FreezeAndValidate(definition with
+        {
+            Nodes = definition.Nodes.Select(node => node.Id is not ("dagu" or "huanyuan") ? node : node with
+            {
+                Encounters = node.Encounters!.Concat(new[]
+                {
+                    Local(node.Id + ":veteran-2474-local", "经验传承 · 百战老兵", veteran,
+                        "百战老兵以战绝与连营接战，高档还能运用龙胆、武圣和再起。"),
+                    Local(node.Id + ":wuhuan-rider-2467-local", "乌桓贼匪 · 乌桓骑手", rider,
+                        "乌桓骑手以怀异夺牌，高档还可突袭与急袭。"),
+                    Local(node.Id + ":warrior-2487-local", "探听虚实 · 武卫兵", warrior, OrdinaryTroopStory(2487))
+                }).ToArray(),
+                Description = node.Description + "另有百战老兵、乌桓骑手与武卫兵驻守。"
+            }).ToArray()
+        });
+
+        ShanheEncounterDefinition Local(string id, string name, string general, string story) =>
+            new(id, name, [new(general, MaxHpBonus: 3 + 2 * growth, Hp: 7 + 2 * growth,
+                InitialHandBonus: 1 + growth, DrawBonus: 1)], [], VictoryGold: 200, HealAfterVictory: 2)
+            { StoryText = story };
+    }
+
+    private static string OrdinaryTroopGeneral(int group, int difficulty) => group switch
+    {
+        2474 => StandardShanheSourceVeteranPackage.GetGeneralId(difficulty),
+        2467 => StandardShanheSourceWuhuanRiderPackage.GetGeneralId(difficulty),
+        2487 => StandardShanheSourceWarriorPackage.GetGeneralId(difficulty),
+        _ => throw new ArgumentOutOfRangeException(nameof(group))
+    };
+    private static string OrdinaryTroopName(int group) => group switch
+    {
+        2474 => "经验传承 · 百战老兵", 2467 => "乌桓贼匪 · 乌桓骑手", 2487 => "探听虚实 · 武卫兵",
+        _ => throw new ArgumentOutOfRangeException(nameof(group))
+    };
+    private static string OrdinaryTroopStory(int group) => group switch
+    {
+        2474 => "百战老兵凭战绝压阵，随难度累积连营、龙胆、武圣与再起。",
+        2467 => "乌桓骑手以怀异夺牌，高档还可突袭手牌、以锦囊急袭。",
+        2487 => "武卫兵受伤后可以积攒锋牌，高档还能诱敌与裸衣奋战。",
+        _ => throw new ArgumentOutOfRangeException(nameof(group))
+    };
+}

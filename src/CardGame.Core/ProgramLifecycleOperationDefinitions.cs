@@ -406,7 +406,7 @@ internal sealed class GrantTurnCardDamageModifierProgramOperationDescriptor : Tu
         var amount = DrawProgramOperationDescriptor.Amount(r, 20);
         var kinds = r.RequiredEnumArray<CardKind>("cardKinds");
         if (kinds.Count == 0 || kinds.Any(kind => kind is not
-                (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.Duel or
+                (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash or CardKind.Duel or
                  CardKind.BarbarianAssault or CardKind.ArrowBarrage or CardKind.FireAttack)))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}.cardKinds: contains a kind that cannot directly cause card-use damage.");
         return new(Op, Owner(r), amount, r.Condition(), cardKinds: kinds,

@@ -167,6 +167,7 @@ public static partial class StandardShanheCampaignCatalog
         // The original pools' server premises are not executable here. These local bodies have
         // no source battle identity; only the player's genuinely selected source city is retained.
         var candidates = Source2026LocalGarrisons(region, city, difficulty).ToList();
+        candidates.AddRange(Source2026KnownOrdinaryTroops(city, difficulty));
         if (region.SourceUniqueId == 10)
         {
             var mulu = template.Nodes.Single(node => node.Id == MuluEncounterNodeId).Encounters!.Single();

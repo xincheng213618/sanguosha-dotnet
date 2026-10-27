@@ -59,10 +59,13 @@ internal static class ShanheSourceGarrisonChecks
             // Admit a real later entry without manufacturing wins. Keep the
             // original starts and graph, including sibling elite references.
             var node = source.Nodes.First(candidate => candidate.ChapterNumber == chapter && candidate.Kind == kind &&
-                candidate.Encounters!.All(encounter => encounter.SourceBattleId is null));
+                candidate.Encounters!.Any(encounter => encounter.SourceBattleId is null));
             var entry = source with
             {
-                StartingNodeIds = [.. source.StartingNodeIds, node.Id], RandomStartingNode = false
+                StartingNodeIds = [.. source.StartingNodeIds, node.Id], RandomStartingNode = false,
+                Nodes = source.Nodes.Select(candidate => candidate.Id == node.Id
+                    ? candidate with { Encounters = candidate.Encounters!.Where(encounter => encounter.SourceBattleId is null).ToArray() }
+                    : candidate).ToArray()
             };
             var session = ShanheCampaignSession.Create(entry, new(83, "classic:guan-yu")
                 { SourceDifficultyId = source.SourceDifficultyId }, StandardShanheCampaignCatalog.CreateBattleRegistry);

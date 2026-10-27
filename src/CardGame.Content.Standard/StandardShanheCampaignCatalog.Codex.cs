@@ -107,6 +107,7 @@ public static partial class StandardShanheCampaignCatalog
         var definition = WithCodexRewards(CreateCurrentBaseDefinition(difficulty, editionId), editionId);
         definition = WithTeamGrowth(definition, editionId);
         definition = WithReturningSourceReinforcements(definition, difficulty);
+        definition = WithReturningOrdinaryTroops(definition, difficulty);
         definition = WithStartingResourcesContract(definition, categorizeNormalRewards: editionId == Returning2026EditionId);
         definition = WithRandomOpeningBattles(definition, difficulty);
         definition = WithStoryEventPools(definition, editionId);
