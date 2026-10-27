@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:black-light-armor-6011", "revision": 1,
+      "triggers": [
+        {
+          "id": "multi-target-immunity", "window": "cardUseTargetsFinalized", "ownerRelation": "target",
+          "cardCategories": ["basic", "trick"], "optional": false,
+          "effects": [{ "op": "nullifyCurrentCardEffect", "target": "owner" }]
+        }
+      ]
+    }
+  ]
+}

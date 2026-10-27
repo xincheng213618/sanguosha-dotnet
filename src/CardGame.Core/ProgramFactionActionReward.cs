@@ -37,6 +37,7 @@ public sealed partial class GameEngine
     {
         if (action.Type == CardActionType.Response) action = NormalizeShiLsResponseAction(action);
         action = CaptureWushuangJinzhiAppearance(action);
+        action = CaptureGouXiangActionAppearance(action);
         if (!TracksFactionActionOrigin || action.FactionOrigin is not null ||
             !(IsSlashCard(action.EffectiveKind) || action.EffectiveKind == CardKind.Dodge &&
                 _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RewardOutOfTurnFactionDodge)) || action.ActionId == 0) return action;

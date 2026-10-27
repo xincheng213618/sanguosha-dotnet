@@ -420,6 +420,14 @@ public static class CardCatalog
                 CardKind.ShanheSanshou, "三首", "装备牌",
                 "当你受到伤害时，你可以亮出牌堆顶三张牌，若包含本回合未使用过的类型，你防止此伤害。",
                 AiPlayValue: 35, AiResponseValue: 0, HandKeepValue: 45),
+            [CardKind.BlackLightArmor] = new(
+                CardKind.BlackLightArmor, "黑光铠", "装备牌",
+                "锁定技，当你成为杀、伤害锦囊或黑色锦囊的目标后，若你不是唯一目标，此牌对你无效。",
+                AiPlayValue: 35, AiResponseValue: 0, HandKeepValue: 42),
+            [CardKind.GouXiang] = new(
+                CardKind.GouXiang, "钩镶", "装备牌",
+                "锁定技，你使用同花色或同点数的闪响应杀后，获得对方随机一张手牌。",
+                AiPlayValue: 36, AiResponseValue: 0, HandKeepValue: 43),
             [CardKind.XingtianAxe] = new(
                 CardKind.XingtianAxe, "刑天破军斧", "装备牌",
                 "攻击范围 4，单一目标用牌后可弃两张牌，令其本回合不能使用或打出手牌且防具失效。",

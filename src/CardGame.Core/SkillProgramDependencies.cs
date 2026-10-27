@@ -160,6 +160,7 @@ internal sealed class SkillProgramDependencies
                 (trigger.CardCategories.Count == 0 || trigger.CardCategories.Contains(category)))
             select (kind, category)).ToFrozenSet();
         CapturesCompletedResponseSuit = HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengUse) ||
+            HasTriggerOperation(SkillProgramEffectOp.ResolveGouXiangResponse) ||
             HasActivationOperation(SkillProgramEffectOp.ResolveMobileShiXiongtu) || triggers.Any(trigger =>
             trigger.Window == SkillProgramTriggerWindow.CardUseCompleted && trigger.IncludeResponseUses &&
             resolver.Features(trigger).UsesCondition(SkillProgramTriggerConditionKind.CardActionSuitIs));

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:gouxiang-armor-14088": {
+      "name": "钩镶",
+      "description": "锁定技，你使用同花色或同点数的【闪】响应【杀】后，获得对方随机一张手牌。"
+    }
+  }
+}

@@ -663,6 +663,45 @@
       "notes": "Unmodified complete face from public catalogue card4061. Its original printed title, armor illustration and equipment label are retained. The upstream official frame identity is not established; this catalogue URL is not labelled official. Runtime suit/rank remain separate. No equipment strip is synthesized."
     },
     {
+      "kind": "BlackLightArmor",
+      "file": "BlackLightArmor.png",
+      "sourceKind": "publicCatalogueCardFace",
+      "source": {
+        "pageUrl": "https://s.xiaochao.org/data/cards.json",
+        "catalogueCardId": 4050,
+        "catalogueAliasCardId": 4216,
+        "imageUrl": "https://s.xiaochao.org/data/images/f5ee9d6839716f0f59144628.png",
+        "imageSha256": "F5EE9D6839716F0F59144628FF94ED2AA05D250CD205E80D35E0D061D202D414",
+        "originalSize": [186, 260],
+        "rankSuitBakedIn": false
+      },
+      "transform": {
+        "mode": "copy",
+        "outputSize": [186, 260]
+      },
+      "sha256": "F5EE9D6839716F0F59144628FF94ED2AA05D250CD205E80D35E0D061D202D414",
+      "notes": "Unmodified complete public catalogue face shared by cards4050/4216. The printed Black Light Armor title, armor illustration and equipment label are retained without baked suit/rank. Catalogue entries share the same name and multi-target immunity rule with the local armor; their physical identifiers are not equated with source20722. The official upstream frame is unconfirmed. No equipment strip is synthesized."
+    },
+    {
+      "kind": "GouXiang",
+      "file": "GouXiang.png",
+      "sourceKind": "publicCatalogueCardFace",
+      "source": {
+        "pageUrl": "https://s.xiaochao.org/data/cards.json",
+        "catalogueCardId": 4153,
+        "imageUrl": "https://s.xiaochao.org/data/images/828b194f65658419932ce796.png",
+        "imageSha256": "828B194F65658419932CE796C700793CCDE2F7A3B998E79F4552C989124CC032",
+        "originalSize": [186, 260],
+        "rankSuitBakedIn": false
+      },
+      "transform": {
+        "mode": "copy",
+        "outputSize": [186, 260]
+      },
+      "sha256": "828B194F65658419932CE796C700793CCDE2F7A3B998E79F4552C989124CC032",
+      "notes": "Unmodified complete public catalogue card4153 face, retaining its Gouxiang title, original illustration and equipment label without baked suit/rank. Its name and suit-or-rank Dodge hand-claim rule match the local armor. Catalogue physical card20833 is not equated with source20883; the official upstream frame is unconfirmed. No equipment strip is synthesized."
+    },
+    {
       "kind": "GeneralWeapon",
       "file": "GeneralWeapon.png",
       "sourceKind": "projectGenerated",

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-quhu-14190": {
+      "name": "驱虎",
+      "description": "出牌阶段限一次，你可以与体力值大于你的一名角色拼点：若你赢，其对其攻击范围内一名由你选择的角色造成X点伤害；若你没赢，其对你造成1点伤害。（X为其体力上限且至多为5）",
+      "activationLabels": {"contest": "驱虎"}
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:gouxiang-armor-14088",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "matching-dodge",
+          "window": "cardResponseCompleted",
+          "ownerRelation": "actor",
+          "cardKinds": ["dodge"],
+          "optional": false,
+          "effects": [{"op": "resolveGouXiangResponse", "target": "owner"}]
+        }
+      ]
+    }
+  ]
+}

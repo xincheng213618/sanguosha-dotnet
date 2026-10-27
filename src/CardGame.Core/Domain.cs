@@ -128,7 +128,9 @@ public enum CardKind
     DagongChe = 43500,
     MantianGuohai = 47700,
     ShanRangZhaoShu = 20331,
-    ShanheSanshou = 20336
+    ShanheSanshou = 20336,
+    BlackLightArmor = 20722,
+    GouXiang = 20883
 }
 
 public enum Suit

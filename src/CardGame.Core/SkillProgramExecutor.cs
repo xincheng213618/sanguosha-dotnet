@@ -1517,7 +1517,7 @@ public sealed class SkillProgramExecutor
                  replacement.ReplacementRank is not { } replacementRank ||
                  replacementRank < effect.MinimumReplacementRank ||
                  replacementRank > effect.MaximumReplacementRank)) continue;
-            if (effect.Op == SkillProgramEffectOp.Damage && effect.SkipIfNoTarget &&
+            if (effect.Op is (SkillProgramEffectOp.Damage or SkillProgramEffectOp.DamageShanheQuhuOpponentMaximumHp) && effect.SkipIfNoTarget &&
                 effect.Target == SkillProgramEffectTarget.SelectedTarget && frame.SelectedTargetSeats.Count == 0)
                 continue;
 

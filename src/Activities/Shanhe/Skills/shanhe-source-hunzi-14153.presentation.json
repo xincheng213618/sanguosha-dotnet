@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-hunzi-14153": {
+      "name": "魂姿",
+      "description": "觉醒技，准备阶段，若你的体力值不为满，你减少1点体力上限并获得“英姿”“英魂”，本回合结束阶段，你摸三张牌或回复2点体力。",
+      "optionLabels": { "draw-three": "摸三张牌", "recover-two": "回复2点体力" }
+    },
+    "shanhe:source-yinghun-108": {
+      "name": "英魂",
+      "description": "准备阶段，若你已受伤，你可以令一名其他角色摸X张牌然后弃置一张牌，或摸一张牌然后弃置X张牌（X为你已损失的体力值）。",
+      "triggerChoices": { "draw-many": "摸X张，弃一张", "discard-many": "摸一张，弃X张" }
+    }
+  }
+}

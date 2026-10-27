@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-hunzi-14153",
+      "revision": 1,
+      "states": [
+        { "id": "ending-armed", "initialValue": false, "visibility": "public", "resetScope": "turn", "reacquirePolicy": "preserveUntilGameEnd" }
+      ],
+      "triggers": [
+        {
+          "id": "wounded-preparation-awakening", "window": "turnStartBeforeNormalFlow", "subject": "owner",
+          "optional": false, "usageScope": "game", "usageLimit": 1,
+          "condition": { "kind": "compare", "left": { "kind": "currentHp" }, "operator": "lessThan", "right": { "kind": "currentMaxHp" } },
+          "effects": [
+            { "op": "changeMaximumHp", "target": "owner", "amount": -1 },
+            { "op": "grantSkills", "target": "owner", "skillIds": ["boundary:yingzi", "shanhe:source-yinghun-108"] },
+            { "op": "setBooleanState", "target": "owner", "stateId": "ending-armed", "value": true }
+          ]
+        },
+        {
+          "id": "awakening-turn-ending", "window": "turnEnding", "subject": "owner",
+          "optional": false, "usageScope": "turn", "usageLimit": 1,
+          "condition": { "kind": "booleanState", "stateId": "ending-armed", "expectedValue": true },
+          "effects": [
+            { "op": "chooseOption", "target": "owner", "resultBind": "hunzi-choice", "options": [{ "id": "draw-three" }, { "id": "recover-two" }] },
+            { "op": "draw", "target": "owner", "amount": 3, "condition": { "kind": "choiceIs", "sourceBind": "hunzi-choice", "optionId": "draw-three" } },
+            { "op": "recover", "target": "owner", "amount": 2, "condition": { "kind": "choiceIs", "sourceBind": "hunzi-choice", "optionId": "recover-two" } },
+            { "op": "setBooleanState", "target": "owner", "stateId": "ending-armed", "value": false }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shanhe:source-yinghun-108", "revision": 1,
+      "triggers": [
+        {
+          "id": "draw-many", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": true,
+          "usageScope": "turn", "usageLimit": 1, "choiceGroup": "card-exchange",
+          "condition": { "kind": "compare", "left": { "kind": "currentHp" }, "operator": "lessThan", "right": { "kind": "currentMaxHp" } },
+          "effects": [
+            { "op": "selectTarget", "target": "owner", "targetKind": "otherLiving" },
+            { "op": "draw", "target": "selectedTarget", "numberExpression": "ownerLostHp" },
+            { "op": "selectOwnedCards", "target": "selectedTarget", "amount": 1, "zones": ["hand", "equipment"], "resultBind": "exchange-cards" },
+            { "op": "moveBoundCards", "target": "owner", "sourceBind": "exchange-cards", "destination": "discardPile" }
+          ]
+        },
+        {
+          "id": "discard-many", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": true,
+          "usageScope": "turn", "usageLimit": 1, "choiceGroup": "card-exchange",
+          "condition": { "kind": "compare", "left": { "kind": "currentHp" }, "operator": "lessThan", "right": { "kind": "currentMaxHp" } },
+          "effects": [
+            { "op": "selectTarget", "target": "owner", "targetKind": "otherLiving" },
+            { "op": "draw", "target": "selectedTarget", "amount": 1 },
+            { "op": "selectOwnedCards", "target": "selectedTarget", "numberExpression": "ownerLostHp", "zones": ["hand", "equipment"], "resultBind": "exchange-cards" },
+            { "op": "moveBoundCards", "target": "owner", "sourceBind": "exchange-cards", "destination": "discardPile" }
+          ]
+        }
+      ]
+    }
+  ]
+}

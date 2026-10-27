@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:source-pojun-14112",
+    "revision": 1,
+    "triggers": [{
+      "id": "hold-all-target-hand",
+      "window": "slashBeforeResponse",
+      "ownerRelation": "actor",
+      "cardKinds": ["slash", "fireSlash", "thunderSlash"],
+      "optional": true,
+      "priority": 0,
+      "effects": [{"op": "holdShanheSourcePojunHand", "target": "owner"}]
+    }],
+    "damageModifiers": [{
+      "id": "not-fewer-hand-and-equipment",
+      "cardKinds": ["slash", "fireSlash", "thunderSlash"],
+      "amount": 1,
+      "condition": "sourceNotFewerHandAndEquipmentThanTarget"
+    }]
+  }]
+}

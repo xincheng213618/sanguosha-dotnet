@@ -16,6 +16,8 @@ public sealed class StandardBattleFeatureFactory : IGameModeFeatureFactory
         if (options.ShanheBattle is { } campaign)
         {
             features.Add(new ShanheBattleFeature(campaign, context.GetHost<IStandardBattleHost>()));
+            features.Add(new ShanheInitialDongdangFeature(campaign, context.GetHost<IModeEncounterHost>(),
+                context.GetHost<IStandardBattleHost>()));
             if (campaign.BossTransition is not null)
                 features.Add(new ShanheBossStageFeature(campaign, context.GetHost<IModeEncounterHost>(),
                     context.GetHost<IStandardBattleHost>()));

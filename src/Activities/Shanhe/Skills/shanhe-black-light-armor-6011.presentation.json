@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:black-light-armor-6011": {
+      "name": "黑光铠",
+      "description": "锁定技，当你成为【杀】、伤害锦囊或黑色锦囊牌的目标后，若你不是唯一目标，此牌对你无效。"
+    }
+  }
+}

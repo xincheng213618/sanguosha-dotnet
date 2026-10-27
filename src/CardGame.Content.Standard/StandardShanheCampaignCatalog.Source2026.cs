@@ -185,6 +185,7 @@ public static partial class StandardShanheCampaignCatalog
     {
         new(2632, "dagu:taishici-s5", "笃烈之士"), new(2633, "dagu:yudu-s5", "黑山匪害"),
         new(2634, "dagu:xujing-xuqiu-s5", "其实难副"),
+        new(2635, "dagu:taishici-s5", "徐盛"),
         new(2636, "guangcheng:lijue-s5", "乱世恶徒"), new(2637, "guangcheng:guosi-s5", "祸国凶贼"),
         new(2638, "guangcheng:zhangxiu-s5", "枪王张绣"), new(2639, "guangcheng:caoxing-s5", "夺目一箭"),
         new(2640, "dagu:ma-pair-s5", "青年双俊"), new(2641, "dagu:xurong-s5", "辽东猛将"),
@@ -195,15 +196,18 @@ public static partial class StandardShanheCampaignCatalog
         new(2650, "dagu:dianwei-weizi-s5", "忠烈双卫"), new(2651, "hulao:xiahou-pair-s5", "盟中夏侯"),
         new(2652, "huanyuan:zhouyu-s5", "年少风华"), new(2653, "huanyuan:zhangniujiao-s5", "黄巾余匪"),
         new(2654, "guangcheng:yuanshu-s5", "代汉涂高"), new(2656, "guangcheng:zhangliang-s5", "末路残梁"),
+        new(2655, "huanyuan:zhouyu-s5", "孙策"),
         new(2657, "huanyuan:xuncan-caoshi-s5", "狂傲荀粲"), new(2658, "huanyuan:sunjian-wuguotai-s5", "贤侣虎将"),
         new(2659, "huanyuan:dongwu-veterans-s5", "东吴宿将"), new(2660, "dagu:yuanshao-s5", "盟首袁绍"),
         new(2661, "dagu:xuyou-jushou-s5", "谋臣双璧"), new(2662, "dagu:gongsun-zan-yue-s5", "白马将军"),
         new(2663, "huanyuan:xiliang-dark-s5", "西凉暗军"), new(2664, "hulao:zhuling-s5", "悍将朱灵"),
         new(2665, "dagu:yanliang-wenchou-s5", "河北双雄"), new(2666, "hulao:quyi-s5", "凉州猛将"),
         new(2667, "hulao:lukuang-luxiang-s5", "幽燕双骑"), new(2668, "luoyang:liru-s5", "毒士谋深"),
+        new(2669, "guangcheng:zhangxiu-s5", "狂暴枪王"),
         new(2670, "luoyang:dongzhuo-2670-s5", "急功悍将"), new(2671, "luoyang:dongzhuo-2671-s5", "董氏凶僚"),
         new(2672, "huanyuan:chenlin-s5", "檄文雄才"), new(2673, "huanyuan:zhanghe-s5", "俊乂张郃"),
         new(2674, "huanyuan:moushi-s5", "谋士争衡"), new(2676, "huanyuan:xuchu-s5", "虎痴许褚"),
+        new(2675, "huanyuan:moushi-s5", "荀彧"),
         new(2677, "luoyang:simayi-s5", "司马隐谋"), new(2678, "huanyuan:caoren-zhaoyun-s5", "双雄际会"),
         new(2679, "huanyuan:cao-wei-pioneers-s5", "曹魏先驱"), new(2680, "hulao:gaoshun-s5", "陷阵高顺"),
         new(2681, "huanyuan:gongsun-zan-zhaoyun-s5", "白马从龙"), new(2682, "dagu:zuoci-huatuo-s5", "奇人异士"),
@@ -216,6 +220,23 @@ public static partial class StandardShanheCampaignCatalog
     {
         var original = templates[binding.TemplateEncounterId];
         var enemies = original.Enemies;
+        if (binding.BattleId == 2635)
+            enemies = [new(difficulty >= 6 ? StandardShanheSourceXuShengPackage.MediumGeneralId :
+                StandardShanheSourceXuShengPackage.BaseGeneralId)
+            { StartingCards = difficulty >= 6 ? [new(CardKind.GhostDragonCrescentBlade, Suit.Club, 5)] : [] }];
+        if (binding.BattleId == 2655)
+            enemies = [new(StandardShanheSourceSunCePackage.SunCeId)
+            { StartingCards = difficulty >= 16 ? [new(CardKind.BlackLightArmor, Suit.Diamond, 2)] : [] }];
+        if (binding.BattleId == 2675)
+            enemies = [new(StandardShanheSourceXunYuPackage.GeneralId)
+            { StartingCards = difficulty >= 11 ? [new(CardKind.GouXiang, Suit.Club, 2)] : [] }];
+        if (binding.BattleId == 2669)
+        {
+            var equipment = new List<ShanheStartingCard>();
+            if (difficulty >= 11) equipment.Add(new(CardKind.WushuangHalberd, Suit.Heart, 12));
+            if (difficulty >= 16) equipment.Add(new(CardKind.LionBelt, Suit.Club, 2));
+            enemies = [new(StandardShanheSourceQiangWangPackage.GeneralId) { StartingCards = equipment.ToArray() }];
+        }
         if (binding.BattleId == 2653 && difficulty >= 6)
             enemies = enemies.Select((enemy, index) => index == 0 ? enemy with
             {
