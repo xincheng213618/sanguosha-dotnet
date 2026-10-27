@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-shengxi-2118",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "discard-start-with-no-actual-turn-damage",
+          "window": "discardPhaseStarting",
+          "subject": "owner",
+          "turnOwnerScope": "own",
+          "optional": true,
+          "condition": {
+            "kind": "compare",
+            "left": {
+              "kind": "turnOwnerDamageDealtThisTurn"
+            },
+            "operator": "equal",
+            "right": {
+              "kind": "integerConstant",
+              "value": 0
+            }
+          },
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 2
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

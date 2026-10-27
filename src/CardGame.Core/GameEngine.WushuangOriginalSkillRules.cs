@@ -7,7 +7,7 @@ public sealed partial class GameEngine
         var outcome = f.JudgmentOutcomeBindings?.SingleOrDefault(o => o.Name == "qianxi-outcome");
         if (f.SkillId != "wushuang:skill-3180" || outcome is null || !IsValidProgramJudgmentOutcome(f, outcome) ||
             f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_players[target].IsAlive ||
-            GetSeatDistance(f.OwnerSeat, target) != 1)
+            GetCombatDistance(f.OwnerSeat, target) != 1)
             throw new InvalidOperationException("Qianxi requires its finalized judgment color and exact distance-one other target.");
         if (outcome.Suit is { } suit && suit != Suit.None)
         {
@@ -60,7 +60,7 @@ public sealed partial class GameEngine
                     _ => false
                 };
             case "wushuang:skill-3180":
-                return _players.Any(p => p.IsAlive && p.Seat != owner.Seat && GetSeatDistance(owner.Seat, p.Seat) == 1);
+                return _players.Any(p => p.IsAlive && p.Seat != owner.Seat && GetCombatDistance(owner.Seat, p.Seat) == 1);
             case "wushuang:skill-3247":
                 return c.CardUse is { } action && LifecycleCardUse(action.ParentCardUseFrameId) is { Action: { Type: CardActionType.Use } use } frame &&
                     use.ActorSeat == owner.Seat && owner.Seat == _currentSeat && _phase == TurnPhase.Play &&

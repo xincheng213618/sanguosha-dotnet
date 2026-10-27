@@ -2,13 +2,23 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
-    // 据守: offer every discardable own hand card; the picked equipment is used, the rest discarded.
+    // The closing step uses equipment rather than discarding it, so both its
+    // selection and continuation must honour the actual equipment-use rules.
+    private bool CanPayJushouHandCard(CharacterState owner, Card card) =>
+        !IsSelfHandCategoryDiscardForbidden(owner.Seat, card, CardLocation.Hand(owner.Seat), OwnedCardMoveIntent.Discard) &&
+        (!EquipmentRules.IsEquipment(card.Kind) || owner.IsAlive && owner.Hp > 0 &&
+            owner.EquipmentSlotCapacity(EquipmentRules.Get(card.Kind).Slot) > 0 &&
+            !IsCardUseForbidden(owner.Seat, card.Kind, CardActionType.Use) &&
+            !IsSelfTargetForbiddenAction(owner, card.Kind, [owner.Seat]) &&
+            !IsResponseEntityRestricted(owner.Seat, card.Id) &&
+            !IsPlayPhasePhysicalCardRestricted(owner, card) && !IsTurnHandCardRestricted(owner, card) &&
+            !IsTurnSuitUseForbidden(owner.Seat, EffectiveSuit(owner, card)));
+
     private SkillProgramStepOutcome BeginDiscardHandOrUseEquipment(ProgramSkillFrame frame)
     {
         var owner = _players[frame.OwnerSeat];
         var candidates = GetHand(owner)
-            .Where(card => !IsSelfHandCategoryDiscardForbidden(owner.Seat, card, CardLocation.Hand(owner.Seat),
-                OwnedCardMoveIntent.Discard))
+            .Where(card => CanPayJushouHandCard(owner, card))
             .Select(card => card.Id).OrderBy(id => id).ToArray();
         if (candidates.Length == 0) return SkillProgramStepOutcome.Continue;
         ReplaceRuntimeTop(frame = frame with
@@ -25,6 +35,8 @@ public sealed partial class GameEngine
             !_cardZones.CardsAt(location).Any(item => item.Id == cardId))
             throw new InvalidOperationException("The Jushou cost card left the owner's hand.");
         var card = _cardZones.CardsAt(location).Single(item => item.Id == cardId);
+        if (!CanPayJushouHandCard(_players[frame.OwnerSeat], card))
+            throw new InvalidOperationException("The Jushou hand card can no longer pay its actual discard or equipment use.");
         if (EquipmentRules.IsEquipment(card.Kind))
         {
             var owner = _players[frame.OwnerSeat];

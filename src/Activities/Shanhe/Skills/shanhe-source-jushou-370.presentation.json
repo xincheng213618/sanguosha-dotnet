@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-jushou-370": {
+      "name": "据守",
+      "description": "结束阶段，你可以翻面并摸四张牌，然后弃置一张手牌；若为装备牌，改为使用之。"
+    }
+  }
+}

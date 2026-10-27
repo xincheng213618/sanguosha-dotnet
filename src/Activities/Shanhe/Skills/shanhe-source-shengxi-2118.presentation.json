@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-shengxi-2118": {
+      "name": "生息",
+      "description": "弃牌阶段开始时，若你本回合未造成伤害，你可以摸两张牌。"
+    }
+  }
+}

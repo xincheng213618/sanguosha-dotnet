@@ -429,7 +429,19 @@ public static partial class StandardShanheCampaignCatalog
         var sourceLinZhongGu = ids.Any(id => id is StandardShanheSourceLinZhongGuPackage.BaseId or
             StandardShanheSourceLinZhongGuPackage.NightmareId);
         var sourceXinPing = ids.Contains(StandardShanheSourceXinPingPackage.GeneralId, StringComparer.Ordinal);
-        var sourceWuqueAssassin = RequiresThreeBossRegistry(requirements, StandardShanheSourceWuqueAssassinPackage.BaseId,
+        var sourceDemonAssassin = ids.Any(id => id is StandardShanheSourceDemonAssassinPackage.BaseId or
+            StandardShanheSourceDemonAssassinPackage.HardId or StandardShanheSourceDemonAssassinPackage.HellId);
+        var sourceBuHeng = RequiresThreeBossRegistry(requirements, StandardShanheSourceBuHengPackage.BaseId,
+            StandardShanheSourceBuHengPackage.ShengxiSkillId) ||
+            ids.Any(id => id is StandardShanheSourceBuHengPackage.HardId or StandardShanheSourceBuHengPackage.NightmareId);
+        var sourceYulinGuard = RequiresThreeBossRegistry(requirements, StandardShanheSourceYulinGuardPackage.BaseId,
+            StandardShanheSourceYulinGuardPackage.JushouSkillId) ||
+            ids.Any(id => id is StandardShanheSourceYulinGuardPackage.HardId or StandardShanheSourceYulinGuardPackage.HellId);
+        var sourceAgricultureOfficer = RequiresThreeBossRegistry(requirements, StandardShanheSourceAgricultureOfficerPackage.BaseId,
+            StandardShanheSourceAgricultureOfficerPackage.TuntianSkillId) ||
+            ids.Any(id => id is StandardShanheSourceAgricultureOfficerPackage.HardId or StandardShanheSourceAgricultureOfficerPackage.HellId);
+        var sourceKeshou = sourceBuHeng || sourceYulinGuard || extraSkills.Contains(StandardShanheSourceKeshouPackage.SkillId);
+        var sourceWuqueAssassin = sourceDemonAssassin || RequiresThreeBossRegistry(requirements, StandardShanheSourceWuqueAssassinPackage.BaseId,
             StandardShanheSourceWuqueAssassinPackage.YiduSkillId) ||
             ids.Any(id => id is StandardShanheSourceWuqueAssassinPackage.HardId or StandardShanheSourceWuqueAssassinPackage.HellId);
         var sourceExecutioner = RequiresThreeBossRegistry(requirements, StandardShanheSourceExecutionerPackage.BaseId,
@@ -560,6 +572,11 @@ public static partial class StandardShanheCampaignCatalog
             (sourceLocalMagnate ? "/source-local-magnate-2460" : "") +
             (sourceLinZhongGu ? "/source-linzhonggu-2476" : "") +
             (sourceXinPing ? "/source-xinping-2489" : "") +
+            (sourceDemonAssassin ? "/source-demon-assassin-2457" : "") +
+            (sourceBuHeng ? "/source-buheng-2451" : "") +
+            (sourceYulinGuard ? "/source-yulin-guard-2498" : "") +
+            (sourceAgricultureOfficer ? "/source-agriculture-officer-2500" : "") +
+            (sourceKeshou ? "/source-keshou-993" : "") +
             (sourceWuqueAssassin ? "/source-wuque-assassin-2493" : "") +
             (sourceExecutioner ? "/source-executioner-2495" : "") +
             (s5Simayi ? "/s5-simayi-2677" : "") +
@@ -741,7 +758,12 @@ public static partial class StandardShanheCampaignCatalog
             if (sourceLocalMagnate) packages.Add(new StandardShanheSourceLocalMagnatePackage());
             if (sourceLinZhongGu) packages.Add(new StandardShanheSourceLinZhongGuPackage());
             if (sourceXinPing) packages.Add(new StandardShanheSourceXinPingPackage());
+            if (sourceKeshou) packages.Add(new StandardShanheSourceKeshouPackage());
+            if (sourceBuHeng) packages.Add(new StandardShanheSourceBuHengPackage());
+            if (sourceYulinGuard) packages.Add(new StandardShanheSourceYulinGuardPackage());
+            if (sourceAgricultureOfficer) packages.Add(new StandardShanheSourceAgricultureOfficerPackage());
             if (sourceWuqueAssassin) packages.Add(new StandardShanheSourceWuqueAssassinPackage());
+            if (sourceDemonAssassin) packages.Add(new StandardShanheSourceDemonAssassinPackage());
             if (sourceExecutioner) packages.Add(new StandardShanheSourceExecutionerPackage());
             if (ids.Any(id => id is StandardShanheS5SunJianWuguotaiPackage.SunjianId or StandardShanheS5SunJianWuguotaiPackage.WuguotaiId))
                 packages.Add(new StandardShanheS5SunJianWuguotaiPackage());

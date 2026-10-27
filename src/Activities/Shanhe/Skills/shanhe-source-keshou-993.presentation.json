@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-keshou-993": {
+      "name": "恪守",
+      "description": "当你受到伤害时，你可以弃置两张颜色相同的牌，令此伤害-1。若没有与你势力相同的其他存活角色，你判定，若结果为红色，你摸一张牌。"
+    }
+  }
+}

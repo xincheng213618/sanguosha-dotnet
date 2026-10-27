@@ -11,7 +11,8 @@ public static partial class StandardShanheCampaignCatalog
         ShanheSourceRouteCityDefinition city, int difficulty)
     {
         var potential = StandardShanheSourceRouteCatalog.Season5.GetPotentialBattleIds(city.SourceCityId);
-        foreach (var group in new[] { 2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495 })
+        foreach (var group in new[] { 2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495,
+                     2451, 2457, 2498, 2500 })
         {
             if (!potential.Contains(group)) continue;
             var general = OrdinaryTroopGeneral(group, difficulty);
@@ -49,6 +50,10 @@ public static partial class StandardShanheCampaignCatalog
         var magnate = StandardShanheSourceLocalMagnatePackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
         var linzhonggu = StandardShanheSourceLinZhongGuPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
         var xinping = StandardShanheSourceXinPingPackage.GetGeneralId(difficulty);
+        var buheng = StandardShanheSourceBuHengPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var demon = StandardShanheSourceDemonAssassinPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var yulin = StandardShanheSourceYulinGuardPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var farmer = StandardShanheSourceAgricultureOfficerPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
         return ShanheCampaignContent.FreezeAndValidate(definition with
         {
             Nodes = definition.Nodes.Select(node => node.Id is "hulao" or "guangcheng" ? node with
@@ -58,9 +63,11 @@ public static partial class StandardShanheCampaignCatalog
                     FirstChapter(node.Id + ":qiang-raider-2473-local", 2473, raider),
                     FirstChapter(node.Id + ":coalition-scout-2455-local", 2455, scout),
                     FirstChapter(node.Id + ":coalition-spy-2459-local", 2459, spy, baseHp: 3),
-                    FirstChapter(node.Id + ":local-magnate-2460-local", 2460, magnate)
+                    FirstChapter(node.Id + ":local-magnate-2460-local", 2460, magnate),
+                    FirstChapter(node.Id + ":demon-assassin-2457-local", 2457, demon, baseHp: 3),
+                    FirstChapter(node.Id + ":yulin-guard-2498-local", 2498, yulin)
                 }).ToArray(),
-                Description = node.Description + "另有羌人劫匪、联军斥候、联军细作与本地豪强在此游弋。"
+                Description = node.Description + "另有羌人劫匪、联军斥候、联军细作、本地豪强、魔军刺客与羽林军在此游弋。"
             } : node.Id is not ("dagu" or "huanyuan") ? node : node with
             {
                 Encounters = node.Encounters!.Concat(new[]
@@ -74,9 +81,11 @@ public static partial class StandardShanheCampaignCatalog
                     Local(node.Id + ":jiangdong-veteran-2497-local", OrdinaryTroopName(2497), jiangdong, OrdinaryTroopStory(2497),
                         startingCards: JiangdongVeteranGear(jiangdongTier)),
                     Local(node.Id + ":linzhonggu-2476-local", OrdinaryTroopName(2476), linzhonggu, OrdinaryTroopStory(2476)),
-                    Local(node.Id + ":xinping-2489-local", OrdinaryTroopName(2489), xinping, OrdinaryTroopStory(2489))
+                    Local(node.Id + ":xinping-2489-local", OrdinaryTroopName(2489), xinping, OrdinaryTroopStory(2489)),
+                    Local(node.Id + ":buheng-2451-local", OrdinaryTroopName(2451), buheng, OrdinaryTroopStory(2451)),
+                    Local(node.Id + ":agriculture-officer-2500-local", OrdinaryTroopName(2500), farmer, OrdinaryTroopStory(2500), baseHp: 3)
                 }).ToArray(),
-                Description = node.Description + "另有百战老兵、乌桓骑手、武卫兵、荀悦、江东老兵、林中鹘与辛评驻守。"
+                Description = node.Description + "边军与地方兵马在此驻守。"
             }).ToArray()
         });
 
@@ -88,12 +97,17 @@ public static partial class StandardShanheCampaignCatalog
 
         ShanheEncounterDefinition FirstChapter(string id, int group, string general, int baseHp = 4) =>
             new(id, OrdinaryTroopName(group), [new(general, MaxHpBonus: 4 + difficulty - baseHp,
-                Hp: 4 + difficulty, DrawBonus: difficulty)], [], VictoryGold: 200, HealAfterVictory: 1)
+                Hp: 4 + difficulty, DrawBonus: difficulty,
+                InitialHandBonus: group == 2498 && difficulty == 3 ? 2 : 0)], [], VictoryGold: 200, HealAfterVictory: 1)
             { StoryText = OrdinaryTroopStory(group) };
     }
 
     private static string OrdinaryTroopGeneral(int group, int difficulty) => group switch
     {
+        2451 => StandardShanheSourceBuHengPackage.GetGeneralId(difficulty),
+        2457 => StandardShanheSourceDemonAssassinPackage.GetGeneralId(difficulty),
+        2498 => StandardShanheSourceYulinGuardPackage.GetGeneralId(difficulty),
+        2500 => StandardShanheSourceAgricultureOfficerPackage.GetGeneralId(difficulty),
         2474 => StandardShanheSourceVeteranPackage.GetGeneralId(difficulty),
         2467 => StandardShanheSourceWuhuanRiderPackage.GetGeneralId(difficulty),
         2487 => StandardShanheSourceWarriorPackage.GetGeneralId(difficulty),
@@ -111,6 +125,7 @@ public static partial class StandardShanheCampaignCatalog
     };
     private static string OrdinaryTroopName(int group) => group switch
     {
+        2451 => "步珩", 2457 => "擒拿刺客 · 魔军刺客", 2498 => "羽林军", 2500 => "农都尉",
         2474 => "经验传承 · 百战老兵", 2467 => "乌桓贼匪 · 乌桓骑手", 2487 => "探听虚实 · 武卫兵",
         2473 => "趁人之危 · 羌人劫匪", 2480 => "空谈无益 · 荀悦",
         2497 => "狭路相逢 · 江东老兵",
@@ -121,6 +136,10 @@ public static partial class StandardShanheCampaignCatalog
     };
     private static string OrdinaryTroopStory(int group) => group switch
     {
+        2451 => "步珩以镇骨调度双方手牌，高档还能生息补给、恪守减伤。",
+        2457 => "魔军刺客凭判定潜袭封锁手牌，高档还会诱敌夺牌、遗毒追逼。",
+        2498 => "羽林军据守补牌，高档还能恪守减伤、废除装备区后穷守。",
+        2500 => "农都尉以屯田积攒田牌，高档还能天妒取判定、断粮施压。",
         2474 => "百战老兵凭战绝压阵，随难度累积连营、龙胆、武圣与再起。",
         2467 => "乌桓骑手以怀异夺牌，高档还可突袭手牌、以锦囊急袭。",
         2487 => "武卫兵受伤后可以积攒锋牌，高档还能诱敌与裸衣奋战。",

@@ -1154,6 +1154,7 @@ public enum SkillProgramEffectOp
     DiscardHuxinMirrorAndPreventDamage = 62058,
     ResolveSourceExecutionerYishi = 62059,
     ResolveSourceExecutionerHuanfu = 62060,
+    ResolveShanheSourceKeshou = 62061,
     CollectPublicPile = 780,
     GrantNextCardTargetAdjustment = 782,
     GrantNextActualUseTargetAdjustment = 4700,
@@ -5792,8 +5793,8 @@ public sealed class SkillProgramCatalog
             Fail(path + ".optional", "damageAppliedBeforeDying cannot request a choice");
         var condition = OptionalTriggerCondition(node, path);
         if (EnumerateTriggerValues(condition).Any(value => value.Kind == SkillProgramTriggerValueKind.TurnOwnerDamageDealtThisTurn) &&
-            window != SkillProgramTriggerWindow.TurnEnding)
-            Fail(path + ".condition", "ending-turn damage history requires turnEnding");
+            window is not (SkillProgramTriggerWindow.TurnEnding or SkillProgramTriggerWindow.DiscardPhaseStarting))
+            Fail(path + ".condition", "turn-owner damage history requires turnEnding or discardPhaseStarting");
         if (EnumerateTriggerConditions(condition).Any(c => c.Kind == SkillProgramTriggerConditionKind.TurnDiscardIncludesAllSuits) &&
             window != SkillProgramTriggerWindow.AfterTurnEnded)
             Fail(path, "turn discard suit history requires AfterTurnEnded");

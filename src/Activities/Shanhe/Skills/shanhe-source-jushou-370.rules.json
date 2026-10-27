@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-jushou-370",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "ending-flip-draw-and-cost",
+          "window": "turnEnding",
+          "subject": "owner",
+          "optional": true,
+          "effects": [
+            { "op": "turnOver", "target": "owner" },
+            { "op": "draw", "target": "owner", "amount": 4 },
+            { "op": "discardHandOrUseEquipment", "target": "owner" }
+          ]
+        }
+      ]
+    }
+  ]
+}

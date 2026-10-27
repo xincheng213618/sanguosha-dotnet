@@ -65,6 +65,8 @@ internal static class CommittedEventProjection
     // Rules see the original fact first; only the committed projection is copied.
     public static IGameEvent Freeze(IGameEvent payload) => payload switch
     {
+        SourceKeshouPaidBranchEvent value => value with
+        { Receipt = value.Receipt with { Materials = FreezeList(value.Receipt.Materials) } },
         AnniversaryCuiLieUseChangedEvent value => value with
         {
             BeforeTargets = FreezeList(value.BeforeTargets),
