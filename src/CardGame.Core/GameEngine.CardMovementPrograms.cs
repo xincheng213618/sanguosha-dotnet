@@ -3,7 +3,7 @@ namespace CardGame.Core;
 /// <summary>Generic post-movement program host. It contains no skill ids.</summary>
 public sealed partial class GameEngine
 {
-    private CardMovementTiming? CaptureMovementTiming() => !(HasOl2016SimaRenjie || HasLeZhouFeiLingkongCapability || HasZhaoZhongCapability || HasMouFaZhengCapability || _contentRegistry.ProgramDependencies.UsesGainPhaseQualification || TracksRedOwnedLoss || HasActualHandGainCapability || HasShanheChanrangCapability || HasAnniversaryHuCheErRules || HasAnniversaryQiaoRuiCapability ||
+    private CardMovementTiming? CaptureMovementTiming() => !(HasShanheSourceZhaoranRules || HasOl2016SimaRenjie || HasLeZhouFeiLingkongCapability || HasZhaoZhongCapability || HasMouFaZhengCapability || _contentRegistry.ProgramDependencies.UsesGainPhaseQualification || TracksRedOwnedLoss || HasActualHandGainCapability || HasShanheChanrangCapability || HasAnniversaryHuCheErRules || HasAnniversaryQiaoRuiCapability ||
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GiveAfterBatchGain) ||
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.BindOwnTurnEnemyHandGain) ||
         _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GainHappyHuaTuoMedicine) ||
@@ -126,6 +126,7 @@ public sealed partial class GameEngine
             batch.InvocationOrigin?.OwnerSeat ?? batch.OriginProgram?.OwnerSeat)
             { MovementTiming = batch.MovementTiming, DiscardRecoveryPhase = batch.DiscardRecoveryPhase, MouYishiSources = batch.MouYishiSources };
         completed = CaptureNianOwnedTransferBatch(completed, batch.OriginProgram);
+        CaptureShanheSourceZhaoranSuitLosses(completed);
         completed = CaptureWenhePoisonDepartures(completed, batch.WenhePoisonRound);
         // A processing zone has no owner. Only the native use invoice can attribute
         // its exact completed physical materials to an optional owner skill.

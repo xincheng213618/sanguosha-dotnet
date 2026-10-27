@@ -279,6 +279,8 @@ public enum SkillProgramRandomTransferRevealPolicy { RecipientAfterGain = 0 }
 
 public enum SkillProgramEffectOp
 {
+    ArmShanheSourceZhaoran = 24660,
+    ClaimShanheSourceZhaoranSuit = 24661,
     UseShanheWarElephantCounterSlash = 24530,
     ClaimShanheSourceNamanResponseCards = 23130,
     QueueShanheLuanxinNextDraw = 81600,

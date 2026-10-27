@@ -78,7 +78,10 @@ internal static class ShanheBossPortraitChecks
             [StandardShanheSourceMaRiDiPackage.NightmareId] = "ol-ma-mi-di",
             [StandardShanheSourceMaRiDiPackage.HellId] = "ol-ma-mi-di",
             [StandardShanheSourceZhangHePackage.BaseId] = "ol-sp-zhang-he",
-            [StandardShanheSourceZhangHePackage.WeijingId] = "ol-sp-zhang-he"
+            [StandardShanheSourceZhangHePackage.WeijingId] = "ol-sp-zhang-he",
+            [StandardShanheSourceGaoGanPackage.BaseId] = "ol-gao-gan",
+            [StandardShanheSourceGaoGanPackage.HardId] = "ol-gao-gan",
+            [StandardShanheSourceGaoGanPackage.HellId] = "ol-gao-gan"
         };
         foreach (var (id, expectedKey) in ordinaryAliases)
         {

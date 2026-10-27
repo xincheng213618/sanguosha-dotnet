@@ -118,10 +118,13 @@ public sealed partial class GameEngine
     private void SetEquipmentSlotCapacity(CharacterState player, EquipmentSlot slot, int capacity)
     {
         if (capacity < 0 || capacity > 5) throw new InvalidOperationException("Equipment slot capacity must be between zero and five.");
+        var previousCapacity = player.EquipmentSlotCapacity(slot);
         player.EquipmentSlotCapacities[slot] = capacity;
         foreach (var card in GetEquipment(player).Where(card => FieldEquipmentSlot(card) == slot).Skip(capacity).ToArray())
             MoveCard(card, CardLocation.Equipment(player.Seat), CardLocation.DiscardPile, new("equipment.slot-abolished"));
         AdvanceEventRulesAndQueueFact(new EquipmentSlotCapacityChangedEvent(player.Seat, slot, capacity));
+        if (previousCapacity > 0 && capacity == 0 && _resolutionStack.LastOrDefault() is ProgramSkillFrame program)
+            ResolveTuxingAfterSlotAbolish(program, player.Seat, 1);
     }
     private bool RestoreEquipmentSlot(CharacterState player, EquipmentSlot slot)
     {

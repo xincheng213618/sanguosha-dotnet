@@ -552,6 +552,8 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe source war elephant: trick range Slash damage and turnover protection", ShanheSourceWarElephantNativeChecks.RealTrickRangeAllSlashDamageAndTurnoverProtection),
     ("Shanhe source war elephant: first large damage counter returns original attack", ShanheSourceWarElephantNativeChecks.FirstLargeDamagePerActualTurnCounterSlashReturnsOriginalAttack),
     ("Shanhe source Naman: completed physical and converted Slash materials return to parent", ShanheSourceNamanChecks.ActualCompletedSlashClaimsPhysicalAndConvertedMaterialsAndReturnsToParent),
+    ("Shanhe source Zhaoran: public Play hand suit rewards and phase reset", ShanheSourceZhaoranNativeChecks.ActualPlayPublicHandSuitQuotaDrawDiscardAndPhaseReset),
+    ("Shanhe source armory: actual slot payments Tuxing and exact treasure Jizhi", ShanheSourceArmoryCommanderChecks.ActualSlotPaymentsKeepTuxingRecipientAndGrantExactTreasureJizhi),
     ("Shanhe source grain: actual fire loss and equipment sharing with true teammates", ShanheSourceGrainChecks.ActualFireDamageConsumesSourceGrainAndSushouSharesEquippedCardsOnlyWithTrueTeammates),
     ("Shanhe source White Horse: paid Xiying native bans and actual ending reward", ShanheSourceWhiteHorseChecks.PaidXiyingDiscardsBansNativeUseAndResponseAndRewardsAtActualEnding),
     ("Shanhe source Qianxi: real mount distance and original judgment hand prohibition", ShanheSourceQianxiChecks.RealHorseDistanceJudgmentRestrictsTheChosenTargetsBlackHand),

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-zhaoran-7014": {
+      "name": "昭然",
+      "description": "出牌阶段开始时，你可以令你的手牌本阶段对所有角色可见，然后当你于本阶段失去任意花色的最后一张手牌时（每种花色限一次），你摸一张牌或弃置一名其他角色一张牌。",
+      "optionLabels": { "draw": "摸一张牌", "discard": "弃置一名其他角色一张牌" }
+    }
+  }
+}

@@ -12,7 +12,7 @@ public static partial class StandardShanheCampaignCatalog
     {
         var potential = StandardShanheSourceRouteCatalog.Season5.GetPotentialBattleIds(city.SourceCityId);
         foreach (var group in new[] { 2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495,
-                     2451, 2457, 2498, 2500, 2454, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481 })
+                     2451, 2457, 2498, 2500, 2454, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481, 2466, 2484, 2486, 2462 })
         {
             if (!potential.Contains(group)) continue;
             var general = OrdinaryTroopGeneral(group, difficulty);
@@ -75,6 +75,10 @@ public static partial class StandardShanheCampaignCatalog
         var warElephant = StandardShanheSourceWarElephantPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
         var caiWenji = StandardShanheSourceCaiWenjiPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
         var ranger = StandardShanheSourceRangerPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var youyan = StandardShanheSourceYouyanWarriorPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var gaoGan = StandardShanheSourceGaoGanPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var armory = StandardShanheSourceArmoryCommanderPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
+        var chengZhan = StandardShanheSourceChengZhanPackage.GetGeneralId(difficulty switch { 1 => 1, 2 => 11, _ => 21 });
         return ShanheCampaignContent.FreezeAndValidate(definition with
         {
             Nodes = definition.Nodes.Select(node => node.Id is "hulao" or "guangcheng" ? node with
@@ -92,7 +96,10 @@ public static partial class StandardShanheCampaignCatalog
                     FirstChapter(node.Id + ":demon-raider-2458-local", 2458, demonRaider),
                     FirstChapter(node.Id + ":demon-archer-2461-local", 2461, demonArcher),
                     FirstChapter(node.Id + ":maridi-2452-local", 2452, maRiDi, baseHp: 3),
-                    FirstChapter(node.Id + ":war-elephant-2453-local", 2453, warElephant, baseHp: 5)
+                    FirstChapter(node.Id + ":war-elephant-2453-local", 2453, warElephant, baseHp: 5),
+                    FirstChapter(node.Id + ":youyan-warrior-2466-local", 2466, youyan),
+                    FirstChapter(node.Id + ":gaogan-2484-local", 2484, gaoGan),
+                    FirstChapter(node.Id + ":armory-commander-2486-local", 2486, armory)
                 }).ToArray(),
                 Description = node.Description + "另有白马义从、联军斥候等边军在此游弋。"
             } : node.Id is not ("dagu" or "huanyuan") ? node : node with
@@ -115,7 +122,8 @@ public static partial class StandardShanheCampaignCatalog
                     Local(node.Id + ":vanguard-2494-local", OrdinaryTroopName(2494), vanguard, OrdinaryTroopStory(2494),
                         startingCards: VanguardGear()),
                     Local(node.Id + ":caiwenji-2469-local", OrdinaryTroopName(2469), caiWenji, OrdinaryTroopStory(2469), baseHp: 3),
-                    Local(node.Id + ":ranger-2481-local", OrdinaryTroopName(2481), ranger, OrdinaryTroopStory(2481))
+                    Local(node.Id + ":ranger-2481-local", OrdinaryTroopName(2481), ranger, OrdinaryTroopStory(2481)),
+                    Local(node.Id + ":chengzhan-2462-local", OrdinaryTroopName(2462), chengZhan, OrdinaryTroopStory(2462))
                 }).ToArray(),
                 Description = node.Description + "边军与地方兵马在此驻守。"
             }).ToArray()
@@ -149,6 +157,10 @@ public static partial class StandardShanheCampaignCatalog
         2453 => StandardShanheSourceWarElephantPackage.GetGeneralId(difficulty),
         2469 => StandardShanheSourceCaiWenjiPackage.GetGeneralId(difficulty),
         2481 => StandardShanheSourceRangerPackage.GetGeneralId(difficulty),
+        2466 => StandardShanheSourceYouyanWarriorPackage.GetGeneralId(difficulty),
+        2484 => StandardShanheSourceGaoGanPackage.GetGeneralId(difficulty),
+        2486 => StandardShanheSourceArmoryCommanderPackage.GetGeneralId(difficulty),
+        2462 => StandardShanheSourceChengZhanPackage.GetGeneralId(difficulty),
         2456 => StandardShanheSourceCoalitionTrioPackage.GetQuartermasterGeneralId(difficulty),
         2458 => StandardShanheSourceDemonRaiderPackage.GetGeneralId(difficulty),
         2461 => StandardShanheSourceDemonArcherPackage.GetGeneralId(difficulty),
@@ -177,6 +189,8 @@ public static partial class StandardShanheCampaignCatalog
         2456 => "联军督运使", 2458 => "魔军暴徒", 2461 => "魔军弓骑", 2464 => "魔军三将",
         2452 => "马日磾", 2468 => "张郃", 2494 => "先锋精骑",
         2453 => "战象", 2469 => "蔡文姬", 2481 => "游侠",
+        2466 => "幽燕壮士", 2484 => "高干", 2486 => "武库统领",
+        2462 => "成湛",
         2451 => "步珩", 2457 => "擒拿刺客 · 魔军刺客", 2498 => "羽林军", 2500 => "农都尉",
         2474 => "经验传承 · 百战老兵", 2467 => "乌桓贼匪 · 乌桓骑手", 2487 => "探听虚实 · 武卫兵",
         2473 => "趁人之危 · 羌人劫匪", 2480 => "空谈无益 · 荀悦",
@@ -196,6 +210,10 @@ public static partial class StandardShanheCampaignCatalog
         2453 => "战象用牌不受距离限制，高档凶兽增伤反击，再以破军移走目标牌。",
         2469 => "蔡文姬以悲歌判定救援，高档可用默识再用本回合的牌，并凭天妒取得判定牌。",
         2481 => "游侠以同色牌施展义烈，高档储醇救援、弃杀决死，并以纳蛮取得打出的杀。",
+        2466 => "幽燕壮士以拒关应战，高档可昭然示牌，失去花色最后一张牌时补牌或弃置对手牌。",
+        2484 => "高干以拒关应战，高档凭凤魄补牌增伤，再以虎烈进击与反攻。",
+        2486 => "武库统领以先率响应每轮首次伤害，高档废栏决堰，并凭图兴增加体力上限。",
+        2462 => "成湛以透髓置底多牌出杀，高档凭膂力调度体力与手牌，并用夺锐封禁目标技能。",
         2458 => "魔军暴徒以强袭冲阵，高档凭劫掠夺取辎重，再以狼蹈施压。",
         2461 => "魔军弓骑弃牌拓展射程，高档以诱言补牌、扫谷连攻。",
         2464 => "刺客潜袭封牌，弓骑扫谷驰援，暴徒强袭劫掠。",

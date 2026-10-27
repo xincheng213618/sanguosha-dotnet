@@ -6,25 +6,31 @@ public sealed partial class GameEngine
     // 图兴: the locked companion resolves inside the abolish flow. Clause one
     // fires on every abolished slot; clause two fires once, when the last slot
     // goes (minus four maximum HP, then the game-long damage bonus arms).
-    private void ResolveTuxingAfterSlotAbolish(ProgramSkillFrame frame)
+    private void ResolveTuxingAfterSlotAbolish(ProgramSkillFrame frame, int recipientSeat, int abolishedSlotCount)
     {
+        if (abolishedSlotCount <= 0) return;
         var active = GetActiveProgramFrame(frame.Id);
-        var owner = _players[active.OwnerSeat];
+        var owner = _players[recipientSeat];
+        if (!owner.IsAlive) return;
         if (!EnabledContentSkillIds(owner).Contains("ol:tuxing", StringComparer.Ordinal))
             return;
         var tuxingPresentation = _contentRegistry!.GetSkill("ol:tuxing");
-        ChangeProgramMaximumHp(GetActiveProgramFrame(frame.Id), 1, "ol:tuxing");
-        AddLog("SkillTriggered",
-            $"{owner.Name} 的【{tuxingPresentation.Name}】生效：增加1点体力上限并回复1点体力。",
-            active.OwnerSeat);
-        new ProgramSkillHost(this).Recover(active.Id, active.OwnerSeat, active.OwnerSeat, 1, null, null);
-        if (!IsTuxingDamageArmPending(active.OwnerSeat))
+        // Mutations and deferred recovery/HP observers belong to the original
+        // abolishing program. Never substitute its owner for the affected seat.
+        for (var index = 0; index < abolishedSlotCount; index++)
+        {
+            ChangeProgramParticipantMaximumHp(GetActiveProgramFrame(frame.Id), recipientSeat, 1, "ol:tuxing");
+            AddLog("SkillTriggered",
+                $"{owner.Name} 的【{tuxingPresentation.Name}】生效：增加1点体力上限并回复1点体力。", recipientSeat);
+            new ProgramSkillHost(this).Recover(active.Id, recipientSeat, recipientSeat, 1, null, null);
+        }
+        if (!IsTuxingDamageArmPending(recipientSeat))
             return;
         AddLog("SkillTriggered",
             $"{owner.Name} 的【{tuxingPresentation.Name}】生效：所有装备栏均已废除，减少4点体力上限，本局游戏接下来造成的伤害+1。",
-            active.OwnerSeat);
-        ChangeProgramMaximumHp(GetActiveProgramFrame(frame.Id), -4, "ol:tuxing");
-        ArmProgramGameDamageBonus(GetActiveProgramFrame(frame.Id), "ol:tuxing", active.OwnerSeat, 1);
+            recipientSeat);
+        ChangeProgramParticipantMaximumHp(GetActiveProgramFrame(frame.Id), recipientSeat, -4, "ol:tuxing");
+        ArmProgramGameDamageBonus(GetActiveProgramFrame(frame.Id), "ol:tuxing", recipientSeat, 1);
     }
 
     // 图兴 catch-up: the locked turn-start sweep arms the game-long damage
@@ -52,6 +58,6 @@ public sealed partial class GameEngine
         if (!YujueSlotOrder.All(slot => owner.EquipmentSlotCapacity(slot) == 0))
             return false;
         return !CompleteProgramEventHistory().OfType<ProgramGameDamageBonusArmedEvent>()
-            .Any(fact => fact.OwnerSeat == ownerSeat);
+            .Any(fact => fact.OwnerSeat == ownerSeat && fact.SkillId == "ol:tuxing");
     }
 }

@@ -17,7 +17,8 @@ public sealed partial class GameEngine
         if (decision.Kind != DecisionKind.SelectTargetCard || decision.PlayerSeat != viewerSeat ||
             ActiveTargetCardSelection is not { } selection || selection.SourceSeat != viewerSeat ||
             decision.TargetSeat != selection.TargetSeat ||
-            !WushuangHasVisibleTargetHand(viewerSeat, selection.EffectCardKind)) return decision;
+            !(WushuangHasVisibleTargetHand(viewerSeat, selection.EffectCardKind) ||
+              HasShanheSourceZhaoranPublicHand(selection.TargetSeat))) return decision;
         return decision with { Choices = VisibleTargetHandChoices(selection, decision.Choices, includeMetadata: true) };
     }
 
@@ -48,7 +49,8 @@ public sealed partial class GameEngine
         if (_pendingDecision is not { Kind: DecisionKind.SelectTargetCard, PlayerSeat: 0 } pending ||
             ActiveTargetCardSelection is not { SourceSeat: 0 } selection ||
             pending.TargetSeat != selection.TargetSeat ||
-            !WushuangHasVisibleTargetHand(selection.SourceSeat, selection.EffectCardKind)) return false;
+            !(WushuangHasVisibleTargetHand(selection.SourceSeat, selection.EffectCardKind) ||
+              HasShanheSourceZhaoranPublicHand(selection.TargetSeat))) return false;
         _pendingDecision = pending with
         {
             PromptId = CreatePromptId(),

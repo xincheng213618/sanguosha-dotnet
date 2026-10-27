@@ -131,7 +131,6 @@ public sealed partial class GameEngine
         var source = new CardConversionSource(active.SkillId, GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId);
         var pending = new YujuePendingState(slot.ToString(), null, source, active.GameplayHash, active.InstructionIndex);
         AbolishYujueSlot(GetActiveProgramFrame(frame.Id), slot);
-        ResolveTuxingAfterSlotAbolish(GetActiveProgramFrame(frame.Id));
         AdvanceEventRulesAndQueueFact(new ProgramYujueSlotPaidEvent(active.Id, source,
             active.GameplayHash, active.InstructionIndex, slot.ToString()));
         ReplaceRuntimeTop(GetActiveProgramFrame(frame.Id) with { YujuePending = pending, ReexecuteParticipantInstruction = true });

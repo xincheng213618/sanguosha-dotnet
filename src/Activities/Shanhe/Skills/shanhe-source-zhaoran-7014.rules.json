@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "shanhe:source-zhaoran-7014", "revision": 1,
+      "triggers": [
+        { "id": "show-actual-play-hand", "window": "playPhaseStarting", "subject": "owner", "optional": true,
+          "effects": [{ "op": "armShanheSourceZhaoran", "target": "owner" }] },
+        { "id": "last-card-of-suit", "window": "cardsMoved", "subject": "owner", "optional": false,
+          "sourceZones": ["hand"], "movementOccurrence": "perCard",
+          "effects": [
+            { "op": "claimShanheSourceZhaoranSuit", "target": "owner" },
+            { "op": "chooseOption", "target": "owner", "resultBind": "zhaoran-benefit", "options": [
+              { "id": "draw" }, { "id": "discard", "requiredTargetKind": "otherLivingWithDiscardableHandOrEquipment" }
+            ] },
+            { "op": "draw", "target": "owner", "amount": 1,
+              "condition": { "kind": "choiceIs", "sourceBind": "zhaoran-benefit", "optionId": "draw" } },
+            { "op": "selectTarget", "target": "owner", "targetKind": "otherLivingWithDiscardableHandOrEquipment",
+              "condition": { "kind": "choiceIs", "sourceBind": "zhaoran-benefit", "optionId": "discard" } },
+            { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" },
+              "cardOwnerRef": { "kind": "selectedTarget" }, "zones": ["hand", "equipment"], "count": 1,
+              "destination": "discardPile", "awaitMovementTriggers": true,
+              "condition": { "kind": "choiceIs", "sourceBind": "zhaoran-benefit", "optionId": "discard" } }
+          ] }
+      ] }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:source-jueyan-823", "revision": 1,
+    "activations": [
+      {
+        "id": "weapon", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0,
+        "targetKind": "anyLiving", "usesPerTurn": null, "usesPerPhase": 1, "usageGroup": "slot-group",
+        "effects": [
+          { "op": "abolishEquipmentSlotGroup", "target": "owner", "equipmentSlots": ["weapon"] },
+          { "op": "grantTurnRuleModifier", "target": "owner", "ruleQuery": "slashLimit", "ruleOperation": "add", "amount": 3 }
+        ]
+      },
+      {
+        "id": "armor", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0,
+        "targetKind": "anyLiving", "usesPerTurn": null, "usesPerPhase": 1, "usageGroup": "slot-group",
+        "effects": [
+          { "op": "abolishEquipmentSlotGroup", "target": "owner", "equipmentSlots": ["armor"] },
+          { "op": "draw", "target": "owner", "amount": 3 },
+          { "op": "grantTurnRuleModifier", "target": "owner", "ruleQuery": "handLimit", "ruleOperation": "add", "amount": 3 }
+        ]
+      },
+      {
+        "id": "mounts", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0,
+        "targetKind": "anyLiving", "usesPerTurn": null, "usesPerPhase": 1, "usageGroup": "slot-group",
+        "effects": [
+          { "op": "abolishEquipmentSlotGroup", "target": "owner", "equipmentSlots": ["offensiveHorse", "defensiveHorse"] },
+          { "op": "grantTurnRuleModifier", "target": "owner", "ruleQuery": "cardUseDistanceLimit", "ruleOperation": "unlimited" },
+          { "op": "grantTurnRuleModifier", "target": "owner", "ruleQuery": "slashDistanceLimit", "ruleOperation": "unlimited" }
+        ]
+      },
+      {
+        "id": "treasure", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0,
+        "targetKind": "anyLiving", "usesPerTurn": null, "usesPerPhase": 1, "usageGroup": "slot-group",
+        "effects": [
+          { "op": "abolishEquipmentSlotGroup", "target": "owner", "equipmentSlots": ["treasure"] },
+          { "op": "grantTurnSkills", "target": "owner", "skillIds": ["boundary:jizhi-current"], "expiry": "actualTurnEnd" }
+        ]
+      }
+    ]
+  }]
+}

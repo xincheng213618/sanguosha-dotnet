@@ -467,6 +467,13 @@ public static partial class StandardShanheCampaignCatalog
         var sourceRanger = ids.Any(id => id is StandardShanheSourceRangerPackage.BaseId or
             StandardShanheSourceRangerPackage.HardId or StandardShanheSourceRangerPackage.NightmareId or StandardShanheSourceRangerPackage.HellId);
         s5Dongwu |= sourceRanger;
+        var sourceYouyan = ids.Any(id => id is StandardShanheSourceYouyanWarriorPackage.BaseId or StandardShanheSourceYouyanWarriorPackage.HardId);
+        var sourceGaoGan = ids.Any(id => id is StandardShanheSourceGaoGanPackage.BaseId or
+            StandardShanheSourceGaoGanPackage.HardId or StandardShanheSourceGaoGanPackage.HellId);
+        var sourceArmory = ids.Any(id => id is StandardShanheSourceArmoryCommanderPackage.BaseId or
+            StandardShanheSourceArmoryCommanderPackage.HardId or StandardShanheSourceArmoryCommanderPackage.NightmareId);
+        var sourceChengZhan = ids.Any(id => id is StandardShanheSourceChengZhanPackage.BaseId or
+            StandardShanheSourceChengZhanPackage.HardId or StandardShanheSourceChengZhanPackage.HellId);
         var sourceCoalitionTrio = extraSkills.Contains(StandardShanheSourceCoalitionTrioPackage.CangchuSkillId) ||
             extraSkills.Contains(StandardShanheSourceCoalitionTrioPackage.SushouSkillId) ||
             ids.Any(id => id is StandardShanheSourceCoalitionTrioPackage.SpyBaseId or StandardShanheSourceCoalitionTrioPackage.SpyHardId or
@@ -620,6 +627,10 @@ public static partial class StandardShanheCampaignCatalog
             (sourceWarElephant ? "/source-war-elephant-2453" : "") +
             (sourceCaiWenji ? "/source-caiwenji-2469" : "") +
             (sourceRanger ? "/source-ranger-2481" : "") +
+            (sourceYouyan ? "/source-youyan-warrior-2466" : "") +
+            (sourceGaoGan ? "/source-gaogan-2484" : "") +
+            (sourceArmory ? "/source-armory-commander-2486" : "") +
+            (sourceChengZhan ? "/source-chengzhan-2462" : "") +
             (sourceWuqueAssassin ? "/source-wuque-assassin-2493" : "") +
             (sourceExecutioner ? "/source-executioner-2495" : "") +
             (s5Simayi ? "/s5-simayi-2677" : "") +
@@ -815,6 +826,10 @@ public static partial class StandardShanheCampaignCatalog
             if (sourceWarElephant) packages.Add(new StandardShanheSourceWarElephantPackage());
             if (sourceCaiWenji) packages.Add(new StandardShanheSourceCaiWenjiPackage());
             if (sourceRanger) packages.Add(new StandardShanheSourceRangerPackage());
+            if (sourceYouyan) packages.Add(new StandardShanheSourceYouyanWarriorPackage());
+            if (sourceGaoGan) packages.Add(new StandardShanheSourceGaoGanPackage());
+            if (sourceArmory) packages.Add(new StandardShanheSourceArmoryCommanderPackage());
+            if (sourceChengZhan) packages.Add(new StandardShanheSourceChengZhanPackage());
             if (sourceAgricultureOfficer) packages.Add(new StandardShanheSourceAgricultureOfficerPackage());
             if (sourceWuqueAssassin) packages.Add(new StandardShanheSourceWuqueAssassinPackage());
             if (sourceDemonAssassin) packages.Add(new StandardShanheSourceDemonAssassinPackage());

@@ -23,7 +23,7 @@ public sealed partial class GameEngine
                               player.Seat == viewerSeat);
             var canSeeHand = revealAll || player.Seat == viewerSeat;
             var sharedHandAccess = HasShiLsHandView(viewerSeat, player.Seat);
-            var hand = canSeeHand || sharedHandAccess
+            var hand = canSeeHand || sharedHandAccess || HasShanheSourceZhaoranPublicHand(player.Seat)
                 ? playerHand.Select(card => ProjectHandCard(player, card)).ToArray()
                 : [];
             var playerEquipment = GetEquipment(player);

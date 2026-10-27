@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-jueyan-823": {
+      "name": "决堰",
+      "description": "出牌阶段限一次，你可以废除一个装备栏并于本回合获得对应效果：武器栏，使用【杀】的限制次数+3；防具栏，摸三张牌且手牌上限+3；坐骑栏，使用牌无距离限制；宝物栏，获得“集智”。",
+      "activationLabels": {
+        "weapon": "废除武器栏", "armor": "废除防具栏", "mounts": "废除两个坐骑栏", "treasure": "废除宝物栏"
+      }
+    }
+  }
+}
