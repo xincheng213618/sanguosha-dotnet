@@ -604,6 +604,8 @@ var tests = new (string Name, Action Body)[]
     ("OL SP Liu Bei 664 forward: dying brew materials and later price", OlSpLiuBei664Checks.DyingBrewUsesRealMaterialsAndRaisesSubsequentWinePriceForward),
     ("Shanhe source routes: explicit graph potential pools and immutable identities", ShanheSourceRouteCatalogChecks.ExplicitSourceGraphAndPotentialPoolsStayImmutable),
     ("Shanhe source campaign: branches known stages and local identities", ShanheSource2026Checks.SourceBranchesKnownStagesAndLocalBodiesKeepTheirIdentities),
+    ("Shanhe returning reinforcements: both entries local tiers and terrain routes", ShanheReturningReinforcementChecks.BothLocalEntriesSelectCompleteThreeTierProfilesAndCarryThemIntoTerrainRoutes),
+    ("Shanhe returning reinforcements: physical opening native first turn and lethal stage", ShanheReturningReinforcementChecks.FreshLocalOpeningsKeepPhysicalHandGearAndInitialDongdangThenLethallyEnterShenNu),
     ("Shanhe source garrisons: three chapter pools and playable elite branches", ShanheSourceGarrisonChecks.ThreeChaptersOfferDifferentLocalRostersAndARealEliteBranch),
     ("Shanhe source garrisons: native preview move and physical opening", ShanheSourceGarrisonChecks.NativePreviewMoveAndStartKeepTheChosenRosterAndPhysicalOpening),
     ("Shanhe wolf battles: paid future map preview and native elite entry", ShanheWolfBattleChecks.PaidFutureNodesPreviewAndNativeEntryUseTheRealEliteProfile),
