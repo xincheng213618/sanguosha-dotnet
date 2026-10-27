@@ -68,7 +68,7 @@ public sealed partial class ShanheCampaignSession
         var group = _state.BossRewardGroups.SingleOrDefault(group => group.Id == groupId);
         Require(group is not null && group.SelectedRewardId is null && !group.IsSkipped,
             "Choose an unresolved reward group to decline.");
-        var gold = RewardSkipCompensation(group!.OfferIds, _nodes[_state.CurrentNodeId!].RewardSkipGold);
+        var gold = RewardSkipCompensation(group!.OfferIds, ResolveBattleNode(_state, _nodes[_state.CurrentNodeId!]).RewardSkipGold);
         Require(gold > 0, "Tactic rewards cannot be exchanged for copper.");
         return _state with
         {
@@ -92,7 +92,7 @@ public sealed partial class ShanheCampaignSession
     {
         if (state.Phase != ShanheCampaignPhase.Reward || state.BossRewardGroups.Count == 0 ||
             state.CurrentNodeId is not { } id) return null;
-        var node = _nodes[id];
+        var node = ResolveBattleNode(state, _nodes[id]);
         var isBonusOnly = state.BossRewardGroups.All(group => group.IsBonus);
         var bundle = node.BossRewards;
         return new(node.ChapterNumber, isBonusOnly ? node.Name + "·追加奖励" : node.ChapterTitle ?? node.Name,

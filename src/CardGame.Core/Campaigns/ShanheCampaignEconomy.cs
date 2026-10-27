@@ -11,7 +11,8 @@ public sealed record ShanheCampaignEconomy(
     int FreeShopRefreshes = 0, bool RestockOnPurchase = false,
     int ShopTacticPromotionPercent = 0, int ShopSkillPromotionPercent = 0, int ShopMaterialPromotionPercent = 0,
     int BattlePrimaryPromotionPercent = 0, bool UnlimitedPaidShopRefreshes = false,
-    int BattleGoldRandomMinPercent = 100, int BattleGoldRandomMaxPercent = 100);
+    int BattleGoldRandomMinPercent = 100, int BattleGoldRandomMaxPercent = 100,
+    bool UpgradeOrdinaryBattles = false);
 
 public static partial class ShanheCampaignContent
 {

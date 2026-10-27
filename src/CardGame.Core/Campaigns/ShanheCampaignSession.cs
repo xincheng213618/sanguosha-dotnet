@@ -281,7 +281,7 @@ public sealed partial class ShanheCampaignSession
         var node = _nodes[command.NodeId];
         var state = ClearPrimaryRewardState(_state) with
         {
-            CurrentNodeId = node.Id, StoryEventId = null, StoryChoices = [], AvailableNodeIds = [],
+            CurrentNodeId = node.Id, BattleProfileNodeId = null, StoryEventId = null, StoryChoices = [], AvailableNodeIds = [],
             PurchasedChoiceIds = _options.PersistentMarket ? _state.PurchasedChoiceIds : [], BossRewardGroups = [],
             PendingBonusRewardGroups = []
         };
@@ -306,6 +306,14 @@ public sealed partial class ShanheCampaignSession
 
     private RunState BeginNodeBattle(RunState state, ShanheNodeDefinition node)
     {
+        var profileId = EntryBattleProfileId(state, node);
+        state = state with
+        {
+            BattleProfileNodeId = profileId,
+            UpgradedBattleNodeIds = profileId == node.Id ? state.UpgradedBattleNodeIds :
+                ShanheCampaignContent.Freeze(state.UpgradedBattleNodeIds.Append(node.Id).Distinct(StringComparer.Ordinal))
+        };
+        node = ResolveBattleNode(state, node);
         var ordinal = checked(state.EncounterOrdinal + 1);
         var encounter = PrepareEncounter(node, ordinal, state);
         var bonuses = state.Bonuses;
@@ -354,7 +362,7 @@ public sealed partial class ShanheCampaignSession
             result.ProcessingCardCount == 0 && battle.ResolutionStack.Count == 0, "The battle has not finished all of its resolutions.");
         var player = result.Players.Single(p => p.IsHuman && p.Seat == 0);
         Require(player.GeneralId == setup.PlayerGeneralId, "The completed player does not match this campaign setup.");
-        var node = _nodes[_state.CurrentNodeId!];
+        var node = ResolveBattleNode(_state, _nodes[_state.CurrentNodeId!]);
         var encounter = node.Encounters!.Single(e => e.Id == _state.EncounterId);
         var won = result.WinnerTeamId == ShanheBattleSetup.PlayerTeamId && player.IsAlive && player.Hp > 0;
         var completedMarket = _state;
@@ -544,7 +552,7 @@ public sealed partial class ShanheCampaignSession
         return ClearPrimaryRewardState(state) with
         {
             Phase = nextNodes.Count == 0 ? ShanheCampaignPhase.Won : ShanheCampaignPhase.Map,
-            AvailableNodeIds = nextNodes, BossRewardGroups = [], PendingBonusRewardGroups = [], BattleSetup = null,
+            AvailableNodeIds = nextNodes, BossRewardGroups = [], PendingBonusRewardGroups = [], BattleSetup = null, BattleProfileNodeId = null,
             CompletedNodeIds = ShanheCampaignContent.Freeze(state.CompletedNodeIds.Append(node.Id))
         };
     }
@@ -562,16 +570,18 @@ public sealed partial class ShanheCampaignSession
         return new(Definition.Id, Definition.Name, state.Phase, revision, state.CurrentNodeId,
             state.Hp, MarketMaximumHp(state), state.Gold, state.ExtraSkillSlots, state.Bonuses,
             state.ExtraSkillIds, ShanheCampaignContent.Freeze(state.AvailableNodeIds.Select(id => _options.PersistentMarket
-                ? _nodes[id] with { NextNodeIds = ResolveVisibleNodeIds(_nodes[id].NextNodeIds) } : _nodes[id])),
+                ? ResolveBattleNode(state, _nodes[id]) with { NextNodeIds = ResolveVisibleNodeIds(_nodes[id].NextNodeIds) }
+                : ResolveBattleNode(state, _nodes[id]))),
             ShanheCampaignContent.Freeze(state.RewardOfferIds.Select(id => _rewards[id])), ShanheCampaignContent.Freeze(choices),
             state.CompletedNodeIds, state.BattleSetup,
             state.CurrentNodeId is { } current
-                ? CurrentStoryEvent(state, _nodes[current])?.StoryText ?? _nodes[current].Encounters?.FirstOrDefault(encounter => encounter.Id == state.EncounterId)?.StoryText ?? _nodes[current].StoryText
+                ? CurrentStoryEvent(state, _nodes[current])?.StoryText ?? ResolveBattleNode(state, _nodes[current]).Encounters?.FirstOrDefault(encounter => encounter.Id == state.EncounterId)?.StoryText ?? _nodes[current].StoryText
                 : Definition.IntroText,
             state.Phase == ShanheCampaignPhase.Won ?
                 state.CurrentNodeId is { } endingNode && !string.IsNullOrEmpty(_nodes[endingNode].VictoryText) ? _nodes[endingNode].VictoryText : Definition.VictoryText
                 : state.Phase == ShanheCampaignPhase.Lost ? Definition.DefeatText : "")
         {
+            CurrentBattleNode = CurrentBattleNode(state),
             PlayerGeneralId = _options.PlayerGeneralId, PlayerCharacterId = _playerCharacterId,
             CompletedBattles = state.CompletedBattles, StartingCards = state.StartingCards,
             CurrentStoryEventName = state.CurrentNodeId is { } eventNode ? CurrentStoryEvent(state, _nodes[eventNode])?.Name : null,

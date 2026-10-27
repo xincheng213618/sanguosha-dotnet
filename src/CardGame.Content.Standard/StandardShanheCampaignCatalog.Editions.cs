@@ -62,7 +62,7 @@ public static partial class StandardShanheCampaignCatalog
         definition = WithThirdChapterEliteEncounters(definition, editionId);
         definition = WithGuideTerrain(definition, difficulty, editionId);
         definition = WithMuluEncounter(definition, difficulty, editionId);
-        return WithCurrentSchools(definition);
+        return WithCurrentWolfBattles(WithCurrentSchools(definition));
     }
 
     private static ShanheCampaignDefinition CreateCurrentBaseDefinition(int difficulty, string editionId) => editionId switch

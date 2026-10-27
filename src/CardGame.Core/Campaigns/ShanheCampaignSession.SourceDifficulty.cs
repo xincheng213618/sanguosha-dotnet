@@ -24,6 +24,7 @@ public sealed partial class ShanheCampaignSession
 {
     private ShanheEncounterDefinition PrepareEncounter(ShanheNodeDefinition node, int ordinal, RunState state)
     {
+        node = ResolveBattleNode(state, node);
         var encounter = WithRecruitedCompanions(WithOpeningCompanion(SelectEncounter(node, ordinal), node), node);
         return ApplySourceEnemyGrowth(encounter, node, ordinal, state);
     }

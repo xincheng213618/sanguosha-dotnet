@@ -390,9 +390,13 @@ internal static partial class ShanheCampaignChecks
     ], StartingGold: 8, ExtraSkillSlots: 1) { IntroText = "提剑出发。", VictoryText = "远征结束。", DefeatText = "此役失利，来日再战。" };
 
     private static ShanheCampaignSession Create(ShanheCampaignDefinition definition) => ShanheCampaignSession.Create(definition, new(71, Player), Registry);
-    internal static ContentRegistry Registry(ShanheBattleSetup setup) => setup.RebirthAvailable
-        ? ContentRegistry.Build(new StandardContentPackage(), new FixtureBattlePackage(), new StandardShanheRankPrivilegePackage())
-        : ContentRegistry.Build(new StandardContentPackage(), new FixtureBattlePackage());
+    internal static ContentRegistry Registry(ShanheBattleSetup setup)
+    {
+        List<IGameContentPackage> packages = [new StandardContentPackage(), new FixtureBattlePackage(setup)];
+        if (setup.RebirthAvailable) packages.Add(new StandardShanheRankPrivilegePackage());
+        if (setup.MarketSetup is not null) packages.Add(new StandardShanheMarketPackage());
+        return ContentRegistry.Build(packages.ToArray());
+    }
     internal static GameEngine CreateBattle(ShanheBattleSetup setup) => GameEngine.CreateStandard(new()
     {
         Seed = setup.BattleSeed, PlayerCount = 1 + setup.EnemyRoster.Count + setup.AllyRoster.Count, HumanSeat = 0,
@@ -443,7 +447,7 @@ internal static partial class ShanheCampaignChecks
     }
     private static void Require(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 
-    private sealed class FixtureBattlePackage : IGameContentPackage
+    private sealed class FixtureBattlePackage(ShanheBattleSetup setup) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-shanhe-battle", new Version(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
@@ -468,9 +472,11 @@ internal static partial class ShanheCampaignChecks
             builder.AddGeneral(new(Player, "行者", "", Force, "shu"));
             builder.AddGeneral(new(Enemy, "守军", "", Guard, "qun"));
             builder.AddDeck(new("fixture:shanhe-dodge", "闪牌堆", 4, 2, [new("standard:dodge", 40)]));
-            builder.AddMode(new(ShanheBattleSetup.BattleModeId, "山河战斗", 2, 2, new Dictionary<string, int>(),
+            var players = 1 + setup.AllyRoster.Count + setup.EnemyRoster.Count;
+            builder.AddMode(new(ShanheBattleSetup.BattleModeId, "山河战斗", players, players, new Dictionary<string, int>(),
                 "fixture:shanhe-dodge", GeneralPoolIds: [Player, Enemy], ModeKind: ContentModeKind.Team,
-                TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 1, [ShanheBattleSetup.EnemyTeamId] = 1 }));
+                TeamCounts: new Dictionary<string, int>
+                    { [ShanheBattleSetup.PlayerTeamId] = 1 + setup.AllyRoster.Count, [ShanheBattleSetup.EnemyTeamId] = setup.EnemyRoster.Count }));
         }
     }
 }

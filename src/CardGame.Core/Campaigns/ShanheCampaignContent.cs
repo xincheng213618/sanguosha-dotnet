@@ -27,6 +27,7 @@ public static partial class ShanheCampaignContent
         var nodeIds = definition.Nodes.Select(n => n.Id).ToHashSet(StringComparer.Ordinal);
         var rewardIds = definition.Rewards.Select(r => r.Id).ToHashSet(StringComparer.Ordinal);
         Require(definition.StartingNodeIds.All(nodeIds.Contains), "An entry references an unknown node.");
+        ValidateEliteUpgradeProfiles(definition);
         foreach (var reward in definition.Rewards)
         {
             ValidateOpeningSkillReward(definition, reward);

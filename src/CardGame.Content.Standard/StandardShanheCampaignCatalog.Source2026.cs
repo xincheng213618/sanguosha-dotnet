@@ -73,6 +73,7 @@ public static partial class StandardShanheCampaignCatalog
                     [region.ChapterNumber == 3 ? storyId : campId], ordinary, normalRewards)
                 {
                     ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle, CategorizedRewards = true,
+                    EliteUpgradeNodeId = eliteId,
                     PrimaryTacticRarity = 1, PrimarySkillRarity = region.ChapterNumber >= 2 ? 2 : 1, RewardSkipGold = 100,
                     StoryText = "驻军拦住去路。击败敌人后继续行军。",
                     Description = "四种驻军阵容可随机遭遇，获胜后获得200铜币及战利品。"

@@ -56,25 +56,13 @@ internal static class ShanheSourceGarrisonChecks
         foreach (var chapter in new[] { 1, 2, 3 })
         foreach (var kind in new[] { ShanheNodeKind.Battle, ShanheNodeKind.EliteBattle })
         {
-            // A real node is made the entrypoint to inspect later chapters
-            // without manufacturing wins or changing any of its candidates.
+            // Admit a real later entry without manufacturing wins. Keep the
+            // original starts and graph, including sibling elite references.
             var node = source.Nodes.First(candidate => candidate.ChapterNumber == chapter && candidate.Kind == kind &&
                 candidate.Encounters!.All(encounter => encounter.SourceBattleId is null));
-            var byId = source.Nodes.ToDictionary(candidate => candidate.Id, StringComparer.Ordinal);
-            var reachable = new HashSet<string>(StringComparer.Ordinal);
-            var remaining = new Stack<string>([node.Id]);
-            while (remaining.TryPop(out var id))
-            {
-                if (!reachable.Add(id)) continue;
-                var current = byId[id];
-                foreach (var next in current.NextNodeIds.Concat((current.Choices ?? [])
-                    .Concat((current.StoryEvents ?? []).SelectMany(story => story.Choices))
-                    .Select(choice => choice.BattleNodeId).OfType<string>())) remaining.Push(next);
-            }
             var entry = source with
             {
-                StartingNodeIds = [node.Id], RandomStartingNode = false,
-                Nodes = source.Nodes.Where(candidate => reachable.Contains(candidate.Id)).ToArray()
+                StartingNodeIds = [.. source.StartingNodeIds, node.Id], RandomStartingNode = false
             };
             var session = ShanheCampaignSession.Create(entry, new(83, "classic:guan-yu")
                 { SourceDifficultyId = source.SourceDifficultyId }, StandardShanheCampaignCatalog.CreateBattleRegistry);

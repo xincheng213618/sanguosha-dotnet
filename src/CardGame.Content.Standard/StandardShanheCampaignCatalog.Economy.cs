@@ -11,6 +11,7 @@ public static partial class StandardShanheCampaignCatalog
     public const string CurrentResourceSetRewardId = "tactic-economy-2230";
     public const string CurrentGamblerRewardId = "tactic-economy-2217";
     public const string CurrentGambler2RewardId = "tactic-economy-2218";
+    public const string CurrentWolfBattlesRewardId = "tactic-economy-2015";
 
     // Public S5 tactics.json / tactic-tree.json, generated 2026-10-21.
     // 133 and 128 are random unlocks, not fixed grants of 2090 or 2181.
@@ -61,6 +62,8 @@ public static partial class StandardShanheCampaignCatalog
             "击败精英关卡后，额外获得一个稀有战法", new(ExtraEliteRareTactics: 1)),
         new(2014, "tactic-economy-2014", "王牌战技", 2, 300,
             "击败首领关卡后，额外获得一个史诗技能", new(ExtraBossEpicSkills: 1)),
+        new(2015, CurrentWolfBattlesRewardId, "群狼之争", 3, 500,
+            "后续普通关卡都将变为精英关卡，包括对应奖励。", new(UpgradeOrdinaryBattles: true)),
         new(2017, "tactic-economy-2017", "谋略过人", 2, 300,
             "选择【战法奖励】时，候选项从三个变为四个", new(TacticRewardChoiceCount: 4)),
         new(2018, "tactic-economy-2018", "慧黠", 1, 200,

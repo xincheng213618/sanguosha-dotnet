@@ -13,9 +13,11 @@ public sealed partial class ShanheCampaignSession
     }
 
     public bool HasPersistentMarket => _options.PersistentMarket || _battleMarketSession;
-    public IReadOnlyList<ShanheNodeDefinition> VisibleMapNodes => !_options.PersistentMarket ? Definition.Nodes :
-        ShanheCampaignContent.Freeze(Definition.Nodes.Where(node => node.Kind != ShanheNodeKind.Shop)
-            .Select(node => node with { NextNodeIds = ResolveVisibleNodeIds(node.NextNodeIds) }));
+    public IReadOnlyList<ShanheNodeDefinition> VisibleMapNodes =>
+        ShanheCampaignContent.Freeze(Definition.Nodes.Where(node => !_options.PersistentMarket || node.Kind != ShanheNodeKind.Shop)
+            .Select(node => _options.PersistentMarket
+                ? ResolveBattleNode(_state, node) with { NextNodeIds = ResolveVisibleNodeIds(node.NextNodeIds) }
+                : ResolveBattleNode(_state, node)));
 
     public IReadOnlyList<string> ResolveVisibleNodeIds(IEnumerable<string> nodeIds)
     {
@@ -169,7 +171,7 @@ public sealed partial class ShanheCampaignSession
             StartingGold = 0, ExtraSkillSlots = 0, StartingBonuses = new(),
             Nodes = [shop with { NextNodeIds = [probe.Id], ChapterNumber = state.MarketChapterNumber,
                 Choices = ShanheCampaignContent.Freeze((shop.Choices ?? []).Select(choice => choice with { LeavesNode = false })) },
-                probe with { NextNodeIds = [], RewardIds = [], BossRewards = null, AddSkillSlotsOnVictory = 0,
+                probe with { NextNodeIds = [], RewardIds = [], BossRewards = null, EliteUpgradeNodeId = null, AddSkillSlotsOnVictory = 0,
                     CategorizedRewards = false, RewardSkipGold = 0 }]
         });
     }

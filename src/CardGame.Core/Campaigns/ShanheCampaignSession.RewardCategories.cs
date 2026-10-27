@@ -76,7 +76,7 @@ public sealed partial class ShanheCampaignSession
         (state.RewardOfferIds.Count > 0 || state.CategoryRewardGroups.Count > 0 && state.SelectedRewardCategory is null);
 
     private int PrimaryRewardSkipGold(RunState state) => HasPrimaryReward(state)
-        ? RewardSkipCompensation(state.RewardOfferIds, _nodes[state.CurrentNodeId!].RewardSkipGold) : 0;
+        ? RewardSkipCompensation(state.RewardOfferIds, ResolveBattleNode(state, _nodes[state.CurrentNodeId!]).RewardSkipGold) : 0;
 
     private int RewardSkipCompensation(IReadOnlyList<string> offerIds, int configuredGold)
     {

@@ -265,6 +265,9 @@ public sealed record ShanheNodeDefinition(
     IReadOnlyList<ShanheEncounterDefinition>? Encounters = null, IReadOnlyList<string>? RewardIds = null,
     int RewardChoiceCount = 3, IReadOnlyList<ShanheNodeChoiceDefinition>? Choices = null)
 {
+    /// <summary>Authored same-chapter elite profile used by a held ordinary-battle upgrade tactic.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? EliteUpgradeNodeId { get; init; }
     public string StoryText { get; init; } = "";
     public string Description { get; init; } = "";
     public string VictoryText { get; init; } = "";

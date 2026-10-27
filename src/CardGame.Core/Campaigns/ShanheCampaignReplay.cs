@@ -103,6 +103,8 @@ public sealed record ShanheCampaignSnapshot(
     ShanheBattleSetup? PendingBattleSetup, string StoryText, string EndingText)
 {
     public string PlayerGeneralId { get; init; } = "";
+    /// <summary>The immutable encounter and reward profile fixed when this battle was entered.</summary>
+    public ShanheNodeDefinition? CurrentBattleNode { get; init; }
     public string PlayerCharacterId { get; init; } = "";
     private readonly IReadOnlyList<ShanheGuideBattleCompletion> _completedBattles = Array.Empty<ShanheGuideBattleCompletion>();
     public IReadOnlyList<ShanheGuideBattleCompletion> CompletedBattles
