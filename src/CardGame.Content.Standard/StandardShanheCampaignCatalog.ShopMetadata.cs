@@ -58,6 +58,7 @@ public static partial class StandardShanheCampaignCatalog
             .Concat(CurrentDismantlementStockDefaultUnlockedRewardIds)
             .Concat(CurrentBadaoDefaultUnlockedRewardIds)
             .Concat(CurrentSteadyHandDefaultUnlockedRewardIds)
+            .Concat(CurrentCounterspellClaimDefaultUnlockedRewardIds)
             .Append("tactic-duijia-2026")
             .Concat(StandardShanheOriginalSkills.DefaultStockRewardIds)
             .Concat(CurrentReactionTacticDefaultUnlockedRewardIds)
@@ -215,6 +216,7 @@ public static partial class StandardShanheCampaignCatalog
                 .Concat(CurrentDismantlementStockShopMetadata)
                 .Concat(CurrentBadaoShopMetadata)
                 .Concat(CurrentSteadyHandShopMetadata)
+                .Concat(CurrentCounterspellClaimShopMetadata)
                 .Concat(CurrentReactionTacticShopMetadata)
                 .Concat(CurrentShopCardMetadata)
                 .Concat(CurrentEconomyTactics.Select(source => new KeyValuePair<string, ShanheShopMetadata>(source.RewardId,

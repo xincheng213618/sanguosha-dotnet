@@ -32,6 +32,7 @@ public static partial class StandardShanheCampaignCatalog
         definition = WithCurrentDismantlementStockTactics(definition);
         definition = WithCurrentBadaoTactics(definition);
         definition = WithCurrentSteadyHandTactic(definition);
+        definition = WithCurrentCounterspellClaimTactics(definition);
         return WithCurrentGuandaoTactic(definition);
     }
 

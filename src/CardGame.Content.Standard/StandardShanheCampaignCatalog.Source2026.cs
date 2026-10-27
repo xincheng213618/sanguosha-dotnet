@@ -41,6 +41,8 @@ public static partial class StandardShanheCampaignCatalog
         var normalRewards = template.Rewards.Where(reward => reward.OpeningCompanionPool is null &&
                 reward.Rarity is 1 or 2)
             .Select(reward => reward.Id).ToArray();
+        var eliteRewards = template.Rewards.Where(reward => reward.OpeningCompanionPool is null && reward.Rarity >= 2)
+            .Select(reward => reward.Id).ToArray();
         var nodes = new List<ShanheNodeDefinition>();
         foreach (var region in regions)
         {
@@ -51,15 +53,16 @@ public static partial class StandardShanheCampaignCatalog
             var storyId = Source2026RegionNodeId(region.SourceUniqueId, "story");
             var campId = Source2026RegionNodeId(region.SourceUniqueId, "camp");
             var bossId = Source2026CityNodeId(bossCity.SourceCityId);
+            var eliteId = Source2026RegionNodeId(region.SourceUniqueId, "local-elite");
             var exits = region.NextRegionIds.Where(regionIds.Contains).Select(next => Source2026RegionNodeId(next, "market")).ToArray();
             var chapterTitle = "第" + region.ChapterNumber.ToString(CultureInfo.InvariantCulture) + "章 · " + region.Name;
             var market = template.Nodes.FirstOrDefault(node => node.Kind == ShanheNodeKind.Shop && node.ChapterNumber == region.ChapterNumber)
                 ?? template.Nodes.First(node => node.Kind == ShanheNodeKind.Shop);
             nodes.Add(market with
             {
-                Id = marketId, Name = region.Name + " · 集市", NextNodeIds = ordinaryCities.Select(city => Source2026CityNodeId(city.SourceCityId)).ToArray(),
+                Id = marketId, Name = region.Name + " · 集市", NextNodeIds = ordinaryCities.Select(city => Source2026CityNodeId(city.SourceCityId)).Append(eliteId).ToArray(),
                 ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle,
-                StoryText = "行军来到" + region.Name + "。整备后选择一处前战地点。"
+                StoryText = "行军来到" + region.Name + "。整备后选择一处前战地点，或挑战精锐军营。"
             });
             foreach (var city in ordinaryCities)
             {
@@ -72,9 +75,11 @@ public static partial class StandardShanheCampaignCatalog
                     ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle, CategorizedRewards = true,
                     PrimaryTacticRarity = 1, PrimarySkillRarity = region.ChapterNumber >= 2 ? 2 : 1, RewardSkipGold = 100,
                     StoryText = "驻军拦住去路。击败敌人后继续行军。",
-                    Description = "本地前战驻军；此处获胜按实际地点记录，前战敌军不冒认原版战斗编号。"
+                    Description = "四种驻军阵容可随机遭遇，获胜后获得200铜币及战利品。"
                 });
             }
+            nodes.Add(Source2026LocalEliteNode(region, eliteId,
+                region.ChapterNumber == 3 ? storyId : campId, chapterTitle, eliteRewards));
             var stories = Source2026Stories(template, region.ChapterNumber);
             nodes.Add(new(storyId, region.Name + " · 奇遇", ShanheNodeKind.Event,
                 region.ChapterNumber == 3 ? [campId] : exits, Choices: [])
@@ -112,8 +117,9 @@ public static partial class StandardShanheCampaignCatalog
             RandomStartingNode = true, Nodes = nodes,
             Description = "原版25档与地区连边；已支持的来源阵容及明确本地补齐。",
             IntroText = "本入口采用普通1至炼狱5和原版地区连边，开局随机进入广成关或虎牢关。" +
-                "地区内压缩为选择一处前战、营地与关底，奇遇在前两章关底后、第三章关底前揭晓。" +
-                "前战驻军为本地编排，首领从已支持的来源基础阵容中选取；普通3起接入已实现的原二阶段。" +
+                "地区内压缩为选择一处普通前战或本地精英、营地与关底，奇遇在前两章关底后、第三章关底前揭晓。" +
+                "普通驻军每章包含四种组合，第一章一至两敌、第二章两至三敌、第三章三至四敌；每区还可选择挑战精锐军营。" +
+                "首领从已支持的来源基础阵容中选取；普通3起接入已实现的原二阶段。" +
                 "二阶段只采用已核基础技能，尚未接入的高阶神威、神戟、神躯等附加技能不计为已实现；" +
                 "缺失的首领与张牛角、改朝罪魁的未实现二阶段暂不进入相应候选。" +
                 "各档均可直接选择；本地以每场战斗的序号作日数，体力成长同时增加体力上限，" +
@@ -153,18 +159,7 @@ public static partial class StandardShanheCampaignCatalog
     {
         // The original pools' server premises are not executable here. These local bodies have
         // no source battle identity; only the player's genuinely selected source city is retained.
-        var candidates = new List<ShanheEncounterDefinition>
-        {
-            new("source-local:" + city.SourceCityId, region.Name + "驻军",
-                region.ChapterNumber == 1 ? [new(StandardShanheLocalTroopPackage.FootmanId)] :
-                    region.ChapterNumber == 2 ? [new(StandardShanheLocalTroopPackage.FootmanId), new(StandardShanheLocalTroopPackage.ArcherId)] :
-                    [new(StandardShanheLocalTroopPackage.ArcherId), new(StandardShanheLocalTroopPackage.GuardId)],
-                [], VictoryGold: 200, HealAfterVictory: 1)
-            {
-                SourceCityId = city.SourceCityId, TerrainSkillId = Source2026Terrain(city.SourceTerrainSkillId, difficulty),
-                StoryText = "联军遭遇本地编排的西凉驻军。"
-            }
-        };
+        var candidates = Source2026LocalGarrisons(region, city, difficulty).ToList();
         if (region.SourceUniqueId == 10)
         {
             var mulu = template.Nodes.Single(node => node.Id == MuluEncounterNodeId).Encounters!.Single();

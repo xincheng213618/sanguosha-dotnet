@@ -4084,11 +4084,11 @@ public sealed class SkillProgramCatalog
             Fail(path, "Cannot-nullify ordinary tricks require genuine non-delayed trick kinds and no other qualifiers; counterspells use their paid node policy.");
         if (kind is SkillProgramCardPolicyKind.RandomRevealColorFireAttack or SkillProgramCardPolicyKind.UnrespondableNullification or
             SkillProgramCardPolicyKind.RevealFireAttackPayment or SkillProgramCardPolicyKind.AlliedHarvestOnly or
-            SkillProgramCardPolicyKind.AlliedPeachGardenDoubleRecovery)
+            SkillProgramCardPolicyKind.AlliedPeachGardenDoubleRecovery or SkillProgramCardPolicyKind.ClaimNullifiedTrick)
         {
             var required = kind switch
             {
-                SkillProgramCardPolicyKind.UnrespondableNullification => CardKind.Nullification,
+                SkillProgramCardPolicyKind.UnrespondableNullification or SkillProgramCardPolicyKind.ClaimNullifiedTrick => CardKind.Nullification,
                 SkillProgramCardPolicyKind.AlliedHarvestOnly => CardKind.FiveGrains,
                 SkillProgramCardPolicyKind.AlliedPeachGardenDoubleRecovery => CardKind.PeachGarden,
                 _ => CardKind.FireAttack

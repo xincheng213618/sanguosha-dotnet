@@ -8,6 +8,9 @@ public sealed class StandardShanheLocalTroopPackage : IGameContentPackage
     public const string FootmanId = "shanhe:local-footman";
     public const string ArcherId = "shanhe:local-archer";
     public const string GuardId = "shanhe:local-guard";
+    public const string MedicId = "shanhe:local-medic";
+    public const string RedBladeId = "shanhe:local-red-blade";
+    public const string CaptainId = "shanhe:local-captain";
     public static readonly Version CurrentVersion = new(1, 0, 0);
     public PackageManifest Manifest { get; } = new("shanhe-local-troops", CurrentVersion,
         [new("standard-classic-generals", StandardClassicGeneralPackage.CurrentVersion)]);
@@ -17,6 +20,9 @@ public sealed class StandardShanheLocalTroopPackage : IGameContentPackage
         Add(FootmanId, "西凉步卒（本地）", 4, null);
         Add(ArcherId, "西凉弓手（本地）", 5, "classic:mashu");
         Add(GuardId, "西凉卫士（本地）", 6, "classic:yizhong");
+        Add(MedicId, "西凉军医（本地）", 4, "classic:jijiu");
+        Add(RedBladeId, "西凉赤刃卒（本地）", 4, "classic:wusheng");
+        Add(CaptainId, "西凉校尉（本地）", 6, "classic:yingzi");
 
         void Add(string id, string name, int hp, string? skillId) => builder.AddGeneral(new(id, name,
             "supporter", skillId, "qun", hp)

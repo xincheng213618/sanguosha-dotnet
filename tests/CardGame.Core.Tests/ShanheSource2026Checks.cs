@@ -17,7 +17,7 @@ internal static class ShanheSource2026Checks
                 "Every source recipe binds its real selected tier and immutable growth table.");
             var graph = StandardShanheSourceRouteCatalog.Season5;
             var expectedRegions = graph.Regions.Where(region => region.MinimumSourceDifficultyId <= difficulty).ToArray();
-            Need(definition.Nodes.Count == expectedRegions.Length * 11 && definition.StartingNodeIds.SequenceEqual(["source-region-2:market", "source-region-4:market"]),
+            Need(definition.Nodes.Count == expectedRegions.Length * 12 && definition.StartingNodeIds.SequenceEqual(["source-region-2:market", "source-region-4:market"]),
                 "Source region gates and the two random first-chapter entries survive itinerary compression.");
             foreach (var region in expectedRegions)
             {

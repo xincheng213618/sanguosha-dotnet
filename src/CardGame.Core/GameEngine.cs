@@ -17823,10 +17823,13 @@ public sealed partial class GameEngine
             var completedResponseDying = TryGetCompletedNullificationDyingCosts(responseWindow, out var rescueCosts) ||
                 TryGetResponseExchangeMovementDyingCosts(responseWindow, out rescueCosts);
             var counterspellPaymentRide = TryGetPolicyCounterspellPaymentRide(nullification, out var paymentRescueCosts);
+            var shanheClaimRide = TryGetShanheNullifiedClaimRide(nullification, out var claimChildCosts);
             var slotNamedPaymentRide = HasWoLongFengChuUseObserver(nullification.ParentFrameId);
             completedResponseDying |= counterspellPaymentRide && ActiveDying is not null;
+            completedResponseDying |= shanheClaimRide && ActiveDying is not null;
             completedResponseDying |= slotNamedPaymentRide && ActiveDying is not null;
             if (counterspellPaymentRide) rescueCosts = paymentRescueCosts;
+            if (shanheClaimRide) rescueCosts = rescueCosts.Concat(claimChildCosts).Distinct().ToArray();
             var expectedPhysicalCardIds = nullification.DelayedReturn is not null || IsZeroEntityUse(nullification.ParentFrameId) || IsNativeSlashTargetDuelZeroUse(nullification.ParentFrameId) || IsProgramVirtualOrdinaryTrickUse(nullification.ParentFrameId) ? Array.Empty<int>() : IsDamageTargetDuelUse(nullification.ParentFrameId) ? DamageTargetDuelOuterProcessing(nullification.ParentFrameId) : (IsSelectedActorDuelUse(nullification.ParentFrameId) || IsDualColorDuelUse(nullification.ParentFrameId) || IsConditionalDiscardDuelUse(nullification.ParentFrameId) || IsFriendRecastDuelUse(nullification.ParentFrameId) || IsZhenyingDuelUse(nullification.ParentFrameId) || IsHeJinMouzhuDuelUse(nullification.ParentFrameId) || IsWuAnGuoLiyongDuelUse(nullification.ParentFrameId) || IsJueshengDuelUse(nullification.ParentFrameId)) ? Array.Empty<int>() : nullificationCardUse?.PhysicalCardIds is { Count: > 0 } physicalCardIds
                 ? physicalCardIds
                 : [nullification.EffectCardId];
@@ -17845,7 +17848,7 @@ public sealed partial class GameEngine
             if (lixianParentProcessing is null && (ActiveCardAttack is not null ||
                 ActiveDuel is not null || ActiveGroupCard is not null && !IsGroupTargetNullification(nullification) || ActiveFireAttack is not null) ||
                 ActiveDying is not null && !completedResponseDying ||
-                ActiveDamageTrigger is not null && !slotNamedPaymentRide && lixianParentProcessing is null ||
+                ActiveDamageTrigger is not null && !slotNamedPaymentRide && !shanheClaimRide && lixianParentProcessing is null ||
                 ActiveTargetCardSelection is not null)
             {
                 throw new InvalidOperationException(
@@ -17862,7 +17865,7 @@ public sealed partial class GameEngine
                     "A Nullification window must retain its response cursor below any response trigger.");
             }
 
-            if (responseWindow is null && !counterspellPaymentRide && !slotNamedPaymentRide &&
+            if (responseWindow is null && !counterspellPaymentRide && !shanheClaimRide && !slotNamedPaymentRide &&
                 !HasMobileSimaRenjieNativeSubtree(nullification.ParentFrameId))
             {
                 var currentNullificationCards = nullification.CandidateIndex < nullification.CandidateSeats.Count
@@ -19272,7 +19275,8 @@ public sealed partial class GameEngine
             .Any(frame => IsNullificationResponseProgramWindow(frame) &&
                 ActiveNullificationWindow?.Id == frame.ParentFrameId) || ActiveNullificationWindow is { } jueyanNullification && HasMouXqJueyanResponseContinuation(jueyanNullification.Id);
         var awaitingNullificationPayment = ActiveNullificationWindow is { } paymentWindow &&
-            (TryGetPolicyCounterspellPaymentRide(paymentWindow, out _) || HasWoLongFengChuUseObserver(paymentWindow.ParentFrameId) ||
+            (TryGetPolicyCounterspellPaymentRide(paymentWindow, out _) || TryGetShanheNullifiedClaimRide(paymentWindow, out _) ||
+                HasWoLongFengChuUseObserver(paymentWindow.ParentFrameId) ||
                 HasMobileSimaRenjieNativeSubtree(paymentWindow.ParentFrameId));
         if (!(HasHappyDianWeiGuardPrompt() || HasHappyPangTongPrompt() || HasHappyDiaoChanPrompt() || HasHappyQiaoHealthPrompt() || HasHappyZuoCiPrompt() || HasAnniversaryHuZhaoPrompt() || HasAnniversaryXuJingPrompt() || HasDuKuiPrompt() || HasAnniversaryLiuYongPrompt() || HasAnniversaryLiuLiPrompt() || HasAnniversaryBaiLingYunPrompt() || HasZhangFenPrompt() || HasAnniversaryYangBiaoPrompt() || HasAnniversaryHeYanPrompt() || HasAnniversaryGuoZhaoPrompt() || HasAnniversaryFengXiPrompt() || HasAnniversaryJiedaoPrompt() || HasAnniversaryFuRongFuQianPrompt() || HasAnniversaryGaoXiangPrompt() || HasAnniversaryZhangWenPrompt() || HasAnniversaryZhangXunPrompt() || (HasAnniversarySunHuanPrompt() || HasShiGyPrompt() || HasShiLsPrompt()) || HasAnniversaryMuShunPrompt() || HasAnniversaryXingDaoRongPrompt() || HasAnniversaryHanSongPrompt() || HasAnniversaryXiahouHuiPrompt() || HasAnniversaryXunXuPrompt() || HasAnniversaryZhangHuanPrompt() || HasAnniversaryCheZhouPrompt() || HasAnniversaryWangChangPrompt() || HasAnniversaryWuFuPrompt() || HasAnniversaryMaTiePrompt() || HasAnniversaryYanXiangPrompt() || HasAnniversaryCuiLiePrompt() || HasAnniversaryHouChengPrompt() || HasAnniversaryMaMiaoPrompt() || HasAnniversaryYuanYinPrompt() || HasAnniversaryQiaoRuiPrompt() || HasAnniversaryHuCheErPrompt() || HasAnniversaryZhangHengPrompt() || HasAnniversaryLeiBoPrompt() || HasAnniversaryHaoMengPrompt() || HasMobileHeQiPrompt() || HasBoundaryLiuFengPrompt()) && !HasLeChengyanBorrowedPrompt() && !HasExactWenhePoisonResponseContinuation() && !HasHulaoAllianceFeastPrompt() && !HasShenwuTrickPrompt() && !HasMantianGuohaiPrompt() && !HasHellSoulPrompt() && !HasWenheChaosPrompt() && !HasWumiaoFloodDiscardPrompt() && !HasQizhengPrompt() && !HasDragonBoatDiscardPrompt() && !_resolutionStack.OfType<CardEffectBeforeApplyFrame>().Any() && CurrentDamageAttempt is null &&
             ActiveNullificationWindow is null &&

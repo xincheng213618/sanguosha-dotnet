@@ -513,6 +513,7 @@ internal sealed partial class HealthContinuationRuntime
             movement.ResumeSoleIncomingRangeDrawFrameId is not null ||
             movement.ResumeNativeCardEffectDrawFrameId is not null ||
             movement.ResumeColorFireAttackFrameId is not null || movement.ResumeCounterspellPaymentFrameId is not null ||
+            movement.ResumeShanheNullifiedClaimWindowId is not null ||
             movement.ResumeHistoricalEndingUseFrameId is not null || movement.ResumeRoundPileAlcoholUseFrameId is not null ||
             movement.ResumeGuoSiUseFrameId is not null || movement.ResumeDenglouUseFrameId is not null ||
             movement.ResumeDrawPhaseObligationFrameId is not null || movement.ResumeManualDiscardFrameId is not null || movement.ResumeFactionRequestCostFrameId is not null ||

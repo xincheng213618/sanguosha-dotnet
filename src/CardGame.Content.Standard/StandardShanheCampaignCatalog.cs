@@ -210,7 +210,9 @@ public static partial class StandardShanheCampaignCatalog
         var ids = new[] { requirements.PlayerGeneralId }.Concat(requirements.AllyRoster.Select(m => m.GeneralId))
             .Concat(requirements.EnemyRoster.Select(m => m.GeneralId)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal);
         var localTroops = ids.Any(id => id is StandardShanheLocalTroopPackage.FootmanId or
-            StandardShanheLocalTroopPackage.ArcherId or StandardShanheLocalTroopPackage.GuardId);
+            StandardShanheLocalTroopPackage.ArcherId or StandardShanheLocalTroopPackage.GuardId or
+            StandardShanheLocalTroopPackage.MedicId or StandardShanheLocalTroopPackage.RedBladeId or
+            StandardShanheLocalTroopPackage.CaptainId);
         var codexEquipment = RequiresCodexEquipmentRegistry(requirements);
         var currentFarStrike = RequiresCurrentFarStrikeRegistry(requirements);
         var currentJinnangJi = RequiresCurrentJinnangJiRegistry(requirements);
@@ -244,6 +246,7 @@ public static partial class StandardShanheCampaignCatalog
         var dismantlementStock = RequiresCurrentDismantlementStockRegistry(requirements);
         var badaoTactics = RequiresCurrentBadaoRegistry(requirements);
         var steadyHandTactic = RequiresCurrentSteadyHandRegistry(requirements);
+        var counterspellClaimTactic = RequiresCurrentCounterspellClaimRegistry(requirements);
         var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
@@ -411,6 +414,7 @@ public static partial class StandardShanheCampaignCatalog
             (dismantlementStock ? "/current-dismantlement-stock" : "") +
             (badaoTactics ? "/current-badao" : "") +
             (steadyHandTactic ? "/current-steady-hand" : "") +
+            (counterspellClaimTactic ? "/current-counterspell-claim" : "") +
             (wealthTactics ? "/current-wealth-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
@@ -531,6 +535,7 @@ public static partial class StandardShanheCampaignCatalog
             if (dismantlementStock) packages.Add(new StandardShanheDismantlementStockPackage());
             if (badaoTactics) packages.Add(new StandardShanheBadaoPackage());
             if (steadyHandTactic) packages.Add(new StandardShanheSteadyHandPackage());
+            if (counterspellClaimTactic) packages.Add(new StandardShanheCounterspellClaimPackage());
             if (reactionTactics)
             {
                 packages.Add(new StandardShanheArmorTacticsPackage());

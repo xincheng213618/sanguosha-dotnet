@@ -466,6 +466,7 @@ internal static class RuntimeRules_Core_CommonRules
 
     internal static bool HasAlternateProgramMovementReturn(CardsMovedTriggerWindowFrame movement,
         bool allowFactionRequestCost = false) =>
+        movement.ResumeShanheNullifiedClaimWindowId is not null ||
         movement.ResumeFriendDuelResponseFrameId is not null || movement.ResumeDeclarationFrameId is not null || movement.ResumeDrawFundedDistinctBasicFrameId is not null ||
         movement.ResumeRecoveryReplacementFrameId is not null || movement.ResumePaidCardUseFrameId is not null ||
         movement.ResumeSoleIncomingRangeDrawFrameId is not null ||

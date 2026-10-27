@@ -35,6 +35,7 @@ public enum SkillProgramCardPolicyKind
     AlliedPeachGardenDoubleRecovery = 4404,
     VisibleTargetHandDuringTrick = 4405,
     DismantlementSelectionLimit = 4406,
+    ClaimNullifiedTrick = 4407,
     CannotNullifyOwnOrdinaryTrick = 8102,
     // Value 0 prohibits all others; value 1 limits this policy to distance one.
     ProhibitOthersResponse = 5724,

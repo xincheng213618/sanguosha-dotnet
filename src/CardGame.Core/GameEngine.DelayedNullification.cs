@@ -37,6 +37,7 @@ public sealed partial class GameEngine
             window.SourceSeat == delayed.OwnerSeat && window.TargetSeats.SequenceEqual([delayed.OwnerSeat]) &&
             _turnNumber == delayed.TurnNumber && _phase == delayed.Phase && _currentSeat == delayed.OwnerSeat &&
             (delayed.OriginalUseLightning is not null ? ValidOriginalUseLightningDelayed(delayed) :
+             HasShanheClaimedDelayedOwner(window, delayed) ||
              _cardZones.GetLocation(delayed.CardId) == CardLocation.Judgment(delayed.OwnerSeat) &&
              GetJudgmentEffectiveCardKind(GetNullificationEffectCard(window)) == delayed.EffectiveKind);
     }
@@ -56,6 +57,7 @@ public sealed partial class GameEngine
             CompleteOriginalUseLightningNullification(delayed, window.EffectNullified, window.Id);
             return;
         }
+        if (TryCompleteShanheClaimedDelayedNullification(window, delayed)) return;
         var owner = _players[delayed.OwnerSeat];
         if (_winner != Winner.None || !owner.IsAlive) return;
         var card = GetJudgment(owner).SingleOrDefault(card => card.Id == delayed.CardId);

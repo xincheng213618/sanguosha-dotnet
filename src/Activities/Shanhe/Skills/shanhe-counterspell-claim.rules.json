@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:current-caochuanjiejian-2008", "revision": 1,
+      "cardPolicies": [
+        { "id": "claim-nullified-trick", "kind": "claimNullifiedTrick", "value": 0, "cardKinds": ["nullification"] }
+      ]
+    }
+  ]
+}
