@@ -2,6 +2,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CardGame.Core;
 using CardGame.Wpf.Resources;
@@ -35,6 +36,38 @@ internal static class ShanheSanshouArtworkChecks
             EquipmentCatalog.Get(CardKind.Duanhun) is { Slot: EquipmentSlot.Weapon, WeaponAttackRange: 2, IgnoresArmor: false } &&
             EquipmentCatalog.Get(CardKind.KunlunMirror).Slot == EquipmentSlot.Treasure,
             "The original new faces retain Duanhun's range2 weapon and Kunlun Mirror's Treasure slot, with text fallback for unknown equipment strips.");
+        CheckMirrorFallback(Path.Combine(output, "shanhe-zhaogu-mirror-fallback.png"));
+    }
+
+    private static void CheckMirrorFallback(string output)
+    {
+        var kind = CardKind.ZhaoguMirror;
+        var info = CardCatalog.Get(kind);
+        Program.Assert(CardArt.Get(kind) is null && CardArt.GetEquipment(kind) is null &&
+            !CardArt.NeedsRuntimeNameOverlay(kind) && info.DisplayName == "照骨镜" &&
+            EquipmentCatalog.Get(kind).Slot == EquipmentSlot.Treasure &&
+            new GuideCardEntry(info).Artwork is null,
+            "Without a verified original face the mirror uses the existing text fallback, never another treasure's printed name or picture.");
+        var model = new CardViewModel
+        {
+            Id = 9902, Kind = kind, Name = info.DisplayName, KindLabel = info.CategoryName,
+            SuitGlyph = "♦", Rank = "A", Description = info.Description, IsPlayable = true
+        };
+        var control = new ContentControl
+        {
+            Content = model, ContentTemplate = (DataTemplate)Application.Current.FindResource("CardFaceTemplate"),
+            HorizontalContentAlignment = HorizontalAlignment.Stretch, VerticalContentAlignment = VerticalAlignment.Stretch
+        };
+        Program.Render(new Border { Background = (Brush)Application.Current.FindResource("CardPaper"), Child = control }, 186, 260, output);
+        Program.Assert(!model.HasArtwork && !model.HasDynamicWeaponName &&
+            Program.Find<TextBlock>(control).Single(t => t.Name == "RuntimeCardName") is
+                { Visibility: Visibility.Collapsed } &&
+            Program.Find<Grid>(control).Single(g => g.Name == "CardTextFallback") is { Visibility: Visibility.Visible } fallback &&
+            Program.Find<TextBlock>(fallback).Any(t => t.Text == model.VerticalName && t.ActualHeight > 0) &&
+            Program.Find<TextBlock>(control).Single(t => t.Name == "CardRank").Text == "A" &&
+            Program.Find<TextBlock>(control).Single(t => t.Name == "CardSuit").Text == "♦",
+            "The production face renders the actual mirror title and shop Diamond-A appearance through its normal missing-artwork fallback.");
+        control.Content = null;
     }
 
     private static void CheckOriginalFace(CardKind kind, string name, string hash, string output)

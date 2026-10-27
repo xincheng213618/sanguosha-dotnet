@@ -14,6 +14,8 @@ public static partial class BuiltInEquipmentContent
             "锁定技，你造成的伤害无视护甲。", WeaponAttackRange: 2),
         new EquipmentDefinition(CardKind.KunlunMirror, "昆仑镜", EquipmentSlot.Treasure,
             "锁定技，当你受到锦囊牌的伤害后，防止同名锦囊牌本局对你造成的伤害。"),
+        new EquipmentDefinition(CardKind.ZhaoguMirror, "照骨镜", EquipmentSlot.Treasure,
+            "出牌阶段结束时，你可以展示手牌中一张基本牌或普通锦囊牌，视为你使用之。"),
         new EquipmentDefinition(CardKind.ShanRangZhaoShu, "禅让诏书", EquipmentSlot.Treasure,
             "每回合每名角色限一次，当其他角色于其回合外首次获得牌时，你可以交给其一张牌或令其交给你一张牌。"),
         new EquipmentDefinition(
@@ -49,6 +51,7 @@ public static partial class BuiltInEquipmentContent
         new(CardKind.GouXiang, "shanhe:gouxiang-armor-14088", "equipment:shanhe-gouxiang"),
         new(CardKind.Duanhun, "shanhe:duanhun-14079", "equipment:shanhe-duanhun"),
         new(CardKind.KunlunMirror, "shanhe:kunlun-mirror-14080", "equipment:shanhe-kunlun-mirror"),
+        new(CardKind.ZhaoguMirror, "shanhe:zhaogu-mirror-6018", "equipment:shanhe-zhaogu-mirror"),
         new(CardKind.ShanRangZhaoShu, "shanhe:chanrang-edict-1510", "equipment:shanhe-chanrang"),
         new(CardKind.ZhanhunDao, "shanhe:zhanhun-dao", "equipment:shanhe-zhanhun"),
         new(CardKind.AnqiFeiren, "shanhe:anqi-feiren", "equipment:shanhe-anqi"),

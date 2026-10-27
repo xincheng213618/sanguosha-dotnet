@@ -13861,7 +13861,8 @@ public sealed partial class GameEngine
         if (aHuiNanJueman is not null || qinLangXianying is not null || tianChouShandao is not null || wuAnGuoLiyong is not null || heJinMouzhu is not null || zhenyingDuel is not null || chosenAssault is not null || selectedActorDuelOrigin is not null || damageTargetDuelOrigin is not null || dualColorDuelOrigin is not null || conditionalDiscardDuelOrigin is not null || shiQuanDuelOrigin is not null || virtualOrdinaryTrickOrigin is not null || friendRecastDuel is not null)
             actionContext = CaptureFactionAction(new CardActionContext(actionContext!.ActionId, actionContext.ParentActionId,
                 CardActionType.Use, sourceSeat, sourceSeat, null, null, null, aHuiNanJueman is null && qinLangXianying is null && tianChouShandao is null && virtualOrdinaryTrickOrigin is null && chosenAssault is null && heJinMouzhu is null ? CardKind.Duel : effectiveCardKind, targets, [], [], designated,
-                effectiveSuit: Suit.None, effectiveRank: 0, effectiveIsRed: false));
+                effectiveSuit: Suit.None, effectiveRank: 0,
+                effectiveIsRed: virtualOrdinaryTrickOrigin?.SkillId == "shanhe:zhaogu-mirror-6018" ? null : false));
         if (actionContext is not null) actionContext = PrepareMouDanchiAction(actionContext);
         if (actionContext is not null) actionContext = PrepareShenDaCuixinAction(actionContext);
         if (actionContext is not null) actionContext = PrepareHuanpeiAction(PrepareZonghuAction(PrepareWeijieAction(actionContext, weijieOrigin), zonghuOrigin), huanpeiOrigin);

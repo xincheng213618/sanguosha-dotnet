@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:zhaogu-mirror-6018", "revision": 1,
+    "triggers": [{
+      "id": "show-hand-card-and-use", "window": "playEnding", "subject": "owner",
+      "turnOwnerScope": "own", "optional": true,
+      "effects": [{ "op": "resolveShanheZhaoguMirror", "target": "owner" }]
+    }]
+  }]
+}

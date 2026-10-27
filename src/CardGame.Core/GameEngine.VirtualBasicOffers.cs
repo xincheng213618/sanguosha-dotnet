@@ -9,6 +9,7 @@ public sealed partial class GameEngine
     {
         if (frame.VirtualBasicDraft is not { } draft) return;
         if ((effect.Op != SkillProgramEffectOp.OfferVirtualBasicCard &&
+             !(effect.Op == SkillProgramEffectOp.ResolveShanheZhaoguMirror && IsZhaoguVirtualBasicDraft(frame, draft)) &&
              !(effect.Op == SkillProgramEffectOp.UseVirtualAlcohol && IsExactProvenanceVirtualBasicDraft(frame, draft)) &&
              !(effect.Op == SkillProgramEffectOp.UsePhaseOwnerVirtualAlcohol && IsExactPhaseAlcoholVirtualDraft(frame, draft)) &&
              !(effect.Op == SkillProgramEffectOp.UseHellPreparationAlcohol && IsExactHellPreparationAlcoholDraft(frame, draft)) &&
@@ -47,6 +48,7 @@ public sealed partial class GameEngine
     }
 
     private IEnumerable<(CardKind Kind, int Target)> VirtualBasicOptions(ProgramSkillFrame frame) =>
+        frame.ZhaoguMirror is not null ? ZhaoguVirtualBasicOptions(frame) :
         frame.SkillId == "guandu:choulue" ? GuanduChoulueFrozenBasicKind(frame) is { } kind
             ? VirtualBasicOptions(frame.OwnerSeat).Where(o => o.Kind == kind) : [] : VirtualBasicOptions(frame.OwnerSeat, anyRegisteredBasic: true);
 
@@ -164,6 +166,7 @@ public sealed partial class GameEngine
         var frame = GetActiveProgramFrame(receipt.ParentFrameId);
         if (frame.VirtualBasicDraft is not { } draft || draft.ChildFrameId != childId || draft.InstructionIndex != receipt.InstructionIndex || frame.InstructionIndex != receipt.InstructionIndex || _resolutionStack.LastOrDefault()?.Id != frame.Id)
             throw new InvalidOperationException("The virtual basic child lost its exact paid program return.");
+        frame = CompleteZhaoguVirtualBasicReceipt(frame, childId);
         ReplaceRuntimeTop(frame with { VirtualBasicDraft = null });
         AdvanceRuntimeProgram(frame.Id);
     }

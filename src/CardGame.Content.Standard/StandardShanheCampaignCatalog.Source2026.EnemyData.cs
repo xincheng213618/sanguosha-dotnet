@@ -14,6 +14,10 @@ public static partial class StandardShanheCampaignCatalog
     private static readonly IReadOnlyDictionary<int, Source2026EnemyData[]> Source2026EnemyDataByGroup =
         new ReadOnlyDictionary<int, Source2026EnemyData[]>(new Dictionary<int, Source2026EnemyData[]>
         {
+            [2497] =
+            [
+                new(4861, 4, 4, 2, 4, 0, 0, 0, 5, 0, false, []),
+            ],
             [2473] =
             [
                 new(4861, 4, 4, 2, 4, 0, 0, 0, 5, 0, false, []),

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:zhaogu-mirror-6018": {
+      "name": "照骨镜",
+      "description": "出牌阶段结束时，你可以展示手牌中一张基本牌或普通锦囊牌，视为你使用之。"
+    }
+  }
+}

@@ -1255,6 +1255,7 @@ public sealed partial class GameEngine
             AssertProvenanceAlcohol(frame);
             AssertAdjacentDiscardStorage(frame); AssertCompletedUsePayment(frame); AssertRoundPileAlcohol(frame); AssertCurrentSlashFireDraft(frame);
             AssertVirtualBasicDraft(frame, paused);
+            AssertZhaoguMirror(frame, paused);
             AssertProgramVirtualSlashOffer(frame, paused);
             if (!frame.CardSetBindings.Any(binding => binding.Name == paused.ResultBind))
                 AssertProgramEquipmentColorDiscardChoice(frame, paused);

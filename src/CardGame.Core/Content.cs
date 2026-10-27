@@ -436,6 +436,10 @@ public static class CardCatalog
                 CardKind.KunlunMirror, "昆仑镜", "装备牌",
                 "锁定技，当你受到锦囊牌的伤害后，防止同名锦囊牌本局对你造成的伤害。",
                 AiPlayValue: 38, AiResponseValue: 0, HandKeepValue: 45),
+            [CardKind.ZhaoguMirror] = new(
+                CardKind.ZhaoguMirror, "照骨镜", "装备牌",
+                "出牌阶段结束时，你可以展示手牌中一张基本牌或普通锦囊牌，视为你使用之。",
+                AiPlayValue: 38, AiResponseValue: 0, HandKeepValue: 45),
             [CardKind.XingtianAxe] = new(
                 CardKind.XingtianAxe, "刑天破军斧", "装备牌",
                 "攻击范围 4，单一目标用牌后可弃两张牌，令其本回合不能使用或打出手牌且防具失效。",

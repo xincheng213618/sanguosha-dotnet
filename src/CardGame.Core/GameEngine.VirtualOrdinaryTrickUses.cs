@@ -225,6 +225,7 @@ public sealed partial class GameEngine
     }
     private bool ValidProgramVirtualOrdinaryTrickUse(CardUseFrame use)
     {
+        if (use.VirtualOrdinaryTrickOrigin?.SkillId == "shanhe:zhaogu-mirror-6018") return IsZhaoguVirtualOrdinaryTrickUse(use);
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == "mobile:shi-xiaoge") return ValidShiZyVirtualDuelUse(use);
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == "mobile:shi-jixi") return ValidShiDaVirtualSnatchUse(use);
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == "anniversary:zhuning") return IsAnniversaryLiuYongVirtualUse(use);
@@ -362,6 +363,11 @@ public sealed partial class GameEngine
     [NativeUseReturn(210)]
     private void ReturnProgramVirtualOrdinaryTrick(CardUseFrame use)
     {
+        if (use.VirtualOrdinaryTrickOrigin?.SkillId == "shanhe:zhaogu-mirror-6018")
+        {
+            ReturnZhaoguVirtualOrdinaryTrickUse(use);
+            return;
+        }
         if (use.VirtualOrdinaryTrickOrigin is not { } origin) return;
         if (TryReturnShiZyVirtualDuel(use)) return;
         if (TryReturnShiDaVirtualSnatch(use)) return;

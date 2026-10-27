@@ -1150,6 +1150,7 @@ public enum SkillProgramEffectOp
     ResolveShanheSourceFengshang = 62054,
     ResolveShanheSourceZhibing = 62055,
     ResolveKunlunMirror = 62056,
+    ResolveShanheZhaoguMirror = 62057,
     CollectPublicPile = 780,
     GrantNextCardTargetAdjustment = 782,
     GrantNextActualUseTargetAdjustment = 4700,
