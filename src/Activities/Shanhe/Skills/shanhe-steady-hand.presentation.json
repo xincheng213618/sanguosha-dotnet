@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:current-xinshou-nianlai-2166": {
+      "name": "信手拈来",
+      "description": "你的手牌上限不因体力值改变而改变。"
+    }
+  }
+}

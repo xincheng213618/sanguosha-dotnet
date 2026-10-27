@@ -243,6 +243,7 @@ public static partial class StandardShanheCampaignCatalog
         var targetHandVisibility = RequiresCurrentTargetHandVisibilityRegistry(requirements);
         var dismantlementStock = RequiresCurrentDismantlementStockRegistry(requirements);
         var badaoTactics = RequiresCurrentBadaoRegistry(requirements);
+        var steadyHandTactic = RequiresCurrentSteadyHandRegistry(requirements);
         var extraSkills = requirements.ExtraSkillIds.Concat(requirements.TacticSkillIds)
             .Concat(requirements.AllyRoster.Concat(requirements.EnemyRoster).SelectMany(member => member.ExtraSkillIds ?? []))
             .ToHashSet(StringComparer.Ordinal);
@@ -409,6 +410,7 @@ public static partial class StandardShanheCampaignCatalog
             (targetHandVisibility ? "/current-target-hand-visibility" : "") +
             (dismantlementStock ? "/current-dismantlement-stock" : "") +
             (badaoTactics ? "/current-badao" : "") +
+            (steadyHandTactic ? "/current-steady-hand" : "") +
             (wealthTactics ? "/current-wealth-tactics" : "") +
             (currentFuqi ? "/current-fuqi-3100" : "") +
             (currentWangong ? "/current-wangong-3263" : "") +
@@ -528,6 +530,7 @@ public static partial class StandardShanheCampaignCatalog
             if (targetHandVisibility) packages.Add(new StandardShanheTargetHandVisibilityPackage());
             if (dismantlementStock) packages.Add(new StandardShanheDismantlementStockPackage());
             if (badaoTactics) packages.Add(new StandardShanheBadaoPackage());
+            if (steadyHandTactic) packages.Add(new StandardShanheSteadyHandPackage());
             if (reactionTactics)
             {
                 packages.Add(new StandardShanheArmorTacticsPackage());

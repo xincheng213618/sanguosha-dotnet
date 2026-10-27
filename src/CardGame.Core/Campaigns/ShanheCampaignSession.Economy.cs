@@ -30,6 +30,7 @@ public sealed partial class ShanheCampaignSession
     {
         var incomeBonus = OwnedEconomy(state).Sum(e => e.BattleGoldPercent);
         var income = Math.Max(0, checked(battleGold + (int)((long)battleGold * incomeBonus / 100)));
+        income = RandomizeBattleIncome(state, income);
         var principal = checked(state.Gold + income);
         var interest = OwnedEconomy(state).Sum(e => e.PostBattleInterestPercent);
         return checked(principal + (int)((long)principal * interest / 100));

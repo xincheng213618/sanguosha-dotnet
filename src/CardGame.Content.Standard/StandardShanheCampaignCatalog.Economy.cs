@@ -9,6 +9,8 @@ public static partial class StandardShanheCampaignCatalog
 {
     public const string CurrentInterest2RewardId = "tactic-economy-2146";
     public const string CurrentResourceSetRewardId = "tactic-economy-2230";
+    public const string CurrentGamblerRewardId = "tactic-economy-2217";
+    public const string CurrentGambler2RewardId = "tactic-economy-2218";
 
     // Public S5 tactics.json / tactic-tree.json, generated 2026-10-21.
     // 133 and 128 are random unlocks, not fixed grants of 2090 or 2181.
@@ -17,6 +19,10 @@ public static partial class StandardShanheCampaignCatalog
     {
         new ShanheEconomyTacticSource(2089, "tactic-economy-2089", "打秋风", 2, 300,
             "通过战斗获取的铜币增加20%。", new(BattleGoldPercent: 20)),
+        new(2217, CurrentGamblerRewardId, "赌徒Ⅰ", 1, 200,
+            "通过战斗获取的铜币将在50%-200%内随机。", new(BattleGoldRandomMinPercent: 50, BattleGoldRandomMaxPercent: 200)),
+        new(2218, CurrentGambler2RewardId, "赌徒Ⅱ", 2, 300,
+            "通过战斗获取的铜币将在0%-300%内随机。", new(BattleGoldRandomMinPercent: 0, BattleGoldRandomMaxPercent: 300)),
         new(2090, "tactic-economy-2090", "利滚利", 2, 300,
             "每场战斗后，你的总铜币数量增加5%。", new(PostBattleInterestPercent: 5)),
         new(2146, CurrentInterest2RewardId, "利滚利Ⅱ", 4, 700,

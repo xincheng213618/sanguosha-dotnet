@@ -265,6 +265,7 @@ public sealed partial class GameEngine
     {
         var bindings = GetSkillBindingShard(player).GetNumericModifiers(query)
             .Where(binding => IsShanheSchoolSkillQualified(player.Seat, binding.Source.SkillId))
+            .Where(binding => IsShanheSteadyHandModifierQualified(player.Seat, binding.Source.SkillId))
             .Where(binding => binding.Modifier.RecipientScope == SkillRuleRecipientScope.Owner)
             .Where(binding => binding.Modifier.MinimumRound is not { } round || _roundNumber >= round)
             .Where(binding => binding.Modifier.ValueExpression != SkillRuleValueExpression.OwnerMarkerCount ||
