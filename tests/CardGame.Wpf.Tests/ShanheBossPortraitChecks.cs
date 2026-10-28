@@ -97,7 +97,19 @@ internal static class ShanheBossPortraitChecks
             ["shanhe:source-caosong-trio-2485-caosong-hard"] = "ol-cao-song",
             ["shanhe:source-caosong-trio-2485-caosong-hell"] = "ol-cao-song",
             ["shanhe:source-qianzhao-pair-2471-qianzhao-base"] = "ol-qian-zhao",
-            ["shanhe:source-qianzhao-pair-2471-qianzhao-hard"] = "ol-qian-zhao"
+            ["shanhe:source-qianzhao-pair-2471-qianzhao-hard"] = "ol-qian-zhao",
+            ["shanhe:source-wolong-trio-2482-wolong-base"] = "wolong-zhuge-liang",
+            ["shanhe:source-wolong-trio-2482-wolong-hard"] = "wolong-zhuge-liang",
+            ["shanhe:source-wolong-trio-2482-wolong-nightmare"] = "wolong-zhuge-liang",
+            ["shanhe:source-wolong-trio-2482-wolong-hell"] = "wolong-zhuge-liang",
+            ["shanhe:source-wolong-trio-2482-simahui-base"] = "ol-sima-hui",
+            ["shanhe:source-wolong-trio-2482-simahui-hard"] = "ol-sima-hui",
+            ["shanhe:source-wolong-trio-2482-simahui-nightmare"] = "ol-sima-hui",
+            ["shanhe:source-wolong-trio-2482-pangtong-base"] = "boundary-pang-tong",
+            ["shanhe:source-wolong-trio-2482-pangtong-nightmare"] = "boundary-pang-tong",
+            ["shanhe:source-liuyan-trio-2463-liuyan-base"] = "ol-liu-yan",
+            ["shanhe:source-liuyan-trio-2463-liuyan-hard"] = "ol-liu-yan",
+            ["shanhe:source-liuyan-trio-2463-liuyan-hell"] = "ol-liu-yan"
         };
         foreach (var (id, expectedKey) in ordinaryAliases)
         {

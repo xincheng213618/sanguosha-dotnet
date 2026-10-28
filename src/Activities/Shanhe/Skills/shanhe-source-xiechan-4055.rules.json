@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 62,
+  "skills": [{ "id": "shanhe:source-xiechan-4055", "revision": 1,
+    "activations": [{ "id": "limited-contest-duel", "minCards": 0, "maxCards": 0,
+      "minTargets": 1, "maxTargets": 1, "targetKind": "otherLivingWithHand", "usesPerTurn": null, "usesPerGame": 1,
+      "condition": { "kind": "handCountAtLeast", "value": 1 },
+      "effects": [
+        { "op": "startPindian", "target": "owner", "opponentRef": { "kind": "selectedTarget" }, "resultBind": "contest", "visibility": "public" },
+        { "op": "resolveShanheSourceXiechanDuel", "target": "owner" }
+      ]
+    }]
+  }]
+}

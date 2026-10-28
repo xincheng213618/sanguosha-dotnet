@@ -12,7 +12,7 @@ public static partial class StandardShanheCampaignCatalog
     {
         var potential = StandardShanheSourceRouteCatalog.Season5.GetPotentialBattleIds(city.SourceCityId);
         foreach (var group in new[] { 2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495,
-                     2451, 2457, 2498, 2500, 2454, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481, 2466, 2484, 2486, 2462, 2470, 2479, 2478 })
+                     2451, 2457, 2498, 2500, 2454, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481, 2466, 2484, 2486, 2462, 2470, 2479, 2478, 2488 })
         {
             if (!potential.Contains(group)) continue;
             var general = OrdinaryTroopGeneral(group, difficulty);
@@ -30,7 +30,7 @@ public static partial class StandardShanheCampaignCatalog
                 StoryText = OrdinaryTroopStory(group)
             }, group);
         }
-        foreach (var group in new[] { 2465, 2499, 2464, 2492, 2475, 2485, 2471 })
+        foreach (var group in new[] { 2465, 2499, 2464, 2492, 2475, 2485, 2471, 2482, 2491, 2463 })
         {
             if (!potential.Contains(group)) continue;
             yield return WithSource2026EnemyData(new("source-city-" + city.SourceCityId + ":troop-" + group,
@@ -172,6 +172,7 @@ public static partial class StandardShanheCampaignCatalog
         2470 => StandardShanheSourceZuoCiPackage.GetGeneralId(difficulty),
         2479 => StandardShanheSourceLiuSandaoPackage.GetGeneralId(difficulty),
         2478 => StandardShanheSourceWuCongPackage.GetGeneralId(difficulty),
+        2488 => StandardShanheSourceArmorerPackage.GetGeneralId(difficulty),
         2456 => StandardShanheSourceCoalitionTrioPackage.GetQuartermasterGeneralId(difficulty),
         2458 => StandardShanheSourceDemonRaiderPackage.GetGeneralId(difficulty),
         2461 => StandardShanheSourceDemonArcherPackage.GetGeneralId(difficulty),
@@ -206,6 +207,7 @@ public static partial class StandardShanheCampaignCatalog
         2475 => "民兵三人组", 2485 => "曹嵩与卫兵",
         2478 => "吴琮",
         2471 => "牵招与乌桓奇袭兵",
+        2482 => "卧龙诸葛、司马徽与庞统", 2488 => "周昕", 2491 => "盾阵卫队", 2463 => "刘焉与东州兵",
         2451 => "步珩", 2457 => "擒拿刺客 · 魔军刺客", 2498 => "羽林军", 2500 => "农都尉",
         2474 => "经验传承 · 百战老兵", 2467 => "乌桓贼匪 · 乌桓骑手", 2487 => "探听虚实 · 武卫兵",
         2473 => "趁人之危 · 羌人劫匪", 2480 => "空谈无益 · 荀悦",
@@ -236,6 +238,10 @@ public static partial class StandardShanheCampaignCatalog
         2485 => "曹嵩以翊正策应双卫兵，高档以威重补牌、龙威救援，卫兵用穿云打击体力较多的敌军。",
         2478 => "吴琮以铁炮反击伤害来源，命中后拉开单向距离；高档凭暗箭进击，并携贯石斧。",
         2471 => "牵招以威抚蓄势，高档可款塞调度；乌桓奇袭兵凭效死借牌、怨仇破甲。",
+        2482 => "卧龙诸葛凭八阵守御、火计进攻，司马徽与庞统从旁策应；高档结营连阵，再以兆火施压。",
+        2488 => "周昕以锻甲取得防具，高档再凭独进补牌、辎重填补空装备栏。",
+        2491 => "两翼盾阵引兵屯守，以绝地补给同伴；高档武卫骁勇镇卫中军，盾阵弃手牌卫主。",
+        2463 => "刘焉以图射调度辎重，高档立牧经营、观变蓄势；两翼东州兵以精骑减距，再以挟缠拼点决斗。",
         2458 => "魔军暴徒以强袭冲阵，高档凭劫掠夺取辎重，再以狼蹈施压。",
         2461 => "魔军弓骑弃牌拓展射程，高档以诱言补牌、扫谷连攻。",
         2464 => "刺客潜袭封牌，弓骑扫谷驰援，暴徒强袭劫掠。",

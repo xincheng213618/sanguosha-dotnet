@@ -4,7 +4,7 @@ using CardGame.Core.Campaigns;
 
 internal static class ShanheSourceMixedTroopChecks
 {
-    private static readonly int[] Groups = [2465, 2499, 2464, 2492, 2475, 2485, 2471];
+    private static readonly int[] Groups = [2465, 2499, 2464, 2492, 2475, 2485, 2471, 2482, 2491, 2463];
     private static bool SecondChapter(int group) => group is 2499 or 2475 or 2485 or 2471;
 
     public static void CompleteMixedSourceRecipesAndBothRecommendedRoutes()
@@ -188,14 +188,19 @@ internal static class ShanheSourceMixedTroopChecks
             var initial = game.CardMovements.Where(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(seat) &&
                 m.Reason == CardMoveReasons.InitialDeal).Select(m => m.CardId).ToArray();
             var extra = group == 2499 && i == 1 && tier >= 16 ? QiongshouDraw(game, seat) : [];
+            var gear = ExpectedGear(group, i, tier);
+            var fixedCards = game.CardMovements.Where(m => m.From == CardLocation.OutsideGame && m.To == CardLocation.Hand(seat))
+                .Select(m => m.CardId).ToArray();
+            var fixedViews = fixedCards.Select(id => player.Hand.Single(c => c.Id == id)).ToArray();
             Need(player.GeneralId == GeneralIds(group, tier)[i] && player.Hp == member.Hp &&
                 player.MaxHp == BaseHp(group, i) + member.MaxHpBonus && player.Armor == member.InitialArmor &&
                 player.Equipment.Count == 0 && initial.Length == deck.InitialHandSize + member.InitialHandBonus &&
                 initial.Distinct().Count() == initial.Length && !initial.Intersect(extra).Any() &&
-                initial.Concat(extra).Order().SequenceEqual(player.Hand.Select(c => c.Id).Order()) &&
-                !game.CardMovements.Any(m => m.From == CardLocation.OutsideGame && m.To == CardLocation.Hand(seat)) &&
+                !initial.Concat(extra).Intersect(fixedCards).Any() &&
+                initial.Concat(extra).Concat(fixedCards).Order().SequenceEqual(player.Hand.Select(c => c.Id).Order()) &&
+                fixedViews.Select(c => new ShanheStartingCard(c.Kind, c.Suit, c.Rank)).SequenceEqual(gear) &&
                 ExpectedSkills(group, i, tier).All(id => player.Skills!.Count(s => s.ContentId == id) == 1),
-                "Every actual enemy preserves its original seat/body and complete skill set; random initial entities and real skill draws conserve separately, with no fabricated fixed cards or auto-installed gear.");
+                "Every actual enemy preserves its original seat/body and complete skill set; random initial entities, exact fixed hand cards and real skill draws conserve separately without auto-installed gear.");
             if (group == 2465 && i == 2 && tier >= 11) AssertInitialGrain(game, seat);
         }
         Need(game.State.TurnNumber == 1 && game.State.CurrentSeat == 0 && game.State.Winner == Winner.None &&
@@ -213,8 +218,9 @@ internal static class ShanheSourceMixedTroopChecks
             Need(body.GeneralId == GeneralIds(group, tier)[i] && body.Hp == BaseHp(group, i) &&
                 body is { MaxHpBonus: 0, InitialHandBonus: 0, DrawBonus: 0, SlashBonus: 0, InitialArmor: 0,
                     ArmorRecoveryPerRound: 0, ArmorRecoveryCap: 5, ExtraDamage: 0 } &&
-                (body.SourceDifficultyAttributes ?? []).SequenceEqual(ExpectedAttributes(group, i)) && NoGear(body),
-                $"Source{group} member{i} preserves its ordered raw body, draw2/hand4 and complete cumulative att fields without local growth or equipment.");
+                (body.SourceDifficultyAttributes ?? []).SequenceEqual(ExpectedAttributes(group, i)) && OrdinaryShape(body) &&
+                (body.StartingCards ?? []).SequenceEqual(ExpectedGear(group, i, tier)),
+                $"Source{group} member{i} preserves its ordered raw body, draw2/hand4, cumulative att fields and exact held equipment without local growth.");
         }
     }
 
@@ -230,13 +236,14 @@ internal static class ShanheSourceMixedTroopChecks
             var bonus = (SecondChapter(group) ? 3 : 4) + 2 * growth +
                 (group == 2464 && i == 2 ? (tier >= 11 ? 1 : 0) + (tier >= 21 ? 1 : 0) : 0);
             var hand = (SecondChapter(group) ? 1 : 2) + growth + (group == 2465 && i == 2
-                ? (tier >= 16 ? 1 : 0) + (tier >= 21 ? 2 : 0) : group == 2499 && i == 1 && tier >= 16 ? 2 : group == 2485 && i > 0 ? (tier >= 16 ? 1 : 0) + (tier >= 21 ? 1 : 0) : 0);
+                ? (tier >= 16 ? 1 : 0) + (tier >= 21 ? 2 : 0) : group == 2499 && i == 1 && tier >= 16 ? 2 : group == 2485 && i > 0 ? (tier >= 16 ? 1 : 0) + (tier >= 21 ? 1 : 0) : group == 2491 && i != 1 && tier >= 6 ? 1 : 0);
             Need(member.GeneralId == GeneralIds(group, tier)[i] && member.MaxHpBonus == bonus &&
                 member.Hp == BaseHp(group, i) + bonus && member.InitialHandBonus == hand &&
                 member.DrawBonus == (SecondChapter(group) ? 1 : 2) && member.SourceDifficultyAttributes is null &&
-                member is { SlashBonus: 0, InitialArmor: 0, ArmorRecoveryPerRound: 0, ArmorRecoveryCap: 0, ExtraDamage: 0 } && NoGear(member) &&
+                member is { SlashBonus: 0, InitialArmor: 0, ArmorRecoveryPerRound: 0, ArmorRecoveryCap: 0, ExtraDamage: 0 } && OrdinaryShape(member) &&
+                (member.StartingCards ?? []).SequenceEqual(ExpectedGear(group, i, tier)) &&
                 1 + encounter.Enemies.Count <= 8,
-                "Each local member uses its own source base HP plus one explicit local curve and its own cumulative health/hand increments without gear or a source-growth pass.");
+                "Each local member uses its own source base HP plus one explicit local curve, exact held gear and its own cumulative health/hand increments without a source-growth pass.");
         }
     }
 
@@ -250,9 +257,12 @@ internal static class ShanheSourceMixedTroopChecks
             if (group == 2492) character = Character(i);
             if (group == 2485 && i == 0) character = "character:cao-song";
             if (group == 2471 && i == 0) character = "character:qian-zhao";
+            if (group == 2482) character = i switch { 0 => "character:zhuge-liang", 1 => "character:sima-hui", _ => "character:pang-tong" };
+            if (group == 2491) character = i == 1 ? "character:shanhe-source-general-4871" : "character:shanhe-source-soldier-4861";
+            if (group == 2463) character = i == 1 ? "character:liu-yan" : "character:shanhe-source-soldier-" + (i == 0 ? 4861 : 4862);
             Need(general.CharacterId == character && general.BaseHp == BaseHp(group, i) && general.InitialHp == BaseHp(group, i) &&
                 registry.IsGeneralPlayable(general.Id) && general.SkillIds.Order().SequenceEqual(ExpectedSkills(group, i, tier).Order()) &&
-                general.SkillIds.All(id => registry.GetSkill(id).Program is not null),
+                general.SkillIds.All(id => registry.GetSkill(id).Program is not null || id == StandardShanheSourceLiuYanTrioPackage.JingqiSkillId),
                 "Production dependency discovery loads every selected original SourceGeneralId body and all exact cumulative executable skills once.");
         }
     }
@@ -303,6 +313,9 @@ internal static class ShanheSourceMixedTroopChecks
         2475 => StandardShanheSourceMilitiaTrioPackage.GetRosterGeneralIds(tier),
         2485 => StandardShanheSourceCaoSongTrioPackage.GetRosterGeneralIds(tier),
         2471 => StandardShanheSourceQianZhaoPairPackage.GetRosterGeneralIds(tier),
+        2482 => StandardShanheSourceWolongTrioPackage.GetRosterGeneralIds(tier),
+        2491 => StandardShanheSourceGuardTrioPackage.GetRosterGeneralIds(tier),
+        2463 => StandardShanheSourceLiuYanTrioPackage.GetRosterGeneralIds(tier),
         2465 => new[] { StandardShanheSourceCoalitionTrioPackage.GetSpyGeneralId(tier),
             StandardShanheSourceCoalitionTrioPackage.GetScoutGeneralId(tier), StandardShanheSourceCoalitionTrioPackage.GetQuartermasterGeneralId(tier) },
         2464 => new[] { StandardShanheSourceDemonAssassinPackage.GetGeneralId(tier),
@@ -311,6 +324,31 @@ internal static class ShanheSourceMixedTroopChecks
     };
     private static string[] ExpectedSkills(int group, int index, int tier)
     {
+        if (group == 2482)
+            return index switch
+            {
+                0 => new[] { StandardShanheSourceWolongTrioPackage.BazhenSkillId }
+                    .Concat(tier >= 11 ? [StandardShanheSourceWolongTrioPackage.HuojiSkillId] : Array.Empty<string>())
+                    .Concat(tier >= 16 ? [StandardShanheSourceWolongTrioPackage.JieyingSkillId] : Array.Empty<string>())
+                    .Concat(tier >= 21 ? [StandardShanheSourceWolongTrioPackage.ZhaohuoSkillId] : Array.Empty<string>()).ToArray(),
+                1 => new[] { StandardShanheSourceWolongTrioPackage.YinshiSkillId }
+                    .Concat(tier >= 11 ? [StandardShanheSourceWolongTrioPackage.ChenghaoSkillId] : Array.Empty<string>())
+                    .Concat(tier >= 16 ? [StandardShanheSourceWolongTrioPackage.JieyingSkillId] : Array.Empty<string>()).ToArray(),
+                _ => new[] { StandardShanheSourceWolongTrioPackage.NiepanSkillId }
+                    .Concat(tier >= 16 ? [StandardShanheSourceWolongTrioPackage.JieyingSkillId] : Array.Empty<string>()).ToArray()
+            };
+        if (group == 2491)
+            return index == 1
+                ? (tier >= 11 ? [StandardShanheSourceGuardTrioPackage.ZhenweiSkillId] : [])
+                : new[] { StandardShanheSourceGuardTrioPackage.YinbingSkillId, StandardShanheSourceGuardTrioPackage.JuediSkillId }
+                    .Concat(tier >= 21 ? [StandardShanheSourceGuardTrioPackage.WeizhuSkillId] : Array.Empty<string>()).ToArray();
+        if (group == 2463)
+            return index == 1
+                ? new[] { StandardShanheSourceLiuYanTrioPackage.TusheSkillId }
+                    .Concat(tier >= 11 ? [StandardShanheSourceLiuYanTrioPackage.LimuSkillId] : Array.Empty<string>())
+                    .Concat(tier >= 21 ? [StandardShanheSourceLiuYanTrioPackage.GuanbianSkillId] : Array.Empty<string>()).ToArray()
+                : new[] { StandardShanheSourceLiuYanTrioPackage.JingqiSkillId }
+                    .Concat(tier >= 11 ? [StandardShanheSourceLiuYanTrioPackage.XiechanSkillId] : Array.Empty<string>()).ToArray();
         if (group == 2471)
             return index == 0
                 ? new[] { StandardShanheSourceQianZhaoPairPackage.WeifuSkillId }
@@ -378,6 +416,7 @@ internal static class ShanheSourceMixedTroopChecks
         group == 2465 && index == 2 ? new[] { new ShanheSourceEnemyTierAttributes(4, new(StartingCards: 1)), new(5, new(StartingCards: 2)) }
         : group == 2499 && index == 1 ? new[] { new ShanheSourceEnemyTierAttributes(4, new(StartingCards: 2)) }
         : group == 2485 && index > 0 ? new[] { new ShanheSourceEnemyTierAttributes(4, new(StartingCards: 1)), new(5, new(StartingCards: 1)) }
+        : group == 2491 && index != 1 ? new[] { new ShanheSourceEnemyTierAttributes(2, new(StartingCards: 1)) }
         : group == 2464 && index == 2 ? new[] { new ShanheSourceEnemyTierAttributes(3, new(Hp: 1)), new(5, new(Hp: 1)) } : [];
     private static int Count(int group) => group is 2499 or 2471 ? 2 : 3;
     private static int BaseHp(int group, int index) => group switch
@@ -388,17 +427,29 @@ internal static class ShanheSourceMixedTroopChecks
         2492 or 2475 => 4,
         2485 => index == 0 ? 6 : 2,
         2471 => index == 0 ? 4 : 2,
+        2482 => 3,
+        2491 => index == 1 ? 5 : 4,
+        2463 => index == 1 ? 3 : 2,
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static string LocalSuffix(int group) => group switch
     {
         2499 => ":yulin-officer-2499-local", 2465 => ":coalition-trio-2465-local", 2464 => ":demon-trio-2464-local", 2492 => ":jiangdong-trio-2492-local",
         2475 => ":militia-trio-2475-local", 2485 => ":caosong-trio-2485-local", 2471 => ":qianzhao-pair-2471-local",
+        2482 => ":wolong-trio-2482-local", 2491 => ":guard-trio-2491-local", 2463 => ":liuyan-trio-2463-local",
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static int LocalTier(int difficulty) => difficulty switch { 1 => 1, 2 => 11, 3 => 21, _ => throw new ArgumentOutOfRangeException(nameof(difficulty)) };
-    private static bool NoGear(ShanheCombatantDefinition member) => member.StartingHand is null &&
-        (member.StartingCards?.Count ?? 0) == 0 && (member.StartingEquipment?.Count ?? 0) == 0 &&
+    private static IReadOnlyList<ShanheStartingCard> ExpectedGear(int group, int index, int tier) =>
+        tier < 16 ? [] : group switch
+        {
+            2482 when index == 0 => [new(CardKind.BaguaFormation, Suit.Diamond, 2)],
+            2491 when index != 1 => [new(CardKind.RenwangShield, Suit.Diamond, 2)],
+            2463 when index == 1 => [new(CardKind.ZhangbaSerpentSpear, Suit.Club, 12)],
+            _ => []
+        };
+    private static bool OrdinaryShape(ShanheCombatantDefinition member) => member.StartingHand is null &&
+        (member.StartingEquipment?.Count ?? 0) == 0 &&
         (member.ExtraSkillIds?.Count ?? 0) == 0 && (member.QualifiedPrintedLordSkillIds?.Count ?? 0) == 0;
     private static bool SameMembers(IReadOnlyList<ShanheCombatantDefinition> left, IReadOnlyList<ShanheCombatantDefinition> right) =>
         left.Count == right.Count && left.Zip(right).All(p => p.First.GeneralId == p.Second.GeneralId && p.First.Hp == p.Second.Hp &&
@@ -406,6 +457,7 @@ internal static class ShanheSourceMixedTroopChecks
             p.First.DrawBonus == p.Second.DrawBonus && p.First.SlashBonus == p.Second.SlashBonus &&
             p.First.InitialArmor == p.Second.InitialArmor && p.First.ArmorRecoveryPerRound == p.Second.ArmorRecoveryPerRound &&
             p.First.ArmorRecoveryCap == p.Second.ArmorRecoveryCap && p.First.ExtraDamage == p.Second.ExtraDamage &&
-            (p.First.SourceDifficultyAttributes ?? []).SequenceEqual(p.Second.SourceDifficultyAttributes ?? []) && NoGear(p.First) && NoGear(p.Second));
+            (p.First.SourceDifficultyAttributes ?? []).SequenceEqual(p.Second.SourceDifficultyAttributes ?? []) &&
+            (p.First.StartingCards ?? []).SequenceEqual(p.Second.StartingCards ?? []) && OrdinaryShape(p.First) && OrdinaryShape(p.Second));
     private static void Need(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
 }

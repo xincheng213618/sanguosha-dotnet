@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-duanjia-14095", "revision": 1,
+      "triggers": [
+        {
+          "id": "preparation-place-random-missing-armor", "window": "turnStartBeforeNormalFlow",
+          "subject": "owner", "optional": false,
+          "effects": [{ "op": "placeRandomMissingArmorDeckEquipment", "target": "owner" }]
+        }
+      ]
+    }
+  ]
+}

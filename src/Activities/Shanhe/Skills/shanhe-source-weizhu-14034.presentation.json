@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-weizhu-14034": {
+      "name": "卫主",
+      "description": "己方队友受到伤害时，你可以弃置1张手牌令此伤害无效。"
+    }
+  }
+}

@@ -4,9 +4,9 @@ using CardGame.Core.Campaigns;
 
 internal static class ShanheSourceOrdinaryTroopChecks
 {
-    private static readonly int[] Groups = [2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495, 2457, 2498, 2451, 2500, 2454, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481, 2466, 2484, 2486, 2462, 2470, 2479, 2478];
+    private static readonly int[] Groups = [2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495, 2457, 2498, 2451, 2500, 2454, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481, 2466, 2484, 2486, 2462, 2470, 2479, 2478, 2488];
     private static bool FirstChapter(int group) => group is 2473 or 2455 or 2459 or 2460 or 2457 or 2498 or 2454 or 2456 or 2458 or 2461 or 2452 or 2453 or 2466 or 2484 or 2486 or 2470 or 2479;
-    private static bool ThirdChapter(int group) => group is 2493 or 2495 or 2468 or 2478;
+    private static bool ThirdChapter(int group) => group is 2493 or 2495 or 2468 or 2478 or 2488;
 
     public static void SourcePoolsAndBothRecommendedEntrypointsRetainCompleteTieredRecipes()
     {
@@ -132,7 +132,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
                 new[] { "luoyang", "suanzao", "henei", StandardShanheCampaignCatalog.ThirdChapterDongwuEliteId,
                     StandardShanheCampaignCatalog.MuluEncounterNodeId }.All(originalRoutes.Contains) &&
                 !patrol.NextNodeIds.Contains(camp.Id) && !patrol.NextNodeIds.Contains(patrol.Id) &&
-                patrol.Encounters is { Count: 7 },
+                patrol.Encounters is { Count: 11 },
                 "The optional third-chapter ordinary patrol preserves every existing final route, elite and Mulu detour without a cycle or a chapter-boss reward contract.");
             foreach (var group in Groups.Where(ThirdChapter))
             {
@@ -158,7 +158,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
     public static void SourceAndLocalPreviewMoveAndStartUseOneProjectionAndRealOpeningEntities()
     {
         var source = StandardShanheCampaignCatalog.CreateSourceCodexDefinition(25);
-        foreach (var group in new[] { 2474, 2480, 2497, 2455, 2459, 2489, 2493, 2495, 2498, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481, 2466, 2484, 2486, 2462, 2470, 2479, 2478 })
+        foreach (var group in new[] { 2474, 2480, 2497, 2455, 2459, 2489, 2493, 2495, 2498, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481, 2466, 2484, 2486, 2462, 2470, 2479, 2478, 2488 })
         {
             var cityNode = source.Nodes.First(n => n.Kind == ShanheNodeKind.Battle && n.Encounters!.Any(e => e.SourceBattleId == group));
             var sourceEncounter = cityNode.Encounters!.Single(e => e.SourceBattleId == group);
@@ -331,7 +331,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
             Need(general.CharacterId == (group == 2484 ? "character:gao-gan" : group is 2486 or 2462
                     ? "character:shanhe-source-general-4871" : "character:shanhe-source-soldier-4861"),
                 "Youyan, Gao Gan and the armory commander retain their actual4861/482/4871 bodies and cumulative skills.");
-        if (group == 2478) Need(general.CharacterId == "character:shanhe-source-general-4871", "Wu Cong retains the source4871 officer body.");
+        if (group is 2478 or 2488) Need(general.CharacterId == "character:shanhe-source-general-4871", "Wu Cong and Zhou Xin retain their original source4871 officer bodies.");
         if (group is 2470 or 2479)
             Need(general.CharacterId == (group == 2470 ? "character:zuo-ci" : "character:shanhe-source-general-4871"),
                 "Zuo Ci keeps source447 while Liu Sandao keeps source4871; neither imports another general's attached abilities.");
@@ -382,6 +382,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
             2470 => StandardShanheSourceZuoCiPackage.HuashenSkillId,
             2479 => StandardShanheSourceLiuSandaoPackage.ChongzhenSkillId,
             2478 => StandardShanheSourceWuCongPackage.TiepaoSkillId,
+            2488 => StandardShanheSourceArmorerPackage.DuanjiaSkillId,
             2456 => StandardShanheSourceCoalitionTrioPackage.DuliangSkillId,
             2458 => StandardShanheSourceDemonRaiderPackage.QiangxiSkillId,
             2461 => StandardShanheSourceDemonArcherPackage.GongqiSkillId,
@@ -503,6 +504,11 @@ internal static class ShanheSourceOrdinaryTroopChecks
         {
             if (difficulty >= 11) skills.Add(StandardShanheSourceWuCongPackage.AnjianSkillId);
         }
+        else if (group == 2488)
+        {
+            if (difficulty >= 11) skills.Add(StandardShanheSourceArmorerPackage.DujinSkillId);
+            if (difficulty >= 16) skills.Add(StandardShanheSourceArmorerPackage.ZizhongSkillId);
+        }
         else if (group == 2470)
         {
             skills.Add(StandardShanheSourceZuoCiPackage.XinshengSkillId);
@@ -578,6 +584,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
         2470 => StandardShanheSourceZuoCiPackage.GetGeneralId(difficulty),
         2479 => StandardShanheSourceLiuSandaoPackage.GetGeneralId(difficulty),
         2478 => StandardShanheSourceWuCongPackage.GetGeneralId(difficulty),
+        2488 => StandardShanheSourceArmorerPackage.GetGeneralId(difficulty),
         2456 => StandardShanheSourceCoalitionTrioPackage.GetQuartermasterGeneralId(difficulty),
         2458 => StandardShanheSourceDemonRaiderPackage.GetGeneralId(difficulty),
         2461 => StandardShanheSourceDemonArcherPackage.GetGeneralId(difficulty),
@@ -604,13 +611,13 @@ internal static class ShanheSourceOrdinaryTroopChecks
     {
         2474 => difficulty switch { 1 => 6, 2 => 16, _ => 21 },
         2473 => difficulty switch { 1 => 1, 2 => 11, _ => 16 },
-        2467 or 2487 or 2480 or 2497 or 2455 or 2459 or 2460 or 2476 or 2489 or 2493 or 2495 or 2457 or 2498 or 2451 or 2500 or 2454 or 2456 or 2458 or 2461 or 2452 or 2468 or 2494 or 2453 or 2469 or 2481 or 2466 or 2484 or 2486 or 2462 or 2470 or 2479 or 2478 => difficulty switch { 1 => 1, 2 => 11, _ => 21 },
+        2467 or 2487 or 2480 or 2497 or 2455 or 2459 or 2460 or 2476 or 2489 or 2493 or 2495 or 2457 or 2498 or 2451 or 2500 or 2454 or 2456 or 2458 or 2461 or 2452 or 2468 or 2494 or 2453 or 2469 or 2481 or 2466 or 2484 or 2486 or 2462 or 2470 or 2479 or 2478 or 2488 => difficulty switch { 1 => 1, 2 => 11, _ => 21 },
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static int SourceBaseHp(int group) => group switch
     {
         2480 or 2459 or 2493 or 2457 or 2500 or 2456 or 2452 or 2469 or 2470 or 2478 => 3,
-        2453 or 2479 => 5,
+        2453 or 2479 or 2488 => 5,
         2474 or 2467 or 2487 or 2473 or 2497 or 2455 or 2460 or 2476 or 2489 or 2495 or 2498 or 2451 or 2454 or 2458 or 2461 or 2468 or 2494 or 2481 or 2466 or 2484 or 2486 or 2462 => 4,
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };

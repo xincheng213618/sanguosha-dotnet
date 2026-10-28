@@ -25,7 +25,11 @@ public static partial class StandardShanheCampaignCatalog
             ReturningMixedOrdinary(2464, difficulty, ThirdChapterPatrolNodeId + ":demon-trio-2464-local", chapter: 3),
             Patrol(2468, StandardShanheSourceZhangHePackage.GetGeneralId(tier), 4, 1 + (tier >= 21 ? 1 : 0), []),
             ReturningMixedOrdinary(2492, difficulty, ThirdChapterPatrolNodeId + ":jiangdong-trio-2492-local", chapter: 3),
-            Patrol(2478, StandardShanheSourceWuCongPackage.GetGeneralId(tier), 3, 1, WuCongGear(tier))
+            Patrol(2478, StandardShanheSourceWuCongPackage.GetGeneralId(tier), 3, 1, WuCongGear(tier)),
+            Patrol(2488, StandardShanheSourceArmorerPackage.GetGeneralId(tier), 5, 1, []),
+            ReturningMixedOrdinary(2482, difficulty, ThirdChapterPatrolNodeId + ":wolong-trio-2482-local", chapter: 3),
+            ReturningMixedOrdinary(2491, difficulty, ThirdChapterPatrolNodeId + ":guard-trio-2491-local", chapter: 3),
+            ReturningMixedOrdinary(2463, difficulty, ThirdChapterPatrolNodeId + ":liuyan-trio-2463-local", chapter: 3)
         };
         var patrol = new ShanheNodeDefinition(ThirdChapterPatrolNodeId, "第三章 · 京畿巡军", ShanheNodeKind.Battle,
             camp.NextNodeIds, encounters, rewards)

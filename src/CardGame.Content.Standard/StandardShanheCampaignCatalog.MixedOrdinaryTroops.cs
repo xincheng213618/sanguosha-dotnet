@@ -1,3 +1,4 @@
+using CardGame.Core;
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Content.Standard;
@@ -22,6 +23,15 @@ public static partial class StandardShanheCampaignCatalog
             .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
         2471 => StandardShanheSourceQianZhaoPairPackage.GetRosterGeneralIds(tier)
             .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
+        2482 => StandardShanheSourceWolongTrioPackage.GetRosterGeneralIds(tier)
+            .Select((id, index) => new ShanheCombatantDefinition(id)
+                { StartingCards = index == 0 ? WolongGear(tier) : [] }).ToArray(),
+        2491 => StandardShanheSourceGuardTrioPackage.GetRosterGeneralIds(tier)
+            .Select((id, index) => new ShanheCombatantDefinition(id)
+                { StartingCards = index != 1 ? GuardTrioGear(tier) : [] }).ToArray(),
+        2463 => StandardShanheSourceLiuYanTrioPackage.GetRosterGeneralIds(tier)
+            .Select((id, index) => new ShanheCombatantDefinition(id)
+                { StartingCards = index == 1 ? LiuYanGear(tier) : [] }).ToArray(),
         2465 =>
         [
             new(StandardShanheSourceCoalitionTrioPackage.GetSpyGeneralId(tier)),
@@ -30,6 +40,13 @@ public static partial class StandardShanheCampaignCatalog
         ],
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
+
+    private static IReadOnlyList<ShanheStartingCard> WolongGear(int tier) => tier >= 16
+        ? [new(CardKind.BaguaFormation, Suit.Diamond, 2)] : [];
+    private static IReadOnlyList<ShanheStartingCard> GuardTrioGear(int tier) => tier >= 16
+        ? [new(CardKind.RenwangShield, Suit.Diamond, 2)] : [];
+    private static IReadOnlyList<ShanheStartingCard> LiuYanGear(int tier) => tier >= 16
+        ? [new(CardKind.ZhangbaSerpentSpear, Suit.Club, 12)] : [];
 
     private static ShanheEncounterDefinition ReturningMixedOrdinary(int group, int difficulty, string id, int chapter)
     {

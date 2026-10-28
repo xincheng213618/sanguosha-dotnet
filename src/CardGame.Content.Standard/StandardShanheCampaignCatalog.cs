@@ -273,7 +273,9 @@ public static partial class StandardShanheCampaignCatalog
             extraSkills.Contains(StandardShanheConfidentLvbuPackage.XiaoruiId);
         var eliteDongwu = ids.Any(id => id is StandardShanheEliteDongwuPackage.HuangGaiId or StandardShanheEliteDongwuPackage.ChengPuId) ||
             extraSkills.Contains(StandardShanheEliteDongwuPackage.ChunlaoId);
-        var eliteHandang = ids.Contains(StandardShanheEliteHandangPackage.HandangId, StringComparer.Ordinal) ||
+        var sourceArmorer = extraSkills.Contains(StandardShanheSourceArmorerPackage.DuanjiaSkillId) ||
+            ids.Any(id => id.StartsWith("shanhe:source-armorer-2488-", StringComparison.Ordinal));
+        var eliteHandang = sourceArmorer || ids.Contains(StandardShanheEliteHandangPackage.HandangId, StringComparer.Ordinal) ||
             extraSkills.Contains(StandardShanheEliteHandangPackage.ZizhongId) || extraSkills.Contains(StandardShanheEliteHandangPackage.MengwuId);
         var recruitment = extraSkills.Contains(StandardShanheRecruitmentPackage.HuihuoSkillId) ||
             ids.Any(id => id is StandardShanheRecruitmentPackage.XunyuNormalId or StandardShanheRecruitmentPackage.XunyuEliteId);
@@ -442,6 +444,15 @@ public static partial class StandardShanheCampaignCatalog
         var sourceWuCong = extraSkills.Contains(StandardShanheSourceWuCongPackage.TiepaoSkillId) ||
             ids.Any(id => id is StandardShanheSourceWuCongPackage.BaseId or StandardShanheSourceWuCongPackage.HardId);
         var sourceQianZhaoPair = ids.Any(id => id.StartsWith("shanhe:source-qianzhao-pair-2471-", StringComparison.Ordinal));
+        var sourceWolongTrio = extraSkills.Contains(StandardShanheSourceWolongTrioPackage.HuojiSkillId) ||
+            extraSkills.Contains(StandardShanheSourceWolongTrioPackage.NiepanSkillId) ||
+            extraSkills.Contains(StandardShanheSourceWolongTrioPackage.ZhaohuoSkillId) ||
+            ids.Any(id => id.StartsWith("shanhe:source-wolong-trio-2482-", StringComparison.Ordinal));
+        var sourceGuardTrio = extraSkills.Contains(StandardShanheSourceGuardTrioPackage.WeizhuSkillId) ||
+            ids.Any(id => id.StartsWith("shanhe:source-guard-trio-2491-", StringComparison.Ordinal));
+        var sourceLiuYanTrio = extraSkills.Contains(StandardShanheSourceLiuYanTrioPackage.JingqiSkillId) ||
+            extraSkills.Contains(StandardShanheSourceLiuYanTrioPackage.XiechanSkillId) ||
+            ids.Any(id => id.StartsWith("shanhe:source-liuyan-trio-2463-", StringComparison.Ordinal));
         var sourceYulinOfficer = ids.Any(id => id is StandardShanheSourceYulinOfficerPackage.BaseId or
             StandardShanheSourceYulinOfficerPackage.HardId or StandardShanheSourceYulinOfficerPackage.HellId);
         var sourceYulinGuard = sourceMilitiaTrio || sourceYulinOfficer || RequiresThreeBossRegistry(requirements, StandardShanheSourceYulinGuardPackage.BaseId,
@@ -652,6 +663,10 @@ public static partial class StandardShanheCampaignCatalog
             (sourceCaoSongTrio ? "/source-caosong-trio-2485" : "") +
             (sourceWuCong ? "/source-wucong-2478" : "") +
             (sourceQianZhaoPair ? "/source-qianzhao-pair-2471" : "") +
+            (sourceWolongTrio ? "/source-wolong-trio-2482" : "") +
+            (sourceGuardTrio ? "/source-guard-trio-2491" : "") +
+            (sourceArmorer ? "/source-armorer-2488" : "") +
+            (sourceLiuYanTrio ? "/source-liuyan-trio-2463" : "") +
             (sourceWuqueAssassin ? "/source-wuque-assassin-2493" : "") +
             (sourceExecutioner ? "/source-executioner-2495" : "") +
             (s5Simayi ? "/s5-simayi-2677" : "") +
@@ -858,6 +873,15 @@ public static partial class StandardShanheCampaignCatalog
             if (sourceCaoSongTrio) packages.Add(new StandardShanheSourceCaoSongTrioPackage());
             if (sourceWuCong) packages.Add(new StandardShanheSourceWuCongPackage());
             if (sourceQianZhaoPair) packages.Add(new StandardShanheSourceQianZhaoPairPackage());
+            if (sourceWolongTrio)
+            {
+                packages.Add(new StandardShenwuActivityPackage());
+                packages.Add(new StandardShenwu2020ActivityPackage());
+                packages.Add(new StandardShanheSourceWolongTrioPackage());
+            }
+            if (sourceGuardTrio) packages.Add(new StandardShanheSourceGuardTrioPackage());
+            if (sourceArmorer) packages.Add(new StandardShanheSourceArmorerPackage());
+            if (sourceLiuYanTrio) packages.Add(new StandardShanheSourceLiuYanTrioPackage());
             if (sourceAgricultureOfficer) packages.Add(new StandardShanheSourceAgricultureOfficerPackage());
             if (sourceWuqueAssassin) packages.Add(new StandardShanheSourceWuqueAssassinPackage());
             if (sourceDemonAssassin) packages.Add(new StandardShanheSourceDemonAssassinPackage());

@@ -283,6 +283,8 @@ public enum SkillProgramEffectOp
 {
     DistributeShanheSourceQingjianGains = 24750,
     ResolveShanheSourceTiepaoRetaliation = 24780,
+    PlaceRandomMissingArmorDeckEquipment = 24880,
+    ResolveShanheSourceXiechanDuel = 24630,
     ArmShanheSourceZhaoran = 24660,
     ClaimShanheSourceZhaoranSuit = 24661,
     AdjustShanheSourceHuchenDraw = 24790,

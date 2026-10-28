@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-weizhu-14034", "revision": 1,
+      "triggers": [
+        { "id": "paid-hand-protect-other-team", "window": "beforeDamageApplied", "subject": "owner", "optional": true,
+          "effects": [
+            { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" },
+              "cardOwnerRef": { "kind": "owner" }, "zones": ["hand"], "count": 1,
+              "destination": "discardPile", "awaitMovementTriggers": true, "resultBind": "paid-hand" },
+            { "op": "preventCurrentDamage", "target": "owner" }
+          ] }
+      ]
+    }
+  ]
+}

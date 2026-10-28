@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-huoji-906": {
+      "name": "火计",
+      "description": "你可以将一张红色牌当【火攻】使用。"
+    },
+    "shanhe:source-niepan-911": {
+      "name": "涅槃",
+      "description": "限定技，当你处于濒死状态时，你可以：弃置所有牌，复原你的武将牌，摸三张牌，回复至3点体力，然后获得“八阵”“火计”“看破”中的一个。",
+      "optionLabels": { "bazhen": "获得“八阵”", "huoji": "获得“火计”", "kanpo": "获得“看破”" }
+    }
+  }
+}
