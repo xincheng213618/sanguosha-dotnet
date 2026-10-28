@@ -16,6 +16,7 @@
             "kind": "all",
             "children": [
               { "kind": "cardActionPhaseIsPlay" },
+              { "kind": "not", "children": [{ "kind": "cardActionTargetIsOwner" }] },
               {
                 "kind": "compare",
                 "left": { "kind": "cardUseDesignatedTargetCount" },

@@ -6,6 +6,7 @@
       "id": "single-target-card", "window": "cardUseBeforeTargetEffects", "ownerRelation": "actor",
       "optional": true, "condition": { "kind": "all", "children": [
         { "kind": "cardActionPhaseIsPlay" },
+        { "kind": "not", "children": [{ "kind": "cardActionTargetIsOwner" }] },
         { "kind": "compare", "left": { "kind": "cardUseDesignatedTargetCount" }, "operator": "equal",
           "right": { "kind": "integerConstant", "value": 1 } }
       ] },

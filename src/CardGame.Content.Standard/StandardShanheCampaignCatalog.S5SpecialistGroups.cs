@@ -25,7 +25,7 @@ public static partial class StandardShanheCampaignCatalog
             "hulao" => AddS5BaseLordGroup(node with
                 { Encounters = node.Encounters!.Where(e => e.Id != "hulao:zhangliao-s5-base").ToArray() },
                 "zhangliao-armed", "文远之威·完整基础形态",
-                "张辽4/4，保留突袭、破军，另得红桃5刑天破军斧。出牌阶段对唯一目标用牌后可弃两张牌，使其本回合不能使用或打出牌且防具失效。基础斧替换原无装备基础候选，灵动及惶恐的本地技能形态另行保留。",
+                "张辽4/4，保留突袭、破军，另得红桃5刑天破军斧。出牌阶段对唯一其他角色用牌后可弃两张牌，使其本回合不能使用或打出牌且防具失效。基础斧替换原无装备基础候选，灵动及惶恐的本地技能形态另行保留。",
                 [new(StandardShanheS5BossPackage.ZhangliaoBaseId) { StartingCards = [new(CardKind.ShanheXingtianAxe, Suit.Heart, 5)] }], true),
             _ => node
         }).ToArray()

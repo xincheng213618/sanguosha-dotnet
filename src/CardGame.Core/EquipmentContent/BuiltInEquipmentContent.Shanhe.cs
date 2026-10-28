@@ -39,7 +39,7 @@ public static partial class BuiltInEquipmentContent
 
         new EquipmentDefinition(
                 CardKind.ShanheXingtianAxe, "刑天破军斧", EquipmentSlot.Weapon,
-                "出牌阶段，使用牌指定唯一目标后，可弃置两张牌，令其本回合不能使用或打出牌且防具失效。攻击范围4为本地约定。",
+                "出牌阶段，使用牌指定唯一其他角色为目标后，可弃置两张牌，令其本回合不能使用或打出牌且防具失效。攻击范围4为本地约定。",
                 WeaponAttackRange: 4),
 
         new EquipmentDefinition(

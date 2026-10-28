@@ -410,7 +410,7 @@ public static class CardCatalog
                 AiPlayValue: 40, AiResponseValue: 0, HandKeepValue: 43),
             [CardKind.ShanheXingtianAxe] = new(
                 CardKind.ShanheXingtianAxe, "刑天破军斧", "装备牌",
-                "出牌阶段，使用牌指定唯一目标后，可弃置两张牌，令其本回合不能使用或打出牌且防具失效。攻击范围4为本地约定。",
+                "出牌阶段，使用牌指定唯一其他角色为目标后，可弃置两张牌，令其本回合不能使用或打出牌且防具失效。攻击范围4为本地约定。",
                 AiPlayValue: 42, AiResponseValue: 0, HandKeepValue: 45),
             [CardKind.Leizhen] = new(
                 CardKind.Leizhen, "雷震", "装备牌",
@@ -446,7 +446,7 @@ public static class CardCatalog
                 AiPlayValue: 38, AiResponseValue: 0, HandKeepValue: 45),
             [CardKind.XingtianAxe] = new(
                 CardKind.XingtianAxe, "刑天破军斧", "装备牌",
-                "攻击范围 4，单一目标用牌后可弃两张牌，令其本回合不能使用或打出手牌且防具失效。",
+                "攻击范围 4，单一其他角色用牌后可弃两张牌，令其本回合不能使用或打出手牌且防具失效。",
                 AiPlayValue: 42, AiResponseValue: 0, HandKeepValue: 45),
             [CardKind.Tengjia] = new(
                 CardKind.Tengjia,

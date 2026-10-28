@@ -16,14 +16,15 @@ public sealed partial class GameEngine
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 59300, SkillProgramEffectOp.ApplyShanheXingtianSeal)]
     private bool CanOfferShanheXingtian(ProgramTriggerLegalityContext gate) => gate.SkillId != ShanheXingtianSkill ||
-        gate.WindowContext is { TargetSeat: { } target } && !HasShanheXingtianSeal(target) &&
+        gate.WindowContext is { TargetSeat: { } target } && target != gate.OwnerSeat && !HasShanheXingtianSeal(target) &&
         GetEquipment(_players[gate.OwnerSeat]).Any(c => c.Kind == CardKind.ShanheXingtianAxe &&
             IsActiveProgramSourceEquipmentCard(gate.OwnerSeat, gate.SkillId, gate.Candidate.SkillInstanceId, c)) &&
         _cardZones.CardsAt(CardLocation.Hand(gate.OwnerSeat)).Count + GetEquipment(_players[gate.OwnerSeat]).Count >= 2;
 
     private bool HasShanheXingtianPaidCost(ProgramSkillFrame f)
     {
-        if (f.SkillId != ShanheXingtianSkill || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects } ||
+        if (f.SkillId != ShanheXingtianSkill || f.WindowContext is not
+                { Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects, TargetSeat: { } target } || target == f.OwnerSeat ||
             f.CardSetBindings.SingleOrDefault(b => b.Name == "axe-cost") is not { CardIds.Count: 2, SourceLocations.Count: 2 } cost)
             return false;
         var invoices = ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.ParentFrameId == f.Id &&
@@ -40,7 +41,7 @@ public sealed partial class GameEngine
     private void ApplyShanheXingtianSeal(ProgramSkillFrame input)
     {
         var f = GetActiveProgramFrame(input.Id);
-        if (!HasShanheXingtianPaidCost(f) || f.SelectedTargetSeats is not [var target] ||
+        if (!HasShanheXingtianPaidCost(f) || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat ||
             _resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == f.WindowContext!.ParentFrameId) is not { } parent ||
             parent.Action.ActorSeat != f.OwnerSeat || parent.Action.EffectiveDesignatedTargetSeats is not [var original] || original != target)
             throw new InvalidOperationException("The S5 axe lost its exact use, target or completed two-card cost.");

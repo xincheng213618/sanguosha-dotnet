@@ -685,6 +685,7 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe S5 Xingtian: native weapon cost all response bans armor and expiry cold", ShanheXingtianChecks.FixedHandRealEquipWeaponCostAndAllResponsesSealOtherSourceArmorUntilActualTurnEndCold),
     ("Shanhe S5 Xingtian: sealed target no repeated offer other target and next turn cold", ShanheXingtianChecks.RetainedAxeDoesNotReofferSealedTargetButOtherTargetsAndNextTurnRemainLegalCold),
     ("Shanhe S5 Xingtian forward: sealed target no repeated offer other target and next turn", ShanheXingtianChecks.RetainedAxeDoesNotReofferSealedTargetButOtherTargetsAndNextTurnRemainLegalForward),
+    ("Shanhe Xingtian forward: self target excluded and other target retained", ShanheXingtianChecks.SelfTargetUseNeverOffersEitherAxeAndOtherTargetsStillResolve),
     ("Shanhe S5 Xingtian: original special axe retains hand-only and directed armor contract", ShanheXingtianChecks.ExistingSpecialAxeStillOnlyBlocksHandAndHolderArmorBypass),
     ("Shanhe NPC opening: random four plus fixed equipment native cold", ShanheNpcStartingCardChecks.RandomFourPlusFixedEquipmentOrdinaryLifecycleAndRecipeCold),
     ("Shanhe S5 Li Jue: every actual prepare positive random damage and paid child cold", ShanheS5LiJueChecks.EveryActualPreparePositiveRandomDamageAndPaidChildCold),

@@ -12,6 +12,36 @@ internal static class ShanheXingtianChecks
         Equip = "fixture:shanhe-axe-equip", EquipmentDodge = "fixture:shanhe-axe-equipment-dodge",
         React = "fixture:shanhe-axe-other-source", Watch = "fixture:shanhe-axe-paid-watch", Deck = "fixture:shanhe-axe-deck";
 
+    public static void SelfTargetUseNeverOffersEitherAxeAndOtherTargetsStillResolve()
+    {
+        foreach (var old in new[] { false, true })
+        {
+            var skill = old ? OldAxe : Axe;
+            var s = Scene.Start(old, [new(CardKind.IronChain, Suit.Diamond, 12)]);
+            s.Play(); s.Card(old ? CardKind.XingtianAxe : CardKind.ShanheXingtianAxe, []); s.Play();
+            var hand = s.V(0).HandCount;
+            var discards = s.E<NativeLogicalDiscardInvocationRecordedEvent>().Length;
+            s.Card(CardKind.IronChain, [0]); s.PlayWithoutAxeOffer();
+            s.Need(s.V(0).IsChained && s.V(0).HandCount == hand - 1 &&
+                s.E<NativeLogicalDiscardInvocationRecordedEvent>().Length == discards &&
+                !s.E<ProgramBindingStartedEvent>().Any(e => e.SkillId == skill) &&
+                !s.Forbidden(0, CardKind.Slash, CardActionType.Use),
+                "A genuine self-target Iron Chain resolves normally without either axe's offer, payment or self-seal.");
+
+            s.Card(CardKind.IronChain, [1]); s.Offer(skill); s.Activate();
+            s.Pay(s.V(0).Hand.Where(c => c.Kind == CardKind.Peach).Take(2).Select(c => c.Id).ToArray());
+            s.Play();
+            if (old)
+                s.Need(s.E<HandCardColorRestrictionGrantedEvent>().Count(e => e.Restriction.AffectedSeat == 1) == 2 &&
+                    s.E<HandCardColorRestrictionGrantedEvent>().All(e => e.Restriction.AffectedSeat != 0),
+                    "The original axe still applies both paid hand restrictions to the actual other target only.");
+            else
+                s.Need(s.E<CardTargetRestrictionGrantedEvent>().Count(e => e.Restriction.Source.SkillId == Axe && e.Restriction.TargetSeat == 1) == 2 &&
+                    s.E<CardTargetRestrictionGrantedEvent>().All(e => e.Restriction.Source.SkillId != Axe || e.Restriction.TargetSeat != 0),
+                    "The S5 axe still applies both paid target restrictions to the actual other target only.");
+        }
+    }
+
     public static void RetainedAxeDoesNotReofferSealedTargetButOtherTargetsAndNextTurnRemainLegalCold()
         => VerifyRetainedAxeTargetAndTurnEligibility(restoreAtBoundaries: true);
 
@@ -208,7 +238,7 @@ internal static class ShanheXingtianChecks
             for (var step = 0; step < 160; step++)
             {
                 if (P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard }) return;
-                Need(P?.SkillPrompt?.SkillId != Axe, "An already sealed target must not publish another S5 axe prompt.");
+                Need(P?.SkillPrompt?.SkillId is not (Axe or OldAxe), "An ineligible target must not publish either axe prompt.");
                 Need(P?.PlayerSeat != 0, "The sealed-target use must resolve without unexpected player input.");
                 Accept(new AdvanceOneStepCommand(G.Revision));
             }

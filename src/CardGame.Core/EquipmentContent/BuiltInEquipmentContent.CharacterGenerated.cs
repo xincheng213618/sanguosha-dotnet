@@ -20,7 +20,7 @@ public static partial class BuiltInEquipmentContent
                 CardKind.XingtianAxe,
                 "刑天破军斧",
                 EquipmentSlot.Weapon,
-                "装备至武器槽；攻击范围 4，你对单一目标用牌后可弃两张牌，令其本回合不能使用或打出手牌且防具失效。",
+                "装备至武器槽；攻击范围 4，你对单一其他角色用牌后可弃两张牌，令其本回合不能使用或打出手牌且防具失效。",
                 WeaponAttackRange: 4)
     ],
     [
