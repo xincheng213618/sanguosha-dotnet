@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": { "shanhe:source-zirun-1172": {
+    "name": "滋润",
+    "description": "锁定技，准备阶段，你令所有角色摸一张牌，若其装备区里有牌，其额外摸一张牌。"
+  } }
+}

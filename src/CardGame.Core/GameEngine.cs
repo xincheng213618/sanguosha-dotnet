@@ -11313,7 +11313,7 @@ public sealed partial class GameEngine
         CaptureProgramSlashSuitJudgment(pending, judgmentSuit);
         CaptureDamageJudgmentSuitResult(pending, judgmentCard, judgmentSuit);
         CaptureProgramRepeatedJudgmentClaimOutcome(pending, judgmentCard, judgmentSuit);
-        var succeeded = IsMouGjLightningJudgment(pending) ? judgmentSuit == Suit.Spade && judgmentRank is >= 2 and <= 9 : pending.Continuation switch
+        var succeeded = IsMouGjLightningJudgment(pending) || IsSourceHuojieLightningJudgment(pending) ? judgmentSuit == Suit.Spade && judgmentRank is >= 2 and <= 9 : pending.Continuation switch
         {
             JudgmentContinuationKind.Lightning =>
                 judgmentSuit == Suit.Spade && judgmentRank is >= 2 and <= 9,
@@ -11594,6 +11594,7 @@ public sealed partial class GameEngine
             if (TryReturnWushuangLightningJudgment(pending)) return;
             if (TryReturnBinghuoJudgment(pending)) return;
             if (ReturnMouGjJudgment(pending)) return;
+            if (ReturnSourceHuojieJudgment(pending)) return;
             if (TryReturnNingwuJudgment(pending)) return;
             if (TryReturnWeifuJudgment(pending)) return;
             if (TryReturnZhangJiJudgment(pending)) return;
@@ -13914,6 +13915,7 @@ public sealed partial class GameEngine
         BindMouZhangXiuAnniversarySlashUse(LifecycleCardUse(resolutionId)!);
         BindMouDcUse(LifecycleCardUse(resolutionId)!);
         BindMouChenLinNativeUse(LifecycleCardUse(resolutionId)!);
+        BindSourceDingxiNativeUse(LifecycleCardUse(resolutionId)!);
         BindMouHuLieSlashUse(LifecycleCardUse(resolutionId)!);
         BindZongluanSlashUse(resolutionId);
         PrepareXieweiNativeUse(LifecycleCardUse(resolutionId)!);

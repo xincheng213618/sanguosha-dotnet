@@ -29,6 +29,32 @@ public static partial class StandardShanheCampaignCatalog
             [2479] = [new(4871, 5, 5, 2, 4, 0, 0, 0, 5, 0, false, [])],
             [2478] = [new(4871, 3, 3, 2, 4, 0, 0, 0, 5, 0, false, [])],
             [2488] = [new(4871, 5, 5, 2, 4, 0, 0, 0, 5, 0, false, [])],
+            [2450] =
+            [
+                new(4861, 4, 4, 2, 4, 0, 0, 0, 5, 0, false,
+                    [new(3, new(Hp: 1)), new(5, new(Hp: 2))]),
+                new(4871, 4, 4, 2, 4, 0, 0, 0, 5, 0, false,
+                    [new(3, new(StartingCards: 1)), new(4, new(StartingCards: 1))])
+            ],
+            [2472] =
+            [
+                new(4067, 3, 3, 2, 4, 0, 0, 0, 5, 0, false, []),
+                new(4028, 4, 4, 2, 4, 0, 0, 0, 5, 0, false, []),
+                new(4038, 4, 4, 2, 4, 0, 0, 0, 5, 0, false, [])
+            ],
+            [2490] =
+            [
+                new(395, 3, 3, 2, 4, 0, 0, 0, 5, 0, false,
+                    [new(3, new(StartingCards: 2)), new(4, new(Draw: 1)), new(5, new(ExtraSlash: 1))]),
+                new(181, 3, 3, 2, 4, 0, 0, 0, 5, 0, false,
+                    [new(2, new(StartingCards: 2)), new(4, new(Draw: 1)), new(5, new(ExtraSlash: 1))]),
+                new(643, 4, 4, 2, 4, 0, 0, 0, 5, 0, false,
+                    [new(4, new(Draw: 1)), new(5, new(ExtraSlash: 1))]),
+                new(520, 3, 3, 2, 4, 0, 0, 0, 5, 0, false,
+                    [new(2, new(StartingCards: 2)), new(4, new(Draw: 1)), new(5, new(ExtraSlash: 1))]),
+                new(428, 3, 3, 2, 4, 0, 0, 0, 5, 0, false,
+                    [new(3, new(StartingCards: 2)), new(4, new(Draw: 1)), new(5, new(ExtraSlash: 1))])
+            ],
             [2482] =
             [
                 new(37, 3, 3, 2, 4, 0, 0, 0, 5, 0, false, []),

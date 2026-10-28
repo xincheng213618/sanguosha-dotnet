@@ -285,6 +285,11 @@ public enum SkillProgramEffectOp
     ResolveShanheSourceTiepaoRetaliation = 24780,
     PlaceRandomMissingArmorDeckEquipment = 24880,
     ResolveShanheSourceXiechanDuel = 24630,
+    ResolveShanheSourceZirun = 24922,
+    ResolveSourceDingxiUsedCard = 24510,
+    DrawSourceDingxiPile = 24511,
+    ResolveSourceHuojie = 24512,
+    ResolveSourceXingxia = 24513,
     ArmShanheSourceZhaoran = 24660,
     ClaimShanheSourceZhaoranSuit = 24661,
     AdjustShanheSourceHuchenDraw = 24790,
@@ -5618,8 +5623,6 @@ public sealed class SkillProgramCatalog
             if (window == SkillProgramTriggerWindow.DiscardPileReceived && node.TryGetProperty("sourceZones", out _))
             {
                 sourceZones = EnumArray<CardZoneKind>(node, "sourceZones", path);
-                if (sourceZones.Any(zone => zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment)))
-                    Fail(path + ".sourceZones", "discardPileReceived accepts hand, equipment and judgment sources only");
             }
             if (window == SkillProgramTriggerWindow.CardsMoved)
             {
@@ -6014,6 +6017,17 @@ public sealed class SkillProgramCatalog
             (effect, effectPath) => ParseCompositionEffect(effect, effectPath,
                 isAfterDamageTrigger: window == SkillProgramTriggerWindow.AfterDamageApplied,
                 allowZeroDraw: drawPhaseMode == SkillProgramDrawPhaseMode.Replacement));
+        var isSourceDingxiDiscard = skillId == "shanhe:source-dingxi-3601" && id == "actual-used-damage-enters-discard" &&
+            window == SkillProgramTriggerWindow.DiscardPileReceived && subject == SkillProgramTriggerSubject.Owner && optional &&
+            sourceZones is [CardZoneKind.Processing] && node.TryGetProperty("movementOccurrence", out _) &&
+            EnumValue<SkillProgramMovementOccurrence>(node, "movementOccurrence", path) == SkillProgramMovementOccurrence.PerBatch &&
+            effects is [{ Op: SkillProgramEffectOp.ResolveSourceDingxiUsedCard, Target: SkillProgramEffectTarget.Owner,
+                Condition.Kind: SkillProgramConditionKind.Always }];
+        if (effects.Any(e => e.Op == SkillProgramEffectOp.ResolveSourceDingxiUsedCard) && !isSourceDingxiDiscard)
+            Fail(path, "source Dingxi requires its exact original-use Processing discard trigger");
+        if (window == SkillProgramTriggerWindow.DiscardPileReceived && !isSourceDingxiDiscard &&
+            sourceZones.Any(zone => zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment)))
+            Fail(path + ".sourceZones", "discardPileReceived accepts hand, equipment and judgment sources only");
         if (window == SkillProgramTriggerWindow.AfterTurnEnded &&
             EnumerateTriggerConditions(condition).Any(item => item.Kind == SkillProgramTriggerConditionKind.OwnerKilledThisTurn) &&
             effects is not [{ Op: SkillProgramEffectOp.ResolveQujiaLimitedTurnEnd }])
@@ -6196,7 +6210,7 @@ public sealed class SkillProgramCatalog
         // The provenance operation makes that existing boundary explicit without
         // changing the occurrence contract of historical discard programs.
         if (window == SkillProgramTriggerWindow.DiscardPileReceived &&
-            effects.Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryZhangJiaoYizhao or SkillProgramEffectOp.ClaimDiscardedEntityWithProvenance or SkillProgramEffectOp.StoreAdjacentDiscardedSlash or SkillProgramEffectOp.DrawFromOtherActualBasicDiscard or SkillProgramEffectOp.DiscardAfterActualOutsideDiscard or SkillProgramEffectOp.GiveOffTurnUsedCards or SkillProgramEffectOp.ReclaimFriendXuanjian or SkillProgramEffectOp.YuejianRevealAndClaimUsedCard or SkillProgramEffectOp.ReturnDiscardedSilvEntity or SkillProgramEffectOp.ResolveOrdinaryGuYongBingyi or SkillProgramEffectOp.ResolveAnniversaryXuJingShangyu or SkillProgramEffectOp.ResolveAnniversaryXunXuDiyin))
+            effects.Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryZhangJiaoYizhao or SkillProgramEffectOp.ClaimDiscardedEntityWithProvenance or SkillProgramEffectOp.StoreAdjacentDiscardedSlash or SkillProgramEffectOp.DrawFromOtherActualBasicDiscard or SkillProgramEffectOp.DiscardAfterActualOutsideDiscard or SkillProgramEffectOp.GiveOffTurnUsedCards or SkillProgramEffectOp.ReclaimFriendXuanjian or SkillProgramEffectOp.YuejianRevealAndClaimUsedCard or SkillProgramEffectOp.ReturnDiscardedSilvEntity or SkillProgramEffectOp.ResolveOrdinaryGuYongBingyi or SkillProgramEffectOp.ResolveAnniversaryXuJingShangyu or SkillProgramEffectOp.ResolveAnniversaryXunXuDiyin or SkillProgramEffectOp.ResolveSourceDingxiUsedCard))
             movementOccurrence = node.TryGetProperty("movementOccurrence", out _)
                 ? EnumValue<SkillProgramMovementOccurrence>(node, "movementOccurrence", path)
                 : effects.Any(e => e.Op is SkillProgramEffectOp.DrawFromOtherActualBasicDiscard or SkillProgramEffectOp.DiscardAfterActualOutsideDiscard or SkillProgramEffectOp.GiveOffTurnUsedCards)

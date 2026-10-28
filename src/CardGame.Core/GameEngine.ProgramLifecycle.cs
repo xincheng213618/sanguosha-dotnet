@@ -617,6 +617,7 @@ public sealed partial class GameEngine
         if (frame?.WushuangCombat is { TacticId: 2019 })
             return pending.ParentFrameId == frame.Id && IsWushuangLightningJudgment(frame, pending.TargetSeat, pending.Reason, pending.ProgramResultBind!, pending.ProgramResultVisibility ?? SkillProgramCardSetVisibility.Private);
         if (frame?.MouGuoJia is not null) return IsMouGjJudgment(pending, frame);
+        if (frame?.SourceHuojie is not null) return IsSourceHuojieJudgment(pending, frame);
         if (frame?.ZhouQun is not null) return IsNingwuJudgment(pending, frame);
         if (frame?.MaYuanYi is not null) return IsBinghuoJudgment(pending, frame);
         if (frame?.Weifu is not null) return IsWeifuJudgment(pending, frame);
@@ -654,6 +655,8 @@ public sealed partial class GameEngine
             return IsWushuangLightningJudgment(frame, targetSeat, reason, resultBind, visibility);
         if (frame.MouGuoJia is not null)
             return MouGjJudgmentRequest(frame, targetSeat, reason, resultBind, visibility);
+        if (frame.SourceHuojie is not null)
+            return CanBeginSourceHuojieJudgment(frame, targetSeat, reason, resultBind, visibility);
         if (frame.ZhouQun is not null)
             return CanBeginNingwuJudgment(frame, targetSeat, reason, resultBind, visibility);
         if (frame.MaYuanYi is not null)

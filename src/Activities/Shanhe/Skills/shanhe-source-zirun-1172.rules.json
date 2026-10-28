@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 62,
+  "skills": [{
+    "id": "shanhe:source-zirun-1172", "revision": 1,
+    "triggers": [{ "id": "preparation-every-living-draw", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false,
+      "effects": [{ "op": "resolveShanheSourceZirun", "target": "owner" }] }]
+  }]
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-lianyu-623": {
+      "name": "炼狱",
+      "description": "锁定技，结束阶段，你对所有敌方角色造成1点火焰伤害。"
+    },
+    "shanhe:source-luolei-619": {
+      "name": "落雷",
+      "description": "锁定技，准备阶段，你对一名其他角色造成1点雷电伤害。"
+    }
+  }
+}

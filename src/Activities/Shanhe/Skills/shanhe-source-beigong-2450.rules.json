@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "shanhe:source-dingxi-3601", "revision": 1, "triggers": [
+      { "id": "actual-used-damage-enters-discard", "window": "discardPileReceived", "subject": "owner", "sourceZones": ["processing"], "movementOccurrence": "perBatch", "optional": true,
+        "effects": [{ "op": "resolveSourceDingxiUsedCard", "target": "owner" }] },
+      { "id": "ending-dingxi-count", "window": "turnEnding", "subject": "owner", "optional": false,
+        "effects": [{ "op": "drawSourceDingxiPile", "target": "owner" }] }
+    ] },
+    { "id": "shanhe:source-huojie-3603", "revision": 1, "triggers": [
+      { "id": "pile-over-population-lightning", "window": "playPhaseStarting", "subject": "owner", "optional": false,
+        "effects": [{ "op": "resolveSourceHuojie", "target": "owner" }] }
+    ] },
+    { "id": "shanhe:source-xingxia-1117", "revision": 1, "triggers": [
+      { "id": "two-round-ally-fire-then-enemies", "window": "playPhaseStarting", "subject": "owner", "optional": false,
+        "effects": [{ "op": "selectTarget", "target": "owner", "targetKind": "otherPublicTeamAllies" },
+                    { "op": "resolveSourceXingxia", "target": "owner" }] }
+    ] }
+  ]
+}

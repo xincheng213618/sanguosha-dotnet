@@ -109,7 +109,19 @@ internal static class ShanheBossPortraitChecks
             ["shanhe:source-wolong-trio-2482-pangtong-nightmare"] = "boundary-pang-tong",
             ["shanhe:source-liuyan-trio-2463-liuyan-base"] = "ol-liu-yan",
             ["shanhe:source-liuyan-trio-2463-liuyan-hard"] = "ol-liu-yan",
-            ["shanhe:source-liuyan-trio-2463-liuyan-hell"] = "ol-liu-yan"
+            ["shanhe:source-liuyan-trio-2463-liuyan-hell"] = "ol-liu-yan",
+            ["shanhe:source-scholars-2490-caiyong-base"] = "cai-yong",
+            ["shanhe:source-scholars-2490-caiyong-hard"] = "cai-yong",
+            ["shanhe:source-scholars-2490-caiyong-hell"] = "cai-yong",
+            ["shanhe:source-scholars-2490-yufan-base"] = "boundary-yu-fan",
+            ["shanhe:source-scholars-2490-yufan-hard"] = "boundary-yu-fan",
+            ["shanhe:source-scholars-2490-kongrong-base"] = "mou-kong-rong-ol",
+            ["shanhe:source-scholars-2490-kongrong-nightmare"] = "mou-kong-rong-ol",
+            ["shanhe:source-scholars-2490-maridi-base"] = "ol-ma-mi-di",
+            ["shanhe:source-scholars-2490-maridi-hard"] = "ol-ma-mi-di",
+            ["shanhe:source-scholars-2490-wangcan-base"] = "ol-wang-can",
+            ["shanhe:source-scholars-2490-wangcan-hard"] = "ol-wang-can",
+            ["shanhe:source-scholars-2490-wangcan-hell"] = "ol-wang-can"
         };
         foreach (var (id, expectedKey) in ordinaryAliases)
         {

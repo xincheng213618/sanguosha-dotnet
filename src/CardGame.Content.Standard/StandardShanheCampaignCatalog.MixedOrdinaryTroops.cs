@@ -32,6 +32,12 @@ public static partial class StandardShanheCampaignCatalog
         2463 => StandardShanheSourceLiuYanTrioPackage.GetRosterGeneralIds(tier)
             .Select((id, index) => new ShanheCombatantDefinition(id)
                 { StartingCards = index == 1 ? LiuYanGear(tier) : [] }).ToArray(),
+        2490 => StandardShanheSourceScholarsPackage.GetRosterGeneralIds(tier)
+            .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
+        2472 => StandardShanheSourceElementalTrioPackage.GetRosterGeneralIds(tier)
+            .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
+        2450 => StandardShanheSourceBeigongDuoPackage.GetRosterGeneralIds(tier)
+            .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
         2465 =>
         [
             new(StandardShanheSourceCoalitionTrioPackage.GetSpyGeneralId(tier)),
@@ -61,7 +67,9 @@ public static partial class StandardShanheCampaignCatalog
             var hpBonus = (third ? 4 : 3) + 2 * growth + attributes.Sum(a => a.Hp);
             return member with
             {
-                Hp = data[index].Hp + hpBonus, MaxHpBonus = hpBonus, DrawBonus = third ? 2 : 1,
+                Hp = data[index].Hp + hpBonus, MaxHpBonus = hpBonus,
+                DrawBonus = (third ? 2 : 1) + attributes.Sum(a => a.Draw),
+                SlashBonus = attributes.Sum(a => a.ExtraSlash),
                 InitialHandBonus = (third ? 2 : 1) + growth + extraHand
             };
         }).ToArray();

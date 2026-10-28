@@ -132,7 +132,7 @@ internal static class ShanheSourceOrdinaryTroopChecks
                 new[] { "luoyang", "suanzao", "henei", StandardShanheCampaignCatalog.ThirdChapterDongwuEliteId,
                     StandardShanheCampaignCatalog.MuluEncounterNodeId }.All(originalRoutes.Contains) &&
                 !patrol.NextNodeIds.Contains(camp.Id) && !patrol.NextNodeIds.Contains(patrol.Id) &&
-                patrol.Encounters is { Count: 11 },
+                patrol.Encounters is { Count: 14 },
                 "The optional third-chapter ordinary patrol preserves every existing final route, elite and Mulu detour without a cycle or a chapter-boss reward contract.");
             foreach (var group in Groups.Where(ThirdChapter))
             {

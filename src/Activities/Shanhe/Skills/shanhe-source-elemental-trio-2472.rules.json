@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-lianyu-623", "revision": 1,
+      "triggers": [
+        {
+          "id": "compulsory-ending-fire-all-enemies", "window": "turnEnding",
+          "subject": "owner", "optional": false,
+          "effects": [
+            { "op": "selectAllPublicTeamTargets", "target": "owner", "targetKind": "publicTeamEnemies", "allowEmpty": true },
+            { "op": "damageParticipants", "target": "selectedTargets", "amount": 1, "nature": "fire" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shanhe:source-luolei-619", "revision": 1,
+      "triggers": [
+        {
+          "id": "compulsory-preparation-thunder-other", "window": "turnStartBeforeNormalFlow",
+          "subject": "owner", "optional": false,
+          "effects": [
+            { "op": "selectTarget", "target": "owner", "targetKind": "otherLiving" },
+            { "op": "damage", "target": "selectedTarget", "amount": 1, "nature": "thunder" }
+          ]
+        }
+      ]
+    }
+  ]
+}
