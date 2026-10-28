@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-huchen-1612", "revision": 1,
+      "triggers": [{
+        "id": "actual-enemy-kills-extra-normal-draw", "window": "drawPhaseStarting", "subject": "owner", "optional": false,
+        "effects": [{ "op": "adjustShanheSourceHuchenDraw", "target": "owner" }]
+      }]
+    },
+    {
+      "id": "shanhe:source-zhanshen-507", "revision": 1,
+      "triggers": [{
+        "id": "wounded-with-dead-teammate-awakening", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false,
+        "usageScope": "game", "usageLimit": 1,
+        "effects": [
+          { "op": "changeMaximumHp", "target": "owner", "amount": -1 },
+          { "op": "discardShanheSourceZhanshenWeapons", "target": "owner" },
+          { "op": "grantSkills", "target": "owner", "skillIds": ["classic:mashu", "hulao:shenji"] }
+        ]
+      }]
+    }
+  ]
+}

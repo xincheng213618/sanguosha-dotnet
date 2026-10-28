@@ -2,7 +2,8 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
-    private bool TracksAdjacentDiscardStorage => _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.StoreAdjacentDiscardedSlash);
+    private bool TracksAdjacentDiscardStorage => _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.StoreAdjacentDiscardedSlash) ||
+        _contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferShanheSourceChunlaoStorage);
 
     private CardKind? FreezeAdjacentDiscardPaymentIdentity(Card card, CardLocation from, CardLocation to, CardMoveReason reason)
     {

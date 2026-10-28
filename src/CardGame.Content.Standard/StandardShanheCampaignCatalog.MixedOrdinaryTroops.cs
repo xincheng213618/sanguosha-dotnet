@@ -14,6 +14,8 @@ public static partial class StandardShanheCampaignCatalog
         ],
         2499 => StandardShanheSourceYulinOfficerPackage.GetRosterGeneralIds(tier)
             .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
+        2492 => StandardShanheSourceJiangdongTrioPackage.GetRosterGeneralIds(tier)
+            .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
         2465 =>
         [
             new(StandardShanheSourceCoalitionTrioPackage.GetSpyGeneralId(tier)),

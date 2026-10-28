@@ -51,7 +51,8 @@ public sealed partial class GameEngine
         var actor = _players[use.SourceSeat];
         var baseMaximum = UsesFormalFangtianHalberd && use.Action!.PhysicalCards.Count == 1 &&
             GetHand(actor).Count == 0 && HasWeaponAbility(actor, CardKind.FangtianHalberd) ? 3 : 1;
-        return baseMaximum + ((FiniteRuleQueryValue)EvaluateCardTargetCount(actor, CardKind.FireSlash).Value).Value - 1;
+        return baseMaximum + ((FiniteRuleQueryValue)EvaluateCardTargetCount(actor, CardKind.FireSlash).Value).Value - 1 +
+            ShanheSourceLihuoProspectiveTargetBonus(use);
     }
 
     private bool CanAddCurrentFireSlashTarget(CardUseFrame use) =>

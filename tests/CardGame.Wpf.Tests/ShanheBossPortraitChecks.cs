@@ -81,7 +81,18 @@ internal static class ShanheBossPortraitChecks
             [StandardShanheSourceZhangHePackage.WeijingId] = "ol-sp-zhang-he",
             [StandardShanheSourceGaoGanPackage.BaseId] = "ol-gao-gan",
             [StandardShanheSourceGaoGanPackage.HardId] = "ol-gao-gan",
-            [StandardShanheSourceGaoGanPackage.HellId] = "ol-gao-gan"
+            [StandardShanheSourceGaoGanPackage.HellId] = "ol-gao-gan",
+            ["shanhe:source-zuo-ci-2470-base"] = "zuo-ci",
+            ["shanhe:source-zuo-ci-2470-hard"] = "zuo-ci",
+            ["shanhe:source-zuo-ci-2470-nightmare"] = "zuo-ci",
+            ["shanhe:source-jiangdong-trio-2492-chengpu-base"] = "cheng-pu",
+            ["shanhe:source-jiangdong-trio-2492-chengpu-hard"] = "cheng-pu",
+            ["shanhe:source-jiangdong-trio-2492-chengpu-hell"] = "cheng-pu",
+            ["shanhe:source-jiangdong-trio-2492-handang-base"] = "han-dang",
+            ["shanhe:source-jiangdong-trio-2492-handang-hard"] = "han-dang",
+            ["shanhe:source-jiangdong-trio-2492-handang-nightmare"] = "han-dang",
+            ["shanhe:source-jiangdong-trio-2492-huanggai-base"] = "boundary-huang-gai",
+            ["shanhe:source-jiangdong-trio-2492-huanggai-hard"] = "boundary-huang-gai"
         };
         foreach (var (id, expectedKey) in ordinaryAliases)
         {

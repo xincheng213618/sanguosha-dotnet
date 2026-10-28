@@ -11,6 +11,8 @@ public sealed record DrawPhaseObligationFrame(long Id, int OwnerSeat, int Actual
     public IReadOnlyList<long>? InheritedMovementBatchIds { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public ActualDiscardRecoveryPhaseKey? DiscardRecoveryPhase { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ShanheSourceChunlaoJudgmentDrawReceipt? ShanheSourceChunlaoJudgmentDraw { get; init; }
 }
 public sealed record DrawPhaseSkippedEvent(long FrameId, int OwnerSeat, int ActualTurnNumber, bool IsExtra) : IGameEvent;
 public sealed record ExtraDrawPhaseStartedEvent(long FrameId, long ParentFrameId, int OwnerSeat,
@@ -249,6 +251,7 @@ public sealed partial class GameEngine
         }
         if (_winner != Winner.None) { AdvanceRulesAndPublishState(); return; }
         if (!_players[frame.OwnerSeat].IsAlive) { EndTurn(); return; }
+        if (TryCompleteShanheSourceChunlaoJudgmentDraw(frame)) return;
         CompleteTurnStartAfterDraw(_players[frame.OwnerSeat], (DelayedTurnEffects)frame.DelayedEffects,
             drawPhaseEndedProgramsCompleted: true, actualDrawCompletionCompleted: true);
     }

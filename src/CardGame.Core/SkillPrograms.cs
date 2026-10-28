@@ -281,6 +281,10 @@ public enum SkillProgramEffectOp
 {
     ArmShanheSourceZhaoran = 24660,
     ClaimShanheSourceZhaoranSuit = 24661,
+    AdjustShanheSourceHuchenDraw = 24790,
+    DiscardShanheSourceZhanshenWeapons = 24791,
+    ResolveShanheSourceLihuoFirstDamage = 24920,
+    OfferShanheSourceChunlaoStorage = 24921,
     UseShanheWarElephantCounterSlash = 24530,
     ClaimShanheSourceNamanResponseCards = 23130,
     QueueShanheLuanxinNextDraw = 81600,

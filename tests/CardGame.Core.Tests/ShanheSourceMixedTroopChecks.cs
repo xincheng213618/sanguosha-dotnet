@@ -4,7 +4,7 @@ using CardGame.Core.Campaigns;
 
 internal static class ShanheSourceMixedTroopChecks
 {
-    private static readonly int[] Groups = [2465, 2499, 2464];
+    private static readonly int[] Groups = [2465, 2499, 2464, 2492];
 
     public static void CompleteMixedSourceRecipesAndBothRecommendedRoutes()
     {
@@ -245,12 +245,18 @@ internal static class ShanheSourceMixedTroopChecks
             var general = registry.Generals[GeneralIds(group, tier)[i]];
             var sourceGeneral = group == 2499 ? i == 0 ? 4871 : 4861 : group == 2464 ? 4861 + i : i switch { 0 => 4861, 1 => 4862, _ => 4871 };
             var character = "character:shanhe-source-" + (sourceGeneral == 4871 ? "general-" : "soldier-") + sourceGeneral;
+            if (group == 2492) character = Character(i);
             Need(general.CharacterId == character && general.BaseHp == BaseHp(group, i) && general.InitialHp == BaseHp(group, i) &&
                 registry.IsGeneralPlayable(general.Id) && general.SkillIds.Order().SequenceEqual(ExpectedSkills(group, i, tier).Order()) &&
                 general.SkillIds.All(id => registry.GetSkill(id).Program is not null),
                 "Production dependency discovery loads every selected original SourceGeneralId body and all exact cumulative executable skills once.");
         }
     }
+
+    private static string Character(int index) => index switch
+    {
+        0 => "character:cheng-pu", 1 => "character:han-dang", _ => "character:huang-gai"
+    };
 
     private static IReadOnlyList<int> QiongshouDraw(GameEngine game, int seat)
     {
@@ -289,6 +295,7 @@ internal static class ShanheSourceMixedTroopChecks
     private static IReadOnlyList<string> GeneralIds(int group, int tier) => group switch
     {
         2499 => StandardShanheSourceYulinOfficerPackage.GetRosterGeneralIds(tier),
+        2492 => StandardShanheSourceJiangdongTrioPackage.GetRosterGeneralIds(tier),
         2465 => new[] { StandardShanheSourceCoalitionTrioPackage.GetSpyGeneralId(tier),
             StandardShanheSourceCoalitionTrioPackage.GetScoutGeneralId(tier), StandardShanheSourceCoalitionTrioPackage.GetQuartermasterGeneralId(tier) },
         2464 => new[] { StandardShanheSourceDemonAssassinPackage.GetGeneralId(tier),
@@ -297,6 +304,16 @@ internal static class ShanheSourceMixedTroopChecks
     };
     private static string[] ExpectedSkills(int group, int index, int tier)
     {
+        if (group == 2492)
+            return index switch
+            {
+                0 => new[] { StandardShanheSourceJiangdongTrioPackage.LihuoSkillId }
+                    .Concat(tier >= 11 ? [StandardShanheSourceJiangdongTrioPackage.ChunlaoSkillId] : Array.Empty<string>())
+                    .Concat(tier >= 21 ? ["classic:qixi"] : Array.Empty<string>()).ToArray(),
+                1 => new[] { "classic:gongqi" }.Concat(tier >= 11 ? ["classic:jiefan"] : Array.Empty<string>())
+                    .Concat(tier >= 16 ? ["classic:anjian"] : Array.Empty<string>()).ToArray(),
+                _ => new[] { "boundary:kurou", "boundary:zhaxiang" }.Concat(tier >= 11 ? ["classic:qiangxi"] : Array.Empty<string>()).ToArray()
+            };
         if (group == 2499)
             return index == 0
                 ? new[] { "ol:kuangshou" }.Concat(tier >= 11 ? [StandardShanheSourceKeshouPackage.SkillId] : Array.Empty<string>())
@@ -338,11 +355,12 @@ internal static class ShanheSourceMixedTroopChecks
         2499 => index == 0 ? 5 : 4,
         2465 => index == 1 ? 4 : 3,
         2464 => index == 0 ? 3 : 4,
+        2492 => 4,
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static string LocalSuffix(int group) => group switch
     {
-        2499 => ":yulin-officer-2499-local", 2465 => ":coalition-trio-2465-local", 2464 => ":demon-trio-2464-local",
+        2499 => ":yulin-officer-2499-local", 2465 => ":coalition-trio-2465-local", 2464 => ":demon-trio-2464-local", 2492 => ":jiangdong-trio-2492-local",
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static int LocalTier(int difficulty) => difficulty switch { 1 => 1, 2 => 11, 3 => 21, _ => throw new ArgumentOutOfRangeException(nameof(difficulty)) };

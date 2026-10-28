@@ -19,11 +19,10 @@ public sealed partial class GameEngine
             .Single(frame => frame.Id == frameId)
             .Action;
         if (action is null ||
-            action.EffectiveKind != CardKind.Slash ||
+            !IsSlashCard(action.EffectiveKind) ||
             action.PhysicalCards.Count != 1 ||
             !action.ConversionChain.Any(conversion =>
-                conversion.OwnerSeat == source.Seat &&
-                string.Equals(conversion.SkillId, SpGuanYuWushengSkillId, StringComparison.Ordinal)))
+                conversion.OwnerSeat == source.Seat))
         {
             return default;
         }
@@ -60,50 +59,48 @@ public sealed partial class GameEngine
         foreach (var converted in playableCards.Where(card =>
                      CardCatalog.Get(card.Kind).CategoryName == "锦囊牌"))
         {
-            var source = GetProgramViewAsConversions(
+            foreach (var source in GetProgramViewAsConversions(
+                         actor,
+                         converted,
+                         CardKind.Slash,
+                         forResponse: false))
+            {
+                var targets = GetFangtianOrderedSlashTargets(
                     actor,
                     converted,
-                    CardKind.Slash,
-                    forResponse: false)
-                .SingleOrDefault(candidate =>
-                    string.Equals(candidate.SkillId, SpGuanYuWushengSkillId, StringComparison.Ordinal));
-            if (source is null) continue;
-
-            var targets = GetFangtianOrderedSlashTargets(
-                actor,
-                converted,
-                source,
-                ignoresSlashLimit: true);
-            foreach (var target in targets)
-            {
-                actions.Add(new LegalAction(
-                    LegalActionKind.Slash,
-                    converted.Id,
-                    target.Seat,
-                    DescribeConversion(source,
-                        $"将【{converted.DisplayName}】当作【杀】对 {target.Name} 使用（【怒斩】不计次数）"),
-                    PlayedCardKind: CardKind.Slash)
+                    source,
+                    ignoresSlashLimit: true);
+                foreach (var target in targets)
                 {
-                    ConversionSource = source
-                });
-            }
+                    actions.Add(new LegalAction(
+                        LegalActionKind.Slash,
+                        converted.Id,
+                        target.Seat,
+                        DescribeConversion(source,
+                            $"将【{converted.DisplayName}】当作【杀】对 {target.Name} 使用（【怒斩】不计次数）"),
+                        PlayedCardKind: CardKind.Slash)
+                    {
+                        ConversionSource = source
+                    });
+                }
 
-            AddFangtianHalberdSlashActions(
-                actions,
-                actor,
-                converted,
-                targets,
-                "杀",
-                CardKind.Slash,
-                source);
-            AddProgramTargetCountSlashActions(
-                actions,
-                actor,
-                converted,
-                targets,
-                "杀",
-                CardKind.Slash,
-                source);
+                AddFangtianHalberdSlashActions(
+                    actions,
+                    actor,
+                    converted,
+                    targets,
+                    "杀",
+                    CardKind.Slash,
+                    source);
+                AddProgramTargetCountSlashActions(
+                    actions,
+                    actor,
+                    converted,
+                    targets,
+                    "杀",
+                    CardKind.Slash,
+                    source);
+            }
         }
     }
 

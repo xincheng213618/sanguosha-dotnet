@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-lihuo-3160", "revision": 1,
+      "states": [{ "id": "fire-target-unlocked", "initialValue": false, "visibility": "public", "resetScope": "game", "reacquirePolicy": "preserveUntilGameEnd" }],
+      "modifiers": [{ "id": "unlocked-fire-target", "query": "cardTargetCount", "operation": "add", "value": 1, "priority": 0,
+        "cardKinds": ["fireSlash"], "condition": { "kind": "runtimeBooleanState", "stateId": "fire-target-unlocked" } }],
+      "viewAs": [{ "id": "ordinary-slash-to-fire", "inputKinds": ["slash"], "inputSuits": [], "outputKind": "fireSlash",
+        "forPlay": true, "forResponse": false, "allowChainedInput": true }],
+      "triggers": [
+        { "id": "committed-fire-target", "window": "cardUseCommitted", "ownerRelation": "actor", "cardKinds": ["slash", "fireSlash"], "optional": true,
+          "effects": [{ "op": "offerCurrentSlashFireAndExtraTarget", "target": "owner" }] },
+        { "id": "first-converted-use-damage-cost", "window": "afterDamageApplied", "subject": "damageSource", "damageOccurrence": "perDamage", "optional": false,
+          "effects": [{ "op": "resolveShanheSourceLihuoFirstDamage", "target": "owner" }] }
+      ]
+    },
+    {
+      "id": "shanhe:source-chunlao-3161", "revision": 1,
+      "triggers": [
+        { "id": "discarder-optional-distance-one-store", "window": "discardPileReceived", "subject": "owner", "optional": false,
+          "effects": [{ "op": "offerShanheSourceChunlaoStorage", "target": "owner" }] },
+        { "id": "round-priced-pile-alcohol", "window": "dyingResponse", "subject": "owner", "optional": true,
+          "effects": [{ "op": "useRoundPricedPileDyingAlcohol", "target": "owner", "zones": ["chunlao"], "stateId": "round-wine-uses" }] }
+      ]
+    }
+  ]
+}

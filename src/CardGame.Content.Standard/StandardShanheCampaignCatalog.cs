@@ -474,6 +474,12 @@ public static partial class StandardShanheCampaignCatalog
             StandardShanheSourceArmoryCommanderPackage.HardId or StandardShanheSourceArmoryCommanderPackage.NightmareId);
         var sourceChengZhan = ids.Any(id => id is StandardShanheSourceChengZhanPackage.BaseId or
             StandardShanheSourceChengZhanPackage.HardId or StandardShanheSourceChengZhanPackage.HellId);
+        var sourceZuoCi = ids.Any(id => id is StandardShanheSourceZuoCiPackage.BaseId or
+            StandardShanheSourceZuoCiPackage.HardId or StandardShanheSourceZuoCiPackage.NightmareId);
+        var sourceLiuSandao = ids.Any(id => id is StandardShanheSourceLiuSandaoPackage.BaseId or
+            StandardShanheSourceLiuSandaoPackage.MediumId or StandardShanheSourceLiuSandaoPackage.HardId or
+            StandardShanheSourceLiuSandaoPackage.NightmareId or StandardShanheSourceLiuSandaoPackage.HellId);
+        var sourceJiangdongTrio = ids.Any(id => id.StartsWith("shanhe:source-jiangdong-trio-2492-", StringComparison.Ordinal));
         var sourceCoalitionTrio = extraSkills.Contains(StandardShanheSourceCoalitionTrioPackage.CangchuSkillId) ||
             extraSkills.Contains(StandardShanheSourceCoalitionTrioPackage.SushouSkillId) ||
             ids.Any(id => id is StandardShanheSourceCoalitionTrioPackage.SpyBaseId or StandardShanheSourceCoalitionTrioPackage.SpyHardId or
@@ -631,6 +637,9 @@ public static partial class StandardShanheCampaignCatalog
             (sourceGaoGan ? "/source-gaogan-2484" : "") +
             (sourceArmory ? "/source-armory-commander-2486" : "") +
             (sourceChengZhan ? "/source-chengzhan-2462" : "") +
+            (sourceZuoCi ? "/source-zuoci-2470" : "") +
+            (sourceLiuSandao ? "/source-liusandao-2479" : "") +
+            (sourceJiangdongTrio ? "/source-jiangdong-trio-2492" : "") +
             (sourceWuqueAssassin ? "/source-wuque-assassin-2493" : "") +
             (sourceExecutioner ? "/source-executioner-2495" : "") +
             (s5Simayi ? "/s5-simayi-2677" : "") +
@@ -830,6 +839,9 @@ public static partial class StandardShanheCampaignCatalog
             if (sourceGaoGan) packages.Add(new StandardShanheSourceGaoGanPackage());
             if (sourceArmory) packages.Add(new StandardShanheSourceArmoryCommanderPackage());
             if (sourceChengZhan) packages.Add(new StandardShanheSourceChengZhanPackage());
+            if (sourceZuoCi) packages.Add(new StandardShanheSourceZuoCiPackage());
+            if (sourceLiuSandao) packages.Add(new StandardShanheSourceLiuSandaoPackage());
+            if (sourceJiangdongTrio) packages.Add(new StandardShanheSourceJiangdongTrioPackage());
             if (sourceAgricultureOfficer) packages.Add(new StandardShanheSourceAgricultureOfficerPackage());
             if (sourceWuqueAssassin) packages.Add(new StandardShanheSourceWuqueAssassinPackage());
             if (sourceDemonAssassin) packages.Add(new StandardShanheSourceDemonAssassinPackage());
@@ -881,7 +893,7 @@ public static partial class StandardShanheCampaignCatalog
                 packages.Add(new StandardShanheRoundRecoveryPackage());
                 packages.Add(new StandardShanheIncomingReductionPackage());
             }
-            return ComposedSkillContentRegistry.CreateShowcase(additionalPackages: packages);
+            return ComposedSkillContentRegistry.CreateShowcase(includeHulaoActivities: sourceLiuSandao, additionalPackages: packages);
         })).Value;
     }
 

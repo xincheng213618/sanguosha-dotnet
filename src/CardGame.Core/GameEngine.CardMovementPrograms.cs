@@ -496,6 +496,8 @@ public sealed partial class GameEngine
             return MatchingProvenanceDiscardIndexes(batch, candidate, trigger);
         if (features.HasOperation(SkillProgramEffectOp.StoreAdjacentDiscardedSlash))
             return MatchingAdjacentDiscardIndexes(batch, candidate);
+        if (features.HasOperation(SkillProgramEffectOp.OfferShanheSourceChunlaoStorage))
+            return MatchingShanheSourceChunlaoIndexes(batch, candidate);
         if(features.HasOperation(SkillProgramEffectOp.RewardDiscardedActionColor))
         {
             var action=CompleteProgramEventHistory().OfType<ActionCardsDiscardedEvent>().LastOrDefault(e=>e.BatchId==batch.Id);
