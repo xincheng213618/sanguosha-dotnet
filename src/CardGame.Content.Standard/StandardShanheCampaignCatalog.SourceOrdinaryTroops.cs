@@ -12,7 +12,7 @@ public static partial class StandardShanheCampaignCatalog
     {
         var potential = StandardShanheSourceRouteCatalog.Season5.GetPotentialBattleIds(city.SourceCityId);
         foreach (var group in new[] { 2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495,
-                     2451, 2457, 2498, 2500, 2454, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481, 2466, 2484, 2486, 2462, 2470, 2479 })
+                     2451, 2457, 2498, 2500, 2454, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481, 2466, 2484, 2486, 2462, 2470, 2479, 2478 })
         {
             if (!potential.Contains(group)) continue;
             var general = OrdinaryTroopGeneral(group, difficulty);
@@ -20,6 +20,7 @@ public static partial class StandardShanheCampaignCatalog
             if (group == 2497) member = member with { StartingCards = JiangdongVeteranGear(difficulty) };
             if (group == 2495) member = member with { StartingCards = ExecutionerGear(difficulty) };
             if (group == 2494) member = member with { StartingCards = VanguardGear() };
+            if (group == 2478) member = member with { StartingCards = WuCongGear(difficulty) };
             yield return WithSource2026EnemyData(new("source-city-" + city.SourceCityId + ":troop-" + group,
                 OrdinaryTroopName(group), [member], [],
                 VictoryGold: 200, HealAfterVictory: 1)
@@ -29,7 +30,7 @@ public static partial class StandardShanheCampaignCatalog
                 StoryText = OrdinaryTroopStory(group)
             }, group);
         }
-        foreach (var group in new[] { 2465, 2499, 2464, 2492 })
+        foreach (var group in new[] { 2465, 2499, 2464, 2492, 2475, 2485, 2471 })
         {
             if (!potential.Contains(group)) continue;
             yield return WithSource2026EnemyData(new("source-city-" + city.SourceCityId + ":troop-" + group,
@@ -127,7 +128,10 @@ public static partial class StandardShanheCampaignCatalog
                         startingCards: VanguardGear()),
                     Local(node.Id + ":caiwenji-2469-local", OrdinaryTroopName(2469), caiWenji, OrdinaryTroopStory(2469), baseHp: 3),
                     Local(node.Id + ":ranger-2481-local", OrdinaryTroopName(2481), ranger, OrdinaryTroopStory(2481)),
-                    Local(node.Id + ":chengzhan-2462-local", OrdinaryTroopName(2462), chengZhan, OrdinaryTroopStory(2462))
+                    Local(node.Id + ":chengzhan-2462-local", OrdinaryTroopName(2462), chengZhan, OrdinaryTroopStory(2462)),
+                    ReturningMixedOrdinary(2475, difficulty, node.Id + ":militia-trio-2475-local", chapter: 2),
+                    ReturningMixedOrdinary(2485, difficulty, node.Id + ":caosong-trio-2485-local", chapter: 2),
+                    ReturningMixedOrdinary(2471, difficulty, node.Id + ":qianzhao-pair-2471-local", chapter: 2)
                 }).ToArray(),
                 Description = node.Description + "边军与地方兵马在此驻守。"
             }).ToArray()
@@ -167,6 +171,7 @@ public static partial class StandardShanheCampaignCatalog
         2462 => StandardShanheSourceChengZhanPackage.GetGeneralId(difficulty),
         2470 => StandardShanheSourceZuoCiPackage.GetGeneralId(difficulty),
         2479 => StandardShanheSourceLiuSandaoPackage.GetGeneralId(difficulty),
+        2478 => StandardShanheSourceWuCongPackage.GetGeneralId(difficulty),
         2456 => StandardShanheSourceCoalitionTrioPackage.GetQuartermasterGeneralId(difficulty),
         2458 => StandardShanheSourceDemonRaiderPackage.GetGeneralId(difficulty),
         2461 => StandardShanheSourceDemonArcherPackage.GetGeneralId(difficulty),
@@ -198,6 +203,9 @@ public static partial class StandardShanheCampaignCatalog
         2466 => "幽燕壮士", 2484 => "高干", 2486 => "武库统领",
         2462 => "成湛",
         2470 => "左慈", 2479 => "刘三刀", 2492 => "江东三将",
+        2475 => "民兵三人组", 2485 => "曹嵩与卫兵",
+        2478 => "吴琮",
+        2471 => "牵招与乌桓奇袭兵",
         2451 => "步珩", 2457 => "擒拿刺客 · 魔军刺客", 2498 => "羽林军", 2500 => "农都尉",
         2474 => "经验传承 · 百战老兵", 2467 => "乌桓贼匪 · 乌桓骑手", 2487 => "探听虚实 · 武卫兵",
         2473 => "趁人之危 · 羌人劫匪", 2480 => "空谈无益 · 荀悦",
@@ -224,6 +232,10 @@ public static partial class StandardShanheCampaignCatalog
         2470 => "左慈以化身、新生变化技能，高档还能博览群策，以知命调整牌序。",
         2479 => "刘三刀以虎臣积累战功，高档能怒斩连攻、傲战突破次数；无前和登极仍需各自实际资源。",
         2492 => "程普以疠火攻阵、醇醪救援，韩当与黄盖从旁接战。",
+        2475 => "民兵凭清俭即时分牌，高档再以素俭、据守周转辎重，并以诛害追击。",
+        2485 => "曹嵩以翊正策应双卫兵，高档以威重补牌、龙威救援，卫兵用穿云打击体力较多的敌军。",
+        2478 => "吴琮以铁炮反击伤害来源，命中后拉开单向距离；高档凭暗箭进击，并携贯石斧。",
+        2471 => "牵招以威抚蓄势，高档可款塞调度；乌桓奇袭兵凭效死借牌、怨仇破甲。",
         2458 => "魔军暴徒以强袭冲阵，高档凭劫掠夺取辎重，再以狼蹈施压。",
         2461 => "魔军弓骑弃牌拓展射程，高档以诱言补牌、扫谷连攻。",
         2464 => "刺客潜袭封牌，弓骑扫谷驰援，暴徒强袭劫掠。",
@@ -259,4 +271,6 @@ public static partial class StandardShanheCampaignCatalog
 
     private static IReadOnlyList<ShanheStartingCard> VanguardGear() =>
         Array.AsReadOnly(new[] { new ShanheStartingCard(CardKind.FangtianHalberd, Suit.Heart, 12) });
+    private static IReadOnlyList<ShanheStartingCard> WuCongGear(int sourceDifficulty) => sourceDifficulty >= 16
+        ? Array.AsReadOnly(new[] { new ShanheStartingCard(CardKind.StoneAxe, Suit.Heart, 5) }) : [];
 }

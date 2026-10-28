@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "shanhe:source-tiepao-14075", "revision": 1,
+      "triggers": [
+        { "id": "actual-source-retaliation", "window": "afterDamageApplied", "subject": "owner",
+          "damageOccurrence": "perDamage", "optional": true,
+          "effects": [{ "op": "resolveShanheSourceTiepaoRetaliation", "target": "owner" }] }
+      ]
+    }
+  ]
+}

@@ -16,6 +16,12 @@ public static partial class StandardShanheCampaignCatalog
             .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
         2492 => StandardShanheSourceJiangdongTrioPackage.GetRosterGeneralIds(tier)
             .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
+        2475 => StandardShanheSourceMilitiaTrioPackage.GetRosterGeneralIds(tier)
+            .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
+        2485 => StandardShanheSourceCaoSongTrioPackage.GetRosterGeneralIds(tier)
+            .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
+        2471 => StandardShanheSourceQianZhaoPairPackage.GetRosterGeneralIds(tier)
+            .Select(id => new ShanheCombatantDefinition(id)).ToArray(),
         2465 =>
         [
             new(StandardShanheSourceCoalitionTrioPackage.GetSpyGeneralId(tier)),

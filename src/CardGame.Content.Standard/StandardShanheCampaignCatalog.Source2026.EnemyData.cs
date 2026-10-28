@@ -27,6 +27,26 @@ public static partial class StandardShanheCampaignCatalog
             [2462] = [new(4871, 4, 4, 2, 4, 0, 0, 0, 5, 0, false, [])],
             [2470] = [new(447, 3, 3, 2, 4, 0, 0, 0, 5, 0, false, [])],
             [2479] = [new(4871, 5, 5, 2, 4, 0, 0, 0, 5, 0, false, [])],
+            [2478] = [new(4871, 3, 3, 2, 4, 0, 0, 0, 5, 0, false, [])],
+            [2471] =
+            [
+                new(580, 4, 4, 2, 4, 0, 0, 0, 5, 0, false, []),
+                new(4861, 2, 2, 2, 4, 0, 0, 0, 5, 0, false, [])
+            ],
+            [2475] =
+            [
+                new(4861, 4, 4, 2, 4, 0, 0, 0, 5, 0, false, []),
+                new(4862, 4, 4, 2, 4, 0, 0, 0, 5, 0, false, []),
+                new(4863, 4, 4, 2, 4, 0, 0, 0, 5, 0, false, [])
+            ],
+            [2485] =
+            [
+                new(438, 6, 6, 2, 4, 0, 0, 0, 5, 0, false, []),
+                new(4861, 2, 2, 2, 4, 0, 0, 0, 5, 0, false,
+                    [new(4, new(StartingCards: 1)), new(5, new(StartingCards: 1))]),
+                new(4862, 2, 2, 2, 4, 0, 0, 0, 5, 0, false,
+                    [new(4, new(StartingCards: 1)), new(5, new(StartingCards: 1))])
+            ],
             [2492] =
             [
                 new(620, 4, 4, 2, 4, 0, 0, 0, 5, 0, false, []),

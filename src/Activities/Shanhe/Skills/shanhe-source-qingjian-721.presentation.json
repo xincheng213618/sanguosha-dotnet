@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-qingjian-721": {
+      "name": "清俭",
+      "description": "每当你于摸牌阶段外获得牌后，你可以将其中的至少一张牌交给其他角色。"
+    }
+  }
+}

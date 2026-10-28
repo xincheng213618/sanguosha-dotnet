@@ -92,7 +92,12 @@ internal static class ShanheBossPortraitChecks
             ["shanhe:source-jiangdong-trio-2492-handang-hard"] = "han-dang",
             ["shanhe:source-jiangdong-trio-2492-handang-nightmare"] = "han-dang",
             ["shanhe:source-jiangdong-trio-2492-huanggai-base"] = "boundary-huang-gai",
-            ["shanhe:source-jiangdong-trio-2492-huanggai-hard"] = "boundary-huang-gai"
+            ["shanhe:source-jiangdong-trio-2492-huanggai-hard"] = "boundary-huang-gai",
+            ["shanhe:source-caosong-trio-2485-caosong-base"] = "ol-cao-song",
+            ["shanhe:source-caosong-trio-2485-caosong-hard"] = "ol-cao-song",
+            ["shanhe:source-caosong-trio-2485-caosong-hell"] = "ol-cao-song",
+            ["shanhe:source-qianzhao-pair-2471-qianzhao-base"] = "ol-qian-zhao",
+            ["shanhe:source-qianzhao-pair-2471-qianzhao-hard"] = "ol-qian-zhao"
         };
         foreach (var (id, expectedKey) in ordinaryAliases)
         {

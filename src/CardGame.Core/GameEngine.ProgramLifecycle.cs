@@ -915,6 +915,8 @@ public sealed partial class GameEngine
                 CreateTurnEndingProgramContext(ending, candidate, ending.Items[ending.ItemIndex].Facts),
             _ => null
         };
+        if (CaoSongSourceTargetSeats(ownerSeat, targetKind, windowContext) is { } caoSongTargets)
+            return caoSongTargets;
         if (targetKind == SkillProgramTargetKind.EventTargetWithHand)
             return windowContext?.TargetSeat is { } eventSeat && _players[eventSeat].IsAlive &&
                 GetHand(_players[eventSeat]).Count > 0 ? [eventSeat] : [];

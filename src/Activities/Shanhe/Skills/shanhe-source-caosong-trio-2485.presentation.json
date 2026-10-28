@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-chuanyun-665": { "name": "穿云", "description": "结束阶段，你可以对一名体力值大于你的敌方角色造成1点伤害。" },
+    "shanhe:source-longwei-1602": { "name": "龙威", "description": "当一名友方角色进入濒死状态时，你可以减少1点体力上限，令其回复至1点体力。" }
+  }
+}

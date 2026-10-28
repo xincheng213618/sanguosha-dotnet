@@ -141,6 +141,8 @@ public enum SkillProgramComparisonOperator
 }
 public enum SkillProgramTargetKind
 {
+    PublicTeamEnemyHpGreaterThanOwner = 24850,
+    DyingEventPublicTeamAlly = 24851,
     OtherLivingWithMoreHandCards = 78200,
     OtherLivingWithFewerHandCardsAndOwnedCards = 78201,
     MobileZhongYaoZuodingTarget = 77700,
@@ -279,6 +281,8 @@ public enum SkillProgramRandomTransferRevealPolicy { RecipientAfterGain = 0 }
 
 public enum SkillProgramEffectOp
 {
+    DistributeShanheSourceQingjianGains = 24750,
+    ResolveShanheSourceTiepaoRetaliation = 24780,
     ArmShanheSourceZhaoran = 24660,
     ClaimShanheSourceZhaoranSuit = 24661,
     AdjustShanheSourceHuchenDraw = 24790,

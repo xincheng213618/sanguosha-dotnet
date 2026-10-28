@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "shanhe:source-chuanyun-665", "revision": 1, "triggers": [
+      { "id": "ending-higher-hp-enemy", "window": "turnEnding", "subject": "owner", "optional": true,
+        "effects": [
+          { "op": "selectTarget", "target": "owner", "targetKind": "publicTeamEnemyHpGreaterThanOwner" },
+          { "op": "damage", "target": "selectedTarget", "amount": 1 }
+        ] }
+    ] },
+    { "id": "shanhe:source-longwei-1602", "revision": 1, "triggers": [
+      { "id": "pay-maximum-for-dying-ally", "window": "dyingEntering", "subject": "any", "optional": true,
+        "effects": [
+          { "op": "selectTarget", "target": "owner", "targetKind": "dyingEventPublicTeamAlly" },
+          { "op": "changeMaximumHp", "target": "owner", "amount": -1 },
+          { "op": "recoverTo", "target": "selectedTarget", "numberExpression": "integerConstant", "minimumValue": 1, "clampToMaxHp": true }
+        ] }
+    ] }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 3,
+  "skills": {
+    "shanhe:source-tiepao-14075": {
+      "name": "铁炮",
+      "description": "当你受到其他角色的伤害后，你可以将一张牌当【杀】对伤害来源使用。若此【杀】造成伤害，其与你的距离+1直到你的回合开始。"
+    }
+  }
+}

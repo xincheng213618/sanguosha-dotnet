@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 62,
+  "skills": [
+    { "id": "shanhe:source-qingjian-721", "revision": 1,
+      "triggers": [{ "id": "immediate-original-gain-distribution", "window": "cardsGained", "subject": "owner",
+        "destinationZones": ["hand"], "movementOccurrence": "perBatch", "gainPhaseQualification": "outsideOwnerDraw",
+        "optional": true, "effects": [{ "op": "distributeShanheSourceQingjianGains", "target": "owner" }] }]
+    }
+  ]
+}

@@ -4,7 +4,8 @@ using CardGame.Core.Campaigns;
 
 internal static class ShanheSourceMixedTroopChecks
 {
-    private static readonly int[] Groups = [2465, 2499, 2464, 2492];
+    private static readonly int[] Groups = [2465, 2499, 2464, 2492, 2475, 2485, 2471];
+    private static bool SecondChapter(int group) => group is 2499 or 2475 or 2485 or 2471;
 
     public static void CompleteMixedSourceRecipesAndBothRecommendedRoutes()
     {
@@ -34,8 +35,8 @@ internal static class ShanheSourceMixedTroopChecks
                     AssertRawMembers(encounter.Enemies, group, tier);
                 }
                 Need(actualCities.Order().SequenceEqual(expectedCities) && expectedCities.Length > 0 &&
-                    (tier != 25 || actualCities.Count == (group == 2499 ? 56 : 28)),
-                    "Complete mixed troops follow actual open city pools; at source25 each trio has28 cities and the officer pair56.");
+                    (tier != 25 || actualCities.Count == (SecondChapter(group) ? 56 : 28)),
+                    "Complete mixed troops follow actual open city pools; at source25 each chapter-two group has56 cities and each chapter-three group28.");
             }
             foreach (var cohort in Groups.Chunk(2))
             {
@@ -66,21 +67,22 @@ internal static class ShanheSourceMixedTroopChecks
             Need(definition.SourceDifficultyId is null && definition.SourceEnemyGrowth is null,
                 "Recommended mixed formations use the local three-tier recipe without borrowing source difficulty growth.");
             foreach (var (id, template, terrain) in sites)
+            foreach (var group in Groups.Where(SecondChapter))
             {
                 var node = definition.Nodes.Single(n => n.Id == id);
-                var roster = GeneralIds(2499, tier);
+                var roster = GeneralIds(group, tier);
                 var encounter = node.Encounters!.Single(e => e.Enemies.Select(m => m.GeneralId).SequenceEqual(roster));
                 var original = definition.Nodes.Single(n => n.Id == template).Encounters!
-                    .Single(e => e.Id == template + ":yulin-officer-2499-local");
+                    .Single(e => e.Id == template + LocalSuffix(group));
                 var expectedId = id == template ? original.Id : id + ":" + original.Id;
                 Need(node.ChapterNumber == 2 && encounter.Id == expectedId && SameMembers(encounter.Enemies, original.Enemies) &&
                     encounter.TerrainSkillId == (difficulty == 3 ? terrain : null),
-                    "The officer pair survives both chapter-two routes and each terrain clone with its original template identity, complete ordered members and unchanged growth.");
-                AssertLocalMembers(encounter, 2499, difficulty);
+                    "Each complete chapter-two formation survives both routes and each terrain clone with its original template identity, complete ordered members and unchanged growth.");
+                AssertLocalMembers(encounter, group, difficulty);
             }
             var camp = definition.Nodes.Single(n => n.Id == "finalcamp");
             var patrol = definition.Nodes.Single(n => n.Id == StandardShanheCampaignCatalog.ThirdChapterPatrolNodeId);
-            foreach (var group in Groups.Where(g => g != 2499))
+            foreach (var group in Groups.Where(g => !SecondChapter(g)))
             {
                 var trio = patrol.Encounters!.Single(e => e.Id == patrol.Id + LocalSuffix(group));
                 AssertLocalMembers(trio, group, difficulty);
@@ -92,7 +94,7 @@ internal static class ShanheSourceMixedTroopChecks
                     StandardShanheCampaignCatalog.MuluEncounterNodeId }.All(patrol.NextNodeIds.Contains) &&
                 !patrol.NextNodeIds.Contains(patrol.Id) && !patrol.NextNodeIds.Contains(camp.Id),
                 "Adding a complete trio to the optional patrol preserves every prior boss, elite and Mulu route, without a cycle or boss rewards.");
-            Need(GeneralIds(2465, tier).Count == 3 && GeneralIds(2464, tier).Count == 3 && GeneralIds(2499, tier).Count == 2,
+            Need(GeneralIds(2465, tier).Count == 3 && GeneralIds(2464, tier).Count == 3 && GeneralIds(2499, tier).Count == 2 && GeneralIds(2475, tier).Count == 3 && GeneralIds(2485, tier).Count == 3 && GeneralIds(2471, tier).Count == 2,
                 "All local tiers retain every source member rather than substituting one leader body.");
         }
     }
@@ -105,12 +107,12 @@ internal static class ShanheSourceMixedTroopChecks
             var node = source.Nodes.First(n => n.Kind == ShanheNodeKind.Battle && n.Encounters!.Any(e => e.SourceBattleId == group));
             var encounter = node.Encounters!.Single(e => e.SourceBattleId == group);
             // One actual three-enemy opening also exercises the exact eight-seat boundary.
-            EnterAndStart(source, node, encounter, group, 16, allies: group == 2465 ? 4 : 0);
+            EnterAndStart(source, node, encounter, group, 16, allies: group == 2465 ? 4 : group == 2471 ? 5 : 0);
         }
         var local = StandardShanheCampaignCatalog.CreateCodexDefinition(3, StandardShanheCampaignCatalog.Returning2026EditionId);
         foreach (var group in Groups)
         {
-            var node = local.Nodes.Single(n => n.Id == (group == 2499
+            var node = local.Nodes.Single(n => n.Id == (SecondChapter(group)
                 ? "dagu" : StandardShanheCampaignCatalog.ThirdChapterPatrolNodeId));
             var encounter = node.Encounters!.Single(e => e.Id == node.Id + LocalSuffix(group));
             EnterAndStart(local, node, encounter, group, 21, localDifficulty: 3);
@@ -144,7 +146,7 @@ internal static class ShanheSourceMixedTroopChecks
         Need(SameMembers(setup.EnemyRoster, preview.Enemies) && setup.EnemyRoster.Count == Count(group) &&
             setup.EncounterOrdinal == ordinal + 1 && setup.SourceDifficultyId == definition.SourceDifficultyId &&
             setup.BossTransition is null && setup.AllyRoster.Count == allies &&
-            1 + setup.EnemyRoster.Count + setup.AllyRoster.Count == (allies == 4 ? 8 : 1 + Count(group)),
+            1 + setup.EnemyRoster.Count + setup.AllyRoster.Count == (allies > 0 ? 8 : 1 + Count(group)),
             "Move retains every previewed member and the exact full eight-seat boundary without truncating the formation.");
         if (definition.SourceDifficultyId is { } sourceDifficulty)
         {
@@ -225,13 +227,13 @@ internal static class ShanheSourceMixedTroopChecks
         for (var i = 0; i < Count(group); i++)
         {
             var member = encounter.Enemies[i];
-            var bonus = (group == 2499 ? 3 : 4) + 2 * growth +
+            var bonus = (SecondChapter(group) ? 3 : 4) + 2 * growth +
                 (group == 2464 && i == 2 ? (tier >= 11 ? 1 : 0) + (tier >= 21 ? 1 : 0) : 0);
-            var hand = (group == 2499 ? 1 : 2) + growth + (group == 2465 && i == 2
-                ? (tier >= 16 ? 1 : 0) + (tier >= 21 ? 2 : 0) : group == 2499 && i == 1 && tier >= 16 ? 2 : 0);
+            var hand = (SecondChapter(group) ? 1 : 2) + growth + (group == 2465 && i == 2
+                ? (tier >= 16 ? 1 : 0) + (tier >= 21 ? 2 : 0) : group == 2499 && i == 1 && tier >= 16 ? 2 : group == 2485 && i > 0 ? (tier >= 16 ? 1 : 0) + (tier >= 21 ? 1 : 0) : 0);
             Need(member.GeneralId == GeneralIds(group, tier)[i] && member.MaxHpBonus == bonus &&
                 member.Hp == BaseHp(group, i) + bonus && member.InitialHandBonus == hand &&
-                member.DrawBonus == (group == 2499 ? 1 : 2) && member.SourceDifficultyAttributes is null &&
+                member.DrawBonus == (SecondChapter(group) ? 1 : 2) && member.SourceDifficultyAttributes is null &&
                 member is { SlashBonus: 0, InitialArmor: 0, ArmorRecoveryPerRound: 0, ArmorRecoveryCap: 0, ExtraDamage: 0 } && NoGear(member) &&
                 1 + encounter.Enemies.Count <= 8,
                 "Each local member uses its own source base HP plus one explicit local curve and its own cumulative health/hand increments without gear or a source-growth pass.");
@@ -243,9 +245,11 @@ internal static class ShanheSourceMixedTroopChecks
         for (var i = 0; i < Count(group); i++)
         {
             var general = registry.Generals[GeneralIds(group, tier)[i]];
-            var sourceGeneral = group == 2499 ? i == 0 ? 4871 : 4861 : group == 2464 ? 4861 + i : i switch { 0 => 4861, 1 => 4862, _ => 4871 };
+            var sourceGeneral = group == 2471 ? (i == 0 ? 580 : 4861) : group == 2475 ? 4861 + i : group == 2485 ? (i == 0 ? 438 : 4860 + i) : group == 2499 ? i == 0 ? 4871 : 4861 : group == 2464 ? 4861 + i : i switch { 0 => 4861, 1 => 4862, _ => 4871 };
             var character = "character:shanhe-source-" + (sourceGeneral == 4871 ? "general-" : "soldier-") + sourceGeneral;
             if (group == 2492) character = Character(i);
+            if (group == 2485 && i == 0) character = "character:cao-song";
+            if (group == 2471 && i == 0) character = "character:qian-zhao";
             Need(general.CharacterId == character && general.BaseHp == BaseHp(group, i) && general.InitialHp == BaseHp(group, i) &&
                 registry.IsGeneralPlayable(general.Id) && general.SkillIds.Order().SequenceEqual(ExpectedSkills(group, i, tier).Order()) &&
                 general.SkillIds.All(id => registry.GetSkill(id).Program is not null),
@@ -296,6 +300,9 @@ internal static class ShanheSourceMixedTroopChecks
     {
         2499 => StandardShanheSourceYulinOfficerPackage.GetRosterGeneralIds(tier),
         2492 => StandardShanheSourceJiangdongTrioPackage.GetRosterGeneralIds(tier),
+        2475 => StandardShanheSourceMilitiaTrioPackage.GetRosterGeneralIds(tier),
+        2485 => StandardShanheSourceCaoSongTrioPackage.GetRosterGeneralIds(tier),
+        2471 => StandardShanheSourceQianZhaoPairPackage.GetRosterGeneralIds(tier),
         2465 => new[] { StandardShanheSourceCoalitionTrioPackage.GetSpyGeneralId(tier),
             StandardShanheSourceCoalitionTrioPackage.GetScoutGeneralId(tier), StandardShanheSourceCoalitionTrioPackage.GetQuartermasterGeneralId(tier) },
         2464 => new[] { StandardShanheSourceDemonAssassinPackage.GetGeneralId(tier),
@@ -304,6 +311,28 @@ internal static class ShanheSourceMixedTroopChecks
     };
     private static string[] ExpectedSkills(int group, int index, int tier)
     {
+        if (group == 2471)
+            return index == 0
+                ? new[] { StandardShanheSourceQianZhaoPairPackage.WeifuSkillId }
+                    .Concat(tier >= 11 ? [StandardShanheSourceQianZhaoPairPackage.KuansaiSkillId] : Array.Empty<string>()).ToArray()
+                : (tier >= 11 ? new[] { StandardShanheSourceQianZhaoPairPackage.XiaosiSkillId } : Array.Empty<string>())
+                    .Concat(tier >= 16 ? [StandardShanheSourceQianZhaoPairPackage.YuanchouSkillId] : Array.Empty<string>()).ToArray();
+        if (group == 2475)
+            return index switch
+            {
+                0 => (tier >= 11 ? new[] { StandardShanheSourceMilitiaTrioPackage.SujianSkillId } : Array.Empty<string>())
+                    .Concat(tier >= 21 ? [StandardShanheSourceMilitiaTrioPackage.YingyuanSkillId] : Array.Empty<string>()).ToArray(),
+                1 => new[] { StandardShanheSourceMilitiaTrioPackage.QingjianSkillId }
+                    .Concat(tier >= 16 ? [StandardShanheSourceMilitiaTrioPackage.JushouSkillId] : Array.Empty<string>()).ToArray(),
+                _ => (tier >= 11 ? new[] { StandardShanheSourceMilitiaTrioPackage.YuejianSkillId } : Array.Empty<string>())
+                    .Concat(tier >= 16 ? [StandardShanheSourceMilitiaTrioPackage.ZhuhaiSkillId] : Array.Empty<string>()).ToArray()
+            };
+        if (group == 2485)
+            return index == 0
+                ? new[] { StandardShanheSourceCaoSongTrioPackage.YizhengSkillId }
+                    .Concat(tier >= 11 ? [StandardShanheSourceCaoSongTrioPackage.WeizhongSkillId] : Array.Empty<string>())
+                    .Concat(tier >= 21 ? [StandardShanheSourceCaoSongTrioPackage.LongweiSkillId] : Array.Empty<string>()).ToArray()
+                : tier >= 11 ? [StandardShanheSourceCaoSongTrioPackage.ChuanyunSkillId] : [];
         if (group == 2492)
             return index switch
             {
@@ -348,19 +377,23 @@ internal static class ShanheSourceMixedTroopChecks
     private static IReadOnlyList<ShanheSourceEnemyTierAttributes> ExpectedAttributes(int group, int index) =>
         group == 2465 && index == 2 ? new[] { new ShanheSourceEnemyTierAttributes(4, new(StartingCards: 1)), new(5, new(StartingCards: 2)) }
         : group == 2499 && index == 1 ? new[] { new ShanheSourceEnemyTierAttributes(4, new(StartingCards: 2)) }
+        : group == 2485 && index > 0 ? new[] { new ShanheSourceEnemyTierAttributes(4, new(StartingCards: 1)), new(5, new(StartingCards: 1)) }
         : group == 2464 && index == 2 ? new[] { new ShanheSourceEnemyTierAttributes(3, new(Hp: 1)), new(5, new(Hp: 1)) } : [];
-    private static int Count(int group) => group == 2499 ? 2 : 3;
+    private static int Count(int group) => group is 2499 or 2471 ? 2 : 3;
     private static int BaseHp(int group, int index) => group switch
     {
         2499 => index == 0 ? 5 : 4,
         2465 => index == 1 ? 4 : 3,
         2464 => index == 0 ? 3 : 4,
-        2492 => 4,
+        2492 or 2475 => 4,
+        2485 => index == 0 ? 6 : 2,
+        2471 => index == 0 ? 4 : 2,
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static string LocalSuffix(int group) => group switch
     {
         2499 => ":yulin-officer-2499-local", 2465 => ":coalition-trio-2465-local", 2464 => ":demon-trio-2464-local", 2492 => ":jiangdong-trio-2492-local",
+        2475 => ":militia-trio-2475-local", 2485 => ":caosong-trio-2485-local", 2471 => ":qianzhao-pair-2471-local",
         _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
     private static int LocalTier(int difficulty) => difficulty switch { 1 => 1, 2 => 11, 3 => 21, _ => throw new ArgumentOutOfRangeException(nameof(difficulty)) };
