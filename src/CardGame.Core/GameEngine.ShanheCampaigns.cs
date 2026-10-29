@@ -20,7 +20,9 @@ public sealed partial class GameEngine
 
     private void ExcludeShanheDeckEquipment(CardLocation zone)
     {
-        if (_options.ShanheBattle is null) return;
+        // The equipment-free deck belongs to the opted-in resource contract.
+        // Legacy recipes retain their authored deck through command replay.
+        if (_options.ShanheBattle is not { StartingResourcesExpireOnUse: true }) return;
         var equipment = _cardZones.CardsAt(zone).Where(card => EquipmentRules.IsEquipment(card.Kind)).ToArray();
         if (equipment.Length > 0)
             MoveCards(equipment, zone, CardLocation.OutsideGame, new CardMoveReason("shanhe.deck.exclude-equipment"));

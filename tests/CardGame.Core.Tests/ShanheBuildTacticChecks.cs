@@ -26,7 +26,7 @@ internal static class ShanheBuildTacticChecks
                     RewardId: reward.Id, LeavesNode: false)).ToArray()),
              new("battle", "步卒", ShanheNodeKind.Battle, [],
                 [new("guard", "步卒", [new(StandardShanheLocalTroopPackage.FootmanId) { StartingHand = [] }])])],
-            rewards, StartingGold: 3000);
+            rewards, StartingGold: 3000) { Schools = current.Schools };
         var session = ShanheCampaignSession.Create(definition, new(83, buyer) { UseCodexRewardPool = true },
             StandardShanheCampaignCatalog.CreateBattleRegistry);
         Pay(new MoveShanheNodeCommand("shop", session.Revision));

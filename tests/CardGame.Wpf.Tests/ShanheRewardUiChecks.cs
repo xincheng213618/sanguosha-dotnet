@@ -81,12 +81,13 @@ internal static partial class ShanheRewardUiChecks
             Program.Render(panel, 1440, 880, Path.Combine(output, "shanhe-reward-choice.png"));
             Click(confirm, panel);
             Program.Assert(!vm.IsShanheRewardOpen && overlay.Visibility == Visibility.Collapsed &&
-                session.Revision == revision + 1 && session.Snapshot.Gold == gold + 100 &&
+                session.Revision == revision + 2 && session.Snapshot.Gold == gold + 100 &&
                 session.Snapshot.ExtraSkillIds.Count == 0 && session.Snapshot.TacticIds.Count == 0 &&
                 session.AcceptedCommands.OfType<SkipShanheRewardCommand>().Count() == 1 &&
+                session.AcceptedCommands.OfType<EnableShanheBalancedRewardsCommand>().Count() == 1 &&
                 mapGoldValue.Text == vm.ShanheGoldText && mapGoldValue.Text == "铜币   117" &&
                 Program.Engine(vm).Revision == ordinaryRevision,
-                "Only confirmation may grant exactly 100 extra coins, without learning a skill or touching the hidden ordinary game.");
+                "Confirmation grants the authored mixed-offer compensation once, then appends the safe reward-rule upgrade without learning a skill or touching the ordinary game.");
             Program.Assert(objective.Text == vm.ShanheChapterObjectiveText &&
                     !objective.Text.Contains("放弃", StringComparison.Ordinal) && !objective.Text.Contains("100", StringComparison.Ordinal),
                 "The same header immediately retires the paid decline offer after its real confirmation rather than leaving stale reward instructions on the map.");
@@ -178,7 +179,7 @@ internal static partial class ShanheRewardUiChecks
             Click(Bound(panel, vm.SelectShanheSkillReplacementCommand, freshReplacement), panel);
             Click(replacementConfirm, panel);
             Program.Assert(session.Snapshot.ExtraSkillIds.SequenceEqual([Learned]) && session.Snapshot.ExtraSkillSlots == 1 &&
-                session.Snapshot.Gold == gold && session.Revision == revision + 1 && !vm.IsShanheRewardOpen &&
+                session.Snapshot.Gold == gold && session.Revision == revision + 2 && !vm.IsShanheRewardOpen &&
                 !vm.IsShanheSkillReplacementOpen && Program.Engine(vm).Revision == ordinaryRevision,
                 "Only the modal confirmation may exchange exactly one acquired skill without changing printed skills, slot count, coins, or the ordinary table.");
             var afterReplacement = Snapshot(session);
@@ -276,7 +277,7 @@ internal static partial class ShanheRewardUiChecks
             Click(replacementConfirm, panel);
             var purchased = SkillMarketProduct(vm, session, "learned");
             var purchasedButton = Bound(panel, vm.RequestShanheShopPurchaseCommand, purchased);
-            Program.Assert(!vm.IsShanheSkillReplacementOpen && session.Revision == revision + 1 &&
+            Program.Assert(!vm.IsShanheSkillReplacementOpen && session.Revision == revision + 2 &&
                 session.Snapshot.Gold == gold - 25 && session.Snapshot.ExtraSkillIds.SequenceEqual([Learned]) &&
                 session.Snapshot.ExtraSkillSlots == 1 && session.Snapshot.Phase == ShanheCampaignPhase.Map &&
                 purchased is { State: ShanheShopItemState.Purchased, Status: "已购", CanBuy: false } && !purchasedButton.IsEnabled &&
@@ -304,7 +305,7 @@ internal static partial class ShanheRewardUiChecks
             revision = session.Revision;
             Click(Bound(panel, vm.RequestShanheShopPurchaseCommand, item), panel);
             Program.Assert(!vm.IsShanheSkillReplacementOpen && session.Snapshot.Gold == gold - item.Price &&
-                session.Snapshot.ExtraSkillIds.SequenceEqual([Learned]) && session.Revision == revision + 1,
+                session.Snapshot.ExtraSkillIds.SequenceEqual([Learned]) && session.Revision == revision + 2,
                 "With an unused skill slot, the same purchase command must learn the skill and charge its price directly without a replacement dialog.");
             AssertMarketStateCard(SkillMarketProduct(vm, session, "learned"));
 
@@ -470,7 +471,7 @@ internal static partial class ShanheRewardUiChecks
                 if (chapter == 1) Program.Render(panel, 1440, 880, Path.Combine(output, "shanhe-boss-reward-claimed.png"));
                 var completedRevision = session.Revision;
                 Click(finish, panel);
-                Program.Assert(session.Revision == completedRevision + 1 && !vm.IsShanheBossRewardOpen &&
+                Program.Assert(session.Revision == completedRevision + (chapter == 1 ? 2 : 1) && !vm.IsShanheBossRewardOpen &&
                     session.Snapshot.BossRewardSummary is null && session.Snapshot.CompletedNodeIds.Count == chapter &&
                     session.Snapshot.TacticIds.Count == chapter && session.Snapshot.ExtraSkillIds.Count == chapter &&
                     session.Snapshot.StartingCards.Count == 0 &&

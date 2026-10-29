@@ -20,6 +20,12 @@ internal static partial class ShanheCampaignUiChecks
         original.OpenShanheCommand.Execute(null);
         original.StartShanheCommand.Execute(null);
         var saved = store.Read();
+        using (var matching = Create(new MemorySaveStore(), store))
+        {
+            matching.ContinueShanheCommand.Execute(null);
+            Program.Assert(matching.HasShanheSession && matching.IsShanheRunInProgress,
+                "Matching current content restores the issued expedition normally.");
+        }
         var definition = StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(saved.Campaign, saved.Difficulty);
         var changed = saved with { Campaign = saved.Campaign with
             { CampaignHash = ShanheCampaignContent.GetContentHash(definition with { IntroText = "Earlier presentation" }) } };
@@ -28,14 +34,15 @@ internal static partial class ShanheCampaignUiChecks
         using (var readable = Create(new MemorySaveStore(), store))
         {
             readable.ContinueShanheCommand.Execute(null);
-            Program.Assert(readable.HasShanheSession && readable.IsShanheRunInProgress &&
+            Program.Assert(!readable.HasShanheSession && readable.CanPrepareShanheExpedition &&
+                !readable.CanContinueShanheExpedition &&
                 JsonSerializer.Serialize(store.Read()) == source,
-                "A changed whole-definition fingerprint alone does not reject or rewrite valid expedition progress.");
+                "Mismatched content returns to preparation and preserves the source journal until a new expedition is confirmed.");
         }
-        var invalid = changed with { Campaign = changed.Campaign with
+        var invalid = saved with { Campaign = saved.Campaign with
         {
-            Commands = changed.Campaign.Commands.Append(new MoveShanheNodeCommand("missing-node", changed.Campaign.Revision)).ToArray(),
-            Revision = changed.Campaign.Revision + 1
+            Commands = saved.Campaign.Commands.Append(new MoveShanheNodeCommand("missing-node", saved.Campaign.Revision)).ToArray(),
+            Revision = saved.Campaign.Revision + 1
         } };
         store.Write(invalid);
         source = JsonSerializer.Serialize(store.Read());

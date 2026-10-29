@@ -12,7 +12,7 @@ internal static class ShanheCodexContentChecks
             var codex = StandardShanheCampaignCatalog.CreateCodexDefinition(difficulty, edition.Id);
             var options = new ShanheCampaignOptions(71, "classic:cao-cao")
             {
-                UseCodexRewardPool = true,
+                UseCodexRewardPool = true, SourceDifficultyId = codex.SourceDifficultyId,
                 UnlockedRewardIds = [.. StandardShanheCampaignCatalog.DefaultCodexUnlockedRewardIds, "codex-57", "codex-88"]
             };
             var session = ShanheCampaignSession.Create(codex, options, StandardShanheCampaignCatalog.CreateBattleRegistry);
@@ -27,7 +27,7 @@ internal static class ShanheCodexContentChecks
                 checkpoint with { Options = checkpoint.Options with { UseCodexRewardPool = false } }, difficulty));
 
             var legacyDefinition = StandardShanheCampaignCatalog.CreateDefinition(difficulty, edition.Id);
-            var legacy = ShanheCampaignSession.Create(legacyDefinition, new(71, "classic:cao-cao"), StandardShanheCampaignCatalog.CreateBattleRegistry);
+            var legacy = ShanheCampaignSession.Create(legacyDefinition, new(71, "classic:cao-cao") { SourceDifficultyId = legacyDefinition.SourceDifficultyId }, StandardShanheCampaignCatalog.CreateBattleRegistry);
             var legacyCheckpoint = ShanheCampaignJson.Deserialize(ShanheCampaignJson.Serialize(legacy.CreateCheckpoint()));
             var legacyRestoredDefinition = StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(legacyCheckpoint, difficulty);
             Require(ShanheCampaignContent.GetContentHash(legacyRestoredDefinition) == legacy.ContentHash &&

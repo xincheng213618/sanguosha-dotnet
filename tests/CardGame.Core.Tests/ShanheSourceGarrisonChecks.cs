@@ -17,7 +17,7 @@ internal static class ShanheSourceGarrisonChecks
                 candidate.Encounters!.Any(encounter => encounter.SourceBattleId is null));
             var entry = source with
             {
-                StartingNodeIds = [.. source.StartingNodeIds, node.Id], RandomStartingNode = false,
+                StartingNodeIds = source.StartingNodeIds.Append(node.Id).Distinct(StringComparer.Ordinal).ToArray(), RandomStartingNode = false,
                 Nodes = source.Nodes.Select(candidate => candidate.Id == node.Id
                     ? candidate with { Encounters = candidate.Encounters!.Where(encounter => encounter.SourceBattleId is null).ToArray() }
                     : candidate).ToArray()

@@ -112,8 +112,9 @@ internal static class ShanheStartingResourceChecks
 
         var old = Scene.Start(false); old.Play(); var oldGear = old.V().Equipment.Single(c => c.Kind == CardKind.Crossbow).Id;
         var oldDraw = old.V().Hand.Single(c => c.Kind == CardKind.DrawTwo).Id;
-        Need(old.E<ShanheStartingResourceCreatedEvent>().Length == 0 && old.Zone(oldGear) == CardLocation.Equipment(0),
-            "The absent/false contract keeps legacy direct starting equipment placement and emits no new provenance.");
+        Need(old.E<ShanheStartingResourceCreatedEvent>().Length == 0 && old.Zone(oldGear) == CardLocation.Equipment(0) &&
+            old.G.CreateCardZoneDiagnostics().Any(card => card.Location == CardLocation.DrawPile && EquipmentCatalog.IsEquipment(card.CardKind)),
+            "The absent/false contract keeps its authored equipment-bearing deck, direct starting equipment and original provenance shape.");
         old.Card(oldDraw, []); old.Until(() => old.At(UseWatch)); Need(old.Zone(oldDraw) == CardLocation.DiscardPile && old.E<ShanheStartingResourceDestroyedEvent>().Length == 0,
             "Old false recipes preserve their original physical use/discard lifecycle without new exits."); old.Cold(); old.Continue(); old.Play();
     }

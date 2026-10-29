@@ -53,8 +53,9 @@ internal static class ShanheShopStockChecks
 
         var game = StandardShanheCampaignCatalog.CreateBattle(setup);
         var opening = game.CreateSnapshot(0).Players[0];
-        Require(opening.Equipment.Count == 0 && game.CreateSnapshot(0).Players[1].HandCount == 0,
-            "Purchased equipment must enter hand for manual use while the real Footman begins empty-handed.");
+        Require(opening.Equipment.Select(card => new ShanheStartingCard(card.Kind, card.Suit, card.Rank)).ToHashSet().SetEquals(equipment) &&
+            game.CreateSnapshot(0).Players[1].HandCount == 0,
+            "Purchased equipment is installed directly with its exact faces while the real Footman begins empty-handed.");
         Accept(game, new StartGameCommand());
         var origins = game.Events.Select(entry => entry.Payload).OfType<ShanheStartingResourceCreatedEvent>().ToArray();
         Require(origins.Length == 5 && origins.Select(origin => origin.CardId).Distinct().Count() == 5,
@@ -62,20 +63,21 @@ internal static class ShanheShopStockChecks
         int Initial(bool isEquipment, int index) => origins.Single(origin => origin.EquipmentResource == isEquipment && origin.RecipeIndex == index).CardId;
         foreach (var origin in origins)
         {
-            var face = opening.Hand.Single(card => card.Id == origin.CardId);
+            var face = opening.Hand.Concat(opening.Equipment).Single(card => card.Id == origin.CardId);
             Require(new ShanheStartingCard(face.Kind, face.Suit, face.Rank) ==
                 (origin.EquipmentResource ? equipment : cards)[origin.RecipeIndex],
-                "Each original hand entity must preserve its purchased source kind, suit and rank.");
+                "Each original hand or equipment entity preserves its purchased kind, suit, rank and recipe index.");
         }
 
         ReachPlay(game);
         var turn = game.CreateSnapshot(0).TurnNumber;
         foreach (var id in new[] { Initial(true, 0), Initial(true, 1) })
         {
-            Play(game, id, []);
-            ReachPlay(game);
-            Require(Zone(game, id) == CardLocation.Equipment(0),
-                "A purchased equipment entity must install through its real legal native card-use action.");
+            Require(Zone(game, id) == CardLocation.Equipment(0) &&
+                game.CardMovements.Count(move => move.CardId == id && move.From == CardLocation.OutsideGame &&
+                    move.To == CardLocation.Equipment(0) && move.Reason == CardMoveReasons.EquipmentEnter) == 1 &&
+                !game.Events.Any(entry => entry.Payload is CardUseDeclaredEvent use && use.CardId == id),
+                "A purchased equipment entity installs exactly once before play without fabricating a card-use declaration.");
         }
         var drawTwo = Initial(false, 0);
         var beforeHand = game.CreateSnapshot(0).Players[0].HandCount;

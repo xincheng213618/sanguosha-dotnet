@@ -24,7 +24,7 @@ internal static class ShanheSourceDuanjiaChecks
             var setup = new ShanheBattleSetup(109, 1, "source-duanjia-native", general, 5,
                 0, 0, 0, 0, [Capacity], [], equipment,
                 [new(Peer) { StartingHand = [] }, new(Peer) { StartingHand = [] }, new(Peer) { StartingHand = [] }],
-                [], new string('d', 64));
+                [], new string('d', 64)) { StartingResourcesExpireOnUse = true };
             var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup with
                 { EnemyRoster = setup.EnemyRoster.Select(p => p with { GeneralId = "classic:guan-yu" }).ToArray() })
                 .WithExtension(new Fixture(available, capacity), mode => mode.Id == ShanheBattleSetup.BattleModeId

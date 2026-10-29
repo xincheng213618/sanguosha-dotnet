@@ -92,6 +92,7 @@ internal static class ShanheCompanionChecks
             "The screenshot's named hands override the article's swapped Manzhu and Chilian prose.");
         var definition = Definition() with
         {
+            Schools = production.Schools,
             Rewards = [ordinary with { OpeningCompanionPool = [manzhu] },
                 new(StandardShanheCampaignCatalog.EliteOpeningCompanionRewardId, "第二份队友") { OpeningCompanionPool = [chilian] }]
         };

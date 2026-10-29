@@ -18,7 +18,7 @@ internal static class ShanheDifficultyPreviewUiChecks
             var encounter = entry.Encounters!.Single(item => item.Id.EndsWith(":opening:yibing", StringComparison.Ordinal));
             var definition = published with
             {
-                Nodes = [entry with { NextNodeIds = [], Encounters = [encounter], RewardIds = null }],
+                Nodes = [entry with { NextNodeIds = [], Encounters = [encounter], RewardIds = null, EliteUpgradeNodeId = null }],
                 StartingNodeIds = [entry.Id], Rewards = [], RandomStartingNode = false
             };
             var session = ShanheCampaignSession.Create(definition, new(71, "classic:guan-yu"),

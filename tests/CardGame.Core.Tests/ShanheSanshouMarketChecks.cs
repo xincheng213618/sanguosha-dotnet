@@ -55,7 +55,8 @@ internal static class ShanheSanshouMarketChecks
             StartingNodeIds = ["shop"], RandomStartingNode = false, StartingGold = 2000,
             Nodes =
             [
-                merchant with { Id = "shop", ChapterNumber = 1, NextNodeIds = ["battle"],
+                merchant with { Id = "shop", ChapterNumber = 1, NextNodeIds = ["battle"], ChapterRouteId = null,
+                    ChapterRole = ShanheChapterNodeRole.None, RequiredChapterProgress = 0,
                     Choices = merchant.Choices!.Where(choice => choice.RewardId == rewardId).ToArray() },
                 new("battle", reward.Name + "集市试阵", ShanheNodeKind.Battle, [],
                     [new("guard", "步卒", [new(StandardShanheLocalTroopPackage.FootmanId) { StartingHand = [] }])])

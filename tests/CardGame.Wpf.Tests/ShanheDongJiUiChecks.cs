@@ -120,7 +120,7 @@ internal static class ShanheDongJiUiChecks
             Program.Assert(prompt is { PlayerSeat: 0, IsPrivate: true, RequiredCardCount: 3, SkillPrompt.SkillId: Skill } &&
                 prompt.Choices.SelectMany(choice => choice.Cards).ToHashSet().SetEquals(oldCards) &&
                 !prompt.Choices.Any(choice => choice.Cards.Contains(gift.CardId)) &&
-                model.IsOwnedCardSelectionPending && !model.CanConfirmSelected && model.ActionHint.Contains("3 张手牌或装备") &&
+                model.IsOwnedCardSelectionPending && !model.CanConfirmSelected && model.ActionHint.Contains("需选 3 张") &&
                 game.CreateSnapshot(1).PendingDecision is null && game.CreateSnapshot(1).Players[0].Hand.Count == 0,
                 "The restored human view must show frozen X=3 through the shared owned-card selector, excluding the locked gift and hiding private payment choices from the NPC. " + Diagnostic(game));
         }

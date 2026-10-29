@@ -573,7 +573,7 @@ internal static partial class ShanheRewardUiChecks
             Fight("boss", ShanheChapterNodeRole.Boss, 0, 6, [], ShanheNodeKind.BossBattle)
         ],
         [
-            new("tactic", "战法·整备", Bonuses: new(Draw: 1)),
+            new("tactic", "战法·整备", Bonuses: new(Draw: 1)) { Rarity = 2 },
             new("hand", "随身杀", StartingCards: [new(CardKind.Slash, Suit.Heart, 7)]),
             new("march1", "日行千里Ⅰ") { CampaignEconomy = new(ExtraChapterBattles: 1) },
             new("march2", "日行千里Ⅱ") { CampaignEconomy = new(ExtraChapterBattles: 2) }

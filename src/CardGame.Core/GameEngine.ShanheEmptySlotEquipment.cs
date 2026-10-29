@@ -19,7 +19,7 @@ public sealed partial class GameEngine
         // Shanhe excludes equipment before dealing and before recycling. Its
         // random equipment skills use the registered deck's printed templates,
         // creating a native entity directly in the field, never in DrawPile.
-        var pool = _options.ShanheBattle is not null
+        var pool = _options.ShanheBattle is { StartingResourcesExpireOnUse: true }
             ? CreateDeckFromRegistry(_contentRegistry,
                 ResolveDeckDefinition(_contentRegistry, _options.DeckId ?? _modeDefinition.DeckId))
             : _cardZones.CardsAt(CardLocation.DrawPile);
@@ -47,7 +47,7 @@ public sealed partial class GameEngine
         if (candidates.Length == 0) return SkillProgramStepOutcome.Continue;
         var card = candidates[_random.Next(candidates.Length)];
         var from = CardLocation.DrawPile;
-        if (_options.ShanheBattle is not null)
+        if (_options.ShanheBattle is { StartingResourcesExpireOnUse: true })
         {
             card = card with { Id = CreateCardZoneDiagnostics().Select(c => c.CardId).DefaultIfEmpty(0).Max() + 1 };
             _cardZones.AddGeneratedCard(card);

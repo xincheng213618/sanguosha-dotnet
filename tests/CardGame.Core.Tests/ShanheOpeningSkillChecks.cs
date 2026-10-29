@@ -91,25 +91,35 @@ internal static class ShanheOpeningSkillChecks
             var inheritance = current.Rewards.Single(reward => reward.Id == StandardShanheCampaignCatalog.OpeningInheritanceRewardId);
             Require(StandardShanheCampaignCatalog.CodexRewardIdsByNodeId[2] == inheritance.Id && inheritance.TacticSkillId is null && inheritance.SkillId is null &&
                 inheritance.OpeningSkillRewardIds is { Count: >= 3 }, "Node 2 must map to a real one-time opening tactic with no placeholder program.");
+            var options = new ShanheCampaignOptions(73, current.PlayerGeneralIds[0])
+            {
+                SourceDifficultyId = current.SourceDifficultyId,
+                UseCodexRewardPool = true, EquippedTacticIds = [inheritance.Id], UnlockedRewardIds = [inheritance.Id]
+            };
+            ContentRegistry? inheritedContent = null;
+            var session = ShanheCampaignSession.Create(current, options, setup =>
+            {
+                var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup);
+                inheritedContent ??= registry;
+                return registry;
+            });
             foreach (var id in inheritance.OpeningSkillRewardIds!)
             {
                 var skill = current.Rewards.Single(reward => reward.Id == id).SkillId!;
                 Require(StandardShanheCampaignCatalog.ShopMetadataByRewardId[id] is { Rarity: 2, Kind: "技能" } &&
-                    StandardShanheCampaignCatalog.PlayerRosterRegistry.Skills[skill].ImplementationStatus == SkillImplementationStatus.Complete,
+                    inheritedContent!.Skills[skill].ImplementationStatus == SkillImplementationStatus.Complete,
                     "Every inheritance candidate must be an implemented skill explicitly classified rare in the verified source metadata.");
             }
-            var options = new ShanheCampaignOptions(73, current.PlayerGeneralIds[0])
-            { UseCodexRewardPool = true, EquippedTacticIds = [inheritance.Id], UnlockedRewardIds = [inheritance.Id] };
-            var session = ShanheCampaignSession.Create(current, options, StandardShanheCampaignCatalog.CreateBattleRegistry);
             Require(session.Snapshot.OpeningSkillOffers.Count == 3, "Real codex content must offer three rare skills with only inheritance unlocked.");
             var old = current with { Rewards = current.Rewards.Where(reward => reward.Id != inheritance.Id).ToArray() };
             Require(!JsonSerializer.Serialize(old).Contains("OpeningSkillRewardIds", StringComparison.Ordinal), "Absent opening metadata must not alter historical content JSON.");
             var historical = ShanheCampaignSession.Create(old, options with { EquippedTacticIds = [], UnlockedRewardIds = [] }, StandardShanheCampaignCatalog.CreateBattleRegistry);
             var checkpoint = ShanheCampaignJson.Deserialize(ShanheCampaignJson.Serialize(historical.CreateCheckpoint()));
-            var reconstructed = StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(checkpoint, 1);
-            Require(ShanheCampaignContent.GetContentHash(reconstructed) == checkpoint.CampaignHash &&
-                reconstructed.Rewards.All(reward => reward.Id != inheritance.Id), "A pre-inheritance codex journal must select its complete old content fingerprint.");
-            var restored = ShanheCampaignSession.Restore(checkpoint, reconstructed, StandardShanheCampaignCatalog.CreateBattleRegistry);
+            var sourceJson = ShanheCampaignJson.Serialize(checkpoint);
+            MustThrow(() => StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(checkpoint, 1));
+            Require(ShanheCampaignJson.Serialize(checkpoint) == sourceJson,
+                "The current-only desktop catalogue rejects a retired inheritance fingerprint without rewriting its source journal.");
+            var restored = ShanheCampaignSession.Restore(checkpoint, old, StandardShanheCampaignCatalog.CreateBattleRegistry);
             Require(Serialize(restored) == Serialize(historical), "Old codex runs must restore without an opening draft being inserted.");
         }
     }

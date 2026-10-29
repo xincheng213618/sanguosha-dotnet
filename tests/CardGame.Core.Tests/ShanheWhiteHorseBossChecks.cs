@@ -27,7 +27,7 @@ internal static class ShanheWhiteHorseBossChecks
                 // Verified seeds select White Horse in the current three-entry boss pools.
                 // Shorten only the route, retaining its actual encounters and chapter rewards.
                 var fixture = new ShanheCampaignDefinition("fixture:white-horse-" + nodeId, "白马从龙首领",
-                    ["classic:guan-yu"], [nodeId], [node with { NextNodeIds = [] }], definition.Rewards);
+                    ["classic:guan-yu"], [nodeId], [node with { NextNodeIds = [] }], definition.Rewards) { Schools = definition.Schools };
                 var session = ShanheCampaignSession.Create(fixture, new(nodeId == "lijue" ? 71 : 3, "classic:guan-yu"),
                     StandardShanheCampaignCatalog.CreateBattleRegistry);
                 var before = ShanheCampaignJson.Serialize(session.CreateCheckpoint());

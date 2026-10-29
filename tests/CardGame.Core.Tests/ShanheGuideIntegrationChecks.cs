@@ -15,9 +15,14 @@ internal static class ShanheGuideIntegrationChecks
             var inherited = definition.Rewards.Single(reward => reward.Id == StandardShanheCampaignCatalog.OpeningInheritanceRewardId).OpeningSkillRewardIds!;
             Need(inherited.Contains("build-skill-3362") && definition.Rewards.Single(reward => reward.Id == "build-skill-3341").SkillId == "boundary:gongqi-current",
                 "The guide's rare Xiasheng and exact Gongqi edition are reachable through the real catalogue and inheritance pool.");
-            foreach (var id in new[] { "build-skill-3362", "build-skill-3365", "build-skill-3366", "tactic-duipai-2026", "tactic-duijia-2026" })
+            foreach (var id in new[] { "build-skill-3362", "build-skill-3365", "build-skill-3366" })
                 Need(definition.Rewards.Single(reward => reward.Id == id).Rarity == StandardShanheCampaignCatalog.ShopMetadataByRewardId[id].Rarity,
                     "Source shop quality also drives real reward offers: " + id);
+            foreach (var id in new[] { "tactic-duipai-2026", "tactic-duijia-2026" })
+                Need(definition.Rewards.Single(reward => reward.Id == id).TacticSkillId == "shanhe:" + id[7..] &&
+                    (!StandardShanheCampaignCatalog.ShopMetadataByRewardId.TryGetValue(id, out var metadata) ||
+                     definition.Rewards.Single(reward => reward.Id == id).Rarity == metadata.Rarity),
+                    "Unclassified team tactics retain their actual runtime identity without inventing verified shop metadata.");
             Need(definition.Rewards.All(reward => reward.SchoolMembership?.SourceId != 2235),
                 "The automatic team set cannot be claimed as ordinary loot.");
             var mulu = definition.Nodes.Single(node => node.Id == StandardShanheCampaignCatalog.MuluEncounterNodeId);

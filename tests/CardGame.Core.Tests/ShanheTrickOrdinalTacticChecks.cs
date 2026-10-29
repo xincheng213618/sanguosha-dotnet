@@ -24,9 +24,9 @@ internal static class ShanheTrickOrdinalTacticChecks
         s.Reach(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("branch") == "cost" && c.Cards.SequenceEqual([cost])) == true);
         s.Cold();
         s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "cost" && c.Cards.SequenceEqual([cost]));
-        // The retained engine exposes one whole-group Nullification window.
-        // Cancel this round, then observe the native paid extra round of the same use.
-        s.Reach(() => s.NullificationFor(1, 2, 3));
+        // Native group tricks ask for Nullification separately for each target.
+        // Cancel the first target, retaining the other targets and paid extra round.
+        s.Reach(() => s.NullificationFor(1));
         var original = s.G.ResolutionStack.OfType<CardUseFrame>().Last(f => f.CardKind == CardKind.ArrowBarrage);
         s.Need(original.Action is { PhysicalCards.Count: 2 } action &&
             action.ConversionChain.Any(source => source.SkillId == Luanji) &&
@@ -37,25 +37,25 @@ internal static class ShanheTrickOrdinalTacticChecks
         var actionId = original.Action!.ActionId;
         s.Cold();
         s.Answer(c => c.Cards.SequenceEqual([counter]));
-        s.Reach(() => s.IsDamagePause(1));
+        s.Reach(() => s.IsDamagePause(2));
         s.Need(s.Events<CardActionAcceptedEvent>().Count(e => e.Action.ActorSeat == 0 &&
                 e.Action.EffectiveKind == CardKind.Nullification && e.Action.Type == CardActionType.Response) == 1 &&
-            s.Events<ExtraCardEffectStartedEvent>().Count(e => e.CardUseFrameId == useId && e.ActionId == actionId) == 1 &&
-            s.Events<DamageAppliedEvent>() is [{ SourceSeat: 0, TargetSeat: 1, Amount: 2 }] &&
+            s.Events<ExtraCardEffectStartedEvent>().Count(e => e.CardUseFrameId == useId && e.ActionId == actionId) == 0 &&
+            s.Events<DamageAppliedEvent>() is [{ SourceSeat: 0, TargetSeat: 2, Amount: 2 }] &&
             s.G.ResolutionStack.OfType<CardUseFrame>().Any(f => f.Id == useId && f.Action?.ActionId == actionId),
-            "The owner's later Nullification occupies slot two and cancels the original effect; its paid extra round keeps the same first-use identity and still receives Miaoji I.");
+            "The owner's Nullification occupies slot two and cancels only target one; target two still receives the frozen first-use bonus before the paid extra round begins.");
         s.Cold(); s.ContinueDamage(); s.Play();
         var originalHits = s.Events<DamageAppliedEvent>();
-        s.Need(originalHits.Length == 3 && originalHits.Select(e => e.TargetSeat).SequenceEqual([1, 2, 3]) &&
+        s.Need(originalHits.Length == 5 && originalHits.Select(e => e.TargetSeat).SequenceEqual([2, 3, 1, 2, 3]) &&
             originalHits.All(e => e.SourceSeat == 0 && e.Amount == 2) &&
             s.Events<ExtraCardEffectIssuedEvent>().Count(e => e.CardUseFrameId == useId && e.ActionId == actionId && e.PaidCardId == cost) == 1 &&
             s.Events<ExtraCardEffectStartedEvent>().Count(e => e.CardUseFrameId == useId && e.ActionId == actionId) == 1 &&
             s.Events<CardUseDeclaredEvent>().Count(e => e.ResolutionId == useId) == 1 &&
             s.Events<CardUseFinishedEvent>().Count(e => e.ResolutionId == useId) == 1,
-            "All three landed AOE occurrences in the real repeated effect retain the frozen first-use bonus, without inventing another use or paying the repeat again.");
+            "Both remaining original targets and all three repeated effects retain the frozen first-use bonus, without inventing another use or paying the repeat again.");
         s.PlayCardId(later);
-        s.Need(s.Events<DamageAppliedEvent>().Skip(3).Select(e => e.TargetSeat).SequenceEqual([1, 2, 3]) &&
-            s.Events<DamageAppliedEvent>().Skip(3).All(e => e.SourceSeat == 0 && e.Amount == 1) &&
+        s.Need(s.Events<DamageAppliedEvent>().Skip(5).Select(e => e.TargetSeat).SequenceEqual([1, 2, 3]) &&
+            s.Events<DamageAppliedEvent>().Skip(5).All(e => e.SourceSeat == 0 && e.Amount == 1) &&
             pair.All(id => s.G.CardMovements.Count(m => m.CardId == id && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1 &&
                 s.G.CardMovements.Count(m => m.CardId == id && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile) == 1) &&
             s.G.CardMovements.Count(m => m.CardId == cost && m.From == CardLocation.Hand(0) && m.To == CardLocation.DiscardPile) == 1 &&

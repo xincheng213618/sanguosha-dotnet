@@ -263,7 +263,7 @@ internal static class ShanheS5DongMinChecks
     private static void VerifyActualEncounterIsolation()
     {
         var modern = StandardShanheCampaignCatalog.CreateDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
-        var encounter = modern.Nodes.Single(node => node.Id == "luoyang").Encounters!.Single(e => e.Enemies.Any(npc => npc.GeneralId == Boss));
+        var encounter = modern.Nodes.Single(node => node.Id == "luoyang").Encounters!.Single(e => e.Id == "luoyang:dongmin-current-base");
         var general = Production.Value.Generals[Boss];
         Need(encounter.Enemies is [{ GeneralId: Boss, MaxHpBonus: 0 }] && general.BaseHp == 5 && general.SkillIds.SequenceEqual([Cap]) &&
             StandardShanheCampaignCatalog.CreateDefinition(1).Nodes.SelectMany(n => n.Encounters ?? []).SelectMany(e => e.Enemies).All(npc => npc.GeneralId != Boss),

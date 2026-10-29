@@ -86,7 +86,7 @@ internal static class ShanheBossOpeningTacticChecks
             [new(First, Hp: secondForm ? 1 : null)], [new(Ally)])
         { BossTransition = secondForm ? new(0, Second, 6, 5, 2) : null };
         return new("fixture:boss-opening", "首领战初始实体牌", [Owner], [nodeId],
-            [new(nodeId, "按类型限定", kind, [], [encounter])], rewards);
+            [new(nodeId, "按类型限定", kind, [], [encounter])], rewards) { Schools = StandardShanheCampaignCatalog.CurrentSchools };
     }
 
     private static ShanheCampaignSession Create(ShanheNodeKind kind, IReadOnlyList<ShanheRewardDefinition> rewards,
@@ -98,7 +98,8 @@ internal static class ShanheBossOpeningTacticChecks
             {
                 if (!probed)
                 {
-                    Need(setup.TacticSkillIds.ToHashSet().SetEquals(Tiers.Select(tier => tier.Skill)),
+                    Need(setup.TacticSkillIds.ToHashSet().SetEquals(Tiers.Select(tier => tier.Skill)
+                            .Concat(StandardShanheCampaignCatalog.CurrentSchools.Select(ShanheSchoolEffects.SkillId).OfType<string>())),
                         "The registry-only probe still discovers every potential boss program even when its first node is a normal or elite battle and no source is owned.");
                     probed = true;
                 }

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -352,7 +353,8 @@ internal static class WushuangUiChecks
     public static void MixedShopEquipmentShowsItsNativePurchase(string output)
     {
         var registry = ComposedSkillContentRegistry.CreateShowcase(additionalPackages: [new QuietFixture()]);
-        var game = GameEngine.CreateStandard(StandardWushuangContentRegistry.CreateOptions(80) with
+        // Verified catalogue query: this page contains native equipment and multiple skills.
+        var game = GameEngine.CreateStandard(StandardWushuangContentRegistry.CreateOptions(169) with
             { UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false }, registry);
         Accept(game, new StartGameCommand());
         for (var step = 0; game.PendingDecision?.Kind != DecisionKind.SelectGeneral && step < 40; step++)
@@ -366,9 +368,11 @@ internal static class WushuangUiChecks
         vm.BuyWushuangOfferCommand.Execute(vm.WushuangOffers.First());
         Drive(vm, () => Program.Engine(vm).CreateWushuangSnapshot(0) is { CanShop: true, Phase: WushuangShopPhase.Shopping });
         var equipment = vm.WushuangOffers.FirstOrDefault(o => o.IsEquipment && o.IsEnabled);
-        Program.Assert(vm.WushuangOffers.Count(o => o.Kind == WushuangOfferKind.Skill) == 2 &&
-            vm.WushuangOffers.Count(o => o.Kind == WushuangOfferKind.Card) == 1,
-            "The verified mixed page contains two skills and one card, proving there is no fixed type quota.");
+        Program.Assert(vm.WushuangOffers.Count(o => !o.IsPurchased && o.Kind == WushuangOfferKind.Skill) >= 2 &&
+            vm.WushuangOffers.Count(o => !o.IsPurchased && o.Kind == WushuangOfferKind.Card) == 1 &&
+            vm.WushuangOffers.Where(o => !o.IsPurchased).Select(o => o.Id).ToHashSet().SetEquals(
+                Program.Engine(vm).CreateWushuangSnapshot(0)!.Offers.Select(o => o.Id)),
+            "The UI exposes exactly the native mixed page, including multiple skills and one equipment card without a fixed type quota.");
         Program.Assert(equipment is { CardOfferId: not null, TypeText: "装备", Artwork: not null } &&
             equipment.DetailText.Contains("立即装备") && equipment.DetailText.Contains("销毁"),
             "The real random page exposes an enabled equipment card with its source identity, artwork and immediate-equip/destruction explanation.");
@@ -388,7 +392,9 @@ internal static class WushuangUiChecks
     public static void ActiveTacticKeepsAnExecutableEntry(string output)
     {
         var registry = ComposedSkillContentRegistry.CreateShowcase(additionalPackages: [new QuietFixture("standard:peach_garden")]);
-        var game = GameEngine.CreateStandard(StandardWushuangContentRegistry.CreateOptions(31) with
+        // Mechanism tactics are excluded from free opening offers; seed 294
+        // publishes 2365 in the first paid page after the opening selection.
+        var game = GameEngine.CreateStandard(StandardWushuangContentRegistry.CreateOptions(294) with
             { UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false }, registry);
         Accept(game, new StartGameCommand());
         for (var step = 0; game.PendingDecision?.Kind != DecisionKind.SelectGeneral && step < 40; step++)
@@ -399,7 +405,22 @@ internal static class WushuangUiChecks
         using var vm = Create(new MemorySaveStore(), store, registry);
         LegacySaveFixtures.Load(vm, wushuang: true);
         Drive(vm, () => vm.IsWushuangOpening && vm.IsWushuangShopInteractive);
+        vm.BuyWushuangOfferCommand.Execute(vm.WushuangOffers.First());
+        Drive(vm, () => Program.Engine(vm).CreateWushuangSnapshot(0) is { CanShop: true, Phase: WushuangShopPhase.Shopping });
+        // Keep the published page and earn its price through native turn income.
+        for (var turn = 0; !vm.WushuangOffers.Any(offer => offer.TacticId == 2365 && offer.IsEnabled) && turn < 6; turn++)
+        {
+            if (!Program.Engine(vm).CreateWushuangSnapshot(0)!.IsLocked)
+                vm.ToggleWushuangShopLockCommand.Execute(null);
+            vm.CloseWushuangShopCommand.Execute(null);
+            Drive(vm, () => Program.Engine(vm).PendingDecision is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
+            vm.EndTurnCommand.Execute(null);
+            Drive(vm, () => Program.Engine(vm).CreateWushuangSnapshot(0) is { CanShop: true, Phase: WushuangShopPhase.Shopping });
+        }
+        Program.Assert(vm.WushuangOffers.Any(offer => offer.TacticId == 2365 && offer.IsEnabled), "The active-tactic fixture requires its published paid offer. " +
+            JsonSerializer.Serialize(vm.WushuangOffers.Select(offer => new { offer.Id, offer.TacticId })));
         vm.BuyWushuangOfferCommand.Execute(vm.WushuangOffers.Single(o => o.TacticId == 2365));
+        vm.CloseWushuangShopCommand.Execute(null);
         Drive(vm, () => Program.Engine(vm).PendingDecision is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
         game = Program.Engine(vm);
         var chip = vm.HumanSkillCards.Single(s => s.ContentId == "wushuang:tactic-2365");

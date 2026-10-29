@@ -208,7 +208,7 @@ internal static class ShanheYujinChecks
             var definition = StandardShanheCampaignCatalog.CreateDefinition(tier, StandardShanheCampaignCatalog.Returning2026EditionId);
             var encounter = definition.Nodes.Single(n => n.Id == "huanyuan").Encounters!.Single(e => e.Id == "huanyuan:yujin-s5");
             Need(encounter.Enemies is [{ GeneralId: Boss, Hp: null, MaxHpBonus: 0, InitialHandBonus: 0, DrawBonus: 0, SlashBonus: 0, StartingHand: null }] &&
-                (encounter.Allies?.Count ?? 0) == 0 && encounter.VictoryGold == 80 && encounter.HealAfterVictory == 2,
+                (encounter.Allies?.Count ?? 0) == 0 && encounter.VictoryGold == 200 && encounter.HealAfterVictory == 2,
                 "All three local tiers retain the raw complete four-HP single-238 form without higher-band skills, invented gear, growth or allies.");
             var setup = new ShanheBattleSetup(83, 1, "huanyuan", "classic:guan-yu", 4, 0, 0, 0, 0, [], [], [], encounter.Enemies, [], ShanheCampaignContent.GetContentHash(definition));
             var r = StandardShanheCampaignCatalog.CreateBattleRegistry(setup); var g = StandardShanheCampaignCatalog.CreateBattle(setup);

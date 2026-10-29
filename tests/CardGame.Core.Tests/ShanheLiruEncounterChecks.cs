@@ -46,7 +46,7 @@ internal static class ShanheLiruEncounterChecks
                 SnapshotJson.Serialize(recovered.CreateSnapshot(0)) == SnapshotJson.Serialize(game.CreateSnapshot(0)),
                 "The native battle recovers its source content fingerprint, command prefix and player view.");
 
-            var plain = setup with { EnemyRoster = [new("classic:cao-cao")] };
+            var plain = setup with { EnemyRoster = [new("classic:cao-cao")], BossTransition = null };
             var ordinary = StandardShanheCampaignCatalog.CreateBattleRegistry(plain);
             var originalHash = ordinary.ContentHash;
             foreach (var id in skillIds.Skip(1))

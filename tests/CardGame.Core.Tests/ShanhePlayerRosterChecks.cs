@@ -61,9 +61,11 @@ internal static class ShanhePlayerRosterChecks
             var legacyJson = ShanheCampaignJson.Serialize(legacy);
             Require(!legacyJson.Contains("\"PlayerGeneralIds\"", StringComparison.Ordinal),
                 "The additive roster field must remain absent from a genuine fixed-roster legacy checkpoint.");
-            var restoredLegacy = Restore(ShanheCampaignJson.Deserialize(legacyJson));
-            Require(restoredLegacy.Definition.PlayerGeneralIds.SequenceEqual(current.PlayerGeneralIds) && restoredLegacy.ContentHash == legacy.CampaignHash,
-                "Absent optional roster metadata uses the current catalogue without rebuilding a historical eight-general definition.");
+            MustThrow(() => Restore(ShanheCampaignJson.Deserialize(legacyJson)));
+            var restoredLegacy = ShanheCampaignSession.Restore(ShanheCampaignJson.Deserialize(legacyJson),
+                current with { PlayerGeneralIds = LegacyRoster }, StandardShanheCampaignCatalog.CreateBattleRegistry);
+            Require(restoredLegacy.Definition.PlayerGeneralIds.SequenceEqual(LegacyRoster) && restoredLegacy.ContentHash == legacy.CampaignHash,
+                "Absent roster metadata keeps its original fingerprint and cannot select a different current pool.");
 
             var savedRoster = LegacyRoster.Append(ExpandedPlayer).ToList();
             var partialSession = Create(current with { PlayerGeneralIds = savedRoster }, ExpandedPlayer);
@@ -84,10 +86,11 @@ internal static class ShanhePlayerRosterChecks
             Require(detached.PlayerGeneralIds!.Count == frozenRoster.Count, "The checkpoint roster init accessor must freeze caller-owned lists too.");
             RejectMutation(ShanheCampaignJson.Deserialize(ShanheCampaignJson.Serialize(saved)).PlayerGeneralIds!);
             MustThrow(() => Restore(saved with { CampaignHash = "invalid" }));
-            Require(Restore(saved with { PlayerGeneralIds = frozenRoster.Reverse().ToArray() }).Definition.PlayerGeneralIds.SequenceEqual(frozenRoster.Reverse()),
-                "Valid stored roster ordering remains data, rather than being rejected only by the old whole-definition hash.");
-            Require(Restore(saved with { PlayerGeneralIds = null }).Definition.PlayerGeneralIds.SequenceEqual(current.PlayerGeneralIds),
-                "Missing optional roster metadata naturally uses the current valid pool.");
+            MustThrow(() => Restore(saved with { PlayerGeneralIds = frozenRoster.Reverse().ToArray() }));
+            MustThrow(() => Restore(saved with { PlayerGeneralIds = null }));
+            var currentSaved = Create(current, current.PlayerGeneralIds[0]).CreateCheckpoint();
+            Require(Restore(currentSaved with { PlayerGeneralIds = null }).Definition.PlayerGeneralIds.SequenceEqual(current.PlayerGeneralIds),
+                "Missing optional roster metadata is valid when the current definition actually matches its saved fingerprint.");
             MustThrow(() => Restore(saved with { PlayerGeneralIds = frozenRoster.Append(ExpandedPlayer).ToArray() }));
             MustThrow(() => ShanheCampaignSession.Restore(saved with { PlayerGeneralIds = LegacyRoster }, partialDefinition,
                 StandardShanheCampaignCatalog.CreateBattleRegistry));
@@ -103,7 +106,7 @@ internal static class ShanhePlayerRosterChecks
     }
 
     private static ShanheCampaignSession Create(ShanheCampaignDefinition definition, string player) =>
-        ShanheCampaignSession.Create(definition, new(71, player), StandardShanheCampaignCatalog.CreateBattleRegistry);
+        ShanheCampaignSession.Create(definition, new(71, player) { SourceDifficultyId = definition.SourceDifficultyId }, StandardShanheCampaignCatalog.CreateBattleRegistry);
 
     private static ShanheCampaignSession Restore(ShanheCampaignCheckpoint checkpoint)
     {

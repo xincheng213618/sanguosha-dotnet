@@ -85,7 +85,7 @@ internal static class ShanheBonusRewardTacticChecks
         [ShanheCampaignChecks.Player], ["elite"],
         [BattleNode("elite", ShanheNodeKind.EliteBattle, ["ordinary"]), BattleNode("ordinary", ShanheNodeKind.Battle, ["finish"]),
             new("finish", "归程", ShanheNodeKind.Camp, [], Choices: [new("leave", "归程")])],
-        Rewards(), StartingGold: 100, ExtraSkillSlots: 1);
+        Rewards(), StartingGold: 100, ExtraSkillSlots: 1) { Schools = StandardShanheCampaignCatalog.CurrentSchools };
 
     private static ShanheNodeDefinition BattleNode(string id, ShanheNodeKind kind, IReadOnlyList<string> next) =>
         new(id, id, kind, next, [new(id + "-guard", "守军", [new(ShanheCampaignChecks.Enemy)], VictoryGold: 7)], ["base"])

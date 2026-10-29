@@ -13,7 +13,8 @@ public static partial class StandardShanheCampaignCatalog
     {
         if (editionId != Returning2026EditionId) return definition;
         var camp = definition.Nodes.Single(node => node.Id == "finalcamp");
-        var rewards = definition.Rewards.Where(reward => reward.Rarity >= 2 && reward.OpeningCompanionPool is null)
+        var rewards = definition.Rewards.Where(reward => reward.Rarity >= 2 && reward.OpeningCompanionPool is null &&
+                reward.CampaignEconomy?.StartingGold is not > 0)
             .Select(reward => reward.Id).ToArray();
         var encounter = new ShanheEncounterDefinition(ThirdChapterDongwuEliteId + ":encounter", "东吴精锐 · 黄盖、韩当、程普",
             [new(StandardShanheEliteDongwuPackage.HuangGaiId, Hp: 5, DrawBonus: 2, SlashBonus: 1),

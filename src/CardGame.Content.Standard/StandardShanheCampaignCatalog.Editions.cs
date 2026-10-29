@@ -112,7 +112,8 @@ public static partial class StandardShanheCampaignCatalog
         ShanheCampaignDefinition WithSavedRoster(ShanheCampaignDefinition source) =>
             ShanheCampaignContent.FreezeAndValidate(source with { PlayerGeneralIds = roster });
         definition = WithSavedRoster(definition);
-        return definition;
+        if (ShanheCampaignContent.GetContentHash(definition) == checkpoint.CampaignHash) return definition;
+        throw new ArgumentException("Campaign checkpoint content fingerprint does not match an available definition.", nameof(checkpoint));
     }
 
     public static string EditionIdForCampaign(string campaignId, int difficulty)

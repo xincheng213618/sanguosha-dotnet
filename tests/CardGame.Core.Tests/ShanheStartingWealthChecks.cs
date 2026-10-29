@@ -75,7 +75,7 @@ internal static class ShanheStartingWealthChecks
                 Choices: [new("supply", "购入军粮", GoldCost: 10, LeavesNode: false)]),
             new("story", "继续行军", ShanheNodeKind.Event, ["battle"], Choices: [new("march", "继续行军")]),
             BattleNode()
-        ], rewards, StartingGold: gold);
+        ], rewards, StartingGold: gold) { Schools = StandardShanheCampaignCatalog.CurrentSchools };
 
     private static ShanheNodeDefinition BattleNode() => new("battle", "前哨", ShanheNodeKind.Battle, [],
         [new("footman", "步卒", [new(StandardShanheLocalTroopPackage.FootmanId)])]);

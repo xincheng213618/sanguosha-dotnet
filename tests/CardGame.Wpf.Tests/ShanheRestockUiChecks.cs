@@ -81,7 +81,7 @@ internal static partial class ShanheCodexUiChecks
     private static ShanheCampaignSession CreateRestockShopSession(bool restock)
     {
         var goods = Enumerable.Range(1, 12).Select(index => new ShanheRewardDefinition("restock-growth-" + index,
-            "军略研习" + index, Bonuses: new(MaxHp: 1)) { Description = "体力上限增加1点。" }).ToArray();
+            "军略研习" + index, Bonuses: new(MaxHp: 1)) { Rarity = 2, Description = "体力上限增加1点。" }).ToArray();
         var sources = restock ? new[] { 2252, 2291, 2107 } : new[] { 2291, 2107 };
         var perks = StandardShanheCampaignCatalog.CurrentEconomyTactics.Where(source => sources.Contains(source.SourceId)).ToArray();
         Program.Assert(perks.Length == sources.Length, "The fixture equips the actual current Restock, Free Refresh and Membership source definitions.");
@@ -93,7 +93,7 @@ internal static partial class ShanheCodexUiChecks
         ], goods.Concat(perks.Select(source => new ShanheRewardDefinition(source.RewardId, source.Name)
             { CampaignEconomy = source.Effect, Rarity = source.Rarity, Description = source.Description })).ToArray(), StartingGold: 1000);
         var session = ShanheCampaignSession.Create(definition, new(83, "standard:guan-yu")
-            { UseCodexRewardPool = true, EquippedTacticIds = perks.Select(source => source.RewardId).ToArray() }, _ => FreeRefreshRegistry.Value);
+            { UseBalancedJourneyRewards = true, UseCodexRewardPool = true, EquippedTacticIds = perks.Select(source => source.RewardId).ToArray() }, _ => FreeRefreshRegistry.Value);
         var entered = session.Submit(new MoveShanheNodeCommand("shop", session.Revision));
         Program.Assert(entered.Accepted, entered.Error ?? "The Restock UI fixture must enter its actual merchant through a real command.");
         return session;

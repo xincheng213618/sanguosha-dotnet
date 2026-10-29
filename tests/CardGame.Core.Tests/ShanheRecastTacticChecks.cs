@@ -94,7 +94,7 @@ internal static class ShanheRecastTacticChecks
                     StandardShanheCampaignCatalog.ShopMetadataByRewardId[reward.Id].Price, RewardId: reward.Id, LeavesNode: false)).ToArray()),
             new("battle", "闪避后重铸与真实回合外响应", ShanheNodeKind.Battle, [],
                 [new("guard", "仅一张闪的原生敌军", [new(Enemy) { StartingHand = [new(CardKind.Dodge)] }])])
-        ], rewards.Append(loadout).ToArray(), StartingGold: 1500, ExtraSkillSlots: 1);
+        ], rewards.Append(loadout).ToArray(), StartingGold: 1500, ExtraSkillSlots: 1) { Schools = current.Schools };
         var campaign = ShanheCampaignSession.Create(definition,
             new(83, Owner) { UseCodexRewardPool = true, UnlockedRewardIds = rewards.Select(reward => reward.Id).ToArray() }, _ => registry);
         Campaign(new MoveShanheNodeCommand("loadout", campaign.Revision));

@@ -237,12 +237,15 @@ internal static partial class ShanheCodexUiChecks
         {
             resumed.ContinueShanheCommand.Execute(null);
             var resumedRun = (ShanheCampaignSession)typeof(MainViewModel).GetField("_shanheSession", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(resumed)!;
+            var upgraded = resumedRun.CreateCheckpoint();
             Program.Assert(resumed.IsShanheRunInProgress && resumed.ShanheExtraSkillCards.All(item => item.Id != skill) &&
-                ShanheCampaignJson.Serialize(resumedRun.CreateCheckpoint()) == frozenBefore &&
-                ShanheCampaignJson.Serialize(frozenStore.Read().Campaign) == frozenBefore && account.Writes == 0,
-                "Resuming an already issued run keeps its original frozen reward options, even though the account has since earned a newly implemented entitlement.");
+                upgraded.Commands.Skip((int)frozen.Revision).SequenceEqual([new EnableShanheBalancedRewardsCommand(frozen.Revision)]) &&
+                ShanheCampaignJson.Serialize(upgraded with { Revision = frozen.Revision, Commands = upgraded.Commands.Take((int)frozen.Revision).ToArray() }) == frozenBefore &&
+                ShanheCampaignJson.Serialize(frozenStore.Read().Campaign) == ShanheCampaignJson.Serialize(upgraded) && account.Writes == 0,
+                "Resuming preserves the exact original journal and unlocked reward options, appending only the safe reward-rule upgrade without granting new account entitlements.");
         }
 
+        var frozenAfterUpgrade = ShanheCampaignJson.Serialize(frozenStore.Read().Campaign);
         var currentStore = new MemoryShanheCampaignSaveStore();
         using (var current = Create(account, currentStore))
         {
@@ -290,7 +293,7 @@ internal static partial class ShanheCodexUiChecks
             Program.Assert(account.Writes == 1 && account.Read().Books == profile.Books - cost &&
                 account.Read().UnlockedRewardIds.Contains(reward) && account.Read().UnlockedRewardIds.Contains(tacticReward) &&
                 account.Read().UnlockedRewardIds.Contains("codex-3") &&
-                ShanheCampaignJson.Serialize(frozenStore.Read().Campaign) == frozenBefore,
+                ShanheCampaignJson.Serialize(frozenStore.Read().Campaign) == frozenAfterUpgrade,
                 "Only explicit research persists the derived old entitlement, charges just the new route, and leaves an existing run's frozen options untouched.");
         }
 

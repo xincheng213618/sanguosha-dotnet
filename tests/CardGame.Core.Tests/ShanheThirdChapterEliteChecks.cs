@@ -12,16 +12,18 @@ internal static class ShanheThirdChapterEliteChecks
         const string id = StandardShanheCampaignCatalog.ThirdChapterDongwuEliteId;
         var published = StandardShanheCampaignCatalog.CreateCodexDefinition(2, StandardShanheCampaignCatalog.Returning2026EditionId);
         var elite = published.Nodes.Single(node => node.Id == id);
-        var onward = elite.NextNodeIds.ToHashSet(StringComparer.Ordinal);
+        var onward = elite.NextNodeIds.Where(id => published.Nodes.Single(node => node.Id == id).Kind == ShanheNodeKind.BossBattle)
+            .ToHashSet(StringComparer.Ordinal);
         Need(elite is { Kind: ShanheNodeKind.EliteBattle, ChapterNumber: 3, BossRewards: null,
                 PrimaryTacticRarity: 3, PrimarySkillRarity: 3, PrimaryCardRarity: 3 } &&
             published.Nodes.Single(node => node.Id == "finalcamp").NextNodeIds.Contains(id) && onward.Count == 3 &&
-            published.Nodes.Where(node => onward.Contains(node.Id)).All(node => node.Kind == ShanheNodeKind.BossBattle) &&
+            elite.NextNodeIds.All(next => onward.Contains(next) || published.Nodes.Single(node => node.Id == next).ExtraChapterBattleIndex == 1) &&
             elite.Encounters is [{ Enemies.Count: 3, BossTransition: null }] &&
             !StandardShanheCampaignCatalog.CreateDefinition(2, StandardShanheCampaignCatalog.LocalEditionId).Nodes.Any(node => node.Id == id),
             "The optional third-chapter elite keeps three enemies, has no boss transition or ending bundle, and rejoins the three original final routes only in the current edition.");
         var shortened = published with { StartingNodeIds = [id], RandomStartingNode = false,
-            Nodes = published.Nodes.Where(node => node.Id == id || onward.Contains(node.Id)).ToArray() };
+            Nodes = published.Nodes.Where(node => node.Id == id || onward.Contains(node.Id)).Select(node => node with
+                { NextNodeIds = node.NextNodeIds.Where(onward.Contains).ToArray() }).ToArray() };
         var campaign = ShanheCampaignSession.Create(shortened, new(91, "classic:guan-yu"), StandardShanheCampaignCatalog.CreateBattleRegistry);
         Need(campaign.Submit(new MoveShanheNodeCommand(id, campaign.Revision)).Accepted, "The real elite map command accepts the encounter.");
         var setup = campaign.PendingBattleSetup!;
@@ -33,9 +35,9 @@ internal static class ShanheThirdChapterEliteChecks
             "The actual conditional battle registry starts the full three-general 5/5 roster with ordinary hands and player initiative: " +
                 JsonSerializer.Serialize(native.CreateSnapshot(0).Players.Select(player => new { player.GeneralId, player.Hp, player.MaxHp, player.HandCount })));
 
-        var loot = new ShanheRewardDefinition("elite-loot", "稀有整军", Bonuses: new(Draw: 1)) { Rarity = 2 };
+        var loot = new ShanheRewardDefinition("elite-loot", "史诗整军", Bonuses: new(Draw: 1)) { Rarity = 3 };
         var fixture = new ShanheCampaignDefinition("fixture:third-elite", "第三章精英领奖", [Owner], [id],
-            new[] { elite with { RewardIds = [loot.Id] } }.Concat(onward.Select(next => new ShanheNodeDefinition(next,
+            new[] { elite with { RewardIds = [loot.Id], NextNodeIds = onward.ToArray() } }.Concat(onward.Select(next => new ShanheNodeDefinition(next,
                 "最终路线", ShanheNodeKind.BossBattle, [], [new(next, "最终战", [new(Peer)])]) { ChapterNumber = 3 })).ToArray(), [loot]);
         var session = ShanheCampaignSession.Create(fixture, new(91, Owner), Registry);
         Need(session.Submit(new MoveShanheNodeCommand(id, session.Revision)).Accepted, "The bounded reward fixture enters the original elite recipe.");
@@ -56,8 +58,8 @@ internal static class ShanheThirdChapterEliteChecks
             "Authentic victory pays the local elite credit and opens ordinary classified loot instead of ending the expedition.");
         var saved = ShanheCampaignJson.Serialize(session.CreateCheckpoint());
         session = ShanheCampaignSession.Restore(ShanheCampaignJson.Deserialize(saved), fixture, Registry);
-        Need(session.Submit(new ChooseShanheRewardCategoryCommand(ShanheRewardCategory.Tactic, session.Revision)).Accepted &&
-            session.Snapshot.RewardOffers.Single().Rarity == 2 &&
+        Need(session.Snapshot.RewardCategories.Count == 0 &&
+            session.Snapshot.RewardOffers.Single().Rarity == 3 &&
             session.Submit(new ChooseShanheRewardCommand(loot.Id, null, session.Revision)).Accepted &&
             session.Snapshot.Phase == ShanheCampaignPhase.Map &&
             session.Snapshot.AvailableNodes.Select(node => node.Id).ToHashSet(StringComparer.Ordinal).SetEquals(onward),

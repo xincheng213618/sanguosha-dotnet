@@ -68,7 +68,7 @@ public sealed partial class ShanheCampaignSession
     }
 
     private ShanheCampaignSession(ShanheCampaignDefinition definition, ShanheCampaignOptions options,
-        Func<ShanheBattleSetup, ContentRegistry> battleRegistryFactory, string? savedCampaignHash = null)
+        Func<ShanheBattleSetup, ContentRegistry> battleRegistryFactory)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(battleRegistryFactory);
@@ -77,10 +77,7 @@ public sealed partial class ShanheCampaignSession
         Definition = ShanheCampaignContent.FreezeAndValidate(definition);
         Require(options.SourceDifficultyId == Definition.SourceDifficultyId,
             "The selected source difficulty must match the authored campaign recipe.");
-        // Existing battle journals retain their expedition identity. Changes to
-        // current map/shop descriptions are checked by command replay, not a
-        // whole-definition fingerprint gate.
-        ContentHash = savedCampaignHash ?? ShanheCampaignContent.GetContentHash(Definition);
+        ContentHash = ShanheCampaignContent.GetContentHash(Definition);
         ShanheCampaignContent.Require(Definition.PlayerGeneralIds.Contains(options.PlayerGeneralId, StringComparer.Ordinal), "The selected general is not available in this campaign.");
         _options = options with { };
         _battleRegistryFactory = battleRegistryFactory;
@@ -184,8 +181,9 @@ public sealed partial class ShanheCampaignSession
             throw new ArgumentException("Campaign checkpoint metadata is invalid.", nameof(checkpoint));
         ShanheCampaignContent.Require(checkpoint.CampaignHash is { Length: 64 } && checkpoint.CampaignHash.All(Uri.IsHexDigit),
             "Campaign checkpoint fingerprint metadata is invalid.");
-        var session = new ShanheCampaignSession(definition, checkpoint.Options, battleRegistryFactory, checkpoint.CampaignHash);
+        var session = new ShanheCampaignSession(definition, checkpoint.Options, battleRegistryFactory);
         if (!string.Equals(checkpoint.CampaignId, session.Definition.Id, StringComparison.Ordinal) ||
+            !string.Equals(checkpoint.CampaignHash, session.ContentHash, StringComparison.Ordinal) ||
             !string.Equals(checkpoint.TacticAcquisitionHash, session.TacticAcquisitionHash, StringComparison.Ordinal) ||
             (checkpoint.PlayerGeneralIds is { } savedRoster && !savedRoster.SequenceEqual(session.Definition.PlayerGeneralIds, StringComparer.Ordinal)))
             throw new ArgumentException("Campaign checkpoint content fingerprint does not match.", nameof(checkpoint));

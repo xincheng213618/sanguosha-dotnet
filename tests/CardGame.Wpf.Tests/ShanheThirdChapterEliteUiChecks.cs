@@ -16,9 +16,12 @@ internal static class ShanheThirdChapterEliteUiChecks
                 : StandardShanheCampaignCatalog.CreateDefinition(2, StandardShanheCampaignCatalog.Returning2026EditionId);
             var elite = published.Nodes.Single(node => node.Id == StandardShanheCampaignCatalog.ThirdChapterDongwuEliteId);
             // Retain the real camp branch, elite and all onward final routes.
+            var retained = elite.NextNodeIds.Where(id => published.Nodes.Single(node => node.Id == id).Kind == ShanheNodeKind.BossBattle)
+                .Append(elite.Id).Append("finalcamp").ToHashSet(StringComparer.Ordinal);
             var definition = published with
             {
-                Nodes = published.Nodes.Where(node => node.Id is "finalcamp" || node.Id == elite.Id || elite.NextNodeIds.Contains(node.Id)).ToArray(),
+                Nodes = published.Nodes.Where(node => retained.Contains(node.Id)).Select(node => node with
+                    { NextNodeIds = node.NextNodeIds.Where(retained.Contains).ToArray() }).ToArray(),
                 StartingNodeIds = ["finalcamp"], RandomStartingNode = false
             };
             var session = ShanheCampaignSession.Create(definition,
@@ -51,10 +54,10 @@ internal static class ShanheThirdChapterEliteUiChecks
                 !vm.ShanheEncounterEnemyDetail.Contains("二阶段", StringComparison.Ordinal),
                 "Both campaign entry points show a third-chapter elite with all three real portraits and base 5/5, Draw4, Slash2 panels, without a boss second form.");
             Program.Assert(vm.ShanheEncounterRewardText.Contains("基础铜币 × 200", StringComparison.Ordinal) &&
-                vm.ShanheEncounterRewardText.Contains("稀有", StringComparison.Ordinal) &&
+                vm.ShanheEncounterRewardText.Contains("史诗", StringComparison.Ordinal) &&
                 !vm.ShanheEncounterRewardText.Contains("最终结算", StringComparison.Ordinal) &&
                 ShanheCampaignJson.Serialize(session.CreateCheckpoint()) == before && session.PendingBattleSetup is null,
-                "The optional elite previews its normal copper and rare build rewards without claiming final settlement, journaling a move or starting battle.");
+                "The optional elite previews its authored copper and epic build rewards without final settlement, journaling a move or starting battle.");
         }
     }
 }

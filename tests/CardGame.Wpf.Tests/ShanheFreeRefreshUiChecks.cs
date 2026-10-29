@@ -145,7 +145,7 @@ internal static partial class ShanheCodexUiChecks
     private static ShanheCampaignSession CreateRefreshShopSession(IReadOnlyList<int> sources, int gold, int hpCost = 0)
     {
         var goods = Enumerable.Range(1, 12).Select(index => new ShanheRewardDefinition("refresh-training-" + index,
-            "行军操练" + index, Bonuses: new(MaxHp: 1)) { Description = "体力上限增加1点。" }).ToArray();
+            "行军操练" + index, Bonuses: new(MaxHp: 1)) { Rarity = 2, Description = "体力上限增加1点。" }).ToArray();
         var perks = StandardShanheCampaignCatalog.CurrentEconomyTactics.Where(source => sources.Contains(source.SourceId)).ToArray();
         Program.Assert(perks.Length == sources.Count, "Every equipped refresh perk must use its actual current source definition.");
         var definition = new ShanheCampaignDefinition("fixture:shanhe-free-refresh-ui", "商店刷新", ["standard:guan-yu"], ["shop"],
@@ -156,7 +156,7 @@ internal static partial class ShanheCodexUiChecks
         ], goods.Concat(perks.Select(source => new ShanheRewardDefinition(source.RewardId, source.Name)
             { CampaignEconomy = source.Effect, Rarity = source.Rarity, Description = source.Description })).ToArray(), StartingGold: gold);
         var session = ShanheCampaignSession.Create(definition, new(83, "standard:guan-yu")
-            { UseCodexRewardPool = true, EquippedTacticIds = perks.Select(source => source.RewardId).ToArray() }, _ => FreeRefreshRegistry.Value);
+            { UseBalancedJourneyRewards = true, UseCodexRewardPool = true, EquippedTacticIds = perks.Select(source => source.RewardId).ToArray() }, _ => FreeRefreshRegistry.Value);
         var entered = session.Submit(new MoveShanheNodeCommand("shop", session.Revision));
         Program.Assert(entered.Accepted, entered.Error ?? "The refresh UI fixture must enter the actual merchant through a real command.");
         return session;

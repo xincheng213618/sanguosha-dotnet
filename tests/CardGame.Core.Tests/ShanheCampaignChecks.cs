@@ -98,10 +98,11 @@ internal static partial class ShanheCampaignChecks
             "The metadata regression must include a real completed battle with its frozen market inputs.");
         var changed = definition with { IntroText = "Updated map and shop presentation",
             Rewards = definition.Rewards.Select(reward => reward with { Description = reward.Description + " Updated catalogue text." }).ToArray() };
-        var loaded = ShanheCampaignSession.Restore(marketRun.CreateCheckpoint(), changed, Registry);
+        MustThrow(() => ShanheCampaignSession.Restore(marketRun.CreateCheckpoint(), changed, Registry));
+        var loaded = ShanheCampaignSession.Restore(marketRun.CreateCheckpoint(), definition, Registry);
         Require(loaded.Snapshot.CompletedBattles.Count == 1 && loaded.Snapshot.Gold == marketRun.Snapshot.Gold &&
-            loaded.Definition.IntroText == changed.IntroText,
-            "Current campaign metadata can change while recorded native market battles still replay and pay their real rewards once.");
+            loaded.Definition.IntroText == definition.IntroText,
+            "The matching definition replays recorded market battles and rewards once; changed metadata cannot bypass the fingerprint.");
     }
 
     public static void EndExpeditionFromMapChoiceBattleAndRewardReplaysCold()
@@ -366,9 +367,9 @@ internal static partial class ShanheCampaignChecks
         Cold(first, definition);
         var saved = first.CreateCheckpoint();
         MustThrow(() => ShanheCampaignSession.Restore(saved with { CampaignHash = "different" }, definition, Registry));
-        var current = ShanheCampaignSession.Restore(saved, definition with { IntroText = "changed story" }, Registry);
-        Require(ShanheBattleSetup.ValueEquals(current.PendingBattleSetup, first.PendingBattleSetup) && current.ContentHash == saved.CampaignHash,
-            "Changed presentation metadata does not block valid command replay or alter the pending battle's recorded identity.");
+        MustThrow(() => ShanheCampaignSession.Restore(saved, definition with { IntroText = "changed story" }, Registry));
+        Require(ShanheBattleSetup.ValueEquals(ShanheCampaignSession.Restore(saved, definition, Registry).PendingBattleSetup, first.PendingBattleSetup),
+            "Matching content preserves the pending battle identity; changed presentation metadata still belongs to the fingerprint.");
         var remaining = definition.Nodes.Single(node => node.Id != entry);
         MustThrow(() => ShanheCampaignSession.Restore(saved, definition with
             { Nodes = [remaining], StartingNodeIds = [remaining.Id] }, Registry));
@@ -451,10 +452,10 @@ internal static partial class ShanheCampaignChecks
                 ShanheCampaignContent.GetContentHash(legacy) == saved.CampaignHash &&
                 !JsonSerializer.Serialize(legacy).Contains("RewardSkipGold", StringComparison.Ordinal),
                 "Optional zero compensation fields preserve the exact definition fingerprint and original hash shape.");
-            var active = StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(saved, 1);
-            var loaded = ShanheCampaignSession.Restore(saved, active, StandardShanheCampaignCatalog.CreateBattleRegistry);
-            Require(loaded.ContentHash == saved.CampaignHash && active.Nodes.Any(node => node.RewardSkipGold > 0),
-                "Current compensation rules load normally when the journal remains valid, without reconstructing old definitions.");
+            MustThrow(() => StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(saved, 1));
+            var loaded = ShanheCampaignSession.Restore(saved, legacy, StandardShanheCampaignCatalog.CreateBattleRegistry);
+            Require(loaded.ContentHash == saved.CampaignHash && loaded.Definition.Nodes.All(node => node.RewardSkipGold == 0),
+                "Explicit matching legacy content retains its original compensation; the current catalogue cannot silently substitute changed rewards.");
             MustThrow(() => StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(saved with { CampaignHash = "different" }, 1));
         }
     }

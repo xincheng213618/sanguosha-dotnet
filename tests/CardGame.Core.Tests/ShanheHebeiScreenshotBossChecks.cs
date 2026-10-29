@@ -12,7 +12,7 @@ internal static class ShanheHebeiScreenshotBossChecks
         {
             var node = definition.Nodes.Single(node => node.Id == nodeId);
             var fixture = new ShanheCampaignDefinition("fixture:hebei-boss-" + nodeId, "河北双雄首领",
-                ["classic:guan-yu"], [nodeId], [node with { NextNodeIds = [] }], definition.Rewards);
+                ["classic:guan-yu"], [nodeId], [node with { NextNodeIds = [] }], definition.Rewards) { Schools = definition.Schools };
             // Verified against the real three-entry pools: seed 127 chooses index 2
             // on both routes, retaining every alternative in the authored pool.
             var session = ShanheCampaignSession.Create(fixture, new(127, "classic:guan-yu"),
