@@ -85,10 +85,8 @@ public sealed partial class GameEngine
 
         public bool TryStartPostInstructionWindow(long frameId) =>
             engine.TryBeginPublicHandRevealWindow(frameId, PublicHandRevealReturnKind.Program) ||
-            engine.TryBeginQueuedRecoveryReplacement(frameId, PostEventContinuation.Program) ||
-            engine.TryBeginCharacterStateProgramWindow(frameId, CharacterStateContinuation.Program) ||
-            engine.TryBeginHpChangedProgramWindow(frameId, PostEventContinuation.Program) ||
-            engine.TryBeginCardsMovedProgramWindow(frameId) || engine.TryBeginAdvancedSkillsChanged(frameId) || engine.TryContinueAdvancedDamage(frameId);
+            engine.TryBeginProgramChildWindows(frameId, PostEventContinuation.Program) ||
+            engine.TryContinueAdvancedDamage(frameId);
 
         public bool TryStartInstructionHealthQuery(ProgramSkillFrame frame, SkillProgramEffect effect) =>
             engine.TryBeginHappyQiaoInstructionQuery(frame, effect);

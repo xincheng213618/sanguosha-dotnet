@@ -53,7 +53,7 @@ public sealed partial class GameEngine
     }
     private void RecordBaoXinRandom(ProgramSkillFrame f,int ordinal,int recipient)
     {var r=f.BaoXin!;for(var i=0;i<r.Eligible.Count;i++)AdvanceEventRulesAndQueueFact(new BaoXinRandomCandidateEvent(f.Id,ordinal,i,r.Eligible[i]));AdvanceEventRulesAndQueueFact(new BaoXinRandomIssuedEvent(f.Id,ordinal,r.SelectedCard!.Value,recipient,r.RandomIndex,r.Eligible.Count,r.RandomBefore,r.RandomAfter));}
-    private bool DrainBaoXin(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainBaoXin(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueBaoXin(long id)
     {
         if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{BaoXin:{}r}f||f.Id!=id)return;AssertBaoXin(f);

@@ -87,7 +87,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new OrdinaryQietingDrawReturnedEvent(f.Id, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId));
         ContinueOrdinaryQieting(f.Id);
     }
-    private bool DrainOrdinaryQieting(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainOrdinaryQieting(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueOrdinaryQieting(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { OrdinaryQieting: { } r } f || f.Id != id) return;

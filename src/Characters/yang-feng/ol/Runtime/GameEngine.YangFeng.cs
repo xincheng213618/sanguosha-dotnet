@@ -121,8 +121,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(f with{YangFeng=r with{Movements=r.Movements.Append(move).ToArray()}});
         AdvanceEventRulesAndQueueFact(new YangFengMovementIssuedEvent(id,move));
     }
-    private bool DrainYangFengChildren(long id) => TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id,PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainYangFengChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueYangFeng(long id)
     {
         while(_resolutionStack.LastOrDefault() is ProgramSkillFrame{YangFeng:{}r}f&&f.Id==id)

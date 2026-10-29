@@ -15,6 +15,15 @@ internal sealed class ProgramContinuationAttribute(ProgramContinuationKind kind,
 
 public sealed partial class GameEngine
 {
+    // This order is part of the resolution contract. Callers keep their original
+    // parent-return kind; chains with a different order must stay separate.
+    private bool TryBeginProgramChildWindows(long frameId, PostEventContinuation continuation) =>
+        TryBeginQueuedRecoveryReplacement(frameId, continuation) ||
+        TryBeginCharacterStateProgramWindow(frameId, CharacterStateContinuation.Program) ||
+        TryBeginHpChangedProgramWindow(frameId, continuation) ||
+        TryBeginCardsMovedProgramWindow(frameId) ||
+        TryBeginAdvancedSkillsChanged(frameId);
+
     private static readonly Lazy<ProgramContinuationCatalog> ProgramContinuations = new(() =>
         ProgramContinuationCatalog.Discover(RuntimeModuleMethods), true);
 

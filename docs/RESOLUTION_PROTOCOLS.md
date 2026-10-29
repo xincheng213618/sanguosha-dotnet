@@ -25,6 +25,14 @@
 
 回复替换子帧的续接种类在 `recovery.Return.Continuation`，继续推进的拥有帧 ID 在 `recovery.Return.ResumeFrameId`，请求来源在 `recovery.Attempt.Completion`，而不是 `recovery.Continuation`。复用[现有恢复协议](../src/CardGame.Core/RecoveryReplacement.cs)及[已支付装备回复的父边证明](../src/Characters/zhang-xiu/mou-ol/Runtime/GameEngine.MouZhangXiuOlObservers.cs)，继续核对本机制自己的父帧、付款和来源，不能只凭返回枚举取得续接资格。
 
+## 程序子窗口链
+
+`TryBeginProgramChildWindows(frameId, continuation)` 集中一条既有的短路链：回复替换 → 武将状态 → 体力变化 → 牌移动 → 技能变更。仅当全部入口都没有开启窗口时返回 `false`。回复替换与体力变化使用调用者原有的 `PostEventContinuation`，武将状态仍使用 `CharacterStateContinuation.Program`；帧归属、支付凭据、候选及恢复检查仍在原机制中执行。
+
+初始调用者为鲍信、普通蔡夫人、杨奉，均保留 `AwaitedProgramMovement` 返回；通用指令宿主使用 `Program` 返回，并保留公共手牌展示在该链之前、后续伤害在该链之后的位置。窗口顺序不同、两个续接参数不同或附带额外资格判断的实现不应直接复用此入口。该帮助方法没有游标或 pending 状态，不替代人物规则状态机。试点结果与迁移边界见 [归因与试点记录](REGRESSION_PROTOCOL_AUDIT_2026_10_30.md)。
+
+## 原生用牌返回
+
 原生用牌在弹帧前按 `[NativeUseValidation]` 验证，再执行全部 `[NativeUsePreparation]` 并捕获返回事实；弹帧后按 `[NativeUseReturn]` 推进。布尔回调表示已独占处理，普通回调按顺序继续。准备结果只在本次调用的返回上下文中存活，不能写成另一套引擎 pending 状态，也不能重复消费该上下文。
 
 准备处理器可声明成对的返回方法及返回顺序；只有本次准备成功，配对返回才参与弹帧后的独占分派。`NativeUseReturnContext` 保存本次用牌、已经捕获的返回事实及各准备结果，并拒绝第二次返回。回调仍需核对其原生拥有者、来源及已完成费用。
