@@ -22,7 +22,7 @@
             {
               "op": "draw",
               "target": "owner",
-              "numberExpression": "handLimitMinusHandCount",
+              "amountExpr": ["-", ["handLimit", "owner"], ["handCount", "owner"]],
               "condition": { "kind": "not", "children": [{ "kind": "handCountAtLeast", "value": 1 }] }
             }
           ]

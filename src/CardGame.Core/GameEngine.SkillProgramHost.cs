@@ -105,6 +105,9 @@ public sealed partial class GameEngine
             engine.FinishProgramSkill(frame, completed);
         }
 
+        public int? EvaluateAmountExpression(ProgramSkillFrame frame, ProgramExpression expression) =>
+            engine.EvaluateProgramAmountExpression(frame.Id, expression);
+
         public void Draw(long frameId, int ownerSeat, int targetSeat, int amount,
             SkillProgramNumberExpression? numberExpression, string? resultBind,
             SkillProgramCardSetVisibility visibility, CardMoveReason reason) =>

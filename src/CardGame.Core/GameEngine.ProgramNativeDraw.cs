@@ -8,7 +8,7 @@ public sealed partial class GameEngine
     {
         public SkillProgramStepOutcome DrawInstruction(ProgramSkillFrame frame, DrawProgramInstruction instruction,
             int targetSeat, CardMoveReason reason) =>
-            engine.ExecuteProgramDrawInstruction(frame, instruction, targetSeat, reason);
+            engine.ExecuteProgramDrawInstruction(engine.GetActiveProgramFrame(frame.Id), instruction, targetSeat, reason);
     }
 
     private SkillProgramStepOutcome ExecuteProgramDrawInstruction(ProgramSkillFrame frame,

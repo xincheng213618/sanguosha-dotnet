@@ -328,7 +328,7 @@ public sealed partial class SimpleAiBrain
             .Sum(e => Math.Max(0, e.Amount));
         foreach (var effect in effects)
         {
-            var amount = effect.Amount > 0 ? effect.Amount : effect.NumberExpression is not null ? 1 : 0;
+            var amount = effect.Amount > 0 ? effect.Amount : effect.NumberExpression is not null || effect.AmountExpression is not null ? 1 : 0;
             var owner = effect.Target == SkillProgramEffectTarget.Owner;
             var benefit = effect.Op switch
             {

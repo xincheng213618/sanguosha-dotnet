@@ -253,13 +253,14 @@ internal sealed partial class HealthContinuationRuntime
             change.Amount <= 0 || !facts.IsValidPlayerSeat(change.TargetSeat)) return false;
         if (effect.CompiledInstruction is LoseHpProgramInstruction loss)
             return global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(producer, effect.Target) == change.TargetSeat && change.Kind == HpChangeKind.Loss &&
-                change.SourceSeat is null && change.Amount == loss.Amount &&
-                (long)change.HpAfter == (long)change.HpBefore - loss.Amount;
+                change.SourceSeat is null && change.Amount == loss.IssuedAmount(producer) &&
+                (long)change.HpAfter == (long)change.HpBefore - loss.IssuedAmount(producer);
         if (effect.CompiledInstruction is not RecoverProgramInstruction recovery || change.Kind != HpChangeKind.Recovery ||
             change.SourceSeat != producer.OwnerSeat || change.HpAfter != change.HpBefore + change.Amount) return false;
         var requested = recovery.Amount switch
         {
             FixedProgramAmount fixedAmount => fixedAmount.Value,
+            RuntimeExpressionProgramAmount => ProgramExpressionAmounts.IssuedAmount(producer),
             BoundCardCountProgramAmount bound => producer.CardSetBindings.SingleOrDefault(b => b.Name == bound.SourceBind)?.CardIds.Count ?? -1,
             ExpressionProgramAmount { Expression: SkillProgramNumberExpression.AfterDamageAmount } when
                 producer.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied, DamageFrameId: not null, Amount: > 0 } damage &&
@@ -441,6 +442,7 @@ internal sealed partial class HealthContinuationRuntime
         var requested = instruction.Amount switch
         {
             FixedProgramAmount fixedAmount => fixedAmount.Value,
+            RuntimeExpressionProgramAmount => ProgramExpressionAmounts.IssuedAmount(producer),
             BoundCardCountProgramAmount bound => producer.CardSetBindings.SingleOrDefault(b => b.Name == bound.SourceBind)?.CardIds.Count ?? -1,
             ExpressionProgramAmount { Expression: SkillProgramNumberExpression.AfterDamageAmount } when
                 producer.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied, DamageFrameId: not null, Amount: > 0 } damage &&
@@ -565,7 +567,7 @@ internal sealed partial class HealthContinuationRuntime
             var h = facts.PendingHpChangeAt(index);
             if (h.ParentFrameId != producer.Id || h.TargetSeat != dying.VictimSeat ||
                 h.Kind != HpChangeKind.Loss || h.SourceSeat is not null || h.HpAfter > 0 ||
-                h.Amount != instruction.Amount || (long)h.HpAfter != (long)h.HpBefore - instruction.Amount) continue;
+                h.Amount != instruction.IssuedAmount(producer) || (long)h.HpAfter != (long)h.HpBefore - instruction.IssuedAmount(producer)) continue;
             invoice = h;
             break;
         }

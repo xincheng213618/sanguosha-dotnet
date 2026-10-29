@@ -136,7 +136,7 @@
             {
               "op": "draw",
               "target": "owner",
-              "numberExpression": "fourMinusHandCount"
+              "amountExpr": ["-", 4, ["handCount", "owner"]]
             }
           ]
         },
@@ -177,7 +177,7 @@
             {
               "op": "draw",
               "target": "owner",
-              "numberExpression": "fourMinusHandCount"
+              "amountExpr": ["-", 4, ["handCount", "owner"]]
             }
           ]
         },
@@ -331,7 +331,7 @@
             {
               "op": "draw",
               "target": "owner",
-              "numberExpression": "fourMinusHandCount"
+              "amountExpr": ["-", 4, ["handCount", "owner"]]
             }
           ],
           "sourceZones": [
@@ -373,7 +373,7 @@
             {
               "op": "draw",
               "target": "owner",
-              "numberExpression": "fourMinusHandCount"
+              "amountExpr": ["-", 4, ["handCount", "owner"]]
             }
           ]
         },
@@ -407,7 +407,7 @@
             {
               "op": "draw",
               "target": "owner",
-              "numberExpression": "fourMinusHandCount"
+              "amountExpr": ["-", 4, ["handCount", "owner"]]
             }
           ]
         },
@@ -441,7 +441,7 @@
             {
               "op": "draw",
               "target": "owner",
-              "numberExpression": "fourMinusHandCount"
+              "amountExpr": ["-", 4, ["handCount", "owner"]]
             }
           ]
         }

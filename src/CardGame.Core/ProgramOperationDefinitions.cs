@@ -236,6 +236,13 @@ internal sealed class ProgramOperationNodeReader
     internal bool AllowZeroDraw { get; }
     internal bool Has(string name) => _node.TryGetProperty(name, out _);
     internal bool IsNull(string name) => _node.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Null;
+    internal ProgramExpression? AmountExpression()
+    {
+        if (!Has("amountExpr")) return null;
+        if (Has("amount") || Has("numberExpression"))
+            Fail(Path + ".amountExpr", "amountExpr is mutually exclusive with amount and numberExpression");
+        return ProgramExpressions.ParseInt(_node.GetProperty("amountExpr"), Path + ".amountExpr");
+    }
     internal void AllowOnly(params string[] names)
     {
         var allowed = names.ToHashSet(StringComparer.Ordinal);
@@ -459,7 +466,8 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards,
         static (effect, context) => context.Draw(effect));
     public override ProgramSkillInstruction Compile(SkillProgramEffect effect) =>
-        new DrawProgramInstruction(effect.Target, effect.NumberExpression switch
+        new DrawProgramInstruction(effect.Target, effect.AmountExpression is { } amountExpr
+            ? new RuntimeExpressionProgramAmount(amountExpr) : effect.NumberExpression switch
         {
             SkillProgramNumberExpression.BoundCardCount =>
                 new BoundCardCountProgramAmount(effect.SourceBind!),
@@ -470,33 +478,36 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
         }, effect.ResultBind, effect.Visibility, effect.TargetReference);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "amount", "numberExpression", "sourceBind", "resultBind", "targetRef", "condition",
+        r.AllowOnly("op", "target", "amount", "amountExpr", "numberExpression", "sourceBind", "resultBind", "targetRef", "condition",
             "replacementSuits", "minimumReplacementRank", "maximumReplacementRank", "ownerKillsOnly");
+        var amountExpr = r.AmountExpression();
         var target = r.RequiredEnum<SkillProgramEffectTarget>("target");
         if (target == SkillProgramEffectTarget.SelectedTargets &&
             (r.Has("numberExpression") || r.Has("sourceBind") || r.Has("resultBind")))
-            throw new InvalidOperationException($"Invalid skill program at {r.Path}: selectedTargets draws require a fixed amount and no card binding.");
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: selectedTargets draws accept amount or amountExpr and no card binding.");
         var expression = r.Has("numberExpression")
             ? r.RequiredEnum<SkillProgramNumberExpression>("numberExpression") : (SkillProgramNumberExpression?)null;
         if (expression is not null && (r.Has("amount") || expression is not
                 (SkillProgramNumberExpression.LivingFactionCount or SkillProgramNumberExpression.TargetLostHp or SkillProgramNumberExpression.TargetMaxHpMinusHandCount or
                  SkillProgramNumberExpression.CategoryTargetTurnUsage or SkillProgramNumberExpression.OwnerLostHp or SkillProgramNumberExpression.BoundCardCount or
-                 SkillProgramNumberExpression.CurrentAttackRange or SkillProgramNumberExpression.HandLimitMinusHandCount or SkillProgramNumberExpression.FourMinusHandCount or
+                 SkillProgramNumberExpression.CurrentAttackRange or
                  SkillProgramNumberExpression.LostHpMinusHandCount or SkillProgramNumberExpression.SelectedTargetsHandGreaterThanLord or
                  SkillProgramNumberExpression.PhaseSkillUsage or SkillProgramNumberExpression.CurrentTurnUsedCardCategoryCount or SkillProgramNumberExpression.ActualTurnDeathBenefits or
                  SkillProgramNumberExpression.TurnOwnerDiscardPhaseHandDiscardCount or SkillProgramNumberExpression.CurrentHandEmptyTwoOtherwiseOne or SkillProgramNumberExpression.OwnerLeastHandTwoOtherwiseOne or
-                 SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne or SkillProgramNumberExpression.EquipmentHalfFloorPlusOne or SkillProgramNumberExpression.OwnerMaxHp or
+                 SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne or SkillProgramNumberExpression.OwnerMaxHp or
                  SkillProgramNumberExpression.CurrentHp or SkillProgramNumberExpression.LiveOwnerLostHp or SkillProgramNumberExpression.BoundaryWangYiMijiCount)))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: draw accepts a constant or a supported public-state expression.");
         var source = r.OptionalIdentifier("sourceBind");
         if ((expression is SkillProgramNumberExpression.BoundCardCount or SkillProgramNumberExpression.PhaseSkillUsage) != (source is not null))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: sourceBind is required only for boundCardCount and phaseSkillUsage draws.");
-        var amount = expression is null ? Amount(r, 20, allowZero: r.AllowZeroDraw) : 0;
+        var amount = expression is null && amountExpr is null ? Amount(r, 20, allowZero: r.AllowZeroDraw) : 0;
         var bind = r.OptionalIdentifier("resultBind");
+        if (amountExpr is not null && bind is not null)
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: amountExpr draws cannot guarantee a result binding when the amount is unknown.");
         var targetRef = r.Has("targetRef") ? r.RequiredParticipantReference("targetRef") : null;
         if (targetRef is not null && (target != SkillProgramEffectTarget.Owner ||
             expression is not null || source is not null || bind is not null))
-            throw new InvalidOperationException($"Invalid skill program at {r.Path}.targetRef: participant draws require owner placeholder, fixed amount and no card binding.");
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}.targetRef: participant draws require owner placeholder, amount or amountExpr and no card binding.");
         if (targetRef is not null && targetRef.Kind is not
             (ProgramParticipantRef.EventSource or ProgramParticipantRef.EventTarget))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}.targetRef: draw requires eventSource or eventTarget.");
@@ -510,7 +521,7 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
             sourceBind: source, resultBind: bind, targetReference: targetRef,
             replacementSuits: replacementSuits, minimumReplacementRank: minimumReplacementRank,
             maximumReplacementRank: maximumReplacementRank)
-        { ActualTurnDeathOwnerKillsOnly = r.Has("ownerKillsOnly") ? r.RequiredBool("ownerKillsOnly") : null };
+        { AmountExpression = amountExpr, ActualTurnDeathOwnerKillsOnly = r.Has("ownerKillsOnly") ? r.RequiredBool("ownerKillsOnly") : null };
         if (r.Has("ownerKillsOnly") && expression != SkillProgramNumberExpression.ActualTurnDeathBenefits)
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: ownerKillsOnly requires actualTurnDeathBenefits.");
         if (expression == SkillProgramNumberExpression.BoundaryWangYiMijiCount &&
@@ -522,7 +533,7 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
         if (expression == SkillProgramNumberExpression.OwnerLeastHandTwoOtherwiseOne &&
             (target != SkillProgramEffectTarget.Owner || bind is not null || targetRef is not null || replacementSuits.Count != 0))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: least-hand draw requires the owner and no binding or replacement filter.");
-        if (expression is SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne or SkillProgramNumberExpression.EquipmentHalfFloorPlusOne &&
+        if (expression == SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne &&
             (target != SkillProgramEffectTarget.Owner || bind is not null || targetRef is not null || replacementSuits.Count != 0))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: equipment half-count draw requires the owner and no binding or replacement filter.");
         if (expression == SkillProgramNumberExpression.OwnerMaxHp &&
@@ -576,7 +587,8 @@ internal sealed class RecoverProgramOperationDescriptor : ProgramOperationDescri
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.Recover,
         static (effect, context) => context.Recover(effect));
     public override ProgramSkillInstruction Compile(SkillProgramEffect effect) =>
-        new RecoverProgramInstruction(effect.Target, effect.NumberExpression switch
+        new RecoverProgramInstruction(effect.Target, effect.AmountExpression is { } amountExpr
+            ? new RuntimeExpressionProgramAmount(amountExpr) : effect.NumberExpression switch
         {
             SkillProgramNumberExpression.BoundCardCount =>
                 new BoundCardCountProgramAmount(effect.SourceBind!),
@@ -588,8 +600,9 @@ internal sealed class RecoverProgramOperationDescriptor : ProgramOperationDescri
         }, effect.TargetReference);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "amount", "numberExpression", "sourceBind", "targetRef", "condition",
+        r.AllowOnly("op", "target", "amount", "amountExpr", "numberExpression", "sourceBind", "targetRef", "condition",
             "replacementSuits", "minimumReplacementRank", "maximumReplacementRank");
+        var amountExpr = r.AmountExpression();
         var replacementSuits = r.OptionalEnumArray<Suit>("replacementSuits") ?? [];
         var minimumReplacementRank = r.Has("minimumReplacementRank") ? r.RequiredInt("minimumReplacementRank") : 0;
         var maximumReplacementRank = r.Has("maximumReplacementRank") ? r.RequiredInt("maximumReplacementRank") : 0;
@@ -603,15 +616,15 @@ internal sealed class RecoverProgramOperationDescriptor : ProgramOperationDescri
             throw new InvalidOperationException($"Invalid skill program at {r.Path}.targetRef: recovery requires an event participant and owner placeholder.");
         if (target == SkillProgramEffectTarget.SelectedTargets &&
             (r.Has("numberExpression") || r.Has("sourceBind")))
-            throw new InvalidOperationException($"Invalid skill program at {r.Path}: selectedTargets recovery requires a fixed amount.");
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: selectedTargets recovery accepts amount or amountExpr.");
         if (!r.Has("numberExpression"))
         {
             if (r.Has("sourceBind"))
                 throw new InvalidOperationException($"Invalid skill program at {r.Path}: constant recovery cannot read a card binding.");
-            return new(Op, target, DrawProgramOperationDescriptor.Amount(r, 20), r.Condition(),
+            return new(Op, target, amountExpr is null ? DrawProgramOperationDescriptor.Amount(r, 20) : 0, r.Condition(),
                 targetReference: targetRef,
                 replacementSuits: replacementSuits, minimumReplacementRank: minimumReplacementRank,
-                maximumReplacementRank: maximumReplacementRank);
+                maximumReplacementRank: maximumReplacementRank) { AmountExpression = amountExpr };
         }
         if (r.Has("amount")) throw new InvalidOperationException($"Invalid skill program at {r.Path}: recover accepts amount or numberExpression.");
         var expression = r.RequiredEnum<SkillProgramNumberExpression>("numberExpression");
@@ -650,12 +663,14 @@ internal sealed class LoseHpProgramOperationDescriptor : ProgramOperationDescrip
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.LoseHp,
         static (effect, context) => context.LoseHp(effect));
     public override ProgramSkillInstruction Compile(SkillProgramEffect effect) =>
-        new LoseHpProgramInstruction(effect.Amount);
+        new LoseHpProgramInstruction(effect.Amount, effect.AmountExpression);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "amount", "condition");
+        r.AllowOnly("op", "target", "amount", "amountExpr", "condition");
+        var amountExpr = r.AmountExpression();
         return new(Op, r.RequiredEnum<SkillProgramEffectTarget>("target"),
-            DrawProgramOperationDescriptor.Amount(r, 20), r.Condition());
+            amountExpr is null ? DrawProgramOperationDescriptor.Amount(r, 20) : 0, r.Condition())
+            { AmountExpression = amountExpr };
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => WithSelectedTarget(effect);
 }

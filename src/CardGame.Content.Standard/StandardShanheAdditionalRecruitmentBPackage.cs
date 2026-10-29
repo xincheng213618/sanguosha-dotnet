@@ -48,9 +48,9 @@ public sealed class StandardShanheAdditionalRecruitmentBPackage : IGameContentPa
              "effects":[{"op":"abolishPublicTeamEnemyEquipmentSlots","target":"owner"}]}]},
           {"id":"{{{ShunxueSkillId}}}","revision":1,"triggers":[
             {"id":"play-refill","window":"playPhaseStarting","subject":"owner","optional":false,
-             "effects":[{"op":"draw","target":"owner","numberExpression":"handLimitMinusHandCount"}]},
+             "effects":[{"op":"draw","target":"owner","amountExpr": ["-",["handLimit","owner"],["handCount","owner"]]}]},
             {"id":"ending-refill","window":"turnEnding","subject":"owner","optional":false,
-             "effects":[{"op":"draw","target":"owner","numberExpression":"handLimitMinusHandCount"}]}]}
+             "effects":[{"op":"draw","target":"owner","amountExpr": ["-",["handLimit","owner"],["handCount","owner"]]}]}]}
         ]}
         """,
         $$$"""

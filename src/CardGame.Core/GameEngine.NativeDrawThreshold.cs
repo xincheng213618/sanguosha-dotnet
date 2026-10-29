@@ -178,7 +178,8 @@ public sealed partial class GameEngine
         if (producer.InstructionIndex > plan.Instructions.Count ||
             plan.GetPausedInstruction(producer.InstructionIndex).Effect.CompiledInstruction is not DrawProgramInstruction draw ||
             proof.Reason.Value != $"skill-program.{producer.SkillId}.{SkillProgramEffectOp.Draw}" ||
-            draw.Amount is FixedProgramAmount fixedAmount && fixedAmount.Value != proof.RequestedCount) return false;
+            draw.Amount is FixedProgramAmount fixedAmount && fixedAmount.Value != proof.RequestedCount ||
+            draw.Amount is RuntimeExpressionProgramAmount && ProgramExpressionAmounts.IssuedAmount(producer) != proof.RequestedCount) return false;
         return draw.Target == SkillProgramEffectTarget.SelectedTargets
             ? producer.SelectedTargetSeats.Contains(proof.OwnerSeat)
             : (draw.TargetReference is { } reference ? ResolveProgramParticipant(producer, reference)

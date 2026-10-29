@@ -1990,7 +1990,6 @@ public enum SkillProgramNumberExpression
     HandHalfFloor = 12,
     SelectedPairHandDifference = 13,
     LivingPlayersMinHp = 14,
-    HandLimitMinusHandCount = 15,
     OwnerLostHpPlusOne = 16,
     RecipientCurrentHp = 17,
     LostHpMinusHandCount = 600,
@@ -1999,11 +1998,9 @@ public enum SkillProgramNumberExpression
     TurnOwnerDiscardPhaseHandDiscardCount = 3100, CurrentHandEmptyTwoOtherwiseOne = 8008,
     OwnerLeastHandTwoOtherwiseOne = 239,
     EquipmentHalfCeilingPlusOne = 9000,
-    EquipmentHalfFloorPlusOne = 74500,
     ActualTurnDeathBenefits = 4721,
     LiveOwnerLostHp = 40800,
     OwnerMaxHp = 43000,
-    FourMinusHandCount = 47000,
     HandCountMinusFour = 47001,
     AfterDamageAmount = 56100,
     BoundaryWangYiMijiCount = 57400,
@@ -2071,7 +2068,8 @@ public sealed class SkillProgramCondition
         ChoiceBind = choiceBind;
         Gender = gender;
         RequiresHandLimitContext = kind is SkillProgramConditionKind.PositiveHandLimit or
-            SkillProgramConditionKind.HasUsableHandCard || children.Any(child => child.RequiresHandLimitContext);
+            SkillProgramConditionKind.HasUsableHandCard || expression?.Reads("handLimit") == true ||
+            children.Any(child => child.RequiresHandLimitContext);
     }
 
     public SkillProgramConditionKind Kind { get; }
@@ -3107,6 +3105,8 @@ public sealed partial class SkillProgramEffect
     public TurnPhase? Phase { get; }
     public SkillProgramPhaseContinuation? PhaseContinuation { get; }
     public SkillProgramNumberExpression? NumberExpression { get; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramExpression? AmountExpression { get; internal init; }
     public int MinimumValue { get; }
     public bool ClampToMaxHp { get; }
     public string? SourceBind { get; }
@@ -6069,7 +6069,7 @@ public sealed class SkillProgramCatalog
              Campaigns.ShanheYongzhanPrograms.IsTriggerShape(skillId, id, window, subject, optional, condition, effects));
         if (window is SkillProgramTriggerWindow.DyingEntered or SkillProgramTriggerWindow.DyingExited && !awaitedDyingExit &&
             (optional || effects.Any(effect => effect.Op != SkillProgramEffectOp.Draw || effect.Target != SkillProgramEffectTarget.Owner ||
-                effect.NumberExpression is not null || effect.Condition.Kind != SkillProgramConditionKind.Always)))
+                effect.NumberExpression is not null || effect.AmountExpression is not null || effect.Condition.Kind != SkillProgramConditionKind.Always)))
             Fail(path, "dying transition triggers require mandatory constant owner draws");
         foreach (var effect in effects.Where(item => item.Op == SkillProgramEffectOp.SkipTurnPhases))
         {

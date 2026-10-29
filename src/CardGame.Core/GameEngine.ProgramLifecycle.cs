@@ -812,7 +812,6 @@ public sealed partial class GameEngine
             SkillProgramNumberExpression.OwnerLeastHandTwoOtherwiseOne =>
                 _players.Where(player => player.IsAlive).All(player => GetHand(player).Count >= GetHand(target).Count) ? 2 : 1,
             SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne => (GetEquipment(target).Count + 1) / 2 + 1,
-            SkillProgramNumberExpression.EquipmentHalfFloorPlusOne => GetEquipment(target).Count / 2 + 1,
             SkillProgramNumberExpression.CurrentTurnUsedCardCategoryCount => CurrentTurnCategoryDrawCount(frame, targetSeat),
             SkillProgramNumberExpression.ActualTurnDeathBenefits => ActualTurnDeathDrawCount(frame, targetSeat),
             SkillProgramNumberExpression.CategoryTargetTurnUsage => GetProgramCategoryTargetTurnUsage(frame),
@@ -828,9 +827,6 @@ public sealed partial class GameEngine
                 frame.WindowContext?.Facts is { } facts && facts.CurrentAttackRange > 0
                     ? facts.CurrentAttackRange
                     : GetAttackRange(target.Seat),
-            SkillProgramNumberExpression.FourMinusHandCount => Math.Max(0, 4 - GetHand(target).Count),
-            SkillProgramNumberExpression.HandLimitMinusHandCount =>
-                Math.Max(0, GetHandLimit(target) - GetHand(target).Count),
             SkillProgramNumberExpression.TurnOwnerDiscardPhaseHandDiscardCount => TurnOwnerDiscardPhaseHandDiscardCount,
             _ => throw new InvalidOperationException(
                 $"Unsupported draw number expression '{numberExpression}'.")

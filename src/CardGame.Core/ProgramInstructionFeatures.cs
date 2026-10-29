@@ -22,6 +22,7 @@ internal sealed class ProgramInstructionFeatures
         FactRequirements = effects.Aggregate(default(ProgramFactRequirements), static (requirements, effect) =>
             requirements.Union(ProgramOperationCatalog.Default.FactRequirementsFor(effect.Op)));
         RequiresHandLimitContext = effects.Any(effect => effect.Condition.RequiresHandLimitContext ||
+            effect.AmountExpression?.Reads("handLimit") == true ||
             effect.Options.Any(option => option.Condition.RequiresHandLimitContext));
         FirstInstruction = effects.FirstOrDefault();
         FirstNonTargetSelection = effects.SkipWhile(effect => effect.Op == SkillProgramEffectOp.SelectTarget).FirstOrDefault();

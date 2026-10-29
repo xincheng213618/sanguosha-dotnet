@@ -162,7 +162,7 @@ internal static class ProgramCompositionAi
             boundCardSuitMatchesChoice: (_, _) => false,
             boundCardCategoryMatchesCardAction: (_, _) => false,
             expression: expression => ProgramExpressions.EvaluateBool(expression,
-                new SkillContextExpressionWorld(player, context?.SelectedTarget)));
+                new SkillContextExpressionWorld(player, context?.SelectedTarget, context?.EquipmentCardCount)));
     }
 }
 
@@ -283,7 +283,6 @@ internal sealed partial class ProgramAiEstimateContext
             // Zero is always tied for least; this composition estimate has no peer hand-count context.
             SkillProgramNumberExpression.OwnerLeastHandTwoOtherwiseOne => _estimatedHandCount == 0 ? 2 : 1,
             SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne => (_publicContext.EquipmentCardCount + 1) / 2 + 1,
-            SkillProgramNumberExpression.EquipmentHalfFloorPlusOne => _publicContext.EquipmentCardCount / 2 + 1,
             SkillProgramNumberExpression.CurrentTurnUsedCardCategoryCount => _publicContext.CurrentTurnUsedCardCategoryCount ?? 0,
             SkillProgramNumberExpression.ActualTurnDeathBenefits => _publicContext.ActualTurnDeathBenefits ?? 0,
             SkillProgramNumberExpression.OwnerLostHp or SkillProgramNumberExpression.BoundaryWangYiMijiCount => Math.Max(0, _player.MaxHp - _player.Hp),
@@ -304,6 +303,11 @@ internal sealed partial class ProgramAiEstimateContext
                 Math.Max(1, _publicContext.AttackRange > 0 ? _publicContext.AttackRange : 1),
             _ => effect.Amount
         };
+        if (effect.AmountExpression is { } expression)
+        {
+            if (EvaluateAmount(expression) is not { } evaluated) return;
+            amount = evaluated;
+        }
         if (TargetsOwner(effect))
         {
             _ownerDraw += amount;
@@ -419,6 +423,11 @@ internal sealed partial class ProgramAiEstimateContext
             SkillProgramNumberExpression.AfterDamageAmount => Math.Max(0, _publicContext.AfterDamageAmount ?? 1),
             _ => effect.Amount
         };
+        if (effect.AmountExpression is { } expression)
+        {
+            if (EvaluateAmount(expression) is not { } evaluated) return;
+            amount = evaluated;
+        }
         if (TargetsOwner(effect))
         {
             var actual = Math.Min(amount, Math.Max(0, _estimatedMaxHp - _estimatedHp));
@@ -449,9 +458,19 @@ internal sealed partial class ProgramAiEstimateContext
     }
     internal void LoseHp(SkillProgramEffect effect)
     {
-        if (TargetsOwner(effect)) ApplyOwnerHealth(new(PublicHealthEffectKind.HpLoss, effect.Amount));
-        else ApplyTargetHealth(new(PublicHealthEffectKind.HpLoss, effect.Amount));
+        var amount = effect.AmountExpression is { } expression ? EvaluateAmount(expression) : effect.Amount;
+        if (amount is null) return;
+        if (TargetsOwner(effect)) ApplyOwnerHealth(new(PublicHealthEffectKind.HpLoss, amount.Value));
+        else ApplyTargetHealth(new(PublicHealthEffectKind.HpLoss, amount.Value));
     }
+
+    private int? EvaluateAmount(ProgramExpression expression) =>
+        ProgramExpressions.EvaluateInt(expression, new SkillContextExpressionWorld(_player with
+        {
+            Hp = Rounded(_estimatedHp), MaxHp = Rounded(_estimatedMaxHp),
+            HandCount = Rounded(_estimatedHandCount), HpValueProvider = null
+        }, _publicContext.SelectedTarget, _publicContext.EquipmentCardCount)) is { } amount
+            ? Math.Max(0, amount) : null;
 
     internal void Reveal(SkillProgramEffect effect)
     {

@@ -171,7 +171,7 @@ public sealed partial class SimpleAiBrain
                 var party = ShopReviewedEffectTarget(effect, participants);
                 var target = party == ShopReviewParty.Owner ? self : party == ShopReviewParty.Other ? opponent : null;
                 var sign = party == ShopReviewParty.Owner ? 1 : party == ShopReviewParty.Other ? -1 : 0;
-                var amount = effect.Amount > 0 ? effect.Amount : effect.NumberExpression is not null ? 1 : 0;
+                var amount = effect.Amount > 0 ? effect.Amount : effect.NumberExpression is not null || effect.AmountExpression is not null ? 1 : 0;
                 double benefit = 0;
                 switch (effect.Op)
                 {

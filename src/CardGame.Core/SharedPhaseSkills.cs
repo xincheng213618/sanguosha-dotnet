@@ -40,7 +40,7 @@ internal static class SharedPhaseSkillContract
             activation.UsageGroup != activation.Id ||
             activation.MarkerCost is not null || activation.ContinueAfterOwnerDeath || activation.Condition.Kind != SkillProgramConditionKind.Always ||
             activation.Effects.Any(effect => effect.Target != SkillProgramEffectTarget.Activator ||
-                effect.NumberExpression is not null || effect.TargetReference is not null ||
+                effect.NumberExpression is not null || effect.AmountExpression is not null || effect.TargetReference is not null ||
                 effect.Condition.Kind != SkillProgramConditionKind.Always ||
                 effect.Op is not (SkillProgramEffectOp.LoseHp or SkillProgramEffectOp.Draw or SkillProgramEffectOp.OfferRandomPlayPhaseSkill or
                     SkillProgramEffectOp.ResolveMobileShiXinXianYingJiejie)))

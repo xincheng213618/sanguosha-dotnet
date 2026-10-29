@@ -9,6 +9,7 @@ internal abstract record ProgramSkillInstruction;
 internal abstract record ProgramAmount;
 internal sealed record FixedProgramAmount(int Value) : ProgramAmount;
 internal sealed record ExpressionProgramAmount(SkillProgramNumberExpression Expression) : ProgramAmount;
+internal sealed record RuntimeExpressionProgramAmount(ProgramExpression Expression) : ProgramAmount;
 internal sealed record BoundCardCountProgramAmount(string SourceBind) : ProgramAmount;
 internal sealed record PhaseSkillUsageProgramAmount(string UsageId) : ProgramAmount;
 
@@ -24,7 +25,11 @@ internal sealed record RecoverProgramInstruction(
     ProgramAmount Amount,
     ProgramParticipantReference? TargetReference) : ProgramSkillInstruction;
 
-internal sealed record LoseHpProgramInstruction(int Amount) : ProgramSkillInstruction;
+internal sealed record LoseHpProgramInstruction(int Amount, ProgramExpression? AmountExpression = null) : ProgramSkillInstruction
+{
+    internal int IssuedAmount(ProgramSkillFrame frame) => AmountExpression is null
+        ? Amount : ProgramExpressionAmounts.IssuedAmount(frame);
+}
 
 internal sealed record DamageProgramInstruction(
     int Amount,

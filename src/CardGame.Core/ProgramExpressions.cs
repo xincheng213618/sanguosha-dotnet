@@ -14,7 +14,7 @@ public sealed class ProgramExpression
     internal ProgramExpression(string op, ProgramExpressionType type, IReadOnlyList<ProgramExpression> args,
         int literal = 0, string? name = null)
     {
-        Op = op; Type = type; Args = args; Literal = literal; Name = name;
+        Op = op; Type = type; Args = Array.AsReadOnly(args.ToArray()); Literal = literal; Name = name;
     }
 
     public string Op { get; }
@@ -22,6 +22,8 @@ public sealed class ProgramExpression
     public IReadOnlyList<ProgramExpression> Args { get; }
     public int Literal { get; }
     public string? Name { get; }
+
+    internal bool Reads(string op) => Op == op || Args.Any(arg => arg.Reads(op));
 }
 
 /// <summary>Read-only seat facts. Null means unknown or undefined.</summary>
@@ -39,12 +41,15 @@ internal static class ProgramExpressions
     public const string Iterator = "it";
     public static readonly string[] Participants = ["owner", "selectedTarget", "eventSource", "eventTarget"];
     public static readonly string[] Sets = ["living", "livingOthers"];
-    private static readonly string[] Stats = ["hp", "maxHp", "lostHp", "handCount", "equipmentCount"];
+    private static readonly string[] Stats = ["hp", "maxHp", "lostHp", "handCount", "handLimit", "equipmentCount"];
     private static readonly string[] Flags = ["alive", "hasHp", "faceDown", "chained"];
     private static readonly string[] Comparisons = ["<", "<=", ">", ">=", "==", "!="];
 
     public static ProgramExpression Parse(JsonElement node, string path) =>
         Parse(node, path, ProgramExpressionType.Bool, 0, iteratorInScope: false);
+
+    public static ProgramExpression ParseInt(JsonElement node, string path) =>
+        Parse(node, path, ProgramExpressionType.Int, 0, iteratorInScope: false);
 
     private static ProgramExpression Parse(JsonElement node, string path, ProgramExpressionType expected, int depth, bool iteratorInScope)
     {
@@ -98,6 +103,7 @@ internal static class ProgramExpressions
         if (Stats.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Participant)); }
         if (op is "+" or "min" or "max") { Arity(2, 8); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
         if (op == "-") { Arity(2, 2); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
+        if (op == "floorDiv") { Arity(2, 2); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
         if (op is "all" or "any" or "count")
         {
             Arity(2, 2);
@@ -173,6 +179,14 @@ internal static class ProgramExpressions
             case "int": return e.Literal;
             case "-":
                 return EvaluateInt(e.Args[0], world, it) is { } left && EvaluateInt(e.Args[1], world, it) is { } right ? left - right : null;
+            case "floorDiv":
+            {
+                if (EvaluateInt(e.Args[0], world, it) is not { } dividend ||
+                    EvaluateInt(e.Args[1], world, it) is not { } divisor || divisor == 0) return null;
+                var quotient = dividend / (long)divisor;
+                if (dividend % (long)divisor != 0 && (dividend < 0) != (divisor < 0)) quotient--;
+                return quotient is >= int.MinValue and <= int.MaxValue ? (int)quotient : null;
+            }
             case "+" or "min" or "max":
             {
                 var values = e.Args.Select(arg => EvaluateInt(arg, world, it)).ToArray();
@@ -218,7 +232,8 @@ internal static class ProgramExpressions
 /// AI estimate view: only the owner and the selected target are known; every
 /// other participant or set is unknown, so expressions that need them are false.
 /// </summary>
-internal sealed class SkillContextExpressionWorld(PlayerSkillContext owner, PlayerSkillContext? selectedTarget) : IProgramExpressionWorld
+internal sealed class SkillContextExpressionWorld(PlayerSkillContext owner, PlayerSkillContext? selectedTarget,
+    int? ownerEquipmentCount = null) : IProgramExpressionWorld
 {
     private PlayerSkillContext? Context(int seat) =>
         seat == owner.Seat ? owner : selectedTarget?.Seat == seat ? selectedTarget : null;
@@ -238,6 +253,8 @@ internal sealed class SkillContextExpressionWorld(PlayerSkillContext owner, Play
         return stat switch
         {
             "handCount" => context.HandCount,
+            "handLimit" => context.HandLimit,
+            "equipmentCount" => seat == owner.Seat ? ownerEquipmentCount : null,
             "maxHp" => context.MaxHp,
             "hp" => context.HpUndefined ? null : context.Hp,
             "lostHp" => context.HpUndefined ? null : context.MaxHp - context.Hp,

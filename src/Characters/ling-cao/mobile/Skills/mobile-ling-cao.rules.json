@@ -14,7 +14,7 @@
             {
               "op": "draw",
               "target": "owner",
-              "numberExpression": "equipmentHalfFloorPlusOne"
+              "amountExpr": ["+", ["floorDiv", ["equipmentCount", "owner"], 2], 1]
             }
           ]
         }

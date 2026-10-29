@@ -65,7 +65,8 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
         plan.BindingId == (frame.TriggerId ?? frame.ActivationId) &&
         plan.Instructions[frame.InstructionIndex - 1] is
             { Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.SelectedTargets,
-                NumberExpression: null, SourceBind: null, ResultBind: null } draw && draw.Amount == amount &&
+                NumberExpression: null, SourceBind: null, ResultBind: null } draw &&
+        (draw.AmountExpression is not null ? ProgramExpressionAmounts.IssuedAmount(frame) == amount : draw.Amount == amount) &&
         // The preceding selection was validated and committed by the ordinary
         // answer path on this same cursor. An unselected/default empty list is
         // not sufficient to turn an arbitrary multi-recipient draw into a no-op.
@@ -184,6 +185,7 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
                 plan.Instructions[paid.InstructionIndex - 1].CompiledInstruction is not DrawProgramInstruction instruction ||
                 paid.ResultBind != (instruction.Target == SkillProgramEffectTarget.SelectedTargets ? null : instruction.ResultBind) ||
                 paid.Visibility != instruction.Visibility ||
+                instruction.Amount is RuntimeExpressionProgramAmount && paid.RequestedCount != ProgramExpressionAmounts.IssuedAmount(frame) ||
                 paid.Reason != new CardMoveReason($"skill-program.{frame.SkillId}.{SkillProgramEffectOp.Draw}"))
                 throw new InvalidOperationException("A Draw instruction changed its result contract.");
         }
