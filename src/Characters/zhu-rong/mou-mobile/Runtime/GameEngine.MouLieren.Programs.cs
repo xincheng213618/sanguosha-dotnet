@@ -81,24 +81,4 @@ public sealed partial class GameEngine
         (f.TriggerId == "unique-slash-contest" && f.PindianResultBindings.Any(r => r.Name == "contest" && r.SourceSeat == f.OwnerSeat && r.OpponentSeat == c.TargetSeat) ||
          f.TriggerId == "won-slash-damage" && MouZhuRongWin(f.OwnerSeat, c) is { } won && won.Source.SkillInstanceId == f.SkillInstanceId && won.GameplayHash == f.GameplayHash);
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 30400)]
-    private bool AllowsMouZhuRongCompletedSlashDamage(ProgramSkillFrame f, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.SkillId != MouZhuRongComposition.Lieren || f.TriggerId != "won-slash-damage" || f.ActivationId != f.TriggerId ||
-            f.InstructionIndex != 3 || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id ||
-            amount != 1 || source is not null || sourceLess || nature is not (null or DamageNature.Normal) ||
-            f.SelectedTargetSeats is not [var selected] || selected != target || !_players[target].IsAlive || target == f.OwnerSeat ||
-            f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCompleted } c || MouZhuRongWin(f.OwnerSeat, c) is not { } won ||
-            won.Source.SkillInstanceId != f.SkillInstanceId || won.GameplayHash != f.GameplayHash || target == won.OpponentSeat ||
-            CurrentDamageAttempt?.ResolutionId != won.UseId || LifecycleCardUse(won.UseId) is not { Action: { } action } use ||
-            action.ActionId != won.ActionId || !IsSlashCard(use.CardKind) ||
-            _resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId) is not { } parent ||
-            parent.ParentFrameId != won.UseId || parent.Action.ActionId != won.ActionId || GetCardActionWindow(parent) != SkillProgramTriggerWindow.CardUseCompleted)
-            return false;
-        return ProgramEventHistory<MouZhuRongLierenDamageChosenEvent>().Count(e => e.FrameId == f.Id && e.UseId == won.UseId &&
-            e.ActionId == won.ActionId && e.OwnerSeat == f.OwnerSeat && e.TargetSeat == target) == 1 &&
-            GetPausedPrivateOfferEffect(f) is { Op: SkillProgramEffectOp.Damage, Target: SkillProgramEffectTarget.SelectedTarget,
-                Amount: 1, ActorReference: null, TargetReference: null, DamageNature: null or DamageNature.Normal };
-    }
 }

@@ -49,16 +49,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 350)]
     private bool IsQiaoZhouDying() => ActiveDying is { } dying && QiaoZhouObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 990)]
-    private bool AllowsQiaoZhouNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || QiaoZhouObserverRoot() is not { } root || root.Id == f.Id ||
-            f.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.DiscardPileReceived or
-                SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged)) return false;
-        var effect = GetPausedPrivateOfferEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26220)]
     private bool AdvanceQiaoZhouSubtree() => _pendingDecision is null && QiaoZhouObserverRoot() is not null && TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

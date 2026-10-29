@@ -66,7 +66,7 @@ public sealed partial class GameEngine
         {
             // The root-to-first incoming edge is already proved above. Every
             // later edge is exact; whole rescue suffixes are used only after it.
-            if (i > rootIndex + 1 && !(HalfHandPaidDamageObserverEdge(i) || PaidTargetObserverEdge(i))) return false;
+            if (i > rootIndex + 1 && !(HalfHandPaidDamageObserverEdge(i) || ProgramChildResolutionEdge(i))) return false;
             if (_resolutionStack[i] is DyingFrame d && i < lastIndex &&
                 (IsRoundPricedPileAlcoholRide(i, d) || IsPaidHandRepaymentProgramAlcoholRide(i, d) || IsPaidHandRepaymentRescueRide(i, d) || PolicyCounterspellVirtualAlcoholRide(i, d) || PaidObserverDamageVirtualAlcoholRide(i, d)))
                 return lastIndex == _resolutionStack.Count - 1;
@@ -99,18 +99,5 @@ public sealed partial class GameEngine
             window.ParentFrameId == damage.Id && _resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == damage.ParentFrameId) is { AttackAttempt: not null, AttackReturn: not null } attack &&
             CurrentDamageAttempt?.ResolutionId == attack.Id && RecipientContestPaidObserverRoot() is { } root &&
             _resolutionStack.FindIndex(f => f.Id == root.Id) < _resolutionStack.FindIndex(f => f.Id == attack.Id);
-    }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 50)]
-    private bool AllowsRecipientContestNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != observer.Id || observer.InstructionIndex < 1 ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.DiscardPileReceived or
-                SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged)) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!).GetPausedInstruction(observer.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.Damage || amount != effect.Amount || source != effect.ActorReference || nature != effect.DamageNature ||
-            target != (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target))) return false;
-        return RecipientContestPaidObserverRoot() is { UniqueHpPeer: { } receipt } &&
-            ActiveCardAttack?.ResolutionId == receipt.CardUseFrameId && CurrentDamageAttempt?.ResolutionId == receipt.CardUseFrameId;
     }
 }

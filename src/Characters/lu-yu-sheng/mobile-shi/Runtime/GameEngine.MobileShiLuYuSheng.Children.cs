@@ -45,15 +45,6 @@ public sealed partial class GameEngine
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 67400)]
     private bool ShiLysBeforeDamageChild(long id) => ShiLysObserverRoot() is { } f &&
         _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 67400)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 67400)]
-    private bool ShiLysNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess || ShiLysObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } p ? ResolveProgramParticipant(f,p) : ResolveProgramEffectTarget(f,effect.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 67400)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 67400)]
     private bool ShiLysRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

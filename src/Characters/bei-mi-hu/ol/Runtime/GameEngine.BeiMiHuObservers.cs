@@ -52,11 +52,4 @@ public sealed partial class GameEngine
     private bool HasBeiMiHuBeforeDamageObserver(long id)=>_resolutionStack.Any(f=>f.Id==id && f is BeforeDamageProgramWindowFrame) && BeiMiHuObserverRoot() is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 230)]
     private bool TryAdvanceBeiMiHuSubtree()=>_pendingDecision is null && BeiMiHuObserverRoot() is not null && TryAdvanceObserverSubtree(true);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 470)]
-    private bool AllowsBeiMiHuNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference?source,DamageNature?nature,bool sourceLess)
-    {
-        if(sourceLess || f.AttackAttempt is not null || f.InstructionIndex<1 || _resolutionStack.LastOrDefault()?.Id!=f.Id || BeiMiHuObserverRoot() is null ||
-            f.WindowContext?.Window is not(SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterDamageApplied or SkillProgramTriggerWindow.SkillsChanged))return false;
-        var e=BeiMiHuPausedEffect(f)!;return e.Op==SkillProgramEffectOp.Damage && amount==e.Amount && source==e.ActorReference && nature==e.DamageNature && target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
-    }
 }

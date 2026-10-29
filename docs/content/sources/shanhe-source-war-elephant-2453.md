@@ -8,13 +8,19 @@
 {"a":2453,"startChapter":1,"b":4861,"c":"战象","d":"1000003","f":0,"h":100,"k":5,"l":5,"m":0,"n":0,"o":5,"p":2,"q":4,"r":0,"otherad":0,"v":"673","getspell_KN":"1136","getspell_LY":"414","pvpspell":"3189"}
 ```
 
-身体为士兵4861，体力5/5、摸牌2、随机起手4，没有固定装备、额外属性、隐藏成员或二阶段。护甲、护甲回复、额外出杀和额外伤害均为0，护甲上限字段5。PVP字段3189不加入山河技能。肖像1000003尚无已核实的本地资源，使用明确的 `supporter` 回退；群势力和男性沿本地士兵约定。
+身体为士兵4861，体力5/5、摸牌2、随机起手4，没有固定装备、额外属性、隐藏成员或二阶段。护甲、护甲回复、额外出杀和额外伤害均为0，护甲上限字段5。PVP字段3189不加入山河技能。运行时保留 `supporter` 回退键；桌面可按下列精确来源战象卡面及运行时ID绑定显示，群势力和男性仍沿本地士兵约定，不因美术改变规则。
 
 | 来源难度 | 累计技能 |
 | --- | --- |
 | 1—10 | 673兽裔 |
 | 11—20 | 兽裔、1136凶兽 |
 | 21—25 | 兽裔、凶兽、414破军 |
+
+## 原生卡面
+
+已于2026-10-29核对普通组2453唯一成员 `rawOrdinal=0 → b=4861 → d=1000003`。载体4861的 `character.sgs` 行为“士兵”、类 `ShiBing61`，无 `au/av` 头像重定向；明确的PVE皮肤覆盖载体默认头像，不能拿其他士兵图替代战象。`cha_gs_dbs_fs_skininfo.sgs/root.pveskin` 的1000003行指定 `seatpic=generalface_1000003`、`headpic=1000003`、`diagrampic=100000300`。该解码皮肤表SHA-256为 `00ee5f994401976563e241571d3e5618f573ad2a4b85336ff132afb262f1e8d4`。客户端 `q6t.getSeatSkinUrl → hA.SkinSeatUrl` 经 `N2t.SeatImgUrl=general/seat/static/` 及桌面 `res/runtime/pc/` 生成[官方卡面URL](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000003.png)。
+
+官方响应为HTTP200、`image/png`；目视为披甲战象。原生146×172、RGB、51223字节，原字节保存为 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000003.png`；文件SHA-256为 `e4a0d8d09d4a9075a5a373160340a5b15e48c0e7124247bb607400a6841bd697`，解码RGBA像素SHA-256为 `cccf3408e9c3560b5067a7083633251b1b38e643d80fd0a5ad735f2d12abe843`。未裁剪、缩放、换色或重编码。精确绑定仅为 `shanhe:source-war-elephant-2453-base`（1–10）、`shanhe:source-war-elephant-2453-hard`（11–20）、`shanhe:source-war-elephant-2453-hell`（21–25）；同组累计技能不改变 `d`。原行未设置 `g/hide/generalShow`，按源默认分别为false/false/0；`startChapter=1`、`f=0`，无主帅身份。
 
 ## 准确能力
 

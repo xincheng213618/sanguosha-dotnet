@@ -40,22 +40,31 @@ public sealed partial class ShanheCampaignSession
     private ShanheRewardCategory? AutomaticRewardCategory(ShanheNodeDefinition node)
     {
         if (!node.AutomaticRewardCategory) return null;
-        // Type is a property of the appearing location, independent of battle
-        // order, later acquisitions and the elite quality of its candidates.
-        var categories = (node.RewardIds ?? []).Select(id => _rewards[id])
-            .Where(reward => IsRewardUnlocked(reward) && reward.OpeningCompanionPool is null &&
-                reward.OpeningSkillRewardIds is null && reward.CampaignEconomy?.StartingGold is not > 0)
-            .Select(RewardCategory).Distinct().Order().Where(category => CategoryWeight(category) > 0).ToArray();
-        var total = categories.Sum(CategoryWeight);
+        // Bind type to the appearing route. A later Wolf Battles upgrade changes
+        // its quality, so only types supported by both authored profiles enter
+        // this location's fixed lottery, regardless of when that tactic is bought.
+        var route = BalancedBattleRewards(_state, _nodes[node.Id]);
+        var categories = EligibleCategories(route);
+        if (route.EliteUpgradeNodeId is { } eliteId)
+            categories = categories.Intersect(EligibleCategories(BalancedBattleRewards(_state, _nodes[eliteId])));
+        var available = categories.Distinct().Order().ToArray();
+        var total = available.Sum(CategoryWeight);
         if (total == 0) return null;
         var random = new DeterministicRandom(ShanheBattleSetup.DeriveSeed(_options.Seed, node.Id + ":reward-category", 1));
         var roll = random.Next(total);
-        foreach (var category in categories)
+        foreach (var category in available)
         {
             roll -= CategoryWeight(category);
             if (roll < 0) return category;
         }
         throw new InvalidOperationException("The location's reward category lost its weighted choice.");
+
+        IEnumerable<ShanheRewardCategory> EligibleCategories(ShanheNodeDefinition profile) => (profile.RewardIds ?? [])
+            .Select(id => _rewards[id])
+            .Where(reward => (profile.IsStoryBattle || IsRewardUnlocked(reward)) &&
+                (reward.CampaignEconomy?.FavorOwnedSchoolRewards != true || BalancedJourneyRewards(_state)) && IsPrimaryRewardRarity(profile, reward) &&
+                reward.OpeningCompanionPool is null && reward.OpeningSkillRewardIds is null && reward.CampaignEconomy?.StartingGold is not > 0)
+            .Select(RewardCategory).Where(category => CategoryWeight(category) > 0);
 
         static int CategoryWeight(ShanheRewardCategory category) => category switch
         { ShanheRewardCategory.Tactic => 6, ShanheRewardCategory.Skill => 3, ShanheRewardCategory.Card => 1, _ => 0 };
@@ -105,6 +114,24 @@ public sealed partial class ShanheCampaignSession
     private static bool HasPrimaryReward(RunState state) =>
         state.Phase == ShanheCampaignPhase.Reward && state.BossRewardGroups.Count == 0 &&
         (state.RewardOfferIds.Count > 0 || state.CategoryRewardGroups.Count > 0 && state.SelectedRewardCategory is null);
+
+    private RunState ReconcileMarketRewardOffers(RunState state)
+    {
+        if (state.Phase != ShanheCampaignPhase.Reward) return state;
+        if (state.BossRewardGroups.Count > 0)
+            return state with { BossRewardGroups = PruneUnavailableBossRewardOffers(state, state.BossRewardGroups) };
+        var node = _nodes[state.CurrentNodeId!];
+        bool CanClaim(string id) => node.IsStoryBattle ? CanApplyBossReward(state, _rewards[id]) : CanReceiveReward(state, _rewards[id]);
+        var next = state with
+        {
+            RewardOfferIds = ShanheCampaignContent.Freeze(state.RewardOfferIds.Where(CanClaim)),
+            CategoryRewardGroups = ShanheCampaignContent.Freeze(state.CategoryRewardGroups.Select(group => group with
+                { OfferIds = ShanheCampaignContent.Freeze(group.OfferIds.Where(CanClaim)) }).Where(group => group.OfferIds.Count > 0))
+        };
+        // Keep surviving candidates frozen. A purchase that exhausts the offer
+        // must not trap the run behind an unclaimable, compulsory tactic.
+        return HasPrimaryReward(next) ? next : BeginPendingBonusRewardsOrFinish(next);
+    }
 
     private int PrimaryRewardSkipGold(RunState state) => HasPrimaryReward(state)
         ? RewardSkipCompensation(state.RewardOfferIds, ResolveBattleNode(state, _nodes[state.CurrentNodeId!]).RewardSkipGold) : 0;

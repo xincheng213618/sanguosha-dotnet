@@ -22,7 +22,7 @@
 
 曹嵩保留原行 `g=1` 的首领标记；这是普通遭遇内的首领，不代表二阶段。三员均无固定装备、隐藏角色、变身跳转或额外 `otherad`。不导入独立的新手组22485，也不把 `pvpspell=3189` 当作普通战斗技能。曹嵩原人物的礼赂9017没有出现在本组技能行，因此不附带。
 
-曹嵩采用已有 `wei` 身份、男性与已核实本地图 `ol-cao-song`。双卫兵保留各自原身体身份，使用本地普通士兵的 `qun`/男性占位约定；皮肤号1000215没有核实可用的本地原图，继续使用 `supporter` 回退，不借用别人的肖像。
+曹嵩采用已有 `wei` 身份与男性设定。冻结Character438没有头像替代或版本门槛，原生席位图按默认ItemID链得到 `generalface_438.png`；此族三个精确来源ID使用该原卡。既有 `ol-cao-song` 的750×950大图保留给其他角色，不将其当成146×172原生席位图的同字节复本。双卫兵保留各自原身体身份和本地普通士兵的 `qun`/男性约定；运行时保留 `supporter` 回退键，桌面原图按两条独立源行共同指定的PVE皮肤1000215复用既有原始PNG，覆盖两卫兵各自基础／困难四个精确ID，不合并两席或借用别人的身体。
 
 ## 1—25档累计配置
 
@@ -67,3 +67,18 @@
 包为 `StandardShanheSourceCaoSongTrioPackage`，ID前缀 `shanhe:source-caosong-trio-2485-`。`GetRosterGeneralIds(difficulty)` 按曹嵩、4861、4862返回三员；分别提供 `GetCaoSongGeneralId`、`GetFirstGuardGeneralId`、`GetSecondGuardGeneralId`。共7个技能档身份；起手属性由地图累计，故16档不额外复制同技能身份。
 
 新鲜聚焦检查 `Source665EnemyHpAnd1602PaidMaximumChildBeforeNegativeHpRescue` 验证严格敌方体力选择、敌方濒死排除、实际威重摸牌孩子返回、负体力恢复至1及上限支付最低边界。只从新建游戏和实际命令驱动，不运行存档恢复、回放或完整对局检查。纯复用9018/239由原共享机制检查覆盖，不复制角色行为快照。
+
+
+## 2026-10-29 原生席位图与预览身份
+
+完整源组逐行保留；`hide` 缺省false、`startChapter=1`、`generalShow` 缺省0。下表按从0开始的源行顺序记录真实 `g`，未列出的 `g` 按0处理；不从首席、同名、通用载体或将领称呼推定主帅。身份只用于预览布局，不改变关卡类型、技能、数值、抽选或内容版本。
+
+| 源行与成员 | g | 原图链 | PNG | 字节 | SHA256 |
+| --- | --- | --- | --- | --- | --- |
+| raw0 曹嵩（438） | 1 | 无General.d → Character438默认ItemID | [官方146×172原图](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_438.png) | 54075 | `02361373c7bfe126d0ea8f3dc49686c15ca76dd108318aa4b6910cdbcbf16be4` |
+| raw1 卫兵（4861） | 0 | General.d=1000215 → root.pveskin.seatpic | [官方146×172原图](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000215.png) | 51324 | `b7cdae24bfa47ff260127855116a095cec1d768cddcbb58a9dbbfde4d33838fd` |
+| raw2 卫兵（4862） | 0 | General.d=1000215 → root.pveskin.seatpic | [官方146×172原图](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000215.png) | 51324 | `b7cdae24bfa47ff260127855116a095cec1d768cddcbb58a9dbbfde4d33838fd` |
+
+所有表内PNG均取得HTTP200、image/png响应并完成目视、尺寸、原字节SHA及RGBA像素核对；直接使用原始响应字节，不裁剪、缩放、重绘或重新编码。多人组的重复成员仍占独立席位；同一PNG的复用必须有各条源行的独立皮肤证据。当前完整来源配方的25个难度值均已只读检查，体力成长和固定装备不改变名单或角色顺序。原图、精确运行时绑定与身份布局证据集中记录在[山河NPC美术来源](../shanhe-npc-art-sources.json)及[敌将布局来源](../shanhe-encounter-layout-sources.json)。
+
+Character438／634的解码字节SHA256与既有冻结记录一致（`92f00132ed944b279066f46655478bde6a2f3b9f1c006d086c197fbbbada49de`），两个角色均无 `au`／`av`／`needVersion`；按已核对的 `needVersion||0`、LOG_VERSION40303及默认ItemID链解析原生席位图。此次公开配置和客户端外包哈希已经不同，不将当前外包冒充旧冻结包。旧750×950大图与原生146×172卡图像素不相同，仅此组精确来源ID使用原生图，其他普通武将默认图保留。

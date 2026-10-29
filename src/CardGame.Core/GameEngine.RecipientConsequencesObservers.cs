@@ -101,7 +101,7 @@ public sealed partial class GameEngine
                 changed.Window == SkillProgramTriggerWindow.SkillsChanged && changed.ResumeProgramFrameId == changedParent.Id &&
                 changed.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && changed.CandidateIndex >= 0 &&
                 changed.CandidateIndex <= changed.Candidates.Count) continue;
-            if (!DyingSuitsStructuralEdge(_resolutionStack[i - 1], _resolutionStack[i]) && !HalfHandPaidDamageObserverEdge(i) && !PaidTargetObserverEdge(i)) return false;
+            if (!DyingSuitsStructuralEdge(_resolutionStack[i - 1], _resolutionStack[i]) && !HalfHandPaidDamageObserverEdge(i) && !ProgramChildResolutionEdge(i)) return false;
         }
         return true;
     }
@@ -116,20 +116,6 @@ public sealed partial class GameEngine
             w.ParentFrameId == damage.Id && _resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == damage.ParentFrameId) is { AttackAttempt: not null, AttackReturn: not null } attack &&
             CurrentDamageAttempt?.ResolutionId == attack.Id && RecipientConsequencesObserverRoot() is { } root &&
             _resolutionStack.FindIndex(f => f.Id == root.Id) < _resolutionStack.FindIndex(f => f.Id == attack.Id);
-    }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 60)]
-    private bool AllowsRecipientConsequencesNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != observer.Id || observer.InstructionIndex < 1 ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.DiscardPileReceived or
-                SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or
-                SkillProgramTriggerWindow.SkillsChanged)) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!).GetPausedInstruction(observer.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.Damage || amount != effect.Amount || source != effect.ActorReference || nature != effect.DamageNature ||
-            target != (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target))) return false;
-        return CurrentDamageAttempt is { } attack && RecipientConsequencesObserverRoot() is { } root &&
-            _resolutionStack.FindIndex(f => f.Id == attack.ResolutionId) > _resolutionStack.FindIndex(f => f.Id == root.Id);
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 540)]
     private bool TryAdvanceRecipientConsequencesSubtree()

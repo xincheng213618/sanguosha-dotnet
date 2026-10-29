@@ -62,6 +62,9 @@ public static partial class ShanheCampaignContent
             UniqueIds(node.RewardIds ?? [], "node reward");
             Require((node.RewardIds ?? []).All(rewardIds.Contains), "A node references an unknown reward.");
             var battle = IsBattle(node.Kind);
+            Require(node.ExtraChapterBattleIndex is >= 0 and <= 2 &&
+                (node.ExtraChapterBattleIndex == 0 || node.Kind == ShanheNodeKind.Battle && node.ChapterNumber > 0 && !node.IsStoryBattle),
+                "Only ordinary chapter battles can require an extra chapter action.");
             Require(node.PrimaryTacticRarity is >= 0 and <= 4 && node.PrimarySkillRarity is >= 0 and <= 4 &&
                 node.PrimaryCardRarity is >= 0 and <= 4 &&
                 (battle || node.PrimaryTacticRarity == 0 && node.PrimarySkillRarity == 0 && node.PrimaryCardRarity == 0),
@@ -74,13 +77,22 @@ public static partial class ShanheCampaignContent
                 "Only battle nodes can grant bounded reward-skip compensation.");
             Require(battle ? node.Encounters is { Count: > 0 and <= 64 } && (node.Choices?.Count ?? 0) == 0 :
                 (node.Encounters?.Count ?? 0) == 0 && ((node.Choices is { Count: > 0 } &&
-                node.Choices.Count <= (node.Kind == ShanheNodeKind.Shop ? 512 : 64)) || node.StoryEvents is { Count: > 0 }) && (node.RewardIds?.Count ?? 0) == 0,
+                node.Choices.Count <= (node.Kind == ShanheNodeKind.Shop ? 512 : 64)) || node.StoryEvents is { Count: > 0 } ||
+                node.SupplementalStoryEvents is { Count: > 0 }) && (node.RewardIds?.Count ?? 0) == 0,
                 "Battle nodes need encounters; other nodes need explicit choices.");
             ValidateStoryEvents(node);
-            foreach (var story in node.StoryEvents ?? [])
+            foreach (var story in AllStoryEvents(node))
+            {
                 foreach (var id in story.SkillRewardIds ?? [])
                     Require(definition.Rewards.Any(reward => reward.Id == id && reward.SkillId is not null && reward.Rarity >= 2),
                         "A story skill pool requires known rare-or-better skill rewards.");
+                foreach (var id in story.TacticRewardIds ?? [])
+                    Require(definition.Rewards.Any(reward => reward.Id == id && reward.Rarity >= 2 &&
+                        (reward.TacticSkillId is not null || reward.CampaignEconomy is not null || reward.OpeningSkillRewardIds is not null ||
+                         reward.OpeningCompanionPool is not null || reward.Bonuses is { } bonus &&
+                         (bonus.MaxHp != 0 || bonus.InitialHand != 0 || bonus.Draw != 0 || bonus.Slash != 0))),
+                        "A story tactic pool requires known rare-or-better tactic rewards.");
+            }
             UniqueIds((node.Encounters ?? []).Select(e => e?.Id ?? ""), "encounter");
             foreach (var encounter in node.Encounters ?? [])
             {
@@ -99,7 +111,7 @@ public static partial class ShanheCampaignContent
                 ValidateBossTransition(encounter.BossTransition, encounter.Enemies);
             }
             UniqueIds((node.Choices ?? []).Select(c => c?.Id ?? ""), "node choice");
-            foreach (var choice in (node.Choices ?? []).Concat((node.StoryEvents ?? []).SelectMany(story => story.Choices)))
+            foreach (var choice in (node.Choices ?? []).Concat(AllStoryEvents(node).SelectMany(story => story.Choices)))
             {
                 RequireText(choice.Name, "choice name");
                 Require(choice.Id != "$leave" && choice.GoldCost is >= 0 and <= 100_000 && choice.HpCost is >= 0 and <= 1000, "Invalid choice cost or reserved choice id.");
@@ -117,6 +129,7 @@ public static partial class ShanheCampaignContent
                 }
             }
         }
+        ValidateChapterRoutes(definition);
         ValidateRoutes(definition);
         return definition with
         {
@@ -127,8 +140,8 @@ public static partial class ShanheCampaignContent
             {
                 NextNodeIds = Freeze(node.NextNodeIds), RewardIds = Freeze(node.RewardIds ?? []),
                 Choices = Freeze((node.Choices ?? []).Select(FreezeStoryChoice)),
-                StoryEvents = node.StoryEvents is null ? null : Freeze(node.StoryEvents.Select(story => story with
-                { Choices = Freeze(story.Choices.Select(FreezeStoryChoice)), SkillRewardIds = story.SkillRewardIds is null ? null : Freeze(story.SkillRewardIds) })),
+                StoryEvents = node.StoryEvents is null ? null : Freeze(node.StoryEvents.Select(FreezeStoryEvent)),
+                SupplementalStoryEvents = node.SupplementalStoryEvents is null ? null : Freeze(node.SupplementalStoryEvents.Select(FreezeStoryEvent)),
                 BossRewards = FreezeBossRewards(node.BossRewards),
                 Encounters = Freeze((node.Encounters ?? []).Select(encounter => encounter with
                 {
@@ -241,7 +254,7 @@ public static partial class ShanheCampaignContent
             if (visited.Contains(id)) return;
             Require(visiting.Add(id), "Campaign routes must not contain cycles.");
             foreach (var next in nodes[id].NextNodeIds.Concat((nodes[id].Choices ?? [])
-                .Concat((nodes[id].StoryEvents ?? []).SelectMany(story => story.Choices))
+                .Concat(AllStoryEvents(nodes[id]).SelectMany(story => story.Choices))
                 .Select(choice => choice.BattleNodeId).OfType<string>())) Visit(next);
             visiting.Remove(id);
             visited.Add(id);

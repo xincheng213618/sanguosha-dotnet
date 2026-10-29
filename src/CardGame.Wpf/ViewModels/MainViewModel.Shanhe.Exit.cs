@@ -82,6 +82,7 @@ public sealed partial class MainViewModel
         IsShanheMarketOpen = false;
         if (IsShanheBattleSession && _shanheReturnGame is { } previous) ReplaceEngine(previous);
         _shanheBattleGame = _shanheTableGame = _shanheReturnGame = null;
+        ResetShanheBattleProjection();
         _shanheTableSetup = null;
         _autoSavePending = false;
         _saveTimer?.Stop();

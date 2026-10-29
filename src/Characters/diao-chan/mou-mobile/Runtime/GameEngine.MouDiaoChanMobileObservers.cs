@@ -66,14 +66,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 31700)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31700)]
     private bool IsMouDiaoChanDying() => ActiveDying is { } dying && MouDiaoChanObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 31700)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 31700)]
-    private bool AllowsMouDiaoChanNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess || MouDiaoChanObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature &&
-            target == (e.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31700)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 31700)]
     private bool IsMouDiaoChanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

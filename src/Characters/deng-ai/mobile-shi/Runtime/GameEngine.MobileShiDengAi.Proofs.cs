@@ -104,13 +104,6 @@ public sealed partial class GameEngine
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 50300)] private bool ShiDaBeforeDamageObserver(long id) => ShiDaObserverRoot() is { } root && _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 50300)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 50300)]
     private bool ShiDaDyingObserver() => ActiveDying is { } dying && ShiDaObserverRoot() is { } root && _resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStack.FindIndex(x => x.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 50300)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 50300)]
-    private bool ShiDaNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || ShiDaObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature &&
-            target == (e.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 50300)] [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 50300)]
     private bool ShiDaRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
     {

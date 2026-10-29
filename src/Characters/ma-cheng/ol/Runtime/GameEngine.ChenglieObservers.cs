@@ -65,9 +65,6 @@ public sealed partial class GameEngine
     private bool HasMaChengBeforeDamageObserver(long id)=>MaChengObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 980)]
     private bool HasMaChengDyingObserver()=>ActiveDying is{}d&&MaChengObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1550)]
-    private bool AllowsMaChengNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||MaChengObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27560)]private bool AdvanceMaChengSubtree()=>_pendingDecision is null&&MaChengObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
     private bool HasChenglieCompletedUseObserver(long useId)
     {

@@ -10,14 +10,13 @@ internal static class ProgramRuntimeProofChecks
         var effect = new SkillProgramEffect(SkillProgramEffectOp.Draw, SkillProgramEffectTarget.Owner, 1,
             new(SkillProgramConditionKind.Always, 0, []));
         var movement = new ProgramMovementContinuation(0, 0, null);
-        var source = new ProgramParticipantReference(ProgramParticipantRef.Actor);
-        var a = new Fixture(catalog, frame, effect, movement, source) { Match = true };
-        var b = new Fixture(catalog, frame, effect, movement, source);
+        var a = new Fixture(catalog, frame, effect, movement) { Match = true };
+        var b = new Fixture(catalog, frame, effect, movement);
         Need(a.Bound.Count == 0 && b.Bound.Count == 0, "Unused proof phases must not bind handlers.");
         Need(a.Proofs.MatchesObserver(ProgramObserverProofPhase.PaidDamage, 17) &&
             a.Trace.SequenceEqual(["observer-first", "observer-second"]) && b.Trace.Count == 0,
             "Observer proofs retain exact window identity, order, short circuit and per-match binding.");
-        Need(!a.Bound.Any(name => name.Contains("Nested", StringComparison.Ordinal) || name.Contains("Movement", StringComparison.Ordinal)),
+        Need(!a.Bound.Any(name => name.Contains("Movement", StringComparison.Ordinal)),
             "An observer query must not initialize unrelated proof phases.");
         Need(!b.Proofs.MatchesObserver(ProgramObserverProofPhase.PaidDamage, 17) &&
             b.Trace.SequenceEqual(["observer-first", "observer-second", "observer-last"]), "Unmatched observers try the original whole list.");
@@ -25,12 +24,6 @@ internal static class ProgramRuntimeProofChecks
         Need(!a.Proofs.MatchesObserver(ProgramObserverProofPhase.NestedDamage, 17) && a.Trace.SequenceEqual(["observer-other"]),
             "Paid-damage admission cannot authorize a different observer position.");
         Need(a.Proofs.MatchesObserver(ProgramObserverProofPhase.BeforeDamage, 18), "Static proofs retain their exact argument.");
-        a.Trace.Clear();
-        Need(a.Proofs.AllowsNestedDamage(ProgramNestedDamageProofPhase.BeforeFactionDebts, frame, 4, 3, source, DamageNature.Fire, true) &&
-            a.Trace.SequenceEqual(["nested"]), "Nested damage retains its original frame, target, amount, source, nature and source-less flag.");
-        a.Trace.Clear();
-        Need(!a.Proofs.AllowsNestedDamage(ProgramNestedDamageProofPhase.AfterFactionDebts, frame, 4, 3, source, DamageNature.Fire, true) &&
-            a.Trace.SequenceEqual(["nested-other"]), "Admission on one side of faction debts cannot bypass the other side.");
         a.Trace.Clear();
         Need(a.Proofs.MatchesMovement(ProgramMovementProofPhase.EffectPayments, frame, effect, movement) && a.Trace.SequenceEqual(["movement"]),
             "Movement admission receives the exact effect and paid continuation.");
@@ -48,7 +41,7 @@ internal static class ProgramRuntimeProofChecks
         try { a.Proofs.MatchesObserver(ProgramObserverProofPhase.PaidDamage, 17); throw new Exception("Expected proof failure."); }
         catch (InvalidOperationException error) when (ReferenceEquals(error, a.Failure))
         { Need(a.Trace.SequenceEqual(["observer-first"]), "The original failure stops dispatch without reflection wrapping."); }
-        Need(catalog.Observers.Values.Concat(catalog.NestedDamage.Values).Concat(catalog.Movements.Values)
+        Need(catalog.Observers.Values.Concat(catalog.Movements.Values)
                 .Concat(catalog.Dying.Values.SelectMany(groups => groups)).All(rows => rows is IList<ProgramRuntimeRegistration> list && list.IsReadOnly) &&
             catalog.Dying.Values.All(groups => groups is IList<IReadOnlyList<ProgramRuntimeRegistration>> list && list.IsReadOnly),
             "Shared proof lists and their eager dying groups remain immutable.");
@@ -78,12 +71,11 @@ internal static class ProgramRuntimeProofChecks
         private readonly ProgramSkillFrame _frame;
         internal SkillProgramEffect? ExpectedEffect { get; set; }
         private readonly ProgramMovementContinuation _movement;
-        private readonly ProgramParticipantReference _source;
         internal ProgramRuntimeProofs Proofs { get; }
         internal Fixture(ProgramRuntimeProofCatalog catalog, ProgramSkillFrame frame, SkillProgramEffect effect,
-            ProgramMovementContinuation movement, ProgramParticipantReference source)
+            ProgramMovementContinuation movement)
         {
-            (_frame, ExpectedEffect, _movement, _source) = (frame, effect, movement, source);
+            (_frame, ExpectedEffect, _movement) = (frame, effect, movement);
             Proofs = new(catalog, row =>
             {
                 Bound.Add(row.Method.Name);
@@ -100,15 +92,6 @@ internal static class ProgramRuntimeProofChecks
         private bool ObserverOther(long id) { Trace.Add("observer-other"); return false; }
         [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 10)]
         private static bool StaticObserver(long id) => id == 18;
-        [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 10)]
-        private bool Nested(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-        {
-            Need(ReferenceEquals(f, _frame) && target == 4 && amount == 3 && ReferenceEquals(source, _source) && nature == DamageNature.Fire && sourceLess,
-                "Nested damage arguments changed."); Trace.Add("nested"); return Match;
-        }
-        [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 10)]
-        private bool NestedOther(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-        { Trace.Add("nested-other"); return false; }
         [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 10)]
         private bool Movement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement)
         {

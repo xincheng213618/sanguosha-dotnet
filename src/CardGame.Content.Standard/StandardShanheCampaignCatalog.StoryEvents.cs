@@ -7,6 +7,7 @@ public static partial class StandardShanheCampaignCatalog
 {
     public const string RecruitmentStoryId = "story:toumingzhuang";
     public const string RecruitmentCompanionId = "boundary:cai-wen-ji";
+    public const string RareTacticStoryId = "story:shiyoudaru-tactics";
 
     private static ShanheCampaignDefinition WithStoryEventPools(ShanheCampaignDefinition definition, string editionId)
     {
@@ -75,6 +76,7 @@ public static partial class StandardShanheCampaignCatalog
             Name = "奇遇", Choices = [], StoryEvents = stories.Where(story => node.ChapterNumber == 1 || story.Id != "story:zhijinanpeng")
                 .Concat(CreateAdditionalRecruitmentAStories(node.ChapterNumber)).Concat(CreateAdditionalRecruitmentBStories(node.ChapterNumber))
                 .Concat(BattleStories(node)).ToArray(),
+            SupplementalStoryEvents = CreateSupplementalTacticStories(rewards),
             StoryText = "行军途中可能遇到求援、商旅、秘闻、投名来归的帮手或可选战斗。进入后揭晓本次奇遇。",
             Description = "随机奇遇：不同事件有各自的选项与收益，优先出现本次征程尚未遇过的事件。"
         }).Concat(definition.Nodes.Where(node => eventIds.Contains(node.Id)).SelectMany(node => new[]
@@ -108,10 +110,24 @@ public static partial class StandardShanheCampaignCatalog
             IsStoryBattle = true, ChapterNumber = origin.ChapterNumber, ChapterTitle = origin.ChapterTitle,
             PrimaryTacticRarity = elite ? 2 : 1,
             PrimarySkillRarity = elite ? origin.ChapterNumber >= 2 ? 3 : 2 : origin.ChapterNumber >= 2 ? 2 : 1,
-            PrimaryCardRarity = elite ? 2 : 0,
+            PrimaryCardRarity = elite ? 2 : 1,
             CategorizedRewards = true, AutomaticRewardCategory = true, RewardSkipGold = 100,
             StoryText = elite ? "击败黄巾精锐，领取300铜币与稀有及以上战利品。" : "击败疲惫的黄巾余众，领取200铜币。",
             Description = "由奇遇选项进入的本地战斗编排，胜利后回到原来的行军路线。"
         };
+    }
+
+    private static IReadOnlyList<ShanheStoryEventDefinition>? CreateSupplementalTacticStories(IReadOnlyList<ShanheRewardDefinition> rewards)
+    {
+        var tactics = rewards.Where(reward => reward.Rarity == 2 && reward.OpeningCompanionPool is null &&
+            reward.OpeningSkillRewardIds is null && (reward.TacticSkillId is not null || reward.CampaignEconomy is not null ||
+            reward.Bonuses is { } bonus && (bonus.MaxHp != 0 || bonus.InitialHand != 0 || bonus.Draw != 0 || bonus.Slash != 0)))
+            .Select(reward => reward.Id).ToArray();
+        if (tactics.Length < 2) return null;
+        // Frozen Adventure1928 / Choose192801-3 grants two revealed rare tactic
+        // options (RewardGroup202) or 210 copper. The same-name1931 is skills.
+        return [new(RareTacticStoryId, "世有大儒", "路过此地，你听闻城中有人施粥讲学。你决定？",
+            [new("decline-story-tactics", "维持秩序 · 获得210铜币", RewardId: "story-decline-skills")
+                { Description = "放弃此次两个稀有战法选项，获得210铜币后继续行军。" }]) { TacticRewardIds = tactics }];
     }
 }

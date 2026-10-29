@@ -10,9 +10,13 @@
 | 11—20 | 强袭、1149劫掠 | +1/+1 |
 | 21—25 | 强袭、劫掠、3368狼蹈 | +2/+2 |
 
-基础身体仍为4/4；后两档的属性由共享来源成长层单独计算一次，不能同时硬改将领身体又叠加属性。`pvpspell=3189` 为独立PVP字段，不加入山河技能。来源肖像1000303尚未核实本地资源，使用通用回退。
+基础身体仍为4/4；后两档的属性由共享来源成长层单独计算一次，不能同时硬改将领身体又叠加属性。`pvpspell=3189` 为独立PVP字段，不加入山河技能。
 
 2464的第三员技能、属性与上述配方相同，但原身体ID为4863，不能冒用2458的4861。`GetTrioGeneralId` 提供单独的三个档位身份和 `character:shanhe-source-soldier-4863`；其前两员为魔军刺客4861、魔军弓骑4862，三员应按原顺序整组安装。
+
+美术依据分别核对2458第0行的 `b=4861` 与2464第2行的 `b=4863`，两条独立源行均明确 `d=1000303`，不是由通用士兵载体推测共图。PVE皮肤1000303指定 `seatpic=generalface_1000303`，已核实[官方原卡](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000303.png)，146×172原字节保存在 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000303.png`。源行、像素哈希及单人／三人组全部精确运行时身份见[美术核验记录](shanhe-demon-troops-art-2026-10-29.json)。内容定义的 `PortraitKey="supporter"`、`VariantId` 与规则不变，桌面按各自精确身份绑定原卡。
+
+两条来源记录的 `g` 均缺省为false，`hide=false`、`startChapter=1`、`Generalshow=0`；暴徒不是主帅。遇敌介绍保留完整卡与技能，三人组也保留三员完整卡。
 
 ## 精确技能
 

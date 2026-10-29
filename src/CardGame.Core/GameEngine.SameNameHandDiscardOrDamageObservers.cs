@@ -130,7 +130,7 @@ public sealed partial class GameEngine
             CardSupplyCompletionStructuralEdge(parent, current) || CompletedUndamagedTargetRevealStructuralEdge(parent, current) ||
             RecipientCategoryMarkStructuralEdge(parent, current) || OffTurnUsedCardGiftStructuralEdge(parent, current) ||
             OriginalHandEntityStructuralEdge(parent, current) || OutsidePhaseDrawDiscardStructuralEdge(parent, current) ||
-            DyingSuitsStructuralEdge(parent, current) || HalfHandPaidDamageObserverEdge(child) || PaidTargetObserverEdge(child);
+            DyingSuitsStructuralEdge(parent, current) || HalfHandPaidDamageObserverEdge(child) || ProgramChildResolutionEdge(child);
     }
     private ProgramSkillFrame? SameNameHandObserverRoot() => FindProgramObserverRoot(
         static (engine, root, child) => engine.SameNameHandFirstChild(root, child),
@@ -159,21 +159,6 @@ public sealed partial class GameEngine
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1820)]
     private bool HasSameNameHandDamageObserver(long windowId) => _resolutionStack.Any(f => f.Id == windowId && f is DamageTriggerWindowFrame) &&
         (SameNameHandObserverRoot() is not null || ResponseCompletionObserverRoot() is not null || CardSupplyCompletionObserverRoot() is not null);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 850)]
-    private bool AllowsSameNameHandNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id) return false;
-        if (observer.SameNameHandDiscardOrDamage is { Stage: SameNameHandStage.DamageIssued, DamageIssued: true, TargetSeat: { } issuedTarget } &&
-            ValidSameNameHandReceipt(observer)) return target == issuedTarget && amount == 1 && source is null && nature is null;
-        if (observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or
-                SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or
-                SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) ||
-            SameNameHandObserverRoot() is null && ResponseCompletionObserverRoot() is null && CardSupplyCompletionObserverRoot() is null) return false;
-        var e = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!).GetPausedInstruction(observer.InstructionIndex).Effect;
-        return e.Op == SkillProgramEffectOp.Damage && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature &&
-            target == (e.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 10)]
     private bool TryAdvanceSameNameHandSubtree()
     {

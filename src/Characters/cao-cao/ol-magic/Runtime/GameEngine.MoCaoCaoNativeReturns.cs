@@ -62,18 +62,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant,33800)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime,33800)]
     private bool MoCaoCaoDying() => ActiveDying is { } d && MoCaoCaoNativeRoot() is { } f && _resolutionStack.FindIndex(x=>x.Id==d.Id)>_resolutionStack.FindIndex(x=>x.Id==f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts,33800)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts,33800)]
-    private bool MoCaoCaoNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id!=f.Id || sourceLess) return false;
-        if (MoCaoCaoBachao.Valid(f) && f.MoCaoCaoBachao is { Stage:MoCaoCaoBachaoStage.Damage,TargetSeat:{ } selected })
-            return target==selected && amount==1 && source is null && nature is null;
-        if (MoCaoCaoNativeRoot() is not { } root || root.Id==f.Id) return false;
-        var e=GetPausedPrivateOfferEffect(f);
-        return e is {Op:SkillProgramEffectOp.Damage} && amount==e.Amount && source==e.ActorReference && nature==e.DamageNature &&
-            target==(e.TargetReference is { } p ? ResolveProgramParticipant(f,p) : ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor,33800)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor,33800)]
     private bool MoCaoCaoRecoveryParent(ProgramSkillFrame f,RecoveryReplacementFrame recovery)

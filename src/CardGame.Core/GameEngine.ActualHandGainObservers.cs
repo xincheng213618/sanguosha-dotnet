@@ -96,18 +96,6 @@ public sealed partial class GameEngine
     private ProgramSkillFrame? ActualHandGainObserverRoot() => FindProgramObserverRoot(
         static (engine, root, child) => engine.ActualHandGainFirstChild(root, child),
         static (engine, index) => engine.HasHandGainDebtObserverSuffix(index));
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 880)]
-    private bool AllowsActualHandGainNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id ||
-            ActiveDying is not null || observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or
-                SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.SkillsChanged) ||
-            ActualHandGainObserverRoot() is not { } root || root.Id == observer.Id) return false;
-        var e = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!).GetPausedInstruction(observer.InstructionIndex).Effect;
-        return e.Op == SkillProgramEffectOp.Damage && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature &&
-            target == (e.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, e.Target));
-    }
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 60, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 190)]
     private bool IsActualHandGainProgramDying() => ActiveDying is { } dying && ActualHandGainObserverRoot() is { } root &&

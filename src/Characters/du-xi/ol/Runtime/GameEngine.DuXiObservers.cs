@@ -63,14 +63,6 @@ public sealed partial class GameEngine
         _resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStack.FindIndex(f => f.Id == id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 370)]
     private bool IsDuXiDying() => ActiveDying is { } dying && DuXiObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1010)]
-    private bool AllowsDuXiNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || DuXiObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26300)]
     private bool AdvanceDuXiSubtree() => _pendingDecision is null && DuXiObserverRoot() is not null && TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

@@ -4,7 +4,9 @@
 
 `Fight.fightID=2476,Ggroup=2476,text=247600` 只有一名完整成员：`General.a=2476,b=4871,c=林中鹘,d=1000301,f=0,h=100`。基础为 `k=4,l=4,p=2,q=4`，即4/4、摸牌2、初始牌4；`m=0,n=0,o=5,r=0,otherad=0`。该成员没有固定牌、装备、`att_*`、阶段转换或额外隐藏成员字段。保留 `r=0` 的普通属性含义，不把它解释成隐藏标志，也不把 `pvpspell=3189` 追加为固有技能。
 
-原身体4871是“将领”。本包使用独立 `character:shanhe-source-general-4871` 和印刷4/4，不借祝融或李严的身体。原外观串1000301没有已核本地素材，明确采用 supporter fallback。
+原身体4871是“将领”。本包使用独立 `character:shanhe-source-general-4871` 和印刷4/4，不借祝融或李严的身体。此行明确 `d=1000301`，PVE皮肤1000301的 `seatpic=generalface_1000301` 已核实为[官方原卡](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000301.png)，146×172、51,886字节，SHA-256为 `8c4a64da009c40a14bc1d7d11321626c27874323be4dacf03533c13e65c4db79`。原PNG保存在 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000301.png`，美术记录汇入[山河NPC素材清单](../shanhe-npc-art-sources.json)。两个难度身份均按精确运行时ID绑定原卡；内容定义的 `PortraitKey="supporter"`、`VariantId`、身体及技能不变。
+
+本行 `g` 缺省为false，`hide=false`、`startChapter=1`、`Generalshow=0`。林中鹘不是主帅，介绍保留完整卡与全部技能，不因载体4871名为“将领”而改为主帅标记。
 
 | 来源难度 | GeneralId | 原始技能 |
 | --- | --- | --- |

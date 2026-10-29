@@ -2,7 +2,7 @@ using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
 
-internal static class ShanheSourceOrdinaryTroopChecks
+internal static partial class ShanheSourceOrdinaryTroopChecks
 {
     private static readonly int[] Groups = [2474, 2467, 2487, 2473, 2480, 2497, 2455, 2459, 2460, 2476, 2489, 2493, 2495, 2457, 2498, 2451, 2500, 2454, 2456, 2458, 2461, 2452, 2468, 2494, 2453, 2469, 2481, 2466, 2484, 2486, 2462, 2470, 2479, 2478, 2488];
     private static bool FirstChapter(int group) => group is 2473 or 2455 or 2459 or 2460 or 2457 or 2498 or 2454 or 2456 or 2458 or 2461 or 2452 or 2453 or 2466 or 2484 or 2486 or 2470 or 2479;
@@ -153,6 +153,105 @@ internal static class ShanheSourceOrdinaryTroopChecks
             }
             PreviewAndMovePatrolFromFreshCamp(definition, camp, patrol);
         }
+    }
+
+    public static void NewSourcePreferencePreservesPreviewReplayAndHistoricalMixedPools()
+    {
+        var source = StandardShanheCampaignCatalog.CreateSourceCodexDefinition(1);
+        // Expose the four genuine initial cities together, retaining every original
+        // candidate, city identity and seed. No wins or replacement rosters are supplied.
+        var entry = source with { RandomStartingNode = false };
+        var historicalOptions = new ShanheCampaignOptions(270017, "classic:guan-yu") { SourceDifficultyId = 1 };
+        var preferred = ShanheCampaignSession.Create(entry,
+            historicalOptions with { PreferSourceOrdinaryEncounters = true }, StandardShanheCampaignCatalog.CreateBattleRegistry);
+        var before = ShanheCampaignJson.Serialize(preferred.CreateCheckpoint());
+        Need(preferred.Snapshot.AvailableNodes.Count == 4 && preferred.Snapshot.AvailableNodes.All(node =>
+                node.Kind == ShanheNodeKind.Battle && node.ChapterRole == ShanheChapterNodeRole.OpeningBattle),
+            "The preference check reads every real opening city of both supported first-chapter regions.");
+        foreach (var node in preferred.Snapshot.AvailableNodes)
+        {
+            var raw = node.Encounters!;
+            var city = raw.Select(encounter => encounter.SourceCityId).Distinct().Single();
+            var preview = preferred.PreviewEncounter(node.Id);
+            var repeated = preferred.PreviewEncounter(node.Id);
+            Need(raw.Count(encounter => encounter.SourceBattleId is null) == 4 &&
+                    preview.SourceBattleId is not null && preview.SourceCityId == city &&
+                    raw.Any(encounter => encounter.Id == preview.Id && encounter.SourceBattleId == preview.SourceBattleId &&
+                        encounter.SourceCityId == city) && preview.Id == repeated.Id && SameMembers(preview.Enemies, repeated.Enemies) &&
+                    ShanheCampaignJson.Serialize(preferred.CreateCheckpoint()) == before && preferred.PendingBattleSetup is null,
+                "Each original opening city prefers one of its own already-supported source candidates; repeated preview retains the four fallback recipes and writes no command.");
+        }
+
+        const string cityId = "source-city-5021";
+        var selected = preferred.PreviewEncounter(cityId);
+        Need(selected.Id == "source-city-5021:troop-2453" && selected.SourceBattleId == 2453 && selected.SourceCityId == 5021,
+            "The retained 270017 seed chooses the original-order source subset without changing the seed derivation or borrowing another city's roster.");
+        Need(preferred.Submit(new MoveShanheNodeCommand(cityId, preferred.Revision)).Accepted &&
+                SameMembers(preferred.PendingBattleSetup!.EnemyRoster, selected.Enemies) &&
+                preferred.PendingBattleSetup is { NodeId: cityId, SourceDifficultyId: 1, EncounterOrdinal: 1 },
+            "Move enters the exact already-previewed original roster and the same first encounter ordinal.");
+        var preferredJson = ShanheCampaignJson.Serialize(preferred.CreateCheckpoint());
+        var preferredCheckpoint = ShanheCampaignJson.Deserialize(preferredJson);
+        var cold = ShanheCampaignSession.Restore(preferredCheckpoint, entry, StandardShanheCampaignCatalog.CreateBattleRegistry);
+        Need(preferredJson.Contains("\"PreferSourceOrdinaryEncounters\":true", StringComparison.Ordinal) &&
+                preferredCheckpoint.Options.PreferSourceOrdinaryEncounters &&
+                ShanheBattleSetup.ValueEquals(cold.PendingBattleSetup, preferred.PendingBattleSetup) &&
+                ShanheCampaignJson.Serialize(cold.CreateCheckpoint()) == preferredJson,
+            "The additive true preference survives JSON and accepted-command replay with the identical frozen pending battle.");
+
+        var historical = ShanheCampaignSession.Create(entry, historicalOptions, StandardShanheCampaignCatalog.CreateBattleRegistry);
+        var explicitFalse = ShanheCampaignSession.Create(entry,
+            historicalOptions with { PreferSourceOrdinaryEncounters = false }, StandardShanheCampaignCatalog.CreateBattleRegistry);
+        var oldPreview = historical.PreviewEncounter(cityId);
+        Need(oldPreview.Id == "source-local:5021:0" && oldPreview.SourceBattleId is null && oldPreview.SourceCityId == 5021 &&
+                explicitFalse.PreviewEncounter(cityId).Id == oldPreview.Id && preferred.ContentHash == historical.ContentHash,
+            "The known 270017 Guangcheng opening keeps its exact historical local-footman choice for missing/false options, with the original definition hash.");
+        Need(historical.Submit(new MoveShanheNodeCommand(cityId, historical.Revision)).Accepted,
+            "The historical local-footman recipe remains enterable through the original move command.");
+        var oldJson = ShanheCampaignJson.Serialize(historical.CreateCheckpoint());
+        Need(!oldJson.Contains("PreferSourceOrdinaryEncounters", StringComparison.Ordinal) &&
+                !ShanheCampaignJson.Deserialize(oldJson).Options.PreferSourceOrdinaryEncounters,
+            "False is omitted entirely so older missing-field campaign JSON retains its original shape and selection policy.");
+        var falseJson = oldJson.Replace("\"Options\":{", "\"Options\":{\"PreferSourceOrdinaryEncounters\":false,", StringComparison.Ordinal);
+        Need(falseJson != oldJson && falseJson.Contains("\"PreferSourceOrdinaryEncounters\":false", StringComparison.Ordinal),
+            "The explicit-false compatibility case actually inserts the optional field instead of silently reusing the missing-field JSON.");
+        foreach (var json in new[] { oldJson, falseJson })
+        {
+            var restored = ShanheCampaignSession.Restore(ShanheCampaignJson.Deserialize(json), entry,
+                StandardShanheCampaignCatalog.CreateBattleRegistry);
+            Need(!restored.CreateCheckpoint().Options.PreferSourceOrdinaryEncounters &&
+                    ShanheBattleSetup.ValueEquals(restored.PendingBattleSetup, historical.PendingBattleSetup) &&
+                    ShanheCampaignJson.Serialize(restored.CreateCheckpoint()) == oldJson,
+                "Both genuinely missing and explicit-false fields replay the same original local pending battle without migrating stored data.");
+        }
+
+        var fallbackEntry = entry with { Nodes = entry.Nodes.Select(node => node.Id != cityId ? node : node with
+            { Encounters = node.Encounters!.Where(encounter => encounter.SourceBattleId is null).ToArray() }).ToArray() };
+        var fallback = ShanheCampaignSession.Create(fallbackEntry,
+            historicalOptions with { PreferSourceOrdinaryEncounters = true }, StandardShanheCampaignCatalog.CreateBattleRegistry);
+        var fallbackBaseline = ShanheCampaignSession.Create(fallbackEntry, historicalOptions,
+            StandardShanheCampaignCatalog.CreateBattleRegistry);
+        var fallbackPreview = fallback.PreviewEncounter(cityId);
+        var baselinePreview = fallbackBaseline.PreviewEncounter(cityId);
+        Need(fallbackPreview.SourceBattleId is null && fallbackPreview.SourceCityId == 5021 &&
+                fallbackPreview.Id == baselinePreview.Id && SameMembers(fallbackPreview.Enemies, baselinePreview.Enemies) &&
+                fallback.Submit(new MoveShanheNodeCommand(cityId, fallback.Revision)).Accepted &&
+                fallbackBaseline.Submit(new MoveShanheNodeCommand(cityId, fallbackBaseline.Revision)).Accepted &&
+                SameMembers(fallback.PendingBattleSetup!.EnemyRoster, fallbackPreview.Enemies) &&
+                ShanheBattleSetup.ValueEquals(fallback.PendingBattleSetup, fallbackBaseline.PendingBattleSetup),
+            "With no original candidates, the preference uses the same genuine local-only pool as its false baseline and preserves the actual preview and move setup.");
+
+        var local = StandardShanheCampaignCatalog.CreateCodexDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
+        var localOptions = new ShanheCampaignOptions(270017, "classic:guan-yu");
+        var localDefault = ShanheCampaignSession.Create(local, localOptions, StandardShanheCampaignCatalog.CreateBattleRegistry);
+        var localPreferred = ShanheCampaignSession.Create(local,
+            localOptions with { PreferSourceOrdinaryEncounters = true }, StandardShanheCampaignCatalog.CreateBattleRegistry);
+        var localNode = localDefault.Snapshot.AvailableNodes.First(node => node.Kind == ShanheNodeKind.Battle).Id;
+        var localPreview = localDefault.PreviewEncounter(localNode);
+        var ignoredPreference = localPreferred.PreviewEncounter(localNode);
+        Need(local.SourceDifficultyId is null && localPreview.Id == ignoredPreference.Id &&
+                SameMembers(localPreview.Enemies, ignoredPreference.Enemies),
+            "The source-only preference stays inert in an actual retained non-source campaign.");
     }
 
     public static void SourceAndLocalPreviewMoveAndStartUseOneProjectionAndRealOpeningEntities()
@@ -671,10 +770,18 @@ internal static class ShanheSourceOrdinaryTroopChecks
         var enteredCamp = session.Submit(new MoveShanheNodeCommand(camp.Id, session.Revision));
         Need(enteredCamp.Accepted && session.PendingBattleSetup is null && session.Snapshot.EncounterOrdinal == 0,
             enteredCamp.Error ?? "The actual final camp remains a non-battle entry.");
+        // The published local graph also contains a daily-travel pursuit edge.
+        // This fresh probe owns neither travel tactic, so that authored edge
+        // stays locked while every ordinary final route remains available.
+        var expectedRoutes = camp.NextNodeIds.Where(id =>
+            definition.Nodes.Single(node => node.Id == id).ExtraChapterBattleIndex == 0).ToArray();
         var rested = session.Submit(new ChooseShanheNodeOptionCommand("rest", null, session.Revision));
         Need(rested.Accepted && session.Snapshot.Phase == ShanheCampaignPhase.Map &&
-            session.Snapshot.AvailableNodes.Select(n => n.Id).SequenceEqual(camp.NextNodeIds),
-            rested.Error ?? "A real camp choice retains every old route and the optional ordinary patrol.");
+            session.ChapterExtraBattleCount == 0 &&
+            session.Snapshot.AvailableNodes.Select(n => n.Id).SequenceEqual(expectedRoutes) &&
+            session.Snapshot.AvailableNodes.Any(node => node.Id == patrol.Id) &&
+            session.Snapshot.AvailableNodes.All(node => node.ExtraChapterBattleIndex == 0),
+            rested.Error ?? "A real camp choice retains every ordinary final route and optional patrol while unequipped daily-travel pursuits remain locked.");
         var revision = session.Revision;
         var first = session.PreviewEncounter(patrol.Id);
         var again = session.PreviewEncounter(patrol.Id);

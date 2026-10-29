@@ -115,7 +115,7 @@ public sealed partial class GameEngine
             return PaidObserverAttackHpLossDyingMatches(attack, replaced);
         if (parent is DyingFrame { Continuation: DyingContinuationKind.Damage or DyingContinuationKind.AttackHpLoss } dying && child is ProgramSkillFrame response)
             return PaidObserverDamageDyingProgramMatches(response, dying);
-        return EquipmentDonationDamageObserverEdge(index);
+        return ProgramChildResolutionEdge(index);
     }
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1740)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 110)]

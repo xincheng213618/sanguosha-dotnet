@@ -138,7 +138,7 @@ public sealed partial class GameEngine
                 if (_resolutionStack[j] is ProgramLifecycleTriggerWindowFrame changed && _resolutionStack[j - 1] is ProgramSkillFrame owner &&
                     changed.Window == SkillProgramTriggerWindow.SkillsChanged && changed.ResumeProgramFrameId == owner.Id &&
                     changed.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && changed.CandidateIndex >= 0 && changed.CandidateIndex <= changed.Candidates.Count) continue;
-                if (!(HalfHandPaidDamageObserverEdge(j) || PaidTargetObserverEdge(j) ||
+                if (!(HalfHandPaidDamageObserverEdge(j) || ProgramChildResolutionEdge(j) ||
                     DyingSuitsStructuralEdge(_resolutionStack[j - 1], _resolutionStack[j]))) { exact = false; break; }
                 if (_resolutionStack[j] is DyingFrame dying && j + 1 < _resolutionStack.Count &&
                     (IsPaidHandRepaymentProgramAlcoholRide(j, dying) || IsPaidHandRepaymentRescueRide(j, dying) ||
@@ -148,20 +148,6 @@ public sealed partial class GameEngine
             if (exact) return root;
         }
         return null;
-    }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 300)]
-    private bool AllowsGainGiftNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 ||
-            _resolutionStack.LastOrDefault()?.Id != observer.Id || ActiveDying is not null ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or
-                SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.SkillsChanged) ||
-            GainGiftObserverRoot() is not { } root || root.Id == observer.Id) return false;
-        var e = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!)
-            .GetPausedInstruction(observer.InstructionIndex).Effect;
-        return e.Op == SkillProgramEffectOp.Damage && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature &&
-            target == (e.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, e.Target));
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 90, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 200)]

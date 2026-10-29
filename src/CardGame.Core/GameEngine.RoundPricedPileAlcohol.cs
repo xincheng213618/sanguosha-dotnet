@@ -211,7 +211,7 @@ public sealed partial class GameEngine
             // Keep this scoped to the already-proved round invoice and real owning Wine.
             if (parent is DyingFrame nested && (child is CardUseFrame && IsPaidHandRepaymentRescueRide(index - 1, nested) ||
                 child is ProgramSkillFrame && (IsPaidHandRepaymentProgramAlcoholRide(index - 1, nested) || PolicyCounterspellVirtualAlcoholRide(index - 1, nested)))) return true;
-            if (!ParticipantHandRescueObserverRide(child, parent, use) && !PreventionDrawObserverEdge(index)) return false;
+            if (!ParticipantHandRescueObserverRide(child, parent, use) && !ProgramChildResolutionEdge(index)) return false;
         }
         return true;
     }

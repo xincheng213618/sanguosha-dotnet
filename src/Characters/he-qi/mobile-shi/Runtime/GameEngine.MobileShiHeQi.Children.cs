@@ -35,15 +35,6 @@ public sealed partial class GameEngine
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49000)]
     private bool ShiHqBeforeDamageChild(long id) => ShiHqObserverRoot() is { } f &&
         _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 49000)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 49000)]
-    private bool ShiHqNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess || ShiHqObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 49000)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 49000)]
     private bool ShiHqRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

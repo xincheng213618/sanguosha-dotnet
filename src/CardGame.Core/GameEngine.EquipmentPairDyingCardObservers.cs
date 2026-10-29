@@ -4,7 +4,7 @@ public sealed partial class GameEngine
 {
     private bool EquipmentPairDyingCardChildEdge(int index)
     {
-        if (PreventionDrawObserverEdge(index)) return true;
+        if (ProgramChildResolutionEdge(index)) return true;
         var child = _resolutionStack[index]; var parent = _resolutionStack[index - 1];
         return child is ProgramSkillFrame response && parent is DyingFrame dying && PolicyCounterspellDyingProgramRidesOn(response, dying) ||
             PolicyCounterspellDyingFaceEdge(index);

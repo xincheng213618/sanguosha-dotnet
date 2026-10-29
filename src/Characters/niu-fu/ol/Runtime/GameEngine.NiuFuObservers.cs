@@ -103,13 +103,6 @@ public sealed partial class GameEngine
     private bool HasNiuFuBeforeDamageObserver(long id) => NiuFuObserverRoot() is { } root && _resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStack.FindIndex(f => f.Id == id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 570)]
     private bool IsNiuFuDying() => ActiveDying is { } dying && NiuFuObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1210)]
-    private bool AllowsNiuFuNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || NiuFuObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature && target ==
-            (e.TargetReference is { } reference ? ResolveProgramParticipant(f, reference) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27050)]
     private bool AdvanceNiuFuSubtree() => _pendingDecision is null && NiuFuObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

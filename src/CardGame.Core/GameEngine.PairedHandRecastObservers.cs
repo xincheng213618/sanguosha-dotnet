@@ -151,20 +151,6 @@ public sealed partial class GameEngine
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1880)]
     private bool HasPairedHandRecastDamageObserver(long windowId) => _resolutionStack.Any(f =>
         f.Id == windowId && f is DamageTriggerWindowFrame) && PairedHandRecastObserverRoot() is not null;
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 790)]
-    private bool AllowsPairedHandRecastNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or
-                SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or
-                SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) ||
-            PairedHandRecastObserverRoot() is not { } root || root.Id == observer.Id) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!)
-            .GetPausedInstruction(observer.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 60)]
     private bool TryAdvancePairedHandRecastSubtree()
     {

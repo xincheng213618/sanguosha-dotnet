@@ -195,24 +195,6 @@ public sealed partial class GameEngine
         return true;
     }
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 53400)]
-    private bool AllowsBoundarySidiCancellationDamage(ProgramSkillFrame frame, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (frame.SkillId != BoundarySidiSkill || frame.TriggerId != "consume-first-use" || frame.AttackAttempt is not null ||
-            _resolutionStack.LastOrDefault()?.Id != frame.Id || sourceLess || source is not null || nature is not null || amount != 1 ||
-            ActiveDying is not null || _players.Any(player => player.IsAlive && player.HasHpValue && player.Hp <= 0) ||
-            !TryBoundarySidiWindow(frame.WindowContext, out var window) || GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCommitted ||
-            window.Action.Type != CardActionType.Use || window.Action.ActorSeat != target ||
-            LifecycleCardUse(window.ParentFrameId) is not { BoundarySidiCancellation: { } proof } use ||
-            proof.ProgramFrameId != frame.Id || proof.OwnerSeat != frame.OwnerSeat || proof.SkillInstanceId != frame.SkillInstanceId ||
-            CurrentDamageAttempt?.ResolutionId != use.Id || !IsBoundarySidiUseIneffective(use)) return false;
-        var effect = GetPausedPrivateOfferEffect(frame);
-        return effect is { Op: SkillProgramEffectOp.Damage, Amount: 1, ActorReference: null, DamageNature: null,
-                TargetReference.Kind: ProgramParticipantRef.Actor, Condition.Kind: SkillProgramConditionKind.ChoiceIs } &&
-            frame.ChoiceBindings.SingleOrDefault(binding => binding.Name == effect.Condition.SourceBind) is { OptionId: "cancel-damage" } result &&
-            effect.Condition.OptionId == result.OptionId && IsBoundarySidiChoiceResult(frame, result);
-    }
 
     private bool TryBoundarySidiEquipmentCommitted(long id, Card equipment)
     {

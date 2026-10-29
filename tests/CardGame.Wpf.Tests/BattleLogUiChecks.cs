@@ -166,6 +166,7 @@ internal static class BattleLogUiChecks
                 model.FilteredBattleLog.Where(entry => entry.ActorSeat == human.Seat || entry.TargetSeat == human.Seat)
                     .All(entry => !entry.Message.StartsWith("你", StringComparison.Ordinal) && !entry.Message.Contains("号位", StringComparison.Ordinal)),
                 "Loading a match must start at 全部 and rebuild named history from its existing public log.");
+            VerifyShanheHistoricalNames();
             Program.AssertNoBindingErrors();
 
             void Click(string id)
@@ -183,5 +184,139 @@ internal static class BattleLogUiChecks
         string Display(SeatViewModel seat) => seat.GeneralName + (seat.IsHuman ? "（你）" : "");
         void Add(string type, string message, int? actor = null, int? targetSeat = null) =>
             addLog.Invoke(model, [new GameLogEntry(next++, 1, type, message, actor, targetSeat)]);
+
+        void VerifyShanheHistoricalNames()
+        {
+            var engine = Program.Engine(model);
+            var before = engine.CreateSnapshot(model.HumanPlayer!.Seat);
+            var actor = before.Players.Single(player => player.IsHuman);
+            var boss = before.Players.First(player => !player.IsHuman && player.GeneralName != actor.GeneralName);
+            var second = engine.ContentRegistry.Generals.Values.First(general =>
+                before.Players.All(player => player.GeneralId != general.Id && player.GeneralName != general.Name) &&
+                !general.Name.Contains(boss.GeneralName, StringComparison.Ordinal) && !boss.GeneralName.Contains(general.Name, StringComparison.Ordinal));
+            var rawLog = engine.Log.ToArray();
+            var rawEvents = engine.Events.ToArray();
+            var checkpoint = GameCheckpointJson.Serialize(engine.CreateCheckpoint());
+            var historyField = typeof(MainViewModel).GetField("_battleLogShanheStageHistory", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            var originalHistory = historyField.GetValue(model);
+            var build = typeof(MainViewModel).GetMethod("BuildShanheBattleLogStageHistory", BindingFlags.Static | BindingFlags.NonPublic)!;
+            var project = typeof(MainViewModel).GetMethod("ProjectBattleLogEntry", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            var refresh = typeof(MainViewModel).GetMethod("Refresh", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            var damage = new DamageAppliedEvent(actor.Seat, boss.Seat, 1, 0);
+            var entered = new ShanheBossStageStartedEvent(boss.Seat, boss.GeneralId, second.Id, 1, 4, 4);
+            // Deliberately different counters, with the text announcement after
+            // the new body's draw, rule out cross-stream or announcement cuts.
+            GameLogEntry[] logs =
+            [
+                new(10, 1, "CardUsed", $"{actor.Name} 对 {boss.Name} 使用【杀】。", actor.Seat, boss.Seat),
+                new(20, 1, "Damage", $"{boss.Name} 受到 {actor.Name} 造成的 1 点伤害，剩余 0 点体力。", actor.Seat, boss.Seat),
+                new(30, 1, "CardsDrawn", $"{boss.Name} 摸了 4 张牌。", boss.Seat),
+                new(40, 1, "ShanheBossTransformed", $"首领进入第二阶段【{second.Name}】。", boss.Seat)
+            ];
+            EventEnvelope[] facts = [Envelope(10000, 7, damage), Envelope(10002, 7, entered)];
+            var history = Build(logs, facts);
+            var boundary = ((System.Collections.IEnumerable)history).Cast<object>().Single();
+            Program.Assert((int)boundary.GetType().GetProperty("LastPreviousFormLogSequence")!.GetValue(boundary)! == 20,
+                "A public stage identity pair correlates its native lethal damage occurrence to the independent log counter, before the new-body draw and late announcement.");
+            Program.Assert(Count(Build(logs, [facts[0], facts[1] with { Revision = 8 }])) == 0 &&
+                Count(Build(logs, [facts[0], Envelope(10001, 7, new ProgramSkillHpLostEvent(1, "test", boss.Seat, 1, 0)), facts[1]])) == 0 &&
+                Count(Build(logs, [facts[0], Envelope(10001, 7, damage), facts[1]])) == 0 &&
+                Count(Build(logs.Select(log => log.Type == "Damage" ? log with { Message = log.Message.Replace("1 点伤害", "2 点伤害", StringComparison.Ordinal) } : log).ToArray(), facts)) == 0 &&
+                Count(Build(logs.Select(log => log.Type == "Damage" ? log with { ActorSeat = boss.Seat } : log).ToArray(), facts)) == 0,
+                "Historical names fall back for a stale command, non-damage final health cause, missing occurrence, changed public amount or mismatched actor; no stage boundary is guessed.");
+            var sourceLess = damage with { SourceLess = true };
+            var sourceLessLogs = logs.Select(log => log.Type == "Damage" ? log with
+            {
+                ActorSeat = null, Message = $"{boss.Name} 受到 1 点无来源伤害，剩余 0 点体力。"
+            } : log).ToArray();
+            Program.Assert(Count(Build(sourceLessLogs, [Envelope(10000, 7, sourceLess), facts[1]])) == 1 &&
+                Count(Build(sourceLessLogs, facts)) == 0,
+                "Source-less damage correlates only with its own public null-actor result and never borrows an attributed hit.");
+            var withoutDamage = logs.Where(log => log.Type != "Damage").ToArray();
+            Program.Assert(Count(Build(withoutDamage,
+                [Envelope(10000, 7, new ProgramSkillHpLostEvent(1, "test", boss.Seat, 1, 0)), facts[1]])) == 0 &&
+                Count(Build(withoutDamage,
+                [Envelope(10000, 7, new MaximumHpChangedEvent(boss.Seat, -1, 0, "test") { HpBeforeClamp = 1 }), facts[1]])) == 0,
+                "Legacy HP-loss and maximum-HP-loss stage facts without an explicit cut or corresponding pre-transition result log retain the safe projection rather than borrow a damage or late announcement cut.");
+            var marked = entered with { LastPreviousFormLogSequence = 10 };
+            var hpLossHistory = Build(withoutDamage,
+                [Envelope(10000, 7, new ProgramSkillHpLostEvent(1, "test", boss.Seat, 1, 0)), Envelope(10002, 7, marked)]);
+            var maximumLossHistory = Build(withoutDamage.Where(log => log.Type != "CardsDrawn").ToArray(),
+                [Envelope(10000, 7, new MaximumHpChangedEvent(boss.Seat, -1, 0, "test") { HpBeforeClamp = 1 }), Envelope(10002, 7, marked)]);
+            Program.Assert(Count(hpLossHistory) == 1 && Cut(hpLossHistory) == 10 && Count(maximumLossHistory) == 1 && Cut(maximumLossHistory) == 10 &&
+                Count(Build([], [Envelope(10002, 7, marked with { TurnNumber = 0, LastPreviousFormLogSequence = 0 })])) == 1 &&
+                Count(Build(logs, [facts[0], Envelope(10001, 7, damage), Envelope(10002, 7, marked)])) == 1,
+                "An explicit pre-replacement log cut supports HP loss, maximum-HP loss without a new-body draw, startup with no prior logs and unrelated unmatched damage occurrences without guessing an event/log correspondence.");
+            Program.Assert(Count(Build(logs, [facts[0], Envelope(10002, 7, marked with { LastPreviousFormLogSequence = -1 })])) == 0 &&
+                Count(Build(logs, [facts[0], Envelope(10002, 7, marked with { LastPreviousFormLogSequence = 41 })])) == 0 &&
+                Count(Build(logs, [Envelope(10002, 7, marked with { BossSeat = boss.Seat + 100 })])) == 0 &&
+                Count(Build(logs, [Envelope(10002, 7, marked with { GeneralId = boss.GeneralId })])) == 0 &&
+                Count(Build(logs, [Envelope(10002, 7, marked), Envelope(10003, 7, marked)])) == 0,
+                "A present invalid cut, missing seat, unchanged identity or duplicate same-seat transition cannot borrow an otherwise valid legacy damage boundary.");
+            try
+            {
+                var visible = before with { Players = Array.AsReadOnly(before.Players.Select(player => player.Seat == boss.Seat
+                    ? player with { GeneralId = second.Id, GeneralName = second.Name } : player).ToArray()) };
+                refresh.Invoke(model, [visible]); historyField.SetValue(model, history);
+                var attack = Project(logs[0]); var hit = Project(logs[1]); var draw = Project(logs[2]);
+                Program.Assert(attack.Message.Contains(boss.GeneralName, StringComparison.Ordinal) &&
+                    hit.Message.StartsWith(boss.GeneralName + " 受到", StringComparison.Ordinal) &&
+                    hit.ParticipantNames.Contains(boss.GeneralName) && draw.Message.StartsWith(second.Name + " 摸了", StringComparison.Ordinal) &&
+                    draw.ParticipantNames.Contains(second.Name),
+                    "The actual log projector preserves the first body's prior attack target and lethal damage name while naming the new body's draw correctly.");
+                var rebuilt = Build(logs, facts); historyField.SetValue(model, rebuilt);
+                var rebuiltHit = Project(logs[1]);
+                Program.Assert(Count(rebuilt) == 1 && rebuiltHit.Message == hit.Message &&
+                    rebuiltHit.ParticipantNames.SequenceEqual(hit.ParticipantNames),
+                    "Rebuilding history from the same public log and typed events preserves its deterministic historical projection.");
+                foreach (var explicitHistory in new[] { hpLossHistory, maximumLossHistory })
+                {
+                    historyField.SetValue(model, explicitHistory);
+                    Program.Assert(Project(logs[0]).Message.Contains(boss.GeneralName, StringComparison.Ordinal) &&
+                        Project(logs[2]).Message.StartsWith(second.Name + " 摸了", StringComparison.Ordinal),
+                        "The same real name projector consumes explicit HP-loss and maximum-HP-loss boundaries for both historical and post-stage rows.");
+                }
+                var other = visible.Players.First(player => player.Seat != boss.Seat && player.Seat != actor.Seat);
+                refresh.Invoke(model, [visible with { Players = Array.AsReadOnly(visible.Players.Select(player => player.Seat == other.Seat
+                    ? player with { GeneralName = boss.GeneralName } : player).ToArray()) }]);
+                historyField.SetValue(model, history);
+                var duplicate = Project(logs[1]);
+                var qualified = $"{boss.GeneralName}（{model.Seats.Single(seat => seat.Seat == boss.Seat).DisplaySeatNumber}）";
+                Program.Assert(duplicate.Message.StartsWith(qualified + " 受到", StringComparison.Ordinal) && duplicate.ParticipantNames.Contains(qualified),
+                    "Historical names participate in the existing duplicate-name seat qualification and colored participant labels.");
+                refresh.Invoke(model, [visible with { Players = Array.AsReadOnly(visible.Players.Select(player => player.Seat == boss.Seat
+                    ? player with { GeneralName = "后续公开形态" } : player).ToArray()) }]);
+                historyField.SetValue(model, hpLossHistory);
+                Program.Assert(Project(logs[0]).Message.Contains(boss.GeneralName, StringComparison.Ordinal) &&
+                    Project(logs[2]).Message.StartsWith("后续公开形态 摸了", StringComparison.Ordinal),
+                    "Only pre-cut rows use the previous form; later rows retain the current projection instead of forcing a later non-stage identity back to the second form.");
+                foreach (var concealed in new[] { false, true })
+                {
+                    refresh.Invoke(model, [visible with { Players = Array.AsReadOnly(visible.Players.Select(player => player.Seat == boss.Seat
+                        ? player with { GeneralName = "不可见历史将名", IsGeneralPublic = concealed, IdentityConcealed = concealed } : player).ToArray()) }]);
+                    historyField.SetValue(model, hpLossHistory);
+                    var hidden = Project(logs[1]);
+                    Program.Assert(hidden.Message.StartsWith(concealed ? "隐匿武将" : "暗将", StringComparison.Ordinal) &&
+                        !hidden.Message.Contains(boss.GeneralName, StringComparison.Ordinal) && !hidden.Message.Contains(second.Name, StringComparison.Ordinal) &&
+                        !hidden.ParticipantNames.Any(name => name.StartsWith(boss.GeneralName, StringComparison.Ordinal) || name.StartsWith(second.Name, StringComparison.Ordinal)),
+                        "Current player-view concealment overrides both historical and current stage identities in text and participant highlighting.");
+                }
+            }
+            finally { refresh.Invoke(model, [before]); historyField.SetValue(model, originalHistory); }
+            Program.Assert(engine.Log.SequenceEqual(rawLog) && engine.Events.SequenceEqual(rawEvents) &&
+                GameCheckpointJson.Serialize(engine.CreateCheckpoint()) == checkpoint,
+                "Historical name correlation and privacy reprojection leave original logs, typed event history and checkpoint/replay content untouched.");
+
+            object Build(IReadOnlyList<GameLogEntry> entries, IReadOnlyList<EventEnvelope> events) => build.Invoke(null, [entries, events, before.Players])!;
+            static int Count(object value) => ((System.Collections.IEnumerable)value).Cast<object>().Count();
+            static int Cut(object value)
+            {
+                var item = ((System.Collections.IEnumerable)value).Cast<object>().Single();
+                return (int)item.GetType().GetProperty("LastPreviousFormLogSequence")!.GetValue(item)!;
+            }
+            static EventEnvelope Envelope(long sequence, long revision, IGameEvent payload) => new(new(sequence), null, sequence, revision, "ui-history", payload);
+            BattleLogEntryViewModel Project(GameLogEntry entry) => (BattleLogEntryViewModel)project.Invoke(model,
+                [new BattleLogEntryViewModel(entry.Sequence, entry.TurnNumber, entry.Type, "all", "", entry.Message, entry.ActorSeat, entry.TargetSeat)])!;
+        }
     }
 }

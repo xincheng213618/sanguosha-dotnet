@@ -60,18 +60,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1370)]
     private bool IsMouZuifengDying() => ActiveDying is { } dying && MouZuifengObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1960)]
-    private bool AllowsMouZuifengNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess) return false;
-        if (f.MouZuifeng is { Stage: MouZuifengStage.DamageChildren, FireIssued: true, FireReturned: false } r)
-            return IsPaidMouZuifeng(f) && target == r.TargetSeat && amount == 1 && source is null && nature == DamageNature.Fire &&
-                ProgramEventHistory<MouZuifengFireIssuedEvent>().Count(e => e == new MouZuifengFireIssuedEvent(f.Id,f.OwnerSeat,r.TargetSeat,r.ShownId!.Value)) == 1;
-        if (MouZuifengObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } p ? ResolveProgramParticipant(f,p) : ResolveProgramEffectTarget(f,effect.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 620)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 560)]
     private bool IsMouZuifengRecoveryParent(ProgramSkillFrame f,RecoveryReplacementFrame recovery)

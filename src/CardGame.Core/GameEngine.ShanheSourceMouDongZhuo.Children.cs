@@ -41,15 +41,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 62053)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 62053)]
     private bool SourceMouDying() => ActiveDying is { } dying && SourceMouRoot() is { } root && _resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStack.FindIndex(frame => frame.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 62053)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 62053)]
-    private bool SourceMouNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess || SourceMouRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(f, reference) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 62053)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 62053)]
     private bool SourceMouRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

@@ -27,7 +27,7 @@ public sealed class StandardShanheSourceYouyanWarriorPackage : IGameContentPacka
         Add(HardId, "11-25", [ZhaoranSkillId]);
 
         void Add(string id, string tier, IReadOnlyList<string> extra) => builder.AddGeneral(new(id,
-            // Source portrait1000170 has no verified local image: supporter is explicit fallback art.
+            // Desktop binds source skin1000170 by exact runtime ID; supporter remains the runtime fallback.
             "幽燕壮士", "supporter", JuguanSkillId, "qun", 4, extra)
         {
             InitialHp = 4, CharacterId = "character:shanhe-source-soldier-4861",

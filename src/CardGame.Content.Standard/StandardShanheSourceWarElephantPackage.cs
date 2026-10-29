@@ -33,7 +33,7 @@ public sealed class StandardShanheSourceWarElephantPackage : IGameContentPackage
         Add(HellId, "21-25", [XiongshouSkillId, PojunSkillId]);
 
         void Add(string id, string tier, IReadOnlyList<string> extra) => builder.AddGeneral(new(id,
-            // Source portrait1000003 has no verified local image: supporter is explicit fallback art.
+            // Runtime supporter fallback; exact source art is resolved by the desktop ID binding.
             "战象", "supporter", ShouyiSkillId, "qun", 5, extra)
         {
             InitialHp = 5, CharacterId = "character:shanhe-source-soldier-4861",

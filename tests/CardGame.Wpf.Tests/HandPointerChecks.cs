@@ -114,13 +114,13 @@ internal static class HandPointerChecks
         root.UpdateLayout();
         var keyboardTail = (FrameworkElement)items.ItemContainerGenerator.ContainerFromIndex(vm.Hand.Count - 1);
         var keyboardBounds = keyboardTail.TransformToAncestor(presenter).TransformBounds(new Rect(keyboardTail.RenderSize));
-        Program.Assert(viewport.HorizontalOffset > 0 && keyboardBounds.Left >= -.5 &&
+        Program.Assert(viewport.HorizontalOffset == 0 && viewport.ScrollableWidth <= .5 && keyboardBounds.Left >= -.5 &&
                        keyboardBounds.Right <= presenter.ActualWidth + .5,
-            "Keyboard selection stopped revealing an offscreen card in full.");
+            "Keyboard selection must retain the complete tail card inside the compressed single-row hand.");
         vm.ClearSelectionCommand.Execute(null);
         viewport.ScrollToRightEnd();
         root.UpdateLayout();
-        Program.Assert(viewport.HorizontalOffset > 0, "The overlap fixture did not exercise horizontal scrolling.");
+        Program.Assert(viewport.HorizontalOffset == 0, "A compressed hand must not move its physical hit strips when asked to scroll.");
         var tail = (FrameworkElement)items.ItemContainerGenerator.ContainerFromIndex(vm.Hand.Count - 1);
         var screenPoint = tail.TranslatePoint(new Point(50, 80), viewport);
         var scrolledPoint = viewport.TranslatePoint(screenPoint, panel);
@@ -128,7 +128,7 @@ internal static class HandPointerChecks
         root.UpdateLayout();
         Program.Assert(((Button)resolver.Invoke(panel, [scrolledPoint])!).DataContext == vm.Hand.Last() &&
                        press.Invoke(panel, [scrolledPoint]) is true && vm.Hand.Last().IsSelected,
-            "Scrolling changed the physical card resolved beneath the pointer.");
+            "The compressed tail card must retain its physical pointer target without scrolling.");
         try
         {
             VerifySortedPointerAndKeyboard(vm, window, output);
@@ -214,9 +214,9 @@ internal static class HandPointerChecks
         var container = (FrameworkElement)items.ItemContainerGenerator.ContainerFromItem(card);
         var button = Program.Find<Button>(container).Single();
         var sortedBounds = container.TransformToAncestor(presenter).TransformBounds(new Rect(container.RenderSize));
-        Program.Assert(sortedIndex > beforeIndex && sortedBounds.Left >= presenter.ActualWidth &&
+        Program.Assert(sortedIndex > beforeIndex && sortedBounds.Left >= 0 && sortedBounds.Right <= presenter.ActualWidth + .5 &&
                        viewport.HorizontalOffset == 0 && ReferenceEquals(button.CommandParameter, card),
-            "The real hand-sort command must move the same published card beyond the viewport before keyboard activation.");
+            "The real hand-sort command must retain the same published card inside the compressed row before keyboard activation.");
         Console.WriteLine($"Hand sort pointer: card={card.Id}, index {beforeIndex}->{sortedIndex}, " +
                           $"same button={ReferenceEquals(beforeButton, button)}, pointer={HandPanel.GetIsPointerCard(button)}.");
         panel.PreviewMouseMove += LogPointerEvent;
@@ -249,9 +249,9 @@ internal static class HandPointerChecks
         var keyboardBounds = container.TransformToAncestor(presenter).TransformBounds(new Rect(container.RenderSize));
         Console.WriteLine($"Hand sort keyboard: offset={viewport.HorizontalOffset:F1}, " +
                           $"bounds={keyboardBounds.Left:F1}..{keyboardBounds.Right:F1}, viewport={presenter.ActualWidth:F1}.");
-        Program.Assert(viewport.HorizontalOffset > 0 && keyboardBounds.Left >= -.5 &&
+        Program.Assert(viewport.HorizontalOffset == 0 && keyboardBounds.Left >= -.5 &&
                        keyboardBounds.Right <= presenter.ActualWidth + .5,
-            "Sorting retained a pointer marker on an offscreen card and blocked its subsequent keyboard reveal.");
+            "Sorting must clear the stale pointer marker and allow keyboard selection without scrolling the compressed row.");
 
         void Pump()
         {

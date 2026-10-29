@@ -126,6 +126,9 @@ public sealed partial class MainViewModel
         {
             ExpeditionId = Guid.NewGuid().ToString("N"),
             SourceDifficultyId = definition.SourceDifficultyId,
+            PreferSourceOrdinaryEncounters = definition.SourceDifficultyId is not null,
+            UseSourceSceneCityBindings = definition.SourceDifficultyId is not null,
+            UseBalancedJourneyRewards = true,
             UseCodexRewardPool = true,
             UnlockedRewardIds = ShanheCodexTree.ResolveUnlockedRewardIds(
                 _shanheCodexProfile.UnlockedRewardIds.Concat(StandardShanheCampaignCatalog.GetDefaultCodexUnlockedRewardIds(definition)).ToArray(), known),

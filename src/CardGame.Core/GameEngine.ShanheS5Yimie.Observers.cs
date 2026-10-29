@@ -66,17 +66,4 @@ public sealed partial class GameEngine
         return TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     }
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 5795)]
-    private bool AllowShanheS5YimieHealthObserverDamage(ProgramSkillFrame f, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || f.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != f.Id ||
-            f.WindowContext?.Window is not (SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or
-                SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained)) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(f, _contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.Damage || effect.Amount != amount || effect.ActorReference != source || effect.DamageNature != nature ||
-            target != (effect.TargetReference is { } reference ? ResolveProgramParticipant(f, reference) : ResolveProgramEffectTarget(f, effect.Target))) return false;
-        var original = ShanheS5YimieCostObserverRoot()?.ShanheS5YimieCost?.AttackId ?? ShanheS5YimieRecoveryObserverRoot()?.ParentFrameId;
-        return original is not null && original == CurrentDamageAttempt?.ResolutionId;
-    }
 }

@@ -14,6 +14,17 @@
 
 三个程序分别来自 `src/Characters/han-fu/ol/Skills/ol-han-fu.rules.json`、`jiang-gan/ol/Skills/ol-jiang-gan.rules.json`、`du-fu-ren/ol/Skills/ol-du-fu-ren.rules.json`。它们按技能实例、当前帧和阶段资格工作，没有韩馥、蒋干或杜夫人的身体门槛。本包只授这三项，不复制其他武将的身体或附属技能，不重复注册既有程序。
 
-来源身份为 `character:shanhe-source-soldier-4861`，三个技能档使用独立的 `shanhe:source-local-magnate-2460-*` 定义，原始体力均为4/4。`d=1000320` 不能作为已核本地肖像，使用明确的 `supporter` 缺图回退。
+来源身份为 `character:shanhe-source-soldier-4861`，三个技能档使用独立的 `shanhe:source-local-magnate-2460-*` 定义，原始体力均为4/4。运行时保留 `supporter` 回退键；桌面原图以这三个精确ID对应的PVE皮肤1000320为界，内容字段不变。
 
 S5的 `UniversalGroup` 池15和17均引用2460，对应广成、虎牢两个第一章地区的14座普通城市。服务器前提与权重没有公开执行依据，具体候选抽选仍沿本地政策。推荐三章的两个入口也将其放到广成、虎牢及开场克隆，本地1／2／3档选来源1／11／21档，使用既有第一章单将体力、摸牌与奖励曲线，详见[普通敌军投放](shanhe-source-ordinary-troops-2026.md)。
+
+
+## 2026-10-29 原生席位图与预览身份
+
+完整源组逐行保留；`hide` 缺省false、`startChapter=1`、`generalShow` 缺省0。下表按从0开始的源行顺序记录真实 `g`，未列出的 `g` 按0处理；不从首席、同名、通用载体或将领称呼推定主帅。身份只用于预览布局，不改变关卡类型、技能、数值、抽选或内容版本。
+
+| 源行与成员 | g | 原图链 | PNG | 字节 | SHA256 |
+| --- | --- | --- | --- | --- | --- |
+| raw0 本地豪强（4861） | 0 | General.d=1000320 → root.pveskin.seatpic | [官方146×172原图](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000320.png) | 54637 | `a8ccf451fbfbe79f8fc28e350f31e41c52ced6ee248d872c55f32030d2451161` |
+
+所有表内PNG均取得HTTP200、image/png响应并完成目视、尺寸、原字节SHA及RGBA像素核对；直接使用原始响应字节，不裁剪、缩放、重绘或重新编码。多人组的重复成员仍占独立席位；同一PNG的复用必须有各条源行的独立皮肤证据。当前完整来源配方的25个难度值均已只读检查，体力成长和固定装备不改变名单或角色顺序。原图、精确运行时绑定与身份布局证据集中记录在[山河NPC美术来源](../shanhe-npc-art-sources.json)及[敌将布局来源](../shanhe-encounter-layout-sources.json)。

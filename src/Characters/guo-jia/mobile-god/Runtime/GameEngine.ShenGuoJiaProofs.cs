@@ -91,12 +91,4 @@ public sealed partial class GameEngine
     private bool IsShenGuoJiaDying() => ActiveDying is { } dying && ShenGuoJiaObserverRoot() is { } root && _resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 38000)]
     private bool AdvanceShenGuoJiaSubtree() => _pendingDecision is null && ShenGuoJiaObserverRoot() is not null && TryAdvanceObserverSubtree(true);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 38000)]
-    private bool AllowsShenGuoJiaNestedDamage(ProgramSkillFrame frame, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (frame.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != frame.Id || ShenGuoJiaObserverRoot() is null) return false;
-        var effect = GetPausedPrivateOfferEffect(frame);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature && !sourceLess &&
-            target == (effect.TargetReference is { } participant ? ResolveProgramParticipant(frame, participant) : ResolveProgramEffectTarget(frame, effect.Target));
-    }
 }

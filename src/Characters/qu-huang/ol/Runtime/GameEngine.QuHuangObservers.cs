@@ -55,8 +55,5 @@ public sealed partial class GameEngine
     private bool HasQuHuangBeforeDamageObserver(long id)=>HasQuHuangDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 840)]
     private bool IsQuHuangDying()=>ActiveDying is{}d&&QuHuangObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1410)]
-    private bool AllowsQuHuangNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||QuHuangObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27420)]private bool AdvanceQuHuangChildren()=>_pendingDecision is null&&QuHuangObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

@@ -588,6 +588,7 @@ public sealed partial class GameEngine
         bool sourceLess = false,
         int? explicitSourceSeat = null)
     {
+        var insertion = DamageInsertions.Describe(frame);
         var judgmentNested = frame.WindowContext?.Judgment is { } frozenJudgment &&
             ActiveJudgment is { } pendingJudgment &&
             pendingJudgment.Id == frozenJudgment.JudgmentFrameId &&
@@ -595,16 +596,12 @@ public sealed partial class GameEngine
         var damageWindowNested = frame.WindowContext?.Window ==
             SkillProgramTriggerWindow.AfterDamageApplied && ActiveDamageTrigger is { } outerWindow &&
             outerWindow.Id == frame.WindowContext.ParentFrameId;
-        var recoveryNested = TryDescribeRecoveryDamage(frame, targetSeat, amount, sourceReference,
+        _ = TryDescribeRecoveryDamage(frame, targetSeat, amount, sourceReference,
             nature, sourceLess, explicitSourceSeat, out var recoveryOrigin, out var recoveryDamageWindowId);
         NativeDrawThresholdDyingOrigin? drawDyingOrigin = null;
-        var drawDyingNested = frame.AttackAttempt is null && TryDescribeNativeDrawThresholdDyingDamage(frame,
+        _ = frame.AttackAttempt is null && TryDescribeNativeDrawThresholdDyingDamage(frame,
             targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat, out drawDyingOrigin);
-        var ownerDeathNested = IsOwnerDeathProgramDamage(frame);
-        if (CurrentDamageAttempt is not null && !judgmentNested && !damageWindowNested && !recoveryNested && !drawDyingNested && !ownerDeathNested &&
-            !RuntimeHooks.AllowsNestedDamage(ProgramNestedDamageProofPhase.BeforeFactionDebts, frame, targetSeat, amount, sourceReference, nature, sourceLess) &&
-            frame.FactionRecoveryDraft?.SettlingDebts != true && !RuntimeHooks.AllowsNestedDamage(ProgramNestedDamageProofPhase.AfterFactionDebts, frame, targetSeat, amount, sourceReference, nature, sourceLess) ||
-            ActiveDying is not null && !recoveryNested && !drawDyingNested && !ownerDeathNested && !IsMobileJwShenpeiDamage(frame, targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat) ||
+        if (insertion is null && (CurrentDamageAttempt is not null || ActiveDying is not null) ||
             _resolutionStack.LastOrDefault() is not ProgramSkillFrame current || current.Id != frame.Id ||
             amount <= 0 || !IsValidPlayerSeat(targetSeat) || !_players[targetSeat].IsAlive)
             throw new InvalidOperationException("A program damage effect requires one active program and living target.");
@@ -617,7 +614,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(current with { AttackAttempt = state,
             AttackReturn = new(parentAttackId, damageWindowNested ? frame.WindowContext!.ParentFrameId : recoveryDamageWindowId,
                 judgmentNested ? frame.WindowContext!.Judgment!.JudgmentFrameId : null)
-                { RecoveryOrigin = recoveryOrigin, NativeDrawDyingOrigin = drawDyingOrigin } });
+                { RecoveryOrigin = recoveryOrigin, NativeDrawDyingOrigin = drawDyingOrigin, Insertion = insertion } });
         IDamageAttempt attack = new ProgramAttackHandle(this, frame.Id);
         if (frame.WindowContext?.Judgment is { } judgment)
         {

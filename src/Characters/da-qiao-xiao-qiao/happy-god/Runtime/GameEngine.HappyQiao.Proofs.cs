@@ -70,20 +70,4 @@ public sealed partial class GameEngine
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 42400)]
     private bool AdvanceHappyQiaoSkillObservers() => _pendingDecision is null && HappyQiaoSkillObserverRoot() is not null && TryAdvanceObserverSubtree(true);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 42400)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 42400)]
-    private bool HappyQiaoNestedProgramDamage(ProgramSkillFrame frame, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || frame.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != frame.Id) return false;
-        if (frame.HappyQiao is { Operation: SkillProgramEffectOp.ResolveHappyQiaoTongxin, Stage: HappyQiaoStage.DamageChildren, CostBatch: not null } receipt)
-        {
-            RequireHappyQiaoSkill(frame);
-            return source is null && nature is null && target == receipt.Target && amount == 1 &&
-                ProgramEventHistory<HappyQiaoCostPaidEvent>().Count(e => e.FrameId == frame.Id && e.BatchId == receipt.CostBatch && e.CardId == receipt.CardId && e.Sequence == receipt.After) == 1;
-        }
-        if (HappyQiaoSkillObserverRoot() is not { } root || root.Id == frame.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(frame);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(frame, reference) : ResolveProgramEffectTarget(frame, effect.Target));
-    }
 }

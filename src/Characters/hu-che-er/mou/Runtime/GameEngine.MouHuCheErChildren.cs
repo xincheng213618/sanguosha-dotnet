@@ -22,12 +22,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 35800)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35800)] private bool MouHuCheErDying() => ActiveDying is { } d && MouHuCheErRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 35800)] [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 35800)] private bool MouHuCheErDamageWindow(long id) => MouHuCheErRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 35800)] private bool MouHuCheErBeforeDamage(long id) => MouHuCheErRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 35800)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 35800)]
-    private bool MouHuCheErNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess || MouHuCheErRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f,p) : ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 35800)] [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 35800)] private bool MouHuCheErRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
     {
         var n = _resolutionStack.FindIndex(x => x.Id == f.Id); var c = _resolutionStack.FindIndex(x => x.Id == recovery.Id);

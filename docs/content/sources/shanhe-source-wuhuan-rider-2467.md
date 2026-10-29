@@ -25,7 +25,13 @@
 | 11–20 | 747怀异、722突袭 | `shanhe:source-wuhuan-rider-2467-hard` |
 | 21–25 | 747怀异、722突袭、1600急袭 | `shanhe:source-wuhuan-rider-2467-hell` |
 
-三种身份均使用 `supporter` 作为明确的本地肖像回退；未将 `d=1000107` 或 `h=100` 误认成已经核实的皮肤。它们不会借用公孙渊的角色身体。
+三种身份保留 `supporter` 运行时回退键；桌面可按下列精确来源卡面及运行时ID绑定显示，不改变内容定义，也不借用公孙渊的角色身体。
+
+## 原生卡面
+
+2026-10-29核对了普通组2467的完整单人配方：`rawOrdinal=0 → b=4861 → d=1000107`。`character.sgs` 中4861为“士兵”、类 `ShiBing61`，无 `au/av` 头像重定向；本图来自该组明确的PVE皮肤覆盖，不按通用载体推断。`cha_gs_dbs_fs_skininfo.sgs/root.pveskin` 的1000107行指定 `seatpic=generalface_1000107`、`headpic=1000107`、`diagrampic=100010700`；该解码皮肤表SHA-256为 `00ee5f994401976563e241571d3e5618f573ad2a4b85336ff132afb262f1e8d4`。客户端 `q6t.getSeatSkinUrl → hA.SkinSeatUrl` 经 `N2t.SeatImgUrl=general/seat/static/` 及桌面 `res/runtime/pc/` 生成[官方卡面URL](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000107.png)。
+
+官方响应HTTP200、`image/png`，目视为持弓的骑士；原生146×172、RGBA、56625字节。原字节保存为 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000107.png`，文件SHA-256为 `af35cb4937818140e03d61172ccc3b65b38951e9426be25e4b44eac52285af3a`，解码RGBA像素SHA-256为 `ec97e9b97c6fc499bdedab9e78770f8a093a9b587059ad6d189fc7958094786c`。未裁剪、缩放、换色或重编码。上表三个精确运行时ID共享本行同一皮肤；不泛绑其他4861载体NPC。原行无 `g/hide/generalShow`，按源默认分别为false/false/0，`startChapter=1`、`f=0`，没有主帅身份。
 
 ## 技能身份和复用边界
 

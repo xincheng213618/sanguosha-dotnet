@@ -2,6 +2,13 @@ namespace CardGame.Wpf.ViewModels;
 
 internal static class ShanheDisplayText
 {
+    internal static string RewardName(string name)
+    {
+        foreach (var prefix in new[] { "战法·", "战法 ·", "传习·", "传习 ·" })
+            if (name.StartsWith(prefix, StringComparison.Ordinal)) return name[prefix.Length..].TrimStart();
+        return name;
+    }
+
     internal static string Rule(string description, string rule) =>
         (string.IsNullOrWhiteSpace(rule) ? description : rule).Trim();
 

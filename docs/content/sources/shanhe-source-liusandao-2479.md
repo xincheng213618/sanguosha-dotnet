@@ -8,7 +8,7 @@
 {"a":2479,"startChapter":1,"b":4871,"c":"刘三刀","d":"1000096","f":0,"h":100,"k":5,"l":5,"m":0,"n":0,"o":5,"p":2,"q":4,"r":0,"otherad":0,"v":"208;1612","getspell_ZD":"386;249","getspell_KN":"314","getspell_EM":"507","getspell_LY":"917","pvpspell":"3189"}
 ```
 
-原身体4871是将领，此成员明确为5/5，基础摸牌2、随机初手4。护甲、护甲回复、额外伤害、额外出杀基础值均为0，护甲上限字段为5。没有固定牌、固定装备、`att_*` 属性、隐藏成员或二阶段。`r=0` 不解释为隐藏标志；PVP字段3189不作为山河图固有技能。外观1000096没有已核本地肖像，使用 supporter fallback 和独立 `character:shanhe-source-general-4871`，不借赵云、关羽、吕布或神曹丕的印刷身体。
+原身体4871是将领，此成员明确为5/5，基础摸牌2、随机初手4。护甲、护甲回复、额外伤害、额外出杀基础值均为0，护甲上限字段为5。没有固定牌、固定装备、`att_*` 属性、隐藏成员或二阶段。`r=0` 不解释为隐藏标志；PVP字段3189不作为山河图固有技能。外观1000096已按下述完整来源链核到官方原PNG；运行时保留 `supporter` 回退键和独立 `character:shanhe-source-general-4871`，不借赵云、关羽、吕布或神曹丕的印刷身体。
 
 | 来源难度 | 完整累计技能 | 包内身份 |
 | --- | --- | --- |
@@ -39,3 +39,21 @@
 新行为检查使用新建场景和实际命令，验证敌方击杀与友方击杀的区分、下一真实正常摸牌阶段的虎臣增量、受伤与死亡队友引起的战神觉醒，以及武器弃置孩子返回原帧。觉醒后实际使用两张冰杀，各可指定三名目标，验证神戟次数和目标数。另一场景验证非武圣锦囊及装备转杀的实际材料、次数和伤害，普通杀不误触怒斩。检查止于指定原生流程，不模拟通关或执行存档恢复。
 
 原组实际由第一章普通池15、17引用，对应城市5021–5027、5041–5047，共14座普通城市。此两行没有 `premisegroup`；不据此虚构服务端条件或概率。原始完整配方、技能引用闭包与25档累积关系均独立核对，本地实际投放沿统一地图编排。
+
+## 2026-10-29 原生席位图与预览身份
+
+完整链为 `Fight2479.Ggroup=2479 → General raw0,b=4871,c=刘三刀,d=1000096 → root.pveskin.skinID=1000096`。皮肤行明确指定 `seatpic=generalface_1000096`、`headpic=1000096`、`diagrampic=100009600`。人物表4871是“将领”、类 `ShiBing71`，没有 `au/av` 头像重定向；本行的PVE皮肤覆盖载体默认图，不按同名、共享载体或相似面孔借图。
+
+冻结人物表解码SHA-256为 `92f00132ed944b279066f46655478bde6a2f3b9f1c006d086c197fbbbada49de`，皮肤表解码SHA-256为 `00ee5f994401976563e241571d3e5618f573ad2a4b85336ff132afb262f1e8d4`。当前另行核实的公网Config/client包装SHA已变化，但Character解码字节仍与该冻结值完全一致；旧包装与当前包装证据分别记录于[山河NPC美术来源](../shanhe-npc-art-sources.json)，本批不重抓配置或用当前包装SHA覆盖冻结General/Fight/皮肤资料。
+
+同版客户端 `q6t.getSeatSkinUrl → hA.SkinSeatUrl` 经 `N2t.SeatImgUrl=general/seat/static/` 和桌面 `res/runtime/pc/` 得到[官方原PNG](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000096.png)。已取得HTTP200、`image/png`，并目视核实原生卡面。原图146×172 RGBA、58607字节，原字节导入 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000096.png`；文件SHA-256为 `5a02d809f7f42a8fd6092a76141c0a387a7bc7ee527dd8a43117a0ec06c0a1d6`，RGBA像素SHA-256为 `bae797e84cf60c5d808fe1c60565eb12f81d5a27b9c6de3f5d7eb15c3055c1b8`。未裁剪、缩放、换色或重编码。
+
+此组只有上述一名源成员，`startChapter=1,f=0`；原行没有 `g/hide/generalShow`，按源默认false/false/0，无主帅、隐藏成员或后续章节成员。完整单人预览保留大卡，不从首席推断主帅。下列运行时ID与上轮全25档实际发布配方盘点一致；美术绑定不改变PortraitKey、VariantId、内容指纹、印刷身体、技能、装备或成长。
+
+| 来源难度 | 精确运行时ID |
+| --- | --- |
+| 1–5 | `shanhe:source-liusandao-2479-base` |
+| 6–10 | `shanhe:source-liusandao-2479-medium` |
+| 11–15 | `shanhe:source-liusandao-2479-hard` |
+| 16–20 | `shanhe:source-liusandao-2479-nightmare` |
+| 21–25 | `shanhe:source-liusandao-2479-hell` |

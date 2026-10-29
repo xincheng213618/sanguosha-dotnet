@@ -8,8 +8,12 @@ public sealed record NativeDrawOrdinalEntitlementsCapturedEvent(long InvocationI
     int ActualTurnNumber, int ActualTurnOwnerSeat, long SequenceBefore, int Count) : IGameEvent;
 public sealed record NativeDrawOrdinalSourceCapturedEvent(long InvocationId, int OwnerSeat,
     long SequenceBefore, NativeDrawOrdinalEntitlement Entitlement) : IGameEvent;
+public sealed record NativeDrawProgramOrigin(CardConversionSource Source, string GameplayHash,
+    int InstructionIndex, SkillProgramEffectOp Operation);
 public sealed partial record NativeDrawInvocationProof
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public NativeDrawProgramOrigin? ProgramOrigin { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? ActualTurnDrawOrdinal { get; init; }
     private readonly IReadOnlyList<NativeDrawOrdinalEntitlement>? _ordinalEntitlements;
@@ -46,6 +50,8 @@ public sealed record NativeDrawInvocationRecordedEvent(long InvocationId, int Ow
     ActualDiscardRecoveryPhaseKey? Phase, long? ParentFrameId, CardConversionSource? DirectProducer,
     CardMoveReason Reason, long SequenceBefore, long SequenceAfter, long LastBatchId) : IGameEvent
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public NativeDrawProgramOrigin? ProgramOrigin { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? ActualTurnDrawOrdinal { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

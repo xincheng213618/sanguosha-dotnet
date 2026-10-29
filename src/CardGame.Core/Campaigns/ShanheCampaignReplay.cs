@@ -21,6 +21,18 @@ public sealed record ShanheCampaignOptions(int Seed, string PlayerGeneralId)
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? SourceDifficultyId { get; init; }
 
+    /// <summary>New source ordinary battles prefer supported original encounters; false preserves historical mixed-pool selection.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool PreferSourceOrdinaryEncounters { get; init; }
+
+    /// <summary>New source journeys use the original encounter pool at each chapter scene's displayed city; false preserves saved route pools.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool UseSourceSceneCityBindings { get; init; }
+
+    /// <summary>Uses varied story categories and the current tactic reward and market quality rules.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool UseBalancedJourneyRewards { get; init; }
+
     /// <summary>Opts new expeditions into the verified codex skill and equipment reward pool.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool UseCodexRewardPool { get; init; }
@@ -58,8 +70,10 @@ public sealed record ShanheCampaignOptions(int Seed, string PlayerGeneralId)
 [JsonDerivedType(typeof(CompleteShanheBattleCommand), "complete-battle")]
 [JsonDerivedType(typeof(BeginShanheBattleAttemptCommand), "begin-battle-attempt")]
 [JsonDerivedType(typeof(EndShanheExpeditionCommand), "end-expedition")]
+[JsonDerivedType(typeof(EnableShanheBalancedRewardsCommand), "enable-balanced-rewards")]
 public abstract record ShanheCampaignCommand(long ExpectedRevision);
 
+public sealed record EnableShanheBalancedRewardsCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record EndShanheExpeditionCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 public sealed record BeginShanheBattleAttemptCommand(long ExpectedRevision) : ShanheCampaignCommand(ExpectedRevision);
 

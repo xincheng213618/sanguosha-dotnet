@@ -8,7 +8,9 @@
 {"a":2466,"startChapter":1,"b":4861,"c":"幽燕壮士","d":"1000170","f":0,"h":100,"k":4,"l":4,"m":0,"n":0,"o":5,"p":2,"q":4,"r":0,"otherad":0,"v":"9000","getspell_KN":"7014","pvpspell":"3189"}
 ```
 
-身体为士兵4861，体力4/4、摸牌2、随机起手4，没有固定装备、额外属性、隐藏成员或二阶段。护甲、护甲回复、额外出杀和额外伤害均为0，护甲上限字段5。PVP字段3189不加入山河技能。肖像1000170尚无已核实的本地资源，使用明确的 `supporter` 回退；群势力和男性沿本地士兵约定。
+身体为士兵4861，体力4/4、摸牌2、随机起手4，没有固定装备、额外属性、隐藏成员或二阶段。护甲、护甲回复、额外出杀和额外伤害均为0，护甲上限字段5。PVP字段3189不加入山河技能。运行时保留 `supporter` 回退键；桌面按此族两个精确运行时ID绑定已核对的PVE原卡1000170。群势力和男性沿本地士兵约定，内容身份与规则字段不变。
+
+2026-10-29美术核对：冻结 `General.d=1000170` 对应 `cha_gs_dbs_fs_skininfo.sgs/root.pveskin` 的 `seatpic=generalface_1000170`、`headpic=1000170`。沿已核对的桌面SeatImgUrl链取得[官方独立PNG](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000170.png)，HTTP200、image/png、146×172、52,226字节，SHA256 `555e6c8f41ebed02f7bb08891a1ee46471648a8d39c9ab63fb099da9f711c07f`。原始字节直接保存为 `Assets/Shanhe/Npc/generalface_1000170.png`；已目视为红头带男性壮士，身份依据仍是独立源皮肤链。原组唯一raw0的 `g` 缺省0、`hide` 缺省false、`startChapter=1`、`generalShow` 缺省0，不设首席主帅。此次在线核对的是图片，没有重新下载当前线上配置。
 
 | 来源难度 | 累计技能 |
 | --- | --- |

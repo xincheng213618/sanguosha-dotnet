@@ -2116,6 +2116,14 @@
       "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/zhanfa/reward_zhanfa_2288.png",
       "sha256": "c105025af519456c997a47d4156f49c81db41a17ece3bf548aad18b9ef32b463",
       "sourcePlotId": 2369
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/2253.png",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/zhanfa/reward_zhanfa_2331.png",
+      "sourcePlotId": 2253,
+      "width": 100,
+      "height": 100,
+      "sha256": "db44ec1e86446b6a13d3344cce2c3f4b5dedea0a9621352920a5a7457f9aeed4"
     }
   ]
 }

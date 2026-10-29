@@ -65,16 +65,6 @@ public sealed partial class GameEngine
         return _resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.MouBingcai is not null && ValidMouBingcaiStarted(f) && IsMouBingcaiLegacyDyingParent(f)) ||
             IsMouBingcaiLegacyDyingWindow();
     }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1950)]
-    private bool AllowsMouHuangYueyingNestedDamage(ProgramSkillFrame f, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id ||
-            MouHuangYueyingObserverRoot() is not { } root || root.Id == f.Id || sourceLess) return false;
-        var e = GetPausedPrivateOfferEffect(f);
-        return e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature &&
-            target == (e.TargetReference is { } reference ? ResolveProgramParticipant(f, reference) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28960)]
     private bool AdvanceMouHuangYueyingChildren()
     {

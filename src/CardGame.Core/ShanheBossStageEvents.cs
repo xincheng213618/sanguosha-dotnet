@@ -1,7 +1,11 @@
 namespace CardGame.Core;
 
 public sealed record ShanheBossStageStartedEvent(int BossSeat, string PreviousGeneralId, string GeneralId,
-    int TurnNumber, int MaxHp, int Hp) : IGameEvent;
+    int TurnNumber, int MaxHp, int Hp) : IGameEvent
+{
+    // Presentation boundary only; it does not affect transition rules or event order.
+    public int? LastPreviousFormLogSequence { get; init; }
+}
 public sealed record ShanheBossResolutionCancelledEvent(long FrameId, ResolutionFrameKind Kind, int TurnNumber) : IGameEvent;
 public sealed record ShanheBossTurnInterruptedEvent(int TurnNumber, int PlayerSeat, int BossSeat) : IGameEvent;
 

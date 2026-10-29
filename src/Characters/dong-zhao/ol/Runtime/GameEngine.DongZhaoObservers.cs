@@ -10,17 +10,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 220)]
     private bool IsDongZhaoDying() => ActiveDying is {} dying && DongZhaoObserverRoot() is {} root &&
         _resolutionStack.FindIndex(f=>f.Id==dying.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 700)]
-    private bool AllowsDongZhaoNestedDamage(ProgramSkillFrame observer,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex<1 || _resolutionStack.LastOrDefault()?.Id!=observer.Id ||
-            DongZhaoObserverRoot() is not {} root || root.Id==observer.Id || observer.WindowContext?.Window is not
-            (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.DiscardPileReceived or
-             SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged))return false;
-        var e=GetPausedPrivateOfferEffect(observer);
-        return e is { Op:SkillProgramEffectOp.Damage } && e.Amount==amount && e.ActorReference==source && e.DamageNature==nature &&
-            target==(e.TargetReference is {} reference ? ResolveProgramParticipant(observer,reference):ResolveProgramEffectTarget(observer,e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 430)]
     private bool TryAdvanceDongZhaoSubtree()=>_pendingDecision is null && DongZhaoObserverRoot() is not null && TryAdvanceObserverSubtree(true);
     private bool ValidIssuedZaowang(ProgramSkillFrame f)

@@ -306,15 +306,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 730)]
     private bool IsMouKurouDying() => ActiveDying is { } dying && MouKurouObserverRoot() is { } root &&
         _resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStack.FindIndex(frame => frame.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1940)]
-    private bool AllowsMouKurouNestedDamage(ProgramSkillFrame frame, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (frame.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != frame.Id || MouKurouObserverRoot() is not { } root || root.Id == frame.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(frame);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } participant ? ResolveProgramParticipant(frame, participant) : ResolveProgramEffectTarget(frame, effect.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 600)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 540)]
     private bool IsMouKurouRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame recovery)

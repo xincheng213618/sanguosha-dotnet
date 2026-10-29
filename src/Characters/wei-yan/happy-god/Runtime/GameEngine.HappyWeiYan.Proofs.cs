@@ -50,8 +50,6 @@ public sealed partial class GameEngine
         if (receipt.Paid.Count == 0 || receipt.Stage != HappyWeiYanStage.GujingDiscardChildren && receipt.Paid.Count != 1 || ProgramEventHistory<HappyWeiYanMovementEvent>().Count(e => e == new HappyWeiYanMovementEvent(frame.Id, receipt.Stage, receipt.Before, receipt.After, receipt.Paid.Count)) != 1) return false;
         RequireHappyWeiYan(frame); return true;
     }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 42300)] private bool HappyZiguNestedDamage(ProgramSkillFrame frame, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess) =>
-        frame.HappyWeiYan is { Stage: HappyWeiYanStage.Damage } receipt && frame.TriggerId == "first-equipment" && receipt.Target == target && amount == 1 && source is null && nature is null && !sourceLess && HappyZiguFirstEquipment(frame.OwnerSeat, frame.WindowContext!) is not null;
     private bool HappyWeiYanFirstChild(ProgramSkillFrame frame, ResolutionFrame child)
     {
         if (frame.HappyWeiYan is not { } receipt) return false;

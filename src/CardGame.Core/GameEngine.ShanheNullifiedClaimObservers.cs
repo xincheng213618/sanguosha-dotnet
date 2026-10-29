@@ -54,7 +54,7 @@ public sealed partial class GameEngine
                 parent is BeforeDamageProgramWindowFrame && child is ProgramSkillFrame ||
                 parent is DamageFrame && child is DamageTriggerWindowFrame or DyingFrame ||
                 parent is DamageTriggerWindowFrame && child is ProgramSkillFrame)
-            { if (!EquipmentDonationDamageObserverEdge(index)) return false; continue; }
+            { if (!ProgramChildResolutionEdge(index)) return false; continue; }
 
             if (child is DyingFrame dying && parent is ProgramSkillFrame losing && ShanheClaimProgramHpLossDying(losing, dying)) continue;
             if (parent is DyingFrame dyingParent)

@@ -1,7 +1,9 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using CardGame.Core.Campaigns;
+using CardGame.Wpf.Resources;
 
 namespace CardGame.Wpf.ViewModels;
 
@@ -21,11 +23,22 @@ public sealed partial class MainViewModel
         ShanheBossRewardGroups.Count > 2 ? ShanheBossRewardGroups.Count + 1 : 2, GridUnitType.Star);
     public string ShanheBossRewardTitle => IsShanheBonusRewardOnly ? "追 加 奖 励" :
         (_shanheSession?.Snapshot.BossRewardSummary?.Title ?? "章节首领") + " · 奖 励";
-    public string ShanheBossRewardNotice => IsShanheBonusRewardOnly
-        ? "领取追加奖励，继续行军。"
-        : "各组选一项，确认后继续。";
+    public string ShanheBossRewardNotice
+    {
+        get
+        {
+            if (_shanheSession?.Snapshot.BossRewardSummary is not { } summary) return string.Empty;
+            var next = summary.IsBonusOnly ? "继续行军" : summary.ChapterNumber >= 3 ? "完成征程" : "进入下一章";
+            var remaining = summary.Groups.Count(group => !group.IsResolved);
+            return remaining > 0
+                ? $"还有{remaining}组{(summary.IsBonusOnly ? "追加" : "")}奖励待处理，完成后{next}"
+                : $"本次奖励已处理，确认后{next}";
+        }
+    }
     public string ShanheBossFixedGoldText => $"铜币 +{_shanheSession?.Snapshot.BossRewardSummary?.FixedGold ?? 0}";
     public string ShanheBossSkillSlotsText => $"技能槽 +{_shanheSession?.Snapshot.BossRewardSummary?.SkillSlots ?? 0}";
+    public ImageSource? ShanheBossGoldArtwork => AssetImages.Load("Assets/Shanhe/Encounter/14021801.png");
+    public ImageSource? ShanheBossSkillSlotsArtwork => AssetImages.Load("Assets/Shanhe/2293.png");
     public string ShanheBossRewardContinueText => IsShanheBonusRewardOnly ? "继 续 行 军" :
         _shanheSession?.Snapshot.BossRewardSummary?.ChapterNumber is >= 3
         ? "完 成 征 程" : "进 入 下 一 章";
@@ -71,13 +84,25 @@ public sealed partial class MainViewModel
         {
             if (ActiveShanheBossRewardGroup is null) _shanheBossRewardGroupId = null;
             foreach (var group in summary.Groups)
+            {
+                IReadOnlyList<ShanheRewardDefinition> visualRewards = group.SelectedReward is { } chosen ? [chosen] : group.Offers;
                 ShanheBossRewardGroups.Add(new(group.Id, group.Name, group.IsSkipped ? $"已换取 {group.SkipGold} 铜币" : group.SelectedReward?.Name ?? (group.IsExhausted ? "暂无可领取奖励" : $"{group.Offers.Count} 选 一"),
                     group.IsResolved, group.Id == _shanheBossRewardGroupId, state.Revision)
                 {
+                    Rarity = Math.Clamp(group.SelectedReward?.Rarity ?? group.Offers.Select(reward => reward.Rarity).DefaultIfEmpty(2).Max(), 1, 4),
+                    TypeIconIndex = visualRewards.Count == 0 ? 0 : visualRewards.All(IsShanheTactic) ? 2
+                        : visualRewards.All(reward => reward.SkillId is not null) ? 3
+                        : visualRewards.All(reward => reward.StartingCards?.Count > 0 || reward.StartingEquipment?.Count > 0) ? 4 : 0,
+                    IsSkipped = group.IsSkipped,
+                    IsExhausted = group.IsExhausted,
+                    OfferCount = group.Offers.Count,
+                    SkipGold = group.SkipGold,
+                    CanSkip = group.CanSkip,
                     Artworks = group.IsSkipped ? [] : group.SelectedReward is { } selected
                         ? [CreateShanheRewardArtwork(selected)]
                         : group.Offers.Take(3).Select(reward => CreateShanheRewardArtwork(reward, isPreview: true)).ToArray()
                 });
+            }
             if (ActiveShanheBossRewardGroup is { } active)
                 foreach (var reward in active.Offers)
                 {
@@ -102,4 +127,15 @@ public sealed partial class MainViewModel
 public sealed record ShanheBossRewardGroup(string Id, string Name, string SelectedName, bool IsResolved, bool IsSelected, long Revision)
 {
     public IReadOnlyList<ShanheRewardArtwork> Artworks { get; init; } = [];
+    public int Rarity { get; init; }
+    public int TypeIconIndex { get; init; }
+    public bool IsSkipped { get; init; }
+    public bool IsExhausted { get; init; }
+    public int OfferCount { get; init; }
+    public int SkipGold { get; init; }
+    public bool CanSkip { get; init; }
+    public string DisplaySelectedName => ShanheDisplayText.RewardName(SelectedName);
+    public string OverviewTitle => !IsResolved ? $"{OfferCount} 选 一" : IsSkipped ? "已折换" : IsExhausted ? "暂无奖励" : "已领取";
+    public string OverviewDescription => IsResolved ? DisplaySelectedName : "点击卡片，查看完整候选";
+    public string OverviewFooter => IsResolved ? "已处理" : CanSkip ? $"也可折换 {SkipGold} 铜币" : "本组必须领取";
 }

@@ -11,7 +11,7 @@
 | 解码 cha_spell.sgs | e8885a11c46c3b25f37a6fcd8882b0d339ab1d1873c140900d3be93826fdd219 |
 | 解码 sys_playcard.sgs | 05584b30f7986c06158ee6e47f78417b3d5f1c7fbc61174cfad26e12a5ee64ab |
 
-`fightID=2497`、`Ggroup=2497`，标题为狭路相逢。完整阵容只有 `General.a=2497` 一行：`b=4861`、`c=江东老兵`、`d=1000283`、`h=100`。4861是士兵身体，使用统一角色 `character:shanhe-source-soldier-4861`；本地 `supporter` 是缺图回退，并非已核官方士兵肖像，也不借用凌统、朱桓身体。
+`fightID=2497`、`Ggroup=2497`，标题为狭路相逢。完整阵容只有 `General.a=2497` 一行：`b=4861`、`c=江东老兵`、`d=1000283`、`h=100`。4861是士兵身体，使用统一角色 `character:shanhe-source-soldier-4861`；运行时保留 `supporter` 回退键，桌面可按下列精确来源卡面及运行时ID绑定显示，不借用凌统、朱桓身体。
 
 原始体力/上限4/4，通常摸牌2，随机初手4，护甲0、护甲回复0、护甲上限5、额外出杀0、额外伤害0，无隐藏成员或额外 `att_*` 属性。`NewbieGroup=22497` 是另一配置，不追加为本组随从。普通池14、16、18、19、20、21、22、26引用本组，全部开放后覆盖56个第二章普通城市；最终战斗数值由共用来源成长按真实难度、天数、章节及可见人数1投影。
 
@@ -23,6 +23,12 @@
 | 21—25 | 保留全部三个技能 | 以上加 `equip_LY=20771` 照骨镜，红桃A |
 
 装备原始花色/点数 `g/f` 分别为3/6、4/1、2/1，按用户既定本地花色编码约定映射为表中牌面。固定装备额外加入随机初手，不在开局直接装入装备区；这一放置位置沿用用户已确认的本地规则。21档增加装备不增加新的武将形态；`GetGeneralId(21..25)` 继续选择含三个技能的形态，装备由独立来源配置累加。照骨镜采用独立 `CardKind.ZhaoguMirror`、技能 `shanhe:zhaogu-mirror-6018` 与 `StandardShanheZhaoguMirrorPackage`。
+
+## 原生卡面
+
+2026-10-29核对了普通组2497完整单人配方的 `rawOrdinal=0 → b=4861 → d=1000283`。载体4861的角色行无 `au/av` 头像重定向；本图来自本组明确的PVE皮肤覆盖，不按载体或技能所属武将借图。`cha_gs_dbs_fs_skininfo.sgs/root.pveskin` 的1000283行指定 `seatpic=generalface_1000283`、`headpic=1000283`、`diagrampic=100028300`；该解码皮肤表SHA-256为 `00ee5f994401976563e241571d3e5618f573ad2a4b85336ff132afb262f1e8d4`。客户端 `q6t.getSeatSkinUrl → hA.SkinSeatUrl` 经 `N2t.SeatImgUrl=general/seat/static/` 及桌面 `res/runtime/pc/` 生成[官方卡面URL](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000283.png)。
+
+官方响应HTTP200、`image/png`，目视为披甲持刃的老将；原生146×172、RGBA、57778字节。原字节保存为 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000283.png`，文件SHA-256为 `127e40463fd546744aa39a7a0fac6bdc73a06007ab2a930dc01bf3301ab29243`，解码RGBA像素SHA-256为 `1976c591fdbca79af7f91917f2037d34cd334dae047e166b1e7cb49cd549b647`。未裁剪、缩放、换色或重编码。精确绑定为 `shanhe:source-jiangdong-veteran-2497-base`（1–10）、`shanhe:source-jiangdong-veteran-2497-hard`（11–15）、`shanhe:source-jiangdong-veteran-2497-nightmare`（16–25）；21档装备追加不改变皮肤或运行时ID。原行无 `g/hide/generalShow`，按源默认分别为false/false/0，`startChapter=1`、`f=0`，没有主帅身份。
 
 `t` 的字段含义本批已直接核实，不再只凭装备内容推断：解码 `hd_roguelike.sgs` 的 `root.abbreviation` 明确包含 `{"Long":"equip","Short":"t"}`。固定客户端成员中：
 

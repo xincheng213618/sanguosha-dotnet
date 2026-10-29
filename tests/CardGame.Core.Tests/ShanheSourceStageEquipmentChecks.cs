@@ -49,6 +49,52 @@ internal static class ShanheSourceStageEquipmentChecks
                         !(encounter.Enemies[0].StartingEquipment ?? []).Any(card => card.Kind == CardKind.SilverLion),
                         "The extra hard-tier Silver Lion is added to the first form's hand recipe, preserving its four-card base and independent source-growth attributes.");
             }
+            if (difficulty is 16 or 21) VerifyFengyiSourceIdentity(source, difficulty);
+        }
+    }
+
+    private static void VerifyFengyiSourceIdentity(ShanheCampaignDefinition source, int difficulty)
+    {
+        const string dong = StandardShanheS5BossPackage.DongZhuoFengyiId;
+        const string lvbu = StandardShanheS5BossPackage.LvbuBajiId;
+        const string diaochan = StandardShanheS5BossPackage.DiaoChanBiyueId;
+        string[] order = [dong, lvbu, diaochan];
+        var node = source.Nodes.Single(candidate => candidate.Encounters?.Any(encounter => encounter.SourceBattleId == 2686) == true);
+        var encounter = node.Encounters!.Single(candidate => candidate.SourceBattleId == 2686);
+        Need(encounter.Enemies.Select(member => member.GeneralId).SequenceEqual(order) && encounter.SourceVisibleEnemyCount == 3,
+            "The actual source2686 recipe retains its established Dong Zhuo, Lu Bu, Diao Chan seats and complete three-member roster.");
+        // Admit the actual later source node without changing its roster or any
+        // opening quantities, then exercise the normal preview/entry projection.
+        var entry = source with
+        {
+            StartingNodeIds = source.StartingNodeIds.Append(node.Id).Distinct(StringComparer.Ordinal).ToArray(),
+            RandomStartingNode = false,
+            Nodes = source.Nodes.Select(candidate => candidate.Id == node.Id ? candidate with { Encounters = [encounter] } : candidate).ToArray()
+        };
+        var run = ShanheCampaignSession.Create(entry, new(71, "classic:guan-yu") { SourceDifficultyId = difficulty },
+            StandardShanheCampaignCatalog.CreateBattleRegistry);
+        var preview = run.PreviewEncounter(node.Id);
+        var grownDong = preview.Enemies.Single(member => member.GeneralId == dong);
+        var grownLvbu = preview.Enemies.Single(member => member.GeneralId == lvbu);
+        var grownDiaochan = preview.Enemies.Single(member => member.GeneralId == diaochan);
+        Need(grownDong.Hp.HasValue && grownLvbu.Hp.HasValue && grownDong.Hp.Value - grownLvbu.Hp.Value == 3 &&
+            grownDong.DrawBonus - grownLvbu.DrawBonus == 2 && grownDiaochan.DrawBonus == grownDong.DrawBonus,
+            $"At the real source{difficulty} boundary, Dong Zhuo keeps his own health+3 and draw+2 instead of lending them to Lu Bu; Diao Chan retains her separate draw+2.");
+        var moved = run.Submit(new MoveShanheNodeCommand(node.Id, run.Revision));
+        Need(moved.Accepted, moved.Error ?? "The real source2686 entry was rejected.");
+        var setup = run.PendingBattleSetup!;
+        Need(setup.SourceDifficultyId == difficulty &&
+            JsonSerializer.Serialize(preview.Enemies) == JsonSerializer.Serialize(setup.EnemyRoster),
+            "The identity-matched source attributes reach the frozen native battle setup without changing seat order or opening quantities.");
+        if (difficulty == 16)
+        {
+            var game = StandardShanheCampaignCatalog.CreateBattle(setup);
+            var players = game.CreateSnapshot(0).Players;
+            var dongPlayer = players.Single(player => player.GeneralId == dong);
+            var lvbuPlayer = players.Single(player => player.GeneralId == lvbu);
+            Need(players.Where(player => player.TeamId == ShanheBattleSetup.EnemyTeamId).Select(player => player.GeneralId).SequenceEqual(order) &&
+                dongPlayer.Hp - lvbuPlayer.Hp == 3 && dongPlayer.MaxHp - dongPlayer.Hp == 5 && lvbuPlayer.MaxHp == lvbuPlayer.Hp,
+                "The corrected source growth enters real native seats while Dong Zhuo remains initially wounded and Lu Bu starts at full health.");
         }
     }
 

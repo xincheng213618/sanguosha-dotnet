@@ -15,7 +15,7 @@ public sealed class StandardShanheSourceXinPingPackage : IGameContentPackage
         ? GeneralId : throw new ArgumentOutOfRangeException(nameof(difficulty));
 
     public void Register(IContentRegistryBuilder builder) => builder.AddGeneral(new(GeneralId,
-        // Source d=1000261 is not a verified local Xin Ping portrait.
+        // Runtime supporter fallback; exact source art is resolved by the desktop ID binding.
         "辛评", "supporter", SkillId, "qun", 4)
     {
         InitialHp = 4, CharacterId = "character:shanhe-source-general-4871",

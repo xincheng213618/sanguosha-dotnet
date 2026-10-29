@@ -8,12 +8,11 @@ using CardGame.Wpf.ViewModels;
 
 namespace CardGame.Wpf.Controls;
 
-/// <summary>Keep the hand contiguous from the equipment rail; overlap only when space runs out.</summary>
+/// <summary>Keep every hand card in one row and compress its physical hit strip to the available width.</summary>
 public sealed class HandPanel : Panel
 {
     private const double CardWidth = 112;
     private const double CardHeight = 178;
-    private const double MinimumStep = 36;
     internal const double ArrivalEntryInset = 7;
     private double _step;
     private UIElement? _hoveredCard;
@@ -241,9 +240,9 @@ public sealed class HandPanel : Panel
         var scale = CardScale;
         var cardSize = new Size(CardWidth * scale, CardHeight * scale);
         foreach (UIElement child in InternalChildren) child.Measure(cardSize);
-        var minimum = InternalChildren.Count == 0 ? 0 : (CardWidth + (InternalChildren.Count - 1) * MinimumStep) * scale;
-        var width = ViewportWidth > 0 ? ViewportWidth : double.IsInfinity(availableSize.Width) ? minimum : availableSize.Width;
-        return new Size(Math.Max(minimum, width), cardSize.Height);
+        var naturalWidth = InternalChildren.Count * cardSize.Width;
+        var width = ViewportWidth > 0 ? ViewportWidth : double.IsInfinity(availableSize.Width) ? naturalWidth : availableSize.Width;
+        return new Size(Math.Max(InternalChildren.Count == 0 ? 0 : cardSize.Width, width), cardSize.Height);
     }
 
     protected override Size ArrangeOverride(Size finalSize)
@@ -264,12 +263,12 @@ public sealed class HandPanel : Panel
             ClearPointer();
             return finalSize;
         }
-        _step = count == 1 ? cardWidth : Math.Clamp((finalSize.Width - cardWidth) / (count - 1), MinimumStep * scale, cardWidth);
+        _step = count == 1 ? cardWidth : Math.Clamp((layoutWidth - cardWidth) / (count - 1), 0, cardWidth);
         var order = InternalChildren.Cast<UIElement>().ToList();
         var identitiesMatch = order.All(child => !_slots.TryGetValue(child, out var old) ||
             ReferenceEquals(old.Identity, (child as FrameworkElement)?.DataContext));
-        // Overflow content shrinks when a card leaves; the viewport remains
-        // the resize boundary even when the panel's minimum width changes.
+        // The viewport remains the resize boundary when cards leave and the
+        // compression step changes without changing the panel's width.
         // A new card scale also invalidates offsets from the previous layout.
         var sameLayout = Math.Abs(_layoutWidth - layoutWidth) < .01 && Math.Abs(_layoutScale - scale) < .0001;
         var sameOrder = _order.SequenceEqual(order);

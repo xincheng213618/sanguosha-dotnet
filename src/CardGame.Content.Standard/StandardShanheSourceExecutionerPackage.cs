@@ -29,7 +29,7 @@ public sealed class StandardShanheSourceExecutionerPackage : IGameContentPackage
         Add(MediumId, "medium", ["ol:gongqing", HuanfuSkillId]);
         Add(HardId, "hard", ["ol:gongqing", HuanfuSkillId, "classic:junxing"]);
         void Add(string id, string tier, string[] extra) => builder.AddGeneral(new(id, "校事典刑官",
-            // Source d=1000237 has no verified local portrait: supporter is an explicit fallback.
+            // Desktop binds source skin1000237 by exact runtime ID; supporter remains the runtime fallback.
             "supporter", YishiSkillId, "qun", 4, extra)
         {
             InitialHp = 4, CharacterId = "character:shanhe-source-soldier-4861",

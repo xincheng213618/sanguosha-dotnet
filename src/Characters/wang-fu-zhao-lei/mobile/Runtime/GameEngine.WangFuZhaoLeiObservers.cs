@@ -104,13 +104,4 @@ public sealed partial class GameEngine
         _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26320)]
     private bool AdvanceXunyiSubtree() => _pendingDecision is null && XunyiObserverRoot() is not null && TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1000)]
-    private bool AllowsXunyiNestedDamage(ProgramSkillFrame frame, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || frame.AttackAttempt is not null || frame.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != frame.Id ||
-            XunyiObserverRoot() is not { } root || root.Id == frame.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(frame);
-        return effect is { Op: SkillProgramEffectOp.Damage } && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(frame, reference) : ResolveProgramEffectTarget(frame, effect.Target));
-    }
 }

@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using CardGame.Content.Standard;
 using CardGame.Core;
@@ -15,6 +16,109 @@ using CardGame.Wpf.ViewModels;
 
 internal static class MultiCardDraftUiChecks
 {
+    public static void DenseHandStaysInOneRowAndPreservesNativeSelection(string output)
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(timed: false, initialHand: 78));
+        var game = GameEngine.CreateStandard(new GameOptions { Seed = 31, PlayerCount = 4, HumanSeat = 0,
+            HumanRole = Role.Lord, ModeId = Fixture.PlainMode, UseInteractiveSetup = true,
+            UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false }, registry);
+        Accept(game, new StartGameCommand()); ReachSetup(game);
+        Accept(game, new SelectGeneralCommand(0, Fixture.Owner, game.Revision, game.PendingDecision!.PromptId));
+        using var model = new MainViewModel(false, game.Seed, false, new MemorySaveStore(), contentRegistry: registry)
+            { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
+        typeof(MainViewModel).GetMethod("ReplaceEngine", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(model, [game]);
+        DriveToPlay(model);
+        game = Program.Engine(model);
+        Program.Assert(model.Hand.Count == 78, "The real native fixture must deal all 78 physical cards before exercising dense hand input.");
+        using var host = new NativeResponseStatusChecks.NativeHost(model);
+        var items = (ItemsControl)host.Window.FindName("HandCards");
+        var viewport = (HandScrollViewer)host.Window.FindName("HandViewport");
+        host.Capture(output, "dense-hand-baseline", 1120);
+        var panel = Program.Find<HandPanel>(items).Single();
+        var press = typeof(HandPanel).GetMethod("PressCardAt", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var resolve = typeof(HandPanel).GetMethod("CardButtonAt", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var move = typeof(HandPanel).GetMethod("UpdatePointer", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var boundary = (Revision: game.Revision, Commands: game.AcceptedCommands.Count, Moves: game.CardMovements.Count);
+        foreach (var width in new[] { 1120, 1920 })
+        {
+            host.Capture(output, "dense-hand-single-row", width);
+            var containers = Containers();
+            var origins = containers.Select(card => card.TranslatePoint(new Point(), panel)).ToArray();
+            Program.Assert(viewport.ScrollableWidth <= .5 && viewport.HorizontalOffset == 0 &&
+                containers.All(card => Math.Abs(card.TranslatePoint(new Point(), panel).Y - origins[0].Y) < .1) &&
+                origins.Zip(origins.Skip(1), (left, right) => right.X - left.X).All(step => step > 0 && step < 36 * panel.CardScale) &&
+                origins[^1].X + containers[^1].ActualWidth <= viewport.ViewportWidth + .5,
+                "All 78 cards stay in order on one compressed row inside the actual viewport at each table scale.");
+            for (var index = 0; index < model.Hand.Count; index++)
+                Program.Assert(ReferenceEquals(((Button?)resolve.Invoke(panel, [PointAt(index)]))?.CommandParameter, model.Hand[index]),
+                    "Every exposed strip must resolve its own physical entity even when the strip is only a few pixels wide.");
+            Press(39); AssertRaised(39);
+            host.Capture(output, "dense-hand-selected", width);
+            Program.Assert(model.Hand[39].IsSelected && model.Hand.Count(card => card.IsSelected) == 1,
+                "A genuine compressed-strip press selects exactly its own card.");
+            model.ClearSelectionCommand.Execute(null);
+            move.Invoke(panel, [new Point(-10, 80)]); host.Root.UpdateLayout();
+            Program.Assert(model.Hand.All(card => !card.IsSelected) && containers.All(card => Panel.GetZIndex(card) == 0) &&
+                Program.Find<CardLiftSurface>(containers[39]).Single().RenderTransform.Value.OffsetY == 0 &&
+                containers.Select(card => card.TranslatePoint(new Point(), panel)).SequenceEqual(origins) &&
+                (game.Revision, game.AcceptedCommands.Count, game.CardMovements.Count) == boundary,
+                "Cancel restores the ordinary lift and stacking at the exact original slots without committing gameplay.");
+        }
+        host.Capture(output, "dense-hand-multi-selection", 1120);
+        model.ActivateHumanSkillCommand.Execute(model.HumanSkillCards.Single(skill => skill.ContentId == "classic:zhiheng"));
+        host.Root.UpdateLayout();
+        Press(0); Press(1); Press(77); AssertRaised(77);
+        host.Capture(output, "dense-hand-multi-selected", 1120);
+        var selected = new[] { model.Hand[0].Id, model.Hand[1].Id, model.Hand[77].Id };
+        Program.Assert(model.Hand.Where(card => card.IsSelected).Select(card => card.Id).ToHashSet().SetEquals(selected) &&
+            (game.Revision, game.AcceptedCommands.Count, game.CardMovements.Count) == boundary,
+            "Adjacent dense cards and the tail remain independently selectable in the original native multi-card draft.");
+        model.CancelActionCommand.Execute(null);
+        move.Invoke(panel, [new Point(-10, 80)]); host.Root.UpdateLayout();
+        Program.Assert(!model.HasSelection && Containers().All(card => Panel.GetZIndex(card) == 0) &&
+            (game.Revision, game.AcceptedCommands.Count, game.CardMovements.Count) == boundary,
+            "Canceling the entire dense multi-card draft restores its unpaid cards and ordinary stacking.");
+        model.ActivateHumanSkillCommand.Execute(model.HumanSkillCards.Single(skill => skill.ContentId == "classic:zhiheng"));
+        host.Root.UpdateLayout();
+        Press(0); Press(77);
+        var payment = model.Hand.Where(card => card.IsSelected).Select(card => card.Id).ToHashSet();
+        Click((Button)host.Window.FindName("PlayCardButton")); DriveToPlay(model);
+        var paid = game.AcceptedCommands.Skip(boundary.Commands).OfType<UseProgramSkillCommand>().Single();
+        Program.Assert(payment.Count == 2 && paid.SkillId == "classic:zhiheng" && paid.CardIds.ToHashSet().SetEquals(payment) &&
+            payment.All(id => game.CardMovements.Skip(boundary.Moves).Count(movement => movement.CardId == id && movement.To == CardLocation.DiscardPile) == 1) &&
+            !model.HasSelection,
+            "Explicit confirmation submits the original native command and pays exactly the two selected physical cards once.");
+
+        FrameworkElement[] Containers() => Enumerable.Range(0, items.Items.Count)
+            .Select(index => (FrameworkElement)items.ItemContainerGenerator.ContainerFromIndex(index)).ToArray();
+        Point PointAt(int index)
+        {
+            var containers = Containers();
+            var strip = index + 1 < containers.Length ? containers[index + 1].TranslatePoint(new Point(), containers[index]).X : containers[index].ActualWidth;
+            return containers[index].TranslatePoint(new Point(Math.Min(8, strip / 2), 80 * panel.CardScale), panel);
+        }
+        void Press(int index)
+        {
+            Program.Assert(press.Invoke(panel, [PointAt(index)]) is true, "The actual hand panel must handle the dense physical strip.");
+            Program.Find<Button>(Containers()[index]).Single().RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
+                { RoutedEvent = UIElement.MouseLeftButtonUpEvent });
+            host.Root.UpdateLayout();
+        }
+        void AssertRaised(int index)
+        {
+            var surface = Program.Find<CardLiftSurface>(Containers()[index]).Single();
+            Program.Assert(surface.IsSelected && surface.RenderTransform.Value.OffsetY == -18,
+                "The selected card keeps the shared full-size face and selected lift.");
+            foreach (var local in new[] { new Point(3, 3), new Point(106, 3), new Point(3, 151), new Point(106, 151) })
+            {
+                var hit = VisualTreeHelper.HitTest(panel, surface.TranslatePoint(local, panel))?.VisualHit;
+                while (hit is not null && hit is not Button) hit = VisualTreeHelper.GetParent(hit);
+                Program.Assert(ReferenceEquals((hit as Button)?.CommandParameter, model.Hand[index]),
+                    "The selected face must render in front across its complete artwork, beyond its compressed strip.");
+            }
+        }
+    }
+
     public static void ZhihengSelectsAllHandBeforeConfirmation(string output)
     {
         foreach (var skillId in new[] { "classic:zhiheng", "boundary:zhiheng" })
@@ -232,7 +336,11 @@ internal static class MultiCardDraftUiChecks
         var items = (ItemsControl)host.Window.FindName("HandCards");
         var panel = Program.Find<HandPanel>(items).Single();
         var container = (FrameworkElement)items.ItemContainerGenerator.ContainerFromItem(card);
-        var point = container.TranslatePoint(new Point(8, 80), panel);
+        var index = items.Items.IndexOf(card);
+        var strip = index + 1 < items.Items.Count
+            ? ((FrameworkElement)items.ItemContainerGenerator.ContainerFromIndex(index + 1)).TranslatePoint(new Point(), container).X
+            : container.ActualWidth;
+        var point = container.TranslatePoint(new Point(Math.Min(8, strip / 2), 80 * panel.CardScale), panel);
         Program.Assert(typeof(HandPanel).GetMethod("PressCardAt", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(panel, [point]) is true,
             "The real hand panel must accept its current physical card's press.");
         Program.Find<Button>(container).Single().RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
@@ -330,7 +438,8 @@ internal static class MultiCardDraftUiChecks
                 .Select(index => $"fixture:multi-card-draft-ai-{index}").ToArray();
             foreach (var peer in peers) builder.AddGeneral(new(peer, "对手", "supporter", "standard:none", "wei", BaseHp: 20));
             builder.AddDeck(new("fixture:multi-card-draft-deck", "多选实际牌堆", initialHand, 0, [])
-                { PhysicalCards = Enumerable.Range(0, 160).Select(_ => new ContentDeckPhysicalCard("standard:crossbow", Suit.Heart, 7)).ToArray() });
+                { PhysicalCards = Enumerable.Range(0, Math.Max(160, initialHand * (peers.Length + 1) + 16))
+                    .Select(_ => new ContentDeckPhysicalCard("standard:crossbow", Suit.Heart, 7)).ToArray() });
             builder.AddMode(timed
                 ? new(WushuangMode.ModeId, "多选计时场景", 2, 2, new Dictionary<string, int>(), "fixture:multi-card-draft-deck", 2,
                     [Owner, "fixture:multi-card-draft-ai"], ContentModeKind.Team,

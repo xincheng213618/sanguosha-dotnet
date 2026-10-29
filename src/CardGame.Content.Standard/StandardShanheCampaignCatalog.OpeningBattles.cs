@@ -10,6 +10,13 @@ public static partial class StandardShanheCampaignCatalog
     private static ShanheCampaignDefinition WithRandomOpeningBattles(ShanheCampaignDefinition definition, int difficulty)
     {
         if (!definition.Id.StartsWith("shanhe:zhuhou-2026-", StringComparison.Ordinal)) return definition;
+        // The non-codex entry has only ungraded Peach/Duel resources. Add the
+        // same authored rare physical cards used by the catalogue for elites.
+        var rareCards = definition.Rewards.Any(reward => reward.Rarity == 2 && reward.StartingCards?.Count > 0)
+            ? Array.Empty<ShanheRewardDefinition>() : CurrentShopCardSources
+                .Where(source => source.Rarity == 2 && !EquipmentCatalog.IsEquipment(source.Kind))
+                .Select(source => CodexBasicCard(source.SourceId) with
+                    { Id = "route-rare-card-" + source.SourceId.ToString(System.Globalization.CultureInfo.InvariantCulture), Rarity = 2 }).ToArray();
         var sources = definition.Nodes.Where(node => node.ChapterNumber == 1 && node.Id is "hulao" or "guangcheng")
             .ToDictionary(node => node.Id, StringComparer.Ordinal);
         var skills = definition.Rewards.Where(reward => reward.SkillId is not null && reward.Rarity == 2).Select(reward => reward.Id).ToArray();
@@ -34,6 +41,7 @@ public static partial class StandardShanheCampaignCatalog
         };
         return ShanheCampaignContent.FreezeAndValidate(definition with
         {
+            Rewards = definition.Rewards.Concat(rareCards).ToArray(),
             RandomStartingNode = false,
             AllowChapterDetours = true,
             IntroText = definition.IntroText + "\n开局两处战斗地点都可挑战，先后顺序自选；本章已开启的未完成地点可返回补打，进入下一章后关闭旧章地点。每处按本局种子确定剧情和敌军，预览与挑战一致。仅装备传承时先选择初始技能。",
@@ -54,13 +62,14 @@ public static partial class StandardShanheCampaignCatalog
                     PrimaryTacticRarity = elite ? 2 : kind == ShanheNodeKind.Battle ? 1 : 0,
                     PrimarySkillRarity = elite ? node.ChapterNumber >= 2 ? 3 : 2 : kind == ShanheNodeKind.Battle
                         ? node.ChapterNumber >= 2 ? 2 : 1 : 0,
-                    PrimaryCardRarity = elite ? 2 : 0,
+                    PrimaryCardRarity = elite ? 2 : kind == ShanheNodeKind.Battle ? 1 : 0,
                     Encounters = node.Encounters?.Select(encounter => encounter with
                         { VictoryGold = kind == ShanheNodeKind.BossBattle ? 500 : 200 }).ToArray(),
                     // The base sampler applies the quality independently to
                     // each category. Retain elite upgrades for promotion tactics.
                     RewardIds = !elite && node.BossRewards is null && node.ChapterNumber < 3 && node.RewardIds is { Count: > 0 }
-                        ? node.RewardIds.Where(ordinaryRewards.Contains).ToArray() : node.RewardIds
+                        ? node.RewardIds.Where(ordinaryRewards.Contains).ToArray()
+                        : elite ? (node.RewardIds ?? []).Concat(rareCards.Select(reward => reward.Id)).ToArray() : node.RewardIds
                 };
             }).Select(node => node.Id is not ("hulao-start" or "guangcheng-start") ? node : node with
             {

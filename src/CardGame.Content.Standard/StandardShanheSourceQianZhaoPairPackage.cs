@@ -53,7 +53,7 @@ public sealed class StandardShanheSourceQianZhaoPairPackage : IGameContentPackag
         });
 
         void AddWuhuan(string id, string? primary, IReadOnlyList<string> extra) => builder.AddGeneral(new(id,
-            // Source portrait1000297 has no confirmed local mapping.
+            // Keep runtime carrier metadata; desktop artwork uses the verified PVE skin1000297.
             "乌桓奇袭兵", "supporter", primary, "qun", 2, extra)
         {
             InitialHp = 2, CharacterId = "character:shanhe-source-soldier-4861",

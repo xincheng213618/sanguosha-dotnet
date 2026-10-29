@@ -34,7 +34,7 @@ public sealed class StandardShanheSourceArmorerPackage : IGameContentPackage
         Add(NightmareId, [DujinSkillId, ZizhongSkillId]);
 
         void Add(string id, IReadOnlyList<string> extra) => builder.AddGeneral(new(id,
-            // The source name is Zhou Xin; portrait1000204 has no confirmed local mapping.
+            // Keep Zhou Xin's runtime metadata; desktop artwork uses the verified PVE skin1000204.
             "周昕", "supporter", DuanjiaSkillId, "qun", 5, extra)
         {
             InitialHp = 5, CharacterId = "character:shanhe-source-general-4871",

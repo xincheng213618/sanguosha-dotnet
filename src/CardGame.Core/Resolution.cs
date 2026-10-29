@@ -513,7 +513,7 @@ public sealed partial record AttackAttemptState(
 }
 
 /// <summary>Identifies a suspended parent using existing frame IDs, without retaining its attack object.</summary>
-public sealed record ProgramAttackReturn(long? ParentAttackOwnerFrameId,
+public sealed partial record ProgramAttackReturn(long? ParentAttackOwnerFrameId,
     long? ParentDamageWindowFrameId, long? ParentJudgmentFrameId)
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

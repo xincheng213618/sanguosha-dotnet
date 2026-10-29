@@ -63,14 +63,6 @@ public sealed partial class GameEngine
     private bool IsXuanGongZhuDying()=>ActiveDying is {} d && XuanGongZhuObserverRoot() is {} r && _resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 420)]
     private bool TryAdvanceXuanGongZhuSubtree()=>_pendingDecision is null && XuanGongZhuObserverRoot() is not null && TryAdvanceObserverSubtree(true);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 690)]
-    private bool AllowsXuanGongZhuNestedDamage(ProgramSkillFrame observer,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess || observer.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id!=observer.Id || XuanGongZhuObserverRoot() is not {} root || root.Id==observer.Id || observer.WindowContext?.Window is not
-            (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged))return false;
-        var e=GetPausedPrivateOfferEffect(observer);return e is {Op:SkillProgramEffectOp.Damage} && e.Amount==amount && e.ActorReference==source && e.DamageNature==nature &&
-            target==(e.TargetReference is {} reference?ResolveProgramParticipant(observer,reference):ResolveProgramEffectTarget(observer,e.Target));
-    }
     [ProgramCapability]
     private sealed class XuanGongZhuProgramCapability(GameEngine engine) : IXuanGongZhuProgramHost
     {

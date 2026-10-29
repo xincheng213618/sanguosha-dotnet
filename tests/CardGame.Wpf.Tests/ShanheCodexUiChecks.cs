@@ -94,6 +94,9 @@ internal static partial class ShanheCodexUiChecks
         var categories = (ListBox)shop.FindName("MarketCategories");
         Program.Assert(categories.Items.Cast<string>().SequenceEqual(new[] { "战法", "装备", "卡牌", "技能" }),
             "The market exposes its four real goods categories without an empty supplies category.");
+        Program.Assert(vm.ShanheShopItems.All(item => item.MarketCategory != "补给") &&
+                session.Snapshot.ShopItems.All(item => item.Reward?.Id != "medicine"),
+            "The actual opt-in catalogue merchant has no local medicine stock; showing categories cannot invent an unpriced source supply.");
         foreach (var category in new[] { "战法", "装备", "卡牌", "技能" })
         {
             categories.SelectedItem = category;
@@ -119,8 +122,91 @@ internal static partial class ShanheCodexUiChecks
             "Refresh must use the real command and update its availability.");
 
         VerifyPreviouslyResearchedPathGainsCurrentRuntimeEntitlements();
+        VerifyLegacyMedicineCategory(vm, session, shop, output);
 
         ShanheCodexNode Node(int id) => vm.ShanheCodexNodes.Single(node => node.TreeId == id);
+    }
+
+    private static void VerifyLegacyMedicineCategory(MainViewModel vm, ShanheCampaignSession sourceSession,
+        ShanheShopPanel shop, string output)
+    {
+        // Reuse the published local village, its paid training and original next
+        // merchant. As above, expose an existing authored node as a direct start;
+        // do not add stock, change prices, or turn local medicine into source data.
+        var published = StandardShanheCampaignCatalog.CreateDefinition(1);
+        var definition = ShanheCampaignContent.FreezeAndValidate(published with
+        {
+            StartingNodeIds = published.StartingNodeIds.Append("village").Distinct().ToArray(),
+            RandomStartingNode = false
+        });
+        const string player = "classic:zhang-fei";
+        Program.Assert(definition.PlayerGeneralIds.Contains(player), "The original local player roster contains the unmodified training customer.");
+        var legacy = ShanheCampaignSession.Create(definition, new(270017, player), StandardShanheCampaignCatalog.CreateBattleRegistry);
+        var originalMaximum = legacy.Snapshot.MaxHp;
+        Program.Assert(legacy.Submit(new MoveShanheNodeCommand("village", legacy.Revision)).Accepted &&
+                legacy.Submit(new ChooseShanheNodeOptionCommand("training", null, legacy.Revision)).Accepted &&
+                legacy.Snapshot.Hp == originalMaximum - 1 &&
+                legacy.Submit(new MoveShanheNodeCommand("market1", legacy.Revision)).Accepted,
+            "The original village training pays one real health before following its unchanged edge into the legacy merchant.");
+        var authored = definition.Nodes.Single(node => node.Id == "market1").Choices!.Single(choice => choice.Id == "buy-medicine");
+        var reward = definition.Rewards.Single(item => item.Id == authored.RewardId);
+        Program.Assert(authored.GoldCost == 35 && reward.Id == "medicine" && reward.Heal == 3,
+            "The legacy medicine check retains the published thirty-five-copper, three-health medicine package.");
+        var sourceBefore = ShanheCampaignJson.Serialize(sourceSession.CreateCheckpoint());
+        Attach(vm, legacy); Layout(shop);
+        var health = (TextBlock)shop.FindName("MarketHealth");
+        AssertHealthHeader("The actual legacy merchant header shows the village training wound before any supply purchase.");
+        var woundedHealthText = health.Text;
+        var categories = (ListBox)shop.FindName("MarketCategories");
+        Program.Assert(categories.Items.Cast<string>().SequenceEqual(new[] { "战法", "装备", "卡牌", "技能", "补给" }) &&
+                vm.ShanheShopItems.Any(item => item.MarketCategory == "补给" && item.Id == authored.Id),
+            "An existing legacy supply product adds only its missing category to the actual bound merchant selector.");
+        var beforeSelection = ShanheCampaignJson.Serialize(legacy.CreateCheckpoint());
+        categories.SelectedItem = "补给"; Layout(shop);
+        var medicine = vm.ShanheMarketGoods.Single(item => item.Id == authored.Id);
+        var purchase = Program.Find<Button>(shop).Single(button => ReferenceEquals(button.CommandParameter, medicine) &&
+            ReferenceEquals(button.Command, vm.RequestShanheShopPurchaseCommand));
+        Program.Assert(vm.SelectedShanheMarketCategory == "补给" && vm.ShanheMarketGoods.All(item => item.MarketCategory == "补给") &&
+                medicine.Name == reward.Name && medicine.Price == authored.GoldCost && medicine.CanBuy && purchase.IsEnabled &&
+                vm.ShanheMarketCategoryNotice == "补给按当前货品说明结算" && vm.ShanheMarketSurchargeNotice.Length == 0 &&
+                ShanheCampaignJson.Serialize(legacy.CreateCheckpoint()) == beforeSelection,
+            "Selecting the real supply tab exposes its original medicine purchase without charging, healing, or advertising category escalation.");
+        var before = legacy.Snapshot;
+        typeof(ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(purchase, null);
+        Layout(shop);
+        Program.Assert(legacy.Snapshot.Gold == before.Gold - authored.GoldCost &&
+                legacy.Snapshot.Hp == Math.Min(before.MaxHp, before.Hp + reward.Heal) && legacy.Snapshot.Hp > before.Hp &&
+                legacy.Snapshot.MaxHp == before.MaxHp && legacy.Snapshot.Phase == ShanheCampaignPhase.NodeChoice &&
+                legacy.Snapshot.CurrentNodeId == "market1" &&
+                legacy.AcceptedCommands.OfType<ChooseShanheNodeOptionCommand>().Last().ChoiceId == authored.Id &&
+                !vm.ShanheMarketGoods.Single(item => item.Id == authored.Id).CanBuy &&
+                !vm.RequestShanheShopPurchaseCommand.CanExecute(medicine),
+            "The original bound medicine button pays thirty-five copper, actually restores the training wound up to the real ceiling, stays in the shop and retires its prior control.");
+        AssertHealthHeader("The same live market header immediately reflects the actual medicine recovery and unchanged health ceiling.");
+        Program.Assert(health.Text != woundedHealthText,
+            "Medicine confirmation replaces the displayed wounded-health value rather than retaining the previous market header.");
+        Program.Render(shop, 1400, 714, Path.Combine(output, "shanhe-legacy-market-supply-purchased.png"));
+        var afterPurchase = ShanheCampaignJson.Serialize(legacy.CreateCheckpoint());
+        typeof(ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(purchase, null);
+        vm.RequestShanheShopPurchaseCommand.Execute(medicine);
+        Program.Assert(ShanheCampaignJson.Serialize(legacy.CreateCheckpoint()) == afterPurchase,
+            "The old medicine button cannot charge or heal a second time after its actual purchase.");
+        Attach(vm, sourceSession); Layout(shop);
+        Program.Assert(categories.Items.Cast<string>().SequenceEqual(new[] { "战法", "装备", "卡牌", "技能" }) &&
+                !vm.ShanheShopItems.Any(item => item.MarketCategory == "补给") &&
+                vm.SelectedShanheMarketCategory == "战法" && Equals(categories.SelectedItem, "战法") &&
+                vm.ShanheMarketGoods.All(item => item.MarketCategory == "战法") &&
+                ShanheCampaignJson.Serialize(sourceSession.CreateCheckpoint()) == sourceBefore,
+            "Returning to a real catalogue shelf without supplies removes the extra tab, resets its invalid selection and leaves that original source stock and journal unchanged.");
+
+        void AssertHealthHeader(string message)
+        {
+            var values = System.Text.RegularExpressions.Regex.Matches(health.Text, @"-?\d+")
+                .Select(match => int.Parse(match.Value)).ToArray();
+            Program.Assert(health.Visibility == Visibility.Visible && health.ActualWidth > 0 && health.ActualHeight > 0 &&
+                    health.Text == vm.ShanheMarketHealthText && values.SequenceEqual(new[] { legacy.Snapshot.Hp, legacy.Snapshot.MaxHp }),
+                message + $" Actual='{health.Text}', expectedHp={legacy.Snapshot.Hp}, expectedMaxHp={legacy.Snapshot.MaxHp}.");
+        }
     }
 
     private static void VerifyPreviouslyResearchedPathGainsCurrentRuntimeEntitlements()

@@ -43,8 +43,6 @@ public sealed partial class GameEngine
  private bool HasWeijieBeforeDamageObserver(long id)=>WeijieObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
  [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 880)]
  private bool IsWeijieDying()=>ActiveDying is{}d&&(ActiveWeijieDraft()is{Weijie:{Need:{Intent:WeijieIntent.Dying}need}}draft&&need.OwnerFrameId==d.Id&&need.RequestFrameId==d.Id&&WeijieParent(draft)||WeijieObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id));
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1450)]
- private bool AllowsWeijieNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess){if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||WeijieObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));}
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27462)]private bool AdvanceWeijieChildren()=>_pendingDecision is null&&WeijieObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
  private ProgramSkillFrame? ActiveWeijieDraft()=>_resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f=>f.Weijie is not null);
  private PendingDecision? WeijieInvariantDecision(PendingDecision? ordinary)

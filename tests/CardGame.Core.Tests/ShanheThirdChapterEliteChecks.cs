@@ -14,7 +14,7 @@ internal static class ShanheThirdChapterEliteChecks
         var elite = published.Nodes.Single(node => node.Id == id);
         var onward = elite.NextNodeIds.ToHashSet(StringComparer.Ordinal);
         Need(elite is { Kind: ShanheNodeKind.EliteBattle, ChapterNumber: 3, BossRewards: null,
-                PrimaryTacticRarity: 2, PrimarySkillRarity: 2 } &&
+                PrimaryTacticRarity: 3, PrimarySkillRarity: 3, PrimaryCardRarity: 3 } &&
             published.Nodes.Single(node => node.Id == "finalcamp").NextNodeIds.Contains(id) && onward.Count == 3 &&
             published.Nodes.Where(node => onward.Contains(node.Id)).All(node => node.Kind == ShanheNodeKind.BossBattle) &&
             elite.Encounters is [{ Enemies.Count: 3, BossTransition: null }] &&

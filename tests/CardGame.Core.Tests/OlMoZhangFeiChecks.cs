@@ -70,6 +70,92 @@ internal static class OlMoZhangFeiChecks
             "A real Spade/Club black Zhangba pair pays both entities once, retains its color without a single suit, settles mixed Slash/Duel on one Use and consumes the native Slash quota.");
     }
 
+    public static void CumulativeSlashAndDuelDamageCountsArmorBothDirectionsAndEntersOnceForward()
+    {
+        foreach (var counterSlash in new[] { false, true })
+        {
+            var s = ThresholdScene([C(CardKind.Crossbow), C(CardKind.ThunderSlash, Suit.Heart),
+                C(CardKind.Slash), C(CardKind.Duel, Suit.Heart), C(CardKind.Slash, Suit.Heart)], counterSlash);
+            s.Drive("ping", 3); s.Play();
+            s.Drive("armor-one"); s.Play();
+            UseAt(s, CardKind.Crossbow);
+            UseAt(s, CardKind.ThunderSlash, 3);
+            NotEntered(s, "The first one-point card damage cannot enter Rumo, even after unrelated skill damage.");
+            if (!counterSlash)
+            {
+                var firstTurn = s.G.State.TurnNumber;
+                s.Accept(new EndPlayPhaseCommand(0, s.G.Revision, s.P!.PromptId)); s.Play();
+                s.Need(s.G.State.TurnNumber > firstTurn && s.E<DamageAppliedEvent>().Length == 2,
+                    "A full native table turn passes without another damage segment; the first card point must remain in the cumulative total.");
+                NotEntered(s, "A new turn neither clears cumulative progress nor enters before its threshold.");
+            }
+
+            var black = s.V().Hand.Single(card => card.Kind == CardKind.Slash && card.Suit == Suit.Spade);
+            s.Use(s.Action(action => action.CardId == black.Id && action.TargetSeats.SequenceEqual([3])));
+            if (counterSlash)
+            {
+                s.Reach(() => s.P is { Kind: DecisionKind.RespondSlash, PlayerSeat: 0 });
+                s.Need(s.E<DuelResponseEvent>().Any(fact => fact.ResponderSeat == 3 && fact.UsedSlash),
+                    "The same-colour black Slash becomes a real Duel whose enemy really pays its Slash response.");
+                s.Answer(choice => choice.Cards.Count == 0);
+            }
+            s.Play();
+            NotEntered(s, "Two one-point Slash/Duel segments remain below the cumulative threshold.");
+            s.Need(s.E<NativeSlashTargetDuelStartedEvent>().Length == 1,
+                "The black Slash contributes the original Use's genuinely converted Duel effect.");
+            UseAt(s, CardKind.Duel, 3);
+            EnteredOnce(s);
+            var damage = s.E<DamageAppliedEvent>();
+            s.Need(damage.Length == 4 && damage.All(fact => fact.Amount == 1) &&
+                damage.Count(fact => fact.SourceSeat == 3 && fact.TargetSeat == 0) == (counterSlash ? 1 : 0),
+                "Three actual one-point card segments, outgoing or both directions together, enter Rumo; the earlier cardless skill damage is excluded.");
+            s.Need(counterSlash
+                ? s.V(3) is { Hp: 7, Armor: 0 } && damage.Single(fact => fact.SourceSeat == 3 && fact.TargetSeat == 0)
+                    .ArmorPayment is { ArmorAbsorbed: 1, HpLossAmount: 0 }
+                : s.V(3).Hp == 8 && damage.All(fact => fact.ArmorPayment is { ArmorAbsorbed: 1, HpLossAmount: 0 }),
+                "Outgoing-only damage can all be paid by armor; the counter branch naturally spends its unarmored enemy's Slash and counts the incoming armor-paid point together with actual outgoing card damage.");
+            UseAt(s, CardKind.Slash, 3);
+            EnteredOnce(s);
+        }
+
+        var chained = ThresholdScene([C(CardKind.Crossbow), C(CardKind.IronChain),
+            C(CardKind.FireSlash, Suit.Heart), C(CardKind.Slash, Suit.Heart)]);
+        chained.Drive("ping", 3); chained.Play();
+        chained.Drive("armor-one"); chained.Play();
+        UseAt(chained, CardKind.Crossbow);
+        var chain = chained.V().Hand.Single(card => card.Kind == CardKind.IronChain);
+        chained.Use(chained.Action(action => action.CardId == chain.Id && action.TargetSeats.SequenceEqual([0, 3]))); chained.Play();
+        UseAt(chained, CardKind.FireSlash, 3);
+        chained.Need(chained.E<DamageAppliedEvent>().Count(fact => fact.SourceSeat == 0 && fact.TargetSeat == 0 &&
+            fact.Amount == 1 && fact.ArmorPayment is { ArmorAbsorbed: 1, HpLossAmount: 0 }) == 1,
+            "Real chained Fire Slash damage returns one original one-point segment to its own source.");
+        NotEntered(chained, "One outgoing and one self-damage segment total two; self damage must not count twice as both dealt and received.");
+        UseAt(chained, CardKind.Slash, 3);
+        EnteredOnce(chained);
+
+        static Scene ThresholdScene(IReadOnlyList<ShanheStartingCard> hand, bool counterSlash = false) => Scene.Start(false,
+            recipe: new(83, 1, "mzf-cumulative-forward", Hero, 4, 0, 0, 0, 0, [Driver], hand, [],
+                // The armored recipient is adjacent seat 3, inside the real Crossbow's range one.
+                [new(Other, Hp: 8) { StartingHand = [] },
+                 new(Enemy, MaxHpBonus: counterSlash ? 2 : 0, Hp: 8)
+                 { InitialArmor = counterSlash ? 2 : 4, StartingHand = counterSlash ? [C(CardKind.Slash)] : [] }],
+                [new(Ally, Hp: 8) { StartingHand = [] }], new string('f', 64)));
+        static void UseAt(Scene s, CardKind kind, params int[] targets)
+        {
+            var card = s.V().Hand.First(card => card.Kind == kind);
+            s.Use(s.Action(action => action.CardId == card.Id && (targets.Length == 0 || action.TargetSeats.SequenceEqual(targets)))); s.Play();
+        }
+        static void NotEntered(Scene s, string message) => s.Need(s.E<MoZhangFeiChenshiEnteredEvent>().Length == 0 &&
+            s.E<OlMoRumoEnteredEvent>().Length == 0 && s.V().Hp == 4, message);
+        static void EnteredOnce(Scene s) => s.Need(s.V().Hp == 5 &&
+            s.V().Skills!.Any(skill => skill.ContentId == "ol:mo-zhuohun-modified") &&
+            !s.V().Skills!.Any(skill => skill.ContentId == "ol:mo-zhuohun") &&
+            s.E<MoZhangFeiStartedEvent>().Count(fact => fact.Receipt.Op == SkillProgramEffectOp.ResolveMoZhangFeiChenshi) == 1 &&
+            s.E<MoZhangFeiChenshiEnteredEvent>().Length == 1 && s.E<OlMoRumoEnteredEvent>().Length == 1 &&
+            s.E<RecoveryAppliedEvent>().Count(fact => fact.TargetSeat == 0 && fact.Amount == 1) == 1,
+            "First cumulative card damage of three recovers once, replaces Zhuohun and enters shared Rumo once, including after further damage.");
+    }
+
     private sealed class Fixture : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-ol-mo-zhang-fei", new(1, 0, 0));
@@ -85,6 +171,8 @@ internal static class OlMoZhangFeiChecks
                 {"id":"lose-three","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"loseHp","target":"selectedTarget","amount":3}]},
                 {"id":"recover","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"recover","target":"selectedTarget","amount":1}]},
                 {"id":"draw-two","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"draw","target":"selectedTarget","amount":2}]},
+                {"id":"ping","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"selectedTarget","amount":1}]},
+                {"id":"armor-one","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"grantArmor","target":"owner","amount":1}]},
                 {"id":"grant-probe","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"grantSkills","target":"owner","skillIds":["{{Probe}}"]}]},
                 {"id":"lose-zhuohun","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"loseOwnerSkillsAndGrant","target":"owner","skillIds":["ol:mo-zhuohun-modified"],"sourceBind":"standard:none"}]}]},
                 {"id":"{{Probe}}","revision":1,"activations":[{"id":"probe","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"draw","target":"owner","amount":1}]}]},
@@ -93,7 +181,8 @@ internal static class OlMoZhangFeiChecks
             var labels = new[] { Driver, Probe, Boost }.ToDictionary(id => id, id => (object)new { name = id, description = "固定真实原生驱动" });
             var catalog = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, id, id) { Program = program, ProgramPresentation = catalog.Presentations[id], Tags = id == Probe ? SkillTag.None : SkillTag.Locked });
-            foreach (var kind in new[] { CardKind.Slash, CardKind.Dodge, CardKind.Nullification, CardKind.Crossbow, CardKind.ZhangbaSerpentSpear })
+            foreach (var kind in new[] { CardKind.Slash, CardKind.Dodge, CardKind.Nullification, CardKind.Crossbow, CardKind.ZhangbaSerpentSpear,
+                CardKind.Duel, CardKind.IronChain, CardKind.FireSlash, CardKind.ThunderSlash })
             { var c = CardCatalog.Get(kind); b.AddCard(new("fixture:mzf-card-" + kind, c.DisplayName, c.CategoryName, c.Description, kind)); }
             foreach (var peer in new[] { Enemy, Other, Ally }) b.AddGeneral(new(peer, peer, "", "standard:none", "wei", 8));
             b.AddDeck(new(Deck, "固定小牌堆", 0, 0, []) { PhysicalCards = Enumerable.Range(0, 40)
@@ -147,12 +236,12 @@ internal static class OlMoZhangFeiChecks
             if (!condition) throw new InvalidOperationException(message + " " + JsonSerializer.Serialize(new { G.State.TurnNumber, G.State.Phase, G.State.Winner, P,
                 Hp = Enumerable.Range(0, 4).Select(i => V(i).Hp), Frames = G.ResolutionStack.Select(f => f.GetType().Name) }));
         }
-        public static Scene Start(bool boosted, bool spear = false)
+        public static Scene Start(bool boosted, bool spear = false, ShanheBattleSetup? recipe = null)
         {
             var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
             var hand = spear ? new[] { C(CardKind.ZhangbaSerpentSpear), C(CardKind.Crossbow), C(CardKind.Nullification, Suit.Club), C(CardKind.Slash, Suit.Heart) } :
                 boosted ? new[] { C(CardKind.Slash) } : new[] { C(CardKind.Crossbow), C(CardKind.Dodge, Suit.Club), C(CardKind.Dodge, Suit.Heart), C(CardKind.Slash), C(CardKind.Nullification) };
-            var setup = new ShanheBattleSetup(83, 1, "mzf-native", Hero, boosted ? 4 : 5, 0, 0, 0, 0, boosted ? [Driver, Boost] : [Driver], hand, [],
+            var setup = recipe ?? new ShanheBattleSetup(83, 1, "mzf-native", Hero, boosted ? 4 : 5, 0, 0, 0, 0, boosted ? [Driver, Boost] : [Driver], hand, [],
                 [new(Enemy, Hp: 8) { StartingHand = [] }, new(Other, Hp: boosted ? 4 : 3) { StartingHand = boosted ? [] : [C(CardKind.Slash)] }],
                 [new(Ally, Hp: boosted ? 8 : 2) { StartingHand = [] }], new string('f', 64));
             var g = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null,

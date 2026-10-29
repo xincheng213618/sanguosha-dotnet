@@ -41,7 +41,7 @@ public sealed partial class GameEngine
             if (child is CardsMovedTriggerWindowFrame moved) return TypedRecoveryRewardReturnMatches(recovery, moved, history);
         }
         return NativeDrawAttemptRidesOn(child, parent) || OrderedPrintedSkillLossSkillsChangedEdge(parent, child) ||
-            TypedDamagePostEventEdge(parent, child) || HalfHandPaidDamageObserverEdge(index) || PreventionDrawObserverEdge(index);
+            TypedDamagePostEventEdge(parent, child) || HalfHandPaidDamageObserverEdge(index) || ProgramChildResolutionEdge(index);
     }
 
     private ProgramSkillFrame? ShanheSourceBiriObserverRoot() => FindProgramObserverRoot(
@@ -75,20 +75,6 @@ public sealed partial class GameEngine
             RecoveryReplacementFrameRidesOn(recovery, _resolutionStack[child - 1]);
     }
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 62047)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 62047)]
-    private bool AllowsShanheSourceBiriObserverDamage(ProgramSkillFrame frame, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || frame.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != frame.Id ||
-            ShanheSourceBiriObserverRoot() is not { } root || root.Id == frame.Id ||
-            frame.WindowContext?.Window is not (SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or
-                SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved)) return false;
-        var effect = TypedRecoveryPausedEffect(frame);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source &&
-            effect.DamageNature == nature && target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(frame, reference) :
-                ResolveProgramEffectTarget(frame, effect.Target));
-    }
 
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 62047, group: 30)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 62047)]

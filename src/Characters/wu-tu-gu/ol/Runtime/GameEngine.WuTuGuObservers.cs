@@ -24,11 +24,5 @@ public sealed partial class GameEngine
     private bool HasWuTuGuBeforeDamageObserver(long id)=>HasWuTuGuDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 750)]
     private bool IsWuTuGuDying()=>ActiveDying is{}dying&&WuTuGuObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==dying.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1320)]
-    private bool AllowsWuTuGuNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||WuTuGuObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);
-        return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27320)]private bool AdvanceWuTuGuChildren()=>_pendingDecision is null&&WuTuGuObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

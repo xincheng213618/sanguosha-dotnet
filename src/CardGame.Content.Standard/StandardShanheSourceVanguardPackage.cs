@@ -33,7 +33,7 @@ public sealed class StandardShanheSourceVanguardPackage : IGameContentPackage
         Add(NightmareId, "16-25", [DuoruiSkillId, ZhuijiSkillId]);
 
         void Add(string id, string tier, IReadOnlyList<string> extra) => builder.AddGeneral(new(id,
-            // Source portrait1000236 has no verified local image: supporter is explicit fallback art.
+            // Runtime supporter fallback; exact source art is resolved by the desktop ID binding.
             "先锋精骑", "supporter", QingxiSkillId, "qun", 4, extra)
         {
             InitialHp = 4, CharacterId = "character:shanhe-source-soldier-4861",

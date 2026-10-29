@@ -40,12 +40,6 @@ public sealed partial class GameEngine
     private bool HasMouDengAiBeforeDamage(long id) => MouDengAiObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 33400)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33400)]
     private bool IsMouDengAiDying() => ActiveDying is { } d && MouDengAiObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 33400)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 33400)]
-    private bool AllowsMouDengAiNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || MouDengAiObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature && target == (e.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33400)] private bool AdvanceMouDengAiChildren() => _pendingDecision is null && MouDengAiObserverRoot() is not null && TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 33400)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 33400)]
     private bool ContinuePaidMouDengAi(ProgramSkillFrame f) => f.MouDengAiOl is { Paid: true } && ValidMouDengAiOl(f);

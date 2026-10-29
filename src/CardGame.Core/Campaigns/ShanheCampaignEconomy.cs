@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace CardGame.Core.Campaigns;
 
 /// <summary>Expedition tactics, including battle programs qualified by the current campaign balance.</summary>
@@ -12,7 +14,9 @@ public sealed record ShanheCampaignEconomy(
     int ShopTacticPromotionPercent = 0, int ShopSkillPromotionPercent = 0, int ShopMaterialPromotionPercent = 0,
     int BattlePrimaryPromotionPercent = 0, bool UnlimitedPaidShopRefreshes = false,
     int BattleGoldRandomMinPercent = 100, int BattleGoldRandomMaxPercent = 100,
-    bool UpgradeOrdinaryBattles = false);
+    bool UpgradeOrdinaryBattles = false,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] int ExtraChapterBattles = 0,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] bool FavorOwnedSchoolRewards = false);
 
 public static partial class ShanheCampaignContent
 {
@@ -39,6 +43,7 @@ public static partial class ShanheCampaignContent
             (economy.BattleGoldRandomMinPercent == 100 && economy.BattleGoldRandomMaxPercent == 100 ||
                 economy.BattleGoldRandomMinPercent < economy.BattleGoldRandomMaxPercent) &&
             economy.ExtraEliteRareTactics is >= 0 and <= 4 && economy.ExtraBossEpicSkills is >= 0 and <= 4 &&
+            economy.ExtraChapterBattles is >= 0 and <= 2 &&
             (economy.GoldAbove is null && economy.BattleSkillId is null ||
                 economy.GoldAbove is >= 0 and <= 1000000 && !string.IsNullOrWhiteSpace(economy.BattleSkillId)) &&
             economy != new ShanheCampaignEconomy(), "Invalid or empty campaign economy tactic.");

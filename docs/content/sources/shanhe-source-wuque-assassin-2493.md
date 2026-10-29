@@ -4,7 +4,7 @@
 
 `Fight.fightID=2493`、`Ggroup=2493`，战斗标题为刺客夜袭。完整阵容只有一行 `General.a=2493`：`b=4861`、`c=乌鹊暗杀者`、`d=1000228`、`f=0`、`h=100`。独立士兵身体为3/3，通常摸牌2、随机起手4、护甲0、护甲回复0、护甲上限5、基础额外出杀0、额外伤害0。没有固定装备、随身牌或隐藏成员。`NewbieGroup=22493` 是独立战斗组，`pvpspell=3189` 是另一模式字段，均不追加为本阵容成员或山河技能。
 
-外观串暂未对应到已核本地肖像，使用 `supporter` 作为本地缺图回退；角色统一为 `character:shanhe-source-soldier-4861`，不借用何太后、郭槐或张春华的身份及附带技能。
+运行时保留 `supporter` 回退键；桌面原图以此族三个精确ID对应的PVE皮肤1000228为界。角色统一为 `character:shanhe-source-soldier-4861`，不借用何太后、郭槐或张春华的身份及附带技能，不因美术改变内容字段。
 
 完整源难度1—25按以下阈值累计：
 
@@ -31,3 +31,14 @@
 内容包为 `StandardShanheSourceWuqueAssassinPackage`，三个身份为 `shanhe:source-wuque-assassin-2493-base`、`shanhe:source-wuque-assassin-2493-hard`、`shanhe:source-wuque-assassin-2493-hell`；`GetGeneralId(1..25)` 分别选取1—10、11—20、21—25形态。包依赖 `standard-classic-generals` 的鸩毒、绝情，仅新增专版遗毒规则束。
 
 新增前向检查入口为 `ShanheSourceYiduChecks.SoleTargetCompletesNativeRevealWhileOlRetainsMultipleTargets`：以真实实体杀与闪完成单目标用牌，核对公开展示、同色原牌一次弃置、实际弃牌执行者及派生孩子返回；真实三目标万箭齐发不能发动专版遗毒，而OL遗毒仍能选择未受伤目标。检查不使用存档恢复或整局模拟；最终执行结果由本批统一验证记录确认。
+
+
+## 2026-10-29 原生席位图与预览身份
+
+完整源组逐行保留；`hide` 缺省false、`startChapter=1`、`generalShow` 缺省0。下表按从0开始的源行顺序记录真实 `g`，未列出的 `g` 按0处理；不从首席、同名、通用载体或将领称呼推定主帅。身份只用于预览布局，不改变关卡类型、技能、数值、抽选或内容版本。
+
+| 源行与成员 | g | 原图链 | PNG | 字节 | SHA256 |
+| --- | --- | --- | --- | --- | --- |
+| raw0 乌鹊暗杀者（4861） | 0 | General.d=1000228 → root.pveskin.seatpic | [官方146×172原图](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000228.png) | 56702 | `0d2de67c81f5333a05c54b5203061667f8b74390c7ac7425b7795fe5df57e585` |
+
+所有表内PNG均取得HTTP200、image/png响应并完成目视、尺寸、原字节SHA及RGBA像素核对；直接使用原始响应字节，不裁剪、缩放、重绘或重新编码。多人组的重复成员仍占独立席位；同一PNG的复用必须有各条源行的独立皮肤证据。当前完整来源配方的25个难度值均已只读检查，体力成长和固定装备不改变名单或角色顺序。原图、精确运行时绑定与身份布局证据集中记录在[山河NPC美术来源](../shanhe-npc-art-sources.json)及[敌将布局来源](../shanhe-encounter-layout-sources.json)。

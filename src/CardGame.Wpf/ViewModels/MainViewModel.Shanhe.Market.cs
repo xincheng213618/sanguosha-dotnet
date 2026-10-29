@@ -5,7 +5,10 @@ namespace CardGame.Wpf.ViewModels;
 
 public sealed partial class MainViewModel
 {
-    public IReadOnlyList<string> ShanheMarketCategories { get; } = new[] { "战法", "装备", "卡牌", "技能" };
+    private static readonly IReadOnlyList<string> ShanheBaseMarketCategories = Array.AsReadOnly(new[] { "战法", "装备", "卡牌", "技能" });
+    private static readonly IReadOnlyList<string> ShanheSupplyMarketCategories = Array.AsReadOnly(new[] { "战法", "装备", "卡牌", "技能", "补给" });
+    public IReadOnlyList<string> ShanheMarketCategories => ShanheShopItems.Any(item => item.MarketCategory == "补给")
+        ? ShanheSupplyMarketCategories : ShanheBaseMarketCategories;
     private string _selectedShanheMarketCategory = "战法";
     public string SelectedShanheMarketCategory
     {
@@ -26,6 +29,7 @@ public sealed partial class MainViewModel
             ? $"额外技能 {state.ExtraSkillIds.Count}/{state.ExtraSkillSlots} · 满槽可替换" : "额外技能 · 满槽可替换",
         "装备" => IsShanheBattleActive ? "本场购买即加入手牌，后续每战开局直接装备" : "每战开局直接置入装备区",
         "卡牌" => IsShanheBattleActive ? "购买即加入手牌" : "每战开局获得随身牌",
+        "补给" => "补给按当前货品说明结算",
         _ => "战法持续本次征程，不占技能槽"
     };
     public string ShanheMarketSurchargeNotice
@@ -60,7 +64,9 @@ public sealed partial class MainViewModel
         CurrentShanheMarketState.Gold >= CurrentShanheMarketState.ShopRefreshCost && !IsTutorialActive);
     private void RefreshShanheMarketPresentation()
     {
-        foreach (var property in new[] { nameof(ShanheMarketGoods), nameof(ShanheMarketHasGoods), nameof(ShanheMarketCategoryNotice),
+        if (!ShanheMarketCategories.Contains(_selectedShanheMarketCategory)) _selectedShanheMarketCategory = "战法";
+        foreach (var property in new[] { nameof(ShanheMarketCategories), nameof(SelectedShanheMarketCategory),
+            nameof(ShanheMarketGoods), nameof(ShanheMarketHasGoods), nameof(ShanheMarketCategoryNotice),
             nameof(ShanheMarketSurchargeNotice), nameof(ShanheMarketRefreshText), nameof(ShanheMarketRefreshRemaining),
             nameof(ShanheMarketFreeRefreshRemaining), nameof(ShanheMarketPaidRefreshRemaining) }) RaisePropertyChanged(property);
         _refreshShanheMarketCommand?.NotifyCanExecuteChanged();

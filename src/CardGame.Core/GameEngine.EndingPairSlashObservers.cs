@@ -51,7 +51,7 @@ public sealed partial class GameEngine
             {
                 // Local union only after the original real cost/draw invoice and
                 // first incoming movement have been proved. No observer presence gate.
-                if (!PaidObserverDamageDyingFaceEdge(n) && !EquipmentDonationDamageObserverEdge(n) &&
+                if (!PaidObserverDamageDyingFaceEdge(n) && !ProgramChildResolutionEdge(n) &&
                     !(_resolutionStack[n - 1] is ProgramSkillFrame p && _resolutionStack[n] is DyingFrame { Continuation: DyingContinuationKind.AttackHpLoss } loss && PaidObserverAttackHpLossDyingMatches(p, loss)) &&
                     !(_resolutionStack[n - 1] is DyingFrame dying && _resolutionStack[n] is ProgramSkillFrame response && PaidObserverDamageDyingProgramMatches(response, dying)))
                 { valid = false; break; }

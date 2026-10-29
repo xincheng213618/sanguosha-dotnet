@@ -100,13 +100,6 @@ public sealed partial class GameEngine
     private bool HasMengDaBeforeDamageObserver(long id)=>MengDaObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 700)]
     private bool IsMengDaDying()=>ActiveDying is{}d&&MengDaObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1270)]
-    private bool AllowsMengDaNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||MengDaObserverRoot()is not{}root||root.Id==f.Id)return false;
-        var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&
-            target==(e.TargetReference is{}reference?ResolveProgramParticipant(f,reference):ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27240)]
     private bool AdvanceMengDaSubtree()=>_pendingDecision is null&&MengDaObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

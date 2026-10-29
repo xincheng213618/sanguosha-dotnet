@@ -37,7 +37,7 @@ public sealed class StandardShanheSourceRangerPackage : IGameContentPackage
         Add(HellId, "21-25", [ChunlaoSkillId, JuesiSkillId, NamanSkillId]);
 
         void Add(string id, string tier, string[] extra) => builder.AddGeneral(new(id,
-            // The source1000251 costume has no verified local portrait.
+            // Desktop binds source skin1000251 by exact runtime ID; supporter remains the runtime fallback.
             "游侠", "supporter", YilieSkillId, "qun", 4, extra)
         {
             InitialHp = 4, CharacterId = "character:shanhe-source-soldier-4861",

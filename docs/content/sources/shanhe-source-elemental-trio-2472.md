@@ -10,7 +10,17 @@
 {"a":2472,"startChapter":1,"b":4038,"c":"穷奇","d":"4481","f":0,"h":100,"k":4,"l":4,"m":0,"n":0,"o":5,"p":2,"q":4,"r":0,"otherad":0,"v":"0","getspell_EM":"3496","getspell_LY":"619","pvpspell":"3189"}
 ```
 
-原身体依次为4067的3/3、4028的4/4、4038的4/4；三员均基础摸牌2、随机起手4。护甲、护甲回复、额外出杀与额外伤害均为0，护甲上限字段5；没有固定牌、额外属性、隐藏成员、关底标记或二阶段。人物表中水神为神势力女性，火神为神势力男性，穷奇为群势力男性。原皮肤4453、4446、4481尚无确认的本地图片映射，均使用明确的 `supporter` 回退并保留独立来源身体身份；不继承人物表的原活动血量和整套技能。`pvpspell=3189` 不加入本普通组。
+原身体依次为4067的3/3、4028的4/4、4038的4/4；三员均基础摸牌2、随机起手4。护甲、护甲回复、额外出杀与额外伤害均为0，护甲上限字段5；没有固定牌、额外属性、隐藏成员、关底标记或二阶段。人物表中水神为神势力女性，火神为神势力男性，穷奇为群势力男性。保留各自独立来源身体身份，不继承人物表的原活动血量和整套技能。`pvpspell=3189` 不加入本普通组。
+
+三条独立 `General` 源行的 `d` 经PVE皮肤表精确解析为下列原卡；皮肤号与座位文件号不同，不能直接以 `d` 拼文件名。全部为146×172官方原字节PNG，保存在 `src/CardGame.Wpf/Assets/Shanhe/Npc/`，源行与像素证据汇入[山河NPC素材清单](../shanhe-npc-art-sources.json)。
+
+| rawOrdinal／身体 | 皮肤d | PVE seatpic／官方原卡 | 字节数／SHA-256 |
+| --- | --- | --- | --- |
+| 0／4067 | 4453 | [generalface_4067](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_4067.png) | 59,952／`52d3896bd29dd0e6599cda26e7cb822757a61504d5c34fc0aff0b1624ba01b9c` |
+| 1／4028 | 4446 | [generalface_4030](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_4030.png) | 65,049／`30ce50646cea4c738d2220c2a298db9dd6f7d6b941bd6d0906bda1403903717a` |
+| 2／4038 | 4481 | [generalface_4138](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_4138.png) | 58,630／`d515a490bfd645793688b6bf40093ea8de5ca2fd6bac1d2c6dc677bd9a527020` |
+
+三行 `g` 均缺省为false，`hide=false`、`startChapter=1`、`Generalshow=0`；没有主帅，介绍保留三张完整卡与全部技能。七个难度身份按精确运行时ID绑定各自原卡，内容定义的 `PortraitKey="supporter"`、`VariantId` 与规则不变。
 
 | 来源难度 | 第一员：水神玄冥4067 | 第二员：火神祝融4028 | 第三员：穷奇4038 |
 | --- | --- | --- | --- |

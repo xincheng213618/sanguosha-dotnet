@@ -61,14 +61,6 @@ public sealed partial class GameEngine
         if (ShiScFirstChild(f, recovery)) return true; var at = _resolutionStack.FindIndex(x => x.Id == f.Id); var child = _resolutionStack.FindIndex(x => x.Id == recovery.Id);
         return at >= 0 && child > at + 1 && ShiScFirstChild(f, _resolutionStack[at + 1]) && ShiScChildSuffix(at) && RecoveryReplacementFrameRidesOn(recovery, _resolutionStack[child - 1]);
     }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 49100)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 49100)]
-    private bool ShiScNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess) return false;
-        if (f.ShiSunChen is { Stage: ShiScStage.DamageChildren, Chain: true, Draw: true } r && ValidShiSc(f)) return source is null && nature == DamageNature.Fire && target == r.Target && amount == 1 && ProgramEventHistory<ShiScMomentumIssuedEvent>().Count(e => e.FrameId == f.Id && e.Target == target) == 1;
-        if (ShiScObserverRoot() is not { } root || root.Id == f.Id) return false; var effect = GetPausedPrivateOfferEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature && target == (effect.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 49100)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 49100)] private bool KeepShiScPaid(ProgramSkillFrame f) => f.ShiSunChen is not null && ValidShiSc(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 49100)] private bool AdvanceShiScChildren() => _pendingDecision is null && ShiScObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

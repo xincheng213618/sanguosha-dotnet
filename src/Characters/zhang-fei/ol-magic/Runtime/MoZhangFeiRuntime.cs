@@ -144,13 +144,36 @@ internal sealed partial class MoZhangFeiRuntime(IMoZhangFeiFacts facts, IMoZhang
             ? facts.History<MoZhangFeiColorArrivedEvent>().SingleOrDefault(e => SameHealthChange(e.Change, change) &&
                 e.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId) && e.GameplayHash == c.GameplayHash)
             : null;
+    private int ChenshiDamageTotal(int ownerSeat, long damageFrameId)
+    {
+        // DamageRequested binds the effective card kind to the following actual
+        // payment. Read only through this original damage so later children do
+        // not change an already issued entitlement. Armor pays damage too.
+        DamageRequestedEvent? request = null;
+        var total = 0;
+        foreach (var fact in facts.History<IGameEvent>())
+        {
+            if (fact is DamageRequestedEvent next) { request = next; continue; }
+            if (fact is not DamageAppliedEvent applied || request is null ||
+                applied.SourceSeat != request.SourceSeat || applied.TargetSeat != request.TargetSeat ||
+                applied.Amount != request.Amount || applied.Nature != request.Nature || applied.SourceLess != request.SourceLess) continue;
+            if (applied.Amount > 0 && (applied.TargetSeat == ownerSeat || !applied.SourceLess && applied.SourceSeat == ownerSeat) &&
+                request.SourceCard is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash or CardKind.Duel)
+                total = Math.Min(3, total + Math.Min(3, applied.Amount));
+            // Source and target are one predicate: a self-damage segment counts once.
+            if (request.ResolutionId == damageFrameId) return total;
+            request = null;
+        }
+        return 0;
+    }
     private bool ChenshiEligible(ProgramTriggerCandidate c, ProgramSkillWindowContext context) =>
         c.SkillId == Chenshi && c.BindingId == "first-three-damage" &&
-        context.Window == SkillProgramTriggerWindow.AfterDamageApplied && context.Amount >= 3 &&
+        context.Window == SkillProgramTriggerWindow.AfterDamageApplied && context.Amount > 0 &&
         (context.SourceSeat == c.OwnerSeat || context.TargetSeat == c.OwnerSeat) &&
-        facts.DamageKind(context.ParentFrameId) is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash or CardKind.Duel &&
         !IsModified(c.OwnerSeat) && !facts.History<MoZhangFeiStartedEvent>().Any(e =>
-            e.Receipt.Source.OwnerSeat == c.OwnerSeat && e.Receipt.Op == SkillProgramEffectOp.ResolveMoZhangFeiChenshi);
+            e.Receipt.Source.OwnerSeat == c.OwnerSeat && e.Receipt.Op == SkillProgramEffectOp.ResolveMoZhangFeiChenshi) &&
+        facts.DamageKind(context.ParentFrameId) is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash or CardKind.Duel &&
+        context.DamageFrameId is { } damageId && ChenshiDamageTotal(c.OwnerSeat, damageId) >= 3;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 33700,
         SkillProgramEffectOp.ResolveMoZhangFeiZhuohun, SkillProgramEffectOp.ResolveMoZhangFeiChenshi, SkillProgramEffectOp.ResolveMoZhangFeiGreenDraw)]
     internal bool CanOffer(ProgramTriggerLegalityContext g) => g.Candidate.SkillId == Chenshi
@@ -176,7 +199,7 @@ internal sealed partial class MoZhangFeiRuntime(IMoZhangFeiFacts facts, IMoZhang
         }
         else if (op == SkillProgramEffectOp.ResolveMoZhangFeiChenshi)
         {
-            if (!ChenshiEligible(c, context)) throw new InvalidOperationException("Chenshi requires the first one native Slash/Duel damage of at least three.");
+            if (!ChenshiEligible(c, context)) throw new InvalidOperationException("Chenshi requires native Slash/Duel damage to first reach a cumulative total of three.");
             r = r with { Stage = MoZhangFeiStage.RecoveryChildren };
         }
         else
@@ -417,8 +440,9 @@ internal sealed partial class MoZhangFeiRuntime(IMoZhangFeiFacts facts, IMoZhang
                     !facts.History<MoZhangFeiChenshiEnteredEvent>().Any(e => e.FrameId == f.Id)) &&
                 f.SkillId == Chenshi && f.TriggerId == "first-three-damage" &&
                 r.Stage is MoZhangFeiStage.RecoveryChildren or MoZhangFeiStage.Entering &&
-                f.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: >= 3 } damage &&
+                f.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, DamageFrameId: { } damageId } damage &&
                 (damage.SourceSeat == f.OwnerSeat || damage.TargetSeat == f.OwnerSeat) &&
+                ChenshiDamageTotal(f.OwnerSeat, damageId) >= 3 &&
                 frames.Find(r.WindowId) is DamageTriggerWindowFrame { SourceCard: CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash or CardKind.Duel };
         return r.Op == SkillProgramEffectOp.ResolveMoZhangFeiGreenDraw && r.Stage == MoZhangFeiStage.GainChildren &&
             f.WindowContext?.NativeDraw is { } draw && r.DrawAttemptId == draw.AttemptFrameId && r.TargetSeat == draw.RecipientSeat &&

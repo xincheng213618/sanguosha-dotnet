@@ -47,19 +47,6 @@ public sealed partial class GameEngine
     private bool IsCaoSongLiluDying() => ActiveDying is { } dying && CaoSongLiluObserverRoot() is { } root &&
         _resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStack.FindIndex(frame => frame.Id == root.Id);
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 920)]
-    private bool AllowsCaoSongLiluNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != observer.Id ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or
-                SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or
-                SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.SkillsChanged) ||
-            CaoSongLiluObserverRoot() is not { } root || root.Id == observer.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(observer);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target));
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26030)]
     private bool TryAdvanceCaoSongLiluSubtree() => _pendingDecision is null && CaoSongLiluObserverRoot() is not null &&

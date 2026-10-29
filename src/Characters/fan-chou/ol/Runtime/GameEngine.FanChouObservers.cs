@@ -48,10 +48,4 @@ public sealed partial class GameEngine
  private bool IsFanChouDying()=>ActiveDying is{}d&&FanChouObserverRoot()is{}r&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 310)]
  private bool TryAdvanceFanChouSubtree()=>_pendingDecision is null&&FanChouObserverRoot()is not null&&TryAdvanceObserverSubtree(advanceRecoveryReplacement:true);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 540)]
- private bool AllowsFanChouNestedDamage(ProgramSkillFrame observer,int target,int amount,ProgramParticipantReference?source,DamageNature?nature,bool sourceLess)
- {
-  if(sourceLess||observer.AttackAttempt is not null||observer.InstructionIndex<1||_resolutionStack.LastOrDefault()?.Id!=observer.Id||observer.WindowContext?.Window is not(SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged)||FanChouObserverRoot()is not{}r||r.Id==observer.Id)return false;
-  var e=GetPausedPrivateOfferEffect(observer);return e is{Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&target==(e.TargetReference is{}reference?ResolveProgramParticipant(observer,reference):ResolveProgramEffectTarget(observer,e.Target));
- }
 }

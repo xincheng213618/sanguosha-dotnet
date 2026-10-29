@@ -126,23 +126,6 @@ public sealed partial class GameEngine
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1820)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 200)]
     private bool HasSlashBenefitDamageObserver(long id) => SlashBenefitPaidObserverRoot(id) is not null;
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 90)]
-    private bool AllowsSlashTargetBenefitNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 ||
-            _resolutionStack.LastOrDefault()?.Id != observer.Id || observer.WindowContext?.Window is not
-                (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.AfterHpRecovered or
-                 SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost) ||
-            SlashBenefitPaidObserverRoot() is not { SlashTargetBenefitDraft: { } paid } root ||
-            ActiveCardAttack?.ResolutionId != paid.Receipt.Use.CardUseFrameId ||
-            CurrentDamageAttempt?.ResolutionId != paid.Receipt.Use.CardUseFrameId ||
-            root.Id == observer.Id) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!)
-            .GetPausedInstruction(observer.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target));
-    }
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 580, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 660)]
     private bool IsSlashTargetBenefitProgramDying() => ActiveDying is { } dying && SlashBenefitPaidObserverRoot(ActiveDamageTrigger?.Id) is { } root &&

@@ -1,0 +1,1250 @@
+{
+  "regions": [
+    {
+      "regionId": 1,
+      "name": "大谷关",
+      "background": "map5_1.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5011,
+          "name": "凉亭",
+          "image": "city_1_1.png",
+          "x": 117,
+          "y": 187,
+          "width": 120,
+          "height": 87
+        },
+        {
+          "cityId": 5012,
+          "name": "洞窟",
+          "image": "city_1_2.png",
+          "x": 1031,
+          "y": 255,
+          "width": 130,
+          "height": 87
+        },
+        {
+          "cityId": 5013,
+          "name": "箭塔",
+          "image": "city_1_3.png",
+          "x": 841,
+          "y": 310,
+          "width": 129,
+          "height": 87
+        },
+        {
+          "cityId": 5014,
+          "name": "箭塔",
+          "image": "city_1_4.png",
+          "x": 323,
+          "y": 282,
+          "width": 122,
+          "height": 94
+        },
+        {
+          "cityId": 5015,
+          "name": "村落",
+          "image": "city_1_5.png",
+          "x": 837,
+          "y": 427,
+          "width": 130,
+          "height": 87
+        },
+        {
+          "cityId": 5016,
+          "name": "贼营",
+          "image": "city_1_6.png",
+          "x": 480,
+          "y": 429,
+          "width": 118,
+          "height": 87
+        },
+        {
+          "cityId": 5017,
+          "name": "村落",
+          "image": "city_1_7.png",
+          "x": 104,
+          "y": 419,
+          "width": 124,
+          "height": 87
+        },
+        {
+          "cityId": 5018,
+          "name": "大谷关",
+          "image": "city_1_8.png",
+          "x": 661,
+          "y": 194,
+          "width": 139,
+          "height": 90
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 295,
+        "y": 455,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 2,
+      "name": "广成关",
+      "background": "map5_2.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5021,
+          "name": "烽火台",
+          "image": "city_2_1.png",
+          "x": 231,
+          "y": 185,
+          "width": 118,
+          "height": 87
+        },
+        {
+          "cityId": 5022,
+          "name": "村落",
+          "image": "city_2_2.png",
+          "x": 657,
+          "y": 222,
+          "width": 115,
+          "height": 87
+        },
+        {
+          "cityId": 5023,
+          "name": "洞窟",
+          "image": "city_2_3.png",
+          "x": 960,
+          "y": 312,
+          "width": 116,
+          "height": 87
+        },
+        {
+          "cityId": 5024,
+          "name": "木亭",
+          "image": "city_2_4.png",
+          "x": 135,
+          "y": 280,
+          "width": 129,
+          "height": 87
+        },
+        {
+          "cityId": 5025,
+          "name": "村落",
+          "image": "city_2_5.png",
+          "x": 536,
+          "y": 484,
+          "width": 121,
+          "height": 87
+        },
+        {
+          "cityId": 5026,
+          "name": "村落",
+          "image": "city_2_6.png",
+          "x": 78,
+          "y": 432,
+          "width": 130,
+          "height": 87
+        },
+        {
+          "cityId": 5027,
+          "name": "广成关·地点7",
+          "image": "city_2_7.png",
+          "x": 762,
+          "y": 449,
+          "width": 123,
+          "height": 87
+        },
+        {
+          "cityId": 5028,
+          "name": "广成关",
+          "image": "city_2_8.png",
+          "x": 479,
+          "y": 295,
+          "width": 139,
+          "height": 90
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 346,
+        "y": 468,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 3,
+      "name": "函谷关",
+      "background": "map5_3.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5031,
+          "name": "中条山",
+          "image": "city_3_1.png",
+          "x": 226,
+          "y": 194,
+          "width": 117,
+          "height": 87
+        },
+        {
+          "cityId": 5032,
+          "name": "洞窟",
+          "image": "city_3_2.png",
+          "x": 625,
+          "y": 167,
+          "width": 116,
+          "height": 87
+        },
+        {
+          "cityId": 5033,
+          "name": "聚义台",
+          "image": "city_3_3.png",
+          "x": 1008,
+          "y": 190,
+          "width": 132,
+          "height": 87
+        },
+        {
+          "cityId": 5034,
+          "name": "密林",
+          "image": "city_3_4.png",
+          "x": 230,
+          "y": 414,
+          "width": 112,
+          "height": 87
+        },
+        {
+          "cityId": 5035,
+          "name": "栈桥",
+          "image": "city_3_5.png",
+          "x": 516,
+          "y": 286,
+          "width": 148,
+          "height": 107
+        },
+        {
+          "cityId": 5036,
+          "name": "湖县",
+          "image": "city_3_6.png",
+          "x": 826,
+          "y": 294,
+          "width": 129,
+          "height": 87
+        },
+        {
+          "cityId": 5037,
+          "name": "洞窟",
+          "image": "city_3_7.png",
+          "x": 803,
+          "y": 451,
+          "width": 116,
+          "height": 87
+        },
+        {
+          "cityId": 5038,
+          "name": "函谷关",
+          "image": "city_3_8.png",
+          "x": 509,
+          "y": 447,
+          "width": 156,
+          "height": 94
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 360,
+        "y": 330,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 4,
+      "name": "虎牢关",
+      "background": "map5_4.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5041,
+          "name": "芦苇丛",
+          "image": "city_4_1.png",
+          "x": 182,
+          "y": 138,
+          "width": 123,
+          "height": 87
+        },
+        {
+          "cityId": 5042,
+          "name": "村落",
+          "image": "city_4_2.png",
+          "x": 520,
+          "y": 124,
+          "width": 141,
+          "height": 87
+        },
+        {
+          "cityId": 5043,
+          "name": "箭塔",
+          "image": "city_4_3.png",
+          "x": 979,
+          "y": 144,
+          "width": 123,
+          "height": 87
+        },
+        {
+          "cityId": 5044,
+          "name": "成皋",
+          "image": "city_4_4.png",
+          "x": 54,
+          "y": 275,
+          "width": 129,
+          "height": 91
+        },
+        {
+          "cityId": 5045,
+          "name": "山脊道",
+          "image": "city_4_5.png",
+          "x": 327,
+          "y": 445,
+          "width": 129,
+          "height": 88
+        },
+        {
+          "cityId": 5046,
+          "name": "阵前",
+          "image": "city_4_6.png",
+          "x": 871,
+          "y": 372,
+          "width": 143,
+          "height": 87
+        },
+        {
+          "cityId": 5047,
+          "name": "密林",
+          "image": "city_4_7.png",
+          "x": 1043,
+          "y": 307,
+          "width": 137,
+          "height": 87
+        },
+        {
+          "cityId": 5048,
+          "name": "虎牢关",
+          "image": "city_4_8.png",
+          "x": 524,
+          "y": 314,
+          "width": 179,
+          "height": 112
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 727,
+        "y": 178,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 5,
+      "name": "轘辕关",
+      "background": "map5_5.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5051,
+          "name": "粮仓",
+          "image": "city_5_1.png",
+          "x": 124,
+          "y": 175,
+          "width": 139,
+          "height": 88
+        },
+        {
+          "cityId": 5052,
+          "name": "星火洞",
+          "image": "city_5_2.png",
+          "x": 495,
+          "y": 193,
+          "width": 131,
+          "height": 87
+        },
+        {
+          "cityId": 5053,
+          "name": "关门洞",
+          "image": "city_5_3.png",
+          "x": 838,
+          "y": 222,
+          "width": 126,
+          "height": 87
+        },
+        {
+          "cityId": 5054,
+          "name": "烽火台",
+          "image": "city_5_4.png",
+          "x": 256,
+          "y": 397,
+          "width": 135,
+          "height": 99
+        },
+        {
+          "cityId": 5055,
+          "name": "烽火台",
+          "image": "city_5_5.png",
+          "x": 1000,
+          "y": 345,
+          "width": 113,
+          "height": 101
+        },
+        {
+          "cityId": 5056,
+          "name": "大禹殿",
+          "image": "city_5_6.png",
+          "x": 546,
+          "y": 488,
+          "width": 137,
+          "height": 87
+        },
+        {
+          "cityId": 5057,
+          "name": "山谷",
+          "image": "city_5_7.png",
+          "x": 847,
+          "y": 458,
+          "width": 151,
+          "height": 87
+        },
+        {
+          "cityId": 5058,
+          "name": "轘辕关",
+          "image": "city_5_8.png",
+          "x": 415,
+          "y": 322,
+          "width": 173,
+          "height": 104
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 80,
+        "y": 392,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 6,
+      "name": "伊阙关",
+      "background": "map5_6.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5061,
+          "name": "村落",
+          "image": "city_6_1.png",
+          "x": 916,
+          "y": 151,
+          "width": 135,
+          "height": 87
+        },
+        {
+          "cityId": 5062,
+          "name": "粮仓",
+          "image": "city_6_2.png",
+          "x": 624,
+          "y": 142,
+          "width": 130,
+          "height": 87
+        },
+        {
+          "cityId": 5063,
+          "name": "村落",
+          "image": "city_6_3.png",
+          "x": 197,
+          "y": 139,
+          "width": 133,
+          "height": 90
+        },
+        {
+          "cityId": 5064,
+          "name": "山脊道",
+          "image": "city_6_4.png",
+          "x": 165,
+          "y": 324,
+          "width": 142,
+          "height": 87
+        },
+        {
+          "cityId": 5065,
+          "name": "烽火台",
+          "image": "city_6_5.png",
+          "x": 848,
+          "y": 456,
+          "width": 123,
+          "height": 87
+        },
+        {
+          "cityId": 5066,
+          "name": "箭塔",
+          "image": "city_6_6.png",
+          "x": 1058,
+          "y": 280,
+          "width": 129,
+          "height": 87
+        },
+        {
+          "cityId": 5067,
+          "name": "箭塔",
+          "image": "city_6_7.png",
+          "x": 285,
+          "y": 425,
+          "width": 137,
+          "height": 87
+        },
+        {
+          "cityId": 5068,
+          "name": "伊阙关",
+          "image": "city_6_8.png",
+          "x": 598,
+          "y": 327,
+          "width": 144,
+          "height": 93
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 812,
+        "y": 275,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 7,
+      "name": "颍川郡",
+      "background": "map5_7.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5071,
+          "name": "阳翟",
+          "image": "city_7_1.png",
+          "x": 403,
+          "y": 192,
+          "width": 142,
+          "height": 87
+        },
+        {
+          "cityId": 5072,
+          "name": "郏县",
+          "image": "city_7_2.png",
+          "x": 82,
+          "y": 320,
+          "width": 165,
+          "height": 100
+        },
+        {
+          "cityId": 5073,
+          "name": "襄城",
+          "image": "city_7_3.png",
+          "x": 320,
+          "y": 448,
+          "width": 119,
+          "height": 87
+        },
+        {
+          "cityId": 5074,
+          "name": "颍阴",
+          "image": "city_7_4.png",
+          "x": 703,
+          "y": 208,
+          "width": 147,
+          "height": 89
+        },
+        {
+          "cityId": 5075,
+          "name": "繁昌",
+          "image": "city_7_5.png",
+          "x": 672,
+          "y": 427,
+          "width": 188,
+          "height": 111
+        },
+        {
+          "cityId": 5076,
+          "name": "临颍",
+          "image": "city_7_6.png",
+          "x": 926,
+          "y": 436,
+          "width": 114,
+          "height": 87
+        },
+        {
+          "cityId": 5077,
+          "name": "许昌",
+          "image": "city_7_7.png",
+          "x": 951,
+          "y": 240,
+          "width": 213,
+          "height": 130
+        },
+        {
+          "cityId": 5078,
+          "name": "颍阳",
+          "image": "city_7_8.png",
+          "x": 505,
+          "y": 341,
+          "width": 107,
+          "height": 87
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 298,
+        "y": 327,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 8,
+      "name": "孟津",
+      "background": "map5_8.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5081,
+          "name": "渡口",
+          "image": "city_8_1.png",
+          "x": 112,
+          "y": 254,
+          "width": 119,
+          "height": 87
+        },
+        {
+          "cityId": 5082,
+          "name": "会盟台",
+          "image": "city_8_2.png",
+          "x": 675,
+          "y": 155,
+          "width": 128,
+          "height": 87
+        },
+        {
+          "cityId": 5083,
+          "name": "军营",
+          "image": "city_8_3.png",
+          "x": 923,
+          "y": 217,
+          "width": 146,
+          "height": 88
+        },
+        {
+          "cityId": 5084,
+          "name": "江心洲",
+          "image": "city_8_4.png",
+          "x": 169,
+          "y": 394,
+          "width": 112,
+          "height": 87
+        },
+        {
+          "cityId": 5085,
+          "name": "渡口",
+          "image": "city_8_5.png",
+          "x": 477,
+          "y": 463,
+          "width": 110,
+          "height": 87
+        },
+        {
+          "cityId": 5086,
+          "name": "烽火台",
+          "image": "city_8_6.png",
+          "x": 731,
+          "y": 443,
+          "width": 130,
+          "height": 87
+        },
+        {
+          "cityId": 5087,
+          "name": "山脊驿",
+          "image": "city_8_7.png",
+          "x": 1025,
+          "y": 451,
+          "width": 136,
+          "height": 87
+        },
+        {
+          "cityId": 5088,
+          "name": "孟津关",
+          "image": "city_8_8.png",
+          "x": 498,
+          "y": 253,
+          "width": 157,
+          "height": 91
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 293,
+        "y": 150,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 9,
+      "name": "小平津",
+      "background": "map5_9.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5091,
+          "name": "渡口",
+          "image": "city_9_1.png",
+          "x": 191,
+          "y": 196,
+          "width": 123,
+          "height": 87
+        },
+        {
+          "cityId": 5092,
+          "name": "演武台",
+          "image": "city_9_2.png",
+          "x": 466,
+          "y": 210,
+          "width": 124,
+          "height": 87
+        },
+        {
+          "cityId": 5093,
+          "name": "军营",
+          "image": "city_9_3.png",
+          "x": 612,
+          "y": 133,
+          "width": 148,
+          "height": 87
+        },
+        {
+          "cityId": 5094,
+          "name": "聚义台",
+          "image": "city_9_4.png",
+          "x": 971,
+          "y": 203,
+          "width": 132,
+          "height": 87
+        },
+        {
+          "cityId": 5095,
+          "name": "芦苇丛",
+          "image": "city_9_5.png",
+          "x": 739,
+          "y": 325,
+          "width": 116,
+          "height": 87
+        },
+        {
+          "cityId": 5096,
+          "name": "洞窟",
+          "image": "city_9_6.png",
+          "x": 92,
+          "y": 389,
+          "width": 135,
+          "height": 87
+        },
+        {
+          "cityId": 5097,
+          "name": "渡口",
+          "image": "city_9_7.png",
+          "x": 752,
+          "y": 475,
+          "width": 118,
+          "height": 87
+        },
+        {
+          "cityId": 5098,
+          "name": "小平津",
+          "image": "city_9_8.png",
+          "x": 295,
+          "y": 376,
+          "width": 155,
+          "height": 100
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 835,
+        "y": 237,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 10,
+      "name": "洛阳",
+      "background": "map5_10.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5101,
+          "name": "金市",
+          "image": "city_10_1.png",
+          "x": 104,
+          "y": 189,
+          "width": 155,
+          "height": 132
+        },
+        {
+          "cityId": 5102,
+          "name": "华林园",
+          "image": "city_10_2.png",
+          "x": 510,
+          "y": 112,
+          "width": 188,
+          "height": 100
+        },
+        {
+          "cityId": 5103,
+          "name": "太仓",
+          "image": "city_10_3.png",
+          "x": 882,
+          "y": 85,
+          "width": 111,
+          "height": 108
+        },
+        {
+          "cityId": 5104,
+          "name": "司马门",
+          "image": "city_10_4.png",
+          "x": 467,
+          "y": 282,
+          "width": 173,
+          "height": 177
+        },
+        {
+          "cityId": 5105,
+          "name": "武库",
+          "image": "city_10_5.png",
+          "x": 687,
+          "y": 266,
+          "width": 180,
+          "height": 169
+        },
+        {
+          "cityId": 5106,
+          "name": "石址",
+          "image": "city_10_6.png",
+          "x": 867,
+          "y": 274,
+          "width": 205,
+          "height": 133
+        },
+        {
+          "cityId": 5107,
+          "name": "碳墟",
+          "image": "city_10_7.png",
+          "x": 247,
+          "y": 301,
+          "width": 204,
+          "height": 145
+        },
+        {
+          "cityId": 5108,
+          "name": "凌云台",
+          "image": "city_10_8.png",
+          "x": 277,
+          "y": 185,
+          "width": 174,
+          "height": 109
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 78,
+        "y": 340,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 11,
+      "name": "河内",
+      "background": "map5_11.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5111,
+          "name": "山阳",
+          "image": "city_11_1.png",
+          "x": 442,
+          "y": 209,
+          "width": 127,
+          "height": 87
+        },
+        {
+          "cityId": 5112,
+          "name": "重门",
+          "image": "city_11_2.png",
+          "x": 790,
+          "y": 231,
+          "width": 118,
+          "height": 93
+        },
+        {
+          "cityId": 5113,
+          "name": "朝歌",
+          "image": "city_11_3.png",
+          "x": 981,
+          "y": 163,
+          "width": 131,
+          "height": 87
+        },
+        {
+          "cityId": 5114,
+          "name": "野王",
+          "image": "city_11_4.png",
+          "x": 83,
+          "y": 360,
+          "width": 135,
+          "height": 87
+        },
+        {
+          "cityId": 5115,
+          "name": "汲县",
+          "image": "city_11_5.png",
+          "x": 1038,
+          "y": 267,
+          "width": 111,
+          "height": 87
+        },
+        {
+          "cityId": 5116,
+          "name": "温县",
+          "image": "city_11_6.png",
+          "x": 250,
+          "y": 449,
+          "width": 133,
+          "height": 87
+        },
+        {
+          "cityId": 5117,
+          "name": "武德",
+          "image": "city_11_7.png",
+          "x": 855,
+          "y": 481,
+          "width": 135,
+          "height": 87
+        },
+        {
+          "cityId": 5118,
+          "name": "修武",
+          "image": "city_11_8.png",
+          "x": 579,
+          "y": 315,
+          "width": 135,
+          "height": 89
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 282,
+        "y": 359,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 12,
+      "name": "酸枣",
+      "background": "map5_12.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5121,
+          "name": "朝歌",
+          "image": "city_12_1.png",
+          "x": 193,
+          "y": 169,
+          "width": 141,
+          "height": 91
+        },
+        {
+          "cityId": 5122,
+          "name": "白马",
+          "image": "city_12_2.png",
+          "x": 951,
+          "y": 173,
+          "width": 137,
+          "height": 96
+        },
+        {
+          "cityId": 5123,
+          "name": "燕县",
+          "image": "city_12_3.png",
+          "x": 622,
+          "y": 196,
+          "width": 148,
+          "height": 98
+        },
+        {
+          "cityId": 5124,
+          "name": "延津",
+          "image": "city_12_4.png",
+          "x": 458,
+          "y": 307,
+          "width": 126,
+          "height": 87
+        },
+        {
+          "cityId": 5125,
+          "name": "长垣",
+          "image": "city_12_5.png",
+          "x": 993,
+          "y": 343,
+          "width": 128,
+          "height": 87
+        },
+        {
+          "cityId": 5126,
+          "name": "原阳",
+          "image": "city_12_6.png",
+          "x": 167,
+          "y": 385,
+          "width": 161,
+          "height": 107
+        },
+        {
+          "cityId": 5127,
+          "name": "封丘",
+          "image": "city_12_7.png",
+          "x": 789,
+          "y": 411,
+          "width": 152,
+          "height": 87
+        },
+        {
+          "cityId": 5128,
+          "name": "酸枣",
+          "image": "city_12_8.png",
+          "x": 566,
+          "y": 439,
+          "width": 152,
+          "height": 87
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 359,
+        "y": 439,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 13,
+      "name": "荥阳",
+      "background": "map5_13.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5131,
+          "name": "广武",
+          "image": "city_13_1.png",
+          "x": 446,
+          "y": 162,
+          "width": 136,
+          "height": 87
+        },
+        {
+          "cityId": 5132,
+          "name": "敖仓",
+          "image": "city_13_2.png",
+          "x": 749,
+          "y": 108,
+          "width": 135,
+          "height": 90
+        },
+        {
+          "cityId": 5133,
+          "name": "虎牢关",
+          "image": "city_13_3.png",
+          "x": 123,
+          "y": 325,
+          "width": 146,
+          "height": 90
+        },
+        {
+          "cityId": 5134,
+          "name": "冯池",
+          "image": "city_13_4.png",
+          "x": 340,
+          "y": 417,
+          "width": 127,
+          "height": 87
+        },
+        {
+          "cityId": 5135,
+          "name": "故市",
+          "image": "city_13_5.png",
+          "x": 700,
+          "y": 389,
+          "width": 144,
+          "height": 92
+        },
+        {
+          "cityId": 5136,
+          "name": "荥泽",
+          "image": "city_13_6.png",
+          "x": 882,
+          "y": 307,
+          "width": 145,
+          "height": 87
+        },
+        {
+          "cityId": 5137,
+          "name": "京县",
+          "image": "city_13_7.png",
+          "x": 906,
+          "y": 424,
+          "width": 131,
+          "height": 91
+        },
+        {
+          "cityId": 5138,
+          "name": "荥阳",
+          "image": "city_13_8.png",
+          "x": 588,
+          "y": 308,
+          "width": 133,
+          "height": 87
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 319,
+        "y": 288,
+        "width": 86,
+        "height": 71
+      }
+    },
+    {
+      "regionId": 14,
+      "name": "崤函道",
+      "background": "map5_14.png",
+      "width": 1220,
+      "height": 732,
+      "cities": [
+        {
+          "cityId": 5141,
+          "name": "蒲坂",
+          "image": "city_14_1.png",
+          "x": 122,
+          "y": 148,
+          "width": 138,
+          "height": 105
+        },
+        {
+          "cityId": 5142,
+          "name": "河北",
+          "image": "city_14_2.png",
+          "x": 418,
+          "y": 272,
+          "width": 152,
+          "height": 98
+        },
+        {
+          "cityId": 5143,
+          "name": "湖县",
+          "image": "city_14_3.png",
+          "x": 438,
+          "y": 437,
+          "width": 178,
+          "height": 111
+        },
+        {
+          "cityId": 5144,
+          "name": "洞窟",
+          "image": "city_14_4.png",
+          "x": 688,
+          "y": 450,
+          "width": 159,
+          "height": 93
+        },
+        {
+          "cityId": 5145,
+          "name": "弘农",
+          "image": "city_14_5.png",
+          "x": 690,
+          "y": 342,
+          "width": 143,
+          "height": 105
+        },
+        {
+          "cityId": 5146,
+          "name": "曹阳",
+          "image": "city_14_6.png",
+          "x": 885,
+          "y": 312,
+          "width": 143,
+          "height": 98
+        },
+        {
+          "cityId": 5147,
+          "name": "陕津",
+          "image": "city_14_7.png",
+          "x": 1040,
+          "y": 275,
+          "width": 129,
+          "height": 90
+        },
+        {
+          "cityId": 5148,
+          "name": "潼关",
+          "image": "city_14_8.png",
+          "x": 50,
+          "y": 373,
+          "width": 217,
+          "height": 138
+        }
+      ],
+      "arena": {
+        "name": "擂台",
+        "image": "city_6_9_cdd.png",
+        "x": 768,
+        "y": 240,
+        "width": 86,
+        "height": 71
+      }
+    }
+  ]
+}

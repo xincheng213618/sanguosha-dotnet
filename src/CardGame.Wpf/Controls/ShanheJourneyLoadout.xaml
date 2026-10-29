@@ -1,0 +1,97 @@
+<UserControl x:Class="CardGame.Wpf.Controls.ShanheJourneyLoadout" x:Name="LoadoutRoot"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:controls="clr-namespace:CardGame.Wpf.Controls"
+ MinWidth="1000" Height="192" FontFamily="Microsoft YaHei UI" AutomationProperties.Name="山河图随身手牌、战法、技能与队友">
+ <UserControl.Resources>
+  <Style x:Key="DockCaption" TargetType="TextBlock"><Setter Property="Foreground" Value="#E1CE9D"/><Setter Property="FontSize" Value="10"/><Setter Property="Margin" Value="3,0,0,6"/></Style>
+  <Style x:Key="HudRuleTarget" TargetType="Border">
+   <Setter Property="Focusable" Value="True"/><Setter Property="ToolTipService.ShowsToolTipOnKeyboardFocus" Value="True"/><Setter Property="ToolTipService.ShowDuration" Value="60000"/>
+   <EventSetter Event="GotKeyboardFocus" Handler="Rule_GotKeyboardFocus"/><EventSetter Event="LostKeyboardFocus" Handler="Rule_LostKeyboardFocus"/><EventSetter Event="PreviewKeyDown" Handler="Rule_PreviewKeyDown"/><EventSetter Event="Unloaded" Handler="Rule_Unloaded"/>
+   <Style.Triggers><Trigger Property="IsKeyboardFocused" Value="True"><Setter Property="Effect"><Setter.Value><DropShadowEffect Color="#FFE38A" BlurRadius="10" ShadowDepth="0" Opacity="0.9"/></Setter.Value></Setter></Trigger></Style.Triggers>
+  </Style>
+  <Style x:Key="HudRuleTip" TargetType="ToolTip" BasedOn="{StaticResource {x:Type ToolTip}}">
+   <Style.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="ShanheEncounterScrollStyles.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></Style.Resources>
+   <Setter Property="ContentTemplate" Value="{x:Null}"/><Setter Property="FontFamily" Value="Microsoft YaHei UI"/><Setter Property="FontSize" Value="13"/><Setter Property="MaxHeight" Value="360"/><Setter Property="Placement" Value="Top"/>
+  </Style>
+  <DataTemplate x:Key="CompanionPortrait">
+   <Border Width="55" Height="55" Margin="0,0,5,0" Background="Transparent" Style="{StaticResource HudRuleTarget}" AutomationProperties.Name="{Binding Name}" AutomationProperties.HelpText="{Binding Description}">
+    <Border.ToolTip><ToolTip Style="{StaticResource HudRuleTip}" MaxWidth="400"><ScrollViewer MaxHeight="320" Focusable="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel><TextBlock Text="{Binding Name}" FontWeight="SemiBold"/><TextBlock Text="{Binding Description}" TextWrapping="Wrap" LineHeight="21" Margin="0,5,0,0"/></StackPanel></ScrollViewer></ToolTip></Border.ToolTip>
+    <Grid><controls:ShanheHudSkin Source="pack://siteoforigin:,,,/Assets/Shanhe/Hud/toolTipBg.png" Insets="11" IsHitTestVisible="False"/>
+     <Border Background="{Binding Portrait}" Margin="2"/>
+     <TextBlock x:Name="CompanionFallback" Text="{Binding Glyph}" FontFamily="KaiTi" FontSize="23" Foreground="#DEC68F" HorizontalAlignment="Center" VerticalAlignment="Center"><TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers><DataTrigger Binding="{Binding HasPortrait}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+     <Image x:Name="CompanionSourceTag" Source="pack://siteoforigin:,,,/Assets/Shanhe/Hud/rogue_mate_logo.png" Width="33" Height="17" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+     <Border VerticalAlignment="Bottom" Background="#D7342722" Padding="1,2"><TextBlock Text="{Binding Name}" Foreground="#F5E5B7" FontSize="10" TextAlignment="Center" TextTrimming="CharacterEllipsis"/></Border>
+     <Border BorderBrush="#F1D495" BorderThickness="1" Margin="1" IsHitTestVisible="False"><Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Border}}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger><DataTrigger Binding="{Binding IsKeyboardFocused, RelativeSource={RelativeSource AncestorType=Border}}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Border.Style></Border>
+    </Grid>
+   </Border>
+  </DataTemplate>
+ </UserControl.Resources>
+ <Grid>
+  <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="180"/><ColumnDefinition Width="220"/><ColumnDefinition Width="135"/></Grid.ColumnDefinitions>
+  <Grid Margin="0,46,12,0"><Grid.RowDefinitions><RowDefinition Height="20"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+   <TextBlock Text="随 身 手牌" Style="{StaticResource DockCaption}"/>
+   <TextBlock Grid.Row="1" Text="暂无随身手牌" Foreground="#C4B18A" FontFamily="KaiTi" FontSize="17" Margin="8,0" VerticalAlignment="Center"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding ShanheJourneyHandCards.Count}" Value="0"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+   <ScrollViewer x:Name="ShanheJourneyHandScroll" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+    <ItemsControl x:Name="ShanheJourneyHandRows" ItemsSource="{Binding ShanheJourneyHandCards}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate>
+     <Border Width="76" Height="106" Margin="2,0,3,2" BorderBrush="#B89B60" BorderThickness="2" Background="#E6D5AE" CornerRadius="3" VerticalAlignment="Bottom" Style="{StaticResource HudRuleTarget}" AutomationProperties.Name="{Binding CardHint}">
+      <Border.ToolTip><ToolTip Style="{StaticResource HudRuleTip}" MaxWidth="360"><ScrollViewer MaxHeight="320" Focusable="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><TextBlock Text="{Binding CardHint}" TextWrapping="Wrap" LineHeight="21"/></ScrollViewer></ToolTip></Border.ToolTip>
+      <Viewbox Stretch="Fill"><Grid Width="186" Height="260"><ContentControl Content="{Binding}" ContentTemplate="{DynamicResource CardFaceTemplate}"/><ContentControl Content="{Binding}" ContentTemplate="{DynamicResource CardCornerTemplate}" HorizontalAlignment="Left" VerticalAlignment="Top"/></Grid></Viewbox>
+     </Border>
+    </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+   </ScrollViewer>
+  </Grid>
+  <Grid Grid.Column="1" Margin="0,0,10,4" Height="114" VerticalAlignment="Bottom">
+   <Grid Width="{Binding ShanheJourneyTacticDockWidth}" HorizontalAlignment="Right">
+   <controls:ShanheHudSkin x:Name="TacticSourcePanel" Source="pack://siteoforigin:,,,/Assets/Shanhe/Hud/rogue_zhanfa_bg.png" Insets="4" IsHitTestVisible="False"/>
+   <Grid Margin="5,0,5,0">
+    <ScrollViewer x:Name="ShanheJourneyTacticScroll" HorizontalContentAlignment="Right" VerticalContentAlignment="Bottom" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" ScrollChanged="KeepRightEdge">
+     <ItemsControl x:Name="ShanheJourneyTacticRows" ItemsSource="{Binding ShanheJourneyTacticSlots}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><controls:ShanheColumnSlotsPanel CellWidth="32" CellHeight="32"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate>
+      <Border Width="30" Height="30" Margin="1" Background="Transparent" AutomationProperties.Name="{Binding Name}" AutomationProperties.HelpText="{Binding Tooltip}"><Border.Style><Style TargetType="Border" BasedOn="{StaticResource HudRuleTarget}"><Style.Triggers><DataTrigger Binding="{Binding IsEmpty}" Value="True"><Setter Property="Focusable" Value="False"/></DataTrigger></Style.Triggers></Style></Border.Style>
+       <Border.ToolTip><ToolTip Style="{StaticResource HudRuleTip}" MaxWidth="400"><ScrollViewer MaxHeight="320" Focusable="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><TextBlock Text="{Binding Tooltip}" TextWrapping="Wrap" LineHeight="21"/></ScrollViewer></ToolTip></Border.ToolTip>
+       <Grid><Image Source="pack://siteoforigin:,,,/Assets/Shanhe/Hud/zhanfa_slot_bg.png" Stretch="Uniform" IsHitTestVisible="False"/>
+        <Image Source="{Binding Tactic.Frame}" Stretch="Uniform" IsHitTestVisible="False"/><Image Source="{Binding Tactic.Icon}" Stretch="Uniform" Margin="3"/>
+        <TextBlock x:Name="TacticFallback" Text="{Binding Tactic.DisplayName}" FontFamily="KaiTi" Foreground="{Binding Tactic.Foreground}" FontSize="9" TextAlignment="Center" TextWrapping="Wrap" MaxHeight="25" Margin="3" VerticalAlignment="Center"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding IsEmpty}" Value="False"/><Condition Binding="{Binding Tactic.Icon}" Value="{x:Null}"/></MultiDataTrigger.Conditions><Setter Property="Visibility" Value="Visible"/></MultiDataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+       </Grid>
+      </Border>
+     </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+    </ScrollViewer>
+   </Grid>
+   </Grid>
+  </Grid>
+  <Grid Grid.Column="2" Margin="0,0,10,4" Height="114" VerticalAlignment="Bottom">
+   <ScrollViewer x:Name="ShanheJourneySkillScroll" HorizontalContentAlignment="Right" VerticalContentAlignment="Bottom" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" ScrollChanged="KeepRightEdge">
+    <ItemsControl x:Name="ShanheJourneySkillRows" ItemsSource="{Binding ShanheJourneySkillSlots}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><controls:ShanheColumnSlotsPanel CellWidth="102" CellHeight="32"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate>
+     <Border Width="96" Height="32" Margin="1,0,5,0" Background="Transparent" AutomationProperties.Name="{Binding Name}" AutomationProperties.HelpText="{Binding Description}"><Border.Style><Style TargetType="Border" BasedOn="{StaticResource HudRuleTarget}"><Style.Triggers><DataTrigger Binding="{Binding IsEmpty}" Value="True"><Setter Property="Focusable" Value="False"/></DataTrigger></Style.Triggers></Style></Border.Style>
+      <Border.ToolTip><ToolTip Style="{StaticResource HudRuleTip}" MaxWidth="420"><ScrollViewer MaxHeight="320" Focusable="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel><TextBlock Text="{Binding Name}" FontWeight="SemiBold"/><TextBlock Text="{Binding SourceText}" Margin="0,4,0,0"/><TextBlock Text="{Binding Description}" TextWrapping="Wrap" LineHeight="21" Margin="0,4,0,0"/></StackPanel></ScrollViewer></ToolTip></Border.ToolTip>
+      <Grid><Image x:Name="SkillSourceFrame" Stretch="Fill" IsHitTestVisible="False"><Image.Style><Style TargetType="Image"><Setter Property="Source" Value="pack://siteoforigin:,,,/Assets/Shanhe/Hud/roguesmall_skill_up.png"/><Style.Triggers><DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Border}}" Value="True"><Setter Property="Source" Value="pack://siteoforigin:,,,/Assets/Shanhe/Hud/roguesmall_skill_over.png"/></DataTrigger><DataTrigger Binding="{Binding IsKeyboardFocused, RelativeSource={RelativeSource AncestorType=Border}}" Value="True"><Setter Property="Source" Value="pack://siteoforigin:,,,/Assets/Shanhe/Hud/roguesmall_skill_over.png"/></DataTrigger><DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Border}}" Value="False"><Setter Property="Source" Value="pack://siteoforigin:,,,/Assets/Shanhe/Hud/roguesmall_skill_disabled.png"/></DataTrigger><DataTrigger Binding="{Binding IsEmpty}" Value="True"><Setter Property="Source" Value="pack://siteoforigin:,,,/Assets/Shanhe/Hud/roguesmall_skill_null.png"/></DataTrigger></Style.Triggers></Style></Image.Style></Image>
+       <TextBlock Text="{Binding Name}" Foreground="#ECF9CF" FontFamily="KaiTi" FontSize="17" TextAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="9,0"><TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers><DataTrigger Binding="{Binding IsEmpty}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+      </Grid>
+     </Border>
+    </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+   </ScrollViewer>
+  </Grid>
+  <!-- Keep empty space outside actual portraits transparent to map input. -->
+  <Grid Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,10,0" MaxWidth="210" MaxHeight="73">
+   <ScrollViewer x:Name="ShanheJourneyCompanionScroll" HorizontalAlignment="Left" VerticalAlignment="Top" MaxWidth="210" MaxHeight="73" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"><StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+    <ItemsControl x:Name="ShanheStartingCompanionRows" ItemsSource="{Binding ShanheStartingCompanionCards}" ItemTemplate="{StaticResource CompanionPortrait}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel></ItemsControl>
+    <ItemsControl x:Name="ShanheRecruitedCompanionRows" ItemsSource="{Binding ShanheRecruitedCompanionCards}" ItemTemplate="{StaticResource CompanionPortrait}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel></ItemsControl>
+   </StackPanel></ScrollViewer>
+  </Grid>
+  <Grid x:Name="ShanheHeroCard" Grid.Column="3" Width="132" Height="156" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+   <Image Source="{Binding ShanheJourneyHeroFrame}" Width="132" Height="156" VerticalAlignment="Bottom" Stretch="Fill"/>
+   <Grid Margin="8,5,8,8"><controls:ShanheHudSkin Source="pack://siteoforigin:,,,/Assets/Shanhe/Hud/genearlBaseBg.png" Insets="10" IsHitTestVisible="False"/>
+    <Border Background="{Binding CurrentShanheGeneralPortrait}" Margin="2"/>
+    <TextBlock Text="{Binding ShanheJourneyGeneralGlyph}" FontFamily="KaiTi" FontSize="34" Foreground="#DEC68F" HorizontalAlignment="Center" VerticalAlignment="Center"><TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers><DataTrigger Binding="{Binding HasShanheJourneyGeneralPortrait}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+    <Border VerticalAlignment="Top" Background="#B533261C" Padding="5,3"><TextBlock Text="{Binding CurrentShanheGeneralName}" ToolTip="{Binding CurrentShanheGeneralName}" AutomationProperties.Name="{Binding CurrentShanheGeneralName}" FontFamily="KaiTi" FontSize="19" Foreground="#FFF0BC" TextTrimming="CharacterEllipsis"/></Border>
+    <Border VerticalAlignment="Bottom" Background="#E3212018" Padding="3,4"><StackPanel><TextBlock Text="{Binding ShanheVitalText}" Foreground="#DEF0AF" TextAlignment="Center" FontSize="10" TextWrapping="Wrap"/><TextBlock Text="{Binding ShanheGoldText}" Foreground="#F0D38B" TextAlignment="Center" FontSize="11" Margin="0,3,0,0"/></StackPanel></Border>
+   </Grid>
+   <ToggleButton x:Name="ShanheTraitsButton" Width="36" Height="39" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,-43,0,0" ToolTip="查看武将特质与当前构筑" AutomationProperties.Name="查看武将特质"><ToggleButton.Template><ControlTemplate TargetType="ToggleButton">
+    <Grid><Image Source="pack://siteoforigin:,,,/Assets/Shanhe/Hud/cmn_btn_refine1.png" Stretch="Uniform"/><Border x:Name="FocusRing" BorderBrush="#F1D495" BorderThickness="1" CornerRadius="18" Margin="2" Visibility="Collapsed" IsHitTestVisible="False"/></Grid>
+    <ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="FocusRing" Property="Visibility" Value="Visible"/></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusRing" Property="Visibility" Value="Visible"/></Trigger><Trigger Property="IsChecked" Value="True"><Setter TargetName="FocusRing" Property="Visibility" Value="Visible"/></Trigger></ControlTemplate.Triggers>
+   </ControlTemplate></ToggleButton.Template></ToggleButton>
+   <Popup x:Name="ShanheTraitsPopup" Placement="Top" PlacementTarget="{Binding ElementName=ShanheTraitsButton}" IsOpen="{Binding IsChecked, ElementName=ShanheTraitsButton, Mode=TwoWay}" StaysOpen="False" AllowsTransparency="True" Opened="TraitsOpened" Closed="TraitsClosed" PreviewKeyDown="TraitsKeyDown" KeyboardNavigation.TabNavigation="Cycle">
+    <Grid Width="330" Background="Transparent"><controls:ShanheHudSkin x:Name="ShanheTraitsSourceFrame" Source="pack://siteoforigin:,,,/Assets/Shanhe/Hud/toolTipBg.png" Insets="11" IsHitTestVisible="False"/><StackPanel Margin="18"><TextBlock Text="武将特质与构筑" Foreground="#F5D28A" FontFamily="KaiTi" FontSize="24"/><TextBlock Text="{Binding CurrentShanheGeneralName}" Foreground="#EBD6A4" Margin="0,12,0,0" TextWrapping="Wrap"/><TextBlock Text="{Binding CurrentShanheGeneralSkillsText}" Foreground="#E3D3B0" TextWrapping="Wrap" LineHeight="22" Margin="0,10,0,0"/><TextBlock Text="{Binding ShanheBuildSummary}" Foreground="#C6B38D" TextWrapping="Wrap" LineHeight="22" Margin="0,10,0,0"/><Button Content="关闭" Click="CloseTraits" HorizontalAlignment="Right" Margin="0,14,0,0" Padding="16,5"/></StackPanel></Grid>
+   </Popup>
+  </Grid>
+ </Grid>
+</UserControl>

@@ -37,13 +37,6 @@ public sealed partial class GameEngine
     private bool HasQinLangBeforeDamageObserver(long id)=>HasQinLangDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1410)]
     private bool IsQinLangDying()=>ActiveDying is{}dying&&QinLangObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==dying.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 2060)]
-    private bool AllowsQinLangNestedDamage(ProgramSkillFrame f,int targetSeat,int amount,ProgramParticipantReference? sourceReference,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||QinLangObserverRoot()is not{}root||root.Id==f.Id)return false;
-        var effect=GetPausedPrivateOfferEffect(f);return effect is{Op:SkillProgramEffectOp.Damage}&&effect.Amount==amount&&effect.ActorReference==sourceReference&&effect.DamageNature==nature&&
-            targetSeat==(effect.TargetReference is{}participant?ResolveProgramParticipant(f,participant):ResolveProgramEffectTarget(f,effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27170)]private bool AdvanceQinLangChildren()=>_pendingDecision is null&&QinLangObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveXianyingDrawDiscard,SkillProgramEffectOp.ResolveXianyingTurnEndUses)]
     private PromptChoice AiQinLang(PendingDecision p,ProgramSkillFrame f)

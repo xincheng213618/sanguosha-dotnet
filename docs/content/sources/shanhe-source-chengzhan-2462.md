@@ -36,10 +36,26 @@
 
 官方 `character.sgs` 的4871行为“将领” `ShiBing71`，是通用身体，不是成济成倅或其他同姓角色。本包保留 `character:shanhe-source-general-4871`，群、男性沿用本地同身体来源敌军的编排约定。
 
-来源指定皮肤 `1000191`，当前没有已核对应本地原图，因此明确保留 `supporter` 回退与 `portrait-fallback` 变体标记，不借用成济成倅、文鸯或神张辽的肖像，也不为此添加图像别名。
+来源指定皮肤 `1000191`，其官方原PNG已按下述完整身份链核实。运行时保留 `supporter` 回退键与 `portrait-fallback` 变体标记，桌面只按本族精确运行时ID绑定原卡，不借用成济成倅、文鸯或神张辽的肖像。
 
 ## 原城市池
 
 `UniversalGroup` 对普通2462的引用为 `(14,2462,1837)`、`(16,2462,1277)`、`(18,2462,1836)`、`(19,2462,1831)`、`(20,2462,1273)`、`(21,2462,1831)`、`(22,2462,1831)`、`(26,2462,1273)`。这八个第二章地区各七座普通城市，共56城：5011—5017、5031—5037、5051—5057、5061—5067、5071—5077、5081—5087、5091—5097、5131—5137。
 
 `startChapter=1` 不能代替实际城市池关系。来源身体、25档技能和本地推荐路线成长分别保存；共享地图保留实际地区和来源前提，不将本地抽取编排表述为已复现服务器全部前提与概率规则。
+
+## 2026-10-29 原生席位图与预览身份
+
+完整链为 `Fight2462.Ggroup=2462 → General raw0,b=4871,c=成湛,d=1000191 → root.pveskin.skinID=1000191`。皮肤行明确指定 `seatpic=generalface_1000191`、`headpic=1000191`、`diagrampic=100019100`。人物表4871是“将领”、类 `ShiBing71`，没有 `au/av` 头像重定向；本行的PVE皮肤覆盖载体默认图，不按同名、共享载体或相似面孔借图。
+
+冻结人物表解码SHA-256为 `92f00132ed944b279066f46655478bde6a2f3b9f1c006d086c197fbbbada49de`，皮肤表解码SHA-256为 `00ee5f994401976563e241571d3e5618f573ad2a4b85336ff132afb262f1e8d4`。当前另行核实的公网Config/client包装SHA已变化，但Character解码字节仍与该冻结值完全一致；旧包装与当前包装证据分别记录于[山河NPC美术来源](../shanhe-npc-art-sources.json)，本批不重抓配置或用当前包装SHA覆盖冻结General/Fight/皮肤资料。
+
+同版客户端 `q6t.getSeatSkinUrl → hA.SkinSeatUrl` 经 `N2t.SeatImgUrl=general/seat/static/` 和桌面 `res/runtime/pc/` 得到[官方原PNG](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000191.png)。已取得HTTP200、`image/png`，并目视核实原生卡面。原图146×172 RGBA、59112字节，原字节导入 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000191.png`；文件SHA-256为 `a860babdc93ee5b24adfd0514319cc0b32e26aec9c4b1a673ce70ed129c6f89e`，RGBA像素SHA-256为 `32ee45755bad2e6e79198e2913c4f5736cebd75555355982f8a646ce515169ca`。未裁剪、缩放、换色或重编码。
+
+此组只有上述一名源成员，`startChapter=1,f=0`；原行没有 `g/hide/generalShow`，按源默认false/false/0，无主帅、隐藏成员或后续章节成员。完整单人预览保留大卡，不从首席推断主帅。下列运行时ID与上轮全25档实际发布配方盘点一致；美术绑定不改变PortraitKey、VariantId、内容指纹、印刷身体、技能、装备或成长。
+
+| 来源难度 | 精确运行时ID |
+| --- | --- |
+| 1–10 | `shanhe:source-chengzhan-2462-base` |
+| 11–20 | `shanhe:source-chengzhan-2462-hard` |
+| 21–25 | `shanhe:source-chengzhan-2462-hell` |

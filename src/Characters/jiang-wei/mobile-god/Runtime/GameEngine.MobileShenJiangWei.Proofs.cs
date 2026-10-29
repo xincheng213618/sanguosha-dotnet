@@ -69,9 +69,6 @@ public sealed partial class GameEngine
             _resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId) is not ProgramLifecycleTriggerWindowFrame { Continuation: ProgramLifecycleContinuation.ResumeDyingEntry } entry || entry.ResumeDyingFrameId != r.DyingId) return false;
         RequireMobileJw(f); return true;
     }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 40600)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 40600)]
-    private bool MobileJwNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess) => IsMobileJwShenpeiDamage(f, target, amount, source, nature, sourceLess, null);
     private bool IsMobileJwSuspendedDying(long attackId)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { MobileJiangWei: { Operation: SkillProgramEffectOp.ResolveMobileJiangWeiShenpei, Stage: MobileJiangWeiStage.ThunderIssued } r, AttackAttempt: { Nature: DamageNature.Thunder, SourceLess: false } a } f ||

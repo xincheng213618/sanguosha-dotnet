@@ -86,12 +86,4 @@ public sealed partial class GameEngine
     private bool HappyGjDying() => ActiveDying is { } d && HappyGjObserverRoot() is { } f && _resolutionStack.FindIndex(c => c.Id == d.Id) > _resolutionStack.FindIndex(c => c.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40900)]
     private bool AdvanceHappyGjSubtree() => _pendingDecision is null && HappyGjObserverRoot() is not null && TryAdvanceObserverSubtree(true);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 40900)]
-    private bool HappyGjNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || HappyGjObserverRoot() is null) return false;
-        var e = GetPausedPrivateOfferEffect(f);
-        return e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature && !sourceLess &&
-            target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
 }

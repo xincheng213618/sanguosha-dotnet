@@ -40,11 +40,6 @@ public sealed partial class GameEngine
  private bool IsHuangQuanDying()=>ActiveDying is{}d&&HuangQuanObserverRoot()is{}r&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 300)]
  private bool TryAdvanceHuangQuanSubtree()=>_pendingDecision is null&&HuangQuanObserverRoot()is not null&&TryAdvanceObserverSubtree(advanceRecoveryReplacement:true);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 530)]
- private bool AllowsHuangQuanNestedDamage(ProgramSkillFrame observer,int target,int amount,ProgramParticipantReference?source,DamageNature?nature,bool sourceLess)
- {
-  if(observer.AttackAttempt is not null||observer.InstructionIndex<1||_resolutionStack.LastOrDefault()?.Id!=observer.Id||HuangQuanObserverRoot()is not{}root||root.Id==observer.Id)return false;var e=GetPausedPrivateOfferEffect(observer);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(observer,p):ResolveProgramEffectTarget(observer,e.Target));
- }
  private void AssertHuangQuanNativeUses()
  {foreach(var use in _resolutionStack.OfType<CardUseFrame>().Where(u=>u.JianjiUse is not null))if(_resolutionStack.SingleOrDefault(f=>f.Id==use.JianjiUse!.ProgramFrameId)is not ProgramSkillFrame parent||!JianjiNativeUseRidesOn(use,parent))throw new InvalidOperationException("Jianji native use lost its exact actual draw owner.");}
 }

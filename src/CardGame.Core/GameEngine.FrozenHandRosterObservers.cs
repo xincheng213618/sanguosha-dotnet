@@ -13,16 +13,6 @@ public sealed partial class GameEngine
     }
     private ProgramSkillFrame? FrozenHandRosterObserverRoot()=>FindProgramObserverRoot(
         static(e,r,c)=>e.FrozenHandRosterFirstChild(r,c),static(e,i)=>e.SameNameHandObserverSuffix(i));
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 900)]
-    private bool AllowsFrozenHandRosterNestedDamage(ProgramSkillFrame observer,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex<1 || _resolutionStack.LastOrDefault()?.Id!=observer.Id)return false;
-        if(observer.FrozenHandRoster is{Stage:"damage-issued",DamageIssued:true,DamageTarget:{}issued} && ValidFrozenHandRoster(observer))return target==issued && amount==1 && source is null && nature is null;
-        if(observer.WindowContext?.Window is not(SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.AfterHpRecovered or
-            SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterDamageApplied or SkillProgramTriggerWindow.SkillsChanged) || FrozenHandRosterObserverRoot() is null)return false;
-        var e=ProgramInstructionResolver.Default.Resolve(observer,_contentRegistry.GetSkill(observer.SkillId).Program!).GetPausedInstruction(observer.InstructionIndex).Effect;
-        return e.Op==SkillProgramEffectOp.Damage && amount==e.Amount && source==e.ActorReference && nature==e.DamageNature && target==(e.TargetReference is{}r?ResolveProgramParticipant(observer,r):ResolveProgramEffectTarget(observer,e.Target));
-    }
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 80, group: 10)]
     private bool IsFrozenHandRosterDying()=>ActiveDying is{}d && FrozenHandRosterObserverRoot() is{}r && _resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1740)]

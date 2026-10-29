@@ -44,12 +44,6 @@ public sealed partial class GameEngine
     private bool HasMouWenChouBeforeDamage(long id) => MouWenChouObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 33100)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33100)]
     private bool IsMouWenChouDying() => ActiveDying is { } d && MouWenChouObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 33100)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 33100)]
-    private bool AllowsMouWenChouNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || MouWenChouObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature && target == (e.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33100)] private bool AdvanceMouWenChouChildren() => _pendingDecision is null && MouWenChouObserverRoot() is not null && TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 33100)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 33100)]
     private bool ContinuePaidMouWenChou(ProgramSkillFrame f) => f.MouWenChouOl is { } r && ValidMouWenChouOl(f) && (r.Operation != SkillProgramEffectOp.UseMouWenChouLunzhan || r.Stage != MouWenChouOlStage.Targets) || f.MouWenChouOl is null && f.InstructionIndex is 0 or 1 && f.WindowContext is { } w && CanRunIssuedMouWenChou(new(f.OwnerSeat, f.SkillId, GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), w);

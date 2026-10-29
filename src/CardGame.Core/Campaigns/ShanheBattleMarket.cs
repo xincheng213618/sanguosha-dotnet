@@ -22,6 +22,8 @@ public sealed record ShanheBattleMarketSetup(
 /// <summary>Wallet, permanent build and chapter shelf owned by the transaction session.</summary>
 public sealed record ShanheBattleMarketTransfer
 {
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool BalancedRewardsEnabled { get; init; }
     public string MarketContentHash { get; init; } = "";
     public string MarketNodeId { get; init; } = "";
     public int ChapterNumber { get; init; }

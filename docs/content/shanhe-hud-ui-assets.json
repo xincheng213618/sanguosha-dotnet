@@ -1,0 +1,855 @@
+{
+  "schemaVersion": 1,
+  "description": "Original OL Shanhe small-map bottom HUD sprites. Every PNG preserves the decoded native atlas pixels and sourceSize padding; logical renderer dimensions and nine-slice evidence are recorded separately.",
+  "verifiedAtUtc": "2026-10-28T20:18:59.858843+00:00",
+  "clientSource": {
+    "url": "https://web.sanguosha.com/220/h5_2/sgsGame_a.sgs",
+    "sha256": "96b7131953f758a30da44c9bdbbcd8a429174050ef7c16961216b90cd923ec31",
+    "sceneEvidence": "H6t.createbottomView constructs iGt at (0,gameHeight). H6t resource group is roguelikesmallmap."
+  },
+  "resourceIndex": {
+    "url": "https://web.sanguosha.com/220/h5_2/res/default.res.json?v=-2047644578",
+    "sha256": "4b1bfb095720d4de8ce3e9a32fd73b58798ee2dc174864f0a75a1c21338fc452",
+    "evidence": "The preload group includes generals_atlas, which supplies the exact cmn_btn_refine1 normal trait button. The roguelikesmallmap group supplies the scene-specific textures and seat/seatbottom hero frames."
+  },
+  "reuse": {
+    "tacticQualityFrames": "The four existing src/CardGame.Wpf/Assets/Wushuang/rogue_zhanfa_bg_1.png through rogue_zhanfa_bg_4.png remain reused and are not duplicated here."
+  },
+  "assets": [
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/cmn_btn_refine1.png",
+      "width": 110,
+      "height": 118,
+      "bytes": 26730,
+      "sha256": "3cb073daabae9c1c07ecf9e189eb113d229cb9dd9644f1092b6debcf9e5cef7c",
+      "rgbaBytes": 51920,
+      "rgbaSha256": "dc0eae7ff1109bc7ed493c7bfa013e6c1a077e04369fb7879d8df1ffd49f973e",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/window/generals.atlas?v=332585651",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/window/generals.webp?v=-444397584",
+      "sourceAtlasSha256": "f7991e277f14cee505ebd4ff1224a5455da7b927dee972131d9ae4c3b07cf52d",
+      "sourceTextureSha256": "bf634c1e27cc5cb6cc9ab2c8bb54df0dffe390578febbfae21a6bd833fff83f6",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "cmn_btn_refine1.png",
+      "frame": {
+        "idx": 0,
+        "x": 1408,
+        "y": 1534,
+        "w": 110,
+        "h": 118
+      },
+      "sourceSize": {
+        "w": 110,
+        "h": 118
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 110,
+        "h": 118
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 51920,
+      "sourceFrameRgbaSha256": "dc0eae7ff1109bc7ed493c7bfa013e6c1a077e04369fb7879d8df1ffd49f973e",
+      "role": "trait button normal with baked label",
+      "rendererEvidence": "iGt.InitUI btnRefine.InitSkin(cmn_btn_refine1,...); visibility TaritRefinedOpen and supported mode; exact normal only",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "interactionState": "normal",
+      "unresolvedClientStateKeys": [
+        "cmn_btn_refine1_1",
+        "cmn_btn_refine1_2",
+        "cmn_btn_refine1_3"
+      ]
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/genearlBaseBg.png",
+      "width": 264,
+      "height": 308,
+      "bytes": 3117,
+      "sha256": "194106b022a58e46acb47c1ca11165ac909ed9e6101ae10f8514afb35d6933c4",
+      "rgbaBytes": 325248,
+      "rgbaSha256": "f3ad3460bf415a60753f856ef063a987713d0345bde24257b0f7287692cd203e",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/game/seatbottom.atlas?v=1495647598",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/game/seatbottom.webp?v=797544682",
+      "sourceAtlasSha256": "0d7d1aaafebc61b91bf0be26f2211470c08fd94c0d497520e331f1c48d64d50a",
+      "sourceTextureSha256": "d3ab4e217d188f0f73d8c4eaa99872635f6a19e5e02f27a585575652aa67a836",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "genearlBaseBg.png",
+      "frame": {
+        "idx": 0,
+        "x": 1480,
+        "y": 1916,
+        "w": 264,
+        "h": 308
+      },
+      "sourceSize": {
+        "w": 264,
+        "h": 308
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 264,
+        "h": 308
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 325248,
+      "sourceFrameRgbaSha256": "f3ad3460bf415a60753f856ef063a987713d0345bde24257b0f7287692cd203e",
+      "role": "hero base panel",
+      "rendererEvidence": "iGt.UpdateGameData -> Pzt.createBottom -> Kas.initGeneralBg; sizeGrid10,10,10,10; display154x180",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererNineSlice": {
+        "values": [
+          10,
+          10,
+          10,
+          10
+        ],
+        "order": [
+          "top",
+          "right",
+          "bottom",
+          "left"
+        ],
+        "unit": "logical client pixels",
+        "sourceProperty": "sizeGrid"
+      },
+      "rendererLogicalSize": [
+        154,
+        180
+      ]
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/other_general_border3.png",
+      "width": 302,
+      "height": 358,
+      "bytes": 59115,
+      "sha256": "4d909550c98e780f2805219378c348a693b6555e55c805a0be5680caeaacf070",
+      "rgbaBytes": 432464,
+      "rgbaSha256": "0de863e0db2c8dc46bf8656651490dd6a998cfec8e1e3761f1f5a9519c4fdead",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/game/seatbottom.atlas?v=1495647598",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/game/seatbottom.webp?v=797544682",
+      "sourceAtlasSha256": "0d7d1aaafebc61b91bf0be26f2211470c08fd94c0d497520e331f1c48d64d50a",
+      "sourceTextureSha256": "d3ab4e217d188f0f73d8c4eaa99872635f6a19e5e02f27a585575652aa67a836",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "other_general_border3.png",
+      "frame": {
+        "idx": 0,
+        "x": 944,
+        "y": 1060,
+        "w": 302,
+        "h": 358
+      },
+      "sourceSize": {
+        "w": 302,
+        "h": 358
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 302,
+        "h": 358
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 432464,
+      "sourceFrameRgbaSha256": "0de863e0db2c8dc46bf8656651490dd6a998cfec8e1e3761f1f5a9519c4fdead",
+      "role": "hero grade3 border",
+      "rendererEvidence": "Kas.SetGrade grade>=3; image other_general_border+grade; pos(-17,-21),display174x200,sizeGrid119,77,51,67",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererNineSlice": {
+        "values": [
+          119,
+          77,
+          51,
+          67
+        ],
+        "order": [
+          "top",
+          "right",
+          "bottom",
+          "left"
+        ],
+        "unit": "logical client pixels",
+        "sourceProperty": "sizeGrid"
+      },
+      "rendererLogicalSize": [
+        174,
+        200
+      ]
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/other_general_border4.png",
+      "width": 302,
+      "height": 358,
+      "bytes": 65891,
+      "sha256": "af6a84348d3b6e8b6c35b3a7bb095e532ac6f44c4e1f4b5fd78093360130db70",
+      "rgbaBytes": 432464,
+      "rgbaSha256": "985fa2d2ab89106e7c466259b05ec866355f3e817d09877034315a2bf004dbe3",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/game/seatbottom.atlas?v=1495647598",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/game/seatbottom.webp?v=797544682",
+      "sourceAtlasSha256": "0d7d1aaafebc61b91bf0be26f2211470c08fd94c0d497520e331f1c48d64d50a",
+      "sourceTextureSha256": "d3ab4e217d188f0f73d8c4eaa99872635f6a19e5e02f27a585575652aa67a836",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "other_general_border4.png",
+      "frame": {
+        "idx": 0,
+        "x": 520,
+        "y": 1374,
+        "w": 302,
+        "h": 358
+      },
+      "sourceSize": {
+        "w": 302,
+        "h": 358
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 302,
+        "h": 358
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 432464,
+      "sourceFrameRgbaSha256": "985fa2d2ab89106e7c466259b05ec866355f3e817d09877034315a2bf004dbe3",
+      "role": "hero grade4 border",
+      "rendererEvidence": "Kas.SetGrade grade>=3; image other_general_border+grade; pos(-17,-21),display174x200,sizeGrid119,77,51,67",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererNineSlice": {
+        "values": [
+          119,
+          77,
+          51,
+          67
+        ],
+        "order": [
+          "top",
+          "right",
+          "bottom",
+          "left"
+        ],
+        "unit": "logical client pixels",
+        "sourceProperty": "sizeGrid"
+      },
+      "rendererLogicalSize": [
+        174,
+        200
+      ]
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/other_general_border5.png",
+      "width": 302,
+      "height": 358,
+      "bytes": 72229,
+      "sha256": "3afb45b8d7d9a43484fab8250e9678d25c14762dcfa0bdabf6e4c111c7e29c89",
+      "rgbaBytes": 432464,
+      "rgbaSha256": "f444079f07322fa2d5619fa5327b9961e6d028afd0c0e8d2bb07fa13630c9a84",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/game/seatbottom.atlas?v=1495647598",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/game/seatbottom.webp?v=797544682",
+      "sourceAtlasSha256": "0d7d1aaafebc61b91bf0be26f2211470c08fd94c0d497520e331f1c48d64d50a",
+      "sourceTextureSha256": "d3ab4e217d188f0f73d8c4eaa99872635f6a19e5e02f27a585575652aa67a836",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "other_general_border5.png",
+      "frame": {
+        "idx": 0,
+        "x": 914,
+        "y": 1426,
+        "w": 302,
+        "h": 358
+      },
+      "sourceSize": {
+        "w": 302,
+        "h": 358
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 302,
+        "h": 358
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 432464,
+      "sourceFrameRgbaSha256": "f444079f07322fa2d5619fa5327b9961e6d028afd0c0e8d2bb07fa13630c9a84",
+      "role": "hero grade5 border",
+      "rendererEvidence": "Kas.SetGrade grade>=3; image other_general_border+grade; pos(-17,-21),display174x200,sizeGrid119,77,51,67",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererNineSlice": {
+        "values": [
+          119,
+          77,
+          51,
+          67
+        ],
+        "order": [
+          "top",
+          "right",
+          "bottom",
+          "left"
+        ],
+        "unit": "logical client pixels",
+        "sourceProperty": "sizeGrid"
+      },
+      "rendererLogicalSize": [
+        174,
+        200
+      ]
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/rogue_mate_logo.png",
+      "width": 33,
+      "height": 17,
+      "bytes": 1639,
+      "sha256": "3c47b402328d78947cb9fad9659ed943fd0753a2321dd981fd8607782452d323",
+      "rgbaBytes": 2244,
+      "rgbaSha256": "adaf7eadd55de3f838ca4d26b395e63cbfada10685df364ee74509deb0f029c0",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_mate_logo.png",
+      "frame": {
+        "idx": 0,
+        "x": 960,
+        "y": 106,
+        "w": 33,
+        "h": 17
+      },
+      "sourceSize": {
+        "w": 33,
+        "h": 17
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 33,
+        "h": 17
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 2244,
+      "sourceFrameRgbaSha256": "adaf7eadd55de3f838ca4d26b395e63cbfada10685df364ee74509deb0f029c0",
+      "role": "red teammate label",
+      "rendererEvidence": "iGt.UpdateFriendGenerals -> MGt.SetMateImg(rogue_mate_logo); friend display55x55",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/rogue_zhanfa_bg.png",
+      "width": 40,
+      "height": 40,
+      "bytes": 914,
+      "sha256": "f6871113d557355ccce85bf229b82f61bd2fc9cc6a3da5769678caf010f557d5",
+      "rgbaBytes": 6400,
+      "rgbaSha256": "7665b8bc51238107d3dd0b31877a1116fcca323f6a76aaa506bd3fd753808b03",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_zhanfa_bg.png",
+      "frame": {
+        "idx": 0,
+        "x": 960,
+        "y": 58,
+        "w": 40,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 40,
+        "h": 40
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 40,
+        "h": 40
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 6400,
+      "sourceFrameRgbaSha256": "7665b8bc51238107d3dd0b31877a1116fcca323f6a76aaa506bd3fd753808b03",
+      "role": "stretchable tactic panel",
+      "rendererEvidence": "iGt.InitUI; sizeGrid4,4,4,4; panel display width37*columns,height108",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererNineSlice": {
+        "values": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "order": [
+          "top",
+          "right",
+          "bottom",
+          "left"
+        ],
+        "unit": "logical client pixels",
+        "sourceProperty": "sizeGrid"
+      }
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/roguesmall_skill_disabled.png",
+      "width": 234,
+      "height": 78,
+      "bytes": 17126,
+      "sha256": "76f3513b25eab066c07c90df1fb1806e174bddb81c0f0c47446f242199f7c03d",
+      "rgbaBytes": 73008,
+      "rgbaSha256": "63d609ccc9eb13975687a2e55455e577bc6d226c92206631ac1e2d4f4112dc12",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "roguesmall_skill_disabled.png",
+      "frame": {
+        "idx": 0,
+        "x": 4,
+        "y": 604,
+        "w": 234,
+        "h": 78
+      },
+      "sourceSize": {
+        "w": 234,
+        "h": 78
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 234,
+        "h": 78
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 73008,
+      "sourceFrameRgbaSha256": "63d609ccc9eb13975687a2e55455e577bc6d226c92206631ac1e2d4f4112dc12",
+      "role": "disabled skill frame",
+      "rendererEvidence": "b0i.SetSkill InitSkin disabled",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererLogicalSize": [
+        117,
+        39
+      ]
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/roguesmall_skill_down.png",
+      "width": 234,
+      "height": 78,
+      "bytes": 18741,
+      "sha256": "4d225ba4d71ddb7ee58e5b319f7bf29f131a84d307b53a33012f0d299a8692fb",
+      "rgbaBytes": 73008,
+      "rgbaSha256": "eb291f1d620445976f08aea40c2751407e63a55cd010fd7adb97b4e4f908c7ff",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "roguesmall_skill_down.png",
+      "frame": {
+        "idx": 0,
+        "x": 4,
+        "y": 690,
+        "w": 234,
+        "h": 78
+      },
+      "sourceSize": {
+        "w": 234,
+        "h": 78
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 234,
+        "h": 78
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 73008,
+      "sourceFrameRgbaSha256": "eb291f1d620445976f08aea40c2751407e63a55cd010fd7adb97b4e4f908c7ff",
+      "role": "pressed skill frame",
+      "rendererEvidence": "b0i.SetSkill InitSkin pressed",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererLogicalSize": [
+        117,
+        39
+      ]
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/roguesmall_skill_lock.png",
+      "width": 234,
+      "height": 78,
+      "bytes": 18220,
+      "sha256": "c98e97c1c95859ec250dd888b5d966d9ddd81629d8a10d094dea2985065dd3cd",
+      "rgbaBytes": 73008,
+      "rgbaSha256": "07c712633b767bd14b250d16721c6cd26c65259b6e01f950cd1b48f45051898f",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "roguesmall_skill_lock.png",
+      "frame": {
+        "idx": 0,
+        "x": 452,
+        "y": 676,
+        "w": 234,
+        "h": 78
+      },
+      "sourceSize": {
+        "w": 234,
+        "h": 78
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 234,
+        "h": 78
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 73008,
+      "sourceFrameRgbaSha256": "07c712633b767bd14b250d16721c6cd26c65259b6e01f950cd1b48f45051898f",
+      "role": "locked skill slot",
+      "rendererEvidence": "b0i.SetSkill locked",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererLogicalSize": [
+        117,
+        39
+      ]
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/roguesmall_skill_null.png",
+      "width": 234,
+      "height": 78,
+      "bytes": 14319,
+      "sha256": "f6d46d33d6ba269c20fec1e0e6792c1a797f8b3bf4443198981b002d9096c388",
+      "rgbaBytes": 73008,
+      "rgbaSha256": "6cfba0a546e1f5509c6231ab55fb4cf2a7b75ba02f327dda79c899f4912f3f2c",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "roguesmall_skill_null.png",
+      "frame": {
+        "idx": 0,
+        "x": 4,
+        "y": 776,
+        "w": 234,
+        "h": 78
+      },
+      "sourceSize": {
+        "w": 234,
+        "h": 78
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 234,
+        "h": 78
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 73008,
+      "sourceFrameRgbaSha256": "6cfba0a546e1f5509c6231ab55fb4cf2a7b75ba02f327dda79c899f4912f3f2c",
+      "role": "empty skill slot with baked label",
+      "rendererEvidence": "b0i.SetSkill empty",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererLogicalSize": [
+        117,
+        39
+      ]
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/roguesmall_skill_over.png",
+      "width": 234,
+      "height": 78,
+      "bytes": 20342,
+      "sha256": "d94ae4b06ad39720dd0dec3edb5dbcc90cc362b957b9c621b0d941683c6ebd09",
+      "rgbaBytes": 73008,
+      "rgbaSha256": "9c82da4548346a9a588b9a6d78ff82abb823d61cb906e1e582df6ad59e17028e",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "roguesmall_skill_over.png",
+      "frame": {
+        "idx": 0,
+        "x": 4,
+        "y": 862,
+        "w": 234,
+        "h": 78
+      },
+      "sourceSize": {
+        "w": 234,
+        "h": 78
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 234,
+        "h": 78
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 73008,
+      "sourceFrameRgbaSha256": "9c82da4548346a9a588b9a6d78ff82abb823d61cb906e1e582df6ad59e17028e",
+      "role": "hover skill frame",
+      "rendererEvidence": "b0i.SetSkill InitSkin hover",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererLogicalSize": [
+        117,
+        39
+      ]
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/roguesmall_skill_up.png",
+      "width": 234,
+      "height": 78,
+      "bytes": 19207,
+      "sha256": "1c78113ff2f7e6cf4955bf3e1f819c9a8651cb60be3fa04f45cc3a76aed8c787",
+      "rgbaBytes": 73008,
+      "rgbaSha256": "8f21648a968f22c1b96935c4b1ae0ee04c0e0bc576cb946c48ee828729b52281",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "roguesmall_skill_up.png",
+      "frame": {
+        "idx": 0,
+        "x": 694,
+        "y": 744,
+        "w": 234,
+        "h": 78
+      },
+      "sourceSize": {
+        "w": 234,
+        "h": 78
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 234,
+        "h": 78
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 73008,
+      "sourceFrameRgbaSha256": "8f21648a968f22c1b96935c4b1ae0ee04c0e0bc576cb946c48ee828729b52281",
+      "role": "normal skill frame",
+      "rendererEvidence": "H6t.createbottomView -> iGt.GetSkillitem -> b0i.SetSkill; InitSkin normal; display117x39",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererLogicalSize": [
+        117,
+        39
+      ]
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/toolTipBg.png",
+      "width": 54,
+      "height": 50,
+      "bytes": 3857,
+      "sha256": "7ab8015b1d506f998ced46990c0fdbeb270ebc255375796e6c589cf938794ab0",
+      "rgbaBytes": 10800,
+      "rgbaSha256": "0329596da30c44df9e428d20c0326107ca7e75eeed5a2d15f0177a9855556d02",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/baseUI/tipCommon.atlas?v=203189178",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/baseUI/tipCommon.webp?v=-2042252689",
+      "sourceAtlasSha256": "48d62791271204cfc426e40ab48026a70ce4e49de07dd4b807de8e2355b14a4e",
+      "sourceTextureSha256": "d1db2ac97c67446b27e89bf952b2cbf152f4325d97233b2f4952720011a3860b",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "toolTipBg.png",
+      "frame": {
+        "idx": 0,
+        "x": 370,
+        "y": 944,
+        "w": 54,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 54,
+        "h": 50
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 54,
+        "h": 50
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 10800,
+      "sourceFrameRgbaSha256": "0329596da30c44df9e428d20c0326107ca7e75eeed5a2d15f0177a9855556d02",
+      "role": "stretchable teammate panel",
+      "rendererEvidence": "iGt.InitUI matebg; sizeGrid11,11,11,11",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererNineSlice": {
+        "values": [
+          11,
+          11,
+          11,
+          11
+        ],
+        "order": [
+          "top",
+          "right",
+          "bottom",
+          "left"
+        ],
+        "unit": "logical client pixels",
+        "sourceProperty": "sizeGrid"
+      }
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/zhanfa_slot_bg.png",
+      "width": 92,
+      "height": 92,
+      "bytes": 7981,
+      "sha256": "f3eb18d752d07c4b7429182b82ace2fa81e513388b9a13218e7a8846cf56234a",
+      "rgbaBytes": 33856,
+      "rgbaSha256": "e878e77e561b9826b0a1cd8374946be5700a4440750310ace07bf77303488cd6",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "zhanfa_slot_bg.png",
+      "frame": {
+        "idx": 0,
+        "x": 232,
+        "y": 1000,
+        "w": 92,
+        "h": 92
+      },
+      "sourceSize": {
+        "w": 92,
+        "h": 92
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 92,
+        "h": 92
+      },
+      "sourceScale": 2,
+      "sourceFrameRgbaBytes": 33856,
+      "sourceFrameRgbaSha256": "e878e77e561b9826b0a1cd8374946be5700a4440750310ace07bf77303488cd6",
+      "role": "empty circular tactic slot",
+      "rendererEvidence": "iGt.GetZhanfaitem -> _Ki -> Aas.SetZhanfaSlot; background.scale=.88; SetActualSize36x36",
+      "extraction": "Lossless PNG encoding of the decoded official atlas frame with original sourceSize transparent padding. No resizing, repainting or recoloring.",
+      "visualVerification": "Confirmed by the parent reviewer against the supplied original-game HUD reference and native candidate previews.",
+      "rendererSlotLogicalSize": [
+        36,
+        36
+      ],
+      "rendererBackgroundScale": 0.88
+    }
+  ],
+  "layoutEvidence": {
+    "scope": "Frozen original-client HUD layout rules. Displayed empty cells do not establish a Core gameplay capacity limit.",
+    "tactics": {
+      "renderer": "iGt.UpdateZhanfaItem",
+      "countSource": "The owned tactic item IDs returned for the current run; the renderer reverses that list before placing cells.",
+      "rowsPerColumn": 3,
+      "slotFormula": "ownedCount > 0 ? 3 * (ceil(ownedCount / 3) + (ownedCount <= 12 ? 1 : 0)) : 0",
+      "fillOrder": "Top to bottom within each column, columns from right to left. Remaining displayed cells use zhanfa_slot_bg.",
+      "panelHeight": 108,
+      "panelWidthFormula": "37 * (displayedSlotCount / 3)",
+      "examples": [
+        {
+          "owned": 8,
+          "columns": 4,
+          "slots": 12,
+          "empty": 4
+        },
+        {
+          "owned": 10,
+          "columns": 5,
+          "slots": 15,
+          "empty": 5
+        },
+        {
+          "owned": 13,
+          "columns": 5,
+          "slots": 15,
+          "empty": 2
+        },
+        {
+          "owned": 16,
+          "columns": 6,
+          "slots": 18,
+          "empty": 2
+        }
+      ],
+      "capacityConclusion": "The source renderer has no fixed fifteen-tactic limit; the number of columns grows with the owned count."
+    },
+    "skills": {
+      "renderer": "iGt.UpdateSkillItem -> b0i.SetSkill",
+      "rowsPerColumn": 3,
+      "logicalCellSize": [
+        117,
+        39
+      ],
+      "fillOrder": "Base skills first, then acquired extra skills, then unlocked empty cells and locked cells. The first column is beside the hero, with later columns extending leftward.",
+      "positionFormula": "x = -117 * (floor(index / 3) + 1); y = 39 * (index % 3)",
+      "validContentSlotCount": "baseSkillCount + configuredExtraSlotCount; the source does not add cells merely to fill the final column.",
+      "frozenSourceConfiguration": {
+        "table": "hd_roguelike.Common[0]",
+        "spellmax": 3,
+        "spellnum": 2,
+        "meaning": "Three configured extra skill slots, two initially unlocked. Acquired extra skills occupy these slots; run, tactic and profile bonuses can change the unlocked count.",
+        "missingConfigurationFallback": 4
+      },
+      "emptyState": "A missing skill uses roguesmall_skill_null while remaining unlocked extra slots are positive, otherwise roguesmall_skill_lock. The second b0i.SetSkill parameter is true for locked cells."
+    },
+    "hero": {
+      "renderer": "iGt.UpdateGameData -> Pzt.General_GradationChanged -> Kas.SetGrade",
+      "runRankSource": "The larger of profileStar minus one and the matching GeneralPool.trail_star value, overridden by the special egg-general rank when supplied.",
+      "frameSource": "The final Seat.Gradation, which can also reflect a mode minimum, general display gradation and a secondary general.",
+      "condition": "A final gradation below 3 hides the decorative grade frame. Gradation 3 or greater selects other_general_border followed by the gradation number.",
+      "noOverrideProfileMapping": [
+        {
+          "profileStar": 4,
+          "gradation": 3,
+          "frame": "other_general_border3.png"
+        },
+        {
+          "profileStar": 5,
+          "gradation": 4,
+          "frame": "other_general_border4.png"
+        },
+        {
+          "profileStar": 6,
+          "gradation": 5,
+          "frame": "other_general_border5.png"
+        }
+      ],
+      "higherGradationBehavior": "The original method contains no special mapping or clamp above 5; only the verified 3, 4 and 5 images are included here."
+    }
+  },
+  "configurationSource": {
+    "url": "https://web.sanguosha.com/220/h5_2/res/config/Config.sgs",
+    "sha256": "d663d5542f5a63a61611b5dbc1ae736e5e0328eedaab2c498e18c3287c289ce6",
+    "table": "hd_roguelike.sgs",
+    "decodedTableSha256": "97dbdb465d902e771e575ed5165df3d193e1a689e3dae7ae67b9cb5033f18c72"
+  }
+}

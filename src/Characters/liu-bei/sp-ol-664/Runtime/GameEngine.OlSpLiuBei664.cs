@@ -328,7 +328,7 @@ public sealed partial class GameEngine
                 moved.Batch.Movements.All(move => draft.Cards.Contains(move.CardId) && _cardMovements.Contains(move) &&
                     (move.To == CardLocation.Processing && move.Reason == CardMoveReasons.Use ||
                      move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.UseFinished))) continue;
-            if (!ParticipantHandRescueObserverRide(child, parent, use) && !PreventionDrawObserverEdge(cursor)) return false;
+            if (!ParticipantHandRescueObserverRide(child, parent, use) && !ProgramChildResolutionEdge(cursor)) return false;
         }
         return true;
     }

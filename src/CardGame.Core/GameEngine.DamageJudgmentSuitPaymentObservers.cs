@@ -136,7 +136,7 @@ public sealed partial class GameEngine
                 MountObserverCandidateMatches(stateProgram, state.Candidates[state.CandidateIndex]) && stateProgram.WindowContext?.ParentFrameId == state.Id && stateProgram.WindowContext.Window == state.Window;
         // This helper proves only generic typed descendants. Our root above
         // independently locks the 4200 actual Slash/damage/judgment/payment.
-        return PreventionDrawObserverEdge(index);
+        return ProgramChildResolutionEdge(index);
     }
 
     // This edge is reached only after the actual 4200 root and every earlier

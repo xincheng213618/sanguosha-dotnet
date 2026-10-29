@@ -174,61 +174,11 @@ public sealed partial class GameEngine
         for (var child = index + 1; child < _resolutionStack.Count; child++)
         {
             // 621's local union retains exact dying-program/hash/turn-over proofs; it does not broaden the old edge.
-            if (!PaidTargetObserverEdge(child)) return null;
+            if (!ProgramChildResolutionEdge(child)) return null;
             if (_resolutionStack[child] is DyingFrame dying && (IsPaidHandRepaymentRescueRide(child, dying) ||
                 IsPaidHandRepaymentProgramAlcoholRide(child, dying) || PolicyCounterspellVirtualAlcoholRide(child, dying))) break;
         }
         return root;
-    }
-    // Native damage retains its existing generic cursor invariants. Only the new
-    // paid root opts in to this contiguous proof for nested movement/HP/Dying rides.
-    private bool EquipmentDonationDamageObserverEdge(int index)
-    {
-        var parent = _resolutionStack[index - 1]; var child = _resolutionStack[index];
-        if (parent is ProgramSkillFrame { AttackAttempt: { } attack } program)
-        {
-            if (child is BeforeDamageProgramWindowFrame before)
-                return before.ParentFrameId == program.Id && before.Continuation == BeforeDamageProgramContinuation.Attack &&
-                    (before.ContinuationAttackResolutionId is null || before.ContinuationAttackResolutionId == program.Id) &&
-                    before.SourceSeat == attack.SourceSeat && (before.RedirectedTargetSeat ?? before.TargetSeat) == attack.TargetSeat &&
-                    before.Nature == attack.Nature && before.Amount > 0;
-            if (child is DamageFrame damage)
-                return damage.ParentFrameId == program.Id && damage.SourceSeat == attack.SourceSeat && damage.TargetSeat == attack.TargetSeat &&
-                    damage.Amount == attack.DamageAmount && damage.Nature == attack.Nature &&
-                    CompleteProgramEventHistory().OfType<DamageRequestedEvent>().Count(e => e.ResolutionId == damage.Id &&
-                        e.SourceSeat == damage.SourceSeat && e.TargetSeat == damage.TargetSeat && e.Amount == damage.Amount &&
-                        e.Nature == damage.Nature && e.SourceCard is null && e.SourceLess == attack.SourceLess) == 1;
-        }
-        if (parent is BeforeDamageProgramWindowFrame window && child is ProgramSkillFrame prevention)
-            return window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count &&
-                MountObserverCandidateMatches(prevention, window.Candidates[window.CandidateIndex].Candidate) &&
-                prevention.WindowContext is { Window: SkillProgramTriggerWindow.BeforeDamageApplied } beforeContext &&
-                beforeContext.ParentFrameId == window.Id && beforeContext.TargetSeat == window.TargetSeat && beforeContext.Amount == window.Amount &&
-                _resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id ==
-                    (window.ContinuationAttackResolutionId ?? window.ParentFrameId))?.AttackAttempt is { } beforeAttack &&
-                beforeContext.SourceSeat == (beforeAttack.SourceLess ? null : window.SourceSeat) &&
-                beforeContext.OccurrenceIndex == window.Candidates[window.CandidateIndex].Candidate.OccurrenceIndex;
-        if (parent is DamageFrame actual)
-        {
-            if (child is DamageTriggerWindowFrame damageWindow)
-                return damageWindow.ParentFrameId == actual.Id && damageWindow.SourceSeat == actual.SourceSeat &&
-                    damageWindow.TargetSeat == actual.TargetSeat && damageWindow.SourceCardId is null && damageWindow.SourceCard is null &&
-                    damageWindow.TriggerWindow is SkillProgramTriggerWindow.DamageAppliedBeforeDying or SkillProgramTriggerWindow.AfterDamageApplied;
-            if (child is DyingFrame dying)
-                return dying.ParentFrameId == actual.Id && dying.Continuation == DyingContinuationKind.Damage &&
-                    dying.VictimSeat == actual.TargetSeat && ActiveDying?.FrameId == dying.Id &&
-                    GetDyingAttack(dying)?.ResolutionId == actual.ParentFrameId;
-        }
-        if (parent is DamageTriggerWindowFrame applied && child is ProgramSkillFrame observer)
-            return applied.CandidateIndex >= 0 && applied.CandidateIndex < applied.Candidates.Count &&
-                MountObserverCandidateMatches(observer, applied.Candidates[applied.CandidateIndex].ToProgramCandidate()) &&
-                observer.WindowContext is { } afterContext && afterContext.Window == applied.TriggerWindow && afterContext.ParentFrameId == applied.Id &&
-                _resolutionStack.OfType<DamageFrame>().SingleOrDefault(f => f.Id == applied.ParentFrameId) is { } appliedDamage &&
-                _resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == appliedDamage.ParentFrameId)?.AttackAttempt is { } appliedAttack &&
-                afterContext.SourceSeat == (appliedAttack.SourceLess ? null : applied.SourceSeat) &&
-                afterContext.TargetSeat == applied.TargetSeat && afterContext.Amount == appliedDamage.Amount && afterContext.DamageFrameId == appliedDamage.Id &&
-                afterContext.OccurrenceIndex == applied.Candidates[applied.CandidateIndex].OccurrenceIndex;
-        return PaidTargetObserverEdge(index);
     }
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1730)]
     private bool MatchEquipmentDonationDamageObserver(long damageWindowId) => HasEquipmentDonationDamageObserver(damageWindowId);
@@ -242,7 +192,7 @@ public sealed partial class GameEngine
             var aligned = true;
             for (var child = index + 1; child < _resolutionStack.Count; child++)
             {
-                if (!EquipmentDonationDamageObserverEdge(child)) { aligned = false; break; }
+                if (!ProgramChildResolutionEdge(child)) { aligned = false; break; }
                 if (_resolutionStack[child] is DyingFrame dying && (IsPaidHandRepaymentRescueRide(child, dying) ||
                     IsPaidHandRepaymentProgramAlcoholRide(child, dying) || PolicyCounterspellVirtualAlcoholRide(child, dying))) break;
             }

@@ -63,16 +63,4 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 160, group: 10)]
     private bool IsPhaseHandSeizureProgramDying() => ActiveDying is { } dying && PhaseHandSeizureObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 180)]
-    private bool AllowsPhaseHandSeizureNestedDamage(ProgramSkillFrame frame, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (frame.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != frame.Id || frame.InstructionIndex < 1 ||
-            PhaseHandSeizureObserverRoot() is not { } root || root.Id == frame.Id) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!)
-            .GetPausedInstruction(frame.InstructionIndex).Effect;
-        return !sourceLess && effect.Op == SkillProgramEffectOp.Damage && amount == effect.Amount && source == effect.ActorReference &&
-            nature == effect.DamageNature && target == (effect.TargetReference is { } reference
-                ? ResolveProgramParticipant(frame, reference) : ResolveProgramEffectTarget(frame, effect.Target));
-    }
 }

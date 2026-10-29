@@ -8,6 +8,7 @@ public sealed partial class GameEngine
         int PhaseActor, ActualDiscardRecoveryPhaseKey? Phase, long? Parent, CardConversionSource? Producer,
         CardMoveReason Reason, long Before)
     {
+        public NativeDrawProgramOrigin? ProgramOrigin { get; init; }
         public GameStartingDrawOrigin? GameStartingOrigin { get; init; }
         public GameStartingMovementDrawOrigin? GameStartingMovementOrigin { get; init; }
         private readonly IReadOnlyList<ZhanjiDrawEntitlement>? _zhanjiEntitlements;
@@ -60,10 +61,21 @@ public sealed partial class GameEngine
             OutsidePhaseMovementSequence);
         if ((starting?.OutsideDrawChild ?? movementOrigin?.DrawChild) is { } child)
             AdvanceEventRulesAndQueueFact(new GameStartingDrawChildRequestedEvent(draft.Id, child));
-        return draft with { GameStartingOrigin = starting, GameStartingMovementOrigin = movementOrigin,
+        return draft with { ProgramOrigin = _resolutionStack.LastOrDefault() is ProgramSkillFrame producer
+                ? CaptureNativeDrawProgramOrigin(producer) : null,
+            GameStartingOrigin = starting, GameStartingMovementOrigin = movementOrigin,
             ZhanjiEntitlements = CaptureZhanjiDrawEntitlements(draft.Id, owner, draft.Before),
             OrdinalEntitlements = CaptureNativeDrawOrdinalEntitlements(draft.Id, owner, draft.Before),
             ThresholdEntitlements = CaptureNativeDrawThresholdEntitlements(draft.Id, owner, draft.Before) };
+    }
+
+    private NativeDrawProgramOrigin? CaptureNativeDrawProgramOrigin(ProgramSkillFrame frame)
+    {
+        if (frame.InstructionIndex < 1) return null;
+        var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!);
+        return frame.InstructionIndex > plan.Instructions.Count ? null : new(
+            new(frame.SkillId, GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId),
+            frame.GameplayHash, frame.InstructionIndex, plan.Instructions[frame.InstructionIndex - 1].Op);
     }
     private void CompleteNativeDrawInvocation(NativeDrawInvocationDraft? draft, IReadOnlyList<int> actualIds)
     {
@@ -84,7 +96,8 @@ public sealed partial class GameEngine
         var proof = new NativeDrawInvocationProof { InvocationId = draft.Id, OwnerSeat = draft.Owner,
             RequestedCount = draft.Requested, ActualTurnNumber = draft.Turn, ActualTurnOwnerSeat = draft.TurnOwner,
             PhaseActorSeat = draft.PhaseActor, Phase = draft.Phase, ParentFrameId = draft.Parent,
-            DirectProducer = draft.Producer, Reason = draft.Reason, SequenceBefore = draft.Before, SequenceAfter = after,
+            DirectProducer = draft.Producer, ProgramOrigin = draft.ProgramOrigin,
+            Reason = draft.Reason, SequenceBefore = draft.Before, SequenceAfter = after,
             LastBatchId = _pendingCardsMovedBatches[index].Id, Materials = materials, ZhanjiEntitlements = draft.ZhanjiEntitlements,
             GameStartingOrigin = draft.GameStartingOrigin, GameStartingMovementOrigin = draft.GameStartingMovementOrigin,
             ActualTurnDrawOrdinal = FreezeNativeDrawOrdinal(draft), OrdinalEntitlements = draft.OrdinalEntitlements,
@@ -94,7 +107,7 @@ public sealed partial class GameEngine
             proof.RequestedCount, proof.ActualCount, proof.ActualTurnNumber, proof.ActualTurnOwnerSeat, proof.PhaseActorSeat,
             proof.Phase, proof.ParentFrameId, proof.DirectProducer, proof.Reason, proof.SequenceBefore, proof.SequenceAfter,
             proof.LastBatchId) { GameStartingOrigin = proof.GameStartingOrigin, GameStartingMovementOrigin = proof.GameStartingMovementOrigin,
-                ActualTurnDrawOrdinal = proof.ActualTurnDrawOrdinal });
+                ActualTurnDrawOrdinal = proof.ActualTurnDrawOrdinal, ProgramOrigin = proof.ProgramOrigin });
         CompleteNativeDrawThresholdProgress(proof);
         CompleteSanwenNativeDrawQualification(proof);
         CompleteTangTangNativeDrawQualification(proof);
@@ -119,6 +132,7 @@ public sealed partial class GameEngine
             fact.ActualCount != p.ActualCount || fact.TurnNumber != p.ActualTurnNumber ||
             fact.ActualTurnOwnerSeat != p.ActualTurnOwnerSeat || fact.PhaseActorSeat != p.PhaseActorSeat || fact.Phase != p.Phase ||
             fact.ParentFrameId != p.ParentFrameId || fact.DirectProducer != p.DirectProducer || fact.Reason != p.Reason ||
+            fact.ProgramOrigin != p.ProgramOrigin ||
             fact.ActualTurnDrawOrdinal != p.ActualTurnDrawOrdinal ||
             fact.GameStartingOrigin != p.GameStartingOrigin ||
             !SameGameStartingMovementDrawOrigin(fact.GameStartingMovementOrigin, p.GameStartingMovementOrigin) ||

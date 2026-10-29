@@ -8,13 +8,19 @@
 {"a":2454,"startChapter":1,"b":4861,"c":"白马义从","d":"1000128","f":0,"h":100,"k":4,"l":4,"m":0,"n":0,"o":5,"p":2,"q":4,"r":0,"otherad":0,"v":"1180","getspell_KN":"3153","getspell_LY":"204","pvpspell":"3189"}
 ```
 
-本地使用独立来源身体，体力4/4、基础摸牌2、随机起手4；护甲、护甲回复、额外杀次数和额外伤害均为0，护甲上限字段为5。没有本行额外属性、固定装备、隐藏成员或第二阶段；PVP字段3189不加入山河技能。尚未核实来源肖像1000128，使用明确的通用回退。
+本地使用独立来源身体，体力4/4、基础摸牌2、随机起手4；护甲、护甲回复、额外杀次数和额外伤害均为0，护甲上限字段为5。没有本行额外属性、固定装备、隐藏成员或第二阶段；PVP字段3189不加入山河技能。运行时保留 `supporter` 回退键；桌面可按下列精确来源卡面及运行时ID绑定显示白马义从，不改变内容定义。
 
 | 来源难度 | 累计技能 | 对应本地将领 |
 | --- | --- | --- |
 | 1–10 | 1180袭营 | `shanhe:source-white-horse-2454-base` |
 | 11–20 | 袭营、3153清剿 | `shanhe:source-white-horse-2454-hard` |
 | 21–25 | 袭营、清剿、204义从 | `shanhe:source-white-horse-2454-hell` |
+
+## 原生卡面
+
+已于2026-10-29核对普通组2454唯一成员 `rawOrdinal=0 → b=4861 → d=1000128`。`character.sgs` 中4861为“士兵”、类 `ShiBing61`，没有 `au/av` 头像重定向；这不是按通用士兵载体猜图。明确的 `d` 覆盖默认头像，`cha_gs_dbs_fs_skininfo.sgs/root.pveskin` 的1000128行指定 `seatpic=generalface_1000128`、`headpic=1000128`、`diagrampic=100012800`。该解码皮肤表SHA-256为 `00ee5f994401976563e241571d3e5618f573ad2a4b85336ff132afb262f1e8d4`。客户端 `q6t.getSeatSkinUrl → hA.SkinSeatUrl` 经 `N2t.SeatImgUrl=general/seat/static/` 及桌面 `res/runtime/pc/` 生成[官方卡面URL](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000128.png)。
+
+官方响应为HTTP200、`image/png`；目视为骑白马的披甲骑兵。原生146×172、RGBA、60001字节，原字节保存为 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000128.png`；文件SHA-256为 `8ee0c05356d6ee830a8c0d299c4cc01c6ca8a78bb6702576daf19f3d71d7f3f1`，解码RGBA像素SHA-256为 `0816756f15259c95752a7617f7ab0c4b538d7def934e9a49e211257b54305e61`。未裁剪、缩放或换色；三档精确运行时ID共享本行同一 `d`，不向其他4861载体NPC泛化。原行未设置 `g/hide/generalShow`，按源默认分别为false/false/0；`startChapter=1`、`f=0`，无主帅身份。
 
 ## 袭营1180
 

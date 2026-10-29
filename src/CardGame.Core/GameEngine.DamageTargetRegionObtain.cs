@@ -166,7 +166,7 @@ public sealed partial class GameEngine
                 !IsExactDamageTargetRegionMovementChild(frame, first)) continue;
             var valid = true;
             for (var child = index + 1; child < _resolutionStack.Count; child++)
-                if (!PaidMountObserverEdge(child) &&
+                if (!ProgramChildResolutionEdge(child) &&
                     !NativeDrawAttemptRidesOn(_resolutionStack[child], _resolutionStack[child - 1]))
                 { valid = false; break; }
             if (valid) return frame;

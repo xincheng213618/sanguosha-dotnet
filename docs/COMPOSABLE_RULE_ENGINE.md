@@ -34,7 +34,7 @@
 
 专用回复子结算的父帧凭据使用 `[ProgramRecoveryParent(phase, order)]` 注册在所属能力的判断方法上，由现有运行钩子注册器绑定。`RecoveryCursor` 和 `DamageCursor` 分别保留各自的准入集合与短路顺序；方法接收原 `ProgramSkillFrame` 和 `RecoveryReplacementFrame`，继续校验支付、来源及原生回执。新增此类能力无需修改通用游标的人物名单，也不新增存档状态。
 
-伤害、移牌和濒死的专用子树凭据同样由所属模块注册：`ProgramObserverProof` 接收原窗口编号，`ProgramNestedDamageProof` 接收原程序帧及伤害参数，`ProgramMovementProof` 接收原帧、暂停效果和移牌续接凭据，`ProgramDyingProof` 保留独立的运行推进与帧校验范围。各枚举值对应既有调用位置，不能把派系债务前后的伤害许可、或不同付款位置的移牌许可相互替代。复用已有操作的人物只配置内容；只有新增子树机制才需要声明对应凭据入口，不向共享条件追加人物名称。
+插入伤害统一使用调度器签发的帧归属和 `ProgramDamageInsertionRuntime` 的父子作用域，挂起与返回由伤害帧自己的 `ProgramInsertionReturn` 持有，不再注册逐技能的插入伤害许可。`ProgramObserverProof`、`ProgramMovementProof` 和 `ProgramDyingProof` 继续用于各机制已有的窗口资格、真实支付与原生回执校验；这些业务检查与通用子树归属分开。复用已有操作的人物只配置内容，新增伤害效果无需再向共享条件追加人物名称或放行方法，详见 [结算帧与选择](CORE_CONTROL_DESIGN.md#结算帧与选择)。
 
 注册器按各位置内的显式顺序短路判断。濒死校验另保留原来的 `|=` 分组：组内短路，后续组仍执行；`ProgramDyingProof` 的 `group` 参数仅用于保留这些既有边界，默认组为人物专用续接所在的组。元数据只读共享，委托按对局、按实际经过的位置绑定，不进入存档。凭据方法继续负责来源、支付、帧身份及恢复条件；注册本身不授予任何额外许可。
 

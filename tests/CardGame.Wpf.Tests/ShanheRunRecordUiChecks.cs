@@ -26,7 +26,7 @@ internal static class ShanheRunRecordUiChecks
         using var model = new MainViewModel(false, 2501, true, new MemorySaveStore(), useExpandedContent: true,
             shanheSaveStore: new MemoryShanheCampaignSaveStore(), shanheCodexStore: account)
         { IsMotionEnabled = false, IsSoundEnabled = false, IsMusicEnabled = false };
-        Program.Assert(model.SelectedShanheScenario.Id == StandardShanheCampaignCatalog.Returning2026EditionId &&
+        Program.Assert(model.SelectedShanheScenario.Id == StandardShanheCampaignCatalog.Source2026EditionId &&
             model.SelectedShanheScenario.Name.Contains("推荐"),
             "New preparation defaults to the recommended current content instead of hiding it behind the old local theme.");
         model.OpenShanheCommand.Execute(null);

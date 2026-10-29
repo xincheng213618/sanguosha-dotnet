@@ -127,7 +127,7 @@ public sealed partial class GameEngine
                 if (_resolutionStack[n] is ProgramLifecycleTriggerWindowFrame changed && _resolutionStack[n - 1] is ProgramSkillFrame owner &&
                     changed.Window == SkillProgramTriggerWindow.SkillsChanged && changed.ResumeProgramFrameId == owner.Id &&
                     changed.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && changed.CandidateIndex >= 0 && changed.CandidateIndex <= changed.Candidates.Count) continue;
-                if (!DyingSuitsStructuralEdge(_resolutionStack[n - 1], _resolutionStack[n]) && !HalfHandPaidDamageObserverEdge(n) && !PaidTargetObserverEdge(n))
+                if (!DyingSuitsStructuralEdge(_resolutionStack[n - 1], _resolutionStack[n]) && !HalfHandPaidDamageObserverEdge(n) && !ProgramChildResolutionEdge(n))
                 { exact = false; break; }
                 if (_resolutionStack[n] is DyingFrame dying && n + 1 < _resolutionStack.Count &&
                     ((IsOriginalDyingSuspendedByDyingSuits(dying) || IsOriginalDyingSuspendedByRecipientCategoryMark(dying)) || IsOriginalDyingSuspendedByOwnedDeathBenefit(dying) ||
@@ -144,15 +144,4 @@ public sealed partial class GameEngine
         _resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1910)]
     private bool HasPublicPilePreparationDamageObserver(long id) => _resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && PublicPilePreparationObserverRoot() is not null;
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 190)]
-    private bool AllowsPublicPilePreparationNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || f.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != f.Id ||
-            f.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.DiscardPileReceived or
-                SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) ||
-            PublicPilePreparationObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(f, _contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(f, reference) : ResolveProgramEffectTarget(f, effect.Target));
-    }
 }

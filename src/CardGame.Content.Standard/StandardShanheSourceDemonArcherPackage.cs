@@ -47,7 +47,7 @@ public sealed class StandardShanheSourceDemonArcherPackage : IGameContentPackage
         Add(TrioNightmareId, "2464-archer-nightmare", 4862, [YouyanSkillId, SaoguSkillId]);
 
         void Add(string id, string tier, int sourceGeneral, IReadOnlyList<string> extra) => builder.AddGeneral(new(id,
-            // Source portrait1000238 has no verified local image; supporter is explicit fallback artwork.
+            // Keep the generic runtime carrier; desktop artwork may use the verified PVE skin1000238.
             "魔军弓骑", "supporter", GongqiSkillId, "qun", 4, extra)
         {
             InitialHp = 4, CharacterId = "character:shanhe-source-soldier-" + sourceGeneral,

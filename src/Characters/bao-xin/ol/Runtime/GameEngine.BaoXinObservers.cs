@@ -69,12 +69,5 @@ public sealed partial class GameEngine
     private bool HasBaoXinBeforeDamageObserver(long id)=>HasBaoXinDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 870)]
     private bool IsBaoXinDying()=>ActiveDying is{}dying&&BaoXinObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==dying.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1440)]
-    private bool AllowsBaoXinNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id)return false;
-        if(f.BaoXin is{Stage:BaoXinStage.DamageChildren,DamageIssued:true,LastRecipient:{}last}r&&ValidBaoXin(f))return target==last&&amount==r.Damage&&source is null&&nature==DamageNature.Normal;
-        if(BaoXinObserverRoot()is not{}root||root.Id==f.Id)return false;var effect=GetPausedPrivateOfferEffect(f);return effect is{Op:SkillProgramEffectOp.Damage}&&effect.Amount==amount&&effect.ActorReference==source&&effect.DamageNature==nature&&target==(effect.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27450)]private bool AdvanceBaoXinChildren()=>_pendingDecision is null&&BaoXinObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

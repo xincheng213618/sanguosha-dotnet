@@ -19,7 +19,7 @@ public sealed partial class GameEngine
                 : d.Stage==ProgramDamageTargetObtainStage.DrawChildren && d.Receipt is {IsEquipment:false} && actual.From==CardLocation.DrawPile && actual.To==CardLocation.Hand(d.VictimSeat) && actual.Reason.Value==DamageTargetBenefitReason;
             if(!exact)continue;
             var legal=true;
-            for(var n=i+1;n<_resolutionStack.Count;n++)if(!PaidMountObserverEdge(n)){legal=false;break;}
+            for(var n=i+1;n<_resolutionStack.Count;n++)if(!ProgramChildResolutionEdge(n)){legal=false;break;}
             if(legal)return f;
         }
         return null;

@@ -72,20 +72,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 670)]
     private bool IsTargetPenaltyProgramDying() => ActiveDying is { } dying && TargetPenaltyPaidObserverRoot(ActiveDamageTrigger?.Id) is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 100)]
-    private bool AllowsTargetPenaltyNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.AfterHpRecovered or
-                SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost) ||
-            TargetPenaltyPaidObserverRoot() is not { SlashTargetPenaltyDraft: { } paid } root || root.Id == observer.Id ||
-            ActiveCardAttack?.ResolutionId != paid.Identity.CardUseFrameId || CurrentDamageAttempt?.ResolutionId != paid.Identity.CardUseFrameId) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!)
-            .GetPausedInstruction(observer.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target));
-    }
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 100)]
     private bool IsTargetPenaltyMovement(ProgramSkillFrame root, SkillProgramEffect? effect, ProgramMovementContinuation pending) =>
         pending.BeforeCount == 0 && pending.CoverageResultBind is null && effect?.Op == SkillProgramEffectOp.RequireTargetDiscardOrEquipmentRecast &&

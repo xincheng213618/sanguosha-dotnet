@@ -53,10 +53,4 @@ public sealed partial class GameEngine
  private bool IsLuZhiWeiDying()=>ActiveDying is {} d&&LuZhiWeiObserverRoot()is {} root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 240)]
  private bool TryAdvanceLuZhiWeiSubtree()=>_pendingDecision is null&&LuZhiWeiObserverRoot()is not null&&TryAdvanceObserverSubtree(advanceRecoveryReplacement:true);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 650)]
- private bool AllowsLuZhiWeiNestedDamage(ProgramSkillFrame o,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
- {
-  if(sourceLess||o.AttackAttempt is not null||o.InstructionIndex<1||_resolutionStack.LastOrDefault()?.Id!=o.Id||LuZhiWeiObserverRoot()is not {} root||root.Id==o.Id)return false;
-  var e=GetPausedPrivateOfferEffect(o);return e is {Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&target==(e.TargetReference is {} p?ResolveProgramParticipant(o,p):ResolveProgramEffectTarget(o,e.Target));
- }
 }

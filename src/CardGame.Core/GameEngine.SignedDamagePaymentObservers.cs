@@ -54,18 +54,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 540)]
     private bool IsSignedDamagePaymentProgramDying() => ActiveDying is { } dying && SignedDamagePaymentObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 40)]
-    private bool AllowsSignedDamagePaymentNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or
-                SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged)) return false;
-        var e = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!).GetPausedInstruction(observer.InstructionIndex).Effect;
-        return e.Op == SkillProgramEffectOp.Damage && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature &&
-            target == (e.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, e.Target)) &&
-            SignedDamagePaymentObserverRoot() is { } root && root.Id != observer.Id && root.SignedDamagePayment!.OriginalAttackFrameId == CurrentDamageAttempt?.ResolutionId;
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 570)]
     private bool TryAdvanceSignedDamagePaymentSubtree()
     {

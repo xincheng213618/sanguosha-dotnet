@@ -9,7 +9,16 @@
 {"a":2471,"startChapter":1,"b":4861,"c":"乌桓奇袭兵","d":"1000297","f":0,"h":100,"k":2,"l":2,"m":0,"n":0,"o":5,"p":2,"q":4,"r":0,"otherad":0,"v":"0","getspell_KN":"3209","getspell_EM":"3076","pvpspell":"3189"}
 ```
 
-牵招原身体580为4/4，乌桓奇袭兵原身体4861为2/2；两员均基础摸牌2、随机起手4、护甲0、护甲回复0、护甲上限字段5。没有固定装备、额外属性、隐藏成员、关底标记或二阶段。乌桓奇袭兵的 `v=0` 表示低档真实空技能集合；`pvpspell=3189` 不加入山河图普通敌军技能。牵招沿用人物表580及已知本地立绘 `ol-qian-zhao`，乌桓奇袭兵保留士兵4861身份，原头像1000297尚无确认的本地映射，使用明确的 `supporter` 回退，不借用傅肜、范疆或张达的身体。
+牵招原身体580为4/4，乌桓奇袭兵原身体4861为2/2；两员均基础摸牌2、随机起手4、护甲0、护甲回复0、护甲上限字段5。没有固定装备、额外属性、隐藏成员、关底标记或二阶段。乌桓奇袭兵的 `v=0` 表示低档真实空技能集合；`pvpspell=3189` 不加入山河图普通敌军技能。牵招保留人物表580的身体，乌桓奇袭兵保留士兵4861身份，不借用傅肜、范疆或张达的身体。
+
+两条独立源行的头像链分别核对。牵招的 `General.d` 缺省，冻结人物表580为 `牵招/QianZhao`、技能3365/3366，无 `au`、`av` 或 `needVersion` 覆盖，因此默认头像为580；乌桓奇袭兵明确 `d=1000297`，PVE表指定 `seatpic=generalface_1000297`。两张均为146×172官方原字节PNG，保存在 `src/CardGame.Wpf/Assets/Shanhe/Npc/`，源行与像素证据汇入[山河NPC素材清单](../shanhe-npc-art-sources.json)。
+
+| rawOrdinal／身体 | 原图来源 | 官方原卡 | 字节数／SHA-256 |
+| --- | --- | --- | --- |
+| 0／580 | 无皮肤覆盖的默认avatar580 | [generalface_580](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_580.png) | 53,383／`e99c00d94bc1a7fd35b1f99b5980f3cbb82d364db8db0c610f6331cdc2fc3480` |
+| 1／4861 | PVE皮肤1000297 | [generalface_1000297](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000297.png) | 45,792／`44ac702dae61cf389e9ef45dea731ecb25c6114df76ecc1bfecf58dd622569c2` |
+
+既有 `official-ol-qian-zhao.png` 为750×950立绘，与146×172原生座位卡的字节和像素不同；只有本组牵招的两个精确运行时身份使用580原卡，其他牵招角色的默认立绘不变。两行 `g` 均缺省为false，`hide=false`、`startChapter=1`、`Generalshow=0`，介绍保留两张完整卡与全部技能。内容定义的 `PortraitKey`、`VariantId` 和规则保持不变；本段Config、Client哈希只标识既有冻结快照，不代表当前线上wrapper。
 
 | 来源难度 | 第一员：牵招580 | 第二员：乌桓奇袭兵4861 |
 | --- | --- | --- |

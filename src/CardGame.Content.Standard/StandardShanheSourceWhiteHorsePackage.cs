@@ -20,7 +20,7 @@ public sealed class StandardShanheSourceWhiteHorsePackage : IGameContentPackage
         EmbeddedSkillProgramCatalog.RegisterBundle(builder, "shanhe-source-xiying-1180");
         Add(BaseId, "base", []); Add(HardId, "hard", [QingjiaoSkillId]); Add(HellId, "hell", [QingjiaoSkillId, YicongSkillId]);
         void Add(string id, string tier, string[] extra) => builder.AddGeneral(new(id, "白马义从",
-            // Source d=1000128 has no verified local portrait: supporter is explicit fallback art.
+            // Runtime supporter fallback; exact source art is resolved by the desktop ID binding.
             "supporter", XiyingSkillId, "qun", 4, extra)
         { InitialHp = 4, CharacterId = "character:shanhe-source-soldier-4861", VariantId = "shanhe-source-2454-" + tier + "-portrait-fallback",
           RulesetId = "shanhe-s5-current-config", Gender = GeneralGender.Male });

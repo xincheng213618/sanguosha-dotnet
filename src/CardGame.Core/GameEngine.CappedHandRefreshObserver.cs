@@ -44,10 +44,7 @@ public sealed partial class GameEngine
                   actual.All(m => m.From == CardLocation.Hand(target) && m.To == CardLocation.DiscardPile &&
                     m.Reason.Value == "program.capped-hand-refresh.discard");
             if (!exact) continue;
-            var aligned = true;
-            for (var child = index + 1; child < _resolutionStack.Count; child++)
-                if (!PaidMountObserverEdge(child)) { aligned = false; break; }
-            if (aligned) return root;
+            if (HasOwnedProgramChildSubtree(root.Id)) return root;
         }
         return null;
     }

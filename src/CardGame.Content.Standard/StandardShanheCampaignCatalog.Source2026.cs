@@ -24,7 +24,7 @@ public static partial class StandardShanheCampaignCatalog
         CreateSourceDefinition(sourceDifficultyId, includeCodex: true);
 
     /// <summary>
-    /// Uses the original region graph with a documented compressed local itinerary. Source battle
+    /// Uses the original region graph with a ten-stop local chapter itinerary. Source battle
     /// identities belong only to the supported source roster; ordinary local troops carry city identity only.
     /// </summary>
     public static ShanheCampaignDefinition CreateSourceDefinition(int sourceDifficultyId, bool includeCodex = true)
@@ -52,65 +52,105 @@ public static partial class StandardShanheCampaignCatalog
         var nodes = new List<ShanheNodeDefinition>();
         foreach (var region in regions)
         {
+            var routeId = "source-region-" + region.SourceUniqueId;
             var cities = region.CityIds.Select(cityId => graph.ByCityId[cityId]).ToArray();
             var ordinaryCities = cities.Where(city => !city.IsBoss).ToArray();
             var bossCity = cities.Single(city => city.IsBoss);
             var marketId = Source2026RegionNodeId(region.SourceUniqueId, "market");
-            var storyId = Source2026RegionNodeId(region.SourceUniqueId, "story");
+            var storyIds = Enumerable.Range(1, 3).Select(index => Source2026RegionNodeId(region.SourceUniqueId, "story-" + index)).ToArray();
             var campId = Source2026RegionNodeId(region.SourceUniqueId, "camp");
             var bossId = Source2026CityNodeId(bossCity.SourceCityId);
             var eliteId = Source2026RegionNodeId(region.SourceUniqueId, "local-elite");
-            var exits = region.NextRegionIds.Where(regionIds.Contains).Select(next => Source2026RegionNodeId(next, "market")).ToArray();
+            var extraIds = Enumerable.Range(1, 2).Select(index => Source2026RegionNodeId(region.SourceUniqueId, "extra-battle-" + index)).ToArray();
+            var exits = region.NextRegionIds.Where(regionIds.Contains).SelectMany(next => graph.ByRegionId[next].CityIds.Take(2).Select(Source2026CityNodeId)).ToArray();
             var chapterTitle = "第" + region.ChapterNumber.ToString(CultureInfo.InvariantCulture) + "章 · " + region.Name;
             var market = template.Nodes.FirstOrDefault(node => node.Kind == ShanheNodeKind.Shop && node.ChapterNumber == region.ChapterNumber)
                 ?? template.Nodes.First(node => node.Kind == ShanheNodeKind.Shop);
             nodes.Add(market with
             {
-                Id = marketId, Name = region.Name + " · 集市", NextNodeIds = ordinaryCities.Select(city => Source2026CityNodeId(city.SourceCityId)).Append(eliteId).ToArray(),
+                Id = marketId, Name = region.Name + " · 集市", NextNodeIds = [storyIds[2]],
                 ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle,
-                StoryText = "行军来到" + region.Name + "。整备后选择一处前战地点，或挑战精锐军营。"
+                ChapterRouteId = routeId, ChapterRole = ShanheChapterNodeRole.Market, RequiredChapterProgress = 3,
+                StoryText = "走过两处奇遇后，商人已在此摆好货摊。集市交易不消耗主线行军次数。"
             });
             foreach (var city in ordinaryCities)
             {
                 var index = Array.IndexOf(ordinaryCities, city) + 1;
-                var name = region.Name + " · " + (city.SourceCityId == 5107 ? "碳墟" : "前战" + index.ToString(CultureInfo.InvariantCulture));
-                var ordinary = Source2026OrdinaryEncounters(region, city, sourceDifficultyId, template);
+                var role = index switch { 1 or 2 => ShanheChapterNodeRole.OpeningBattle, 3 => ShanheChapterNodeRole.MainBattle,
+                    4 => ShanheChapterNodeRole.OptionalBattle, 7 => ShanheChapterNodeRole.Arena, _ => ShanheChapterNodeRole.Profile };
+                var step = index is 1 or 2 ? 1 : index == 3 ? 5 : 0;
+                var required = index switch { 3 => 4, 4 => 6, 7 => 3, _ => 0 };
+                string[] next = index switch { 1 or 2 => [storyIds[0]], 3 => [campId], 7 => [storyIds[2]], _ => [bossId] };
+                var name = region.Name + " · " + (index switch { 1 => "山前战场", 2 => "渡口战场", 3 => "主线战场", 4 => "驻军营寨", 7 => "擂台", _ => "驻军编队" });
+                if (city.SourceCityId == 5107) name = region.Name + " · 碳墟擂台";
                 nodes.Add(new(Source2026CityNodeId(city.SourceCityId), name, ShanheNodeKind.Battle,
-                    [region.ChapterNumber == 3 ? storyId : campId], ordinary, normalRewards)
+                    next, Source2026OrdinaryEncounters(region, city, sourceDifficultyId, template), normalRewards)
                 {
-                    ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle, CategorizedRewards = true, AutomaticRewardCategory = true,
-                    EliteUpgradeNodeId = eliteId,
-                    PrimaryTacticRarity = 1, PrimarySkillRarity = region.ChapterNumber >= 2 ? 2 : 1, RewardSkipGold = 100,
-                    StoryText = "驻军拦住去路。击败敌人后继续行军。",
-                    Description = "四种驻军阵容可随机遭遇，获胜后获得200铜币及战利品。"
+                    ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle,
+                    ChapterRouteId = routeId, ChapterRole = role, ChapterProgressStep = step, RequiredChapterProgress = required,
+                    CategorizedRewards = true, AutomaticRewardCategory = true,
+                    EliteUpgradeNodeId = index == 7 ? null : eliteId,
+                    PrimaryTacticRarity = 1, PrimarySkillRarity = region.ChapterNumber >= 2 ? 2 : 1, PrimaryCardRarity = 1, RewardSkipGold = 100,
+                    StoryText = index is 1 or 2 ? "两处战场任选一处开启本章；另一处留下作为可选战斗，不再占主线进度。"
+                        : index == 7 ? "擂台已经开战。可挑战积累铜币与战利品，也可直接继续主线。"
+                        : index == 4 ? "休息后发现的一处额外驻军。可在迎战首领前挑战，不消耗主线行军次数。"
+                        : "驻军拦住去路。击败敌人后继续行军。",
+                    Description = "胜利获得200铜币及战利品。"
                 });
             }
-            nodes.Add(Source2026LocalEliteNode(region, eliteId,
-                region.ChapterNumber == 3 ? storyId : campId, chapterTitle, eliteRewards));
-            var stories = Source2026Stories(template, region.ChapterNumber);
-            nodes.Add(new(storyId, region.Name + " · 奇遇", ShanheNodeKind.Event,
-                region.ChapterNumber == 3 ? [campId] : exits, Choices: [])
+            nodes.Add(Source2026LocalEliteNode(region, eliteId, bossId, chapterTitle, eliteRewards) with
+            { ChapterRouteId = routeId, ChapterRole = ShanheChapterNodeRole.Profile });
+            for (var extra = 1; extra <= 2; extra++)
             {
-                ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle, StoryEvents = stories,
-                StoryText = "行军途中遇到来归的帮手、商旅或求援者。",
-                Description = "随机奇遇；第一章限定的帮手仍只在第一章出现。"
-            });
-            var camp = template.Nodes.First(node => node.Kind == ShanheNodeKind.Camp);
-            nodes.Add(camp with
+                var city = ordinaryCities[extra - 1];
+                nodes.Add(new(extraIds[extra - 1], region.Name + " · 追击" + extra, ShanheNodeKind.Battle,
+                    extra == 1 ? [extraIds[1], bossId] : [bossId],
+                    Source2026OrdinaryEncounters(region, city, sourceDifficultyId, template).Select(encounter => encounter with
+                    { Id = extraIds[extra - 1] + ":" + encounter.Id, SourceBattleId = null }).ToArray(), normalRewards)
+                {
+                    ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle,
+                    ChapterRouteId = routeId, ChapterRole = ShanheChapterNodeRole.ExtraBattle, RequiredChapterProgress = 6,
+                    ExtraChapterBattleIndex = extra, CategorizedRewards = true, AutomaticRewardCategory = true, EliteUpgradeNodeId = eliteId,
+                    PrimaryTacticRarity = 1, PrimarySkillRarity = region.ChapterNumber >= 2 ? 2 : 1, PrimaryCardRarity = 1, RewardSkipGold = 100,
+                    StoryText = "日行千里让你赶上了额外敌军。此次追击独立于本章两场基础可选战，胜利照常获得铜币与战利品。",
+                    Description = "日行千里额外战斗，不消耗六格主线进度。"
+                });
+            }
+            for (var story = 1; story <= 3; story++)
             {
-                Id = campId, Name = region.Name + " · 营地", NextNodeIds = [bossId],
-                ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle
+                var next = story == 1 ? new[] { storyIds[1] }
+                    : story == 2 ? new[] { marketId, storyIds[2], Source2026CityNodeId(ordinaryCities[6].SourceCityId),
+                        Source2026CityNodeId(ordinaryCities[4].SourceCityId), Source2026CityNodeId(ordinaryCities[5].SourceCityId), eliteId }
+                    : new[] { Source2026CityNodeId(ordinaryCities[2].SourceCityId) };
+                nodes.Add(new(storyIds[story - 1], region.Name + " · 奇遇" + story, ShanheNodeKind.Event, next, Choices: [])
+                {
+                    ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle,
+                    ChapterRouteId = routeId, ChapterRole = ShanheChapterNodeRole.Event,
+                    ChapterProgressStep = story + 1, RequiredChapterProgress = story,
+                    StoryEvents = Source2026Stories(template, region.ChapterNumber),
+                    SupplementalStoryEvents = CreateSupplementalTacticStories(template.Rewards),
+                    StoryText = "行军途中遇到来归的帮手、商旅或求援者。", Description = "完成此处奇遇，推进一格主线。"
+                });
+            }
+            nodes.Add(new(campId, region.Name + " · 休息", ShanheNodeKind.Camp,
+                [Source2026CityNodeId(ordinaryCities[3].SourceCityId), extraIds[0], bossId], Choices:
+                [new("draw", "摸牌数+1", RewardId: "chapter-rest-draw"), new("maxhp", "体力上限+1", RewardId: "chapter-rest-maxhp")])
+            {
+                ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle,
+                ChapterRouteId = routeId, ChapterRole = ShanheChapterNodeRole.Rest, ChapterProgressStep = 6, RequiredChapterProgress = 5,
+                StoryText = "稍作休息，在摸牌数+1与体力上限+1之间选择一项。完成后六格主线已满，可迎战本章首领。"
             });
             var bosses = bossCity.DirectBattleIds.Where(bindings.ContainsKey).Select(battleId =>
                 Source2026BossEncounter(bindings[battleId], bossCity, sourceDifficultyId, encounters)).ToArray();
             if (bosses.Length == 0) throw new InvalidOperationException("The supported source route lost every boss candidate for " + region.Name + ".");
             nodes.Add(new(bossId, region.Name + " · 关底", ShanheNodeKind.BossBattle,
-                region.ChapterNumber == 3 ? [] : [storyId], bosses, [])
+                region.ChapterNumber == 3 ? [] : exits, bosses, [])
             {
                 ChapterNumber = region.ChapterNumber, ChapterTitle = chapterTitle,
+                ChapterRouteId = routeId, ChapterRole = ShanheChapterNodeRole.Boss, RequiredChapterProgress = 6,
                 BossRewards = region.ChapterNumber < 3 ? chapterBundles[region.ChapterNumber] : null,
-                StoryText = "驻守" + region.Name + "的首领已经现身。击败全部敌军才能继续前进。",
-                Description = "关底采用已支持的来源阵容；有第二阶段时须将其一并击败。"
+                StoryText = "六格主线已完成。可直接迎战首领，也可先补打可选战场、擂台或日行千里追击。",
+                Description = "击败本章首领后进入下一章，未完成的旧章可选战不会再开放。"
             });
         }
         var growth = StandardShanheSourceEnemyGrowth.Season5;
@@ -120,12 +160,15 @@ public static partial class StandardShanheCampaignCatalog
             SourceDifficultyId = sourceDifficultyId, SourceEnemyGrowth = growth,
             SourceEnemyGrowthHash = growth.ContentHash, SourceGrowthPolicy = ShanheSourceDifficultyRuntime.PolicyId,
             StartingNodeIds = regions.Where(region => region.ChapterNumber == 1)
-                .Select(region => Source2026RegionNodeId(region.SourceUniqueId, "market")).ToArray(),
-            RandomStartingNode = true, Nodes = nodes,
+                .SelectMany(region => region.CityIds.Take(2).Select(Source2026CityNodeId)).ToArray(),
+            RandomStartingNode = true, AllowChapterDetours = false, Nodes = nodes,
+            Rewards = template.Rewards.Concat(new[] { new ShanheRewardDefinition("chapter-rest-draw", "休整·摸牌", Bonuses: new(Draw: 1)),
+                new ShanheRewardDefinition("chapter-rest-maxhp", "休整·体力上限", Bonuses: new(MaxHp: 1)) }).ToArray(),
             Description = "三章征程，25档难度，从广成关或虎牢关出发。",
             IntroText = "普通1至炼狱5均可直接挑战，开局随机进入广成关或虎牢关。" +
-                "每区先挑战驻军或精锐军营，在营地整备后迎战关底首领；部分首领在败退后进入第二阶段。" +
-                "敌军的技能与装备随难度增强。奇遇在前两章关底后、第三章关底前揭晓。" +
+                "每章主线六格：开局二选一战场、三处奇遇、主线战场与休息。另一开局战场、休息后的驻军和擂台均可选打，主线六格完成即可挑战首领。" +
+                "击败关底后进入下一章，第三章关底胜利后完成征程。日行千里Ⅰ每章多一场追击，Ⅱ每章多两场，奖励照常结算。" +
+                "敌军的技能与装备随难度增强。" +
                 "普通档前战后回复1点体力、关底后回复2点；中等起取消自动战后回复，困难起加入地形。",
             VictoryText = "三章征程完成。", DefeatText = "此番征程止步，整备后再出发。"
         });

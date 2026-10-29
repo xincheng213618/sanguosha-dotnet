@@ -555,19 +555,18 @@ internal static class WushuangUiChecks
                             "Empty tactic rails must leave no visible badges.");
                         continue;
                     }
-                    CheckRail(rail, human.WushuangTactics, 4);
+                    CheckHumanRail();
                     CheckRail(opposingRail, opponent.WushuangTactics, 5, bounded: true);
-                    foreach (var tacticRail in new[] { rail, opposingRail })
-                    foreach (var icon in Program.Find<System.Windows.Shapes.Ellipse>(tacticRail).Where((_, index) => index == 0 || index == ((ItemsControl)tacticRail.Content).Items.Count - 1))
+                    foreach (var icon in Program.Find<System.Windows.Shapes.Ellipse>(opposingRail).Where((_, index) => index == 0 || index == ((ItemsControl)opposingRail.Content).Items.Count - 1))
                     {
                         // The bounded opponent rail must expose its lower rows through real scrolling.
-                        tacticRail.ScrollToVerticalOffset(0);
+                        opposingRail.ScrollToVerticalOffset(0);
                         icon.BringIntoView();
                         window.UpdateLayout();
                         root.Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle);
                         var hit = root.InputHitTest(icon.TranslatePoint(new Point(icon.ActualWidth / 2, icon.ActualHeight / 2), root));
-                        Program.Assert(hit is DependencyObject element && tacticRail.IsAncestorOf(element),
-                            $"Both the first and final tactic rows must remain reachable by pointer input: {tacticRail.Name}, " +
+                        Program.Assert(hit is DependencyObject element && opposingRail.IsAncestorOf(element),
+                            $"Both the first and final tactic rows must remain reachable by pointer input: {opposingRail.Name}, " +
                             $"count={count}, width={width}, tactic={icon.DataContext}, visible={icon.IsVisible}, hit={hit}.");
                     }
                     opposingRail.ScrollToTop();
@@ -578,7 +577,7 @@ internal static class WushuangUiChecks
                         currentBottom <= dock.TranslatePoint(new Point(), root).Y &&
                         rail.TranslatePoint(new Point(), root).Y >= 0 &&
                         opposingRail.TranslatePoint(new Point(), root).X >= 0,
-                        $"At {width}px, additional tactics must grow upward from a fixed bottom above the hand dock, with opponent tactics inside the table.");
+                        $"At {width}px, the human single row must keep a fixed bottom above the hand dock, with opponent tactics inside the table.");
                 }
             }
         }
@@ -591,6 +590,116 @@ internal static class WushuangUiChecks
             Field("_wushuangClockSubmitting").SetValue(vm, wasSubmitting);
             if (wasRunning) clock.Start();
             Layout(root);
+        }
+
+        void CheckHumanRail()
+        {
+            var rail = (ScrollViewer)window.FindName("HumanWushuangTactics");
+            var items = (ItemsControl)window.FindName("HumanTacticItems");
+            var viewport = (ScrollViewer)window.FindName("HumanTacticsViewport");
+            var toggle = (Button)window.FindName("ToggleHumanTacticsButton");
+            var previous = (Button)window.FindName("PreviousHumanTacticsButton");
+            var next = (Button)window.FindName("NextHumanTacticsButton");
+            var panel = Program.Find<StackPanel>(items).Single(element => element.IsItemsHost);
+            var expected = human.WushuangTactics;
+            var commands = Program.Engine(vm).AcceptedCommands.Count;
+            Program.Assert(items.Items.Cast<WushuangTacticViewModel>().SequenceEqual(expected) &&
+                panel.Orientation == Orientation.Horizontal && Math.Abs(panel.ActualHeight - 66) < 0.1 &&
+                Math.Abs(rail.ActualHeight - 66) < 0.1 && Math.Abs(viewport.ActualHeight - 66) < 0.1 &&
+                rail.VerticalScrollBarVisibility == ScrollBarVisibility.Disabled && rail.HorizontalScrollBarVisibility == ScrollBarVisibility.Disabled &&
+                viewport.VerticalScrollBarVisibility == ScrollBarVisibility.Disabled && viewport.HorizontalScrollBarVisibility == ScrollBarVisibility.Hidden,
+                "The human rail retains every owned tactic in one fixed-height horizontal row, with paging instead of wrapping.");
+            for (var index = 0; index < expected.Count; index++)
+            {
+                var container = (FrameworkElement)items.ItemContainerGenerator.ContainerFromIndex(index);
+                var position = container.TranslatePoint(new Point(), panel);
+                Program.Assert(Math.Abs(position.X - index * 62) < 0.1 && Math.Abs(position.Y) < 0.1,
+                    "Clipped human tactics must retain their source order on the same single row.");
+                CheckBadge(container, expected[index]);
+            }
+
+            var visible = CheckPage();
+            if (expected.Count <= 11)
+            {
+                Program.Assert(!toggle.IsVisible && !previous.IsVisible && !next.IsVisible && visible.SequenceEqual(expected),
+                    "The one- and five-tactic cases fit directly without folding or paging controls.");
+            }
+            else
+            {
+                Program.Assert(toggle.IsVisible && !previous.IsVisible && !next.IsVisible &&
+                    visible.SequenceEqual(expected.Take(3)) && viewport.HorizontalOffset < 0.1,
+                    "Twelve or twenty tactics retain every item while initially showing only the first three.");
+                Click(toggle);
+                visible = CheckPage();
+                Program.Assert(visible.SequenceEqual(expected.Take(visible.Length)) && visible.Length <= 11 &&
+                    previous.IsVisible && next.IsVisible && !previous.IsEnabled && next.IsEnabled,
+                    "Expansion exposes the first page of at most eleven tactics and enables only forward paging.");
+                var seen = visible.ToHashSet();
+                for (var page = 0; next.IsEnabled && page < expected.Count; page++)
+                {
+                    var offset = viewport.HorizontalOffset;
+                    Click(next);
+                    visible = CheckPage();
+                    Program.Assert(viewport.HorizontalOffset > offset, "The real next-page button advances the human tactic viewport.");
+                    seen.UnionWith(visible);
+                }
+                Program.Assert(seen.SetEquals(expected) && visible[^1] == expected[^1] && !next.IsEnabled && previous.IsEnabled,
+                    "Real forward paging reaches every owned tactic and the final icon without exposing another page.");
+                for (var page = 0; previous.IsEnabled && page < expected.Count; page++) Click(previous);
+                var firstPage = CheckPage();
+                Program.Assert(viewport.HorizontalOffset < 0.1 && !previous.IsEnabled &&
+                    firstPage.SequenceEqual(expected.Take(firstPage.Length)),
+                    "Backward paging returns to the first single-row page.");
+                Click(toggle);
+                Program.Assert(CheckPage().SequenceEqual(expected.Take(3)) && viewport.HorizontalOffset < 0.1 &&
+                    !previous.IsVisible && !next.IsVisible,
+                    "Collapsing again restores the first three tactics without removing the remaining owned items.");
+            }
+            Program.Assert(Program.Engine(vm).AcceptedCommands.Count == commands,
+                "Inspecting and paging passive tactic badges must not submit gameplay commands.");
+
+            WushuangTacticViewModel[] CheckPage()
+            {
+                var clip = viewport.TransformToVisual(root).TransformBounds(new Rect(viewport.RenderSize));
+                var containers = Enumerable.Range(0, items.Items.Count)
+                    .Select(index => (FrameworkElement)items.ItemContainerGenerator.ContainerFromIndex(index)).Where(container =>
+                    {
+                        var bounds = container.TransformToVisual(root).TransformBounds(new Rect(container.RenderSize));
+                        return clip.Contains(new Point(bounds.Left + bounds.Width / 2, bounds.Top + bounds.Height / 2));
+                    }).ToArray();
+                Program.Assert(containers.Length is > 0 and <= 11,
+                    "Every human tactic page exposes between one and eleven single-row badges.");
+                foreach (var container in new[] { containers[0], containers[^1] }.Distinct())
+                {
+                    var badge = Program.Find<FrameworkElement>(container).Single(element => element.Name == "TacticBadge");
+                    AssertInput(Program.Find<System.Windows.Shapes.Ellipse>(badge).Single(), badge);
+                }
+                return containers.Select(container => (WushuangTacticViewModel)container.DataContext).ToArray();
+            }
+            void Click(Button button)
+            {
+                Program.Assert(button.IsVisible && button.IsEnabled, "Tactic paging requires its actual available control.");
+                AssertInput(button, button);
+                typeof(System.Windows.Controls.Primitives.ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(button, null);
+                window.UpdateLayout();
+                root.Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle);
+                window.UpdateLayout();
+            }
+            void AssertInput(FrameworkElement target, FrameworkElement owner)
+            {
+                var hit = root.InputHitTest(target.TranslatePoint(new Point(target.ActualWidth / 2, target.ActualHeight / 2), root));
+                Program.Assert(target.IsVisible && target.ActualWidth > 0 && target.ActualHeight > 0 && hit is DependencyObject element &&
+                    (ReferenceEquals(owner, element) || owner.IsAncestorOf(element)),
+                    $"The actual human tactic icon or page control must receive pointer input at {root.RenderSize}: {target.Name}, hit={hit}.");
+            }
+        }
+
+        static void CheckBadge(FrameworkElement container, WushuangTacticViewModel tactic)
+        {
+            var badge = Program.Find<FrameworkElement>(container).Single(element => element.Name == "TacticBadge");
+            Program.Assert(badge.IsHitTestVisible && badge.Focusable && Equals(badge.ToolTip, tactic.Tooltip) &&
+                tactic.Tooltip.Contains(WushuangTactics.ById[tactic.Id].Description, StringComparison.Ordinal),
+                "Each named tactic badge retains input access and its complete actual source-rule tooltip.");
         }
 
         static void CheckRail(ScrollViewer rail, IReadOnlyList<WushuangTacticViewModel> tactics, int columns, bool bounded = false)
@@ -608,11 +717,10 @@ internal static class WushuangUiChecks
             {
                 var container = (FrameworkElement)items.ItemContainerGenerator.ContainerFromIndex(index);
                 var position = container.TranslatePoint(new Point(), panel);
-                var badge = Program.Find<StackPanel>(container).Single();
                 Program.Assert(Math.Abs(position.X - index % columns * 62) < 0.1 &&
-                    Math.Abs(position.Y - index / columns * 66) < 0.1 &&
-                    badge.IsHitTestVisible && Equals(badge.ToolTip, tactics[index].Tooltip),
+                    Math.Abs(position.Y - index / columns * 66) < 0.1,
                     "Each tactic must keep its icon/name cell and full hover description on the expected row.");
+                CheckBadge(container, tactics[index]);
             }
         }
     }

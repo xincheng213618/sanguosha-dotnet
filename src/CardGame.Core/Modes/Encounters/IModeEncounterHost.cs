@@ -26,6 +26,8 @@ public sealed record ModeCancelledResolution(long FrameId, ResolutionFrameKind K
 /// </summary>
 public interface IModeEncounterHost
 {
+    /// <summary>Native log sequence available before a transition; absent for hosts without log history.</summary>
+    int? LastLogSequence => null;
     ModeEncounterFacts CaptureFacts();
     IReadOnlyList<TEvent> History<TEvent>() where TEvent : IGameEvent;
     ModeEncounterGeneralFacts General(string generalId);

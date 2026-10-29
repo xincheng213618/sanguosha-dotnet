@@ -11,11 +11,64 @@ public sealed partial class MainViewModel
     private RelayCommand? _openShanheMarketCommand, _closeShanheMarketCommand;
     private IReadOnlyList<ShanheCampaignChoice> _shanheLiveMarketChoices = [];
 
-    private ShanheCampaignSnapshot? CurrentShanheMarketState => HasLiveShanheBattle
-        ? _shanheBattleGame?.CreateShanheMarketSnapshot(0) : _shanheSession?.Snapshot;
+    private GameEngine? _shanheProjectionGame;
+    private long _shanheProjectionRevision = -1;
+    private GameSnapshot? _shanheBattleProjection;
+    private ShanheCampaignSnapshot? _shanheMarketProjection;
+    private bool _shanheMarketProjectionCreated;
+
+    private void ResetShanheBattleProjection()
+    {
+        _shanheProjectionGame = null;
+        _shanheProjectionRevision = -1;
+        _shanheBattleProjection = null;
+        _shanheMarketProjection = null;
+        _shanheMarketProjectionCreated = false;
+    }
+
+    private GameSnapshot? CurrentShanheBattleState
+    {
+        get
+        {
+            if (!IsShanheBattleActive || _shanheBattleGame is not { IsFaulted: false } battle)
+            {
+                ResetShanheBattleProjection();
+                return null;
+            }
+            if (!ReferenceEquals(_shanheProjectionGame, battle) || _shanheProjectionRevision != battle.Revision)
+            {
+                // These are immutable player views. UI bindings share one projection
+                // per committed revision, including while a hand prompt is waiting.
+                var snapshot = battle.CreateSnapshot(0);
+                _shanheProjectionGame = battle;
+                _shanheProjectionRevision = battle.Revision;
+                _shanheBattleProjection = snapshot;
+                _shanheMarketProjection = null;
+                _shanheMarketProjectionCreated = false;
+            }
+            return _shanheBattleProjection;
+        }
+    }
+
+    private ShanheCampaignSnapshot? CurrentShanheMarketState
+    {
+        get
+        {
+            if (CurrentShanheBattleState is not { Status: not EngineStatus.Completed }) return _shanheSession?.Snapshot;
+            if (!_shanheMarketProjectionCreated)
+            {
+                _shanheMarketProjection = _shanheProjectionGame!.CreateShanheMarketSnapshot(0);
+                _shanheMarketProjectionCreated = true;
+            }
+            return _shanheMarketProjection;
+        }
+    }
     private ShanheCampaignSnapshot? CurrentShanheBuildState => CurrentShanheMarketState ?? _shanheSession?.Snapshot;
     private long ShanheMarketActionRevision => IsShanheBattleActive
         ? _shanheBattleGame?.Revision ?? -1 : _shanheSession?.Revision ?? -1;
+    public bool IsShanheChapterMarketUnlocked => _shanheSession?.IsChapterMarketUnlocked == true;
+    public string ShanheChapterMarketHint => IsShanheChapterMarketUnlocked
+        ? "本章集市已开放，可查看货品与购买补给。" : "完成前两处奇遇（主线3/6）后开放集市。";
     public bool IsShanheMarketOpen
     {
         get => _isShanheMarketOpen;
@@ -32,19 +85,20 @@ public sealed partial class MainViewModel
         if (!OpenShanheMarketCommand.CanExecute(null)) return;
         RefreshShanheModules();
         IsShanheMarketOpen = true;
-    }, () => !IsTutorialActive && IsShanheRunInProgress && !IsShanheBattleRetryReady && _shanheBattleGame?.HasPendingShanheMarketPurchase != true);
+    }, () => !IsTutorialActive && IsShanheRunInProgress && IsShanheChapterMarketUnlocked && !IsShanheBattleRetryReady && _shanheBattleGame?.HasPendingShanheMarketPurchase != true);
     public ICommand CloseShanheMarketCommand => _closeShanheMarketCommand ??= new RelayCommand(() =>
     {
         CancelShanheSkillReplacement();
         IsShanheMarketOpen = false;
     }, () => IsShanheMarketOpen);
     public string ShanheMarketGoldText => $"铜币  {CurrentShanheMarketState?.Gold ?? 0}";
+    public string ShanheMarketHealthText => CurrentShanheMarketState is { } state ? $"体力  {state.Hp}/{state.MaxHp}" : "体力 —";
     public string ShanheMarketEquipmentText
     {
         get
         {
-            var kinds = IsShanheBattleActive && _shanheBattleGame is { } battle
-                ? battle.CreateSnapshot(0).Players[0].Equipment.Select(card => card.Kind).ToArray()
+            var kinds = IsShanheBattleActive && _shanheBattleGame is not null
+                ? (CurrentShanheBattleState?.Players[0].Equipment ?? []).Select(card => card.Kind).ToArray()
                 : (_shanheSession?.Snapshot.StartingEquipment ?? []).Select(card => card.Kind).ToArray();
             string Name(EquipmentSlot slot) => kinds.Where(kind => EquipmentCatalog.Get(kind).Slot == slot)
                 .Select(kind => EquipmentCatalog.Get(kind).DisplayName).LastOrDefault() ?? "无";
@@ -96,7 +150,7 @@ public sealed partial class MainViewModel
     private void RefreshShanheLiveMarketPresentation()
     {
         if (!IsShanheRunInProgress && IsShanheMarketOpen) IsShanheMarketOpen = false;
-        foreach (var property in new[] { nameof(ShanheMarketGoldText), nameof(ShanheMarketEquipmentText) }) RaisePropertyChanged(property);
+        foreach (var property in new[] { nameof(ShanheMarketGoldText), nameof(ShanheMarketHealthText), nameof(ShanheMarketEquipmentText) }) RaisePropertyChanged(property);
         _openShanheMarketCommand?.NotifyCanExecuteChanged();
         _closeShanheMarketCommand?.NotifyCanExecuteChanged();
     }

@@ -24,51 +24,13 @@ public sealed partial class GameEngine
             if(record.CardKind!=receipt.PrintedKind || !_cardMovements.Contains(record))continue;
             var legal=true;
             for(var n=i+1;n<_resolutionStack.Count;n++)
-                if(!PaidMountObserverEdge(n)){legal=false;break;}
+                if(!ProgramChildResolutionEdge(n)){legal=false;break;}
             if(legal)return root;
         }
         return null;
     }
     private static bool MountObserverCandidateMatches(ProgramSkillFrame p,ProgramTriggerCandidate c) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(p,c);
-    private bool PaidMountObserverEdge(int index)
-    {
-        var child=_resolutionStack[index];var parent=_resolutionStack[index-1];
-        if(child is CardsMovedTriggerWindowFrame m && parent is ProgramSkillFrame p)
-            return m.Batch.Id==m.Id && m.Batch.ParentFrameId==p.Id &&
-                (m.Batch.AwaitingProgramFrameId is null || m.Batch.AwaitingProgramFrameId==p.Id) &&
-                m.Batch.OriginSkillId==p.SkillId && m.Batch.OriginSkillInstanceId==p.SkillInstanceId && m.Batch.OriginOwnerSeat==p.OwnerSeat &&
-                m.Batch.Movements.Count>0 && m.Batch.Movements.All(r=>_cardMovements.Contains(r));
-        if(child is ProgramSkillFrame observer && parent is CardsMovedTriggerWindowFrame window)
-            return window.CandidateIndex>=0 && window.CandidateIndex<window.Candidates.Count &&
-                MountObserverCandidateMatches(observer,window.Candidates[window.CandidateIndex]) &&
-                observer.WindowContext is{MovementBatch:{ } batch} c && c.ParentFrameId==window.Id && batch.Id==window.Batch.Id &&
-                c.Window is SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.DiscardPileReceived;
-        if(child is HpChangedTriggerWindowFrame hp && parent is ProgramSkillFrame hpParent)
-            return hp.ResumeFrameId==hpParent.Id && hp.Change.ParentFrameId==hpParent.Id;
-        if(child is HpChangedTriggerWindowFrame peachHp && parent is CardUseFrame peachUse &&
-            index>=2 && _resolutionStack[index-2] is DyingFrame peachDying)
-            return IsAvailableBoundPeachRescueRide(index-2,peachDying) &&
-                peachHp.ResumeFrameId==peachUse.Id && peachHp.Change.ParentFrameId==peachUse.Id &&
-                peachHp.Change.Kind==HpChangeKind.Recovery && peachHp.Change.TargetSeat==peachDying.VictimSeat &&
-                peachHp.Candidates.Count==peachHp.Contexts.Count && peachHp.Contexts.All(c=>
-                    c.ParentFrameId==peachHp.Id && c.HpChange==peachHp.Change &&
-                    c.Window is SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged);
-        if(child is ProgramSkillFrame hpObserver && parent is HpChangedTriggerWindowFrame hpWindow)
-            return hpWindow.CandidateIndex>=0 && hpWindow.CandidateIndex<hpWindow.Candidates.Count &&
-                MountObserverCandidateMatches(hpObserver,hpWindow.Candidates[hpWindow.CandidateIndex]) &&
-                hpObserver.WindowContext is{HpChange:{ } change} c && c.ParentFrameId==hpWindow.Id && change==hpWindow.Change;
-        if(child is DyingFrame dying && parent is ProgramSkillFrame dyingParent)
-            return dying.ResumesProgramSkill && dying.ParentFrameId==dyingParent.Id && ActiveDying?.FrameId==dying.Id;
-        if(child is ProgramSkillFrame rescueProgram && parent is DyingFrame dyingWindow)
-            return rescueProgram.WindowContext is{ } c && c.ParentFrameId==dyingWindow.Id &&
-                c.Window is SkillProgramTriggerWindow.DyingResponse or SkillProgramTriggerWindow.SelfDyingResponse;
-        if(child is DeathFrame death && parent is DyingFrame dead)
-            return death.ReturnKind==DeathReturnKind.Dying && death.ParentFrameId==dead.Id && death.VictimSeat==dead.VictimSeat;
-        if(parent is DyingFrame peachParent && child is CardUseFrame)
-            return IsAvailableBoundPeachRescueRide(index-1,peachParent);
-        return false;
-    }
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 30)]
     private bool HasPaidDamageTargetMountObserver(long damageWindowId)=>PaidDamageTargetMountObserverRoot(damageWindowId) is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 300, group: 10)]

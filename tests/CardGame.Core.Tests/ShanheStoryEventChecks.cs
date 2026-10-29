@@ -91,13 +91,20 @@ internal static class ShanheStoryEventChecks
     internal static ShanheCampaignDefinition Fixture(ShanheCampaignDefinition production, IReadOnlyList<ShanheStoryEventDefinition> stories)
     {
         var battleIds = stories.SelectMany(story => story.Choices).Select(choice => choice.BattleNodeId).OfType<string>().ToHashSet();
+        foreach (var battle in production.Nodes.Where(node => battleIds.Contains(node.Id)).ToArray())
+            if (battle.EliteUpgradeNodeId is { } eliteId) battleIds.Add(eliteId);
         return new("fixture:story-events", "奇遇机制", ["classic:guan-yu"], ["event"],
             new ShanheNodeDefinition[]
             {
                 new("event", "奇遇", ShanheNodeKind.Event, ["after"]) { StoryEvents = stories, ChapterNumber = 1 },
                 new("after", "后续战斗", ShanheNodeKind.Battle, [], [new("after", "后续战斗", [new("classic:cao-cao")])])
-            }.Concat(production.Nodes.Where(node => battleIds.Contains(node.Id)).Select(node => node with { NextNodeIds = ["after"] })).ToArray(),
-            production.Rewards, StartingGold: 600, ExtraSkillSlots: 2);
+            }.Concat(production.Nodes.Where(node => battleIds.Contains(node.Id)).Select(node => node with
+            { NextNodeIds = node.EliteUpgradeNodeId is { } eliteId ? ["after", eliteId] : ["after"] }))
+            // The fixture opens individual stories, not a partial chapter route.
+            // Keep their real upgrade profiles and the full reward/school contract.
+            .Select(node => node with { ChapterRouteId = null, ChapterRole = ShanheChapterNodeRole.None,
+                ChapterProgressStep = 0, RequiredChapterProgress = 0 }).ToArray(),
+            production.Rewards, StartingGold: 600, ExtraSkillSlots: 2) { Schools = production.Schools };
     }
 
     private static ShanheCampaignSession Create(ShanheCampaignDefinition definition) => ShanheCampaignSession.Create(definition,

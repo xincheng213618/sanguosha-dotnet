@@ -45,19 +45,6 @@ public sealed partial class GameEngine
         MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]) &&
         IsShanheYongzhanDyingExitContext(parent.Candidates[parent.CandidateIndex], context);
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 62174)]
-    private bool AllowsShanheYongzhanDyingExitDamage(ProgramSkillFrame frame, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || source is not null || nature != DamageNature.Normal || frame.AttackAttempt is not null ||
-            !frame.ReexecuteParticipantInstruction || !IsShanheYongzhanDyingExitReturn(frame) ||
-            GetPausedPrivateOfferEffect(frame) is not { Op: SkillProgramEffectOp.DamageParticipants,
-                Target: SkillProgramEffectTarget.SelectedTargets, TargetKind: null } effect ||
-            effect.Amount != amount || effect.MinimumValue != amount || effect.DamageNature != nature) return false;
-        var cursors = frame.NumberBindings.Where(binding => binding.Name == "participant-cursor-" + (frame.InstructionIndex - 1)).ToArray();
-        return cursors is [var cursor] && cursor.Value >= 1 && cursor.Value <= frame.SelectedTargetSeats.Count &&
-            frame.SelectedTargetSeats[cursor.Value - 1] == target;
-    }
 
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 62174)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 62174)]

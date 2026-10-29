@@ -49,21 +49,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1140)]
     private bool IsZixiEffectsDying() => ActiveDying is { } dying && ZixiEffectsObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1710)]
-    private bool AllowsZixiEffectsNestedDamage(ProgramSkillFrame f, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id) return false;
-        if (f.ZixiEffects is { Stage: ZixiEffectsStage.DamageChildren } r && ValidZixiEffectsStarted(f))
-            return target == r.TargetSeat && amount == 3 && source is null && nature is null && !sourceLess &&
-                ProgramEventHistory<ZixiEffectsDamageIssuedEvent>().Count(e => e.FrameId == f.Id && e.SourceSeat == f.OwnerSeat &&
-                    e.TargetSeat == target && e.Amount == 3) == 1;
-        if (ZixiEffectsObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source &&
-            effect.DamageNature == nature && !sourceLess && target == (effect.TargetReference is { } reference
-                ? ResolveProgramParticipant(f, reference) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28720)]
     private bool AdvanceZixiEffectsChildren() => _pendingDecision is null && ZixiEffectsObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

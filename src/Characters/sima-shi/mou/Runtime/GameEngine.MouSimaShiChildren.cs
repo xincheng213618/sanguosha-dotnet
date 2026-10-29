@@ -22,14 +22,6 @@ public sealed partial class GameEngine
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 36400)] [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 36400)] private bool MouSimaShiDamageWindow(long id) => MouSimaShiRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 36400)] private bool MouSimaShiBeforeDamage(long id) => MouSimaShiRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 36400)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 36400)] private bool MouSimaShiDying() => ActiveDying is { } d && MouSimaShiRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 36400)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 36400)]
-    private bool MouSimaShiNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess) return false;
-        if (MouSimaShiRules.Valid(f) && f.MouSimaShi is { Stage: MouSimaShiStage.Damage } r) return target == r.Target && amount == 1 && source is null && nature is null;
-        if (MouSimaShiRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f); return effect is { Op: SkillProgramEffectOp.Damage } && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature && target == (effect.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 36400)] [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 36400)] private bool MouSimaShiRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
     {
         if (MouSimaShiFirstChild(f, recovery)) return true;

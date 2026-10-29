@@ -149,7 +149,7 @@ public sealed partial class GameEngine
             var exact = true;
             for (var child = i + 2; child < _resolutionStack.Count; child++)
             {
-                if (!(HalfHandPaidDamageObserverEdge(child) || PaidTargetObserverEdge(child) ||
+                if (!(HalfHandPaidDamageObserverEdge(child) || ProgramChildResolutionEdge(child) ||
                       DyingSuitsStructuralEdge(_resolutionStack[child - 1], _resolutionStack[child]))) { exact = false; break; }
                 if (_resolutionStack[child] is DyingFrame dying && child + 1 < _resolutionStack.Count &&
                     (IsPaidHandRepaymentProgramAlcoholRide(child, dying) || IsPaidHandRepaymentRescueRide(child, dying) ||
@@ -159,23 +159,6 @@ public sealed partial class GameEngine
             if (exact) return root;
         }
         return null;
-    }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 280)]
-    private bool AllowsSourceCurseNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 ||
-            _resolutionStack.LastOrDefault()?.Id != observer.Id || ActiveDying is not null ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or
-                SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or
-                SkillProgramTriggerWindow.AfterHpLost) || SourceCurseObserverRoot() is not { } root ||
-            root.Id == observer.Id) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!)
-            .GetPausedInstruction(observer.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && amount == effect.Amount &&
-            source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) :
-                ResolveProgramEffectTarget(observer, effect.Target));
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 170, group: 10)]
     private bool IsSourceCurseProgramDying() => ActiveDying is { } dying && SourceCurseObserverRoot() is { } root &&

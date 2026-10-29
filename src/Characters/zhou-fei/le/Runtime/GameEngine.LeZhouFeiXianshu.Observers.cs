@@ -218,17 +218,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1110)]
     private bool IsLeZhouFeiXianshuDying() => ActiveDying is { } dying && LeZhouFeiXianshuObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1680)]
-    private bool AllowsLeZhouFeiXianshuNestedDamage(ProgramSkillFrame frame, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (frame.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != frame.Id ||
-            LeZhouFeiXianshuObserverRoot() is not { } root || root.Id == frame.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(frame);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source &&
-            effect.DamageNature == nature && !sourceLess && target == (effect.TargetReference is { } reference
-                ? ResolveProgramParticipant(frame, reference) : ResolveProgramEffectTarget(frame, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28320)]
     private bool AdvanceLeZhouFeiXianshuChildren() => _pendingDecision is null &&
         LeZhouFeiXianshuObserverRoot() is not null && TryAdvanceObserverSubtree(true);

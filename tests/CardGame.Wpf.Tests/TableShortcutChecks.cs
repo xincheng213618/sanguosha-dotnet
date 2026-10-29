@@ -63,9 +63,20 @@ internal static class TableShortcutChecks
                 "Holding Ctrl+M repeatedly toggled sound.");
             Input(window, Key.M, ModifierKeys.Control);
             var writes = store.WriteCount;
-            Program.Assert(Input(window, Key.F5) && store.WriteCount == writes + 1 &&
-                           Input(window, Key.F5, repeat: true) && store.WriteCount == writes + 1,
-                "Holding F5 repeatedly wrote the manual save.");
+            var saveCommands = CommandJson.Serialize(engine.AcceptedCommands);
+            var saveViews = Enumerable.Range(0, engine.CreateSnapshot(0).Players.Count)
+                .Select(seat => SnapshotJson.Serialize(engine.CreateSnapshot(seat))).ToArray();
+            var saveDraft = model.Hand.Where(item => item.IsSelected).Select(item => item.Id).ToArray();
+            // Ordinary matches have no resumable save: fresh F5 falls through, while
+            // its repeat is consumed before it can reach a focused table control.
+            Program.Assert(!model.CanSaveShanheProgress && !model.SaveGameCommand.CanExecute(null) &&
+                           !Input(window, Key.F5) && store.WriteCount == writes &&
+                           Input(window, Key.F5, repeat: true) && store.WriteCount == writes &&
+                           ReferenceEquals(Program.Engine(model), engine) && engine.Revision == revision &&
+                           CommandJson.Serialize(engine.AcceptedCommands) == saveCommands &&
+                           Enumerable.Range(0, saveViews.Length).All(seat => SnapshotJson.Serialize(engine.CreateSnapshot(seat)) == saveViews[seat]) &&
+                           card.IsSelected && model.Hand.Where(item => item.IsSelected).Select(item => item.Id).SequenceEqual(saveDraft),
+                "Ordinary-table F5 and its consumed repeat must neither write a save nor change the hand draft, engine, player views or command journal.");
 
             foreach (var (open, close) in new (Action, Action)[]
             {

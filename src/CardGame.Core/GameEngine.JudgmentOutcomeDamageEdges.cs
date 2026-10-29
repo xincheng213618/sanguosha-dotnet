@@ -54,7 +54,7 @@ public sealed partial class GameEngine
                 candidate.SkillInstanceId == replacement.SkillInstanceId && candidate.GameplayHash == replacement.GameplayHash;
         if (child is DyingFrame dying && parent is ProgramSkillFrame producer)
             return IsDamageJudgmentHpLossDyingRide(dying, producer);
-        return NativeDrawAttemptRidesOn(child, parent) || PreventionDrawObserverEdge(index);
+        return NativeDrawAttemptRidesOn(child, parent) || ProgramChildResolutionEdge(index);
     }
 
     private bool HasExactBeforeDamageJudgmentSubtree(long windowId) => BeforeDamageJudgmentOutcomeRoot(windowId) is not null;

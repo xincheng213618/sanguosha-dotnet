@@ -128,13 +128,6 @@ public sealed partial class GameEngine
     private bool HasYaDanBeforeDamageObserver(long id)=>YaDanObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 720)]
     private bool IsYaDanDying()=>ActiveDying is{}dying&&YaDanObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==dying.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1290)]
-    private bool AllowsYaDanNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||YaDanObserverRoot()is not{}root||root.Id==f.Id)return false;
-        var effect=GetPausedPrivateOfferEffect(f);return effect is{Op:SkillProgramEffectOp.Damage}&&effect.Amount==amount&&effect.ActorReference==source&&effect.DamageNature==nature&&
-            target==(effect.TargetReference is{}reference?ResolveProgramParticipant(f,reference):ResolveProgramEffectTarget(f,effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27260)]
     private bool AdvanceYaDanObserver()=>_pendingDecision is null&&YaDanObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

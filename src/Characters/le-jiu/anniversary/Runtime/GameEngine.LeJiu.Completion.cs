@@ -64,27 +64,4 @@ public sealed partial class GameEngine
         ? ValidLeJiuFrame(f) && (r.Reward || r.Grant is not null || LeJiuPaidCost(f) is not null)
         : f.InstructionIndex is 0 or 1 && f.WindowContext is { } w && IsIssuedLeJiuCandidate(LeJiuCandidate(f), w, false);
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 44100)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 44100)]
-    private bool LeJiuUndamagedUseConsequence(ProgramSkillFrame f, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.LeJiuCuijin is not { Reward: true } r || f.InstructionIndex != 3 ||
-            f.AttackAttempt is not null || f.NativeDraw is not null || f.PendingMovementContinuation is not null ||
-            _resolutionStack.LastOrDefault()?.Id != f.Id || CurrentDamageAttempt?.ResolutionId != r.UseId ||
-            target != r.Actor || amount != 1 || source is not null || nature is not null || sourceLess || !ValidLeJiuFrame(f)) return false;
-
-        // Instruction 2 is the ordinary native Draw. Only its typed recipient
-        // return clears NativeDraw and advances this original frame to 3, after
-        // all paid draw observers have returned. No second draw is issued here.
-        // A request child is optional (there may be no eligible replacement);
-        // when one was issued, retain its exact request/decision relationship.
-        var attempts = ProgramEventHistory<NativeDrawAttemptStartedEvent>().Where(e => e.Context.ParentFrameId == f.Id).ToArray();
-        if (attempts.Length == 0) return true;
-        return attempts is [var started] && started.Context.RecipientSeat == f.OwnerSeat && started.Context.RequestedCount == 2 &&
-            started.Context.Reason == new CardMoveReason($"skill-program.{f.SkillId}.{SkillProgramEffectOp.Draw}") &&
-            started.Return == new NativeDrawAttemptReturn(NativeDrawAttemptReturnKind.ProgramInstruction, 2, 0) &&
-            ProgramEventHistory<NativeDrawAttemptDecidedEvent>().Count(e => e.AttemptFrameId == started.Context.AttemptFrameId &&
-                e.ParentFrameId == f.Id && e.RecipientSeat == f.OwnerSeat && e.RequestedCount == 2) == 1;
-    }
 }

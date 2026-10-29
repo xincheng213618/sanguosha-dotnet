@@ -4769,6 +4769,8 @@ public sealed partial class GameEngine
         ProgramSkillWindowContext? windowContext = null)
     {
         var effects = sourceEffects.ToArray();
+        if (effects is [{ Op: SkillProgramEffectOp.ResolveWushuangZengou }])
+            return EstimateActualDodgeZengouForAi(owner, windowContext);
         if (effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMouYuJinXiayuan))
             return EstimateMouXiayuanForAi(owner, publicContext, windowContext);
         if (effects is [{ Op: SkillProgramEffectOp.ResolveMouHuangGaiKurouGift }])

@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media.Imaging;
 using CardGame.Content.Standard;
 using CardGame.Core.Campaigns;
 using CardGame.Wpf.Controls;
@@ -16,18 +17,29 @@ internal static class ShanheStoryEventUiChecks
         var production = StandardShanheCampaignCatalog.CreateCodexDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
         var source = production.Nodes.Single(node => node.Id == "village");
         var market = production.Nodes.First(node => node.Kind == ShanheNodeKind.Shop);
-        foreach (var storyId in new[] { StandardShanheCampaignCatalog.RecruitmentStoryId, "story:jianluojinpao", "story:shiyoudaru", "story:huangjin-elite" })
+        foreach (var storyId in new[] { StandardShanheCampaignCatalog.RecruitmentStoryId, "story:jianluojinpao", "story:shiyoudaru",
+            "story:huangjin-elite", StandardShanheCampaignCatalog.RareTacticStoryId })
         {
-            var story = source.StoryEvents!.Single(story => story.Id == storyId);
+            var tacticStory = storyId == StandardShanheCampaignCatalog.RareTacticStoryId;
+            var story = (source.StoryEvents ?? []).Concat(source.SupplementalStoryEvents ?? []).Single(story => story.Id == storyId);
             var battleIds = story.Choices.Select(choice => choice.BattleNodeId).OfType<string>().ToHashSet();
+            foreach (var battle in production.Nodes.Where(node => battleIds.Contains(node.Id)).ToArray())
+                if (battle.EliteUpgradeNodeId is { } eliteId) battleIds.Add(eliteId);
             var definition = new ShanheCampaignDefinition("fixture:story-ui", "奇遇", ["classic:guan-yu"], ["village"],
-                new[] { source with { NextNodeIds = [market.Id], StoryEvents = [story] },
+                new[] { source with { NextNodeIds = [market.Id], StoryEvents = [story], SupplementalStoryEvents = null },
                     market with { NextNodeIds = ["after"] },
                     new ShanheNodeDefinition("after", "后续战斗", ShanheNodeKind.Battle, [],
                         [new("after", "后续战斗", [new("classic:cao-cao")])]) }
-                .Concat(production.Nodes.Where(node => battleIds.Contains(node.Id)).Select(node => node with { NextNodeIds = ["after"] })).ToArray(),
-                production.Rewards, StartingGold: storyId == StandardShanheCampaignCatalog.RecruitmentStoryId ? 399 : 600, ExtraSkillSlots: 2);
-            var session = ShanheCampaignSession.Create(definition, new(71, "classic:guan-yu") { UseCodexRewardPool = true, PersistentMarket = true },
+                .Concat(production.Nodes.Where(node => battleIds.Contains(node.Id)).Select(node => node with
+                { NextNodeIds = node.EliteUpgradeNodeId is { } eliteId ? ["after", eliteId] : ["after"] }))
+                // This fixture opens one story directly, rather than publishing a
+                // partial six-step chapter. Keep its real upgrade profiles and rewards.
+                .Select(node => node with { ChapterRouteId = null, ChapterRole = ShanheChapterNodeRole.None,
+                    ChapterProgressStep = 0, RequiredChapterProgress = 0 }).ToArray(),
+                production.Rewards, StartingGold: storyId == StandardShanheCampaignCatalog.RecruitmentStoryId ? 399 : 600, ExtraSkillSlots: 2)
+                { Schools = production.Schools };
+            var session = ShanheCampaignSession.Create(definition, new(71, "classic:guan-yu")
+                { UseCodexRewardPool = true, PersistentMarket = true, UseBalancedJourneyRewards = tacticStory },
                 StandardShanheCampaignCatalog.CreateBattleRegistry);
             Program.Assert(session.Submit(new MoveShanheNodeCommand("village", session.Revision)).Accepted, "The actual event is revealed through a map command.");
             session = ShanheCampaignSession.Restore(session.CreateCheckpoint(), definition,
@@ -45,7 +57,17 @@ internal static class ShanheStoryEventUiChecks
                 var context = (Border)panel.FindName("ShanheContextPanel");
                 Program.Assert(model.IsShanheShopActive && context.Visibility == Visibility.Visible && context.ActualHeight > 0,
                     "An available persistent market must not hide the pending story choices on the journey map.");
-                var choice = model.ShanheChoices.Single(item => item.Id == (storyId switch
+                var tacticOffers = tacticStory ? session.Snapshot.NodeChoices
+                    .Where(option => option.Id.StartsWith("story-tactic:", StringComparison.Ordinal)).ToArray() : [];
+                if (tacticStory)
+                    Program.Assert(tacticOffers.Length == 2 && tacticOffers.Select(option => option.RewardId).Distinct().Count() == 2 &&
+                            tacticOffers.All(option => story.TacticRewardIds!.Contains(option.RewardId!) &&
+                                production.Rewards.Single(reward => reward.Id == option.RewardId) is { Rarity: 2, SkillId: null } &&
+                                StandardShanheCampaignCatalog.ShopMetadataByRewardId.TryGetValue(option.RewardId!, out var metadata) &&
+                                ShanheArt.Get(metadata.SourceRewardId) is BitmapSource { PixelWidth: > 0 }),
+                        "The tactic story reveals two distinct real rare tactics from its typed source pool, each with its original loaded artwork.");
+                var choice = tacticStory ? model.ShanheChoices.Single(item => item.Id == tacticOffers[0].Id) :
+                    model.ShanheChoices.Single(item => item.Id == (storyId switch
                 {
                     StandardShanheCampaignCatalog.RecruitmentStoryId => "recruit-normal",
                     "story:jianluojinpao" => "recruit-xunyu-elite",
@@ -66,6 +88,28 @@ internal static class ShanheStoryEventUiChecks
                         "The HUD displays the actual recruited name and tier.");
                 else if (storyId == "story:shiyoudaru")
                     Program.Assert(session.Snapshot.Gold == 810 && session.Snapshot.ExtraSkillIds.Count == 0, "The real decline button credits exactly 210 copper.");
+                else if (tacticStory)
+                {
+                    var rewardId = tacticOffers[0].RewardId!;
+                    var sourceId = StandardShanheCampaignCatalog.ShopMetadataByRewardId[rewardId].SourceRewardId;
+                    var hudTactic = model.ShanheJourneyTactics.Single(item => item.Id == sourceId);
+                    var hud = (ShanheJourneyLoadout)panel.FindName("ShanhePlayerHudHost");
+                    var icon = Program.Find<Image>(hud).Single(image => image.DataContext is ShanheJourneyTacticSlot
+                        { Tactic: { } tactic } && tactic.Id == sourceId && ReferenceEquals(image.Source, tactic.Icon));
+                    Program.Assert(session.Snapshot.TacticIds.SequenceEqual([rewardId]) && model.ShanheTacticCards.Single().Id == rewardId &&
+                            session.Snapshot.Gold == 600 && session.Snapshot.ExtraSkillIds.Count == 0 &&
+                            session.Snapshot.Phase == ShanheCampaignPhase.Map &&
+                            hudTactic.Icon is BitmapSource { PixelWidth: > 0 } &&
+                            ReferenceEquals(hudTactic.Icon, ShanheArt.Get(sourceId)) &&
+                            hud.Visibility == Visibility.Visible && icon.Visibility == Visibility.Visible &&
+                            icon.ActualWidth > 0 && icon.ActualHeight > 0,
+                        "Clicking the genuine rare tactic button grants its real owned identity once, uses no skill slot or copper, and visibly adds its original icon to the lower HUD.");
+                    Program.Render(panel, 1440, 880, Path.Combine(output, "shanhe-story-rare-tactic-claimed-hud.png"));
+                    var once = ShanheCampaignJson.Serialize(session.CreateCheckpoint());
+                    model.ChooseShanheOptionCommand.Execute(choice);
+                    Program.Assert(ShanheCampaignJson.Serialize(session.CreateCheckpoint()) == once,
+                        "Executing the stale tactic choice cannot grant another copy, credit the decline reward, or advance the journal again.");
+                }
                 else
                     Program.Assert(model.IsShanheBattleActive && model.IsShanheBattleSession && session.PendingBattleSetup is not null,
                         "Clicking combat starts the native table immediately.");

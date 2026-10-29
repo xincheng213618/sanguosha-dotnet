@@ -51,14 +51,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30300)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30300)]
     private bool IsWuZglDying() => ActiveDying is { } d && WuZglObserverRoot() is { } r && _resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 30300)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 30300)]
-    private bool AllowsWuZglNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || WuZglObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return !sourceLess && e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature &&
-            target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30300)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 30300)]
     private bool IsWuZglRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame r)

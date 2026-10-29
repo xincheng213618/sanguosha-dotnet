@@ -25,15 +25,15 @@ public sealed partial class MainViewModel
         { "tactics" => "战 法 选 择", "cards" => "卡 牌 选 择", _ => group.Name + " · 选择" } :
         _shanheSession?.Snapshot.RewardOffers is { Count: > 0 } offers && offers.All(reward => reward.SkillId is not null)
             ? "技 能 选 择" : "战 利 品 选 择";
-    public string ShanheRewardNotice => IsShanheOpeningSkillDraft ? "传承：从3项稀有技能中选择1项" :
+    public string ShanheRewardNotice => IsShanheOpeningSkillDraft ? $"传承：从{_shanheSession!.Snapshot.OpeningSkillOffers.Count}项稀有技能中选择1项" :
         _shanheSession?.Snapshot.RewardCategories.Count > 0 ? "选择奖励类别，确认后不可更换。" :
         ActiveShanheBossRewardGroup is { } group ? IsShanheBonusRewardOnly
-            ? $"从 {group.Offers.Count} 项追加奖励中选择1项" + (group.CanSkip ? $"，或放弃换取 {group.SkipGold} 铜币" : group.Offers.All(IsShanheTactic) ? "，战法必须领取" : "")
-            : $"本组 {group.Offers.Count} 项奖励，选择1项" + (group.CanSkip ? $"，或放弃换取 {group.SkipGold} 铜币" : group.Offers.All(IsShanheTactic) ? "，战法必须领取" : "") :
+            ? $"从 {group.Offers.Count} 项追加奖励中选择1项" + (group.CanSkip ? $"，或放弃换取 {group.SkipGold} 铜币" : group.Offers.All(IsShanheTactic) ? "，战法必须领取" : "，本组必须领取")
+            : $"本组 {group.Offers.Count} 项奖励，选择1项" + (group.CanSkip ? $"，或放弃换取 {group.SkipGold} 铜币" : group.Offers.All(IsShanheTactic) ? "，战法必须领取" : "，本组必须领取") :
         _shanheSession?.Snapshot is { CanSkipReward: true } state
         ? $"选择1项奖励，或放弃换取 {state.RewardSkipGold} 铜币"
         : _shanheSession?.Snapshot.RewardOffers is { Count: > 0 } mandatory && mandatory.All(IsShanheTactic)
-            ? "选择1项战法，必须领取" : "选择1项奖励";
+            ? "选择1项战法，必须领取" : "选择1项奖励，必须领取";
     public ShanheRewardCard? SelectedShanheRewardCard => _selectedShanheRewardCard;
     public bool ShanheRewardNeedsReplacement => SelectedShanheRewardReplacements.Count > 0;
     public string ShanheRewardConfirmText => _selectedShanheRewardCard?.IsSkip == true ? "领 取 铜 币" :
@@ -86,7 +86,7 @@ public sealed partial class MainViewModel
         if (!CanConfirmShanheReward() || _selectedShanheRewardCard is not { } card) return;
         if (ShanheRewardNeedsReplacement)
         {
-            OpenShanheSkillReplacement(card.Name, SelectedShanheRewardReplacements.ToArray(),
+            OpenShanheSkillReplacement(card.DisplayName, SelectedShanheRewardReplacements.ToArray(),
                 choice => CompleteShanheRewardSelection(card, choice), IsCurrentShanheRewardChoice);
             return;
         }
@@ -146,7 +146,7 @@ public sealed partial class MainViewModel
                 var rule = RewardRule(reward);
                 var showSkillRule = reward.SkillId is not null && !string.IsNullOrWhiteSpace(rule);
                 var artwork = CreateShanheRewardArtwork(reward);
-                ShanheRewardCards.Add(new(reward.Id, reward.Name.Replace("传习·", ""), showSkillRule ? rule : reward.Description,
+                ShanheRewardCards.Add(new(reward.Id, reward.Name, showSkillRule ? rule : reward.Description,
                     showSkillRule ? string.Empty : rule, RewardCategory(reward), false, "", state.Revision,
                     CurrentShanheRewardChoices.Any(choice => choice.IsReward && choice.Id == reward.Id && choice.IsEnabled))
                 { Rarity = reward.Rarity, CardImage = artwork.IsCard ? artwork.Image : null,
@@ -171,7 +171,7 @@ public sealed partial class MainViewModel
         }
         foreach (var property in new[] { nameof(IsShanheRewardOpen), nameof(ShanheRewardHeading), nameof(ShanheRewardNotice),
                      nameof(ShanheRewardConfirmText),
-                     nameof(SelectedShanheRewardCard), nameof(ShanheRewardNeedsReplacement) }) RaisePropertyChanged(property);
+                     nameof(SelectedShanheRewardCard), nameof(ShanheRewardNeedsReplacement), nameof(ShanheChapterObjectiveText) }) RaisePropertyChanged(property);
         (ConfirmShanheRewardCommand as RelayCommand)?.NotifyCanExecuteChanged();
     }
 }
@@ -182,6 +182,7 @@ public sealed class ShanheRewardCard(string id, string name, string description,
     private bool _isSelected;
     public string Id { get; } = id;
     public string Name { get; } = name;
+    public string DisplayName => ShanheDisplayText.RewardName(Name);
     public string Description { get; } = description;
     public string RuleDescription { get; } = ruleDescription;
     public bool HasRuleDescription => !string.IsNullOrWhiteSpace(RuleDescription) && RuleDescription != Description;
@@ -190,6 +191,13 @@ public sealed class ShanheRewardCard(string id, string name, string description,
     public int Rarity { get; init; }
     public string QualityText => Rarity switch { 1 => "普通", 2 => "稀有", 3 => "史诗", 4 => "传说", _ => string.Empty };
     public string HeadingText => string.IsNullOrEmpty(QualityText) ? Category : QualityText + " · " + Category;
+    public int TypeIconIndex => IsSkip ? 0 : Category switch
+    {
+        "战法" => 2,
+        "技能" or "额外技能" => 3,
+        "卡牌" or "手牌" or "装备" or "随身牌" or "随身装备" => 4,
+        _ => 0
+    };
     public ImageSource? CardImage { get; init; }
     public ImageSource? TacticImage { get; init; }
     public ImageSource? Artwork => CardImage ?? TacticImage;

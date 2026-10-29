@@ -1,4 +1,4 @@
-﻿namespace CardGame.Core;
+namespace CardGame.Core;
 public sealed partial class GameEngine
 {
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedAfterCategory, 40)]
@@ -121,11 +121,6 @@ public sealed partial class GameEngine
  private bool IsCaoChunDying()=>ActiveDying is{}d&&CaoChunObserverRoot()is{}r&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 340)]
  private bool TryAdvanceCaoChunSubtree()=>_pendingDecision is null&&CaoChunObserverRoot()is not null&&TryAdvanceObserverSubtree(advanceRecoveryReplacement:true);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 570)]
- private bool AllowsCaoChunNestedDamage(ProgramSkillFrame o,int target,int amount,ProgramParticipantReference?source,DamageNature?nature,bool sourceLess)
- {
-  if(sourceLess||o.AttackAttempt is not null||o.InstructionIndex<1||_resolutionStack.LastOrDefault()?.Id!=o.Id||CaoChunObserverRoot()is not{}root||root.Id==o.Id)return false;var e=GetPausedPrivateOfferEffect(o);return e is{Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(o,p):ResolveProgramEffectTarget(o,e.Target));
- }
  private void ExpireCaoChunPlayDebt(int owner,int phaseInstance)
  {if(_players[owner].Shanjia is{}s&&s.Debt?.PhaseInstance==phaseInstance)_players[owner].Shanjia=s with{Debt=null};}
 

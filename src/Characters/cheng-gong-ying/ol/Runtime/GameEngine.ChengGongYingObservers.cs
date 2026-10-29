@@ -58,11 +58,5 @@ public sealed partial class GameEngine
     private bool HasChengGongYingBeforeDamageObserver(long id) => HasChengGongYingDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 620)]
     private bool IsChengGongYingDying() => ActiveDying is { } dying && ChengGongYingObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1260)]
-    private bool AllowsChengGongYingNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || ChengGongYingObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f); return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature && target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(f, reference) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27100)] private bool AdvanceChengGongYingSubtree() => _pendingDecision is null && ChengGongYingObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

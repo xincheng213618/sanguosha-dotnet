@@ -34,9 +34,14 @@ internal static class DamageCursorProjectionChecks
         var replace = store.GetType().GetMethod("Replace")!;
         var project = typeof(GameEngine).GetMethod("TypedDamageProgramObserver", BindingFlags.NonPublic | BindingFlags.Instance)!;
         var resolve = typeof(GameEngine).GetMethod("ResolveDamageCursor", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        var ownedSubtree = typeof(GameEngine).GetMethod("HasOwnedProgramChildSubtree", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        ((ICollection<CardMovementRecord>)typeof(GameEngine).GetField("_cardMovements",
+            BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(game)!).Add(move);
         foreach (var frame in frames) push.Invoke(store, [frame]);
         Require(Project()?.Id == root.Id, "The registered movement/HP chain projects to its exact owning damage candidate.");
         Require(ResolvedTop()?.Id == root.Id, "The final cursor resolver accepts the same exact owning candidate.");
+        Require((bool)ownedSubtree.Invoke(game, [root.Id])!,
+            "The shared child protocol recognizes the same contiguous movement/health subtree without skill-specific permission.");
 
         Reject(root with { SkillInstanceId = "other-instance" });
         Reject(root with { GameplayHash = "other-hash" });
@@ -167,6 +172,9 @@ internal static class DamageCursorProjectionChecks
             try
             {
                 RequireRejected(malformed.Kind.ToString());
+                if (Array.IndexOf(frames, original) >= 3)
+                    Require(!(bool)ownedSubtree.Invoke(game, [root.Id])!,
+                        "The shared protocol cannot admit a rejected child edge through a legacy skill-specific fallback.");
             }
             finally { replace.Invoke(store, [original]); }
         }

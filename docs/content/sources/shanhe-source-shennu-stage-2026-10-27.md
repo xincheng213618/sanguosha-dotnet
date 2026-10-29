@@ -16,6 +16,14 @@
 
 第二阶段为独立的篡天恶魂，基础 `20/20`、摸牌 `2`、随机起手 `4`，仅有 `14214 ShenNuRogue 神怒`与 `111 崩坏`。来源通用身体编号 `4871` 不能用来继承其他同编号敌军的技能。进入第二阶段沿现有山河图致死替换与阶段发牌合同，替换值来自该阶段自己的数值行。
 
+### 第二阶段的精确原卡
+
+2026-10-29独立核对268701第0行：`b=4871,c=篡天恶魂,d=60501,g=1,inStage=2,startChapter=1`，没有隐藏或 `Generalshow` 覆盖。60501不是PVE表中的同号座位图；冻结皮肤表 `generalskin.items.item` 明确 `a=60501,b=605,c=踞京问鼎*谋董卓,d=moudongzhuo01,ab=3`。字段 `ab` 是 `newSkinJudge`，客户端将3解释为三形态皮肤；`Gjt.SetSkin` 初始 `JueXingState=h||1`，`loadStatic` 对多形态皮肤调用 `SkinSeatUrlJueXing(1)`，因此真实初始座位原图为[60501_1.png](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/60501_1.png)，不是通用董卓默认图。
+
+该原PNG为146×172、80,015字节，SHA-256 `39863cd22adcd160a6ac726b30572043dddf21cdf03d37c8c3000b6094b6c179`，RGBA像素SHA-256 `450705e3d5acfc71ad95743a94f33fccdc26d282e02836e41a571c1555a416d1`，原字节保存于 `src/CardGame.Wpf/Assets/Shanhe/Npc/60501_1.png`。阶段翻面效果 `q6t.getSeatSkinUrl` 使用的[60501.png](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/60501.png)字节SHA不同，但实测RGBA完全相同；永久文件采用实际座位加载的第1形态，未裁图或合成。证据汇入[山河NPC素材清单](../shanhe-npc-art-sources.json)。
+
+美术仅绑定既有 `shanhe:source-shennu-268701` 身体；来源版16–25档仍在原首领席进入第二阶段，推荐三档的既有阶段投放也沿用原规则。不把268701添加为开场额外敌军，不生成第二阶段独立的主帅／前锋分组配置，内容 `PortraitKey`、`VariantId` 及技能保持不变。
+
 阶段身体按新模板绑定自身声明的神怒与崩坏，本场已取得的独立技能来源另外保留。撤销旧崩坏来源不代表永久禁止再次取得同一技能；第二阶段明列 `111 崩坏`且没有删技字段。因此新模板可以重新绑定崩坏，同时保留原来取得的再起来源与实例，不清空独立授予，也不把旧来源的撤销扩大成对技能编号的永久禁授。
 
 ## 分档累加

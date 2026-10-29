@@ -138,7 +138,7 @@ public sealed partial class GameEngine
             return ParticipantHandRescueObserverRide(hp, rescue, rescue);
         if (_resolutionStack.OfType<CardUseFrame>().LastOrDefault(f => f.DyingResponse is not null) is { } rescueUse &&
             ParticipantHandRescueObserverRide(child, parent, rescueUse)) return true;
-        return PaidMountObserverEdge(index);
+        return ProgramChildResolutionEdge(index);
     }
 
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 90)]

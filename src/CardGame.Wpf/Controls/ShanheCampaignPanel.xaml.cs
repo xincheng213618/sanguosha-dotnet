@@ -101,10 +101,10 @@ public partial class ShanheCampaignPanel : UserControl
             Dispatcher.BeginInvoke(() => ShanheSettlementHost.FocusSettlement(), System.Windows.Threading.DispatcherPriority.DataBind);
             return;
         }
-        if (e.PropertyName is nameof(MainViewModel.IsShanheEncounterPreviewOpen) or nameof(MainViewModel.IsShanheRewardOpen)
+        if (e.PropertyName is nameof(MainViewModel.IsShanheEncounterPreviewOpen) or nameof(MainViewModel.IsShanheRewardOpen) or nameof(MainViewModel.IsShanheRestChoiceOpen)
             or nameof(MainViewModel.IsShanheBossRewardOpen))
         {
-            if (_observedModel.IsShanheEncounterPreviewOpen || _observedModel.IsShanheRewardOpen || _observedModel.IsShanheBossRewardOpen)
+            if (_observedModel.IsShanheEncounterPreviewOpen || _observedModel.IsShanheRewardOpen || _observedModel.IsShanheBossRewardOpen || _observedModel.IsShanheRestChoiceOpen)
             {
                 ShanheSetupOverlay.Visibility = Visibility.Collapsed;
                 ShanheRulesOverlay.Visibility = Visibility.Collapsed;
@@ -130,6 +130,7 @@ public partial class ShanheCampaignPanel : UserControl
             (DescendantButtons(ShanheBossRewardGroupRows).FirstOrDefault(button => button.IsEnabled) ?? ShanheConfirmBossRewardButton).Focus();
         else if (ShanheRewardOverlay.Visibility == Visibility.Visible)
             (DescendantButtons(ShanheRewardCardRows).FirstOrDefault(button => button.IsEnabled) ?? ShanheConfirmRewardButton).Focus();
+        else if (ShanheRestChoiceHost.Visibility == Visibility.Visible) ShanheRestChoiceHost.FocusChoices();
         else if (ShanheEncounterOverlay.Visibility == Visibility.Visible) ShanheChallengeButton.Focus();
         else if (ShanheRulesOverlay.Visibility == Visibility.Visible) ShanheRulesCloseButton.Focus();
         else if (ShanheSetupOverlay.Visibility == Visibility.Visible) FocusGeneralSelection();
@@ -138,6 +139,7 @@ public partial class ShanheCampaignPanel : UserControl
 
     public bool HandleEscape()
     {
+        if (ShanhePlayerHudHost.HandleEscape()) return true;
         if (DataContext is MainViewModel { IsShanheEndConfirmationOpen: true } ending)
         { ending.CancelEndShanheCommand.Execute(null); return true; }
         if (ModalFocus.HasOpenDropDown(this)) return true;
@@ -151,6 +153,7 @@ public partial class ShanheCampaignPanel : UserControl
             return true;
         }
         if (ShanheBossRewardOverlay.Visibility == Visibility.Visible) return true;
+        if (ShanheRestChoiceHost.Visibility == Visibility.Visible) return true;
         if (ShanheRewardOverlay.Visibility == Visibility.Visible)
         {
             if (DataContext is MainViewModel { HasShanheBossRewardGroup: true } rewardModel &&
@@ -258,4 +261,11 @@ public partial class ShanheCampaignPanel : UserControl
         if (e.Key == Key.Escape && Keyboard.Modifiers == ModifierKeys.None &&
             !ModalFocus.HasOpenDropDown(this)) e.Handled = HandleEscape();
     }
+
+    private void MinorEnemySelected(object sender, RoutedEventArgs e) => Dispatcher.BeginInvoke(() =>
+    {
+        if (DataContext is not MainViewModel { IsShanheEncounterPreviewOpen: true, HasShanheEncounterEnemySelection: true }) return;
+        UpdateLayout();
+        ShanheEncounterEnemyDetailScroll.ScrollToBottom();
+    }, System.Windows.Threading.DispatcherPriority.DataBind);
 }

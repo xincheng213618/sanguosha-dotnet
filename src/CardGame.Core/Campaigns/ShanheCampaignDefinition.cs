@@ -264,13 +264,28 @@ public sealed record ShanheStoryEventDefinition(string Id, string Name, string S
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyList<string>? SkillRewardIds { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<string>? TacticRewardIds { get; init; }
 }
+
+public enum ShanheChapterNodeRole { None, OpeningBattle, Event, Arena, MainBattle, Rest, OptionalBattle, ExtraBattle, Boss, Market, Profile }
 
 public sealed record ShanheNodeDefinition(
     string Id, string Name, ShanheNodeKind Kind, IReadOnlyList<string> NextNodeIds,
     IReadOnlyList<ShanheEncounterDefinition>? Encounters = null, IReadOnlyList<string>? RewardIds = null,
     int RewardChoiceCount = 3, IReadOnlyList<ShanheNodeChoiceDefinition>? Choices = null)
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ChapterRouteId { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public ShanheChapterNodeRole ChapterRole { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int ChapterProgressStep { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int RequiredChapterProgress { get; init; }
+    /// <summary>Optional extra battle unlocked by the chapter action tactic; zero is an ordinary route node.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int ExtraChapterBattleIndex { get; init; }
     /// <summary>Authored same-chapter elite profile used by a held ordinary-battle upgrade tactic.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? EliteUpgradeNodeId { get; init; }
@@ -280,6 +295,9 @@ public sealed record ShanheNodeDefinition(
     /// <summary>One story is selected on entry, independently of battle encounters.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyList<ShanheStoryEventDefinition>? StoryEvents { get; init; }
+    /// <summary>Additional stories admitted only by an opted-in journey; historical event pools retain their order.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<ShanheStoryEventDefinition>? SupplementalStoryEvents { get; init; }
     /// <summary>A battle entered through a story choice, omitted from the ordinary map.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool IsStoryBattle { get; init; }

@@ -48,8 +48,5 @@ public sealed partial class GameEngine
     private bool HasRuanYuBeforeDamageObserver(long id)=>HasRuanYuDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 860)]
     private bool IsRuanYuDying()=>ActiveDying is{}d&&RuanYuObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1430)]
-    private bool AllowsRuanYuNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||RuanYuObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27430)]private bool AdvanceRuanYuChildren()=>_pendingDecision is null&&RuanYuObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

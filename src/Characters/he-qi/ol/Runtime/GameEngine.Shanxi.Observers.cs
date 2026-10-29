@@ -13,12 +13,6 @@ public sealed partial class GameEngine
     private bool HasHeQiDamageObserver(long id)=>HeQiObserverRoot()is{}r && _resolutionStack.Any(f=>f.Id==id && f is DamageTriggerWindowFrame) && _resolutionStack.FindIndex(f=>f.Id==id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 50)]
     private bool IsHeQiDying()=>ActiveDying is{}dying && HeQiObserverRoot()is{}r && _resolutionStack.FindIndex(f=>f.Id==dying.Id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 670)]
-    private bool AllowsHeQiNestedDamage(ProgramSkillFrame observer,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess||observer.AttackAttempt is not null||observer.InstructionIndex<1||_resolutionStack.LastOrDefault()?.Id!=observer.Id||observer.WindowContext?.Window is not(SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged)||HeQiObserverRoot()is not{}root||root.Id==observer.Id)return false;
-        var e=GetPausedPrivateOfferEffect(observer);return e is{Op:SkillProgramEffectOp.Damage} && amount==e.Amount && source==e.ActorReference && nature==e.DamageNature && target==(e.TargetReference is{}reference?ResolveProgramParticipant(observer,reference):ResolveProgramEffectTarget(observer,e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 170)]
     private bool TryAdvanceHeQiSubtree()=>_pendingDecision is null && HeQiObserverRoot()is not null && TryAdvanceObserverSubtree(advanceRecoveryReplacement:true);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 300)]

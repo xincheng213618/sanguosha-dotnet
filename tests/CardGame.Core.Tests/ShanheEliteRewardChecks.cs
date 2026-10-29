@@ -19,19 +19,24 @@ internal static class ShanheEliteRewardChecks
                 elite.RewardIds!.Any(id => definition.Rewards.Single(reward => reward.Id == id).Rarity > 2),
                 "The published Lu Bu/Zhang Liao elite keeps rare categorized baseline loot, a decline quote and its higher promotion pool in both entry paths.");
             var ordinary = definition.Nodes.Single(node => node.Id == "guangcheng");
-            Need(ordinary.PrimaryTacticRarity == 1 && ordinary.PrimarySkillRarity == 1 &&
+            Need(ordinary.PrimaryTacticRarity == 1 && ordinary.PrimarySkillRarity == 1 && ordinary.PrimaryCardRarity == 1 &&
                 definition.StartingNodeIds.All(id => definition.Nodes.Single(node => node.Id == id).PrimarySkillRarity == 2),
                 "Ordinary route battles and the existing rare opening-skill rewards keep their own authored qualities.");
-            if (codex)
+            Need(elite.RewardIds!.Any(id => definition.Rewards.Single(reward => reward.Id == id) is
+                    { Rarity: 2, StartingCards.Count: > 0 }),
+                "Both published entry paths include actual rare cards for an elite card reward.");
+            var third = definition.Nodes.Single(node => node.Id == StandardShanheCampaignCatalog.ThirdChapterDongwuEliteId);
+            Need(third.PrimaryTacticRarity == 3 && third.PrimarySkillRarity == 3 && third.PrimaryCardRarity == 3,
+                "The third-chapter elite upgrades the optional rare patrol baseline to epic rewards.");
             {
                 var defaults = StandardShanheCampaignCatalog.GetDefaultCodexUnlockedRewardIds(definition);
                 var session = ShanheCampaignSession.Create(definition with { StartingNodeIds = [.. definition.StartingNodeIds, elite.Id] },
-                    new(71, "classic:guan-yu") { UseCodexRewardPool = true, UnlockedRewardIds = defaults },
+                    new(71, "classic:guan-yu") { UseCodexRewardPool = codex, UnlockedRewardIds = codex ? defaults : [] },
                     StandardShanheCampaignCatalog.CreateBattleRegistry);
                 EnterRewardStage(session, elite.Id);
                 Need(session.Snapshot.RewardCategories.Count == 0 && session.Snapshot.RewardOffers.Count > 0 &&
                     session.Snapshot.RewardOffers.All(reward => reward.Rarity == 2),
-                    "Default research receives direct rare offers of the location's fixed type, without a category-selection step or common fallback.");
+                    "Each entry path receives direct rare offers of the location's fixed type, without a category-selection step or common fallback.");
             }
         }
 
@@ -73,6 +78,29 @@ internal static class ShanheEliteRewardChecks
         var expanded = Draft(ShanheRewardCategory.Tactic, expand: true);
         Need(expanded.Snapshot.RewardOffers.Count == 4,
             "An automatic reward type preserves the owned tactic's four-candidate bonus.");
+        var unavailable = Draft(ShanheRewardCategory.Card).Definition;
+        unavailable = unavailable with { Nodes = unavailable.Nodes.Select(node => node.Id == "elite"
+            ? node with { PrimaryCardRarity = 4 } : node).ToArray() };
+        var withoutCard = ShanheCampaignSession.Create(unavailable, new(4, ShanheCampaignChecks.Player), ShanheCampaignChecks.Registry);
+        Need(withoutCard.PreviewRewardCategory("elite") != ShanheRewardCategory.Card,
+            "The verified card seed cannot consume a reward on a type without an eligible base-quality candidate.");
+        var route = Draft(ShanheRewardCategory.Tactic).Definition;
+        var eliteProfile = route.Nodes.Single(node => node.Id == "elite");
+        var wolf = new ShanheRewardDefinition("wolf", "狼战") { CampaignEconomy = new(UpgradeOrdinaryBattles: true) };
+        route = route with
+        {
+            StartingNodeIds = ["normal", "elite"], Rewards = route.Rewards.Append(wolf).ToArray(),
+            Nodes = route.Nodes.Select(node => node.Id == "elite" ? node with
+                { RewardIds = node.RewardIds!.Where(id => route.Rewards.Single(reward => reward.Id == id).SkillId is null).ToArray() } : node)
+                .Append(eliteProfile with { Id = "normal", Kind = ShanheNodeKind.Battle, EliteUpgradeNodeId = "elite",
+                    PrimaryTacticRarity = 1, PrimarySkillRarity = 1, PrimaryCardRarity = 1 }).ToArray()
+        };
+        var normal = ShanheCampaignSession.Create(route, new(1, ShanheCampaignChecks.Player), ShanheCampaignChecks.Registry);
+        var upgraded = ShanheCampaignSession.Create(route, new(1, ShanheCampaignChecks.Player)
+            { EquippedTacticIds = [wolf.Id] }, ShanheCampaignChecks.Registry);
+        Need(normal.PreviewRewardCategory("normal") == upgraded.PreviewRewardCategory("normal") &&
+            normal.PreviewRewardCategory("normal") is not (null or ShanheRewardCategory.Skill),
+            "Wolf Battles upgrades quality without rerolling the appearing route's type, even when the elite profile lacks a base type.");
     }
 
     private static ShanheCampaignSession Draft(ShanheRewardCategory category, bool promote = false, bool expand = false)
@@ -101,15 +129,12 @@ internal static class ShanheEliteRewardChecks
                 { CategorizedRewards = true, AutomaticRewardCategory = true, RewardSkipGold = 100,
                     PrimaryTacticRarity = 2, PrimarySkillRarity = 2, PrimaryCardRarity = 2 },
              new("camp", "营地", ShanheNodeKind.Camp, [], Choices: [new("rest", "休整")])], rewards, StartingGold: 10, ExtraSkillSlots: 1);
-        for (var seed = 1; seed <= 128; seed++)
-        {
-            var session = ShanheCampaignSession.Create(definition, new(seed, ShanheCampaignChecks.Player)
-                { EquippedTacticIds = promote ? ["promotion"] : expand ? ["expansion"] : [] }, ShanheCampaignChecks.Registry);
-            if (session.PreviewRewardCategory("elite") != category) continue;
-            EnterRewardStage(session, "elite");
-            return session;
-        }
-        throw new InvalidOperationException("The bounded map-only fixture did not include the requested reward category.");
+        var seed = category switch { ShanheRewardCategory.Tactic => 1, ShanheRewardCategory.Card => 4, _ => 7 };
+        var session = ShanheCampaignSession.Create(definition, new(seed, ShanheCampaignChecks.Player)
+            { EquippedTacticIds = promote ? ["promotion"] : expand ? ["expansion"] : [] }, ShanheCampaignChecks.Registry);
+        Need(session.PreviewRewardCategory("elite") == category, "The fixed seed still selects the intended reward category.");
+        EnterRewardStage(session, "elite");
+        return session;
     }
 
     private static void EnterRewardStage(ShanheCampaignSession session, string nodeId)

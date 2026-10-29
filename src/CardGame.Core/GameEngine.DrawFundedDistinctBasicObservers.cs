@@ -58,17 +58,6 @@ public sealed partial class GameEngine
         (DrawFundedDistinctBasicObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStack.FindIndex(f => f.Id == root.Id) ||
          _resolutionStack.FindIndex(f => f.Id == dying.FrameId) is var index && index >= 0 && (DrawFundedDistinctBasicDyingRescueRide(index, (DyingFrame)_resolutionStack[index]) || HuanpeiDyingRescueRide(index, (DyingFrame)_resolutionStack[index])));
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 270)]
-    private bool AllowsDrawFundedDistinctBasicNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (_resolutionStack.LastOrDefault()?.Id != observer.Id || observer.AttackAttempt is not null || observer.InstructionIndex < 1 ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.AfterHpRecovered or
-                SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost) || DrawFundedDistinctBasicObserverRoot() is null) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!).GetPausedInstruction(observer.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            !sourceLess && target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target));
-    }
 
     private PendingDecision? DrawFundedDistinctBasicInvariantDecision(PendingDecision? nativeDecision)
     {

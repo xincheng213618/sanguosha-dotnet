@@ -82,9 +82,4 @@ public sealed partial class GameEngine
  private bool IsLvKuangLvXiangDying()=>ActiveDying is{}d&&LvKuangLvXiangObserverRoot()is{}r&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 390)]
  private bool TryAdvanceLvKuangLvXiangSubtree()=>_pendingDecision is null&&LvKuangLvXiangObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 620)]
- private bool AllowsLvKuangLvXiangNestedDamage(ProgramSkillFrame o,int target,int amount,ProgramParticipantReference?source,DamageNature?nature,bool sourceLess)
- {
-  if(sourceLess||o.AttackAttempt is not null||o.InstructionIndex<1||_resolutionStack.LastOrDefault()?.Id!=o.Id||LvKuangLvXiangObserverRoot()is not{}r||r.Id==o.Id||o.WindowContext?.Window is not(SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged))return false;var e=GetPausedPrivateOfferEffect(o);return e is{Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&target==(e.TargetReference is{}reference?ResolveProgramParticipant(o,reference):ResolveProgramEffectTarget(o,e.Target));
- }
 }

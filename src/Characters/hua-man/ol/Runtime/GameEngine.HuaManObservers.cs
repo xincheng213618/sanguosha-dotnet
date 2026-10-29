@@ -85,11 +85,6 @@ public sealed partial class GameEngine
  private bool IsHuaManDying()=>ActiveDying is{}d&&HuaManObserverRoot()is{}r&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 410)]
  private bool TryAdvanceHuaManSubtree()=>_pendingDecision is null&&HuaManObserverRoot()is not null&&TryAdvanceObserverSubtree(advanceRecoveryReplacement:true);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 640)]
- private bool AllowsHuaManNestedDamage(ProgramSkillFrame observer,int target,int amount,ProgramParticipantReference?source,DamageNature?nature,bool sourceLess)
- {
-  if(sourceLess||observer.WindowContext?.Window is not(SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged)||observer.AttackAttempt is not null||observer.InstructionIndex<1||_resolutionStack.LastOrDefault()?.Id!=observer.Id||HuaManObserverRoot()is not{}r||r.Id==observer.Id)return false;var e=GetPausedPrivateOfferEffect(observer);return e is{Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(observer,p):ResolveProgramEffectTarget(observer,e.Target));
- }
 
  private bool HuaManLionCost(ProgramSkillFrame f)=>f.HuaMan is{Stage:HuaManStage.DiscardChildren,DiscardedId:{}id}r&&GetAdvancedCard(id).Kind==CardKind.SilverLion&&_cardMovements.Count(m=>m.Sequence>r.Before&&m.Sequence<=r.After&&m.CardId==id&&m.From==CardLocation.Equipment(f.OwnerSeat)&&m.To==CardLocation.DiscardPile&&m.Reason.Value==HuaManDiscardReason)==1;
  private bool HasHuaManCardContinuation(long useId)

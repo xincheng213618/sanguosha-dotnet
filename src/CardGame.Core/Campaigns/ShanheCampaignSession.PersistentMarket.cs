@@ -14,18 +14,21 @@ public sealed partial class ShanheCampaignSession
 
     public bool HasPersistentMarket => _options.PersistentMarket || _battleMarketSession;
     public IReadOnlyList<ShanheNodeDefinition> VisibleMapNodes =>
-        ShanheCampaignContent.Freeze(Definition.Nodes.Where(node => !_options.PersistentMarket || node.Kind != ShanheNodeKind.Shop)
-            .Select(node => _options.PersistentMarket
-                ? ResolveBattleNode(_state, node) with { NextNodeIds = ResolveVisibleNodeIds(node.NextNodeIds) }
-                : ResolveBattleNode(_state, node)));
+        ShanheCampaignContent.Freeze(Definition.Nodes.Where(node => (!_options.PersistentMarket || node.Kind != ShanheNodeKind.Shop) &&
+                IsExtraChapterBattleUnlocked(_state, node) && node.ChapterRole != ShanheChapterNodeRole.Profile &&
+                (node.ChapterRouteId is null || node.ChapterRouteId == ActiveRouteId(_state)))
+            .Select(node => ResolveBattleNode(_state, node) with { NextNodeIds = ResolveVisibleNodeIds(node.NextNodeIds) }));
 
-    public IReadOnlyList<string> ResolveVisibleNodeIds(IEnumerable<string> nodeIds)
+    public IReadOnlyList<string> ResolveVisibleNodeIds(IEnumerable<string> nodeIds) => ResolveVisibleNodeIds(nodeIds, _state);
+
+    private IReadOnlyList<string> ResolveVisibleNodeIds(IEnumerable<string> nodeIds, RunState state)
     {
         var result = new List<string>();
         var visited = new HashSet<string>(StringComparer.Ordinal);
         void Visit(string id)
         {
             if (!visited.Add(id)) return;
+            if (!IsExtraChapterBattleUnlocked(state, _nodes[id])) return;
             if (_options.PersistentMarket && _nodes[id].Kind == ShanheNodeKind.Shop)
                 foreach (var next in _nodes[id].NextNodeIds) Visit(next);
             else result.Add(id);
@@ -55,7 +58,7 @@ public sealed partial class ShanheCampaignSession
 
     public ShanheBattleMarketTransfer CreateBattleMarketTransfer()
     {
-        Require(HasPersistentMarket && _state.MarketNodeId is not null, "There is no persistent market to transfer.");
+        Require(HasPersistentMarket && _state.MarketNodeId is not null && ChapterMarketUnlocked(_state), "There is no unlocked persistent market to transfer.");
         return ExportMarketTransfer(_state, _battleMarketSession ? ContentHash :
             ShanheCampaignContent.GetContentHash(CreateMarketDefinition(_state)));
     }
@@ -108,14 +111,15 @@ public sealed partial class ShanheCampaignSession
         ? checked(maximum + state.Bonuses.MaxHp - state.MarketHealthBonusAtSync)
         : checked(_baseMaxHp + state.Bonuses.MaxHp);
 
-    private bool CanTradePersistentMarket(RunState state) => HasPersistentMarket && state.MarketNodeId is not null &&
+    private bool CanTradePersistentMarket(RunState state) => HasPersistentMarket && state.MarketNodeId is not null && ChapterMarketUnlocked(state) &&
         (_battleMarketSession || state.Phase is ShanheCampaignPhase.Map or ShanheCampaignPhase.Reward or ShanheCampaignPhase.NodeChoice);
 
     private RunState MarketTradeState(RunState state) => state with
     { Phase = ShanheCampaignPhase.NodeChoice, CurrentNodeId = state.MarketNodeId };
 
-    private static RunState ReturnMarketTrade(RunState original, RunState traded) => traded with
-    { Phase = original.Phase, CurrentNodeId = original.CurrentNodeId, AvailableNodeIds = original.AvailableNodeIds };
+    private RunState ReturnMarketTrade(RunState original, RunState traded) => RefreshExtraBattleOptions(
+        ReconcileMarketRewardOffers(traded with
+        { Phase = original.Phase, CurrentNodeId = original.CurrentNodeId, AvailableNodeIds = original.AvailableNodeIds }));
 
     private RunState PreparePersistentMarketPurchase(RunState state, string choiceId, string? replaceSkillId)
     {
@@ -138,8 +142,8 @@ public sealed partial class ShanheCampaignSession
         if (!_options.PersistentMarket || state.Phase is ShanheCampaignPhase.Won or ShanheCampaignPhase.Lost) return state;
         state = state with
         {
-            AvailableNodeIds = ResolveVisibleNodeIds(state.AvailableNodeIds),
-            OpeningResumeNodeIds = ResolveVisibleNodeIds(state.OpeningResumeNodeIds)
+            AvailableNodeIds = ResolveVisibleNodeIds(state.AvailableNodeIds, state),
+            OpeningResumeNodeIds = ResolveVisibleNodeIds(state.OpeningResumeNodeIds, state)
         };
         var chapterNumber = Math.Max(1, chapter ?? (state.Phase == ShanheCampaignPhase.Map && state.AvailableNodeIds.Count > 0
             ? state.AvailableNodeIds.Select(availableId => _nodes[availableId].ChapterNumber).Where(number => number > 0).DefaultIfEmpty(1).Min()
@@ -170,14 +174,17 @@ public sealed partial class ShanheCampaignSession
             Name = Definition.Name + " · 常驻集市", StartingNodeIds = [shop.Id], RandomStartingNode = false,
             StartingGold = 0, ExtraSkillSlots = 0, StartingBonuses = new(),
             Nodes = [shop with { NextNodeIds = [probe.Id], ChapterNumber = state.MarketChapterNumber,
+                ChapterRouteId = null, ChapterRole = ShanheChapterNodeRole.None, ChapterProgressStep = 0, RequiredChapterProgress = 0,
                 Choices = ShanheCampaignContent.Freeze((shop.Choices ?? []).Select(choice => choice with { LeavesNode = false })) },
                 probe with { NextNodeIds = [], RewardIds = [], BossRewards = null, EliteUpgradeNodeId = null, AddSkillSlotsOnVictory = 0,
-                    CategorizedRewards = false, RewardSkipGold = 0 }]
+                    ChapterRouteId = null, ChapterRole = ShanheChapterNodeRole.None, ChapterProgressStep = 0, RequiredChapterProgress = 0,
+                    CategorizedRewards = false, AutomaticRewardCategory = false, ExtraChapterBattleIndex = 0, RewardSkipGold = 0 }]
         });
     }
 
     private ShanheBattleMarketSetup CreateMarketSetup(RunState state)
     {
+        Require(ChapterMarketUnlocked(state), "The chapter market is not unlocked.");
         var definition = CreateMarketDefinition(state);
         return ShanheBattleMarketSetup.Freeze(new(definition,
             _options with { PersistentMarket = false, EquippedTacticIds = [], SourceDifficultyId = null },
@@ -188,6 +195,7 @@ public sealed partial class ShanheCampaignSession
     private ShanheBattleMarketTransfer ExportMarketTransfer(RunState state, string contentHash) =>
         ShanheBattleMarketTransfer.Freeze(new()
         {
+            BalancedRewardsEnabled = BalancedJourneyRewards(state),
             MarketContentHash = contentHash, MarketNodeId = state.MarketNodeId!, ChapterNumber = state.MarketChapterNumber,
             Hp = state.Hp, Gold = state.Gold, ExtraSkillSlots = state.ExtraSkillSlots, Bonuses = state.Bonuses,
             ExtraSkillIds = state.ExtraSkillIds, TacticIds = state.TacticIds, StartingCards = state.StartingCards,
@@ -202,6 +210,9 @@ public sealed partial class ShanheCampaignSession
     {
         var transfer = ShanheBattleMarketTransfer.Freeze(value);
         ShanheCampaignContent.ValidateMarketResources(transfer);
+        Require(_battleMarketSession ? !_options.UseBalancedJourneyRewards || transfer.BalancedRewardsEnabled
+                : transfer.BalancedRewardsEnabled == BalancedJourneyRewards(state),
+            "A market transfer cannot enable or downgrade its owning expedition's reward policy.");
         var expectedHash = replayedMarket is not null ? ShanheCampaignContent.GetContentHash(replayedMarket.Definition)
             : _battleMarketSession ? ContentHash : ShanheCampaignContent.GetContentHash(CreateMarketDefinition(state));
         var hasNode = _nodes.TryGetValue(transfer.MarketNodeId, out var node);
@@ -237,6 +248,7 @@ public sealed partial class ShanheCampaignSession
             "Invalid market shelf or transaction counters.");
         var imported = state with
         {
+            BalancedRewardsEnabled = transfer.BalancedRewardsEnabled,
             MarketNodeId = transfer.MarketNodeId, MarketChapterNumber = transfer.ChapterNumber,
             Hp = transfer.Hp, Gold = transfer.Gold, ExtraSkillSlots = transfer.ExtraSkillSlots, Bonuses = transfer.Bonuses,
             ExtraSkillIds = transfer.ExtraSkillIds, TacticIds = transfer.TacticIds,

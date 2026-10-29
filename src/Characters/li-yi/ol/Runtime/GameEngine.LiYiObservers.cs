@@ -71,7 +71,5 @@ public sealed partial class GameEngine
  private bool HasLiYiBeforeDamageObserver(long id)=>LiYiObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
  [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 910)]
  private bool IsLiYiDying()=>ActiveDying is{}d&&LiYiObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1480)]
- private bool AllowsLiYiNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess){if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||LiYiObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));}
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27480)]private bool AdvanceLiYiChildren()=>_pendingDecision is null&&LiYiObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

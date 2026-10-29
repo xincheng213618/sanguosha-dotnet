@@ -99,13 +99,6 @@ public sealed partial class GameEngine
     private bool HasTangTangBeforeDamageObserver(long id) => TangTangObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 940)]
     private bool IsTangTangDying() => ActiveDying is { } d && TangTangObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1510)]
-    private bool AllowsTangTangNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || TangTangObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f);
-        return e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27530)] private bool AdvanceTangTangChildren() => _pendingDecision is null && TangTangObserverRoot() is not null && TryAdvanceObserverSubtree(true);
     private IEnumerable<CardSnapshot> TangTangPrivatelyViewedCards(int viewerSeat) => _resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.OwnerSeat == viewerSeat && f.TangTang?.Stage == TangTangStage.TakeCards)
         .SelectMany(f => f.TangTang!.Viewed.Where(id => _cardZones.Contains(CardLocation.Hand(f.TangTang.Peer), id))).Distinct().Select(id => ToSnapshot(GetAdvancedCard(id)));

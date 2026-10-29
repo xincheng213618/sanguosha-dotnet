@@ -22,13 +22,6 @@ public sealed partial class GameEngine
     private bool HasWuAnGuoBeforeDamageObserver(long id) => HasWuAnGuoDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 540)]
     private bool IsWuAnGuoDying() => ActiveDying is { } dying && WuAnGuoObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1180)]
-    private bool AllowsWuAnGuoNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || WuAnGuoObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f); return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27010)]
     private bool AdvanceWuAnGuoSubtree() => _pendingDecision is null && WuAnGuoObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

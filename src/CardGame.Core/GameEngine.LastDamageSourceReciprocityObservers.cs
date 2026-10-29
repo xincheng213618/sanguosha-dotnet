@@ -148,7 +148,7 @@ public sealed partial class GameEngine
         return HasObserverSuffix(index + 1,
             static (engine, child) => IsObserverSkillsChangedEdge(engine._resolutionStack[child - 1], engine._resolutionStack[child]) ||
                 engine.DyingSuitsStructuralEdge(engine._resolutionStack[child - 1], engine._resolutionStack[child]) ||
-                engine.HalfHandPaidDamageObserverEdge(child) || engine.PaidTargetObserverEdge(child),
+                engine.HalfHandPaidDamageObserverEdge(child) || engine.ProgramChildResolutionEdge(child),
             static (engine, child, dying) => engine.IsSuspendedOrPaidRescueObserverSuffix(child, dying)) ? root : null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30, group: 10)]
@@ -162,20 +162,6 @@ public sealed partial class GameEngine
     private bool HasLastDamageSourceReciprocityDamageObserver(long windowId) =>
         _resolutionStack.Any(frame => frame.Id == windowId && frame is DamageTriggerWindowFrame) &&
         AnyLastDamageSourceReciprocityObserverRoot() is not null;
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 770)]
-    private bool AllowsLastDamageSourceReciprocityNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or
-                SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or
-                SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) ||
-            AnyLastDamageSourceReciprocityObserverRoot() is not { } root || root.Id == observer.Id) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!)
-            .GetPausedInstruction(observer.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 80)]
     private bool TryAdvanceLastDamageSourceReciprocitySubtree()
     {

@@ -180,17 +180,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 79100)]
     private bool MobileLianzhuDying() => ActiveDying is { } dying && MobileLianzhuObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 79100)]
-    private bool MobileLianzhuNestedDamage(ProgramSkillFrame observer, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.AfterHpRecovered or
-                SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) ||
-            MobileLianzhuObserverRoot() is not { } root || root.Id == observer.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(observer); return effect is { Op: SkillProgramEffectOp.Damage } && amount == effect.Amount &&
-            source == effect.ActorReference && nature == effect.DamageNature && target == (effect.TargetReference is { } participant
-                ? ResolveProgramParticipant(observer, participant) : ResolveProgramEffectTarget(observer, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 79100)]
     private bool AdvanceMobileLianzhuSubtree() => _pendingDecision is null && MobileLianzhuObserverRoot() is not null && TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

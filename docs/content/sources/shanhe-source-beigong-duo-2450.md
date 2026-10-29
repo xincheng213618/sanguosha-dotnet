@@ -44,7 +44,14 @@
 
 原普通池为23、24、25、27，`premisegroup` 分别1971、1964、1964、1964。与赛季5实际 `Level`、`Chapter.location` 关联后，对应第三章洛阳5101—5107、河内5111—5117、酸枣5121—5127、崤函道5141—5147，共28城。原 `startChapter=1` 不替代实际城市关系。来源池前提与本地推荐路线分开保留，不声称复现服务器全部抽取权重。
 
-两员原皮肤号449700、1000355尚未核实可用的本地图，保留各自匿名来源身体身份，并使用 `supporter` 回退；不借用其他人物肖像。本地群/男性标签沿用来源匿名军队的既有约定。
+两条独立 `General` 源行已按各自 `d` 查到PVE座位原图。石像的449700并非文件号，PVE指定 `seatpic=generalface_4410`；北宫伯玉的1000355指定 `seatpic=generalface_1000355`。两张均为146×172官方原字节PNG，保存在 `src/CardGame.Wpf/Assets/Shanhe/Npc/`，源行与像素证据汇入[山河NPC素材清单](../shanhe-npc-art-sources.json)。
+
+| rawOrdinal／身体 | 皮肤d | 官方原卡 | 字节数／SHA-256 |
+| --- | --- | --- | --- |
+| 0／4861 | 449700 | [generalface_4410](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_4410.png) | 48,311／`ff2a5d3e213ab03ce39e49e5926fb071c9319c75081f02afdcc91c52e18a1d2b` |
+| 1／4871 | 1000355 | [generalface_1000355](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000355.png) | 55,464／`84e2f985e824eda4695f3da1cb33edf5cfe2256e91baa3bed28fe6813e68943d` |
+
+石像的 `g` 缺省为false，北宫伯玉明确 `g=1`；两员均 `hide=false`、`startChapter=1`、`Generalshow=0`。介绍据完整匹配的两席配方区分第二席主帅与第一席前锋，保留两人完整资料和原始次序。`StatueId`、`BeigongBaseId`、`BeigongHardId` 三个精确身份全部有对应原图，北宫两个难度身份均单独登记，不把旧缺图盘点当作完整身份清单。内容定义的 `PortraitKey="supporter"`、`VariantId` 及本地群／男性标签不变。
 
 包为 `StandardShanheSourceBeigongDuoPackage`，前缀 `shanhe:source-beigong-duo-2450-`。`StatueId`、`BeigongBaseId`、`BeigongHardId` 暴露三档技能身份；`GetRosterGeneralIds(difficulty)` 按原石像、北宫伯玉顺序返回，`GetBeigongGeneralId(difficulty)` 区分1—10与11—25技能档。原属性累计不复制相同技能身份。另暴露 `DingxiSkillId`、`HuojieSkillId`、`XingxiaSkillId`。
 

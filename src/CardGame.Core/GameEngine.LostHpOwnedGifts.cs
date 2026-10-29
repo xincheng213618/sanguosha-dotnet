@@ -172,7 +172,7 @@ public sealed partial class GameEngine
             if (_resolutionStack[i - 1] is not TurnEndingBoundaryFrame || _resolutionStack[i] is not ProgramSkillFrame root || !IsValidLostHpOwnedGift(root)) continue;
             if (i == _resolutionStack.Count - 1) return root;
             if (root.PendingMovementContinuation is not { SubjectSeat: var subject } || subject != root.OwnerSeat ||
-                !PaidTargetObserverEdge(i + 1)) continue;
+                !ProgramChildResolutionEdge(i + 1)) continue;
             var gift = root.LostHpOwnedGift!;
             var before = gift.Stage == LostHpOwnedGiftStage.Drawing ? gift.DrawSequenceBefore : gift.LastPayment!.SequenceBefore;
             var after = gift.Stage == LostHpOwnedGiftStage.Drawing ? gift.DrawSequenceAfter : gift.LastPayment!.SequenceAfter;
@@ -206,7 +206,7 @@ public sealed partial class GameEngine
             var valid = true;
             for (var child = i + 1; child < _resolutionStack.Count; child++)
             {
-                if (!PaidTargetObserverEdge(child)) { valid = false; break; }
+                if (!ProgramChildResolutionEdge(child)) { valid = false; break; }
                 if (_resolutionStack[child] is DyingFrame d && (IsPaidHandRepaymentRescueRide(child, d) || IsPaidHandRepaymentProgramAlcoholRide(child, d) || PolicyCounterspellVirtualAlcoholRide(child, d))) break;
             }
             if (valid) return root;

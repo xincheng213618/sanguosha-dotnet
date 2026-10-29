@@ -119,6 +119,15 @@ internal static class NativeResponseStatusChecks
             bitmap.Render(visual);
             return bitmap;
         }
+        public void FocusKeyboard()
+        {
+            // Thread-local focus enables genuine routed keyboard checks on the
+            // owned message-only surface without activating a desktop window.
+            SetFocus(_handle);
+            Root.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+            Assert(!IsWindowVisible(_handle) && GetForegroundWindow() != _handle,
+                "Keyboard checks must keep the owned native fixture hidden and out of the foreground.");
+        }
         public void Dispose() { Window.Content = null; Window.DataContext = null; Window.Close(); }
     }
     internal sealed class FrameClock : TimeProvider
@@ -141,6 +150,7 @@ internal static class NativeResponseStatusChecks
     [DllImport("user32.dll")] private static extern bool ShowWindow(nint handle, int command);
     [DllImport("user32.dll")] private static extern bool IsWindowVisible(nint handle);
     [DllImport("user32.dll")] private static extern nint GetForegroundWindow();
+    [DllImport("user32.dll")] private static extern nint SetFocus(nint handle);
     [DllImport("user32.dll", EntryPoint = "GetWindowLongW")] private static extern int GetWindowLong(nint handle, int index);
     [DllImport("user32.dll", EntryPoint = "SetWindowLongW")] private static extern int SetWindowLong(nint handle, int index, int value);
 }

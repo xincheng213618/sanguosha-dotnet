@@ -51,7 +51,10 @@ public static partial class StandardShanheCampaignCatalog
             "加入2026羁绊、队·初，以及可重复获得的精于谋略II、队·牌、队·甲。虎牢可遇风篁助战的神鬼无前吕布，或文远之威张辽；本地第2档张辽增加灵动判定防伤，第3档再加入惶恐的摸牌与弃牌数量翻倍；洛阳加入酒池、肉林、崩坏与逐点暴虐的独立董卓形态，以及当前全站配置的董旻技能形态：本地第1档仅盾弓，第2档起增加篡朝，接受发动后转换阴阳并令此次用牌的牌效果整体无效。来源配置的董氏阶段可在25档配置复现入口体验；本入口的独立投放、遭遇分布、联动顺序及成长为本地编排。另可遇到仅动态无双与专版利驭的霸戟雄英吕布：整区获牌后，按实际获得数量使用原生决斗；此形态原版属于崤函道，本地独立放入洛阳，另加入与闭月仙伶貂蝉同行的双敌候选：离间使用不能被无懈的真实决斗，专版闭月空手补至手牌上限，否则获得流离直到下一本人回合。另有凤仪情仇三敌阵容：覆銮凶影董卓以10/15体力登场，黑色手牌可作酒且不限次数，酒杀造成伤害后永久失去崩坏并获得已损失体力值加一张的再起；肉林使所有其他角色的双向杀均需两闪，盗书可猜花色取牌。三敌使用原始基础体力与技能，地图位置和孙坚同行为本地编排。神武将出征默认按群势力参与战斗，技能改势力仍按实际结果结算。另加入普通战法队友·杀，使其他队友每个出牌阶段可用杀次数+1。当前公开S5的远击技按最终距离大于1增加伤害，不限于杀；山河册节点35可研习，本地每次征程限取一份。") { DefaultGodFactionId = "qun" }
     });
 
-    public static ShanheCampaignDefinition CreateDefinition(int difficulty, string editionId)
+    public static ShanheCampaignDefinition CreateDefinition(int difficulty, string editionId) =>
+        GetCachedFinalDefinition(codex: false, difficulty, editionId);
+
+    private static ShanheCampaignDefinition BuildDefinition(int difficulty, string editionId)
     {
         if (editionId == Source2026EditionId) return CreateSourceDefinition(difficulty, includeCodex: false);
         var definition = WithChapterRewards(CreateCurrentBaseDefinition(difficulty, editionId));
@@ -65,7 +68,7 @@ public static partial class StandardShanheCampaignCatalog
         definition = WithGuideTerrain(definition, difficulty, editionId);
         definition = WithMuluEncounter(definition, difficulty, editionId);
         definition = WithReturningThirdChapterTroops(definition, difficulty, editionId);
-        return WithChapterShopBalance(WithCurrentWolfBattles(WithCurrentSchools(definition)));
+        return WithChapterShopBalance(WithCurrentWolfBattles(WithCurrentSchools(WithDailyTravelBattles(definition, editionId))));
     }
 
     private static ShanheCampaignDefinition CreateCurrentBaseDefinition(int difficulty, string editionId) => editionId switch

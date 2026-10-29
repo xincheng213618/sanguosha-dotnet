@@ -89,7 +89,7 @@ public sealed partial class GameEngine
         if (root.OwnTrickDraw is not null && !OwnTrickDrawFirstChild(root, _resolutionStack[wi + 2])) return null;
         for (var i = wi + 2; i < _resolutionStack.Count; i++)
         {
-            if (!(root.HalfHandSupport is { Paid: true } || root.OwnTrickDraw is not null ? HalfHandPaidDamageObserverEdge(i) : PaidTargetObserverEdge(i))) return null;
+            if (!(root.HalfHandSupport is { Paid: true } || root.OwnTrickDraw is not null ? HalfHandPaidDamageObserverEdge(i) : ProgramChildResolutionEdge(i))) return null;
             if (_resolutionStack[i] is DyingFrame d &&
                 (IsPaidHandRepaymentProgramAlcoholRide(i, d) || IsPaidHandRepaymentRescueRide(i, d) || PolicyCounterspellVirtualAlcoholRide(i, d) ||
                  (root.HalfHandSupport is { Paid: true } || root.OwnTrickDraw is not null) && PaidObserverDamageVirtualAlcoholRide(i, d) ||
@@ -98,15 +98,6 @@ public sealed partial class GameEngine
         return root;
     }
     // New paid roots opt in to exact Dying qualification and Jiushi's paused flip facts.
-    // The old generic movement/Dying edge remains unchanged.
-    private bool PaidTargetObserverEdge(int index)
-    {
-        if (RequestedDeckBasicFrameRidesOn(_resolutionStack[index], _resolutionStack[index - 1])) return true;
-        if (PolicyCounterspellDyingFaceEdge(index)) return true;
-        if (_resolutionStack[index - 1] is DyingFrame dying && _resolutionStack[index] is ProgramSkillFrame response)
-            return PolicyCounterspellDyingProgramRidesOn(response, dying);
-        return PreventionDrawObserverEdge(index);
-    }
     private bool HasActualUseTargetObserver(long useId)
     {
         var window = _resolutionStack.OfType<ActualUseTargetWindowFrame>().LastOrDefault(w => w.ParentFrameId == useId);

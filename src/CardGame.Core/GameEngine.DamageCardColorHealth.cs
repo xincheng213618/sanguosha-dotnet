@@ -140,7 +140,7 @@ public sealed partial class GameEngine
             if (child is CardsMovedTriggerWindowFrame moved) return TypedRecoveryRewardReturnMatches(recovery, moved, history);
         }
         return NativeDrawAttemptRidesOn(child, parent) || OrderedPrintedSkillLossSkillsChangedEdge(parent, child) ||
-            TypedDamagePostEventEdge(parent, child) || HalfHandPaidDamageObserverEdge(index) || PreventionDrawObserverEdge(index);
+            TypedDamagePostEventEdge(parent, child) || HalfHandPaidDamageObserverEdge(index) || ProgramChildResolutionEdge(index);
     }
 
     private ProgramSkillFrame? DamageCardColorHealthObserverRoot() => FindProgramObserverRoot(
@@ -159,20 +159,6 @@ public sealed partial class GameEngine
     private bool IsDamageCardColorHealthDying() => ActiveDying is { } dying && DamageCardColorHealthObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 70)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1820)]
-    private bool AllowsDamageCardColorHealthNestedDamage(ProgramSkillFrame f, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id ||
-            DamageCardColorHealthObserverRoot() is not { } root || root.Id == f.Id ||
-            f.WindowContext?.Window is not (SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or
-                SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved)) return false;
-        var effect = TypedRecoveryPausedEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source &&
-            effect.DamageNature == nature && target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(f, reference) :
-                ResolveProgramEffectTarget(f, effect.Target));
-    }
 
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30)]
     private bool IsDamageCardColorHealthRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame recovery)

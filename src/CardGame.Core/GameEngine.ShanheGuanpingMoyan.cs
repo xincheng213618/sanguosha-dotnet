@@ -55,19 +55,6 @@ public sealed partial class GameEngine
         return null;
     }
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 891)]
-    private bool AllowsGuanpingMoyanPaidLongyinDamage(ProgramSkillFrame frame, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || source is not null || nature != DamageNature.Fire || amount != 1 || target == frame.OwnerSeat ||
-            frame.AttackAttempt is not null || frame.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != frame.Id ||
-            CurrentDamageAttempt?.ResolutionId != ActiveCardAttack?.ResolutionId ||
-            GuanpingMoyanPaidLongyinRoot()?.Id != frame.Id) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!)
-            .GetPausedInstruction(frame.InstructionIndex).Effect;
-        return effect is { Op: SkillProgramEffectOp.Damage, Target: SkillProgramEffectTarget.SelectedTarget, Amount: 1,
-            DamageNature: DamageNature.Fire } && frame.SelectedTargetSeats.SequenceEqual([target]);
-    }
 
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 2005)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 105)]

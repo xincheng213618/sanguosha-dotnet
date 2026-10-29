@@ -158,17 +158,6 @@ public sealed partial class GameEngine
         if (_pendingDecision is not null || KuangfuPaidObserverRoot() is null) return false;
         return TryAdvanceObserverSubtree(advanceRecoveryReplacement: false);
     }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 290)]
-    private bool AllowsKuangfuNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || f.InstructionIndex < 1 || ActiveDying is not null || _resolutionStack.LastOrDefault()?.Id != f.Id ||
-            f.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.DiscardPileReceived or
-                SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) ||
-            KuangfuPaidObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = ProgramInstructionResolver.Default.Resolve(f, _contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        return e.Op == SkillProgramEffectOp.Damage && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature &&
-            target == (e.TargetReference is { } reference ? ResolveProgramParticipant(f, reference) : ResolveProgramEffectTarget(f, e.Target));
-    }
     private void AssertKuangfuPrograms()
     {
         foreach (var root in _resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.Kuangfu is not null))

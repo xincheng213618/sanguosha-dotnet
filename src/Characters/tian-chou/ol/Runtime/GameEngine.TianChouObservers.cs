@@ -33,12 +33,5 @@ public sealed partial class GameEngine
     private bool HasTianChouBeforeDamageObserver(long id) => HasTianChouDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 610)]
     private bool IsTianChouDying() => ActiveDying is { } dying && TianChouObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1250)]
-    private bool AllowsTianChouNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || TianChouObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f); return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27090)] private bool AdvanceTianChouSubtree() => _pendingDecision is null && TianChouObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

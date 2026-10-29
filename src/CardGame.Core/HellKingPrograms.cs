@@ -469,24 +469,4 @@ public sealed partial class GameEngine
     private bool IsOriginalDyingSuspendedByHellKing(DyingFrame dying) => !_players[dying.VictimSeat].IsAlive &&
         _resolutionStack.OfType<ProgramSkillFrame>().Any(root => HasExactHellKingDeathPrefix(root, out var original, out _) && original?.Id == dying.Id);
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 10)]
-    private bool AllowsHellKingNestedDamage(ProgramSkillFrame frame, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || frame.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != frame.Id || frame.InstructionIndex < 1 ||
-            !HasExactHellKingDeathPrefix(frame, out _, out var originalAttack) ||
-            originalAttack is { } original && CurrentDamageAttempt?.ResolutionId != original) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (effect.Op == SkillProgramEffectOp.Damage && effect.CompiledInstruction is DamageProgramInstruction instruction)
-        {
-            if (amount != instruction.Amount || source != instruction.SourceReference || nature != instruction.Nature || effect.Target != SkillProgramEffectTarget.SelectedTarget ||
-                !HasExactHellKingParticipantSelection(frame) || !frame.SelectedTargetSeats.SequenceEqual([target])) return false;
-            return effect.Condition.Kind == SkillProgramConditionKind.Always || effect.Condition is { Kind: SkillProgramConditionKind.ChoiceIs, SourceBind: { } bind, OptionId: { } option } &&
-                frame.ChoiceBindings.SingleOrDefault(b => b.Name == bind) is { } result && result.OptionId == option && IsHellKingChoiceResult(frame, result);
-        }
-        if (effect is not { Op: SkillProgramEffectOp.DamageParticipants, TargetKind: SkillProgramTargetKind.OtherLiving, Condition.Kind: SkillProgramConditionKind.Always } ||
-            source is not null || nature != effect.DamageNature || !frame.ReexecuteParticipantInstruction) return false;
-        var cursor = frame.NumberBindings.SingleOrDefault(b => b.Name == "participant-cursor-" + (frame.InstructionIndex - 1))?.Value ?? 0;
-        var seats = Enumerable.Range(0, _playerCount).Where(seat => seat != frame.OwnerSeat).ToArray();
-        return cursor > 0 && cursor <= seats.Length && seats[cursor - 1] == target && amount == (cursor == 1 ? effect.Amount : effect.MinimumValue);
-    }
 }

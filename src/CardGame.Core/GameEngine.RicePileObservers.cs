@@ -36,17 +36,6 @@ public sealed partial class GameEngine
     private ProgramSkillFrame? RiceObserverRoot() => FindProgramObserverRoot(
         static (engine, root, child) => engine.RiceFirstChild(root, child),
         static (engine, index) => engine.HasMovementObserverSuffix(index));
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 740)]
-    private bool AllowsRiceNestedDamage(ProgramSkillFrame observer, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.DiscardPileReceived or
-                SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) ||
-            RiceObserverRoot() is not { } root || root.Id == observer.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(observer);
-        return effect is { Op: SkillProgramEffectOp.Damage } && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 470)]
     private bool TryAdvanceRiceSubtree() => _pendingDecision is null && RiceObserverRoot() is not null && TryAdvanceObserverSubtree(true);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1610)]

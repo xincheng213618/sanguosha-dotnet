@@ -637,6 +637,9 @@ public sealed partial class GameEngine
         CardsMovedTriggerWindowFrame frame,
         ProgramTriggerCandidate candidate)
     {
+        // All specialized dispatchers issue once when the window is created.
+        // Re-entering one must keep the same frozen facts as its owning cursor.
+        if (frame.Contexts is { } contexts) return contexts[frame.CandidateIndex];
         if (IsShanheChanrangCandidate(candidate))
             return CreateShanheChanrangContext(frame, candidate);
         if (IsShanheYingxiangMovement(candidate))
@@ -681,7 +684,6 @@ public sealed partial class GameEngine
             return CreateFeiYiSingletonContext(frame, candidate);
         if (IsDuFuRenYiseTrigger(GetProgramTrigger(candidate)))
             return CreateDuFuRenYiseContext(frame, candidate);
-        if (frame.Contexts is { } contexts) return contexts[frame.CandidateIndex];
         if (GetProgramTrigger(candidate).Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveYuandiDiscardNames))
             return CreateYuandiMovementContext(frame, candidate);
         if (IsTangTangZhiyiTrigger(GetProgramTrigger(candidate))) return CreateTangTangZhiyiContext(frame, candidate);

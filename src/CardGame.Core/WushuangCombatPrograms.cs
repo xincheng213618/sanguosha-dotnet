@@ -163,31 +163,6 @@ public sealed partial class GameEngine
     // A native draw made by a damage binding can itself reach the
     // sixth/ninth-card damage threshold. The draw's exact producer and invoice
     // keep this child on the suspended attack; a generic gain is insufficient.
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 61410)]
-    private bool AllowsWushuangNativeDrawDamage(ProgramSkillFrame f, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (!IsWushuangMode || source is not null || sourceLess || nature != DamageNature.Normal || amount != 1 ||
-            f.AttackAttempt is not null || ActiveDying is not null || _resolutionStack.Count < 5 ||
-            _resolutionStack[^1].Id != f.Id ||
-            f.WushuangCombat is not { TacticId: 2104 or 2143, Stage: 3, Index: 1, Amount: 1,
-                Nature: DamageNature.Normal, Seats: [var victim] } r || victim != target || target == f.OwnerSeat ||
-            r.InstructionIndex != f.InstructionIndex || f.SkillId != $"wushuang:tactic-{r.TacticId}" ||
-            GetPausedPrivateOfferEffect(f) is not { Op: SkillProgramEffectOp.ResolveWushuangCombatTactic } effect || effect.Amount != r.TacticId ||
-            f.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained, MovementBatch: { } batch } context ||
-            _resolutionStack[^2] is not CardsMovedTriggerWindowFrame moved || moved.Id != context.ParentFrameId ||
-            f.ParentFrameId != moved.Id || moved.Batch.Id != batch.Id || !moved.Batch.Movements.SequenceEqual(batch.Movements) ||
-            moved.CandidateIndex < 0 || moved.CandidateIndex >= moved.Candidates.Count ||
-            moved.Candidates[moved.CandidateIndex] is not { } candidate || candidate.OwnerSeat != f.OwnerSeat ||
-            candidate.SkillId != f.SkillId || candidate.BindingId != f.TriggerId || candidate.SkillInstanceId != f.SkillInstanceId || candidate.GameplayHash != f.GameplayHash ||
-            _resolutionStack[^3] is not ProgramSkillFrame producer || producer.Id != batch.ParentFrameId ||
-            !IsWushuangNativeDrawDamageParent(producer) ||
-            !IsWushuangActualDraw(context, f.OwnerSeat, out var material) || material is null || !_cardMovements.Contains(material) ||
-            !IsWushuangNativeDrawDamageMaterial(producer, batch, material, f.OwnerSeat))
-            return false;
-        return ProgramEventHistory<WushuangCombatIssuedEvent>().Where(issued => issued.ProgramFrameId == f.Id &&
-            issued.InstructionIndex == f.InstructionIndex).ToArray() is [var paid] && paid.TacticId == r.TacticId && paid.OwnerSeat == f.OwnerSeat;
-    }
 
     private bool IsWushuangNativeDrawDamageMaterial(ProgramSkillFrame producer, CardMovementBatchContext batch,
         CardMovementRecord material, int recipient)

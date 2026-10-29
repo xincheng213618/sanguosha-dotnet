@@ -105,12 +105,6 @@ public sealed partial class GameEngine
     private bool HasRuanHuiBeforeDamageObserver(long id)=>RuanHuiObserverRoot()is{}r&&_resolutionStack.FindIndex(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 580)]
     private bool IsRuanHuiDying()=>ActiveDying is{}d&&RuanHuiObserverRoot()is{}r&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1220)]
-    private bool AllowsRuanHuiNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||RuanHuiObserverRoot()is not{}r||r.Id==f.Id)return false;
-        var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}reference?ResolveProgramParticipant(f,reference):ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27080)]
     private bool AdvanceRuanHuiSubtree()=>_pendingDecision is null&&RuanHuiObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

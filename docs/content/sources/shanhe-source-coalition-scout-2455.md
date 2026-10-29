@@ -2,7 +2,7 @@
 
 来源为官方 [Config.sgs](https://web.sanguosha.com/220/h5_2/res/config/Config.sgs) 的山河图战斗配置与技能表。固定缓存外层 SHA256 为 `d663d5542f5a63a61611b5dbc1ae736e5e0328eedaab2c498e18c3287c289ce6`，解码 `hd_roguelike.sgs` 为 `97dbdb465d902e771e575ed5165df3d193e1a689e3dae7ae67b9cb5033f18c72`，解码 `cha_spell.sgs` 为 `e8885a11c46c3b25f37a6fcd8882b0d339ab1d1873c140900d3be93826fdd219`。
 
-`Fight.fightID=2455`、`Ggroup=2455`，`Text.ID=2455` 的战斗标题为贪得无厌。完整阵容只有一行 `General.a=2455`：`b=4861`、`c=联军斥候`、`d=1000148`、`f=0`、`h=100`。角色4861为士兵，统一使用 `character:shanhe-source-soldier-4861`，外观暂以 `supporter` 作为本地缺图回退，不借用廖化、卧龙诸葛亮或黄权的角色身份与附带技能。
+`Fight.fightID=2455`、`Ggroup=2455`，`Text.ID=2455` 的战斗标题为贪得无厌。完整阵容只有一行 `General.a=2455`：`b=4861`、`c=联军斥候`、`d=1000148`、`f=0`、`h=100`。角色4861为士兵，统一使用 `character:shanhe-source-soldier-4861`。桌面按三个精确形态ID绑定已核对的PVE皮肤1000148原卡，来源与图片SHA见[美术记录](../shanhe-npc-art-sources.json)；规则身体保留该独立士兵定义。
 
 原始体力与上限4/4、通常摸牌2、随机初始手牌4、护甲0、护甲回复0、护甲上限5、额外出杀0、额外伤害0。原行没有固定装备、随身牌或 `att_*` 属性，阵容没有隐藏成员。`NewbieGroup=22455` 是独立战斗组，不追加为2455的随从；`pvpspell=3189` 是另一模式字段，不加入本山河图技能配方。
 

@@ -4,7 +4,9 @@
 
 `Fight.fightID=2481,Ggroup=2481,text=248100` 对应一名完整成员：`General.a=2481,b=4861,c=游侠,d=1000251,f=0,h=100`。原始身体 `k=4,l=4,p=2,q=4`，即体力4/4、摸牌2、随机初手4；`m=0,n=0,o=5,r=0,otherad=0`。没有固定装备、额外属性、额外隐藏成员或二阶段。不把 `r=0` 解作隐藏标记，也不把 `pvpspell=3189` 追加为固有技能。
 
-原身份4861是士兵，使用独立 `character:shanhe-source-soldier-4861`，不借周处、程普、庞德或马忠的印刷身体。原外观1000251没有已核本地肖像，明确采用 supporter fallback。
+原身份4861是士兵，使用独立 `character:shanhe-source-soldier-4861`，不借周处、程普、庞德或马忠的印刷身体。运行时保留 `supporter` 回退键；桌面按此族四个精确运行时ID绑定已核对的PVE原卡1000251，内容身份与规则字段不变。
+
+2026-10-29美术核对：冻结 `General.d=1000251` 对应 `cha_gs_dbs_fs_skininfo.sgs/root.pveskin` 的 `seatpic=generalface_1000251`、`headpic=1000251`。沿已核对的桌面SeatImgUrl链取得[官方独立PNG](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000251.png)，HTTP200、image/png、146×172、50,881字节，SHA256 `7bfb81c607a1e0c6df15d40b5fb666e35b1bcb9a690abbb8a07cdc80fa46c592`。原始字节直接保存为 `Assets/Shanhe/Npc/generalface_1000251.png`；已目视为长发男性游侠，身份依据仍是独立源皮肤链。原组唯一raw0的 `g` 缺省0、`hide` 缺省false、`startChapter=1`、`generalShow` 缺省0，不设首席主帅。此次在线核对的是图片，没有重新下载当前线上配置。
 
 | 来源难度 | GeneralId | 累积技能 |
 | --- | --- | --- |

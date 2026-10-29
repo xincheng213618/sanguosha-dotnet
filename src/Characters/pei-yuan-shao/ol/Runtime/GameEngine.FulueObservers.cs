@@ -56,8 +56,5 @@ public sealed partial class GameEngine
     private bool HasFulueBeforeDamageObserver(long id)=>FulueObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 640)]
     private bool IsFulueDying()=>ActiveDying is{}dying&&FulueObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==dying.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 2010)]
-    private bool AllowsFulueNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||FulueObserverRoot()is not{}root||root.Id==f.Id)return false;var effect=GetPausedPrivateOfferEffect(f);return effect is{Op:SkillProgramEffectOp.Damage}&&effect.Amount==amount&&effect.ActorReference==source&&effect.DamageNature==nature&&target==(effect.TargetReference is{}reference?ResolveProgramParticipant(f,reference):ResolveProgramEffectTarget(f,effect.Target));}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27120)]private bool AdvanceFulueSubtree()=>_pendingDecision is null&&FulueObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

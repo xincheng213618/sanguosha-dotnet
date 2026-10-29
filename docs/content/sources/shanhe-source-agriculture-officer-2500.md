@@ -14,7 +14,7 @@
 
 只有一名原 `b=4871` 的泛用“将领”，基础体力/上限3/3、摸牌2、起手4、护甲0、护甲恢复0、护甲上限5、额外杀与额外伤害0。没有 `att_*` 数值档位、固定装备或手牌、隐藏随从、额外成员及二阶段。`Fight2500.Ggroup=2500`，`NewbieGroup=22500` 是独立新手替代组，不是随从。原奖励字段为 `reward=101`、`reward1=401`；不将本地铜币表冒称原奖励金额。
 
-原肖像选择器 `d=1000213` 未对应到已核本地肖像，使用明确的 `supporter` 回退。三档均保存 `character:shanhe-source-general-4871`，不借邓艾、郭嘉或徐晃的身体、性别变体和整套技能。来源成长由既有战斗投影处理，不在印刷身体重复加成。
+运行时保留 `supporter` 回退键；桌面可按下列精确来源卡面及运行时ID绑定显示。三档均保存 `character:shanhe-source-general-4871`，不借邓艾、郭嘉或徐晃的身体、性别变体和整套技能。来源成长由既有战斗投影处理，不在印刷身体重复加成。
 
 | 来源难度 | 内容身份 | 累积源技能 |
 | --- | --- | --- |
@@ -23,6 +23,12 @@
 | 21–25 | `hell` | 959屯田、51天妒、380断粮 |
 
 原Season5普通池14/16/18/19/20/21/22/26引用2500，前置条件组依次为1491/1840/1490/1850/1836/1850/1850/1836。对应第二章八地区普通城市，实际城市是否开放继续采用原地区/难度规则；不能把通用池引用次数当作服务器投放概率。没有借用24489等其他变体的成员或成长。
+
+## 原生卡面
+
+已于2026-10-29按完整源行核对 `Fight2500.Ggroup=2500 → General raw0,b=4871,d=1000213 → root.pveskin.skinID=1000213`。角色4871为“将领”、类 `ShiBing71`，没有 `au/av` 默认头像重定向；实际卡面采用本行明确的PVE皮肤，不按泛用载体或“农都尉”同名借图。皮肤行指定 `seatpic=generalface_1000213`、`headpic=1000213`、`diagrampic=100021300`。`cha_gs_dbs_fs_skininfo.sgs` 解码SHA-256为 `00ee5f994401976563e241571d3e5618f573ad2a4b85336ff132afb262f1e8d4`；角色表解码SHA-256为 `92f00132ed944b279066f46655478bde6a2f3b9f1c006d086c197fbbbada49de`。
+
+同版客户端 `q6t.getSeatSkinUrl → hA.SkinSeatUrl` 使用PVE的 `seatpic`，经 `N2t.SeatImgUrl=general/seat/static/` 和桌面 `res/runtime/pc/` 生成[官方PNG](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000213.png)。HTTP200、`image/png`，已目视紫袍男性官员原卡。原生146×172 RGBA、60553字节，原字节导入 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000213.png`；文件SHA-256为 `9ff5396f5cea2eb2f4011ec8bbecbe3199a3494daaa3ad79ce8f5327aaae54fc`，RGBA像素SHA-256为 `9dafa4a6807bf339728d3d704797fb442e0e6292f7d21c8b09d26b48b3fe2c71`。未裁剪、缩放、换色或重编码。精确绑定为 `shanhe:source-agriculture-officer-2500-base`（1–10）、`shanhe:source-agriculture-officer-2500-hard`（11–20）、`shanhe:source-agriculture-officer-2500-hell`（21–25）。原行只有这一名成员，`startChapter=1,f=0`；`g/hide/generalShow` 均缺省，采用源默认false/false/0，不能新增主帅或隐藏成员。
 
 ## 959屯田：原失牌与判定
 

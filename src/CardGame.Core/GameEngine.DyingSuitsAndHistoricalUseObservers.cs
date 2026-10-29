@@ -234,7 +234,7 @@ public sealed partial class GameEngine
                     : cards.Continuation is ProgramCardContinuation.CommittedSimpleCard or ProgramCardContinuation.FinalizedSimpleCard or ProgramCardContinuation.BeforeSimpleTargetEffects or ProgramCardContinuation.CompletedCard or ProgramCardContinuation.CommittedTrick or ProgramCardContinuation.FinalizedTrick or ProgramCardContinuation.CommittedSlash or ProgramCardContinuation.Slash or ProgramCardContinuation.CompletedSlash);
             if(child is RecoveryReplacementFrame recovery)return RecoveryReplacementFrameRidesOn(recovery,use);
         }
-        return DyingSuitsStructuralEdge(parent,child) || HalfHandPaidDamageObserverEdge(index) || PaidTargetObserverEdge(index);
+        return DyingSuitsStructuralEdge(parent,child) || HalfHandPaidDamageObserverEdge(index) || ProgramChildResolutionEdge(index);
     }
     private bool DyingSuitsPaidPrefix(ProgramSkillFrame root)
     {
@@ -254,14 +254,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 620, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 710)]
     private bool IsDyingSuitsProgramDying() => ActiveDying is {} d && DyingSuitsObserverRoot() is {} root && _resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 170)]
-    private bool AllowsDyingSuitsNestedDamage(ProgramSkillFrame observer,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(observer.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id!=observer.Id || observer.InstructionIndex<1 || ActiveDying is not null || DyingSuitsObserverRoot() is not {} root || root.Id==observer.Id)return false;
-        var effect=ProgramInstructionResolver.Default.Resolve(observer,_contentRegistry.GetSkill(observer.SkillId).Program!).GetPausedInstruction(observer.InstructionIndex).Effect;
-        return !sourceLess && effect.Op==SkillProgramEffectOp.Damage && amount==effect.Amount && source==effect.ActorReference && nature==effect.DamageNature &&
-            target==(effect.TargetReference is {} reference?ResolveProgramParticipant(observer,reference):ResolveProgramEffectTarget(observer,effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 530)]
     private bool TryAdvanceDyingSuitsSubtree()
     {

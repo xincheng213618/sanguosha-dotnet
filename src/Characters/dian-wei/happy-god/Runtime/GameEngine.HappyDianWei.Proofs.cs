@@ -76,20 +76,6 @@ public sealed partial class GameEngine
         if(_resolutionStack.OfType<ProgramSkillFrame>().Any(f=>f.AttackAttempt is not null))AssertProgramAttackState();
         return true;
     }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts,41980)]
-    private bool AllowsPaidHappyDianWeiElaiDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess||source is not null||nature!=DamageNature.Normal||amount!=1||f.AttackAttempt is not null||
-            f.InstructionIndex!=3||f.HappyGuard is not{Stage:HappyGuardStage.ElaiCommitted,ElaiMode:"damage"}r||
-            target!=r.ElaiTarget||!f.SelectedTargetSeats.SequenceEqual([target])||!ValidHappyGuardFrame(f))return false;
-        var index=_resolutionStack.FindIndex(frame=>frame.Id==f.Id);
-        if(index!=_resolutionStack.Count-1||index<2||_resolutionStack[index-1] is not ProgramLifecycleTriggerWindowFrame{HappyGuardRemoval:{}ret}window||
-            window.Id!=r.ParentId||!HappyDianWeiStructuralEdge(f,window)||!HappyDianWeiStructuralEdge(window,_resolutionStack[index-2]))return false;
-        if(ret.DeathParent)return _resolutionStack[index-2] is DeathFrame{HappyGuardMarkerCleanupCompleted:true};
-        return index>=3&&_resolutionStack[index-2] is ProgramSkillFrame{HappyGuard:{Stage:HappyGuardStage.RemovedChildren}paid}root&&
-            HappyDianWeiStructuralEdge(root,_resolutionStack[index-3])&&CurrentDamageAttempt?.ResolutionId==paid.AttackId&&
-            HappyGuardAttack(paid.AttackId) is{}original&&original.TargetSeat==paid.GuardedSeat&&original.SourceSeat==paid.DamageSource&&original.DamageAmount==paid.Amount;
-    }
     private bool HasHappyDianWeiGuardPrompt()=>_resolutionStack.LastOrDefault() is ProgramSkillFrame{HappyGuard:{Stage:HappyGuardStage.GuardChoice}r}f&&
         _pendingDecision is{Kind:DecisionKind.ProgramTrigger}p&&p.PlayerSeat==r.GuardedSeat&&p.SkillPrompt?.SkillId==HappyDianWeiComposition.Shenwei&&ValidHappyGuardFrame(f)&&
         AssistedChoicesEqual(p.Choices,HappyGuardChoices(f));

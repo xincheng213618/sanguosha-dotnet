@@ -51,7 +51,4 @@ public sealed partial class GameEngine
  private bool IsKanZeDying()=>ActiveDying is {} d&&KanZeObserverRoot() is {} root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 160)]
  private bool TryAdvanceKanZeSubtree()=>_pendingDecision is null&&KanZeObserverRoot() is not null&&TryAdvanceObserverSubtree(advanceRecoveryReplacement:true);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 660)]
- private bool AllowsKanZeNestedDamage(ProgramSkillFrame o,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
- {if(sourceLess||o.AttackAttempt is not null||o.InstructionIndex<1||_resolutionStack.LastOrDefault()?.Id!=o.Id||KanZeObserverRoot() is not {} root||root.Id==o.Id)return false;var e=GetPausedPrivateOfferEffect(o);return e is {Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&target==(e.TargetReference is {} p?ResolveProgramParticipant(o,p):ResolveProgramEffectTarget(o,e.Target));}
 }

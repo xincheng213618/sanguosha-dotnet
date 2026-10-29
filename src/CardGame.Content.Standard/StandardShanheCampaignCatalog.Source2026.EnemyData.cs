@@ -469,11 +469,32 @@ public static partial class StandardShanheCampaignCatalog
     {
         var rows = Source2026EnemyDataByGroup[sourceGroupId];
         if (rows.Length != encounter.Enemies.Count)
-            throw new InvalidOperationException("A source roster must keep every member and its original order.");
+            throw new InvalidOperationException("A source roster must keep every member.");
+        if (sourceGroupId == 2686 && !encounter.Enemies.Select(enemy => enemy.GeneralId).SequenceEqual(new[]
+            {
+                StandardShanheS5BossPackage.DongZhuoFengyiId,
+                StandardShanheS5BossPackage.LvbuBajiId,
+                StandardShanheS5BossPackage.DiaoChanBiyueId
+            }, StringComparer.Ordinal))
+            throw new InvalidOperationException("Source2686 requires its complete audited runtime roster and seat order.");
+        Source2026EnemyData RowFor(ShanheCombatantDefinition enemy, int index)
+        {
+            if (sourceGroupId != 2686) return rows[index];
+            // The established local seats put Dong Zhuo before Lu Bu, while the
+            // source group starts with Lu Bu. Keep the seats and bind each body.
+            var sourceGeneralId = enemy.GeneralId switch
+            {
+                StandardShanheS5BossPackage.DongZhuoFengyiId => 470,
+                StandardShanheS5BossPackage.LvbuBajiId => 319,
+                StandardShanheS5BossPackage.DiaoChanBiyueId => 445,
+                _ => throw new InvalidOperationException("Unknown source2686 runtime general.")
+            };
+            return rows.Single(row => row.SourceGeneralId == sourceGeneralId);
+        }
         return encounter with
         {
             SourceVisibleEnemyCount = rows.Count(row => !row.Hidden),
-            Enemies = encounter.Enemies.Select((enemy, index) => ApplySource2026EnemyData(enemy, rows[index])).ToArray()
+            Enemies = encounter.Enemies.Select((enemy, index) => ApplySource2026EnemyData(enemy, RowFor(enemy, index))).ToArray()
         };
     }
 

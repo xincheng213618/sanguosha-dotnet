@@ -3,6 +3,7 @@ namespace CardGame.Core;
 public sealed partial class GameEngine
 {
     private const string WushuangZengou = "wushuang:skill-3287";
+    private static bool UsesActualDodgeZengou(string skillId) => skillId is WushuangZengou or "ol:zengou";
     [ProgramCapability]
     private sealed class WushuangZengouCapability(GameEngine engine) : IWushuangZengouHost
     { public SkillProgramStepOutcome Resolve(ProgramSkillFrame f) => engine.BeginWushuangZengou(f); }
@@ -10,27 +11,30 @@ public sealed partial class GameEngine
     private ProgramCardTriggerWindowFrame? WushuangZengouWindow(ProgramSkillWindowContext? context)
     {
         var w = _resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context?.ParentFrameId);
-        if (w is not { ResponseCompletion: { CostsDrained: true, OriginalContinuation: ProgramCardContinuation.Dodge } completion } ||
+        if (w is not { ResponseCompletion: { CostsDrained: true, OriginalContinuation: ProgramCardContinuation.Dodge or ProgramCardContinuation.GroupResponse } completion } ||
             w.Action is not { EffectiveKind: CardKind.Dodge, Type: CardActionType.Response } action ||
             action.ActorSeat != action.ProviderSeat || action.RequesterSeat is not null || action.ResponderSeat != action.ActorSeat ||
             w.AttackOwnerFrameId is not { } parent || completion.AttackOwnerFrameId != parent || completion.ActionId != action.ActionId ||
             LifecycleCardUse(parent) is not { CardAttack: { EffectiveCardKind: { } kind } attack, Action: { } original } ||
-            !IsSlashCard(kind) || attack.TargetSeat != action.ActorSeat || action.ParentActionId != original.ActionId ||
+            !(IsSlashCard(kind) && completion.OriginalContinuation == ProgramCardContinuation.Dodge ||
+                kind == CardKind.ArrowBarrage && completion.OriginalContinuation == ProgramCardContinuation.GroupResponse) ||
+            attack.TargetSeat != action.ActorSeat || action.ParentActionId != original.ActionId ||
             action.OpponentSeat != attack.SourceSeat || !ValidResponseCompletionWindow(w)) return null;
         return w;
     }
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 61220)]
     private bool CanTriggerWushuangZengou(ProgramTriggerCandidate c, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
-        if (c.SkillId != WushuangZengou) return true;
+        if (!UsesActualDodgeZengou(c.SkillId)) return true;
         return WushuangZengouWindow(context) is { } w && w.Action.ActorSeat != c.OwnerSeat && _players[w.Action.ActorSeat].IsAlive &&
             IsWithinAttackRange(c.OwnerSeat, w.Action.ActorSeat) &&
             LifecycleCardUse(w.AttackOwnerFrameId!.Value)?.WushuangZengouInvalidation?.Payment.ActionId != w.Action.ActionId;
     }
-    private Card[] WushuangZengouCosts(ProgramSkillFrame f) => GetHand(_players[f.OwnerSeat]).Concat(GetEquipment(f.OwnerSeat)).Where(c =>
-        CardCatalog.Get(_cardZones.GetLocation(c.Id) == CardLocation.Hand(f.OwnerSeat) ? AdvancedEffectiveHandKind(_players[f.OwnerSeat], c) : c.Kind).CategoryName != "基本牌" && !c.IsGeneralWeapon &&
-        !IsForeignEquipmentDiscardPrevented(f.OwnerSeat, c, _cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) &&
-        !IsActiveProgramSourceEquipmentCard(f.OwnerSeat, f.SkillId, f.SkillInstanceId, c)).ToArray();
+    private Card[] WushuangZengouCosts(ProgramSkillFrame f) => WushuangZengouCosts(f.OwnerSeat, f.SkillId, f.SkillInstanceId);
+    private Card[] WushuangZengouCosts(int ownerSeat, string skillId, string skillInstanceId) => GetHand(_players[ownerSeat]).Concat(GetEquipment(ownerSeat)).Where(c =>
+        CardCatalog.Get(_cardZones.GetLocation(c.Id) == CardLocation.Hand(ownerSeat) ? AdvancedEffectiveHandKind(_players[ownerSeat], c) : c.Kind).CategoryName != "基本牌" && !c.IsGeneralWeapon &&
+        !IsForeignEquipmentDiscardPrevented(ownerSeat, c, _cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) &&
+        !IsActiveProgramSourceEquipmentCard(ownerSeat, skillId, skillInstanceId, c)).ToArray();
     private IReadOnlyList<PromptChoice> WushuangZengouChoices(ProgramSkillFrame f)
     {
         PromptChoice Choice(string key, string label, int[] cards) => new(new($"wushuang-zengou.{f.Id}.{key}"), label, cards, [],
@@ -121,7 +125,8 @@ public sealed partial class GameEngine
 
     private bool ContinueWushuangZengouDodge(CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
     {
-        if (continuation != ProgramCardContinuation.Dodge || LifecycleCardUse(attack.ResolutionId)?.WushuangZengouInvalidation is not { } proof ||
+        if (continuation is not (ProgramCardContinuation.Dodge or ProgramCardContinuation.GroupResponse) ||
+            LifecycleCardUse(attack.ResolutionId)?.WushuangZengouInvalidation is not { } proof ||
             proof.Payment.ActionId != action.ActionId) return false;
         if (proof.Payment.AttackFrameId != attack.ResolutionId || proof.Payment.DodgerSeat != attack.TargetSeat || action.ActorSeat != attack.TargetSeat ||
             action.EffectiveKind != CardKind.Dodge || action.ParentActionId != LifecycleCardUse(attack.ResolutionId)?.Action?.ActionId ||
@@ -139,7 +144,7 @@ public sealed partial class GameEngine
         if (f.WushuangZengou is not { } r) return;
         var effect = ProgramInstructionResolver.Default.Resolve(f, _contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
         var w = WushuangZengouWindow(f.WindowContext);
-        if (f.SkillId != WushuangZengou || effect.Op != SkillProgramEffectOp.ResolveWushuangZengou || r.InstructionIndex != f.InstructionIndex ||
+        if (!UsesActualDodgeZengou(f.SkillId) || effect.Op != SkillProgramEffectOp.ResolveWushuangZengou || r.InstructionIndex != f.InstructionIndex ||
             w is null || w.Id != r.ResponseWindowId || w.Action.ActionId != r.ActionId || w.AttackOwnerFrameId != r.AttackFrameId ||
             w.Action.ActorSeat != r.DodgerSeat || LifecycleCardUse(r.AttackFrameId)?.CardAttack?.SuccessfulDodgeResponses != r.DodgeCursor ||
             r.Cards.Distinct().Count() != r.Cards.Count || r.Cards.Any(card => !w.Action.PhysicalCards.Any(c => c.CardId == card)) ||
@@ -156,5 +161,7 @@ public sealed partial class GameEngine
             throw new InvalidOperationException("Zengou lost its exact physical non-basic discard cost.");
     }
     [ProgramAiChoice(SkillProgramEffectOp.ResolveWushuangZengou)]
-    private PromptChoice ChooseWushuangZengou(PendingDecision prompt, ProgramSkillFrame frame) => prompt.Choices[0];
+    private PromptChoice ChooseWushuangZengou(PendingDecision prompt, ProgramSkillFrame frame) => prompt.Choices
+        .OrderBy(choice => choice.Cards.Count == 1 ? 8d : ActualDodgeZengouHpCostForAi(_players[frame.OwnerSeat]))
+        .First();
 }

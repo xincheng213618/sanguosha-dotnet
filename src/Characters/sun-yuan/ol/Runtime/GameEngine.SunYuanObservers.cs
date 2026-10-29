@@ -69,12 +69,5 @@ public sealed partial class GameEngine
     private bool HasSunYuanBeforeDamageObserver(long id)=>SunYuanObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 920)]
     private bool IsSunYuanDying()=>ActiveDying is{}d&&SunYuanObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1490)]
-    private bool AllowsSunYuanNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id)return false;
-        if(f.SunYuan is{Paid:true,Stage:SunYuanStage.DamageChildren,DamageSource:{}victim}r)return target==victim&&amount==1&&source is null&&nature==DamageNature.Normal&&!sourceLess&&ProgramEventHistory<DongxinDamageIssuedEvent>().Count(e=>e.FrameId==f.Id&&e.SourceSeat==f.OwnerSeat&&e.TargetSeat==victim)==1;
-        if(SunYuanObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27490)]private bool AdvanceSunYuanChildren()=>_pendingDecision is null&&SunYuanObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

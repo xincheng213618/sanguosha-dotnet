@@ -3,7 +3,7 @@ namespace CardGame.Core;
 public sealed partial class GameEngine
 {
     // Used only after a 6000-6004 root has proved its original issued receipt,
-    // exact ledger and first child. The older generic observer edge is unchanged.
+    // exact ledger and first child. Common native children use the shared protocol.
     private bool HalfHandPaidDamageObserverEdge(int index)
     {
         var child = _resolutionStack[index]; var parent = _resolutionStack[index - 1];
@@ -15,7 +15,7 @@ public sealed partial class GameEngine
             return PaidObserverAttackHpLossDyingMatches(attack, replaced);
         if (parent is DyingFrame { Continuation: DyingContinuationKind.Damage or DyingContinuationKind.AttackHpLoss } dying && child is ProgramSkillFrame response)
             return PaidObserverDamageDyingProgramMatches(response, dying);
-        return EquipmentDonationDamageObserverEdge(index);
+        return ProgramChildResolutionEdge(index);
     }
 
     private bool PaidObserverAttackHpLossDyingMatches(ProgramSkillFrame program, DyingFrame dying) =>
@@ -105,26 +105,6 @@ public sealed partial class GameEngine
 
     // A new gain/HP observer may suspend the original Slash only when the
     // actual recipient's one-card support has already been delivered once.
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 20)]
-    private bool AllowsHalfHandSupportNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 ||
-            _resolutionStack.LastOrDefault()?.Id != observer.Id || observer.WindowContext?.Window is not
-                (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.AfterHpRecovered or
-                 SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost)) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!)
-            .GetPausedInstruction(observer.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.Damage || amount != effect.Amount || source != effect.ActorReference || nature != effect.DamageNature ||
-            target != (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target))) return false;
-        for (var index = 1; index + 1 < _resolutionStack.Count; index++)
-            if (_resolutionStack[index] is ProgramSkillFrame { HalfHandSupport: { Paid: true } aid } root &&
-                _resolutionStack[index - 1] is ActualUseTargetWindowFrame window && HalfHandSupportPaymentMatches(root, window, true) &&
-                IsSlashCard(aid.Use.EffectiveKind) && ActiveCardAttack?.ResolutionId == aid.Use.CardUseFrameId &&
-                CurrentDamageAttempt?.ResolutionId == aid.Use.CardUseFrameId &&
-                HalfHandPaidObserverPrefix(index, _resolutionStack.Count - 1)) return true;
-        return false;
-    }
 
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1750)]
     private bool HasHalfHandPaidDamageObserver(long damageWindowId)

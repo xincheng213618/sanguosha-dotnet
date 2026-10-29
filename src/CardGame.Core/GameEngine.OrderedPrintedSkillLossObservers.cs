@@ -155,7 +155,7 @@ public sealed partial class GameEngine
         var current = _resolutionStack[child];
         return NativeDrawAttemptRidesOn(current, parent) || OrderedPrintedSkillLossSkillsChangedEdge(parent, current) || DyingSuitsStructuralEdge(parent, current) ||
             MatchingRecastStructuralEdge(parent, current) || OverflowTargetCancellationStructuralEdge(parent, current) ||
-            HalfHandPaidDamageObserverEdge(child) || PaidTargetObserverEdge(child);
+            HalfHandPaidDamageObserverEdge(child) || ProgramChildResolutionEdge(child);
     }
 
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 510, group: 10)]
@@ -181,18 +181,6 @@ public sealed partial class GameEngine
         return index < rootIndex;
     }
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 130)]
-    private bool AllowsOrderedPrintedSkillLossNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.DiscardPileReceived or
-                SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) ||
-            OrderedPrintedSkillLossObserverRoot() is not { } root || root.Id == observer.Id) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!).GetPausedInstruction(observer.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target));
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 20)]
     private bool TryAdvanceOrderedPrintedSkillLossSubtree()

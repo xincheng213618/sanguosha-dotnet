@@ -8,7 +8,7 @@
 {"a":2488,"startChapter":1,"b":4871,"c":"周昕","d":"1000204","f":0,"h":100,"k":5,"l":5,"m":0,"n":0,"o":5,"p":2,"q":4,"r":0,"otherad":0,"v":"14095","getspell_KN":"3414","getspell_EM":"14098","pvpspell":"3189"}
 ```
 
-原身体为将领4871，体力5/5、基础摸牌2、随机起手4；没有固定牌、额外属性、隐藏成员、关底标记或二阶段。护甲、护甲回复、额外出杀及额外伤害基础值均为0，护甲上限字段5。人物表4871为通用将领，保留 `character:shanhe-source-general-4871` 身份；原头像1000204尚无已确认的本地映射，使用明确的 `supporter` 回退，不借用凌操或韩当身体。`pvpspell=3189` 不加入山河图普通技能。
+原身体为将领4871，体力5/5、基础摸牌2、随机起手4；没有固定牌、额外属性、隐藏成员、关底标记或二阶段。护甲、护甲回复、额外出杀及额外伤害基础值均为0，护甲上限字段5。人物表4871为通用将领，保留 `character:shanhe-source-general-4871` 身份；原头像1000204已按下述来源链核实。运行时保留 `supporter` 回退键，桌面按本族精确运行时ID绑定原卡，不借用凌操或韩当身体。`pvpspell=3189` 不加入山河图普通技能。
 
 | 来源难度 | 累计技能 |
 | --- | --- |
@@ -31,3 +31,19 @@
 ## 实际投放
 
 普通池23、24、25、27分别以1855、1280、1280、1280为前提，覆盖第三章洛阳5101—5107、河内5111—5117、酸枣5121—5127、崤函道5141—5147，共28座普通城市；来源难度1、11、16起分别开放7、21、28城。`startChapter=1` 不替代真实池、区域与难度开放条件。战斗奖励字段为 `reward=125`、`reward1=401`；本地入口、成长、奖励由地图层编排，不凭编号推定服务器抽取权重或未公开效果。
+
+## 2026-10-29 原生席位图与预览身份
+
+完整链为 `Fight2488.Ggroup=2488 → General raw0,b=4871,c=周昕,d=1000204 → root.pveskin.skinID=1000204`。皮肤行明确指定 `seatpic=generalface_1000204`、`headpic=1000204`、`diagrampic=100020400`。人物表4871是“将领”、类 `ShiBing71`，没有 `au/av` 头像重定向；本行的PVE皮肤覆盖载体默认图，不按同名、共享载体或相似面孔借图。
+
+冻结人物表解码SHA-256为 `92f00132ed944b279066f46655478bde6a2f3b9f1c006d086c197fbbbada49de`，皮肤表解码SHA-256为 `00ee5f994401976563e241571d3e5618f573ad2a4b85336ff132afb262f1e8d4`。当前另行核实的公网Config/client包装SHA已变化，但Character解码字节仍与该冻结值完全一致；旧包装与当前包装证据分别记录于[山河NPC美术来源](../shanhe-npc-art-sources.json)，本批不重抓配置或用当前包装SHA覆盖冻结General/Fight/皮肤资料。
+
+同版客户端 `q6t.getSeatSkinUrl → hA.SkinSeatUrl` 经 `N2t.SeatImgUrl=general/seat/static/` 和桌面 `res/runtime/pc/` 得到[官方原PNG](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000204.png)。已取得HTTP200、`image/png`，并目视核实原生卡面。原图146×172 RGBA、62207字节，原字节导入 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000204.png`；文件SHA-256为 `9732f54ece954c75481f19356a7cfeaed4d971aadb04aed3b263d9812381f4d3`，RGBA像素SHA-256为 `4a83e964882a925e736061de5e2fa9bd3485e6dfa6f4311c541f27c46a224aec`。未裁剪、缩放、换色或重编码。
+
+此组只有上述一名源成员，`startChapter=1,f=0`；原行没有 `g/hide/generalShow`，按源默认false/false/0，无主帅、隐藏成员或后续章节成员。完整单人预览保留大卡，不从首席推断主帅。下列运行时ID与上轮全25档实际发布配方盘点一致；美术绑定不改变PortraitKey、VariantId、内容指纹、印刷身体、技能、装备或成长。
+
+| 来源难度 | 精确运行时ID |
+| --- | --- |
+| 1–10 | `shanhe:source-armorer-2488-base` |
+| 11–15 | `shanhe:source-armorer-2488-hard` |
+| 16–25 | `shanhe:source-armorer-2488-nightmare` |

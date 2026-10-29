@@ -66,13 +66,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31100)]
     private bool IsMouZyMobileDying() => ActiveDying is { } d && (_resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == d.ParentFrameId && MouZyMobileFirstChild(f, d)) ||
         MouZyMobileObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id));
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 31100)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 31100)]
-    private bool AllowsMouZyMobileNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess || MouZyMobileObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31100)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 31100)]
     private bool IsMouZyMobileRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

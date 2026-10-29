@@ -1,0 +1,43 @@
+<UserControl x:Class="CardGame.Wpf.Controls.ShanheRewardChoiceCard" x:Name="ChoiceCard"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Focusable="False" IsTabStop="False" FontFamily="Microsoft YaHei UI">
+ <Viewbox Stretch="Uniform">
+  <Grid Width="500" Height="768">
+   <Image x:Name="FrameArtworkImage" Source="{Binding FrameArtwork, ElementName=ChoiceCard}" Stretch="Fill" IsHitTestVisible="False">
+    <Image.Style><Style TargetType="Image"><Style.Triggers>
+     <DataTrigger Binding="{Binding IsMouseOver, ElementName=ChoiceCard}" Value="True"><Setter Property="Effect"><Setter.Value><DropShadowEffect Color="#F8C959" BlurRadius="15" ShadowDepth="0" Opacity="0.5"/></Setter.Value></Setter></DataTrigger>
+     <DataTrigger Binding="{Binding IsSelected, ElementName=ChoiceCard}" Value="True"><Setter Property="Effect"><Setter.Value><DropShadowEffect Color="#FFE38A" BlurRadius="26" ShadowDepth="0" Opacity="1"/></Setter.Value></Setter></DataTrigger>
+    </Style.Triggers></Style></Image.Style>
+   </Image>
+   <Rectangle x:Name="ChoiceKeyboardFocusOutline" Margin="10,44,10,10" RadiusX="2" RadiusY="2" Stroke="#FFF3B0" StrokeThickness="3" StrokeDashArray="2,2" IsHitTestVisible="False">
+    <Rectangle.Style><Style TargetType="Rectangle"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers>
+     <DataTrigger Binding="{Binding IsChoiceFocused, ElementName=ChoiceCard}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+    </Style.Triggers></Style></Rectangle.Style>
+   </Rectangle>
+   <Viewbox Width="450" Height="50" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,2,0,0" Stretch="Uniform" StretchDirection="DownOnly">
+    <StackPanel Orientation="Horizontal">
+     <Image Source="{Binding TypeArtwork, ElementName=ChoiceCard}" Width="38" Height="38" Margin="0,0,12,0"/>
+     <TextBlock x:Name="ChoiceHeadingText" Text="{Binding Heading, ElementName=ChoiceCard}" Foreground="#FFF0C9" FontFamily="KaiTi" FontWeight="Bold" FontSize="31" VerticalAlignment="Center" TextWrapping="Wrap"/>
+    </StackPanel>
+   </Viewbox>
+   <Grid Width="230" Height="238" VerticalAlignment="Top" Margin="0,111,0,0">
+    <Grid.Style><Style TargetType="Grid"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding ArtworkContent, ElementName=ChoiceCard}" Value="{x:Null}"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Grid.Style>
+    <Image x:Name="ChoiceArtwork" Source="{Binding Artwork, ElementName=ChoiceCard}" Stretch="Uniform"/>
+    <TextBlock Text="{Binding FallbackText, ElementName=ChoiceCard}" FontFamily="KaiTi" FontSize="62" Foreground="#75502D" TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Center">
+     <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Artwork, ElementName=ChoiceCard}" Value="{x:Null}"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+    </TextBlock>
+   </Grid>
+   <ContentPresenter x:Name="ChoiceArtworkContentHost" Content="{Binding ArtworkContent, ElementName=ChoiceCard}" ContentTemplate="{Binding ArtworkContentTemplate, ElementName=ChoiceCard}" Width="400" Height="250" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,104,0,0">
+    <ContentPresenter.Style><Style TargetType="ContentPresenter"><Style.Triggers><DataTrigger Binding="{Binding ArtworkContent, ElementName=ChoiceCard}" Value="{x:Null}"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></ContentPresenter.Style>
+   </ContentPresenter>
+   <Grid Height="48" Margin="24,396,24,0" VerticalAlignment="Top">
+    <Image Source="{Binding NameArtwork, ElementName=ChoiceCard}" Stretch="Fill" IsHitTestVisible="False"/>
+    <TextBlock Text="{Binding Title, ElementName=ChoiceCard}" Foreground="#FFF0C9" FontFamily="KaiTi" FontSize="30" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="35,0"/>
+   </Grid>
+   <StackPanel Margin="45,484,45,38" VerticalAlignment="Top">
+    <ScrollViewer x:Name="ChoiceDescriptionScroll" MaxHeight="210" Focusable="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><TextBlock x:Name="ChoiceDescriptionText" Text="{Binding Description, ElementName=ChoiceCard}" Foreground="#725234" FontSize="24" LineHeight="35" LineStackingStrategy="BlockLineHeight" TextWrapping="Wrap" TextAlignment="Center"/></ScrollViewer>
+    <TextBlock x:Name="ChoiceFooterText" Text="{Binding Footer, ElementName=ChoiceCard}" Foreground="#795333" FontSize="26" FontWeight="SemiBold" TextAlignment="Center" TextWrapping="Wrap" Margin="0,16,0,0"/>
+   </StackPanel>
+  </Grid>
+ </Viewbox>
+</UserControl>

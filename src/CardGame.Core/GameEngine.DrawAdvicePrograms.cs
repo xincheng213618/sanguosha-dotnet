@@ -336,20 +336,6 @@ public sealed partial class GameEngine
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1950)]
     private bool HasDrawAdviceDamageObserver(long id) =>
         _resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && DrawAdviceObserverRoot() is not null;
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 230)]
-    private bool AllowsDrawAdviceNestedDamage(ProgramSkillFrame frame, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || frame.AttackAttempt is not null || frame.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != frame.Id ||
-            frame.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or
-                SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or
-                SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) ||
-            DrawAdviceObserverRoot() is not { } root || root.Id == frame.Id) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!)
-            .GetPausedInstruction(frame.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(frame, reference) : ResolveProgramEffectTarget(frame, effect.Target));
-    }
     [ProgramCapability]
     private sealed class DrawAdviceProgramCapability(GameEngine engine) : IDrawAdviceProgramHost
     {

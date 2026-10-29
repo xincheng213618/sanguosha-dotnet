@@ -7,6 +7,8 @@ public sealed partial class GameEngine
     /// <summary>Native state mutations only. Encounter qualification and transition order live in mode features.</summary>
     private sealed class ModeEncounterHost(GameEngine engine) : IModeEncounterHost
     {
+        public int? LastLogSequence => engine._logSequence;
+
         public ModeEncounterFacts CaptureFacts() => new(engine._setupComplete, engine._winner != Winner.None,
             engine._playerCount, engine._options.HumanSeat, engine._currentSeat, engine._turnNumber,
             engine._phase, engine._resolutionStack.Count, engine._pendingDecision?.Kind,

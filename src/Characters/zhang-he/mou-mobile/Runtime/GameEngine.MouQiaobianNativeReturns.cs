@@ -40,15 +40,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant,34200)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime,34200)]
     private bool MouQiaobianDying()=>ActiveDying is{}d&&MouQiaobianNativeRoot()is{}f&&_resolutionStack.FindIndex(x=>x.Id==d.Id)>_resolutionStack.FindIndex(x=>x.Id==f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts,34200)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts,34200)]
-    private bool MouQiaobianNested(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||sourceLess||MouQiaobianNativeRoot()is not{}root||root.Id==f.Id)return false;
-        var e=GetPausedPrivateOfferEffect(f);
-        return e is{Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&
-            target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor,34200)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor,34200)]
     private bool MouQiaobianRecoveryParent(ProgramSkillFrame f,RecoveryReplacementFrame recovery)

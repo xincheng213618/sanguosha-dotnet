@@ -12,9 +12,29 @@ internal sealed class FrameStore : IReadOnlyList<ResolutionFrame>
 
     public void Push(ResolutionFrame frame)
     {
+        RequireNewIdentity(frame);
+        _frames.Add(frame);
+    }
+
+    internal void PushOwned(ResolutionFrame frame)
+    {
+        RequireNewIdentity(frame);
+        frame.RuntimeOrigin = RuntimeFrameOrigin.Capture(LastOrDefault(), frame);
+        _frames.Add(frame);
+    }
+
+    private void RequireNewIdentity(ResolutionFrame frame)
+    {
         if (frame.Id <= 0 || _frames.Any(current => current.Id == frame.Id))
             throw new InvalidOperationException("A runtime frame requires a unique positive identity.");
-        _frames.Add(frame);
+    }
+
+    internal bool HasIssuedLink(int index)
+    {
+        if (index < 0 || index >= Count || _frames[index].RuntimeOrigin is not { } origin ||
+            !origin.Matches(_frames[index])) return false;
+        return index == 0 ? origin.ParentId is null :
+            origin.ParentId == _frames[index - 1].Id && origin.ParentKind == _frames[index - 1].Kind;
     }
 
     public void Replace(ResolutionFrame next)
@@ -22,6 +42,9 @@ internal sealed class FrameStore : IReadOnlyList<ResolutionFrame>
         var index = _frames.FindLastIndex(frame => frame.Id == next.Id);
         if (index < 0 || _frames[index].Kind != next.Kind || _frames[index].GetType() != next.GetType())
             throw new InvalidOperationException("A runtime write must preserve the existing frame identity and type.");
+        if (next.RuntimeOrigin is { } supplied && supplied != _frames[index].RuntimeOrigin)
+            throw new InvalidOperationException("A runtime write cannot replace its scheduler origin.");
+        next.RuntimeOrigin = _frames[index].RuntimeOrigin;
         _frames[index] = next;
     }
 

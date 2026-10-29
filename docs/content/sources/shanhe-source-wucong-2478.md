@@ -2,7 +2,7 @@
 
 来源为[官方配置](https://web.sanguosha.com/220/h5_2/res/config/Config.sgs)的既有同版冻结快照，本批重新读取并核对哈希，没有重新下载客户端。Config 外包 SHA-256 为 `d663d5542f5a63a61611b5dbc1ae736e5e0328eedaab2c498e18c3287c289ce6`，Client 外包为 `96b7131953f758a30da44c9bdbbcd8a429174050ef7c16961216b90cd923ec31`，`hd_roguelike.sgs` 为 `97dbdb465d902e771e575ed5165df3d193e1a689e3dae7ae67b9cb5033f18c72`，`cha_spell.sgs` 为 `e8885a11c46c3b25f37a6fcd8882b0d339ab1d1873c140900d3be93826fdd219`，`character.sgs` 为 `92f00132ed944b279066f46655478bde6a2f3b9f1c006d086c197fbbbada49de`，`sys_playcard.sgs` 为 `05584b30f7986c06158ee6e47f78417b3d5f1c7fbc61174cfad26e12a5ee64ab`。
 
-`General.a=2478` 只有一名4871来源身体，名称吴琮，原始体力3/3，摸牌2、起手4、护甲0、护甲回复0、护甲上限5，没有额外属性、隐藏成员或二阶段。原头像 `d=1000257` 尚无已确认的本地映射，使用明确的 `supporter` 回退，保留 `character:shanhe-source-general-4871` 来源身份。
+`General.a=2478` 只有一名4871来源身体，名称吴琮，原始体力3/3，摸牌2、起手4、护甲0、护甲回复0、护甲上限5，没有额外属性、隐藏成员或二阶段。原头像 `d=1000257` 已按下述来源链核实；运行时保留 `supporter` 回退键和 `character:shanhe-source-general-4871` 来源身份，桌面只按本族精确运行时ID绑定原卡。
 
 | 来源难度 | 累计技能 | 固定牌 |
 | --- | --- | --- |
@@ -25,3 +25,18 @@
 实际池为23、24、25、27，进入第三章普通城市5101—5107、5111—5117、5121—5127、5141—5147，共28城，不含各区域末尾关底。主战2478与新手组22478分开，`pvpspell=3189` 不作为普通敌军印刷技能。服务器抽选前提、权重、地图事件和战后奖励不由技能包推导，本地入口沿既有编排独立处理。
 
 独立新鲜聚焦检查覆盖原材料付款孩子、原伤害与反击用牌的单次返回、同回合重复反击、单向距离、远距无豁免、闪实际抵消和本人下个真实回合到期；不通过整场比赛模拟或存档检查制造结论。
+
+## 2026-10-29 原生席位图与预览身份
+
+完整链为 `Fight2478.Ggroup=2478 → General raw0,b=4871,c=吴琮,d=1000257 → root.pveskin.skinID=1000257`。皮肤行明确指定 `seatpic=generalface_1000257`、`headpic=1000257`、`diagrampic=100025700`。人物表4871是“将领”、类 `ShiBing71`，没有 `au/av` 头像重定向；本行的PVE皮肤覆盖载体默认图，不按同名、共享载体或相似面孔借图。
+
+冻结人物表解码SHA-256为 `92f00132ed944b279066f46655478bde6a2f3b9f1c006d086c197fbbbada49de`，皮肤表解码SHA-256为 `00ee5f994401976563e241571d3e5618f573ad2a4b85336ff132afb262f1e8d4`。当前另行核实的公网Config/client包装SHA已变化，但Character解码字节仍与该冻结值完全一致；旧包装与当前包装证据分别记录于[山河NPC美术来源](../shanhe-npc-art-sources.json)，本批不重抓配置或用当前包装SHA覆盖冻结General/Fight/皮肤资料。
+
+同版客户端 `q6t.getSeatSkinUrl → hA.SkinSeatUrl` 经 `N2t.SeatImgUrl=general/seat/static/` 和桌面 `res/runtime/pc/` 得到[官方原PNG](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000257.png)。已取得HTTP200、`image/png`，并目视核实原生卡面。原图146×172 RGBA、58385字节，原字节导入 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000257.png`；文件SHA-256为 `f4395e17496f59d30f7608632c517789831f9affc7231278b44be84e756b0432`，RGBA像素SHA-256为 `0bab39f6e12d6379655db51367ebe54c6dcfaef214576661de1c4b486ce54b42`。未裁剪、缩放、换色或重编码。
+
+此组只有上述一名源成员，`startChapter=1,f=0`；原行没有 `g/hide/generalShow`，按源默认false/false/0，无主帅、隐藏成员或后续章节成员。完整单人预览保留大卡，不从首席推断主帅。下列运行时ID与上轮全25档实际发布配方盘点一致；美术绑定不改变PortraitKey、VariantId、内容指纹、印刷身体、技能、装备或成长。
+
+| 来源难度 | 精确运行时ID |
+| --- | --- |
+| 1–10 | `shanhe:source-wucong-2478-base` |
+| 11–25 | `shanhe:source-wucong-2478-hard` |

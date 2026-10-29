@@ -40,7 +40,11 @@ internal static class ShanheBossStageChecks
                 s.V().Skills!.Any(skill => skill.ContentId == Driver) && s.E<ShanheStartingResourceCreatedEvent>().Length == originCount &&
                 s.V(1).Hand.Count == 2,
                 "Transformation preserves the player's HP, original hand/equipment and tactic while drawing only the configured two cards for the second form.");
-            s.Cold(); s.ReachPlay();
+            var logCut = RequireNativeStageLogBoundary(s.G, requireLethalDamage: true);
+            s.Cold();
+            Need(RequireNativeStageLogBoundary(s.G, requireLethalDamage: true) == logCut,
+                "Cold physical-Slash replay preserves the same native log cut, fatal first-form damage and second-form output partition.");
+            s.ReachPlay();
             s.Accept(new UseProgramSkillCommand(0, Driver, "finish", [], [1], s.G.Revision, s.P!.PromptId));
             s.Until(() => s.G.CreateSnapshot(0).Winner != Winner.None);
             Need(s.E<ShanheBossStageStartedEvent>().Length == 1 && s.E<PlayerDiedEvent>().Single().VictimSeat == 1 &&
@@ -81,10 +85,30 @@ internal static class ShanheBossStageChecks
             s.V(1) is { GeneralId: Second, IsAlive: true, MaxHp: 6, Hp: 5 } &&
             s.Zone(slash) == CardLocation.OutsideGame && s.E<ShanheStartingResourceDestroyedEvent>().Single().CardId == slash,
             "A real native card-damage replacement that exhausts the first form's maximum HP transforms before direct death, preserving its exact paid temporary Slash cleanup.");
+        var logCut = RequireNativeStageLogBoundary(s.G, requireLethalDamage: false);
         s.Cold();
         Need(s.E<ShanheBossStageStartedEvent>().Length == 1 && s.G.ResolutionStack.Count == 0 &&
-            s.G.CreateSnapshot(0) is { Winner: Winner.None, CurrentSeat: 1, Phase: TurnPhase.NotStarted },
+            s.G.CreateSnapshot(0) is { Winner: Winner.None, CurrentSeat: 1, Phase: TurnPhase.NotStarted } &&
+            RequireNativeStageLogBoundary(s.G, requireLethalDamage: false) == logCut,
             "Cold replay retains the single zero-maximum transition and retires its replacement/death parent.");
+    }
+
+    internal static int RequireNativeStageLogBoundary(GameEngine game, bool requireLethalDamage)
+    {
+        var stage = game.Events.Select(envelope => envelope.Payload).OfType<ShanheBossStageStartedEvent>().Single();
+        var cut = stage.LastPreviousFormLogSequence ?? throw new InvalidOperationException("A native stage must publish its actual previous-form log boundary.");
+        var announcement = game.Log.Single(log => log.Type == "ShanheBossTransformed" && log.ActorSeat == stage.BossSeat);
+        var draw = game.Log.Last(log => log.Type == "CardsDrawn" && log.ActorSeat == stage.BossSeat && log.Sequence < announcement.Sequence);
+        // Both sides use GameLogEntry.Sequence. Typed-event sequence/counts are a separate
+        // clock and cannot locate this boundary. In these existing scenes, retirement emits
+        // facts/material movements; the configured second-form draw is the first new log.
+        Need(game.Log.LastOrDefault(log => log.Sequence < draw.Sequence)?.Sequence == cut &&
+            draw.Sequence > cut && announcement.Sequence > draw.Sequence,
+            "The cut is the actual last native log before second-form drawing and announcement, including zero-maximum replacement paths with no ordinary HP-loss result log.");
+        if (requireLethalDamage)
+            Need(game.Log.Last(log => log.Type == "Damage" && log.TargetSeat == stage.BossSeat).Sequence <= cut,
+                "The original form's actual fatal Damage log belongs to the previous-form side of the cut.");
+        return cut;
     }
 
     private static void Need(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
@@ -122,15 +146,19 @@ internal static class ShanheBossStageChecks
             var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), registry);
             Need(Enumerable.Range(0, G.PlayerCount).All(seat => SnapshotJson.Serialize(G.CreateSnapshot(seat)) == SnapshotJson.Serialize(restored.CreateSnapshot(seat))) &&
                 JsonSerializer.Serialize(G.CardMovements) == JsonSerializer.Serialize(restored.CardMovements) &&
-                JsonSerializer.Serialize(G.Events) == JsonSerializer.Serialize(restored.Events), "Cold command replay preserves all views, material proofs and the once-only stage marker.");
+                JsonSerializer.Serialize(G.Events) == JsonSerializer.Serialize(restored.Events) &&
+                JsonSerializer.Serialize(G.Log) == JsonSerializer.Serialize(restored.Log),
+                "Cold command replay preserves all views, material proofs, native logs and the once-only stage marker with its log boundary.");
             G = restored;
         }
         public static Scene Start(bool temporary, bool retaliation = false, bool zeroMaximum = false)
         {
             var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(retaliation, zeroMaximum));
             var setup = new ShanheBattleSetup(71, 1, "fixture:shanhe-stage", Owner, 3, 0, 0, 0, 0, [],
-                retaliation ? [] : [new(CardKind.Slash, Suit.Spade, 7), new(CardKind.Peach, Suit.Heart, 3)],
-                retaliation ? [] : [new(CardKind.Crossbow, Suit.Club, 1)],
+                retaliation ? [] : temporary
+                    ? [new(CardKind.Slash, Suit.Spade, 7), new(CardKind.Peach, Suit.Heart, 3), new(CardKind.Crossbow, Suit.Club, 1)]
+                    : [new(CardKind.Slash, Suit.Spade, 7), new(CardKind.Peach, Suit.Heart, 3)],
+                retaliation || temporary ? [] : [new(CardKind.Crossbow, Suit.Club, 1)],
                 [new(First, Hp: 1) { StartingHand = retaliation ? [new(CardKind.Slash, Suit.Spade, 8)] : [] }], [], new string('a', 64))
             { StartingResourcesExpireOnUse = temporary, BossTransition = new(0, Second, 6, 5, 2), TacticSkillIds = zeroMaximum ? [Driver, MaximumLoss] : [Driver] };
             var game = GameEngine.CreateStandard(new() { Seed = setup.BattleSeed, PlayerCount = 2, HumanSeat = 0, HumanRole = null,

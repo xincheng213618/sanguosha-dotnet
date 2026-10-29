@@ -96,12 +96,16 @@ public static partial class StandardShanheCampaignCatalog
             .Append(new(100, "chapter-skill-3091"))
             .Append(new(108, "chapter-skill-3038"))
             .Append(new(105, CurrentInterest2RewardId))
+            .Append(new(120, CurrentDailyTravel2RewardId))
             .Append(new(35, CurrentFarStrikeRewardId))
             .Append(new(28, CurrentQinmianRewardId))
             .Append(new(144, CurrentYongzhan2RewardId)).ToDictionary(pair => pair.Key, pair => pair.Value)));
 
     /// <summary>Adds the opt-in codex pool without altering the historical default campaign definition.</summary>
-    public static ShanheCampaignDefinition CreateCodexDefinition(int difficulty, string editionId)
+    public static ShanheCampaignDefinition CreateCodexDefinition(int difficulty, string editionId) =>
+        GetCachedFinalDefinition(codex: true, difficulty, editionId);
+
+    private static ShanheCampaignDefinition BuildCodexDefinition(int difficulty, string editionId)
     {
         if (editionId == Source2026EditionId) return CreateSourceCodexDefinition(difficulty);
         var definition = WithCodexRewards(CreateCurrentBaseDefinition(difficulty, editionId), editionId);
@@ -115,7 +119,7 @@ public static partial class StandardShanheCampaignCatalog
         definition = WithGuideTerrain(definition, difficulty, editionId);
         definition = WithMuluEncounter(definition, difficulty, editionId);
         definition = WithReturningThirdChapterTroops(definition, difficulty, editionId);
-        return WithChapterShopBalance(WithCurrentWolfBattles(WithCurrentSchools(definition)));
+        return WithChapterShopBalance(WithCurrentWolfBattles(WithCurrentSchools(WithDailyTravelBattles(definition, editionId))));
     }
 
     private static ShanheCampaignDefinition WithCodexRewards(ShanheCampaignDefinition original, string editionId)

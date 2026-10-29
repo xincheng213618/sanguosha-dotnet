@@ -56,11 +56,4 @@ public sealed partial class GameEngine
  private bool IsXiZhiCaiDying()=>ActiveDying is {} d&&XiZhiCaiObserverRoot() is {} root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 210)]
  private bool TryAdvanceXiZhiCaiSubtree()=>_pendingDecision is null&&XiZhiCaiObserverRoot() is not null&&TryAdvanceObserverSubtree(advanceRecoveryReplacement:true);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 450)]
- private bool AllowsXiZhiCaiNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
- {
-  if(sourceLess&&ValidXianfuEcho(f)&&f.XianfuPending is {Receipt.Kind:XianfuEchoKind.Damage} echo&&target==f.OwnerSeat&&amount==echo.Receipt.ActualAmount&&source is null&&nature is null)return true;
-  if(sourceLess||f.AttackAttempt is not null||f.InstructionIndex<1||_resolutionStack.LastOrDefault()?.Id!=f.Id||XiZhiCaiObserverRoot() is not {} root||root.Id==f.Id)return false;
-  var e=GetPausedPrivateOfferEffect(f);return e is {Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&target==(e.TargetReference is {} p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
- }
 }

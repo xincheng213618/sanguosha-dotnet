@@ -4,7 +4,9 @@
 
 `Fight.fightID=2486,Ggroup=2486,text=248600` 对应一名完整成员：`General.a=2486,b=4871,c=武库统领,d=1000282,f=0,h=100`。原始身体 `k=4,l=4,p=2,q=4`，即体力4/4、摸牌2、随机初手4；`m=0,n=0,o=5,r=0,otherad=0`。没有固定装备、额外隐藏成员或二阶段。不把 `r=0` 解作隐藏标志，也不把 `pvpspell=3189` 追加为固有技能。
 
-原身份4871是将领，采用独立 `character:shanhe-source-general-4871`。本地没有已核外观1000282肖像，明确采用 supporter fallback，不借丁原、陆抗或刘宏的印刷身体和附属技能。
+原身份4871是将领，采用独立 `character:shanhe-source-general-4871`。运行时保留 `supporter` 回退键；桌面按此族三个精确运行时ID绑定已核对的PVE原卡1000282，内容身份与规则字段不变，不借丁原、陆抗或刘宏的印刷身体和附属技能。
+
+2026-10-29美术核对：冻结 `General.d=1000282` 对应 `cha_gs_dbs_fs_skininfo.sgs/root.pveskin` 的 `seatpic=generalface_1000282`、`headpic=1000282`。沿已核对的桌面SeatImgUrl链取得[官方独立PNG](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000282.png)，HTTP200、image/png、146×172、53,569字节，SHA256 `89388c95c5367df208fe8083f326dda5bb2c055b0b8bc7226e9ecfa1128dc55c`。原始字节直接保存为 `Assets/Shanhe/Npc/generalface_1000282.png`；已目视为戴盔、着绿衣的持弓男性将领，身份依据仍是独立源皮肤链。原组唯一raw0的 `g` 缺省0、`hide` 缺省false、`startChapter=1`、`generalShow` 缺省0，不以名称“统领”猜测主帅。此次在线核对的是图片，没有重新下载当前线上配置。
 
 | 来源难度 | GeneralId | 累积技能 |
 | --- | --- | --- |

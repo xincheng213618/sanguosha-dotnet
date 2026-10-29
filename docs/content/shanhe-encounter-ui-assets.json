@@ -1,0 +1,914 @@
+{
+  "schemaVersion": 1,
+  "description": "Original OL Shanhe encounter preview assets selected from the frozen client renderer. Standalone PNG bytes and decoded atlas pixels retain their native dimensions and transparent padding.",
+  "verifiedOnLocalDate": "2026-10-29",
+  "clientSource": {
+    "url": "https://web.sanguosha.com/220/h5_2/sgsGame_a.sgs",
+    "sha256": "96b7131953f758a30da44c9bdbbcd8a429174050ef7c16961216b90cd923ec31",
+    "renderer": "Pos extends I7i; resource group roguelikeFight"
+  },
+  "resourceIndex": {
+    "url": "https://web.sanguosha.com/220/h5_2/res/default.res.json?v=-2047644578",
+    "sha256": "4b1bfb095720d4de8ce3e9a32fd73b58798ee2dc174864f0a75a1c21338fc452",
+    "versionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+    "versionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f"
+  },
+  "sourceAtlases": {
+    "roguelikeFight": {
+      "atlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikeFight.atlas?v=-1129854863",
+      "textureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikeFight.webp?v=602421852",
+      "atlasSha256": "d64e10d0ed4ff6f40973d9bbc47d4276ff726b1397a1a0dea408474a866cf3b8",
+      "textureSha256": "db6abf691d4d7d08261708f2c60eda909efeed19958139bdd34d648269b4f4a6",
+      "sourceScale": 2
+    },
+    "baseUI": {
+      "atlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/baseUI/baseUI.atlas?v=-476465977",
+      "textureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/baseUI/baseUI.webp?v=-132110301",
+      "atlasSha256": "2e6b31f3c7411e2d8207fb3a0c5ed65318a0235b2bea75d9e4418bf8aae12352",
+      "textureSha256": "f340af52c94d591623eb3cf7713f346b4331b464f96336d2e066b1498cf3f040",
+      "sourceScale": 2
+    },
+    "seat": {
+      "atlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/game/seat.atlas?v=462010409",
+      "textureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/game/seat.webp?v=-260367522",
+      "atlasSha256": "9df9a7f7299346ef9b898a645e7d4b7540828dfcfeac2e54140ed7825572c337",
+      "textureSha256": "b9dd6e612c2033385d7c2bae732e260536288d67a02f2d49898e9bcbdb36ea5c",
+      "sourceScale": 2
+    }
+  },
+  "configurationSource": {
+    "url": "https://web.sanguosha.com/220/h5_2/res/config/Config.sgs",
+    "sha256": "d663d5542f5a63a61611b5dbc1ae736e5e0328eedaab2c498e18c3287c289ce6",
+    "roguelikeTable": "hd_roguelike.sgs",
+    "decodedRoguelikeTableSha256": "97dbdb465d902e771e575ed5165df3d193e1a689e3dae7ae67b9cb5033f18c72",
+    "goodsTable": "sys_gs_dbs_fs_goodsbaseinfo.sgs",
+    "decodedGoodsTableSha256": "224000a54cc6d8170d61f0a993ea8dbfe7d0c011961fdff80511e596aee7916b"
+  },
+  "assetDirectory": "src/CardGame.Wpf/Assets/Shanhe/Encounter",
+  "extraction": {
+    "standalone": "Byte-for-byte copies of official standalone PNG files.",
+    "atlasFrame": "Lossless PNG encoding of decoded official atlas pixels with the original sourceSize and spriteSourceSize padding. No resizing, repainting or recoloring.",
+    "frameKey": "For an atlas asset the frame key is the file basename. The sourceAtlas field resolves to sourceAtlases above.",
+    "rgbaSha256": "SHA256 of decoded RGBA bytes. For an untrimmed atlas asset with zero source offset, this is also the hash of the original packed frame's decoded RGBA pixels."
+  },
+  "assets": [
+    {
+      "file": "figure_cool_master.png",
+      "width": 50, "height": 52, "bytes": 6901,
+      "sha256": "b17eabbee0f743f8ceb1c0b3ce8a74995cb80b9d530369fcde4e8d22e6250110",
+      "rgbaSha256": "9bb2f19e89d35dfbd44d4a87b4be5200f7489eb78c1b996169edc848c457d2a3",
+      "sourceKind": "atlasFrame", "sourceAtlas": "seat",
+      "frame": {"idx": 0, "x": 3574, "y": 512, "w": 50, "h": 52},
+      "sourceSize": {"w": 50, "h": 52},
+      "spriteSourceSize": {"x": 0, "y": 0, "w": 50, "h": 52},
+      "role": "Source commander identity with baked Chinese text.",
+      "rendererEvidence": "Pos creates a q6t/Fos card and calls SetFigure(figure_cool_master); Pzt passes this to its figure manager. The matched whitelist groups have no Generalshow override.",
+      "rendererLogicalSize": [25, 26],
+      "sourceScale": 2
+    },
+    {
+      "file": "figure_cool_winger.png",
+      "width": 50, "height": 52, "bytes": 7101,
+      "sha256": "eb8380858c92beb5be5223c5f6a7e6004356661dd8ae18947ce4077eca92ad59",
+      "rgbaSha256": "6b7eb6aaef40ed74e52234ab2be2613272a3038bc56d3ee133c77971b9511910",
+      "sourceKind": "atlasFrame", "sourceAtlas": "seat",
+      "frame": {"idx": 0, "x": 3632, "y": 512, "w": 50, "h": 52},
+      "sourceSize": {"w": 50, "h": 52},
+      "spriteSourceSize": {"x": 0, "y": 0, "w": 50, "h": 52},
+      "role": "Source vanguard identity with baked Chinese text.",
+      "rendererEvidence": "Pos supplies figure_cool_winger as the tooltip identity of an ordinary lower-formation member; full-card rendering resolves the default identity texture. This role is not inferred from a local node's battle kind or enemy index.",
+      "rendererLogicalSize": [25, 26],
+      "sourceScale": 2
+    },
+    {
+      "file": "roguelike_fight_bg1.png",
+      "width": 1568,
+      "height": 904,
+      "bytes": 804597,
+      "sha256": "d8a1bbfb4ce73825703995752e3c46ef76efde86945fc4595dd58a70fee426e7",
+      "rgbaSha256": "02643c84e35dfb502a3f869c84c35f95e0b69c76f581bf5135f35dae124446cb",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelike_fight_bg1.png?v=-774984522",
+      "versionIndexListed": true,
+      "role": "Ordinary and elite encounter background, including the copper-gold outer frame, flag silhouettes and left narrative panel outline.",
+      "rendererEvidence": "Pos.Init and Pos.enterWindow use this complete image at 784 by 452. I7i clears its separate background and frame resources.",
+      "rendererLogicalSize": [
+        784,
+        452
+      ],
+      "rendererNineSlice": null
+    },
+    {
+      "file": "roguelike_fight_bg2.png",
+      "width": 1568,
+      "height": 904,
+      "bytes": 784038,
+      "sha256": "07db0ef1dcdf4df620f544ffd2b4f60cf3cde7b95b56cd15874caf671d17c561",
+      "rgbaSha256": "611e19dc80b7135fac8347500cea9f29ebd1265cc5c70fc91721b26836225fb9",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelike_fight_bg2.png?v=-302603185",
+      "versionIndexListed": true,
+      "role": "Boss encounter background, with its frame and scenery baked into the complete image.",
+      "rendererEvidence": "Pos.enterWindow selects this image for the boss encounter argument and retains the 784 by 452 logical canvas.",
+      "rendererLogicalSize": [
+        784,
+        452
+      ],
+      "rendererNineSlice": null
+    },
+    {
+      "file": "roguelike_fight_title.png",
+      "width": 332,
+      "height": 42,
+      "bytes": 11161,
+      "sha256": "97a8a28feff47b0a7f9481c2455c5a286ab802eac77d60896f5a74bdf7105841",
+      "rgbaSha256": "f982ed3a955f08ed386e2ad703322696b4b316412afdbecef52ac200595c8ba0",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "roguelikeFight",
+      "frame": {
+        "idx": 0,
+        "x": 4,
+        "y": 110,
+        "w": 332,
+        "h": 42
+      },
+      "sourceSize": {
+        "w": 332,
+        "h": 42
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 332,
+        "h": 42
+      },
+      "role": "Clear-reward title strip; its localized title is a separate label.",
+      "rendererEvidence": "Pos.Init places the image at 94,279 and the 166 by 18 title label at 94,280.",
+      "rendererLogicalSize": [
+        166,
+        21
+      ]
+    },
+    {
+      "file": "roguelike_fight_right_title.png",
+      "width": 334,
+      "height": 42,
+      "bytes": 21272,
+      "sha256": "06b384e4465fd4f1c39db5dd1495804965baab63c5c8f348492fdd81c1002149",
+      "rgbaSha256": "6ee5c86bd2343ad5f5123ef297e4f6dafc2eed7d919ab1bb687c46ceacef68bf",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "roguelikeFight",
+      "frame": {
+        "idx": 0,
+        "x": 4,
+        "y": 60,
+        "w": 334,
+        "h": 42
+      },
+      "sourceSize": {
+        "w": 334,
+        "h": 42
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 334,
+        "h": 42
+      },
+      "role": "Enemy-formation title strip with baked Chinese text.",
+      "rendererEvidence": "Pos.Init places enemyTitleBg at 389,246; setEnemyVisible controls whether the lower formation is shown.",
+      "rendererLogicalSize": [
+        167,
+        21
+      ]
+    },
+    {
+      "file": "red_small_btn_normal.png",
+      "width": 178,
+      "height": 78,
+      "bytes": 21146,
+      "sha256": "163f503fa5ca15682615913859f91bd8f6aa775c7f8f5846cd2ef982ffd8b9f9",
+      "rgbaSha256": "b5e669fcd4ad63f5e3f4360200feeb7f25328734c57a8f5902f5b07e0a887d94",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 980,
+        "y": 1406,
+        "w": 178,
+        "h": 78
+      },
+      "sourceSize": {
+        "w": 178,
+        "h": 78
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 178,
+        "h": 78
+      },
+      "role": "Challenge button, normal background; no baked label.",
+      "rendererEvidence": "Pos.Init calls eKi.GetRedSmallBtn with a localized challenge label and logical size 126 by 41."
+    },
+    {
+      "file": "red_small_btn_over.png",
+      "width": 178,
+      "height": 78,
+      "bytes": 22744,
+      "sha256": "bd6bb6cac98ced8967a4ee2cd7ca0e44c3f6da52e42f990c0355b259d0cf52ec",
+      "rgbaSha256": "f68d40b6787d5b3f80520323e5b677f0bcd4edb88b3f877da7944ba3d941c520",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 980,
+        "y": 1492,
+        "w": 178,
+        "h": 78
+      },
+      "sourceSize": {
+        "w": 178,
+        "h": 78
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 178,
+        "h": 78
+      },
+      "role": "Challenge button, hover background; no baked label."
+    },
+    {
+      "file": "red_small_btn_down.png",
+      "width": 178,
+      "height": 78,
+      "bytes": 20719,
+      "sha256": "d14f26cd330094380301350d06fc376b08d3106aad93f7f0d3cc0d2cb31fc4dd",
+      "rgbaSha256": "d47b7479975dc290dadb4593f3f5c89ec2df793a4a48ddf532e8207a7ef7c768",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 980,
+        "y": 1320,
+        "w": 178,
+        "h": 78
+      },
+      "sourceSize": {
+        "w": 178,
+        "h": 78
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 178,
+        "h": 78
+      },
+      "role": "Challenge button, pressed background; no baked label."
+    },
+    {
+      "file": "red_small_btn_disable.png",
+      "width": 178,
+      "height": 78,
+      "bytes": 18039,
+      "sha256": "9a0e5436454893a0093444b617e34a8e36c531261a14102ea7f148f70c87184f",
+      "rgbaSha256": "bb4e1c32780e3bca787d9a435c0e565b4da6a2bb31933412bff2956169229260",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 980,
+        "y": 1234,
+        "w": 178,
+        "h": 78
+      },
+      "sourceSize": {
+        "w": 178,
+        "h": 78
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 178,
+        "h": 78
+      },
+      "role": "Challenge button, disabled background; no baked label."
+    },
+    {
+      "file": "window_close_btn2_normal.png",
+      "width": 44,
+      "height": 46,
+      "bytes": 5036,
+      "sha256": "75e9f05c96233e3e7461b5d995b19f978738ec57b8f75d95cdd71d44722024c5",
+      "rgbaSha256": "26ff6f66a16783fffc42d755d47e597df6e99fa5f92305289e49057b9a215ce0",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 182,
+        "y": 2990,
+        "w": 44,
+        "h": 46
+      },
+      "sourceSize": {
+        "w": 44,
+        "h": 46
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 44,
+        "h": 46
+      },
+      "role": "Close button, normal state.",
+      "rendererEvidence": "Pos.Init explicitly supplies the window_close_btn2 state keys. Pos.layout sets the final position to 750,9.",
+      "rendererLogicalSize": [
+        22,
+        23
+      ]
+    },
+    {
+      "file": "window_close_btn2_over.png",
+      "width": 44,
+      "height": 46,
+      "bytes": 5319,
+      "sha256": "ec76eddf0e91dd44fa14987dd28903f93feecaf3ed9e0d58e9d33dba28e4ec07",
+      "rgbaSha256": "708aa0151ee2e5f30bdf42b7f26e7f280a6cc3fe69e38aff375143763269d632",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 234,
+        "y": 2990,
+        "w": 44,
+        "h": 46
+      },
+      "sourceSize": {
+        "w": 44,
+        "h": 46
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 44,
+        "h": 46
+      },
+      "role": "Close button, hover state."
+    },
+    {
+      "file": "window_close_btn2_down.png",
+      "width": 44,
+      "height": 46,
+      "bytes": 5126,
+      "sha256": "5880df5a789b01455b8234121abfa5ca645a22e9b3f19e4850f67b81c60ce722",
+      "rgbaSha256": "36c207d0fc8c5eb8dabd222cc25485fb94a924e557ff7717c390b070939df3a2",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 356,
+        "y": 3024,
+        "w": 44,
+        "h": 46
+      },
+      "sourceSize": {
+        "w": 44,
+        "h": 46
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 44,
+        "h": 46
+      },
+      "role": "Close button, pressed state."
+    },
+    {
+      "file": "window_close_btn2_disable.png",
+      "width": 44,
+      "height": 46,
+      "bytes": 4736,
+      "sha256": "1e42c4308a58a13791aedec2a9ab1766ba122de6b4566e2d5cf23b4a27a4ed8b",
+      "rgbaSha256": "6b0270ec92d80581cf2eed23e6fb18555c87cd2c51b1b6bbe75bf9dde769c21d",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 412,
+        "y": 2998,
+        "w": 44,
+        "h": 46
+      },
+      "sourceSize": {
+        "w": 44,
+        "h": 46
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 44,
+        "h": 46
+      },
+      "role": "Close button, disabled state."
+    },
+    {
+      "file": "14021801.png",
+      "width": 100,
+      "height": 100,
+      "bytes": 8969,
+      "sha256": "48d7729840e5e68c0e5034713f7a1e4ace937e19a7c47ce0b9e8803bfbef7057",
+      "rgbaSha256": "775c9e6215adbace63309f9323e5317a732aa7ad2cd40dca917c867e7061c90e",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/shop/GiveBuy/14021801.png",
+      "versionIndexListed": false,
+      "sourceGoodsId": 14022001,
+      "sourcePicId": 14021801,
+      "role": "Copper-coin reward icon.",
+      "rendererEvidence": "Pos rewards use afs.UpdateCountIdName. Goods abbreviation m is PicID; the copper-coin row has ID14022001, TypeID998 and PicID14021801. JR.ItemSmallIconUrl maps this type to shop/GiveBuy/{PicID}.png."
+    },
+    {
+      "file": "win_noborder_btn_normal.png",
+      "width": 178,
+      "height": 44,
+      "bytes": 6510,
+      "sha256": "10736bb4df8dfbffc792291fb4b5c887e95184405f34882fb0b2478d1a98b11d",
+      "rgbaSha256": "90b88d1bc5074ef87c5db9d6288582741a7d9778faf095a86daec0b083ecde31",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 980,
+        "y": 1638,
+        "w": 178,
+        "h": 44
+      },
+      "sourceSize": {
+        "w": 178,
+        "h": 44
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 178,
+        "h": 44
+      },
+      "role": "Enemy skill label",
+      "rendererEvidence": "Pos.createSkillBtn -> eKi.GetFilterNobordBtn: sizeGrid5, sourceScale2; Pos.Init descPanel/rewardPanel.SetRes for directional arrows."
+    },
+    {
+      "file": "win_noborder_btn_over.png",
+      "width": 178,
+      "height": 44,
+      "bytes": 6617,
+      "sha256": "f2b3c5a917d41c8ac3431ce4bfc734d61b1765d9bf9492cdc111b98bba1caa96",
+      "rgbaSha256": "d722af7450649f65dd4424bff7a4ebedf474f851ee303a65d73bb3b27ce9c886",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 980,
+        "y": 1690,
+        "w": 178,
+        "h": 44
+      },
+      "sourceSize": {
+        "w": 178,
+        "h": 44
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 178,
+        "h": 44
+      },
+      "role": "Enemy skill label",
+      "rendererEvidence": "Pos.createSkillBtn -> eKi.GetFilterNobordBtn: sizeGrid5, sourceScale2; Pos.Init descPanel/rewardPanel.SetRes for directional arrows."
+    },
+    {
+      "file": "win_noborder_btn_down.png",
+      "width": 178,
+      "height": 44,
+      "bytes": 6283,
+      "sha256": "6b20c75b281a67a2ed6358c3f5f94d02bf680e25c490ed83e2b380e02995b29f",
+      "rgbaSha256": "ba3bc9cc4877e97dc5732b61350bea04004a55e527404425d659532532f93ee5",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 3906,
+        "y": 1574,
+        "w": 178,
+        "h": 44
+      },
+      "sourceSize": {
+        "w": 178,
+        "h": 44
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 178,
+        "h": 44
+      },
+      "role": "Enemy skill label",
+      "rendererEvidence": "Pos.createSkillBtn -> eKi.GetFilterNobordBtn: sizeGrid5, sourceScale2; Pos.Init descPanel/rewardPanel.SetRes for directional arrows."
+    },
+    {
+      "file": "win_noborder_btn_disable.png",
+      "width": 178,
+      "height": 44,
+      "bytes": 5712,
+      "sha256": "8428f1468eb394f53fa12e05a04a799e078c6b041c35ba28cab14c42be73a31b",
+      "rgbaSha256": "6ccc9f0d1237b786b8518fae8e1a54ac88e6efa131bd514315cbfeaaac78590b",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 3906,
+        "y": 1522,
+        "w": 178,
+        "h": 44
+      },
+      "sourceSize": {
+        "w": 178,
+        "h": 44
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 178,
+        "h": 44
+      },
+      "role": "Enemy skill label",
+      "rendererEvidence": "Pos.createSkillBtn -> eKi.GetFilterNobordBtn: sizeGrid5, sourceScale2; Pos.Init descPanel/rewardPanel.SetRes for directional arrows."
+    },
+    {
+      "file": "rogue_arrow_up.png",
+      "width": 86,
+      "height": 58,
+      "bytes": 10021,
+      "sha256": "a97c0268b10364b419f38bebe3d37bb92647fa1edc0386f9357fe5f96ce6a4ef",
+      "rgbaSha256": "e8ecf5efc2f09256cfa0af7a89e22ad0941fc42e5489e85758f8f5489f2298e2",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 3378,
+        "y": 292,
+        "w": 86,
+        "h": 58
+      },
+      "sourceSize": {
+        "w": 86,
+        "h": 58
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 86,
+        "h": 58
+      },
+      "role": "Original encounter scroll direction arrow",
+      "rendererEvidence": "Pos.createSkillBtn -> eKi.GetFilterNobordBtn: sizeGrid5, sourceScale2; Pos.Init descPanel/rewardPanel.SetRes for directional arrows."
+    },
+    {
+      "file": "rogue_arrow_down.png",
+      "width": 86,
+      "height": 58,
+      "bytes": 10077,
+      "sha256": "7bc95cc558110dab965af36837b26a0d959f9a87f52e9a0e70d2ae64f189b111",
+      "rgbaSha256": "96b3de6a8bbd99cfaeea961b9c4b6084e43d151d34bf81de5a1ac55fe6ae95d7",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 3378,
+        "y": 226,
+        "w": 86,
+        "h": 58
+      },
+      "sourceSize": {
+        "w": 86,
+        "h": 58
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 86,
+        "h": 58
+      },
+      "role": "Original encounter scroll direction arrow",
+      "rendererEvidence": "Pos.createSkillBtn -> eKi.GetFilterNobordBtn: sizeGrid5, sourceScale2; Pos.Init descPanel/rewardPanel.SetRes for directional arrows."
+    },
+    {
+      "file": "rogue_arrow_left.png",
+      "width": 58,
+      "height": 86,
+      "bytes": 10024,
+      "sha256": "a498b888770bd7dbdf8f5ec73d753f06d3a0df9cb441dc2adfd1ec2f3a5f46d3",
+      "rgbaSha256": "5858eaa69563d1c3f26fc0509b2013d5f616da74d9e15309e19c88d96c744dce",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 2626,
+        "y": 1290,
+        "w": 58,
+        "h": 86
+      },
+      "sourceSize": {
+        "w": 58,
+        "h": 86
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 58,
+        "h": 86
+      },
+      "role": "Original encounter scroll direction arrow",
+      "rendererEvidence": "Pos.createSkillBtn -> eKi.GetFilterNobordBtn: sizeGrid5, sourceScale2; Pos.Init descPanel/rewardPanel.SetRes for directional arrows."
+    },
+    {
+      "file": "rogue_arrow_right.png",
+      "width": 58,
+      "height": 86,
+      "bytes": 10048,
+      "sha256": "489b4ec8002c7bf911ede42abd451ec1b2927cff8035175a7d0c324d0a9c6c9e",
+      "rgbaSha256": "9cf949ee63fbefcc0989e6a7a4a6bbb39debf1c5a7902c98184464df9550fd1f",
+      "sourceKind": "atlasFrame",
+      "sourceAtlas": "baseUI",
+      "frame": {
+        "idx": 0,
+        "x": 2626,
+        "y": 1384,
+        "w": 58,
+        "h": 86
+      },
+      "sourceSize": {
+        "w": 58,
+        "h": 86
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 58,
+        "h": 86
+      },
+      "role": "Original encounter scroll direction arrow",
+      "rendererEvidence": "Pos.createSkillBtn -> eKi.GetFilterNobordBtn: sizeGrid5, sourceScale2; Pos.Init descPanel/rewardPanel.SetRes for directional arrows."
+    }
+  ],
+  "identityAssets": {
+    "layoutDataFile": "src/CardGame.Wpf/Assets/Data/shanhe-encounter-layouts.json",
+    "sourceDocument": "docs/content/shanhe-encounter-layout-sources.json",
+    "usage": "Use the source commander/vanguard identity images only after the complete encounter roster passes the explicit layout whitelist. These three source groups have Generalshow0. Unknown or mismatched rosters keep the existing generic presentation."
+  },
+  "reusedAssets": [
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Hud/genearlBaseBg.png",
+      "sourceManifest": "docs/content/shanhe-hud-ui-assets.json",
+      "renderer": "q6t -> Fos -> Kas.initGeneralBg",
+      "logicalSize": [
+        154,
+        180
+      ],
+      "nineSlice": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "evidence": "The enemy main card uses the already imported hero base. The white-wave group2425 has GeneralRank0, so no higher-grade decorative frame is added."
+    }
+  ],
+  "layoutEvidence": {
+    "logicalCanvas": [
+      784,
+      452
+    ],
+    "background": {
+      "position": [
+        0,
+        0
+      ],
+      "size": [
+        784,
+        452
+      ],
+      "nineSlice": null,
+      "composition": "Frame, flag silhouettes and narrative-panel outline are one complete image. Preserve its aspect ratio rather than stretching separate edges."
+    },
+    "narrative": {
+      "title": {
+        "position": [
+          72,
+          70
+        ],
+        "width": 208,
+        "fontSize": 32,
+        "font": "Lishu",
+        "color": "#EEB45E",
+        "align": "center"
+      },
+      "descriptionViewport": {
+        "position": [
+          72,
+          105
+        ],
+        "size": [
+          208,
+          153
+        ],
+        "scroll": "vertical",
+        "fontSize": 12,
+        "color": "#D9C29F",
+        "lineSpacing": 2
+      },
+      "sceneSkill": {
+        "initialPosition": [
+          72,
+          250
+        ],
+        "width": 208,
+        "fontSize": 12,
+        "color": "#E2D39F",
+        "layoutRule": "Final y is min(270 - measured text height, 250). If the optional scene-skill background is visible, the description viewport is shortened to end above it."
+      }
+    },
+    "rewards": {
+      "titleImagePosition": [
+        94,
+        279
+      ],
+      "titleImageSize": [
+        166,
+        21
+      ],
+      "titleLabelPosition": [
+        94,
+        280
+      ],
+      "titleLabelSize": [
+        166,
+        18
+      ],
+      "titleFontSize": 18,
+      "viewport": {
+        "position": [
+          72,
+          312
+        ],
+        "size": [
+          208,
+          85
+        ],
+        "scroll": "horizontal"
+      },
+      "cellSize": [
+        56,
+        56
+      ],
+      "gap": 18,
+      "iconPositionInCell": [
+        7,
+        7
+      ],
+      "iconSize": [
+        41,
+        42
+      ],
+      "nameY": 61,
+      "nameFontSize": 12
+    },
+    "enemies": {
+      "mainCardViewport": {
+        "x": 389,
+        "size": [
+          298,
+          170
+        ],
+        "scroll": "horizontal",
+        "yRule": "45 when the lower formation is visible and the single main card has skill buttons; otherwise 62 when the formation is visible, or 106 without the formation."
+      },
+      "mainCardSourceSize": [
+        146,
+        172
+      ],
+      "mainCardScale": 0.8,
+      "mainCardScaledSize": [
+        116,
+        137
+      ],
+      "singleCardLocalPosition": [
+        91,
+        10
+      ],
+      "multipleCardLocalPosition": "x = 15 + index * (116 + 20); y = 10",
+      "skillViewport": {
+        "x": 389,
+        "yRule": "mainCardViewport.y + 162",
+        "size": [
+          298,
+          23
+        ],
+        "scroll": "horizontal"
+      },
+      "skillButtonSize": [
+        42,
+        23
+      ],
+      "skillButtonGap": 3,
+      "skillButtonFontSize": 12,
+      "formationTitlePosition": [
+        389,
+        246
+      ],
+      "formationViewport": {
+        "position": [
+          389,
+          273
+        ],
+        "size": [
+          298,
+          65
+        ],
+        "scroll": "horizontal"
+      },
+      "sourceGrouping": "After source chapter and hide filtering, NPCs are partitioned by their IsBoss flag while preserving their relative order. When commanders exist they are the main cards and ordinary NPCs become lower portraits. Without commanders all ordinary NPCs become main cards and the lower formation is hidden.",
+      "sourceInteraction": "There is no portrait-click selection that swaps one main card. Multiple main cards scroll horizontally. Separate skill buttons are created only for a single main card; multiple main cards retain their own tooltips.",
+      "adaptation": "Encounter kind chooses the normal or boss background. The per-NPC commander flag chooses main-card grouping and is independent of the encounter kind. WPF adaptations must retain access to the entire enemy roster and long skill or rule descriptions.",
+      "whiteWaveExample": {
+        "fightId": 2425,
+        "name": "白波叛军",
+        "mainCard": {
+          "generalId": 4871,
+          "name": "杨奉",
+          "IsBoss": true,
+          "GeneralRank": 0
+        },
+        "lowerPortrait": {
+          "generalId": 496,
+          "name": "徐晃",
+          "IsBoss": false,
+          "GeneralRank": 0
+        }
+      }
+    },
+    "challengeButton": {
+      "renderer": "eKi.GetRedSmallBtn",
+      "size": [
+        126,
+        41
+      ],
+      "x": 475,
+      "yRule": "365 with the lower formation; 305 without it.",
+      "nineSlice": {
+        "values": [
+          18,
+          30,
+          18,
+          30
+        ],
+        "order": [
+          "top",
+          "right",
+          "bottom",
+          "left"
+        ],
+        "unit": "logical client pixels"
+      },
+      "label": "A separate localized text label; the source PNG contains no baked text."
+    },
+    "closeButton": {
+      "position": [
+        750,
+        9
+      ],
+      "size": [
+        22,
+        23
+      ],
+      "renderer": "Pos.layout overrides the final position."
+    }
+  },
+  "skillLabelSkin": {
+    "nineSliceLogical": [
+      5,
+      5,
+      5,
+      5
+    ],
+    "sourceScale": 2,
+    "font": "SimSun",
+    "states": {
+      "normal": "normal",
+      "hover": "over",
+      "focus": "over",
+      "disabled": "disable"
+    },
+    "behavior": "Read-only focusable skill label with complete rule tooltip."
+  },
+  "scrollbarAdaptation": "Original directional arrows combined with native WPF Track/Thumb and routed line/page commands. Scoped to encounter preview to retain dragging, wheel and keyboard navigation."
+}

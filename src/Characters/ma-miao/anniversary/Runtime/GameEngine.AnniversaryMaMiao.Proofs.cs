@@ -96,11 +96,5 @@ public sealed partial class GameEngine
         var i = _resolutionStack.FindIndex(x => x.Id == f.Id); var j = _resolutionStack.FindIndex(x => x.Id == recovery.Id);
         return i >= 0 && j > i && MaMiaoFirstChild(f, _resolutionStack[i + 1]) && (j == i + 1 || SameNameHandObserverSuffix(i)) && RecoveryReplacementFrameRidesOn(recovery, _resolutionStack[j - 1]);
     }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 48800)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 48800)] private bool MaMiaoNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || MaMiaoObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 48800)] private bool AdvanceMaMiaoChildren() => _pendingDecision is null && MaMiaoObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

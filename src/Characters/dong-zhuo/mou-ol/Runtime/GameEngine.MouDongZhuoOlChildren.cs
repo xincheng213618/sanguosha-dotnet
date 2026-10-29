@@ -43,14 +43,6 @@ public sealed partial class GameEngine
     private bool MouDongZhuoOlBeforeDamage(long id)=>MouDongZhuoOlRoot()is{}f&&_resolutionStack.FindIndex(x=>x.Id==id&&x is BeforeDamageProgramWindowFrame)>_resolutionStack.FindIndex(x=>x.Id==f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant,34700)][ProgramDyingProof(ProgramDyingProofPhase.Runtime,34700)]
     private bool MouDongZhuoOlDying()=>ActiveDying is{}d&&MouDongZhuoOlRoot()is{}f&&_resolutionStack.FindIndex(x=>x.Id==d.Id)>_resolutionStack.FindIndex(x=>x.Id==f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts,34700)][ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts,34700)]
-    private bool MouDongZhuoOlNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||sourceLess)return false;
-        if(MouDongZhuoOl.Valid(f)&&f.MouDongZhuoOl is{Stage:MouDongZhuoOlStage.Damage}r)return target==r.Payer&&amount==1&&source is null&&nature is null;
-        if(MouDongZhuoOlRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);
-        return e is{Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor,34700)][ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor,34700)]
     private bool MouDongZhuoOlRecoveryParent(ProgramSkillFrame f,RecoveryReplacementFrame recovery)
     {if(MouDongZhuoOlFirstChild(f,recovery))return true;var n=_resolutionStack.FindIndex(x=>x.Id==f.Id);var c=_resolutionStack.FindIndex(x=>x.Id==recovery.Id);

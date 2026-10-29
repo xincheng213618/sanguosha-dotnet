@@ -138,18 +138,6 @@ public sealed partial class GameEngine
     private bool HasMouXuHuangBeforeDamageObserver(long id) => MouXuHuangObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1310)]
     private bool IsMouXuHuangDying() => ActiveDying is { } dying && MouXuHuangObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 110)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1900)]
-    private bool AllowsMouXuHuangNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess) return false;
-        if (f.MouXuHuangShipo is { Stage: MouXuHuangShipoStage.Damage } r && ValidMouXuHuangShipo(f))
-            return r.Cursor < r.Targets.Count && target == r.Targets[r.Cursor] && amount == 1 && source is null && nature is null;
-        if (MouXuHuangObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f);
-        return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature &&
-            target == (e.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 510)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 500)]
     private bool IsMouXuHuangRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

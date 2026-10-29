@@ -139,6 +139,7 @@ internal static class Program
             Check("Identity concealment UI: ActualProjectedConcealmentAndAppearanceBridge", () => IdentityConcealmentViewChecks.ActualProjectedConcealmentAndAppearanceBridge(output));
             Check("Named private pile UI: owner pairs public counts and clear", () => NamedPrivatePileUiChecks.OwnerPairsPublicCountsAndClearingUseSharedReadOnlyFaces(output));
             Check("overlapping hand cards keep stable pointer targets", () => HandPointerChecks.OverlapAndPointer(output));
+            Check("Dense hand UI: 78 cards single row selection and native confirmation", () => MultiCardDraftUiChecks.DenseHandStaysInOneRowAndPreservesNativeSelection(output));
             Check("hand motion preserves surviving positions across equal-count replacements", () => HandReflowChecks.EqualCountReplacement(output));
             Check("general selection input respects overlays and consecutive national prompts", () => GeneralSelectionChecks.InputBoundaries(output));
             Check("Opening customization UI: identities roster and hand confirmation", () => OpeningCustomizationUiChecks.RolesRosterAndHandConfirmation(output));
@@ -161,11 +162,15 @@ internal static class Program
             Check("Shanhe opening UI: native hand reroll confirmation fresh retries and save failure", () => ShanheCampaignUiChecks.OpeningHandRerollsAndFreshRetryUseTheRealTable(output));
             Check("Match lifecycle UI: fresh modes retain history without resume saves", () => ShanheCampaignUiChecks.OrdinaryModesKeepHistoryWithoutResumeSaves(output));
             Check("Shanhe story UI: recruitment variants skills copper and combat buttons", () => ShanheStoryEventUiChecks.RecruitmentSkillChoicesAndBattleButtons(output));
-            Check("Shanhe companion UI: ordinary and elite opening rows show names and rules", ShanheCompanionRosterUiChecks.BothOpeningCompanionsShowTheirOwnNamesAndRules);
+            Check("Shanhe rewards UI: new runs and safe legacy continuation", ShanheBalancedJourneyUiChecks.NewRunsOptInAndLegacyContinueUpgradesOnlyFutureRewards);
+            Check("Shanhe companion UI: bottom hand tactics skills and companion portraits", () => ShanheCompanionRosterUiChecks.BothOpeningCompanionsShowTheirOwnNamesAndRules(output));
             Check("Shanhe guide tasks UI: original conditions and pending scores stay read-only", () => ShanheGuideTaskUiChecks.OriginalConditionsAndPendingScoresRemainReadOnly(output));
             Check("Shanhe guide tasks: native progress atomic book retry and cold", ShanheGuideTaskSettlementChecks.NativeBattleProgressAndAtomicTaskBooksRetryCold);
             Check("Shanhe source difficulty: save settlement and legacy tier boundaries", ShanheGuideTaskSettlementChecks.SourceEditionDifficultyPersistsAndLegacyTiersStayBounded);
             Check("Shanhe source difficulty UI: tier 25 actual battle and cold restore", () => ShanheSourceDifficultyUiChecks.SourceSelectionStartsActualBattleAndRestoresTwentyFifthTier(output));
+            Check("Shanhe chapter map UI: readable bounded route and native node buttons", () => ShanheChapterMapLayoutUiChecks.ReadableBoundedRouteAndNativeNodeButtons(output));
+            Check("Shanhe chapter route UI: stages extra battles and progress", () => ShanheRewardUiChecks.ChapterRouteStagesExtraBattlesAndStatusRemainAccurate(output));
+            Check("Shanhe chapter rest UI: staged choice and native growth cold", () => ShanheRewardUiChecks.RestCardsStageOneNativeGrowthAndRestoreWithoutSpending(output));
             Check("Shanhe choices UI: pending events and camps remain visible with permanent market", ShanheStoryEventUiChecks.PendingChoicesRemainVisibleWithMarket);
             Check("Shanhe campaign UI: actual encounter save routing and stale map choices", () => ShanheCampaignUiChecks.ActualEncounterSaveRoutingAndStaleMapChoices(output));
             Check("Shanhe campaign UI: edition selection exclusive boss and cold restore", () => ShanheCampaignUiChecks.EditionSelectionExclusiveBossAndColdRestore(output));
@@ -179,8 +184,11 @@ internal static class Program
             Check("Shanhe third chapter elite: complete roster preview and onward rewards", ShanheThirdChapterEliteUiChecks.OptionalElitePreviewsCompleteRosterAndRewardsWithoutFinalSettlement);
             Check("Shanhe campaign UI: published boss portraits render on actual seats", () => ShanheBossPortraitChecks.PublishedS5BossAliasesDecodeAndRenderOnRealSeats(output));
             Check("Shanhe campaign UI: inheritance before map and cold restore", () => ShanheCampaignUiChecks.InheritanceOffersBeforeFirstMapAndSurvivesColdRestore(output));
+            Check("Shanhe inheritance UI: complete card and confirm hit targets", () => ShanheInheritanceHitTargetUiChecks.RealWindowInheritanceCardsAndConfirmHaveCompleteHitTargets(output));
             Check("Shanhe campaign UI: pre-run catalogue and collection navigation", () => ShanheModulesUiChecks.PreRunCatalogAndCollectionNavigation(output));
             Check("Shanhe tactic UI: owned passive badges and active skill entries", () => ShanheTacticRailUiChecks.OwnedTacticsUseSharedBadgesAndPreserveActiveSkillEntries(output));
+            Check("Shanhe tactic UI: opening actions below tactics", () => ShanheTacticOpeningLayoutUiChecks.OpeningActionsRemainReachableBelowTactics(output));
+            Check("Shanhe opening performance: staged battle and pending hand", () => ShanheOpeningPerformanceChecks.StagedBattleAndPendingHand(output));
             Check("Shanhe codex UI: bounded opening selection and reopening", () => ShanheCodexPerformanceChecks.OpenSelectAndReopen(output));
             Check("Shanhe codex UI: unlock equip persist and market", () => ShanheCodexUiChecks.UnlockEquipPersistAndMarket(output));
             Check("Shanhe market UI: free refresh clicks paid allowance and zero wallet", () => ShanheCodexUiChecks.FreeRefreshClicksKeepPaidAllowancePricesAndZeroWalletState(output));
@@ -199,6 +207,7 @@ internal static class Program
             Check("Shanhe run records: real history tab keeps completed runs and credited books", () => ShanheRunRecordUiChecks.CompletedRunsRemainVisibleInTheRealHistoryTab(output));
             Check("Shanhe reward UI: real victory cards confirmation skip skill and replacement", () => ShanheRewardUiChecks.RealVictoryRewardCardsConfirmSkipSkillAndReplacement(output));
             Check("Shanhe elite reward UI: automatic rare offers card compensation and mandatory tactics", () => ShanheRewardUiChecks.AutomaticRareEliteOffersAllowCardCompensationAndRequireTacticClaim(output));
+            Check("Shanhe elite reward UI: wolf preview uses effective reward profile", () => ShanheRewardUiChecks.WolfPreviewUsesTheEffectiveEliteRewardProfile(output));
             Check("Shanhe reward UI: grouped card skill decline and mandatory tactic", () => ShanheRewardUiChecks.BossCardAndRareSkillDeclinesKeepTacticGroupMandatory(output));
             Check("Shanhe difficulty UI: published preview and actual challenge stats", ShanheDifficultyPreviewUiChecks.PublishedDifficultyPreviewUsesActualChallengeStats);
             Check("Shanhe reward UI: boss bundles advance through three chapters", () => ShanheRewardUiChecks.BossBundlesRequireEachGroupThenAdvanceThreeChapters(output));

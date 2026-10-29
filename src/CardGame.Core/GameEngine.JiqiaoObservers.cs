@@ -57,12 +57,6 @@ public sealed partial class GameEngine
     private bool IsJiqiaoDying()=>ActiveDying is {} d && JiqiaoObserverRoot() is {} root && _resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 150)]
     private bool TryAdvanceJiqiaoSubtree()=>_pendingDecision is null && JiqiaoObserverRoot() is not null && TryAdvanceObserverSubtree(advanceRecoveryReplacement:true);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 420)]
-    private bool AllowsJiqiaoNestedDamage(ProgramSkillFrame o,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess || o.AttackAttempt is not null || o.InstructionIndex<1 || _resolutionStack.LastOrDefault()?.Id!=o.Id || JiqiaoObserverRoot() is not {} root || root.Id==o.Id)return false;
-        var e=GetPausedPrivateOfferEffect(o);return e is {Op:SkillProgramEffectOp.Damage} && amount==e.Amount && source==e.ActorReference && nature==e.DamageNature && target==(e.TargetReference is {} p?ResolveProgramParticipant(o,p):ResolveProgramEffectTarget(o,e.Target));
-    }
     [ProgramCapability]
     private sealed class JiqiaoProgramCapability(GameEngine engine) : IJiqiaoProgramHost
     {public SkillProgramStepOutcome ExecutePaidJiqiao(ProgramSkillFrame f,SkillProgramEffect e)=>engine.ExecutePaidJiqiao(f,e);}

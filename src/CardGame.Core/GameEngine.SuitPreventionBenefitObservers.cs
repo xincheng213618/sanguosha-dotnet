@@ -105,7 +105,7 @@ public sealed partial class GameEngine
         if (child is DyingFrame dying && parent is DamageFrame fatal)
             return dying.Continuation == DyingContinuationKind.Damage && dying.ParentFrameId == fatal.Id && dying.VictimSeat == fatal.TargetSeat &&
                 CompleteProgramEventHistory().OfType<PlayerDyingEvent>().Any(e => e.ResolutionId == dying.Id && e.VictimSeat == dying.VictimSeat);
-        return PaidTargetObserverEdge(index);
+        return ProgramChildResolutionEdge(index);
     }
     private ProgramSkillFrame? SuitPlacementObserverRoot(long? beforeDamageId = null)
     {

@@ -357,7 +357,7 @@ public sealed partial class GameEngine
                     changed.Continuation == ProgramLifecycleContinuation.ResumeParentProgram &&
                     changed.CandidateIndex >= 0 && changed.CandidateIndex <= changed.Candidates.Count) continue;
                 if (!DyingSuitsStructuralEdge(_resolutionStack[child - 1], _resolutionStack[child]) &&
-                    !HalfHandPaidDamageObserverEdge(child) && !PaidTargetObserverEdge(child)) { aligned = false; break; }
+                    !HalfHandPaidDamageObserverEdge(child) && !ProgramChildResolutionEdge(child)) { aligned = false; break; }
                 if (_resolutionStack[child] is DyingFrame dying && child + 1 < _resolutionStack.Count &&
                     ((IsOriginalDyingSuspendedByDyingSuits(dying) || IsOriginalDyingSuspendedByRecipientCategoryMark(dying)) || IsOriginalDyingSuspendedByOwnedDeathBenefit(dying) ||
                      IsPaidHandRepaymentProgramAlcoholRide(child, dying) || IsPaidHandRepaymentRescueRide(child, dying) ||
@@ -374,19 +374,6 @@ public sealed partial class GameEngine
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1940)]
     private bool HasCategoryActivationDamageObserver(long id) => _resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) &&
         (CategoryActivationObserverRoot(false) is not null || CategoryActivationObserverRoot(true) is not null);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 220)]
-    private bool AllowsCategoryActivationNestedDamage(ProgramSkillFrame f, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || f.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != f.Id ||
-            f.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or
-                SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or
-                SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) ||
-            (CategoryActivationObserverRoot(false) ?? CategoryActivationObserverRoot(true)) is not { } root || root.Id == f.Id) return false;
-        var e = ProgramInstructionResolver.Default.Resolve(f, _contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        return e.Op == SkillProgramEffectOp.Damage && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature &&
-            target == (e.TargetReference is { } reference ? ResolveProgramParticipant(f, reference) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramCapability]
     private sealed class DrawDiscardCategoryProgramCapability(GameEngine engine) : IDrawDiscardCategoryProgramHost
     {

@@ -71,6 +71,13 @@ internal static class ShanheBossOpeningStageChecks
             Events<WinnerDeterminedEvent>(game).Length == 0 && Events<ShanheBossResolutionCancelledEvent>(game).Length == 0 &&
             Events<ShanheBossTurnInterruptedEvent>(game).Length == 0 && Events<TurnEndedEvent>(game).Length == 0,
             "Opening transformation must neither announce first-form death nor cancel pending startup children or manufacture an ended actual turn zero.");
+        var logCut = ShanheBossStageChecks.RequireNativeStageLogBoundary(game, requireLethalDamage: true);
+        var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), Registry.Value);
+        Need(JsonSerializer.Serialize(game.Events) == JsonSerializer.Serialize(restored.Events) &&
+            JsonSerializer.Serialize(game.Log) == JsonSerializer.Serialize(restored.Log) &&
+            ShanheBossStageChecks.RequireNativeStageLogBoundary(restored, requireLethalDamage: true) == logCut,
+            "Cold opening replay preserves the typed turn-zero stage boundary, original fatal Damage and later second-form native draw/announcement logs.");
+        game = restored;
 
         Until(game, () => game.PendingDecision is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
         var openingSources = PreparationSkills.Append(Driver).ToArray();

@@ -58,19 +58,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 210, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 330)]
     private bool IsNamedAcquisitionProgramDying() => ActiveDying is not null && NamedAcquisitionObserverRoot() is not null;
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 80)]
-    private bool AllowsFireOrNamedNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (_resolutionStack.LastOrDefault()?.Id != observer.Id || observer.AttackAttempt is not null || observer.InstructionIndex < 1 ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.AfterHpRecovered or
-                SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost) ||
-            FireTargetBenefitObserverRoot() is null && NamedAcquisitionObserverRoot() is null) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!)
-            .GetPausedInstruction(observer.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            !sourceLess && target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target));
-    }
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 40)]
     private bool CanStartLostHpTargetSelection(CharacterState owner, SkillProgramActivation activation)

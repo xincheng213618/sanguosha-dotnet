@@ -65,18 +65,6 @@ public sealed partial class GameEngine
     private bool IsOlMoRumoDying() => ActiveDying is { } dying && OlMoRumoObserverRoot() is { } root &&
         _resolutionStack.FindIndex(item => item.Id == dying.Id) > _resolutionStack.FindIndex(item => item.Id == root.Id);
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1700)]
-    private bool AllowsOlMoRumoNestedDamage(ProgramSkillFrame frame, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (frame.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != frame.Id ||
-            OlMoRumoObserverRoot() is not { } root || root.Id == frame.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(frame);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount &&
-            effect.ActorReference == source && effect.DamageNature == nature && !sourceLess &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(frame, reference) :
-                ResolveProgramEffectTarget(frame, effect.Target));
-    }
 
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 390)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 380)]

@@ -17,12 +17,6 @@ public sealed partial class GameEngine
     private bool HasAHuiNanBeforeDamageObserver(long id)=>HasAHuiNanDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 660)]
     private bool IsAHuiNanDying()=>ActiveDying is{}d&&AHuiNanObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 2030)]
-    private bool AllowsAHuiNanNestedDamage(ProgramSkillFrame f,int targetSeat,int amount,ProgramParticipantReference? sourceReference,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||AHuiNanObserverRoot()is not{}root||root.Id==f.Id)return false;
-        var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==sourceReference&&e.DamageNature==nature&&targetSeat==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27200)]private bool AdvanceAHuiNanChildren()=>_pendingDecision is null&&AHuiNanObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveJuemanFirstBasicTurnEnd)]private PromptChoice AiAHuiNan(PendingDecision p,ProgramSkillFrame f)
     {

@@ -38,8 +38,5 @@ public sealed partial class GameEngine
     private bool HasCuiYanBeforeDamageObserver(long id)=>HasCuiYanDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 900)]
     private bool IsCuiYanDying()=>IsCuiYanOriginalDyingRide()||ActiveDying is{}d&&CuiYanObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1470)]
-    private bool AllowsCuiYanNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||CuiYanObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27470)]private bool AdvanceCuiYanChildren()=>_pendingDecision is null&&CuiYanObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

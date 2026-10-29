@@ -530,6 +530,9 @@ internal static partial class ShanheCampaignChecks
     internal static ContentRegistry Registry(ShanheBattleSetup setup)
     {
         List<IGameContentPackage> packages = [new StandardContentPackage(), new FixtureBattlePackage(setup)];
+        if (setup.TacticSkillIds.Any(id => id is StandardShanheWealthPackage.WealthHandLimitSkillId or
+            StandardShanheWealthPackage.WealthInitialHandSkillId or StandardShanheWealthPackage.WealthDrawSkillId or
+            StandardShanheWealthPackage.WealthDamageSkillId)) packages.Add(new StandardShanheWealthPackage());
         if (setup.RebirthAvailable) packages.Add(new StandardShanheRankPrivilegePackage());
         if (setup.MarketSetup is not null) packages.Add(new StandardShanheMarketPackage());
         return ContentRegistry.Build(packages.ToArray());

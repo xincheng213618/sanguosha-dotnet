@@ -23,7 +23,7 @@ public sealed partial class MainViewModel
     public IEnumerable<ShanheCampaignChoice> ShanheShopActions => IsShanheShopActive ? ShanheChoices.Where(choice => _shanheSession!.Snapshot.NodeChoices.Any(option => option.Id == choice.Id && option.RewardId is null)) : [];
     public int ShanheShopItemCount => ShanheShopItems.Count;
     public int ShanheCodexCount => ShanheCodexCards.Count;
-    public string ShanheShopNotice => IsShanheShopActive ? "随时购买 · 悬停查看完整规则" : "货品预览";
+    public string ShanheShopNotice => IsShanheShopActive ? "随时购买 · 悬停或聚焦卡片查看完整规则" : "货品预览";
     public string ShanheBuildSummary => CurrentShanheBuildState is { } state
         ? $"{ShanheRankStatusText}   |   体力上限 +{state.Bonuses.MaxHp} · 起手 +{state.Bonuses.InitialHand} · 摸牌 +{state.Bonuses.Draw} · 出杀 +{state.Bonuses.Slash}   |   额外技能 {state.ExtraSkillIds.Count}/{state.ExtraSkillSlots}"
         : "尚未出征 · 可先浏览本篇战法，出征后在此查看基础整备与技能槽。";
@@ -37,26 +37,43 @@ public sealed partial class MainViewModel
         ShanheShopItems.Clear();
         if (IsShanheShopActive)
         {
-            foreach (var product in CurrentShanheMarketState!.ShopItems.Where(product => product.Reward is not null))
+            var marketState = CurrentShanheMarketState!;
+            foreach (var product in marketState.ShopItems.Where(product => product.Reward is not null))
             {
                 var reward = product.Reward;
                 var choices = CurrentShanheMarketChoices.Where(choice => choice.Id == product.ChoiceId &&
                     (choice.ReplaceSkillId is null || product.ReplaceableSkillIds.Contains(choice.ReplaceSkillId))).ToArray();
+                var missingGold = Math.Max(0L, (long)product.GoldCost - marketState.Gold);
+                var missingHealth = product.HpCost > 0 && marketState.Hp <= product.HpCost;
                 var status = product.State switch
                 {
                     ShanheShopItemState.Purchased => "已购",
                     ShanheShopItemState.AlreadyOwned => "已拥有",
-                    ShanheShopItemState.InsufficientResources => "铜币或体力不足",
+                    ShanheShopItemState.InsufficientResources => (missingGold > 0, missingHealth) switch
+                    {
+                        (true, true) => "铜币与体力不足",
+                        (true, false) => "铜币不足",
+                        (false, true) => "体力不足",
+                        _ => "铜币或体力不足"
+                    },
                     ShanheShopItemState.NoSkillSlot => "没有可用技能槽",
                     ShanheShopItemState.RewardLimitReached => "已达获得上限",
                     _ => "购买"
                 };
+                var resourceHints = new List<string>();
+                if (product.State == ShanheShopItemState.InsufficientResources && missingGold > 0)
+                    resourceHints.Add($"还差 {missingGold} 铜币");
+                if (product.HpCost > 0)
+                    resourceHints.Add(product.State == ShanheShopItemState.InsufficientResources && missingHealth
+                        ? $"体力至少 {(long)product.HpCost + 1} 点（当前 {marketState.Hp}），支付后留1点"
+                        : "支付后需留1点体力");
                 if (choices.Length == 0 || !product.CanPurchase)
                     AddProduct(null, status);
                 else AddProduct(choices[0], choices[0].ReplaceSkillId is null ? status : "购买 · 选择替换技能");
                 void AddProduct(ShanheCampaignChoice? choice, string label) => ShanheShopItems.Add(DecorateShanheProduct(new(
                     product.ChoiceId, reward?.Name ?? product.Name, product.Description, reward is null ? "" : RewardRule(reward),
-                    product.GoldCost, label, choice, product.HpCost, reward is null ? "行商货品" : RewardCategory(reward), product.State), reward));
+                    product.GoldCost, label, choice, product.HpCost, reward is null ? "行商货品" : RewardCategory(reward), product.State)
+                    { ResourceHint = string.Join("\n", resourceHints) }, reward));
             }
         }
         else
@@ -67,7 +84,8 @@ public sealed partial class MainViewModel
             {
                 var reward = definition.Rewards.Single(item => item.Id == entry.RewardId);
                 ShanheShopItems.Add(DecorateShanheProduct(new(entry.Id, reward.Name, reward.Description, RewardRule(reward), entry.GoldCost,
-                    "货品图鉴 · 预览", null, entry.HpCost, RewardCategory(reward)), reward));
+                    "货品图鉴 · 预览", null, entry.HpCost, RewardCategory(reward))
+                    { ResourceHint = entry.HpCost > 0 ? "支付后需留1点体力" : string.Empty }, reward));
             }
         }
         RefreshShanheCodex();
@@ -88,15 +106,21 @@ public sealed partial class MainViewModel
                     reward.TacticSkillId is null ? "基础整备 · 成长效果见上方" :
                     state?.TacticIds.Contains(reward.Id) == true ? "战法 · 本次征程已获得" : "战法图鉴 · 尚未获得"));
         foreach (var property in new[] { nameof(IsShanheShopActive), nameof(IsShanheShopNodeActive), nameof(ShanheShopActions), nameof(ShanheShopItemCount), nameof(ShanheCodexCount), nameof(ShanheShopNotice), nameof(ShanheCodexNotice), nameof(ShanheBuildSummary) }) RaisePropertyChanged(property);
+        NotifyShanheJourneyLoadout();
+        RaisePropertyChanged(nameof(IsShanheChapterMarketUnlocked));
+        RaisePropertyChanged(nameof(ShanheChapterMarketHint));
+        _openShanheMarketCommand?.NotifyCanExecuteChanged();
     }
     private static ShanheShopItem DecorateShanheProduct(ShanheShopItem item, ShanheRewardDefinition? reward)
     {
         if (reward is null) return item;
         var card = reward.StartingEquipment?.FirstOrDefault() ?? reward.StartingCards?.FirstOrDefault();
         var entry = ShanheCodexTree.Entries.FirstOrDefault(node => ShanheCodexTree.RuntimeRewardId(node.Id) == reward.Id);
-        var rarity = StandardShanheCampaignCatalog.ShopMetadataByRewardId.TryGetValue(reward.Id, out var metadata) ? metadata.Rarity : entry?.Rarity;
+        var rarity = Math.Clamp(StandardShanheCampaignCatalog.ShopMetadataByRewardId.TryGetValue(reward.Id, out var metadata)
+            ? metadata.Rarity : entry?.Rarity ?? reward.Rarity, 1, 4);
         return item with
         {
+            Rarity = rarity,
             TacticImage = IsShanheTactic(reward) ? ShanheArt.Get(metadata?.SourceRewardId ?? entry?.RewardId ?? 0) : null,
             CardImage = card is null ? null : ShanheArt.Get(metadata?.SourceRewardId ?? entry?.RewardId ?? 0) ?? CardArt.Get(card.Kind),
             CardRuleDescription = card is null ? string.Empty : CardCatalog.Get(card.Kind).Description,
@@ -122,11 +146,20 @@ public sealed record ShanheShopItem(string Id, string Name, string Description, 
     public System.Windows.Media.ImageSource? RankArtwork { get; init; }
     public System.Windows.Media.ImageSource? SuitArtwork { get; init; }
     public bool HasCardImage => CardImage is not null;
+    public int Rarity { get; init; } = 1;
+    public string QualityText => Rarity switch { 2 => "稀有", 3 => "史诗", 4 => "传说", _ => "普通" };
+    public string HeadingText => QualityText + " · " + MarketCategory;
+    public int TypeIconIndex => MarketCategory switch { "战法" => 2, "技能" => 3, "卡牌" or "装备" => 4, _ => 0 };
     public string Accent { get; init; } = "#987653";
     public string MarketCategory => Category switch { "额外技能" => "技能", "随身装备" => "装备", "随身牌" => "卡牌", _ => Category };
-    public string DisplayName => Name.Replace("战法·", "").Replace("传习·", "");
+    public string DisplayName => ShanheDisplayText.RewardName(Name);
     public string Glyph => DisplayName[..Math.Min(2, DisplayName.Length)];
     public bool CanBuy => Choice?.IsEnabled == true;
+    public string ResourceHint { get; init; } = string.Empty;
+    public bool HasResourceHint => !string.IsNullOrWhiteSpace(ResourceHint);
+    public string CardStatusText => Status == "购买" ? "可购买" : Status;
+    public bool ShowPurchasedStamp => State == ShanheShopItemState.Purchased;
+    public System.Windows.Media.ImageSource? PurchasedStampArtwork => WushuangArt.Get("rogue1v1_had_buy.png");
     public string ShopSummary => MarketCategory is "卡牌" or "装备" ? "获得卡牌" :
         ShanheDisplayText.Effect(ShanheDisplayText.Rule(Description, RuleDescription));
     public string ShopTooltip => !string.IsNullOrWhiteSpace(CardRuleDescription) ? CardRuleDescription :

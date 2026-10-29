@@ -32,7 +32,7 @@ public sealed class StandardShanheSourceWuhuanRiderPackage : IGameContentPackage
 
         void Add(string id, string tier, string[] addedSkills) => builder.AddGeneral(new(id, "乌桓骑手",
             // General4861 is the source soldier, not Gongsun Yuan's body. The
-            // source d=1000107 portrait is unverified; supporter is a local fallback.
+            // runtime supporter fallback; exact source art is resolved by the desktop ID binding.
             "supporter", "classic:huaiyi", "qun", 4, addedSkills)
         {
             InitialHp = 4, CharacterId = "character:shanhe-source-soldier-4861",

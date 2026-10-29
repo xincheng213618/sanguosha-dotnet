@@ -227,13 +227,6 @@ public sealed partial class GameEngine
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29062)]
     private bool ContinueIssuedWuZishengMovement(ProgramSkillFrame f) =>
         f.InstructionIndex is 0 or 1 && ExactWuZishengMovementParent(f with { InstructionIndex = 1 }, out _);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 20)]
-    private bool AllowsWuZishengNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess) =>
-        source is null && nature is null && !sourceLess && _resolutionStack.LastOrDefault()?.Id == f.Id &&
-        f.WuZishengMovement is { Issued: true } r && r.RequestedDamage == amount && r.Qualification.VictimSeat == target &&
-        ExactWuZishengMovementParent(f, out _) && CurrentDamageAttempt is { } original &&
-        _resolutionStack.FindIndex(x => x.Id == original.ResolutionId) is var ownerIndex && ownerIndex >= 0 &&
-        ownerIndex < _resolutionStack.FindIndex(x => x.Id == r.ParentWindowId);
 
     private bool WuZishengMovementFirstChild(ProgramSkillFrame f, ResolutionFrame child) =>
         f.WuZishengMovement is { Issued: true } && ExactWuZishengMovementParent(f, out _) &&
@@ -260,16 +253,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 770)]
     private bool IsWuZhangFeiMovementDying() => ActiveDying is { } dying && WuZhangFeiMovementObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 30)]
-    private bool AllowsWuZhangFeiObserverNestedDamage(ProgramSkillFrame f, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id ||
-            WuZhangFeiMovementObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 29062)]
     private bool AdvanceWuZhangFeiObserverChildren() => _pendingDecision is null && WuZhangFeiMovementObserverRoot() is not null && TryAdvanceObserverSubtree(true);
     [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 29062)]

@@ -46,7 +46,7 @@ public sealed partial class GameEngine
         }
         return NativeDrawAttemptRidesOn(child, parent) || CharacterTurnedOverFrameRidesOn(child, parent) ||
             OrderedPrintedSkillLossSkillsChangedEdge(parent, child) || TypedDamagePostEventEdge(parent, child) ||
-            HalfHandPaidDamageObserverEdge(index) || PreventionDrawObserverEdge(index);
+            HalfHandPaidDamageObserverEdge(index) || ProgramChildResolutionEdge(index);
     }
     private ProgramSkillFrame? RandomAreaObserverRoot() => FindProgramObserverRoot(static (g, root, child) => g.RandomAreaFirstChild(root, child),
         static (g, index) => g.HasObserverSuffix(index, static (host, child) => host.RandomAreaObserverEdge(child),
@@ -64,16 +64,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 20, group: 30)]
     private bool IsRandomAreaDying() => ActiveDying is { } dying && RandomAreaObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 80)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1810)]
-    private bool AllowsRandomAreaNestedDamage(ProgramSkillFrame frame, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || frame.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != frame.Id || RandomAreaObserverRoot() is not { } root || root.Id == frame.Id)
-            return false;
-        var effect = TypedRecoveryPausedEffect(frame);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(frame, reference) : ResolveProgramEffectTarget(frame, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 1245)]
     private bool AdvanceRandomAreaChildren() => _pendingDecision is null && RandomAreaObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

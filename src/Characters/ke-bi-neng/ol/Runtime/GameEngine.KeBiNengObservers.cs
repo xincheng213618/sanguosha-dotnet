@@ -41,13 +41,6 @@ public sealed partial class GameEngine
     private bool HasKeBiNengBeforeDamageObserver(long id) => HasKeBiNengDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1440)]
     private bool IsKeBiNengDying() => ActiveDying is { } dying && KeBiNengObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 2090)]
-    private bool AllowsKeBiNengNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || KeBiNengObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f); return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27040)]
     private bool AdvanceKeBiNengSubtree() => _pendingDecision is null && KeBiNengObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

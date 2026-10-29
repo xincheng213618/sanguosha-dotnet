@@ -30,7 +30,7 @@ public sealed class StandardShanheSourceAgricultureOfficerPackage : IGameContent
         Add(HardId, "hard", [TianduSkillId]);
         Add(HellId, "hell", [TianduSkillId, DuanliangSkillId]);
         void Add(string id, string tier, string[] extra) => builder.AddGeneral(new(id, "农都尉",
-            // Source d=1000213 has no verified local portrait: supporter is an explicit fallback.
+            // Runtime supporter fallback; exact source art is resolved by the desktop ID binding.
             "supporter", TuntianSkillId, "qun", 3, extra)
         {
             InitialHp = 3, CharacterId = "character:shanhe-source-general-4871",

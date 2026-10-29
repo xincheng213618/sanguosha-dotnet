@@ -23,21 +23,6 @@ public sealed partial class GameEngine
     private ProgramSkillFrame? OwnedDeathBenefitObserverRoot() => _resolutionStack.OfType<ProgramSkillFrame>()
         .LastOrDefault(f => f.OwnedDeathBenefitReturn is not null && OwnedDeathBenefitObserverPrefix(f));
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 160)]
-    private bool AllowsOwnedDeathBenefitNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id ||
-            ActiveDying is not null || observer.WindowContext?.Window is not
-                (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.AfterHpRecovered or
-                 SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost)) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!)
-            .GetPausedInstruction(observer.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.Damage || amount != effect.Amount || source != effect.ActorReference || nature != effect.DamageNature ||
-            target != (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target))) return false;
-        var root = OwnedDeathBenefitObserverRoot();
-        return root is not null && root.Id != observer.Id && root.OwnedDeathBenefitReturn!.OriginalAttackOwnerFrameId == CurrentDamageAttempt?.ResolutionId;
-    }
 
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 680)]
     private bool IsOwnedDeathBenefitProgramDying() => ActiveDying is { } dying && OwnedDeathBenefitObserverRoot() is { } root &&

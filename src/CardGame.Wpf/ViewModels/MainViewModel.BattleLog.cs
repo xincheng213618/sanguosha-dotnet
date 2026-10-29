@@ -36,6 +36,7 @@ public sealed partial class MainViewModel
     private Regex? _battleLogPlayerNames;
     private readonly Dictionary<string, SeatViewModel> _battleLogPlayersByName = new(StringComparer.Ordinal);
     private readonly Dictionary<int, string> _battleLogGeneralNames = [];
+    private IReadOnlyList<ShanheBattleLogStageBoundary> _battleLogShanheStageHistory = [];
 
     public ObservableRangeCollection<BattleLogEntryViewModel> FilteredBattleLog { get; } = [];
     public ObservableCollection<BattleLogFilterOption> BattleLogSeats { get; } = [];
@@ -88,6 +89,7 @@ public sealed partial class MainViewModel
         _battleLogPlayerNames = null;
         _battleLogPlayersByName.Clear();
         _battleLogGeneralNames.Clear();
+        _battleLogShanheStageHistory = [];
         _selectedBattleLogCategory = "all";
         _selectedBattleLogSeat = "all";
         RaisePropertyChanged(nameof(SelectedBattleLogCategory));
@@ -119,6 +121,7 @@ public sealed partial class MainViewModel
         var signature = string.Join('|', Seats.Select(seat => $"{seat.Seat}:{seat.DisplaySeatNumber}:{players[seat.Seat].Name}:{generalNames[seat.Seat]}:{seat.RoleLabel == "主公"}"));
         if (signature == _battleLogSeatSignature) return;
         _battleLogSeatSignature = signature;
+        _battleLogShanheStageHistory = BuildShanheBattleLogStageHistory(_game.Log, _game.Events, _snapshot.Players);
         BattleLogSeats.Clear();
         BattleLogSeats.Add(new("all", "全部", "全部座次", "全"));
         foreach (var seat in Seats.OrderBy(seat => seat.DisplaySeatNumber))
@@ -156,13 +159,16 @@ public sealed partial class MainViewModel
     {
         var mentioned = new HashSet<int>();
         var names = new HashSet<string>(StringComparer.Ordinal);
+        var generalNames = _battleLogShanheStageHistory.Count == 0 ? _battleLogGeneralNames :
+            _battleLogGeneralNames.ToDictionary(pair => pair.Key,
+                pair => BattleLogGeneralNameAt(entry.Sequence, pair.Key, pair.Value));
         var message = _battleLogPlayerNames?.Replace(entry.OriginalMessage, match =>
         {
             if (!match.Groups["player"].Success) return match.Value;
             var seat = _battleLogPlayersByName[match.Value];
             mentioned.Add(seat.Seat);
-            var name = _battleLogGeneralNames[seat.Seat];
-            if (_battleLogGeneralNames.Values.Count(other => other == name) > 1) name += $"（{seat.DisplaySeatNumber}）";
+            var name = generalNames[seat.Seat];
+            if (generalNames.Values.Count(other => other == name) > 1) name += $"（{seat.DisplaySeatNumber}）";
             if (seat.IsHuman) name += "（你）";
             names.Add(name);
             return name;

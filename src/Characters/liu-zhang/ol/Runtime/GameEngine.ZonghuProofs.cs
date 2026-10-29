@@ -47,8 +47,6 @@ public sealed partial class GameEngine
  private bool HasLiuZhangBeforeDamageObserver(long id)=>ZonghuObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
  [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 930)]
  private bool IsLiuZhangDying()=>ActiveDying is{}d&&(ActiveZonghuDraft()is{Zonghu:{Need:{Intent:ZonghuIntent.Dying}need}}draft&&need.OwnerFrameId==d.Id&&need.RequestFrameId==d.Id&&ZonghuParent(draft)||ZonghuObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id));
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1500)]
- private bool AllowsLiuZhangNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess){if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||ZonghuObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));}
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27512)]private bool AdvanceZonghuChildren()=>_pendingDecision is null&&ZonghuObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
  private ProgramSkillFrame? ActiveZonghuDraft()=>_resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f=>f.Zonghu is not null);
  private PendingDecision? ZonghuInvariantDecision(PendingDecision? ordinary)

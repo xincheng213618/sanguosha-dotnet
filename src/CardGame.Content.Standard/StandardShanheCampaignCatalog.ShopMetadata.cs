@@ -32,7 +32,7 @@ public static partial class StandardShanheCampaignCatalog
                 CurrentDangtouRewardId, CurrentDangtou2RewardId, CurrentCommonDangtouRewardId,
                 CurrentLeihuoRewardId, CurrentLianjiRewardId, CurrentErlianjiRewardId,
                 CurrentTiebushan4RewardId, CurrentJingjijiaRewardId, "codex-card-4059"])
-            .Concat(CurrentEconomyTactics.Where(source => source.RewardId != CurrentInterest2RewardId).Select(source => source.RewardId))
+            .Concat(CurrentEconomyTactics.Where(source => source.RewardId is not (CurrentInterest2RewardId or CurrentDailyTravel2RewardId)).Select(source => source.RewardId))
             .Concat([CurrentMuniuLiumaRewardId, CurrentSougua3RewardId, CurrentFenjinRewardId, CurrentFenjin2RewardId, CurrentSanbanfuRewardId])
             .Concat(CurrentBuildSkillDefaultUnlockedRewardIds)
             .Concat(CurrentMiaoshouDefaultUnlockedRewardIds)

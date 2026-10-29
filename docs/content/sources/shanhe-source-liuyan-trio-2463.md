@@ -45,8 +45,23 @@
 
 原普通池为23、24、25、27，`premisegroup` 分别1973、1966、1966、1966。连接赛季5的实际 `Level` 与 `Chapter.location` 后，对应第三章洛阳5101—5107、河内5111—5117、酸枣5121—5127、崤函道5141—5147，共28城。不能以原行 `startChapter=1` 替换实际城市关系；来源前提和本地推荐路线各自保留，不宣称复现服务器全部抽取权重。
 
-刘焉使用现有群、男性、`character:liu-yan` 与已核 `ol-liu-yan` 本地图；实际PNG SHA-256 为 `1b9554212b71a658d322595d5fd5e877c78a35a904b1dde1a3d9b4e2024b5f05`。两名士兵皮肤号1000181尚未核实可用原图，保留独立身体身份，采用本地群/男性士兵约定及 `supporter` 回退，不借用其他将领身体或肖像。
+刘焉使用现有群、男性与 `character:liu-yan`。冻结Character634没有头像替代或版本门槛，原生席位图按默认ItemID链得到 `generalface_634.png`；此族三个精确来源ID使用该原卡。既有 `ol-liu-yan` 的750×950大图保留给其他角色，其SHA-256仍为 `1b9554212b71a658d322595d5fd5e877c78a35a904b1dde1a3d9b4e2024b5f05`，不将其当成146×172原生席位图的同字节复本。两名士兵的独立源行均明确指定皮肤1000181，现已核到其官方原始PNG。士兵保留独立身体身份和本地群/男性约定，运行时保留 `supporter` 回退键；桌面原图覆盖两名士兵各自基础／困难四个精确ID，不借用其他将领身体或合并两个席位。
 
 包为 `StandardShanheSourceLiuYanTrioPackage`，ID前缀 `shanhe:source-liuyan-trio-2463-`。`GetRosterGeneralIds(difficulty)` 按4861、634、4862返回，另有 `GetFirstSoldierGeneralId`、`GetLiuYanGeneralId`、`GetSecondSoldierGeneralId`，共7个技能档身份；16档固定装备由地图来源资源层累计，不复制相同技能身份。
 
 新鲜聚焦方法 `Source1161TeamDistanceAnd4055LimitedActualPindianDirectionalDuel` 覆盖生产8席阵容的方向距离与真实持有者阵亡、拼点赢/输/平、真实出杀付款孩子、原用牌与原程序返回、游戏内限定再发动拒绝。生产模式只有seat0为人类，敌方AI正常响应。只使用新建游戏与实际命令，不运行存档恢复、回放或完整对局辅助检查。
+
+
+## 2026-10-29 原生席位图与预览身份
+
+完整源组逐行保留；`hide` 缺省false、`startChapter=1`、`generalShow` 缺省0。下表按从0开始的源行顺序记录真实 `g`，未列出的 `g` 按0处理；不从首席、同名、通用载体或将领称呼推定主帅。身份只用于预览布局，不改变关卡类型、技能、数值、抽选或内容版本。
+
+| 源行与成员 | g | 原图链 | PNG | 字节 | SHA256 |
+| --- | --- | --- | --- | --- | --- |
+| raw0 东州兵（4861） | 0 | General.d=1000181 → root.pveskin.seatpic | [官方146×172原图](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000181.png) | 53842 | `8caaa4132733b73b88a2656fe358bf80b7c0a6adb227bda4bfaf15df8adb59d4` |
+| raw1 刘焉（634） | 1 | 无General.d → Character634默认ItemID | [官方146×172原图](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_634.png) | 57516 | `448f445c5db56a20bd204f1b79ec8e3033c61c2f2f38d7b564a0bc273bd2cc1e` |
+| raw2 东州兵（4862） | 0 | General.d=1000181 → root.pveskin.seatpic | [官方146×172原图](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000181.png) | 53842 | `8caaa4132733b73b88a2656fe358bf80b7c0a6adb227bda4bfaf15df8adb59d4` |
+
+所有表内PNG均取得HTTP200、image/png响应并完成目视、尺寸、原字节SHA及RGBA像素核对；直接使用原始响应字节，不裁剪、缩放、重绘或重新编码。多人组的重复成员仍占独立席位；同一PNG的复用必须有各条源行的独立皮肤证据。当前完整来源配方的25个难度值均已只读检查，体力成长和固定装备不改变名单或角色顺序。原图、精确运行时绑定与身份布局证据集中记录在[山河NPC美术来源](../shanhe-npc-art-sources.json)及[敌将布局来源](../shanhe-encounter-layout-sources.json)。
+
+Character438／634的解码字节SHA256与既有冻结记录一致（`92f00132ed944b279066f46655478bde6a2f3b9f1c006d086c197fbbbada49de`），两个角色均无 `au`／`av`／`needVersion`；按已核对的 `needVersion||0`、LOG_VERSION40303及默认ItemID链解析原生席位图。此次公开配置和客户端外包哈希已经不同，不将当前外包冒充旧冻结包。旧750×950大图与原生146×172卡图像素不相同，仅此组精确来源ID使用原生图，其他普通武将默认图保留。

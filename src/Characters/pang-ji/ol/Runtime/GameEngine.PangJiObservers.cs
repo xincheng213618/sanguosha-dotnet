@@ -113,12 +113,5 @@ public sealed partial class GameEngine
     private bool HasPangJiBeforeDamageObserver(long id) => HasDouyuBeforeDamageObserver(id) || PangJiObserverRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1090)]
     private bool IsPangJiDying() => IsDouyuDying() || ActiveDying is { } d && PangJiObserverRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1660)]
-    private bool AllowsPangJiNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (AllowsDouyuNestedDamage(f, target, amount, source, nature, sourceLess)) return true;
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || PangJiObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature && !sourceLess && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28130)] private bool AdvancePangJiChildren() => _pendingDecision is null && PangJiObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

@@ -43,8 +43,5 @@ public sealed partial class GameEngine
     private bool HasLiuBaBeforeDamageObserver(long id)=>HasLiuBaDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 820)]
     private bool IsLiuBaDying()=>ActiveDying is{}d&&LiuBaObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1390)]
-    private bool AllowsLiuBaNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||LiuBaObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27390)]private bool AdvanceLiuBaChildren()=>_pendingDecision is null&&LiuBaObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

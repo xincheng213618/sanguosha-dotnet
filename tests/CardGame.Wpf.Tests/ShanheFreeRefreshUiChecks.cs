@@ -9,6 +9,7 @@ using CardGame.Core;
 using CardGame.Core.Campaigns;
 using CardGame.Wpf.Controls;
 using CardGame.Wpf.Persistence;
+using CardGame.Wpf.ViewModels;
 
 internal static partial class ShanheCodexUiChecks
 {
@@ -52,7 +53,10 @@ internal static partial class ShanheCodexUiChecks
                     !vm.RequestShanheShopPurchaseCommand.CanExecute(retiredProduct),
                     "Each bound free click commits one real refresh, advances its stock identity, preserves the independent paid quota and keeps the category purchase surcharge.");
                 if (used == 1)
+                {
+                    AssertMarketResourceHints(panel, vm, "铜币不足", "还差 200 铜币");
                     Program.Render(panel, 1400, 714, Path.Combine(output, "shanhe-market-free-refresh-zero-wallet.png"));
+                }
             }
             Program.Assert(session.AcceptedCommands.OfType<RefreshShanheShopCommand>().Count() == 6 &&
                 session.Snapshot.ShopRefreshCost == 100 && refresh.Content.ToString() == "刷新 · 100 铜币" &&
@@ -80,11 +84,65 @@ internal static partial class ShanheCodexUiChecks
                 vm.ShanheMarketGoods.All(item => item.Price == 100) &&
                 session.AcceptedCommands.OfType<RefreshShanheShopCommand>().Count() == 1,
                 "The ordinary paid refresh button spends exactly 100 once, publishes fresh stock, and disables when its single allowance is consumed.");
+
+            // A local variant exercises the already-supported health price. Published
+            // source stock has no positive-health shop price and stays unchanged.
+            foreach (var (gold, hpCost, expectedStatus) in new[]
+                { (100, 4, "体力不足"), (0, 4, "铜币与体力不足"), (100, 1, "购买") })
+            {
+                session = CreateRefreshShopSession([], gold, hpCost);
+                Attach(vm, session); Layout(panel);
+                Program.Assert(session.Snapshot.Hp == 4 && session.Snapshot.MaxHp == 4 &&
+                    ((TextBlock)panel.FindName("MarketHealth")).Text == vm.ShanheMarketHealthText &&
+                    vm.ShanheMarketHealthText == "体力  4/4",
+                    "The existing merchant fixture exposes the actual current HP and maximum alongside the wallet.");
+                var expectedHint = (gold == 0 ? "还差 100 铜币\n" : "") + (hpCost == 4
+                    ? "体力至少 5 点（当前 4），支付后留1点" : "支付后需留1点体力");
+                AssertMarketResourceHints(panel, vm, expectedStatus, expectedHint);
+                var quoted = vm.ShanheMarketGoods.First();
+                Program.Assert(quoted.CanBuy == (hpCost == 1) &&
+                    vm.RequestShanheShopPurchaseCommand.CanExecute(quoted) == quoted.CanBuy &&
+                    session.Snapshot.ShopItems.All(item => item.State == (hpCost == 1
+                        ? ShanheShopItemState.Available : ShanheShopItemState.InsufficientResources)),
+                    "Precise resource wording keeps authoritative command availability: HP equal to cost is insufficient and one remaining HP is enough.");
+                if (!quoted.CanBuy)
+                {
+                    var quotedBefore = JsonSerializer.Serialize(session.Snapshot);
+                    vm.RequestShanheShopPurchaseCommand.Execute(quoted); Layout(panel);
+                    Program.Assert(JsonSerializer.Serialize(session.Snapshot) == quotedBefore,
+                        "Reading or invoking an unaffordable quote cannot charge either resource or advance the merchant.");
+                }
+                if (gold == 0)
+                    Program.Render(panel, 1120, 700, Path.Combine(output, "shanhe-market-resource-shortfall.png"));
+            }
         }
         finally { panel.DataContext = null; }
     }
 
-    private static ShanheCampaignSession CreateRefreshShopSession(IReadOnlyList<int> sources, int gold)
+    private static void AssertMarketResourceHints(ShanheShopPanel panel, MainViewModel vm, string status, string hint)
+    {
+        var products = vm.ShanheMarketGoods.Where(item => item.State != ShanheShopItemState.Purchased).ToArray();
+        Program.Assert(products.Length > 0 && products.All(item => item.Status == status && item.ResourceHint == hint && item.HasResourceHint),
+            "Real shop snapshots distinguish missing coins from the surviving-health requirement with an exact, separate resource hint.");
+        foreach (var product in products)
+        {
+            var text = Program.Find<TextBlock>(panel).Single(block => block.Name == "MarketResourceHint" && ReferenceEquals(block.DataContext, product));
+            var cell = (Grid)text.Parent;
+            var button = Program.Find<Button>(cell).Single(control => ReferenceEquals(control.CommandParameter, product));
+            var bounds = text.TransformToAncestor(cell).TransformBounds(new Rect(text.RenderSize));
+            var buyBounds = button.TransformToAncestor(cell).TransformBounds(new Rect(button.RenderSize));
+            Program.Assert(text.Visibility == Visibility.Visible && text.Text == hint && text.FontSize >= 12 && text.TextWrapping == TextWrapping.Wrap &&
+                cell.RowDefinitions.Count == 3 && Math.Abs(cell.RowDefinitions[2].ActualHeight - 36) < 1 &&
+                bounds.Top >= buyBounds.Bottom && bounds.Bottom <= cell.ActualHeight + 1 && text.ActualHeight <= 32.5,
+                "The separate two-line resource hint remains readable inside its reserved row and does not cover the real buy button: " +
+                JsonSerializer.Serialize(new { product.Id, text.Text, text.IsVisible, text.Visibility, text.FontSize,
+                    text.ActualHeight, CellHeight = cell.ActualHeight, Bounds = bounds.ToString(), Buy = buyBounds.ToString(),
+                    Rows = cell.RowDefinitions.Select(row => row.ActualHeight).ToArray() }));
+            ShanheResponsiveMarketUiChecks.AssertTextGlyphsWithin(text, text, "The merchant resource hint");
+        }
+    }
+
+    private static ShanheCampaignSession CreateRefreshShopSession(IReadOnlyList<int> sources, int gold, int hpCost = 0)
     {
         var goods = Enumerable.Range(1, 12).Select(index => new ShanheRewardDefinition("refresh-training-" + index,
             "行军操练" + index, Bonuses: new(MaxHp: 1)) { Description = "体力上限增加1点。" }).ToArray();
@@ -93,7 +151,7 @@ internal static partial class ShanheCodexUiChecks
         var definition = new ShanheCampaignDefinition("fixture:shanhe-free-refresh-ui", "商店刷新", ["standard:guan-yu"], ["shop"],
         [
             new("shop", "行军集市", ShanheNodeKind.Shop, ["battle"], Choices: goods.Select(reward =>
-                new ShanheNodeChoiceDefinition("buy-" + reward.Id, reward.Name, GoldCost: 100, RewardId: reward.Id, LeavesNode: false)).ToArray()),
+                new ShanheNodeChoiceDefinition("buy-" + reward.Id, reward.Name, GoldCost: 100, HpCost: hpCost, RewardId: reward.Id, LeavesNode: false)).ToArray()),
             new("battle", "下一关", ShanheNodeKind.Battle, [], [new("enemy", "守军", [new("standard:zhang-fei")])])
         ], goods.Concat(perks.Select(source => new ShanheRewardDefinition(source.RewardId, source.Name)
             { CampaignEconomy = source.Effect, Rarity = source.Rarity, Description = source.Description })).ToArray(), StartingGold: gold);

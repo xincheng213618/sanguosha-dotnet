@@ -14,6 +14,8 @@
       <Link>Characters\$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)\..\Characters', '%(FullPath)'))</Link>
     </Compile>
     <EmbeddedResource Include="Assets\Data\shanhe-codex-2026.json" LogicalName="CardGame.ShanheCodex2026.json" />
+    <EmbeddedResource Include="Assets\Data\shanhe-map-layouts.json" LogicalName="CardGame.ShanheMapLayouts.json" />
+    <EmbeddedResource Include="Assets\Data\shanhe-encounter-layouts.json" LogicalName="CardGame.ShanheEncounterLayouts.json" />
     <!-- Binary assets have an independent lifecycle from the application assembly. -->
     <Content Include="Assets\**\*.png;Assets\**\*.jpg;Assets\**\*.mp3;Assets\**\*.wav"
              CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />

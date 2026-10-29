@@ -37,12 +37,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 37000)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 37000)] private bool MouChenLinDying() => ActiveDying is { } d && MouChenLinRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 37000)] [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 37000)] private bool MouChenLinDamageWindow(long id) => MouChenLinRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 37000)] private bool MouChenLinBeforeDamage(long id) => MouChenLinRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 37000)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 37000)]
-    private bool MouChenLinNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess || MouChenLinRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f,p) : ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 37000)] [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 37000)] private bool MouChenLinRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
     {
         if (MouChenLinFirstChild(f, recovery)) return true;

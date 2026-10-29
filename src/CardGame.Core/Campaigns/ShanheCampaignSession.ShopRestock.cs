@@ -18,6 +18,7 @@ public sealed partial class ShanheCampaignSession
             .Select(choice => RewardAcquisitionIdentity(_rewards[choice.RewardId!])).ToHashSet(StringComparer.Ordinal);
         var candidates = (node.Choices ?? []).Where(choice => choice is { RewardId: not null, LeavesNode: false } &&
                 HasShopStockPrice(choice) && ShopCategory(_rewards[choice.RewardId!]) == category)
+            .Where(choice => FilterBalancedShopCandidate(state, _rewards[choice.RewardId!]))
             // The shared reward-cap preview bypasses research for earned boss loot;
             // shop candidates must first retain their ordinary unlock and ownership gate.
             .Where(choice => CanReceiveReward(state, _rewards[choice.RewardId!]) &&
@@ -35,7 +36,9 @@ public sealed partial class ShanheCampaignSession
             $"{node.Id}:shop-restock:{state.ShopRefreshCount}:{position}", ordinal));
         if (SelectShopRarity(state, node, candidates.Select(choice => _rewards[choice.RewardId!]), random) is { } rarity)
             candidates = candidates.Where(choice => _rewards[choice.RewardId!].Rarity == rarity).ToList();
-        var authored = candidates[random.Next(candidates.Count)];
+        var authored = candidates[HasWolongMap(state)
+            ? SelectOwnedSchoolRewardIndex(state, candidates.Select(choice => _rewards[choice.RewardId!]).ToArray(), random)
+            : random.Next(candidates.Count)];
         var reward = _rewards[authored.RewardId!];
         stock[position] = new($"$restock:{state.ShopRefreshCount}:{ordinal}:{reward.Id}", reward.Name,
             authored.GoldCost, authored.HpCost, reward.Id, LeavesNode: false) { Description = reward.Description };
@@ -45,5 +48,6 @@ public sealed partial class ShanheCampaignSession
 
     private IEnumerable<ShanheNodeChoiceDefinition> RetainedShopSupplyChoices(RunState state, ShanheNodeDefinition node) =>
         (state.ShopStock.Count == 0 ? node.Choices ?? [] : state.ShopStock)
+            .Where(choice => choice.RewardId is not { } id || FilterBalancedShopCandidate(state, _rewards[id]))
             .Where(choice => choice.RewardId is not { } id || ShopCategory(_rewards[id]) == ShopRewardCategory.Supply);
 }

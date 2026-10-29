@@ -154,7 +154,7 @@ public sealed partial class GameEngine
             MatchingRecastStructuralEdge(parent, current) ||
             OrderedPrintedSkillLossStructuralEdge(parent, current) ||
             OverflowTargetCancellationStructuralEdge(parent, current) ||
-            HalfHandPaidDamageObserverEdge(child) || PaidTargetObserverEdge(child);
+            HalfHandPaidDamageObserverEdge(child) || ProgramChildResolutionEdge(child);
     }
 
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 520, group: 10)]
@@ -178,20 +178,6 @@ public sealed partial class GameEngine
                 !MatchingRecastStructuralEdge(_resolutionStack[child - 1], _resolutionStack[child]) &&
                 !DyingSuitsStructuralEdge(_resolutionStack[child - 1], _resolutionStack[child])) return false;
         return index < rootIndex;
-    }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 140)]
-    private bool AllowsOverflowTargetCancellationNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or
-                SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or
-                SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) ||
-            OverflowTargetCancellationObserverRoot() is not { } root || root.Id == observer.Id) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!)
-            .GetPausedInstruction(observer.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target));
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 30)]

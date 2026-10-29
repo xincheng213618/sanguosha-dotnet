@@ -119,16 +119,6 @@ public sealed partial class GameEngine
 
     // Gains caused by an actual damage observer still use the same exact gain
     // batch and native child damage, without borrowing another use's target.
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 5714)]
-    private bool AllowsOwnTurnEnemyHandGainNestedDamage(ProgramSkillFrame frame, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || source is not null || nature is not null || amount != 1 || frame.AttackAttempt is not null ||
-            frame.InstructionIndex != 2 || frame.SelectedTargetSeats is not [var selected] || selected != target ||
-            _resolutionStack.LastOrDefault()?.Id != frame.Id || frame.WindowContext is not { } context || ActiveDying is not null)
-            return false;
-        return HasExactOwnTurnEnemyHandGainSelection(frame);
-    }
 
     [ProgramCapability]
     private sealed class OwnTurnEnemyHandGainProgramCapability(GameEngine engine) : IOwnTurnEnemyHandGainProgramHost

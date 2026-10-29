@@ -31,7 +31,7 @@ public sealed partial class GameEngine
             var aligned = true;
             for (var child = index + 1; child < _resolutionStack.Count; child++)
             {
-                if (!PreventionDrawObserverEdge(child)) { aligned = false; break; }
+                if (!ProgramChildResolutionEdge(child)) { aligned = false; break; }
                 if (_resolutionStack[child] is DyingFrame dying && IsPaidHandRepaymentProgramAlcoholRide(child, dying)) break;
             }
             if (aligned) return root;

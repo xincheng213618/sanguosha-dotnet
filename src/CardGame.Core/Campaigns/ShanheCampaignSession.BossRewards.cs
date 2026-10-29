@@ -29,7 +29,8 @@ public sealed partial class ShanheCampaignSession
 
     private bool CanApplyBossReward(RunState state, ShanheRewardDefinition reward)
     {
-        if (reward.OpeningCompanionPool is not null) return false;
+        if (reward.OpeningCompanionPool is not null ||
+            reward.CampaignEconomy?.FavorOwnedSchoolRewards == true && !BalancedJourneyRewards(state)) return false;
         // Victory rewards are earned by this run. Account research gates shop
         // stock and initial loadouts, not earned chapter or bonus skills.
         if (reward.SkillId is { } skill && HasSkill(state, skill) ||

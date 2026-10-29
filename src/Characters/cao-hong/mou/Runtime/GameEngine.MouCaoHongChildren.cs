@@ -31,13 +31,6 @@ public sealed partial class GameEngine
     private bool MouCaoHongBeforeDamage(long id) => MouCaoHongRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 35900)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35900)]
     private bool MouCaoHongDying() => ActiveDying is { } d && MouCaoHongRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 35900)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 35900)]
-    private bool MouCaoHongNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess || MouCaoHongRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f);
-        return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 35900)] [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 35900)]
     private bool MouCaoHongRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
     {

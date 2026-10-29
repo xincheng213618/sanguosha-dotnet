@@ -41,7 +41,7 @@ public sealed partial class GameEngine
             {
                 if (!AppliedDamageFieldPayment(root, receipt) || !RecoveryReplacementFrameRidesOn(recovery, root)) return null;
             }
-            else if (!PreventionDrawObserverEdge(child)) return null;
+            else if (!ProgramChildResolutionEdge(child)) return null;
             // A source-owned Dying is already connected by the strict edge above;
             // these proofs own the entire frozen native/converted/provider rescue.
             if (_resolutionStack[child] is DyingFrame dying &&

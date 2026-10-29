@@ -49,7 +49,5 @@ public sealed partial class GameEngine
     private bool HasLiuPanBeforeDamageObserver(long id)=>LiuPanObserverRoot()is{}f&&_resolutionStack.Any(x=>x.Id==id&&x is BeforeDamageProgramWindowFrame)&&_resolutionStack.FindIndex(x=>x.Id==id)>_resolutionStack.FindIndex(x=>x.Id==f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 830)]
     private bool IsLiuPanDying()=>ActiveDying is{}d&&LiuPanObserverRoot()is{}f&&_resolutionStack.FindIndex(x=>x.Id==d.Id)>_resolutionStack.FindIndex(x=>x.Id==f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1400)]
-    private bool AllowsLiuPanNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess){if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||LiuPanObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27410)]private bool AdvanceLiuPanSubtree()=>_pendingDecision is null&&LiuPanObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

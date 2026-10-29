@@ -28,10 +28,6 @@ public sealed partial class GameEngine
         parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count &&
         MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) && IsWushuangDyingExitContext(parent.Candidates[parent.CandidateIndex], context);
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 61400)]
-    private bool AllowsWushuangDyingExitDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess) =>
-        !sourceLess && source is null && nature == DamageNature.Normal && f.AttackAttempt is null && IsExactWushuangDyingExitProgram(f) &&
-        f.WushuangCombat is { Stage: 3, Index: > 0 } r && r.Index <= r.Seats.Count && r.Seats[r.Index - 1] == target && amount == r.Amount;
 
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 61400)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 61400)]

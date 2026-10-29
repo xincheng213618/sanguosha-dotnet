@@ -139,19 +139,6 @@ public sealed partial class GameEngine
     private bool HasMatchingRecastDamageObserver(long windowId) => _resolutionStack.Any(f => f.Id == windowId && f is DamageTriggerWindowFrame) && MatchingRecastObserverRoot() is not null;
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 150)]
     private bool HasMatchingRecastBeforeDamageObserver(long windowId) => _resolutionStack.Any(f => f.Id == windowId && f is BeforeDamageProgramWindowFrame) && MatchingRecastObserverRoot() is not null;
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 780)]
-    private bool AllowsMatchingRecastNestedDamage(ProgramSkillFrame observer, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id) return false;
-        if (observer.MatchingRecast is { Stage: MatchingRecastStage.DamageIssued, DamageIssued: true } r && ValidMatchingRecastReceipt(observer))
-            return target == r.Peer.Seat && amount == 1 && source is null && nature == DamageNature.Thunder;
-        if (observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or
-            SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or
-            SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) || MatchingRecastObserverRoot() is null) return false;
-        var e = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!).GetPausedInstruction(observer.InstructionIndex).Effect;
-        return e.Op == SkillProgramEffectOp.Damage && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature &&
-            target == (e.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 50)]
     private bool TryAdvanceMatchingRecastSubtree()
     {

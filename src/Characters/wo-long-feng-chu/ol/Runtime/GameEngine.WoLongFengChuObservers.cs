@@ -101,15 +101,6 @@ public sealed partial class GameEngine
         (IsExactLuanfengDyingRide(dying.FrameId) || WoLongFengChuObserverRoot() is { } root &&
             (_resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStack.FindIndex(f => f.Id == root.Id) ||
              root.EquipmentSlotNamedUse is { Intent: EquipmentSlotNamedUseIntent.DyingPeach or EquipmentSlotNamedUseIntent.DyingAlcohol } d && d.OriginalParentId == dying.FrameId));
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 970)]
-    private bool AllowsWoLongFengChuNestedDamage(ProgramSkillFrame frame, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || frame.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != frame.Id ||
-            WoLongFengChuObserverRoot() is not { } root || root.Id == frame.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(frame);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(frame, reference) : ResolveProgramEffectTarget(frame, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26100)]
     private bool TryAdvanceWoLongFengChuSubtree() => _pendingDecision is null && WoLongFengChuObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

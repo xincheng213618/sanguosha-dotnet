@@ -329,20 +329,6 @@ public sealed partial class GameEngine
     private bool HasPublicPileCashOutDamageObserver(long id) =>
         _resolutionStack.Any(frame => frame.Id == id && frame is DamageTriggerWindowFrame) && PublicPileCashOutObserverRoot() is not null;
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 200)]
-    private bool AllowsPublicPileCashOutNestedDamage(ProgramSkillFrame frame, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || frame.AttackAttempt is not null || frame.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != frame.Id ||
-            frame.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or
-                SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or
-                SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged) ||
-            PublicPileCashOutObserverRoot() is not { } root || root.Id == frame.Id) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistry.GetSkill(frame.SkillId).Program!)
-            .GetPausedInstruction(frame.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(frame, reference) : ResolveProgramEffectTarget(frame, effect.Target));
-    }
 
     [ProgramCapability]
     private sealed class PublicPileCashOutCapability(GameEngine engine) : IPublicPileCashOutHost

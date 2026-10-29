@@ -6,7 +6,6 @@ namespace CardGame.Core;
 // These are the original admission positions, not new gameplay timings. Keeping
 // them separate preserves the checks before/after native debt and payment rules.
 internal enum ProgramObserverProofPhase { PaidDamage, NestedDamage, BeforeDamagePrelude, BeforeDamage }
-internal enum ProgramNestedDamageProofPhase { BeforeFactionDebts, AfterFactionDebts }
 internal enum ProgramMovementProofPhase { NativeCost, BeforePrivatePayments, PrivatePayments, EffectPayments, BoundEquipment }
 internal enum ProgramDyingProofPhase { Invariant, Runtime }
 
@@ -14,13 +13,6 @@ internal enum ProgramDyingProofPhase { Invariant, Runtime }
 internal sealed class ProgramObserverProofAttribute(ProgramObserverProofPhase phase, int order) : Attribute
 {
     internal ProgramObserverProofPhase Phase { get; } = phase;
-    internal int Order { get; } = order;
-}
-
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-internal sealed class ProgramNestedDamageProofAttribute(ProgramNestedDamageProofPhase phase, int order) : Attribute
-{
-    internal ProgramNestedDamageProofPhase Phase { get; } = phase;
     internal int Order { get; } = order;
 }
 
@@ -39,24 +31,18 @@ internal sealed class ProgramDyingProofAttribute(ProgramDyingProofPhase phase, i
     internal int Group { get; } = group;
 }
 
-internal delegate bool ProgramNestedDamageProof(ProgramSkillFrame frame, int targetSeat, int amount,
-    ProgramParticipantReference? source, DamageNature? nature, bool sourceLess);
-
 internal sealed class ProgramRuntimeProofCatalog
 {
     internal IReadOnlyDictionary<ProgramObserverProofPhase, IReadOnlyList<ProgramRuntimeRegistration>> Observers { get; }
-    internal IReadOnlyDictionary<ProgramNestedDamageProofPhase, IReadOnlyList<ProgramRuntimeRegistration>> NestedDamage { get; }
     internal IReadOnlyDictionary<ProgramMovementProofPhase, IReadOnlyList<ProgramRuntimeRegistration>> Movements { get; }
     internal IReadOnlyDictionary<ProgramDyingProofPhase, IReadOnlyList<IReadOnlyList<ProgramRuntimeRegistration>>> Dying { get; }
 
     private ProgramRuntimeProofCatalog(
         Dictionary<ProgramObserverProofPhase, SortedDictionary<int, ProgramRuntimeRegistration>> observers,
-        Dictionary<ProgramNestedDamageProofPhase, SortedDictionary<int, ProgramRuntimeRegistration>> nestedDamage,
         Dictionary<ProgramMovementProofPhase, SortedDictionary<int, ProgramRuntimeRegistration>> movements,
         Dictionary<ProgramDyingProofPhase, SortedDictionary<int, SortedDictionary<int, ProgramRuntimeRegistration>>> dying)
     {
         Observers = Freeze(observers);
-        NestedDamage = Freeze(nestedDamage);
         Movements = Freeze(movements);
         Dying = new ReadOnlyDictionary<ProgramDyingProofPhase, IReadOnlyList<IReadOnlyList<ProgramRuntimeRegistration>>>(
             dying.ToDictionary(p => p.Key, p => (IReadOnlyList<IReadOnlyList<ProgramRuntimeRegistration>>)Array.AsReadOnly(
@@ -66,7 +52,6 @@ internal sealed class ProgramRuntimeProofCatalog
     internal static ProgramRuntimeProofCatalog Discover(IEnumerable<MethodInfo> methods)
     {
         var observers = Empty<ProgramObserverProofPhase>();
-        var nestedDamage = Empty<ProgramNestedDamageProofPhase>();
         var movements = Empty<ProgramMovementProofPhase>();
         var dying = Enum.GetValues<ProgramDyingProofPhase>().ToDictionary(p => p,
             _ => new SortedDictionary<int, SortedDictionary<int, ProgramRuntimeRegistration>>());
@@ -74,9 +59,6 @@ internal sealed class ProgramRuntimeProofCatalog
         {
             foreach (var attribute in method.GetCustomAttributes<ProgramObserverProofAttribute>())
                 Add(observers, attribute.Phase, attribute.Order, method, typeof(Func<long, bool>), [typeof(long)]);
-            foreach (var attribute in method.GetCustomAttributes<ProgramNestedDamageProofAttribute>())
-                Add(nestedDamage, attribute.Phase, attribute.Order, method, typeof(ProgramNestedDamageProof),
-                    [typeof(ProgramSkillFrame), typeof(int), typeof(int), typeof(ProgramParticipantReference), typeof(DamageNature?), typeof(bool)]);
             foreach (var attribute in method.GetCustomAttributes<ProgramMovementProofAttribute>())
                 Add(movements, attribute.Phase, attribute.Order, method,
                     typeof(Func<ProgramSkillFrame, SkillProgramEffect?, ProgramMovementContinuation, bool>),
@@ -90,7 +72,7 @@ internal sealed class ProgramRuntimeProofCatalog
                 Add(group, attribute.Order, method, typeof(Func<bool>), []);
             }
         }
-        return new(observers, nestedDamage, movements, dying);
+        return new(observers, movements, dying);
     }
 
     private static Dictionary<T, SortedDictionary<int, ProgramRuntimeRegistration>> Empty<T>() where T : struct, Enum =>
@@ -126,7 +108,6 @@ internal sealed class ProgramRuntimeProofCatalog
 internal sealed class ProgramRuntimeProofs(ProgramRuntimeProofCatalog catalog, Func<ProgramRuntimeRegistration, Delegate> bind)
 {
     private readonly Dictionary<ProgramObserverProofPhase, Func<long, bool>[]> _observers = new();
-    private readonly Dictionary<ProgramNestedDamageProofPhase, ProgramNestedDamageProof[]> _nestedDamage = new();
     private readonly Dictionary<ProgramMovementProofPhase, Func<ProgramSkillFrame, SkillProgramEffect?, ProgramMovementContinuation, bool>[]> _movements = new();
     private readonly Dictionary<ProgramDyingProofPhase, Func<bool>[][]> _dying = new();
 
@@ -135,15 +116,6 @@ internal sealed class ProgramRuntimeProofs(ProgramRuntimeProofCatalog catalog, F
         if (!_observers.TryGetValue(phase, out var handlers))
             _observers.Add(phase, handlers = catalog.Observers[phase].Select(row => (Func<long, bool>)bind(row)).ToArray());
         foreach (var handler in handlers) if (handler(windowId)) return true;
-        return false;
-    }
-
-    internal bool AllowsNestedDamage(ProgramNestedDamageProofPhase phase, ProgramSkillFrame frame,
-        int targetSeat, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (!_nestedDamage.TryGetValue(phase, out var handlers))
-            _nestedDamage.Add(phase, handlers = catalog.NestedDamage[phase].Select(row => (ProgramNestedDamageProof)bind(row)).ToArray());
-        foreach (var handler in handlers) if (handler(frame, targetSeat, amount, source, nature, sourceLess)) return true;
         return false;
     }
 
@@ -178,9 +150,6 @@ internal sealed partial class ProgramRuntimeHooks
 {
     private readonly ProgramRuntimeProofs _proofs;
     internal bool MatchesObserver(ProgramObserverProofPhase phase, long windowId) => _proofs.MatchesObserver(phase, windowId);
-    internal bool AllowsNestedDamage(ProgramNestedDamageProofPhase phase, ProgramSkillFrame frame, int targetSeat,
-        int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess) =>
-        _proofs.AllowsNestedDamage(phase, frame, targetSeat, amount, source, nature, sourceLess);
     internal bool MatchesMovement(ProgramMovementProofPhase phase, ProgramSkillFrame frame,
         SkillProgramEffect? effect, ProgramMovementContinuation movement) => _proofs.MatchesMovement(phase, frame, effect, movement);
     internal bool IsDying(ProgramDyingProofPhase phase) => _proofs.IsDying(phase);

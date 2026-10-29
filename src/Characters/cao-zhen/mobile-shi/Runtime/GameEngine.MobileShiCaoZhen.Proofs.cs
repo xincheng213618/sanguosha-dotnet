@@ -63,13 +63,6 @@ public sealed partial class GameEngine
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49900)] private bool ShiCaoZBeforeDamageObserver(long id) => ShiCaoZObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 49900)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49900)]
     private bool ShiCaoZDyingObserver() => ActiveDying is { } dying && ShiCaoZObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 49900)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 49900)]
-    private bool ShiCaoZNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || ShiCaoZObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f);
-        return e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature && target == (e.TargetReference is { } reference ? ResolveProgramParticipant(f, reference) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 49900)] [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 49900)]
     private bool ShiCaoZRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
     {

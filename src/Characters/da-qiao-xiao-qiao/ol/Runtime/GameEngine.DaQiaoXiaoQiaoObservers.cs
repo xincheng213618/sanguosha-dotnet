@@ -46,12 +46,5 @@ public sealed partial class GameEngine
     private bool HasDaQiaoXiaoQiaoBeforeDamageObserver(long id)=>HasDaQiaoXiaoQiaoDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 770)]
     private bool IsDaQiaoXiaoQiaoDying()=>ActiveDying is{}dying&&DaQiaoXiaoQiaoObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==dying.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1340)]
-    private bool AllowsDaQiaoXiaoQiaoNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id)return false;
-        if(f.DaQiaoXiaoQiao is{Stage:DaQiaoXiaoQiaoStage.DamageChildren}r&&ValidDaQiaoXiaoQiao(f))return source is null&&nature is null&&target==r.TargetSeat&&amount==r.Damage&&ProgramEventHistory<DaQiaoXiaoQiaoDamageIssuedEvent>().Count(e=>e.FrameId==f.Id&&e.TargetSeat==target&&e.Amount==amount)==1;
-        if(DaQiaoXiaoQiaoObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27340)]private bool AdvanceDaQiaoXiaoQiaoChildren()=>_pendingDecision is null&&DaQiaoXiaoQiaoObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

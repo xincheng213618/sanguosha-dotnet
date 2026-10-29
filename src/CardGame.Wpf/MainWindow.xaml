@@ -1040,7 +1040,7 @@
                             </ScrollViewer>
                         </Grid>
                         <Grid Grid.Column="1" Margin="8,0">
-                            <controls:HandScrollViewer x:Name="HandViewport" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Focusable="False" ToolTip="按住手牌拖向亮起的武将，松开出牌；多目标牌松开选定目标后继续确认。滚轮浏览手牌，双击确认，右键取消选择。" AutomationProperties.Name="手牌浏览区">
+                            <controls:HandScrollViewer x:Name="HandViewport" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Focusable="False" ToolTip="按住手牌拖向亮起的武将，松开出牌；多目标牌松开选定目标后继续确认。手牌较多时单行压叠，选中牌会浮出；双击确认，右键取消选择。" AutomationProperties.Name="手牌浏览区">
                                 <ItemsControl x:Name="HandCards" ItemsSource="{Binding Hand}" ItemTemplate="{StaticResource CardTemplate}" VerticalAlignment="Top">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -1075,9 +1075,13 @@
                                                 <Trigger Property="controls:HandPanel.IsPointerCard" Value="True">
                                                     <Setter Property="Panel.ZIndex" Value="100" />
                                                 </Trigger>
-                                                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsSelected}" Value="True" />
+                                                        <Condition Binding="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource Self}}" Value="True" />
+                                                    </MultiDataTrigger.Conditions>
                                                     <Setter Property="Panel.ZIndex" Value="75" />
-                                                </Trigger>
+                                                </MultiDataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </ItemsControl.ItemContainerStyle>
@@ -1106,16 +1110,24 @@
                         </StackPanel>
                     </Border>
                 </Grid>
-                <ScrollViewer x:Name="HumanWushuangTactics" Grid.RowSpan="2" Panel.ZIndex="3" MaxWidth="248" HorizontalAlignment="Right" VerticalAlignment="Bottom" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" Visibility="{Binding HumanPlayer.HasWushuangTactics, Converter={StaticResource BoolToVisibility}}" AutomationProperties.Name="本方战法">
+                <!-- Keep the single-row tactic strip above every selection and confirmation dock. -->
+                <ScrollViewer x:Name="HumanWushuangTactics" Grid.Row="0" Panel.ZIndex="3" Height="66" HorizontalAlignment="Right" VerticalAlignment="Bottom" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" Focusable="False" Visibility="{Binding HumanPlayer.HasWushuangTactics, Converter={StaticResource BoolToVisibility}}" AutomationProperties.Name="本方战法" AutomationProperties.HelpText="超过11个战法时可展开、收起，使用左右箭头查看更多">
                     <ScrollViewer.Style>
                         <Style TargetType="ScrollViewer">
                             <Setter Property="Margin" Value="0,0,8,8" />
                             <Style.Triggers><DataTrigger Binding="{Binding HumanPlayer.HasStatusBadges}" Value="True"><Setter Property="Margin" Value="0,0,8,44" /></DataTrigger></Style.Triggers>
                         </Style>
                     </ScrollViewer.Style>
-                    <ItemsControl ItemsSource="{Binding HumanPlayer.WushuangTactics}" ItemTemplate="{StaticResource WushuangTacticBadgeTemplate}">
-                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel HorizontalAlignment="Right" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                    </ItemsControl>
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="ToggleHumanTacticsButton" Content="«" Width="28" Height="52" Padding="0" Margin="0" Foreground="#FFD66A" FontSize="26" Style="{StaticResource QuietButton}" Visibility="Collapsed" Click="ToggleHumanTactics_Click" AutomationProperties.Name="展开战法" />
+                        <Button x:Name="PreviousHumanTacticsButton" Content="‹" Width="28" Height="52" Padding="0" Margin="0" Foreground="#FFD66A" FontSize="24" Style="{StaticResource QuietButton}" Visibility="Collapsed" Click="PreviousHumanTactics_Click" ToolTip="查看前面的战法" AutomationProperties.Name="上一组战法" />
+                        <ScrollViewer x:Name="HumanTacticsViewport" Height="66" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Focusable="False" ScrollChanged="HumanTactics_ScrollChanged" PreviewMouseWheel="HumanTactics_PreviewMouseWheel">
+                            <ItemsControl x:Name="HumanTacticItems" Focusable="False" ItemsSource="{Binding HumanPlayer.WushuangTactics}" ItemTemplate="{StaticResource WushuangTacticBadgeTemplate}">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <Button x:Name="NextHumanTacticsButton" Content="›" Width="28" Height="52" Padding="0" Margin="0" Foreground="#FFD66A" FontSize="24" Style="{StaticResource QuietButton}" Visibility="Collapsed" Click="NextHumanTactics_Click" ToolTip="查看后面的战法" AutomationProperties.Name="下一组战法" />
+                    </StackPanel>
                 </ScrollViewer>
                 <ItemsControl x:Name="HumanJudgmentStatuses" Grid.Row="2" Panel.ZIndex="2" ItemsSource="{Binding HumanPlayer.JudgmentStatuses}" ItemTemplate="{StaticResource JudgmentStatusTemplate}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="32" Margin="8,-36,0,0" Visibility="{Binding HumanPlayer.HasJudgment, Converter={StaticResource BoolToVisibility}}" AutomationProperties.Name="本方判定区">
                     <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>

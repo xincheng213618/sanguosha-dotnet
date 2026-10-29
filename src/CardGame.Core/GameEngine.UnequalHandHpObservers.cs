@@ -33,18 +33,6 @@ public sealed partial class GameEngine
     private ProgramSkillFrame? UnequalHandHpObserverRoot() => FindProgramObserverRoot(
         static (engine, root, child) => engine.UnequalHandHpFirstChild(root, child),
         static (engine, index) => engine.HasHandGainDebtObserverSuffix(index));
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 310)]
-    private bool AllowsUnequalHandHpNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || observer.AttackAttempt is not null || observer.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != observer.Id ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.DiscardPileReceived or
-                SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.SkillsChanged) ||
-            UnequalHandHpObserverRoot() is not { } root || root.Id == observer.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(observer);
-        return effect is { Op: SkillProgramEffectOp.Damage } && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target));
-    }
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 100, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 210)]
     private bool IsUnequalHandHpDying() => ActiveDying is { } dying && UnequalHandHpObserverRoot() is { } root &&

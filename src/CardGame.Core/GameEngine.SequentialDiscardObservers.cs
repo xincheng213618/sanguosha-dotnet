@@ -50,7 +50,7 @@ public sealed partial class GameEngine
                 continue;
             }
             if (PolicyCounterspellDyingFaceEdge(index)) continue;
-            if (!PreventionDrawObserverEdge(index)) return false;
+            if (!ProgramChildResolutionEdge(index)) return false;
             if (child is DyingFrame rescued && (IsPaidHandRepaymentProgramAlcoholRide(index, rescued) ||
                 IsPaidHandRepaymentRescueRide(index, rescued) || PolicyCounterspellVirtualAlcoholRide(index, rescued))) return true;
         }

@@ -1,0 +1,2395 @@
+{
+  "schemaVersion": 1,
+  "sourceSeasonId": 5,
+  "sourceMemberSha256": "97dbdb465d902e771e575ed5165df3d193e1a689e3dae7ae67b9cb5033f18c72",
+  "encounters": [
+    {
+      "sourceBattleId": 2634,
+      "sourceGroupId": 2634,
+      "expectedVisibleEnemyCount": 2,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-xu-jing-2634",
+            "shanhe:s5-xu-qiu-2634"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 427,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4871,
+          "skinId": 1000307,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2685,
+      "sourceGroupId": 2685,
+      "expectedVisibleEnemyCount": 2,
+      "variants": [
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-dongzhuo-baxin",
+            "shanhe:s5-dongji-qiaoxiao"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 470,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 366,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2499,
+      "sourceGroupId": 2499,
+      "expectedVisibleEnemyCount": 2,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-yulin-officer-2499-base",
+            "shanhe:source-yulin-guard-2498-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-yulin-officer-2499-hard",
+            "shanhe:source-yulin-guard-2498-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-yulin-officer-2499-hard",
+            "shanhe:source-yulin-guard-2498-hell"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-yulin-officer-2499-hell",
+            "shanhe:source-yulin-guard-2498-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000318,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4861,
+          "skinId": 1000316,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2686,
+      "sourceGroupId": 2686,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-dongzhuo-fengyi",
+            "shanhe:s5-lvbu-baji",
+            "shanhe:s5-diao-chan-biyue"
+          ],
+          "sourceOrdinalsInRuntimeOrder": [
+            1,
+            0,
+            2
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 319,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 470,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 445,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2642,
+      "sourceGroupId": 2642,
+      "expectedVisibleEnemyCount": 2,
+      "variants": [
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-ma-chao-2642",
+            "shanhe:s5-ma-yun-lu-2642"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 303,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 346,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2650,
+      "sourceGroupId": 2650,
+      "expectedVisibleEnemyCount": 2,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-dian-wei-2650",
+            "shanhe:s5-wei-zi-2650"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 229,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 501,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2661,
+      "sourceGroupId": 2661,
+      "expectedVisibleEnemyCount": 2,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-xu-you-2661",
+            "shanhe:s5-ju-shou-2661"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 406,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 330,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2674,
+      "sourceGroupId": 2674,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-xun-chen-2674",
+            "shanhe:s5-guo-tu-2674",
+            "shanhe:s5-shen-pei-2674"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 460,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 624,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 459,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2679,
+      "sourceGroupId": 2679,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-cao-zhen-2679",
+            "shanhe:s5-cao-cao-2679",
+            "shanhe:s5-cao-hong-2679"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 321,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 311,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 114,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2683,
+      "sourceGroupId": 2683,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-zhang-fei-2683",
+            "shanhe:s5-liu-bei-2683",
+            "shanhe:s5-guan-yu-2683"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 301,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 299,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 300,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2633,
+      "sourceGroupId": 2633,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-yudu-2633"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000098,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2656,
+      "sourceGroupId": 2656,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-zhang-liang-2656"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000367,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2657,
+      "sourceGroupId": 2657,
+      "expectedVisibleEnemyCount": 2,
+      "variants": [
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-xun-can-2657",
+            "shanhe:s5-cao-shi-2657"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 525,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4876,
+          "skinId": 1000051,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2654,
+      "sourceGroupId": 2654,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 6,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-yuan-yao-2654",
+            "shanhe:s5-yuan-shu-2654",
+            "shanhe:s5-yuan-yin-2654"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000339,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 100,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4872,
+          "skinId": 1000338,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2662,
+      "sourceGroupId": 2662,
+      "expectedVisibleEnemyCount": 2,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-gong-sun-zan-2662",
+            "shanhe:s5-gong-sun-yue-2662"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 320,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4871,
+          "skinId": 1000165,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2663,
+      "sourceGroupId": 2663,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:s5-qin-yi-2663",
+            "shanhe:s5-chen-wei-2663",
+            "shanhe:s5-li-hei-2663"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000413,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4872,
+          "skinId": 1000121,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4873,
+          "skinId": 1000414,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2653,
+      "sourceGroupId": 2653,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 6,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-zhangniujiao-2653-medium"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-zhangniujiao-2653-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-zhangniujiao-2653-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000367,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2455,
+      "sourceGroupId": 2455,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-coalition-scout-2455-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-coalition-scout-2455-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-coalition-scout-2455-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000148,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2456,
+      "sourceGroupId": 2456,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-coalition-trio-2465-quartermaster-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-coalition-trio-2465-quartermaster-hard"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000175,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2459,
+      "sourceGroupId": 2459,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-coalition-spy-2459-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-coalition-spy-2459-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-coalition-spy-2459-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000304,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2465,
+      "sourceGroupId": 2465,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-coalition-trio-2465-spy-base",
+            "shanhe:source-coalition-trio-2465-scout-base",
+            "shanhe:source-coalition-trio-2465-quartermaster-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-coalition-trio-2465-spy-hard",
+            "shanhe:source-coalition-trio-2465-scout-hard",
+            "shanhe:source-coalition-trio-2465-quartermaster-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-coalition-trio-2465-spy-nightmare",
+            "shanhe:source-coalition-trio-2465-scout-hard",
+            "shanhe:source-coalition-trio-2465-quartermaster-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-coalition-trio-2465-spy-nightmare",
+            "shanhe:source-coalition-trio-2465-scout-hell",
+            "shanhe:source-coalition-trio-2465-quartermaster-hard"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000304,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4862,
+          "skinId": 1000148,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4871,
+          "skinId": 1000175,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2454,
+      "sourceGroupId": 2454,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-white-horse-2454-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-white-horse-2454-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-white-horse-2454-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000128,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2453,
+      "sourceGroupId": 2453,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-war-elephant-2453-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-war-elephant-2453-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-war-elephant-2453-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000003,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2494,
+      "sourceGroupId": 2494,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-vanguard-2494-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-vanguard-2494-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-vanguard-2494-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000236,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2481,
+      "sourceGroupId": 2481,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-ranger-2481-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-ranger-2481-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-ranger-2481-nightmare"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-ranger-2481-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000251,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2466,
+      "sourceGroupId": 2466,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-youyan-warrior-2466-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-youyan-warrior-2466-hard"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000170,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2486,
+      "sourceGroupId": 2486,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-armory-commander-2486-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-armory-commander-2486-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-armory-commander-2486-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000282,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2458,
+      "sourceGroupId": 2458,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-raider-2458-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-raider-2458-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-raider-2458-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000303,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2461,
+      "sourceGroupId": 2461,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-archer-2461-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-archer-2461-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-archer-2461-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000238,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2457,
+      "sourceGroupId": 2457,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-assassin-2457-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-assassin-2457-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-assassin-2457-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000299,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2464,
+      "sourceGroupId": 2464,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-assassin-2457-base",
+            "shanhe:source-demon-trio-2464-archer-base",
+            "shanhe:source-demon-trio-2464-raider-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-assassin-2457-hard",
+            "shanhe:source-demon-trio-2464-archer-hard",
+            "shanhe:source-demon-trio-2464-raider-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-assassin-2457-hard",
+            "shanhe:source-demon-trio-2464-archer-nightmare",
+            "shanhe:source-demon-trio-2464-raider-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-demon-assassin-2457-hell",
+            "shanhe:source-demon-trio-2464-archer-nightmare",
+            "shanhe:source-demon-trio-2464-raider-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000299,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4862,
+          "skinId": 1000238,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4863,
+          "skinId": 1000303,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2500,
+      "sourceGroupId": 2500,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-agriculture-officer-2500-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-agriculture-officer-2500-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-agriculture-officer-2500-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000213,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2474,
+      "sourceGroupId": 2474,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 5,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-veteran-2474-base"
+          ]
+        },
+        {
+          "minDifficulty": 6,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-veteran-2474-medium"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-veteran-2474-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-veteran-2474-nightmare"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-veteran-2474-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000129,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2467,
+      "sourceGroupId": 2467,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-wuhuan-rider-2467-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-wuhuan-rider-2467-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-wuhuan-rider-2467-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000107,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2487,
+      "sourceGroupId": 2487,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-warrior-2487-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-warrior-2487-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-warrior-2487-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000230,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2473,
+      "sourceGroupId": 2473,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-qiang-raider-2473-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-qiang-raider-2473-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-qiang-raider-2473-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000125,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2497,
+      "sourceGroupId": 2497,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-jiangdong-veteran-2497-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-jiangdong-veteran-2497-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-jiangdong-veteran-2497-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000283,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2460,
+      "sourceGroupId": 2460,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-local-magnate-2460-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-local-magnate-2460-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-local-magnate-2460-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000320,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2493,
+      "sourceGroupId": 2493,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-wuque-assassin-2493-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-wuque-assassin-2493-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-wuque-assassin-2493-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000228,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2495,
+      "sourceGroupId": 2495,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 5,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-executioner-2495-base"
+          ]
+        },
+        {
+          "minDifficulty": 6,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-executioner-2495-medium"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-executioner-2495-hard"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000237,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2475,
+      "sourceGroupId": 2475,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-militia-trio-2475-first-base",
+            "shanhe:source-militia-trio-2475-second-base",
+            "shanhe:source-militia-trio-2475-third-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-militia-trio-2475-first-hard",
+            "shanhe:source-militia-trio-2475-second-base",
+            "shanhe:source-militia-trio-2475-third-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-militia-trio-2475-first-hard",
+            "shanhe:source-militia-trio-2475-second-nightmare",
+            "shanhe:source-militia-trio-2475-third-nightmare"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-militia-trio-2475-first-hell",
+            "shanhe:source-militia-trio-2475-second-nightmare",
+            "shanhe:source-militia-trio-2475-third-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000208,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4862,
+          "skinId": 1000249,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4863,
+          "skinId": 1000309,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2485,
+      "sourceGroupId": 2485,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-caosong-trio-2485-caosong-base",
+            "shanhe:source-caosong-trio-2485-guard-4861-base",
+            "shanhe:source-caosong-trio-2485-guard-4862-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-caosong-trio-2485-caosong-hard",
+            "shanhe:source-caosong-trio-2485-guard-4861-hard",
+            "shanhe:source-caosong-trio-2485-guard-4862-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-caosong-trio-2485-caosong-hell",
+            "shanhe:source-caosong-trio-2485-guard-4861-hard",
+            "shanhe:source-caosong-trio-2485-guard-4862-hard"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 438,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4861,
+          "skinId": 1000215,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4862,
+          "skinId": 1000215,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2491,
+      "sourceGroupId": 2491,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-guard-trio-2491-guard-base",
+            "shanhe:source-guard-trio-2491-captain-base",
+            "shanhe:source-guard-trio-2491-guard-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-guard-trio-2491-guard-base",
+            "shanhe:source-guard-trio-2491-captain-hard",
+            "shanhe:source-guard-trio-2491-guard-base"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-guard-trio-2491-guard-hell",
+            "shanhe:source-guard-trio-2491-captain-hard",
+            "shanhe:source-guard-trio-2491-guard-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000222,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4871,
+          "skinId": 1000233,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4861,
+          "skinId": 1000222,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2463,
+      "sourceGroupId": 2463,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-liuyan-trio-2463-soldier-4861-base",
+            "shanhe:source-liuyan-trio-2463-liuyan-base",
+            "shanhe:source-liuyan-trio-2463-soldier-4862-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-liuyan-trio-2463-soldier-4861-hard",
+            "shanhe:source-liuyan-trio-2463-liuyan-hard",
+            "shanhe:source-liuyan-trio-2463-soldier-4862-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-liuyan-trio-2463-soldier-4861-hard",
+            "shanhe:source-liuyan-trio-2463-liuyan-hell",
+            "shanhe:source-liuyan-trio-2463-soldier-4862-hard"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000181,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 634,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4862,
+          "skinId": 1000181,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2476,
+      "sourceGroupId": 2476,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-linzhonggu-2476-base"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-linzhonggu-2476-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000301,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2471,
+      "sourceGroupId": 2471,
+      "expectedVisibleEnemyCount": 2,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-qianzhao-pair-2471-qianzhao-base",
+            "shanhe:source-qianzhao-pair-2471-wuhuan-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-qianzhao-pair-2471-qianzhao-hard",
+            "shanhe:source-qianzhao-pair-2471-wuhuan-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-qianzhao-pair-2471-qianzhao-hard",
+            "shanhe:source-qianzhao-pair-2471-wuhuan-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 580,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4861,
+          "skinId": 1000297,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2472,
+      "sourceGroupId": 2472,
+      "expectedVisibleEnemyCount": 3,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-elemental-trio-2472-water-base",
+            "shanhe:source-elemental-trio-2472-fire-base",
+            "shanhe:source-elemental-trio-2472-qiongqi-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-elemental-trio-2472-water-base",
+            "shanhe:source-elemental-trio-2472-fire-hard",
+            "shanhe:source-elemental-trio-2472-qiongqi-base"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-elemental-trio-2472-water-base",
+            "shanhe:source-elemental-trio-2472-fire-hard",
+            "shanhe:source-elemental-trio-2472-qiongqi-nightmare"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-elemental-trio-2472-water-base",
+            "shanhe:source-elemental-trio-2472-fire-hell",
+            "shanhe:source-elemental-trio-2472-qiongqi-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4067,
+          "skinId": 4453,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4028,
+          "skinId": 4446,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4038,
+          "skinId": 4481,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2450,
+      "sourceGroupId": 2450,
+      "expectedVisibleEnemyCount": 2,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-beigong-duo-2450-statue",
+            "shanhe:source-beigong-duo-2450-beigong-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-beigong-duo-2450-statue",
+            "shanhe:source-beigong-duo-2450-beigong-hard"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 449700,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4871,
+          "skinId": 1000355,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2451,
+      "sourceGroupId": 2451,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-buheng-2451-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-buheng-2451-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-buheng-2451-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000333,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2462,
+      "sourceGroupId": 2462,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-chengzhan-2462-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-chengzhan-2462-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-chengzhan-2462-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000191,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2478,
+      "sourceGroupId": 2478,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-wucong-2478-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-wucong-2478-hard"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000257,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2479,
+      "sourceGroupId": 2479,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 5,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-liusandao-2479-base"
+          ]
+        },
+        {
+          "minDifficulty": 6,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-liusandao-2479-medium"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-liusandao-2479-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-liusandao-2479-nightmare"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-liusandao-2479-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000096,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2480,
+      "sourceGroupId": 2480,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-xunyue-2480-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-xunyue-2480-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-xunyue-2480-hell"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000195,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2488,
+      "sourceGroupId": 2488,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-armorer-2488-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-armorer-2488-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-armorer-2488-nightmare"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000204,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2489,
+      "sourceGroupId": 2489,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-xinping-2489"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000261,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2684,
+      "sourceGroupId": 2684,
+      "expectedVisibleEnemyCount": 1,
+      "variants": [
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-mou-dongzhuo-2684"
+          ]
+        }
+      ],
+      "members": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 605,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0
+        }
+      ]
+    }
+  ]
+}

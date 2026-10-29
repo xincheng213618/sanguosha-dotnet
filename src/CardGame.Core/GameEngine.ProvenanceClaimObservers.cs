@@ -29,7 +29,7 @@ public sealed partial class GameEngine
                 paid=claim;
             }
             if(_resolutionStack[i-1] is DyingFrame dying && IsPaidHandRepaymentProgramAlcoholRide(i-1,dying)) break;
-            if(!PreventionDrawObserverEdge(i)) return null;
+            if(!ProgramChildResolutionEdge(i)) return null;
         }
         return paid;
     }

@@ -12,9 +12,12 @@ public sealed record WushuangTacticViewModel(int Id)
     public static WushuangTacticViewModel FromContent(int artworkId, string name, string description, int quality, string? skillId) =>
         new(artworkId) { Content = new(name, description, quality, skillId) };
     public string Name => Content?.Name ?? Tactic.Name;
+    public string DisplayName => ShanheDisplayText.RewardName(Name);
     public string? SkillId => Content is { } content ? content.SkillId : Tactic.SkillId;
     private int Quality => Content?.Quality ?? Tactic.Quality;
-    public string Tooltip => $"战法 · {Name}\n{Content?.Description ?? Tactic.Description}";
+    private string TooltipHeading => Name.StartsWith("战法·", StringComparison.Ordinal) || Name.StartsWith("战法 ·", StringComparison.Ordinal)
+        ? Name : $"战法 · {Name}";
+    public string Tooltip => $"{TooltipHeading}\n{Content?.Description ?? Tactic.Description}";
     public ImageSource? Icon => ShanheArt.Get(Id);
     public ImageSource? Frame => WushuangArt.Get($"rogue_zhanfa_bg_{Quality}.png");
     public string Foreground => Quality switch

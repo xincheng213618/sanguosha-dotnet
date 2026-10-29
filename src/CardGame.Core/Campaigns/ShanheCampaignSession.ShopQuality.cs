@@ -5,13 +5,18 @@ public sealed partial class ShanheCampaignSession
     private IEnumerable<ShanheRewardDefinition> SelectShopStockRewards(RunState state, ShanheNodeDefinition node,
         List<ShanheRewardDefinition> candidates, int count, DeterministicRandom random)
     {
-        if (Definition.ShopRarityPolicy is null) return candidates.Take(count);
+        if (Definition.ShopRarityPolicy is null && !HasWolongMap(state)) return candidates.Take(count);
         var selected = new List<ShanheRewardDefinition>();
         while (selected.Count < count && candidates.Count > 0)
         {
             var rarity = SelectShopRarity(state, node, candidates, random);
             // Candidates have already been shuffled and refreshes prefer new faces.
             var index = rarity is { } tier ? candidates.FindIndex(reward => reward.Rarity == tier) : 0;
+            if (HasWolongMap(state))
+            {
+                var eligible = candidates.Where(reward => rarity is null || reward.Rarity == rarity).ToArray();
+                index = candidates.IndexOf(eligible[SelectOwnedSchoolRewardIndex(state, eligible, random)]);
+            }
             selected.Add(candidates[index]);
             candidates.RemoveAt(index);
         }
@@ -25,14 +30,17 @@ public sealed partial class ShanheCampaignSession
         var chapter = state.MarketChapterNumber > 0 ? state.MarketChapterNumber : node.ChapterNumber;
         var weights = chapter <= 1 ? policy.FirstChapter : policy.LaterChapters;
         var available = candidates.Select(reward => reward.Rarity).ToHashSet();
-        var total = Enumerable.Range(1, 4).Where(available.Contains).Sum(weights.Weight);
+        // A held matching school may offer white tactics even under a policy
+        // whose normal white weight is zero. This is a local one-unit exception.
+        int Weight(int rarity) => rarity == 1 && HasWolongMap(state) ? Math.Max(1, weights.Weight(rarity)) : weights.Weight(rarity);
+        var total = Enumerable.Range(1, 4).Where(available.Contains).Sum(Weight);
         // Exhausted tiers cannot duplicate stock or bypass research/ownership gates.
         if (total == 0) return null;
         var roll = random.Next(total);
         for (var rarity = 1; rarity <= 4; rarity++)
         {
             if (!available.Contains(rarity)) continue;
-            roll -= weights.Weight(rarity);
+            roll -= Weight(rarity);
             if (roll < 0) return rarity;
         }
         throw new InvalidOperationException("The authored shop rarity distribution could not be sampled.");
@@ -71,6 +79,7 @@ public sealed partial class ShanheCampaignSession
         var candidates = (node.Choices ?? []).Where(choice => choice is { RewardId: not null, LeavesNode: false } &&
                 HasShopStockPrice(choice) && _rewards[choice.RewardId!] is var reward &&
                 ShopCategory(reward) == category && reward.Rarity > original.Rarity &&
+                FilterBalancedShopCandidate(state, reward) &&
                 RewardAcquisitionIdentity(reward) != originalIdentity &&
                 !occupied.Contains(RewardAcquisitionIdentity(reward)) &&
                 CanReceiveReward(state, reward) && CanApplyBossReward(state, reward))
@@ -79,7 +88,9 @@ public sealed partial class ShanheCampaignSession
         var nextRarity = candidates.Min(choice => _rewards[choice.RewardId!].Rarity);
         var tier = candidates.Where(choice => _rewards[choice.RewardId!].Rarity == nextRarity)
             .DistinctBy(choice => RewardAcquisitionIdentity(_rewards[choice.RewardId!])).ToArray();
-        var authored = tier[random.Next(tier.Length)];
+        var authored = tier[HasWolongMap(state)
+            ? SelectOwnedSchoolRewardIndex(state, tier.Select(choice => _rewards[choice.RewardId!]).ToArray(), random)
+            : random.Next(tier.Length)];
         var promoted = _rewards[authored.RewardId!];
         var prefix = restockOrdinal == 0 ? $"$shop:{state.ShopRefreshCount}:" : $"$restock:{state.ShopRefreshCount}:{restockOrdinal}:";
         return new(prefix + promoted.Id, promoted.Name, authored.GoldCost, authored.HpCost, promoted.Id, LeavesNode: false)

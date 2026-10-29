@@ -547,7 +547,8 @@
     </DataTemplate>
 
     <DataTemplate x:Key="WushuangTacticBadgeTemplate">
-        <StackPanel Width="60" Height="66" Margin="1,0" ToolTip="{Binding Tooltip}" ToolTipService.InitialShowDelay="150" AutomationProperties.Name="{Binding Tooltip}">
+        <Grid x:Name="TacticBadge" Width="60" Height="66" Margin="1,0" Background="Transparent" Focusable="True" ToolTip="{Binding Tooltip}" ToolTipService.InitialShowDelay="150" ToolTipService.ShowsToolTipOnKeyboardFocus="True" AutomationProperties.Name="{Binding Tooltip}">
+        <StackPanel>
             <Grid Width="46" Height="46">
                 <Image Source="{Binding Frame}" Stretch="Uniform" />
                 <Ellipse Width="33" Height="33" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -555,11 +556,16 @@
                 </Ellipse>
             </Grid>
             <Viewbox Height="16" Stretch="Uniform" StretchDirection="DownOnly" Margin="0,2,0,0">
-                <TextBlock Text="{Binding Name}" Foreground="{Binding Foreground}" FontFamily="SimSun" FontSize="12" TextAlignment="Center">
+                <TextBlock Text="{Binding DisplayName}" Foreground="{Binding Foreground}" FontFamily="SimSun" FontSize="12" TextAlignment="Center">
                     <TextBlock.Effect><DropShadowEffect Color="#160C06" BlurRadius="3" ShadowDepth="1" Opacity="1" /></TextBlock.Effect>
                 </TextBlock>
             </Viewbox>
         </StackPanel>
+        <Border x:Name="TacticKeyboardFocus" BorderBrush="#FFE0A2" BorderThickness="1" CornerRadius="4" Visibility="Collapsed" IsHitTestVisible="False" />
+        </Grid>
+        <DataTemplate.Triggers>
+            <Trigger SourceName="TacticBadge" Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="TacticKeyboardFocus" Property="Visibility" Value="Visible" /></Trigger>
+        </DataTemplate.Triggers>
     </DataTemplate>
 
     <DataTemplate x:Key="SeatTemplate">
@@ -684,7 +690,7 @@
         </controls:IdentityMarkButton>
         <Canvas Width="0" Height="0" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="5" Visibility="{Binding ShowPortraitWushuangTactics, Converter={StaticResource BoolToVisibility}}">
             <ScrollViewer x:Name="OpponentWushuangTactics" Canvas.Right="6" Canvas.Top="74" Width="{Binding OpponentWushuangTacticWidth}" MaxHeight="132" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="对方战法" AutomationProperties.HelpText="超过十个战法时可滚动查看">
-                <ItemsControl ItemsSource="{Binding WushuangTactics}" ItemTemplate="{StaticResource WushuangTacticBadgeTemplate}">
+                <ItemsControl Focusable="False" ItemsSource="{Binding WushuangTactics}" ItemTemplate="{StaticResource WushuangTacticBadgeTemplate}">
                     <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel HorizontalAlignment="Right" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                 </ItemsControl>
             </ScrollViewer>

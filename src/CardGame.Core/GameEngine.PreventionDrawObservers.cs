@@ -50,56 +50,13 @@ public sealed partial class GameEngine
                 // as if the Alcohol use were a direct native Dying response.
                 if (_resolutionStack[child - 1] is DyingFrame alcoholDying &&
                     IsPaidHandRepaymentProgramAlcoholRide(child - 1, alcoholDying)) break;
-                if (!PreventionDrawObserverEdge(child)) { aligned = false; break; }
+                if (!ProgramChildResolutionEdge(child)) { aligned = false; break; }
             }
             if (aligned) return root;
         }
         return null;
     }
 
-    private bool PreventionDrawObserverEdge(int index)
-    {
-        var child = _resolutionStack[index]; var parent = _resolutionStack[index - 1];
-        if (ProvenanceClaimTurnedOverEdge(child, parent)) return true;
-        if (RecoveryReplacementFrameRidesOn(child, parent) || RandomEquipmentFrameRidesOn(child, parent) ||
-            PileEquipmentFrameRidesOn(child, parent)) return true;
-        if (parent is DeathFrame death)
-        {
-            if (child is ProgramDeathTriggerWindowFrame ownerDeath)
-                return ownerDeath.DeathFrameId == death.Id && ownerDeath.OwnerSeat == death.VictimSeat && ownerDeath.KillerSeat == death.KillerSeat;
-            if (child is ProgramKillTriggerWindowFrame characterDeath)
-                return characterDeath.DeathFrameId == death.Id && characterDeath.VictimSeat == death.VictimSeat &&
-                    characterDeath.KillerSeat == death.KillerSeat && characterDeath.Candidates.Count == characterDeath.Contexts.Count &&
-                    characterDeath.Contexts.All(c => c.Window == SkillProgramTriggerWindow.CharacterDied && c.ParentFrameId == characterDeath.Id &&
-                        c.TargetSeat == death.VictimSeat && c.SourceSeat == death.KillerSeat);
-        }
-        if (child is ProgramSkillFrame deathObserver && parent is ProgramDeathTriggerWindowFrame deadWindow)
-            return deadWindow.CandidateIndex >= 0 && deadWindow.CandidateIndex < deadWindow.Candidates.Count &&
-                MountObserverCandidateMatches(deathObserver, deadWindow.Candidates[deadWindow.CandidateIndex]) &&
-                deathObserver.WindowContext is { Window: SkillProgramTriggerWindow.OwnerDied } c && c.ParentFrameId == deadWindow.Id &&
-                c.OwnerSeat == deadWindow.OwnerSeat && c.TargetSeat == deadWindow.OwnerSeat && c.SourceSeat == deadWindow.KillerSeat;
-        if (child is ProgramSkillFrame killObserver && parent is ProgramKillTriggerWindowFrame killWindow)
-            return killWindow.CandidateIndex >= 0 && killWindow.CandidateIndex < killWindow.Candidates.Count &&
-                killWindow.Candidates.Count == killWindow.Contexts.Count && MountObserverCandidateMatches(killObserver, killWindow.Candidates[killWindow.CandidateIndex]) &&
-                killObserver.WindowContext is { Window: SkillProgramTriggerWindow.CharacterDied } c &&
-                c.ParentFrameId == killWindow.Id && c.OwnerSeat == killObserver.OwnerSeat && c.TargetSeat == killWindow.VictimSeat &&
-                c.SourceSeat == killWindow.KillerSeat && c.OccurrenceIndex == killWindow.Contexts[killWindow.CandidateIndex].OccurrenceIndex;
-        if (parent is DyingFrame dying)
-        {
-            if (child is CardUseFrame) return IsPaidHandRepaymentRescueRide(index - 1, dying);
-            if (child is ProgramSkillFrame && IsPaidHandRepaymentProgramAlcoholRide(index - 1, dying)) return true;
-            if (ParticipantHandDyingEntryRide(child, parent, dying)) return true;
-        }
-        if (child is ProgramSkillFrame entryProgram && parent is ProgramLifecycleTriggerWindowFrame entry &&
-            _resolutionStack.OfType<DyingFrame>().LastOrDefault(f => f.Id == entry.ResumeDyingFrameId) is { } entryDying &&
-            ParticipantHandDyingEntryRide(entryProgram, entry, entryDying)) return true;
-        if (child is HpChangedTriggerWindowFrame hp && parent is CardUseFrame rescue && index >= 2 &&
-            _resolutionStack[index - 2] is DyingFrame rescued && IsPaidHandRepaymentRescueRide(index - 2, rescued))
-            return ParticipantHandRescueObserverRide(hp, rescue, rescue);
-        if (_resolutionStack.OfType<CardUseFrame>().LastOrDefault(f => f.DyingResponse is not null) is { } rescueUse &&
-            ParticipantHandRescueObserverRide(child, parent, rescueUse)) return true;
-        return PaidMountObserverEdge(index);
-    }
 
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30)]
     private bool HasPreventionDrawDying(long beforeDamageId) => ActiveDying is { ResumesProgramSkill: true } dying &&

@@ -61,7 +61,7 @@ public sealed class StandardShanheSourceElementalTrioPackage : IGameContentPacka
 
         void Add(string id, string name, int body, string portrait, string faction, GeneralGender gender,
             int hp, string? primary, IReadOnlyList<string> extra) =>
-            // Source skins4453/4446/4481 have no confirmed local image mappings.
+            // Keep runtime carrier metadata; desktop artwork uses the verified PVE seatpic mappings.
             builder.AddGeneral(new(id, name, "supporter", primary, faction, hp, extra)
             {
                 InitialHp = hp, CharacterId = "character:shanhe-source-general-" + body,

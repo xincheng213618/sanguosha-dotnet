@@ -50,7 +50,7 @@ public sealed partial class GameEngine
                     m.Reason.Value != reason || !_cardMovements.Contains(m))) continue;
             var aligned = true;
             for (var child = index + 1; child < _resolutionStack.Count; child++)
-                if (!PaidMountObserverEdge(child)) { aligned = false; break; }
+                if (!ProgramChildResolutionEdge(child)) { aligned = false; break; }
             if (aligned) return program;
         }
         return null;

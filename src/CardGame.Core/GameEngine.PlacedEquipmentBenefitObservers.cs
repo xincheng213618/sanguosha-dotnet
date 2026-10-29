@@ -151,17 +151,6 @@ public sealed partial class GameEngine
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1850)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 120)]
     private bool HasPlacedEquipmentBenefitDamageObserver(long damageWindowId) => PlacedEquipmentObserverRoot(damageWindowId) is not null;
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 910)]
-    private bool AllowsPlacedEquipmentBenefitNestedDamage(ProgramSkillFrame observer, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (_resolutionStack.LastOrDefault()?.Id != observer.Id || observer.AttackAttempt is not null || observer.InstructionIndex < 1 ||
-            observer.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.AfterHpRecovered or
-                SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost) || PlacedEquipmentObserverRoot() is null) return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(observer, _contentRegistry.GetSkill(observer.SkillId).Program!).GetPausedInstruction(observer.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.Damage && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            !sourceLess && target == (effect.TargetReference is { } reference ? ResolveProgramParticipant(observer, reference) : ResolveProgramEffectTarget(observer, effect.Target));
-    }
     private void AssertPlacedEquipmentBenefits()
     {
         foreach (var f in _resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.PlacedEquipmentBenefit is not null))

@@ -36,10 +36,4 @@ public sealed partial class GameEngine
  private bool IsZhangQiYingDying()=>ActiveDying is not null&&ZhangQiYingObserverRoot()is not null;
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 330)]
  private bool TryAdvanceZhangQiYingSubtree()=>_pendingDecision is null&&ZhangQiYingObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 560)]
- private bool AllowsZhangQiYingNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference?source,DamageNature?nature,bool sourceLess)
- {
-  if(sourceLess||f.AttackAttempt is not null||f.InstructionIndex<1||_resolutionStack.LastOrDefault()?.Id!=f.Id||ZhangQiYingObserverRoot()is null||f.WindowContext?.Window is not(SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged))return false;
-  var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&target==(e.TargetReference is{}r?ResolveProgramParticipant(f,r):ResolveProgramEffectTarget(f,e.Target));
- }
 }

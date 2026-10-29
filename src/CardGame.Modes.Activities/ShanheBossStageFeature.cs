@@ -108,11 +108,13 @@ internal sealed class ShanheBossStageFeature : IGameModeFeature,
     {
         var boss = facts.Players[BossSeat];
         var transition = _setup.BossTransition!;
+        var lastPreviousFormLogSequence = _host.LastLogSequence;
         _host.ReplaceCombatant(new(BossSeat, boss.GeneralId, transition.GeneralId, PreserveCurrentState: true,
             MaximumHpOverride: transition.MaxHp, HpOverride: transition.Hp, ArmorOverride: transition.Combatant?.InitialArmor));
         // Commit the once-only marker before opening draws or cleanup publish another rule event.
         _host.PublishFact(new ShanheBossStageStartedEvent(BossSeat, boss.GeneralId, transition.GeneralId,
-            facts.TurnNumber, transition.MaxHp, transition.Hp));
+            facts.TurnNumber, transition.MaxHp, transition.Hp)
+        { LastPreviousFormLogSequence = lastPreviousFormLogSequence });
     }
 
     private void DealSecondFormCards(ShanheBossTransition transition)

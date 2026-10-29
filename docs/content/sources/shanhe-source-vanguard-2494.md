@@ -8,13 +8,19 @@
 {"a":2494,"startChapter":1,"b":4861,"c":"先锋精骑","d":"1000236","f":0,"h":100,"k":4,"l":4,"m":0,"n":0,"o":5,"p":2,"q":4,"r":0,"otherad":0,"t":"20546","v":"761","getspell_KN":"923","getspell_EM":"3123","pvpspell":"3189"}
 ```
 
-原身体为士兵4861，体力4/4、摸牌2、随机起手4。没有本行额外属性、隐藏成员或第二阶段；护甲、护甲回复、额外出杀及额外伤害均为0，护甲上限字段5。PVP字段3189不加入山河技能。尚未核实肖像1000236，使用明确的通用回退，不借用曹休、神张辽或SP马超的身体。
+原身体为士兵4861，体力4/4、摸牌2、随机起手4。没有本行额外属性、隐藏成员或第二阶段；护甲、护甲回复、额外出杀及额外伤害均为0，护甲上限字段5。PVP字段3189不加入山河技能。运行时保留 `supporter` 回退键；桌面可按下列精确来源卡面及运行时ID绑定显示先锋精骑，不改变内容定义，不借用曹休、神张辽或SP马超的身体。
 
 | 来源难度 | 累计技能 | 固定装备 |
 | --- | --- | --- |
 | 1—10 | 761倾袭 | 20546方天画戟 |
 | 11—15 | 倾袭、923夺锐 | 保留方天画戟 |
 | 16—25 | 倾袭、夺锐、3123追击 | 保留方天画戟 |
+
+## 原生卡面
+
+已于2026-10-29核对普通组2494唯一成员 `rawOrdinal=0 → b=4861 → d=1000236`。载体4861的 `character.sgs` 行为“士兵”、类 `ShiBing61`，没有 `au/av` 头像重定向；卡面来自本行明确的PVE皮肤，不按载体或技能所属武将借图。`cha_gs_dbs_fs_skininfo.sgs/root.pveskin` 的1000236行指定 `seatpic=generalface_1000236`、`headpic=1000236`、`diagrampic=100023600`。该解码皮肤表SHA-256为 `00ee5f994401976563e241571d3e5618f573ad2a4b85336ff132afb262f1e8d4`。客户端 `q6t.getSeatSkinUrl → hA.SkinSeatUrl` 经 `N2t.SeatImgUrl=general/seat/static/` 及桌面 `res/runtime/pc/` 生成[官方卡面URL](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000236.png)。
+
+官方响应为HTTP200、`image/png`；目视为身着盔甲的先锋骑兵。原生146×172、RGBA、62158字节，原字节保存为 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000236.png`；文件SHA-256为 `db90352c4b8eda4500e1de42eaf490e9118d1528bfe05d0a78a4c50b70153a36`，解码RGBA像素SHA-256为 `ba182fe61a2a893d27c810260d05cb0c96267da8e86907dace9fe9507486b7df`。未裁剪、缩放或换色。精确绑定仅为 `shanhe:source-vanguard-2494-base`（1–10）、`shanhe:source-vanguard-2494-hard`（11–15）、`shanhe:source-vanguard-2494-nightmare`（16–25）；三档同用本行皮肤和固定装备20546。原行未设置 `g/hide/generalShow`，按源默认分别为false/false/0；`startChapter=1`、`f=0`，无主帅身份。
 
 ## 准确能力与装备
 

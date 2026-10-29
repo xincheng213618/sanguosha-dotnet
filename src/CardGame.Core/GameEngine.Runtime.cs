@@ -54,7 +54,7 @@ public sealed partial class GameEngine
         };
         if (parentId > 0 && !_resolutionStack.Any(parent => parent.Id == parentId))
             throw new InvalidOperationException("A runtime child cannot outlive its owning frame.");
-        _resolutionStack.Push(frame);
+        _resolutionStack.PushOwned(frame);
         if (frame is CardUseFrame use && use.Action is { Type: CardActionType.Use } action)
         {
             BindQinglongInsertedUse(use);

@@ -16,7 +16,7 @@ public sealed partial class MainViewModel
         if (sourceId == 0 && reward.Id.StartsWith(chapterCardPrefix, StringComparison.Ordinal))
             int.TryParse(reward.Id.AsSpan(chapterCardPrefix.Length), out sourceId);
         var image = ShanheArt.Get(sourceId) ?? (card is null ? null : CardArt.Get(card.Kind));
-        return new(reward.Name.Replace("战法·", "").Replace("传习·", ""), image, card is not null, isPreview);
+        return new(ShanheDisplayText.RewardName(reward.Name), image, card is not null, isPreview);
     }
 }
 

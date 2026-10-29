@@ -99,7 +99,7 @@ public sealed partial class GameEngine
                 rescueDefinition.Triggers.Any(t => t.Id == response.TriggerId && t.Window == responseContext.Window);
         }
         for (var child = index + 1; child < _resolutionStack.Count; child++)
-            if (!PreventionDrawObserverEdge(child)) return false;
+            if (!ProgramChildResolutionEdge(child)) return false;
         return true;
     }
 

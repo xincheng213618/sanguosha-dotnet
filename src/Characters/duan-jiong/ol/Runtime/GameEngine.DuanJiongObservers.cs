@@ -47,13 +47,6 @@ public sealed partial class GameEngine
     private bool HasDuanJiongBeforeDamageObserver(long id) => HasDuanJiongDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 600)]
     private bool IsDuanJiongDying() => ActiveDying is { } dying && SaoguObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1240)]
-    private bool AllowsDuanJiongNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || SaoguObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature &&
-            target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27060)]
     private bool AdvanceSaoguSubtree() => _pendingDecision is null && SaoguObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

@@ -37,17 +37,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 34800)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 34800)]
     private bool MouLiuXieDying() => ActiveDying is { } dying && MouLiuXieNativeRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 34800)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 34800)]
-    private bool MouLiuXieNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess) return false;
-        if (MouLiuXie.Valid(f) && f.MouLiuXie is { Stage: MouLiuXieStage.Damage } r) return target == r.Payer && amount == 1 && source is null && nature is null;
-        if (MouLiuXieNativeRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && amount == effect.Amount && source == effect.ActorReference && nature == effect.DamageNature &&
-            target == (effect.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 34800)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 34800)]
     private bool MouLiuXieRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

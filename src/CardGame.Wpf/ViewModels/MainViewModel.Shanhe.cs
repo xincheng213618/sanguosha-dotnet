@@ -30,10 +30,10 @@ public sealed partial class MainViewModel
 
     public IReadOnlyList<ShanheScenarioOption> ShanheScenarios { get; } =
         StandardShanheCampaignCatalog.Editions.Select(edition => new ShanheScenarioOption(edition.Id,
-            edition.Name + (edition.Id == StandardShanheCampaignCatalog.Returning2026EditionId ? "（推荐）" : ""))).ToArray();
+            edition.Name + (edition.Id == StandardShanheCampaignCatalog.Source2026EditionId ? "（推荐）" : ""))).ToArray();
     public ShanheScenarioOption SelectedShanheScenario
     {
-        get => _selectedShanheScenario ?? ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.Returning2026EditionId);
+        get => _selectedShanheScenario ?? ShanheScenarios.Single(option => option.Id == StandardShanheCampaignCatalog.Source2026EditionId);
         set
         {
             if (IsShanheRunInProgress && value?.Id != StandardShanheCampaignCatalog.EditionIdForCampaign(_shanheSession!.Definition.Id, _shanheRunDifficulty)) return;
@@ -109,7 +109,7 @@ public sealed partial class MainViewModel
     public string SelectedShanheScenarioDescription => SelectedShanheScenario.Id switch
     {
         StandardShanheCampaignCatalog.Source2026EditionId =>
-            "诸侯伐董：25档配置复现，按原地区连边行军；四项非计分章节任务可累计。未公开的战斗细节采用本地规则。",
+            "诸侯伐董：每章完成六格主线即可挑战首领。沿途开放奇遇、集市和休息，两处可选战场与擂台可按需补打，全部体验共十次。日行千里Ⅰ / Ⅱ每章再增加1 / 2场战斗。可选25档难度。",
         StandardShanheCampaignCatalog.Returning2026EditionId =>
             "诸侯伐董：沿三章路线征战，收集战法、技能与装备，挑战神鬼无前吕布等关底首领。",
         _ => "诸侯伐董：选择路线，击败敌军，组合战法与技能，抵达洛阳。"
@@ -165,7 +165,7 @@ public sealed partial class MainViewModel
         {
             if (_shanheSession is not { } session) return "选择一名武将，踏上征途";
             var live = HasLiveShanheBattle
-                ? _shanheBattleGame?.CreateSnapshot(0).Players.Single(player => player.IsHuman) : null;
+                ? CurrentShanheBattleState?.Players.Single(player => player.IsHuman) : null;
             return $"{ShanheGeneralName(session.Snapshot.PlayerGeneralId)}   体力 {live?.Hp ?? session.Snapshot.Hp}/{live?.MaxHp ?? session.Snapshot.MaxHp}";
         }
     }
@@ -219,7 +219,7 @@ public sealed partial class MainViewModel
             var state = session.Snapshot;
             if (state.Phase is ShanheCampaignPhase.Won or ShanheCampaignPhase.Lost) return state.EndingText;
             return state.StoryText + (state.BossRewardSummary is { IsBonusOnly: true } ? "\n\n领取本次胜利的追加奖励，确认后继续行军。"
-                : state.BossRewardSummary is not null ? "\n\n首领已败，分别领取战法与技能，确认奖励后继续征程。"
+                : state.BossRewardSummary is not null ? "\n\n首领已败，处理本章各组奖励，确认后继续征程。"
                 : state.Phase == ShanheCampaignPhase.Reward ? "\n\n从下方奖励中选择一项，再继续征程。"
                 : state.Phase == ShanheCampaignPhase.Battle ? "\n\n" + (IsShanheBattleRetryReady ? ShanheBattleRetryDescription
                     : "可返回牌桌继续战斗；保存进度并退出后，下次从本关开头重新挑战。") : "");
@@ -293,6 +293,7 @@ public sealed partial class MainViewModel
         if (IsTutorialActive || _shanheSaveStore is null) return;
         if (_shanheSession is not null)
         {
+            if (EnableCurrentShanheRewardRules()) SaveShanheProgress();
             IsShanheOpen = true; RefreshShanhePresentation(); return;
         }
         try
@@ -306,12 +307,14 @@ public sealed partial class MainViewModel
                 StandardShanheCampaignCatalog.EditionIdForCampaign(session.Definition.Id, save.Difficulty));
             SelectedShanheDifficulty = ShanheDifficulties.Single(option => option.Value == save.Difficulty);
             SelectedShanheRank = ShanheRanks.Single(option => option.Value == session.Snapshot.PlayerRank);
+            var rewardRulesUpdated = EnableCurrentShanheRewardRules();
             IsShanheOpen = true;
             ShanheStatusText = $"已恢复征程进度 · {save.SavedAtUtc.ToLocalTime():MM-dd HH:mm}。" +
                 (session.PendingBattleSetup is not null ? "本关从头挑战，不恢复退出前的牌局。" : "");
             SettleShanheCodexReward();
             if (IsShanheSettlementPending) _dismissedShanheSettlement = null;
             RefreshShanhePresentation();
+            if (rewardRulesUpdated) SaveShanheProgress();
         }
         catch (Exception error) when (IsSaveException(error))
         {
@@ -346,6 +349,7 @@ public sealed partial class MainViewModel
         var previousPhase = session.Snapshot.Phase;
         var result = session.Submit(command);
         if (!result.Accepted) { ShanheStatusText = $"选择未执行：{result.Error}"; return; }
+        EnableCurrentShanheRewardRules();
         if (previousPhase != ShanheCampaignPhase.Battle && result.State.Phase == ShanheCampaignPhase.Battle)
             _shanheBattleGame = null;
         RefreshShanhePresentation();
@@ -411,6 +415,7 @@ public sealed partial class MainViewModel
         }
         var result = session.CompleteBattle(battle, session.Revision);
         if (!result.Accepted) { ShanheStatusText = $"战斗结算未完成：{result.Error}"; return; }
+        EnableCurrentShanheRewardRules();
         SettleShanheCodexReward();
         IsShanheOpen = true;
         RefreshShanhePresentation();
@@ -466,9 +471,16 @@ public sealed partial class MainViewModel
     {
         if (_selectedShanheDifficulty is null) return;
         var definition = _shanheSession?.Definition ?? StandardShanheCampaignCatalog.CreateCodexDefinition(SelectedShanheDifficulty.Value, SelectedShanheScenario.Id);
-        if (_shanheSession is { HasPersistentMarket: true } marketSession)
-            definition = definition with { Nodes = marketSession.VisibleMapNodes,
-                StartingNodeIds = marketSession.ResolveVisibleNodeIds(definition.StartingNodeIds) };
+        if (_shanheSession is { } mapSession)
+        {
+            var mapNodes = mapSession.VisibleMapNodes;
+            var mapIds = mapNodes.Select(node => node.Id).ToHashSet(StringComparer.Ordinal);
+            definition = definition with
+            {
+                Nodes = mapNodes.Select(node => node with { NextNodeIds = node.NextNodeIds.Where(mapIds.Contains).ToArray() }).ToArray(),
+                StartingNodeIds = mapSession.ResolveVisibleNodeIds(definition.StartingNodeIds).Where(mapIds.Contains).ToArray()
+            };
+        }
         RefreshShanheGeneralRoster();
         var state = _shanheSession?.Snapshot;
         var available = state?.AvailableNodes.Select(node => node.Id).ToHashSet(StringComparer.Ordinal) ?? [];
@@ -547,86 +559,12 @@ public sealed partial class MainViewModel
     }
 
     private void RefreshShanheJourneyMap(ShanheCampaignDefinition definition, IReadOnlyDictionary<string, int> depths,
-        string? currentNodeId, IReadOnlySet<string> completed)
-    {
-        ShanheMapNodes.Clear();
-        ShanheMapLinks.Clear();
-        var visibleNodes = CurrentShanheChapterNodes(definition, depths, currentNodeId, completed).ToArray();
-        if (visibleNodes.Length == 0) return;
-        var firstDepth = visibleNodes.Min(node => depths.GetValueOrDefault(node.Id));
-        var maxDepth = Math.Max(1, visibleNodes.Max(node => depths.GetValueOrDefault(node.Id)) - firstDepth);
-        var sourceBattleDepth = visibleNodes.Where(node => node.Kind is ShanheNodeKind.Battle or ShanheNodeKind.EliteBattle)
-            .Select(node => depths.GetValueOrDefault(node.Id)).DefaultIfEmpty(firstDepth).Min();
-        var presentations = ShanheMapRows.SelectMany(row => row.Nodes).ToDictionary(node => node.Id, StringComparer.Ordinal);
-        var playerLocation = currentNodeId ?? visibleNodes.FirstOrDefault(node => presentations[node.Id].IsAvailable)?.Id;
-        foreach (var group in visibleNodes.GroupBy(node => depths.GetValueOrDefault(node.Id)).OrderBy(group => group.Key))
-        {
-            var nodes = group.ToArray();
-            for (var index = 0; index < nodes.Length; index++)
-            {
-                var relativeDepth = group.Key - firstDepth;
-                var centerX = 108 + 800.0 * relativeDepth / maxDepth;
-                // Branches retain their real topological order, while alternating bends
-                // spread locations over the landscape instead of a straight flow chart.
-                // Leave the southeast corner clear for the expedition's character panel.
-                var lowerBank = centerX > 700 ? 340.0 : 440.0;
-                var centerY = nodes.Length == 1 ? (relativeDepth % 4) switch
-                    { 0 => 235, 1 => 390, 2 => 195, _ => 310 }
-                    : 170 + (lowerBank - 170) * index / (nodes.Length - 1);
-                // Four third-chapter choices need two columns to keep their
-                // emblems and vertical name plates separately selectable.
-                if (centerX > 700 && nodes.Length > 3)
-                {
-                    centerX -= index % 2 == 0 ? 140 : 0;
-                    var rows = (nodes.Length + 1) / 2;
-                    centerY = 170 + (lowerBank - 170) * (index / 2) / Math.Max(1, rows - 1);
-                }
-                centerY = Math.Min(centerY, lowerBank);
-                if (definition.SourceDifficultyId is not null && SelectedShanheSourceRegion is not null)
-                {
-                    var sourceDepth = group.Key - sourceBattleDepth;
-                    if (nodes[index].Kind == ShanheNodeKind.Shop)
-                    {
-                        centerX = 600; centerY = 90;
-                    }
-                    else if (nodes.Length > 1)
-                    {
-                        centerX = 105 + index % 3 * 165;
-                        centerY = 140 + index / 3 * 150;
-                    }
-                    else if (sourceDepth > 0)
-                    {
-                        centerX = 600 + Math.Min(2, sourceDepth - 1) * 155;
-                        centerY = (sourceDepth % 3) switch { 1 => 300, 2 => 170, _ => 270 };
-                    }
-                }
-                var node = nodes[index];
-                ShanheMapNodes.Add(new(presentations[node.Id], centerX, centerY, node.Kind,
-                    ShanheMapShortName(node), node.Id == currentNodeId, completed.Contains(node.Id))
-                    { IsPlayerLocation = node.Id == playerLocation });
-            }
-        }
-        var positions = ShanheMapNodes.ToDictionary(node => node.Node.Id, StringComparer.Ordinal);
-        foreach (var node in visibleNodes)
-            foreach (var nextId in node.NextNodeIds)
-            {
-                if (!positions.TryGetValue(nextId, out var end)) continue;
-                var start = positions[node.Id];
-                var route = new StreamGeometry();
-                using (var context = route.Open())
-                {
-                    context.BeginFigure(new Point(start.CenterX, start.CenterY + 24), false, false);
-                    var bend = (end.CenterX - start.CenterX) * 0.48;
-                    context.BezierTo(new Point(start.CenterX + bend, start.CenterY + 24),
-                        new Point(end.CenterX - bend, end.CenterY + 24), new Point(end.CenterX, end.CenterY + 24), true, false);
-                }
-                route.Freeze();
-                ShanheMapLinks.Add(new(route, start.IsCompleted && (end.IsCompleted || end.IsCurrent),
-                    (start.IsCurrent || start.IsCompleted) && end.IsAvailable));
-            }
-    }
+        string? currentNodeId, IReadOnlySet<string> completed) =>
+        BuildShanheChapterRouteMap(definition, depths, currentNodeId, completed);
 
-    private static string ShanheMapShortName(ShanheNodeDefinition node) => node.Id switch
+    private static string ShanheMapShortName(ShanheNodeDefinition node) =>
+        node.Id.StartsWith("source-region-", StringComparison.Ordinal) && node.Kind == ShanheNodeKind.EliteBattle
+            ? "精锐军营" : node.Id switch
     {
         "hulao-start" => node.Kind == ShanheNodeKind.Event ? "北路出征" : node.Name,
         "guangcheng-start" => node.Kind == ShanheNodeKind.Event ? "南路出征" : node.Name, "hulao" => "虎牢关",
@@ -682,17 +620,46 @@ public sealed record ShanheMapRow(string Title, IReadOnlyList<ShanheCampaignNode
 public sealed record ShanheJourneyNode(ShanheCampaignNode Node, double CenterX, double CenterY,
     ShanheNodeKind Kind, string ShortName, bool IsCurrent, bool IsCompleted)
 {
-    public double X => CenterX - 60;
-    public double Y => CenterY - 44;
+    public double X => NativeLandmark?.MapX ?? CenterX - 68;
+    public double Y => NativeLandmark?.MapY ?? CenterY - 44;
+    public ShanheNativeMapLandmark? NativeLandmark { get; init; }
+    public bool HasNativeArtwork => NativeLandmark is not null;
+    public ImageSource? NativeArtwork => IsAvailable || IsCurrent && !IsCompleted ? NativeLandmark?.Artwork : NativeLandmark?.DormantArtwork;
+    public double HitWidth => NativeLandmark is { } art ? Math.Max(90, art.MapWidth) : 136;
+    public double HitHeight => NativeLandmark is { } art ? Math.Max(74, art.MapHeight) : 132;
+    public Thickness BattleMarkerMargin => MarkerMargin(58, 58, new(28, -23, 0, 0));
+    public Thickness EventMarkerMargin => MarkerMargin(43, 52, new(35, -23, 0, 0));
+    public Thickness CampMarkerMargin => MarkerMargin(72, 50, new(21, -21, 0, 0));
+    public Thickness BossMarkerMargin => MarkerMargin(88, 63, new(12, -24, 0, 0));
+    public Thickness PlayerPinMargin => NativeLandmark is { } art ? new(art.MapWidth / 2 - 22.5, -59, 0, 0) : new(34, -72, 0, 0);
+    public Thickness ExtraFlagMargin => NativeLandmark is { } art ? new(3, Math.Max(0, art.MapHeight - 24), 0, 0) : new(5, 100, 0, 0);
+    public Thickness CompletedMarkMargin => NativeLandmark is { } art ? new(Math.Max(0, art.MapWidth - 22), Math.Max(0, art.MapHeight - 22), 0, 0) : new(79, 72, 0, 0);
+    private Thickness MarkerMargin(double width, double height, Thickness fallback) => NativeLandmark is { } art
+        ? new(art.MapWidth / 2 + 5 * ShanheMapArt.Scale - width / 2, art.MapHeight / 2 - 10 * ShanheMapArt.Scale - height / 2, 0, 0) : fallback;
     public bool IsPlayerLocation { get; init; }
     public bool IsBattle => Kind is ShanheNodeKind.Battle or ShanheNodeKind.EliteBattle or ShanheNodeKind.BossBattle;
+    public bool IsBoss => Kind == ShanheNodeKind.BossBattle;
+    public bool IsExtraBattle { get; init; }
+    public bool IsAlternativeBattle { get; init; }
+    public bool IsMainline { get; init; }
+    public string SceneLandmark { get; init; } = "City";
+    public string StageLabel { get; init; } = string.Empty;
+    public string RouteFlagText { get; init; } = string.Empty;
+    public bool HasRouteFlag => IsAvailable && !string.IsNullOrWhiteSpace(RouteFlagText);
+    public string RewardText { get; init; } = string.Empty;
+    public string RouteSourceText { get; init; } = string.Empty;
+    public string EnemyText { get; init; } = string.Empty;
     public string VerticalName => string.Join("\n", ShortName.Take(6));
     public bool IsAvailable => Node.IsAvailable;
     public string KindLabel => Node.KindLabel;
-    public string StateLabel => IsCurrent ? $"{KindLabel} · 当前" : IsAvailable ? $"{KindLabel} · 可前往"
-        : IsCompleted ? $"{KindLabel} · 已完成" : KindLabel;
-    public string AccessibleName => Node.AccessibleName;
-    public string DetailText => $"{Node.Name}\n{Node.StatusLabel}\n\n{Node.Description}";
+    public string StateLabel => IsCompleted ? IsBattle ? "已通关" : "已完成"
+        : IsCurrent ? "进行中" : IsAvailable ? IsBattle ? "可挑战" : "可前往" : "未解锁";
+    public string LocationLabel => Kind == ShanheNodeKind.Shop ? "集市" : $"第{StageLabel}站";
+    public string AccessibleName => $"{Node.Name}，{KindLabel}，{StateLabel}" +
+        (RouteSourceText.Length > 0 ? "，" + RouteSourceText : string.Empty);
+    public string DetailText => IsAvailable || IsCurrent || IsCompleted
+        ? $"{Node.Name}\n{StateLabel}" + (RouteSourceText.Length > 0 ? " · " + RouteSourceText : string.Empty) + "\n点击地点查看介绍。"
+        : $"{Node.Name}\n尚未开放";
 }
 public sealed record ShanheJourneyLink(Geometry Route, bool IsCompleted, bool IsAvailable);
 public sealed record ShanheBuildCard(string Id, string Name, string Description, string RuleDescription, string SourceText)

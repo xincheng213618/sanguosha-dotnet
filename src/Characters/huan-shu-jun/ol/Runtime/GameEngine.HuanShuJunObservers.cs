@@ -96,12 +96,6 @@ public sealed partial class GameEngine
             HuanShuJunPaidOrPreparing(draft) && HuanpeiDyingRescueRide(position, d)) return true;
         return HuanShuJunObserverRoot() is { } f && position > _resolutionStack.FindIndex(x => x.Id == f.Id);
     }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1630)]
-    private bool AllowsHuanShuJunNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || HuanShuJunObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28100)]
     private bool AdvanceHuanShuJunChildren() => _pendingDecision is null && HuanShuJunObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

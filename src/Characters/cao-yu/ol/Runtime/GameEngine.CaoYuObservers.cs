@@ -71,7 +71,5 @@ public sealed partial class GameEngine
  private bool HasCaoYuBeforeDamageObserver(long id)=>CaoYuObserverRoot()is{}root&&_resolutionStack.Any(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)&&_resolutionStack.FindIndex(f=>f.Id==id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
  [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 850)]
  private bool IsCaoYuDying()=>ActiveDying is{}d&&CaoYuObserverRoot()is{}root&&(root.CaoYu!.DyingId==d.Id&&CaoYuDyingEntry(root,out var original)&&original.Id==d.Id||_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id));
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1420)]
- private bool AllowsCaoYuNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess){if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||CaoYuObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));}
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27440)]private bool AdvanceCaoYuSubtree()=>_pendingDecision is null&&CaoYuObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

@@ -37,6 +37,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         UpdateTableScale(new Size(1120, 812));
         DataContext = viewModel;
+        InitializeHumanTactics();
         _audio = new GameAudioController(viewModel, () => new MediaPlayerAudioOutput(), feedbackLayer: BattleFeedback);
         Activated += (_, _) => _audio.SetActive(true);
         Deactivated += (_, _) => _audio.SetActive(false);
@@ -737,6 +738,10 @@ public partial class MainWindow : Window
         if (viewModel.IsHelpOpen || viewModel.IsLogOpen || viewModel.IsNewGameSetupOpen || viewModel.IsGeneralGalleryOpen || viewModel.IsSettingsOpen || viewModel.HasGameOver || viewModel.IsGeneralSelectionPending) return false;
         // Only a current selected hand card or portrait confirms its draft.
         // Other focused choices and actions keep their own Button behavior.
+        if (key is Key.Enter or Key.Space && modifiers == ModifierKeys.None &&
+            Keyboard.FocusedElement is FrameworkElement { DataContext: WushuangTacticViewModel } focusedTactic &&
+            focusedTactic.IsDescendantOf(TableSurface))
+            return true;
         if (key == Key.Enter && modifiers == ModifierKeys.None &&
             Keyboard.FocusedElement is Button { IsVisible: true, IsEnabled: true } focusedButton &&
             focusedButton.IsDescendantOf(this))

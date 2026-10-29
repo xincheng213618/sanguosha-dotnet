@@ -76,17 +76,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 340)]
     private bool IsDynamicDiscardDamageProgramDying()=>ActiveDying is { } dying && DynamicDiscardDamageObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f=>f.Id==dying.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 30)]
-    private bool AllowsDynamicDiscardNestedDamage(ProgramSkillFrame observer,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(observer.AttackAttempt is not null || observer.InstructionIndex<1 || _resolutionStack.LastOrDefault()?.Id!=observer.Id ||
-            observer.WindowContext?.Window is not(SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.DiscardPileReceived or
-                SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged))return false;
-        var e=ProgramInstructionResolver.Default.Resolve(observer,_contentRegistry.GetSkill(observer.SkillId).Program!).GetPausedInstruction(observer.InstructionIndex).Effect;
-        return e.Op==SkillProgramEffectOp.Damage && e.Amount==amount && e.ActorReference==source && e.DamageNature==nature &&
-            target==(e.TargetReference is { } reference?ResolveProgramParticipant(observer,reference):ResolveProgramEffectTarget(observer,e.Target)) &&
-            DynamicDiscardDamageObserverRoot() is { } root && root.Id!=observer.Id && CurrentDamageAttempt?.ResolutionId==root.Id;
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 560)]
     private bool TryAdvanceDynamicDiscardDamageSubtree()
     {

@@ -82,7 +82,7 @@ public sealed partial class GameEngine
             var valid = true;
             for (var n = i + 1; n < _resolutionStack.Count; n++)
             {
-                if (!PaidObserverDamageDyingFaceEdge(n) && !EquipmentDonationDamageObserverEdge(n) &&
+                if (!PaidObserverDamageDyingFaceEdge(n) && !ProgramChildResolutionEdge(n) &&
                     !(_resolutionStack[n - 1] is ProgramSkillFrame p && _resolutionStack[n] is DyingFrame { Continuation: DyingContinuationKind.AttackHpLoss } loss && PaidObserverAttackHpLossDyingMatches(p, loss)) &&
                     !(_resolutionStack[n - 1] is DyingFrame dying && _resolutionStack[n] is ProgramSkillFrame response && PaidObserverDamageDyingProgramMatches(response, dying)))
                 { valid = false; break; }

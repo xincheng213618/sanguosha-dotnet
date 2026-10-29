@@ -1,6 +1,6 @@
 # 逆京枭雄2684：专版谋董卓
 
-来源为[官方配置包](https://web.sanguosha.com/220/h5_2/res/config/Config.sgs) `hd_roguelike.sgs / Root.General / a=2684`，武将605、原始皮肤字段 `h=100`，20/20体力，技能串 `3513;14206;14207;14208`。实际来源位置为崤函道区域14、城市5148，最低来源难度16。本地独立武将为 `shanhe:source-mou-dongzhuo-2684`；肖像复用现有 `mou-dong-zhuo-ol` 对应的同角色默认60500素材，作为展示回退，不声称已取得该关底的专用皮肤原图。
+来源为[官方配置包](https://web.sanguosha.com/220/h5_2/res/config/Config.sgs) `hd_roguelike.sgs / Root.General / a=2684`，武将605、`h=100` 为growdouble且未指定 `d=generalskin`，20/20体力，技能串 `3513;14206;14207;14208`。实际来源位置为崤函道区域14、城市5148，最低来源难度16。本地独立武将为 `shanhe:source-mou-dongzhuo-2684`；精确运行时ID使用已核Character605默认原生席位图，不将普通图册60500大图冒充原生卡图。
 
 普通谋董卓与本专版保留不同技能身份。观变3513原文与现有 `mou-ol:guanbian` 一致，直接复用其开局人数冻结、手牌上限和双向距离加成及首轮结束失技。专版凶逆与封赏在真实付款或给牌后，通过现有 `GameEngine.ProgramSkillChanges` 的精确来源删除原语失去观变，并清除原观变标记；不复制普通运行时的直接授删技能方式。
 
@@ -42,3 +42,11 @@
 | sys_playcard.sgs | 05584b30f7986c06158ee6e47f78417b3d5f1c7fbc61174cfad26e12a5ee64ab |
 
 配置包外层SHA-256为 `d663d5542f5a63a61611b5dbc1ae736e5e0328eedaab2c498e18c3287c289ce6`。昆仑镜20841与断魂20836由独立装备包接入；这里不把技能或装备的数字引用与另一版本同名能力混用。
+
+## 2026-10-29 原生席位图与完整身份布局
+
+`Fight2684.Ggroup=2684` 精确指向一员完整源组，未选择NewbieGroup22684。唯一raw0是角色605、`g=1`、`startChapter=1`，`hide` 缺省false、`generalShow` 缺省0。现有来源配方在难度16—25均为 `shanhe:source-mou-dongzhuo-2684` 一员，SourceVisibleEnemyCount为1且无来源第二阶段，符合完整名单及主帅身份布局条件；不向其他部分阵容借用此身份。
+
+冻结Character605的解码字节SHA256为 `92f00132ed944b279066f46655478bde6a2f3b9f1c006d086c197fbbbada49de`，角色无 `au`／`av`／`needVersion`；按已核客户端 `needVersion||0`、LOG_VERSION40303及默认ItemID链，原图为[generalface_605.png](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_605.png)。HTTP200、image/png、146×172、50720字节，原始字节SHA256为 `3292895d2d76b6d89023e488c7001f209cc8a3d3cf84cc1914f10d914477e1e9`，RGBA像素SHA256为 `299af53128d5b57fde0af2a6a04f9748807c12288a231bd65b1f848ddadc083c`。已目视核对，直接保存原响应，不裁剪、缩放、重绘或重编码；当前公开运输外包哈希与旧冻结外包区别记录。
+
+同一角色原图也可显示于本地推荐入口，但本地入口没有SourceBattleId，且其击败后接续篡天恶魂属于[独立本地编排](shanhe-source-mou-dongzhuo-map-2684.md)，不能匹配2684单阶段来源身份布局。精确绑定与完整名单见[山河NPC美术来源](../shanhe-npc-art-sources.json)及[敌将布局来源](../shanhe-encounter-layout-sources.json)。

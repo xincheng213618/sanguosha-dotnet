@@ -43,7 +43,10 @@ internal static class TableOverlayNavigationChecks
                 root.Height = height;
                 window.SizeToContent = SizeToContent.WidthAndHeight;
                 Program.Render(root, width, height, null);
-                var icon = Program.Find<System.Windows.Shapes.Ellipse>(tactics).Last();
+                var viewport = (ScrollViewer)window.FindName("HumanTacticsViewport");
+                var viewportBounds = viewport.TransformToVisual(root).TransformBounds(new Rect(viewport.RenderSize));
+                var icon = Program.Find<System.Windows.Shapes.Ellipse>(tactics).Last(candidate => viewportBounds.Contains(
+                    candidate.TranslatePoint(new Point(candidate.ActualWidth / 2, candidate.ActualHeight / 2), root)));
                 var point = icon.TranslatePoint(new Point(icon.ActualWidth / 2, icon.ActualHeight / 2), root);
                 RequireHit(tactics, "Uncovered tactic badges must remain reachable.");
                 foreach (var overlay in overlays)

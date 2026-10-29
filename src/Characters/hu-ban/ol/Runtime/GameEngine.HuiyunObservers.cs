@@ -86,9 +86,6 @@ public sealed partial class GameEngine
     private bool HasHuBanBeforeDamageObserver(long id)=>HuBanAnyObserverRootIndex()is{}root&&_resolutionStack.Any(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)&&_resolutionStack.FindIndex(f=>f.Id==id)>root;
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 810)]
     private bool IsHuBanDying()=>ActiveDying is{}d&&HuBanAnyObserverRootIndex()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>root;
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1380)]
-    private bool AllowsHuBanNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||HuBanAnyObserverRootIndex()is not{}root||_resolutionStack.FindIndex(p=>p.Id==f.Id)<=root)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27380)]private bool AdvanceHuBanSubtree()=>_pendingDecision is null&&HuBanAnyObserverRootIndex()is not null&&TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,27381)]private bool ContinueIssuedHuiyun(ProgramSkillFrame f)=>f.Huiyun is null&&f.InstructionIndex is 0 or 1&&f.TriggerId=="completed-converted-fire-attack"&&f.WindowContext is{}c&&CanRunIssuedHuiyunCandidate(new(f.OwnerSeat,f.SkillId,f.TriggerId,f.SkillInstanceId,f.GameplayHash,0),c);
 }

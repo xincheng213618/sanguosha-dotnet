@@ -1,0 +1,4179 @@
+{
+  "schemaVersion": 1,
+  "description": "Original OL Shanhe map UI: screenshot-confirmed native atlas sprites, all fourteen Season 5 backgrounds and source-positioned landmarks copied byte-for-byte, plus the source-bound chapter progress background, fill and separators extracted losslessly from the frozen atlas. Sprite sourceSize padding is retained; no images are resized.",
+  "verifiedAtUtc": "2026-10-29T07:27:49.2708111Z",
+  "chapterProgressRenderer": {
+    "sourceClientUrl": "https://web.sanguosha.com/220/h5_2/sgsGame_a.sgs",
+    "sourceClientSha256": "96b7131953f758a30da44c9bdbbcd8a429174050ef7c16961216b90cd923ec31",
+    "renderer": "zyt.InitUI / UpdateChapterDay / UpdateChapterDayNoAnim / SetDaySplit / ProgressBarAniComplete; H6t.createtopView",
+    "rendererSize": { "width": 348, "height": 97 },
+    "placement": "H6t creates zyt at x=(gameWidth-width)>>1, y=0, zOrder=2. Both bar sprites are placed at (0,50); rogue_boss_icon is placed at (207,17).",
+    "fill": "progress=min(1, ChapterData.day/(ChapterCS.ChapterDay + HuiYanShiZhu + HuiYanShiZhu2)); daybar.width=barbg.width*progress. The animated path tweens width over 1000ms using sineOut; no rule changes are imported.",
+    "separators": "SetDaySplit(t) positions rogue_day_split at x=(barbg.width/t)*(index+1), y=53 for index=0..t-1: six slots have five internal lines and a right-boundary line.",
+    "bossState": "bossicontex.Gray=!(ChapterData.day>=ChapterCS.AppTime). Ready displays the original gold shield; locked uses the client's Gray filter rather than a separate grey asset or lower opacity. rogue_boss_bg is not used by zyt and is not imported for this widget.",
+    "currentProgressEffect": "res/assets/animate/roguelike/FX_jindutiao.sk follows the fill edge, with scaleX=progress; at full progress the renderer moves it to the bar centre and plays animation 1. This animation is not present in the inspected local cache, so no static current-glow frame is claimed.",
+    "readyBossEffect": "res/assets/animate/roguelike/gouge_jindutiao.sk is centred on the boss shield and visible only when ready. The frozen version index lists its sk/png, but neither file is present in the inspected local cache; neither is imported.",
+    "calendarEvidence": "ChapterCS is selected by season and CurrentChapterNumber, not by map region. Source month=(ChapterCS.Month+day)%12||12 and year=ChapterCS.Year+ceil((ChapterCS.Month+day)/12)-1; the source year label is 公元{0}年. Frozen Season 5 chapter rows use (Year,Month,ChapterDay,AppTime)=(190,1,4,4),(190,7,6,6),(191,1,7,7). These source calendar and threshold values are evidence only and are not substituted for the local six-step chapter rules.",
+    "sourceScaleEvidence": "The new entries retain the existing sourceScale=2 presentation convention, corresponding to a 258x19 bar and 2x13 divider at half-size. This is inferred from the 348-wide widget and the shield's x=207 geometry; the atlas meta.scale is 1 and an explicit client-wide downscale has not been proven. PNG pixel dimensions below are exact and unchanged."
+  },
+  "assets": [
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/rogue_day_pro_bg.png",
+      "width": 516,
+      "height": 38,
+      "bytes": 21333,
+      "sha256": "86b43572bc5c01837c9e79fe86cf54334407bbec993d1fb9ee345ce434df2ec4",
+      "rgbaSha256": "5dc44d8ab455d8f6404f020a3b6ab5541a2100df4463a52617f1f16d6b957d75",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_day_pro_bg.png",
+      "frame": { "idx": 0, "x": 4, "y": 50, "w": 516, "h": 38 },
+      "sourceSize": { "w": 516, "h": 38 },
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 516, "h": 38 },
+      "sourceScale": 2
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/rogue_day_pro_bar.png",
+      "width": 516,
+      "height": 38,
+      "bytes": 19201,
+      "sha256": "3d58502cd6dfa579bd710ee2102c7a0bdfb4ee4f4f9b5b3176d3d095c068ce86",
+      "rgbaSha256": "cffa98db73aa72619c5490e4d9c828c5f23ccbad6db20f9f123691c0cf6a900f",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_day_pro_bar.png",
+      "frame": { "idx": 0, "x": 4, "y": 4, "w": 516, "h": 38 },
+      "sourceSize": { "w": 516, "h": 38 },
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 516, "h": 38 },
+      "sourceScale": 2
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/rogue_day_split.png",
+      "width": 4,
+      "height": 26,
+      "bytes": 158,
+      "sha256": "9b6f962dd7910e5c443d6113bc7b8028c0a8e64c00353f67f5f660118f40db57",
+      "rgbaSha256": "773f245734e7449fcf1bf03b56f124039b6c60f1434ee6f6bf4f7a0db5b25169",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_day_split.png",
+      "frame": { "idx": 0, "x": 1014, "y": 4, "w": 4, "h": 26 },
+      "sourceSize": { "w": 4, "h": 26 },
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 4, "h": 26 },
+      "sourceScale": 2
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/rogue_boss_icon.png",
+      "width": 282,
+      "height": 160,
+      "sha256": "7713f0becff0865ca2a0945d096055572179eb05140bd5cbc1bd739f681e0841",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_boss_icon.png",
+      "frame": {
+        "idx": 0,
+        "x": 4,
+        "y": 436,
+        "w": 282,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 282,
+        "h": 160
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 282,
+        "h": 160
+      },
+      "sourceScale": 2
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/rogue_event_icon1.png",
+      "width": 220,
+      "height": 152,
+      "sha256": "b18865978b8d6392735b460aefd5152bd2f475a5179a6f714bfc1284a2912d78",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_event_icon1.png",
+      "frame": {
+        "idx": 0,
+        "x": 4,
+        "y": 948,
+        "w": 220,
+        "h": 152
+      },
+      "sourceSize": {
+        "w": 220,
+        "h": 152
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 220,
+        "h": 152
+      },
+      "sourceScale": 2
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/rogue_event_icon2.png",
+      "width": 122,
+      "height": 146,
+      "sha256": "e7fcbe55d57351e7d3c841b6cccd22ce034569cba250ac061cf5eb0ca447f801",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_event_icon2.png",
+      "frame": {
+        "idx": 0,
+        "x": 246,
+        "y": 726,
+        "w": 122,
+        "h": 146
+      },
+      "sourceSize": {
+        "w": 122,
+        "h": 146
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 122,
+        "h": 146
+      },
+      "sourceScale": 2
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/rogue_event_icon3.png",
+      "width": 150,
+      "height": 148,
+      "sha256": "36e06047e65fe3be391ec7f412be8ec63a8cafae273855c0333f439e8e61c0b6",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_event_icon3.png",
+      "frame": {
+        "idx": 0,
+        "x": 294,
+        "y": 570,
+        "w": 150,
+        "h": 148
+      },
+      "sourceSize": {
+        "w": 150,
+        "h": 148
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 150,
+        "h": 148
+      },
+      "sourceScale": 2
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/rogue_event_icon3_2.png",
+      "width": 208,
+      "height": 148,
+      "sha256": "481af8af06726d1a5a4003f181e435a8b5c003766956136bc5c81a542e9aedcb",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_event_icon3_2.png",
+      "frame": {
+        "idx": 0,
+        "x": 616,
+        "y": 830,
+        "w": 208,
+        "h": 148
+      },
+      "sourceSize": {
+        "w": 208,
+        "h": 148
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 208,
+        "h": 148
+      },
+      "sourceScale": 2
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/rogue_play_move_bg.png",
+      "width": 112,
+      "height": 146,
+      "sha256": "bcc334cadf0700b2684607b717cb2212f81b5bd482ef5492d1577977c838952b",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_play_move_bg.png",
+      "frame": {
+        "idx": 0,
+        "x": 832,
+        "y": 830,
+        "w": 112,
+        "h": 146
+      },
+      "sourceSize": {
+        "w": 112,
+        "h": 146
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 112,
+        "h": 146
+      },
+      "sourceScale": 2
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/rogue_shop_btn.png",
+      "width": 112,
+      "height": 116,
+      "sha256": "18cfd2215a9bd8a67bbd417f5b8cd9804dc16d301b4e974ba50ed5be2f25a830",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_shop_btn.png",
+      "frame": {
+        "idx": 0,
+        "x": 832,
+        "y": 984,
+        "w": 112,
+        "h": 116
+      },
+      "sourceSize": {
+        "w": 112,
+        "h": 116
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 112,
+        "h": 116
+      },
+      "sourceScale": 2
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/rogue_city_select.png",
+      "width": 424,
+      "height": 288,
+      "sha256": "9ba4685335a592957d3612aac64a40566cccc979896178ed9844e63a224d40fd",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.atlas?v=1508051589",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikesmallmap.webp?v=-1223719411",
+      "sourceAtlasSha256": "c9ed58d9bbbd8dda78d2d750bb5d4478f92f191b840f5fbab573d11b86ee8478",
+      "sourceTextureSha256": "1a2f5e9dc20f2f743dc3b7421af35052ad6276cbfcf8152f3380e0b37c6c37cd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rogue_city_select.png",
+      "frame": {
+        "idx": 0,
+        "x": 528,
+        "y": 4,
+        "w": 424,
+        "h": 288
+      },
+      "sourceSize": {
+        "w": 424,
+        "h": 288
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 424,
+        "h": 288
+      },
+      "sourceScale": 2
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_3.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1425126,
+      "sha256": "c43175b0162d4825d0f3c67678b3361c42530f6ef15d1c399a33eaefb71d329c",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 3,
+      "sourceRegionName": "函谷关",
+      "visualVerification": "Compared with the supplied original-game screenshot: matching mountains, river geometry and road network.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding.",
+      "versionIndexListed": false
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_14.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1458487,
+      "sha256": "ef6ef655671073aca448547947e74db94bbbc54bb4dca5f080ac451e3dd8eb1d",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_14.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 14,
+      "sourceRegionName": "崤函道",
+      "visualVerification": "Compared with the supplied original-game screenshot: matching mountains, river geometry and road network.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding.",
+      "versionIndexListed": false
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_3_1.png",
+      "width": 117,
+      "height": 87,
+      "bytes": 21323,
+      "sha256": "e3027fae9a142eac9b7b859cb24d236a21f06095f6ad13362e9939e4b7909be6",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_3_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        3
+      ],
+      "name": "中条山",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5031
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_3_2.png",
+      "width": 116,
+      "height": 87,
+      "bytes": 19015,
+      "sha256": "4b4cc86ae04e1c2c04b687ddeaa69def3da466375f969dcb1f15a43266b452bb",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_3_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        3
+      ],
+      "name": "洞窟",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5032
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_3_3.png",
+      "width": 132,
+      "height": 87,
+      "bytes": 22775,
+      "sha256": "2891f4920acea707aef21582115fe72d3b72e11fd6c702a7a8002ca8fe735565",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_3_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        3
+      ],
+      "name": "聚义台",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5033
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_3_4.png",
+      "width": 112,
+      "height": 87,
+      "bytes": 22064,
+      "sha256": "551f7456d2257885d8346a55b6252af092ad493379e2923447e80753a87ff249",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_3_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        3
+      ],
+      "name": "密林",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5034
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_3_5.png",
+      "width": 148,
+      "height": 107,
+      "bytes": 34645,
+      "sha256": "4fe41df0c8b641ff4d835a3c77f13de6cab1ff5a80eea7ff9680ccfd4e212fdb",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_3_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        3
+      ],
+      "name": "栈桥",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5035
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_3_6.png",
+      "width": 129,
+      "height": 87,
+      "bytes": 24088,
+      "sha256": "00cede1ddfb4d0ab057d78336c6b5f6bf104e21e308d659924a8667713159ab9",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_3_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        3
+      ],
+      "name": "湖县",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5036
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_3_7.png",
+      "width": 116,
+      "height": 87,
+      "bytes": 19015,
+      "sha256": "4b4cc86ae04e1c2c04b687ddeaa69def3da466375f969dcb1f15a43266b452bb",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_3_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        3
+      ],
+      "name": "洞窟",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5037
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_3_8.png",
+      "width": 156,
+      "height": 94,
+      "bytes": 31944,
+      "sha256": "79e0f989b2322b622664d78477719149a794a9aefea3fa4d31986664b25c8b25",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_3_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        3
+      ],
+      "name": "函谷关",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5038
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_14_1.png",
+      "width": 138,
+      "height": 105,
+      "bytes": 34638,
+      "sha256": "6db62fe0053d34f7e69675ad9fdaaf9c538259f7d2ae853f854cbe169da3ecca",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_14_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        14
+      ],
+      "name": "蒲坂",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5141
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_14_2.png",
+      "width": 152,
+      "height": 98,
+      "bytes": 34591,
+      "sha256": "e4cb171672c9dd89c535c936eefbdb29479aa5a574e1e9188cca22073dae9f4c",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_14_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        14
+      ],
+      "name": "河北",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5142
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_14_3.png",
+      "width": 178,
+      "height": 111,
+      "bytes": 40773,
+      "sha256": "7274d9ded18124159b2844e60414a262e8e56a3617779940244557e32b53e040",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_14_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        14
+      ],
+      "name": "湖县",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5143
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_14_4.png",
+      "width": 159,
+      "height": 93,
+      "bytes": 30621,
+      "sha256": "05fb662622587c2efde1417bb196f4c651c0d85090a360e9d72fe2b062dde45d",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_14_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        14
+      ],
+      "name": "洞窟",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5144
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_14_5.png",
+      "width": 143,
+      "height": 105,
+      "bytes": 29722,
+      "sha256": "2d98204391eb0a7c67b2b095f3d905008335befad7b72c5bae77586563478c0d",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_14_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        14
+      ],
+      "name": "弘农",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5145
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_14_6.png",
+      "width": 143,
+      "height": 98,
+      "bytes": 30607,
+      "sha256": "c3a345e2b0736252ff29864821abd6020b3e42f560bfe6102a1fce5664177c5f",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_14_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        14
+      ],
+      "name": "曹阳",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5146
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_14_7.png",
+      "width": 129,
+      "height": 90,
+      "bytes": 26298,
+      "sha256": "7a4ea024a74b6e3d129808260ad8fc3d33b5326ff2a4f41397d4bf8fc7c62b68",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_14_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        14
+      ],
+      "name": "陕津",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5147
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_14_8.png",
+      "width": 217,
+      "height": 138,
+      "bytes": 61471,
+      "sha256": "214bfe62f2775c6b650c57cf1fd43b8e96eaaf84a05733a69758a3c46c62e37b",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_14_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        14
+      ],
+      "name": "潼关",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite.",
+      "sourceCityId": 5148
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_6_9_cdd.png",
+      "width": 86,
+      "height": 71,
+      "bytes": 15897,
+      "sha256": "3ea0774fe7c04232bef55922469f70c4ebc46c9fa8973b29ef971710465d9f6d",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_6_9_cdd.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "name": "擂台",
+      "copy": "Byte-for-byte original transparent PNG; no rescaling, repainting or re-encoding.",
+      "visualVerification": "Confirmed against the supplied original-game map screenshots and the original source-position composite."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_1.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1421868,
+      "sha256": "47ff227b4319e522fe3811e7aca5210d6b46ee6fd96d5e01163bbc8c8dd90141",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 1,
+      "sourceRegionName": "大谷关",
+      "visualVerification": "The original background was previewed. Region identity is mapped from frozen hd_roguelike Chapter.map, not inferred from landscape resemblance.",
+      "versionIndexListed": false,
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_1_1.png",
+      "width": 120,
+      "height": 87,
+      "bytes": 22134,
+      "sha256": "dc941c38988ed103a5830a91e4ac9e876d9f107c9d82a3be0c8fae06f6ec057a",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_1_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        1
+      ],
+      "sourceCityId": 5011,
+      "name": "凉亭",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_1_2.png",
+      "width": 130,
+      "height": 87,
+      "bytes": 22280,
+      "sha256": "fd73c19e29b3cb3943490d6049e7f5104148c8339c5daf5c85df0e4c2f61f26f",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_1_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        1
+      ],
+      "sourceCityId": 5012,
+      "name": "洞窟",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_1_3.png",
+      "width": 129,
+      "height": 87,
+      "bytes": 22402,
+      "sha256": "53cd7fbb1a0944bb61c5cba3c0d2dcb75969da8ff6a5f2085844cf31847821c8",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_1_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        1
+      ],
+      "sourceCityId": 5013,
+      "name": "箭塔",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_1_4.png",
+      "width": 122,
+      "height": 94,
+      "bytes": 22055,
+      "sha256": "dd3309ddbe81b2978abeaca90f0b847cf70d50f4eb9335ebf07349a1462830e6",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_1_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        1
+      ],
+      "sourceCityId": 5014,
+      "name": "箭塔",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_1_5.png",
+      "width": 130,
+      "height": 87,
+      "bytes": 23941,
+      "sha256": "4d9ffa830394496e8599df7d8d6576687e2c64dc309e95ff9af8e9f9885be407",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_1_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        1
+      ],
+      "sourceCityId": 5015,
+      "name": "村落",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_1_6.png",
+      "width": 118,
+      "height": 87,
+      "bytes": 21843,
+      "sha256": "d3eeb70eef6b46c86baf075d4ab7b917b859488cd4b25ddf5b87379ff57b91c9",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_1_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        1
+      ],
+      "sourceCityId": 5016,
+      "name": "贼营",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG and independently reviewed; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_1_7.png",
+      "width": 124,
+      "height": 87,
+      "bytes": 22847,
+      "sha256": "7cbf536af65979c413edba1e498821ad84908715faff405ed5e3e5f6d2188a87",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_1_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        1
+      ],
+      "sourceCityId": 5017,
+      "name": "村落",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_1_8.png",
+      "width": 139,
+      "height": 90,
+      "bytes": 27221,
+      "sha256": "c794efecc1e5f805bacec44304040d6450ed83f1d68934e34b7139d8473aeb69",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_1_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        1
+      ],
+      "sourceCityId": 5018,
+      "name": "大谷关",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_2.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1430732,
+      "sha256": "f8e1d82e99901e61417d68f485aac7343c692fa8169ac1492fa2951d2bed7811",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 2,
+      "sourceRegionName": "广成关",
+      "visualVerification": "The original background was previewed. Region identity is mapped from frozen hd_roguelike Chapter.map, not inferred from landscape resemblance.",
+      "versionIndexListed": false,
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_2_1.png",
+      "width": 118,
+      "height": 87,
+      "bytes": 21613,
+      "sha256": "d293f2f811225b399fcaa74e0be07d6abee962c0f5dc00aa4ead5d9404f7ce4f",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_2_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        2
+      ],
+      "sourceCityId": 5021,
+      "name": "烽火台",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_2_2.png",
+      "width": 115,
+      "height": 87,
+      "bytes": 21257,
+      "sha256": "6a970db1a58a751ac78a060e448b0b3e0cc5768fc4d4bb7edfed2b681c5a4cc4",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_2_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        2
+      ],
+      "sourceCityId": 5022,
+      "name": "村落",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_2_3.png",
+      "width": 116,
+      "height": 87,
+      "bytes": 18913,
+      "sha256": "178157094480cc10fe087a7ef1867407eed79f729f70301f562da53eea97d7f2",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_2_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        2
+      ],
+      "sourceCityId": 5023,
+      "name": "洞窟",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_2_4.png",
+      "width": 129,
+      "height": 87,
+      "bytes": 22854,
+      "sha256": "afca3c9ba87eda6c918d10819fbcb38268ccb150074439ac706fc51951c6e850",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_2_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        2
+      ],
+      "sourceCityId": 5024,
+      "name": "木亭",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_2_5.png",
+      "width": 121,
+      "height": 87,
+      "bytes": 22398,
+      "sha256": "e73cdff79926aee6ec25ed4ff465a9df6ea4d753ef327d28a44743a7817a7e3b",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_2_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        2
+      ],
+      "sourceCityId": 5025,
+      "name": "村落",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_2_6.png",
+      "width": 130,
+      "height": 87,
+      "bytes": 23899,
+      "sha256": "7e7c93de948cdd5e5617fac1457b86b327e85c084d3c156caccf32bc81c7e8d6",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_2_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        2
+      ],
+      "sourceCityId": 5026,
+      "name": "村落",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_2_7.png",
+      "width": 123,
+      "height": 87,
+      "bytes": 23546,
+      "sha256": "f63c41a62648a513671d6e196be6f75a66a2bb8517cf07c3242b8902dfaaacc0",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_2_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        2
+      ],
+      "sourceCityId": 5027,
+      "name": "广成关·地点7",
+      "nameProvenance": "Conservative region-and-ordinal label; Level.cityname is empty and independent readings of the small baked PNG label disagreed.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_2_8.png",
+      "width": 139,
+      "height": 90,
+      "bytes": 26977,
+      "sha256": "84e69e06dc2ea1ba0220a1c1c551969175ede30b44920531a2355191d462b17f",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_2_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        2
+      ],
+      "sourceCityId": 5028,
+      "name": "广成关",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_4.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1475997,
+      "sha256": "8e394dc49c8d4cc31de9aff9d39157ec3b66ebbe196bf25396e307ccea0ea2be",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 4,
+      "sourceRegionName": "虎牢关",
+      "visualVerification": "The original background was previewed. Region identity is mapped from frozen hd_roguelike Chapter.map, not inferred from landscape resemblance.",
+      "versionIndexListed": false,
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_4_1.png",
+      "width": 123,
+      "height": 87,
+      "bytes": 25166,
+      "sha256": "49f3b1f3851c84f9efc2f59e02293de2a3f96d1411b05c755637368440a3816c",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_4_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        4
+      ],
+      "sourceCityId": 5041,
+      "name": "芦苇丛",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_4_2.png",
+      "width": 141,
+      "height": 87,
+      "bytes": 24743,
+      "sha256": "38191b6655ae79a0e8b5328e516f51d3e4b8ac8663317aa83eb4d1b8cd16cddf",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_4_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        4
+      ],
+      "sourceCityId": 5042,
+      "name": "村落",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_4_3.png",
+      "width": 123,
+      "height": 87,
+      "bytes": 22018,
+      "sha256": "7af981acc2c99f330632508a68e3b72862662d823d277e4868efdd1b0371d39f",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_4_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        4
+      ],
+      "sourceCityId": 5043,
+      "name": "箭塔",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_4_4.png",
+      "width": 129,
+      "height": 91,
+      "bytes": 23983,
+      "sha256": "77791b5e671304f40186006de9a3c71505fae22d9feb489c825fb7e21b28862f",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_4_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        4
+      ],
+      "sourceCityId": 5044,
+      "name": "成皋",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_4_5.png",
+      "width": 129,
+      "height": 88,
+      "bytes": 24154,
+      "sha256": "f0a1ccfe85a658fbca2b80fd9bf5ad66b92c0db9ce7a40bc18813d25804b0d39",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_4_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        4
+      ],
+      "sourceCityId": 5045,
+      "name": "山脊道",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_4_6.png",
+      "width": 143,
+      "height": 87,
+      "bytes": 25324,
+      "sha256": "baa23df1c19448d1a833c781eb756861a96e525f35d716812c97e862a877927e",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_4_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        4
+      ],
+      "sourceCityId": 5046,
+      "name": "阵前",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_4_7.png",
+      "width": 137,
+      "height": 87,
+      "bytes": 24610,
+      "sha256": "083c598757557432e4504411f8b4930925c935da6de520996fbdd791e4ca3a1a",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_4_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        4
+      ],
+      "sourceCityId": 5047,
+      "name": "密林",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_4_8.png",
+      "width": 179,
+      "height": 112,
+      "bytes": 44227,
+      "sha256": "802aabf182db0637d2542e013f75ce2c879de0a896bb43838156f3fa144330a8",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_4_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        4
+      ],
+      "sourceCityId": 5048,
+      "name": "虎牢关",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_5.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1430239,
+      "sha256": "6de5b3d69ce720bccaf7d4ab3f961b33dc07554bcd123c5fe68e9f91651fbb7d",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 5,
+      "sourceRegionName": "轘辕关",
+      "visualVerification": "The original background was previewed. Region identity is mapped from frozen hd_roguelike Chapter.map, not inferred from landscape resemblance.",
+      "versionIndexListed": false,
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_5_1.png",
+      "width": 139,
+      "height": 88,
+      "bytes": 25413,
+      "sha256": "28629dcf2de501c3b75d40d7a7fe9571928bce416dcc1dcd8b5514171e7b2dd9",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_5_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        5
+      ],
+      "sourceCityId": 5051,
+      "name": "粮仓",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_5_2.png",
+      "width": 131,
+      "height": 87,
+      "bytes": 23490,
+      "sha256": "5f990c83a8b76ed6abfef9dbcff274f11d793d1a45056546fc684e32149c8260",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_5_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        5
+      ],
+      "sourceCityId": 5052,
+      "name": "星火洞",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_5_3.png",
+      "width": 126,
+      "height": 87,
+      "bytes": 22783,
+      "sha256": "40577eae0d79862736c1f3a6e83223538343e9b54d407fc2d1a52c2e2a0baa39",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_5_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        5
+      ],
+      "sourceCityId": 5053,
+      "name": "关门洞",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_5_4.png",
+      "width": 135,
+      "height": 99,
+      "bytes": 25388,
+      "sha256": "ec959f8061f0efbfb6050490626457315e72e8afd2a37e169819a3f7d4dbea6d",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_5_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        5
+      ],
+      "sourceCityId": 5054,
+      "name": "烽火台",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_5_5.png",
+      "width": 113,
+      "height": 101,
+      "bytes": 26530,
+      "sha256": "19c8db138c39dd791bac8a751c0dd5e0c08906ee112084b5b9ee7fc739104964",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_5_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        5
+      ],
+      "sourceCityId": 5055,
+      "name": "烽火台",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_5_6.png",
+      "width": 137,
+      "height": 87,
+      "bytes": 30544,
+      "sha256": "3aaaabdbcf7736f4233b0dee1787b93dce307a61c1e0c743ede20e95fdaa178c",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_5_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        5
+      ],
+      "sourceCityId": 5056,
+      "name": "大禹殿",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_5_7.png",
+      "width": 151,
+      "height": 87,
+      "bytes": 24669,
+      "sha256": "4f73f3582a4775aae2cc6ca3d3f5815fc56b7b86907c7cea7452f661c5daf044",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_5_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        5
+      ],
+      "sourceCityId": 5057,
+      "name": "山谷",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_5_8.png",
+      "width": 173,
+      "height": 104,
+      "bytes": 38850,
+      "sha256": "baa10421df91e5deddcd7cba9501e94a5c04807f0b8f0fbfa6eb9448a2d42053",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_5_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        5
+      ],
+      "sourceCityId": 5058,
+      "name": "轘辕关",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_6.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1431541,
+      "sha256": "e9030dbdd399c239ed21be9d2217a0be0c0f1fdb32a6681ea0d7c958a0a308a4",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 6,
+      "sourceRegionName": "伊阙关",
+      "visualVerification": "The original background was previewed. Region identity is mapped from frozen hd_roguelike Chapter.map, not inferred from landscape resemblance.",
+      "versionIndexListed": false,
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_6_1.png",
+      "width": 135,
+      "height": 87,
+      "bytes": 24556,
+      "sha256": "f2e4327a1fe1ebdf53ef3b244f8ca31af9d3842e6a2cca86999a5da30b002884",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_6_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        6
+      ],
+      "sourceCityId": 5061,
+      "name": "村落",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_6_2.png",
+      "width": 130,
+      "height": 87,
+      "bytes": 24553,
+      "sha256": "e6dca4c30f977b8bd51ca550b0a344d3141fedc893455888738054bd3d280371",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_6_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        6
+      ],
+      "sourceCityId": 5062,
+      "name": "粮仓",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_6_3.png",
+      "width": 133,
+      "height": 90,
+      "bytes": 23448,
+      "sha256": "bf8f29b28461fa0f229a866b668c44c8366230746db7e11f11db8c419230eda3",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_6_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        6
+      ],
+      "sourceCityId": 5063,
+      "name": "村落",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_6_4.png",
+      "width": 142,
+      "height": 87,
+      "bytes": 24924,
+      "sha256": "4058732f886d4442eeeee2f3fffbb431f6b9b678b34dc14f2f51cc252715925d",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_6_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        6
+      ],
+      "sourceCityId": 5064,
+      "name": "山脊道",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_6_5.png",
+      "width": 123,
+      "height": 87,
+      "bytes": 22397,
+      "sha256": "16e7db28e1ea60fa65de7de59674a4d91d31186f9b38fb95c1e7fed46c068d59",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_6_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        6
+      ],
+      "sourceCityId": 5065,
+      "name": "烽火台",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_6_6.png",
+      "width": 129,
+      "height": 87,
+      "bytes": 22380,
+      "sha256": "59e080472f2b8a47cd1e232249c64627ed60af9a5d4f5e001fe0f9658a64c18b",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_6_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        6
+      ],
+      "sourceCityId": 5066,
+      "name": "箭塔",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_6_7.png",
+      "width": 137,
+      "height": 87,
+      "bytes": 22606,
+      "sha256": "7f59bac361f3d12aafe885d390e471e33b758f12e0edc72c77d583a4342894dd",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_6_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        6
+      ],
+      "sourceCityId": 5067,
+      "name": "箭塔",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_6_8.png",
+      "width": 144,
+      "height": 93,
+      "bytes": 30379,
+      "sha256": "40eb12184edf42cdd3b72be74c808f4e7b926f8557955dd55ee33a47bb3f3e24",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_6_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        6
+      ],
+      "sourceCityId": 5068,
+      "name": "伊阙关",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_7.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1362422,
+      "sha256": "8197f17fa704653fa9a5bf78ef44dea1f153c2f8481b747508daa2e22bc7e876",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 7,
+      "sourceRegionName": "颍川郡",
+      "visualVerification": "The original background was previewed. Region identity is mapped from frozen hd_roguelike Chapter.map, not inferred from landscape resemblance.",
+      "versionIndexListed": false,
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_7_1.png",
+      "width": 142,
+      "height": 87,
+      "bytes": 24786,
+      "sha256": "4e86b0df38c38a8babeb569a95baa81be7c7dd3d25f4a9a1fb590cb034c7dd7f",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_7_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        7
+      ],
+      "sourceCityId": 5071,
+      "name": "阳翟",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_7_2.png",
+      "width": 165,
+      "height": 100,
+      "bytes": 37221,
+      "sha256": "cf4c34c4ce730767648518b370ddb85d85c0dd9d65854fa1e9a9ac9c25835b23",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_7_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        7
+      ],
+      "sourceCityId": 5072,
+      "name": "郏县",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG and independently reviewed; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_7_3.png",
+      "width": 119,
+      "height": 87,
+      "bytes": 21730,
+      "sha256": "fe5d74e50837a188963504c7a6e5d78d132bf1ffb68830db59d58e968ebfccfc",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_7_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        7
+      ],
+      "sourceCityId": 5073,
+      "name": "襄城",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_7_4.png",
+      "width": 147,
+      "height": 89,
+      "bytes": 26723,
+      "sha256": "5d76109648c85c6c35b2499c9814d95f0b86aac78ecad7b360279c72805c3f52",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_7_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        7
+      ],
+      "sourceCityId": 5074,
+      "name": "颍阴",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG and independently reviewed; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_7_5.png",
+      "width": 188,
+      "height": 111,
+      "bytes": 44077,
+      "sha256": "d90d048923991eed3b512241c1a8e3bf55077486036f8c3934f11647a063dbde",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_7_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        7
+      ],
+      "sourceCityId": 5075,
+      "name": "繁昌",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_7_6.png",
+      "width": 114,
+      "height": 87,
+      "bytes": 21394,
+      "sha256": "8b80569a46b679d813fe08761d99e85b0fda8bdb2ab2209f83c08dc3d4f2d380",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_7_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        7
+      ],
+      "sourceCityId": 5076,
+      "name": "临颍",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_7_7.png",
+      "width": 213,
+      "height": 130,
+      "bytes": 52620,
+      "sha256": "5eccfc66a84d6592e5a758f437be83879bf41e331da498e9238c5417b17423ea",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_7_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        7
+      ],
+      "sourceCityId": 5077,
+      "name": "许昌",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_7_8.png",
+      "width": 107,
+      "height": 87,
+      "bytes": 21991,
+      "sha256": "0c367be3eea556a05eef443fa0008b554f42308bd378e3b197314af5457c0555",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_7_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        7
+      ],
+      "sourceCityId": 5078,
+      "name": "颍阳",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_8.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1393031,
+      "sha256": "f3715fac68f2be3d5b02ee820e227679cd0247e4bd182fcd1aa3c04b2a913ed4",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 8,
+      "sourceRegionName": "孟津",
+      "visualVerification": "The original background was previewed. Region identity is mapped from frozen hd_roguelike Chapter.map, not inferred from landscape resemblance.",
+      "versionIndexListed": false,
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_8_1.png",
+      "width": 119,
+      "height": 87,
+      "bytes": 17365,
+      "sha256": "531884456a98c302b0e05e9e48f606f17881776eb49695289c59b26a11f1c55d",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_8_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        8
+      ],
+      "sourceCityId": 5081,
+      "name": "渡口",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_8_2.png",
+      "width": 128,
+      "height": 87,
+      "bytes": 20200,
+      "sha256": "18d5fe637d5b212ac861e20c6e2f46d16fdf29a3bb20b0f54b128f7e8f7081cd",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_8_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        8
+      ],
+      "sourceCityId": 5082,
+      "name": "会盟台",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_8_3.png",
+      "width": 146,
+      "height": 88,
+      "bytes": 22573,
+      "sha256": "24f324c58230d8eba5b3462631c6fb675953991077f8a4d9a794cd0e09fc92ed",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_8_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        8
+      ],
+      "sourceCityId": 5083,
+      "name": "军营",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_8_4.png",
+      "width": 112,
+      "height": 87,
+      "bytes": 20521,
+      "sha256": "229210f5652cf4dffafcf57af2afbd4c75316b759eea24cfe599839968fa2997",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_8_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        8
+      ],
+      "sourceCityId": 5084,
+      "name": "江心洲",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_8_5.png",
+      "width": 110,
+      "height": 87,
+      "bytes": 18975,
+      "sha256": "76b661798ee745ae38ec12e41167a1db68a4a169e04a6df8c62ee72522908208",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_8_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        8
+      ],
+      "sourceCityId": 5085,
+      "name": "渡口",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_8_6.png",
+      "width": 130,
+      "height": 87,
+      "bytes": 20741,
+      "sha256": "2b9a272b574a5966295866b8adf84091c7c7e47cb75711f5386430bd4bbbfd50",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_8_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        8
+      ],
+      "sourceCityId": 5086,
+      "name": "烽火台",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_8_7.png",
+      "width": 136,
+      "height": 87,
+      "bytes": 22142,
+      "sha256": "5e4d0bdd70cf62a716534cccd357d927488522b55e30f2c79fae0d1411202814",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_8_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        8
+      ],
+      "sourceCityId": 5087,
+      "name": "山脊驿",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG and independently reviewed; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_8_8.png",
+      "width": 157,
+      "height": 91,
+      "bytes": 28602,
+      "sha256": "8f96a08ef74b609e60d2a0eda984a847965ec53832235d4c873fbfe09b9b0827",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_8_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        8
+      ],
+      "sourceCityId": 5088,
+      "name": "孟津关",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_9.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1451137,
+      "sha256": "7dd684aea670e6228f3db06990badd92bc6ef5e9e34edf645948b2f0106dd148",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_9.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 9,
+      "sourceRegionName": "小平津",
+      "visualVerification": "The original background was previewed. Region identity is mapped from frozen hd_roguelike Chapter.map, not inferred from landscape resemblance.",
+      "versionIndexListed": false,
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_9_1.png",
+      "width": 123,
+      "height": 87,
+      "bytes": 20170,
+      "sha256": "576175c4f2700b0aa4c6ffcbb47517bb540b3e98c748544f5d59615f0098df31",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_9_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        9
+      ],
+      "sourceCityId": 5091,
+      "name": "渡口",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_9_2.png",
+      "width": 124,
+      "height": 87,
+      "bytes": 22389,
+      "sha256": "f2bb658d4befe768d7414e3bf223fa6691c5ee88c062b3ba14d08bab9f28ca08",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_9_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        9
+      ],
+      "sourceCityId": 5092,
+      "name": "演武台",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_9_3.png",
+      "width": 148,
+      "height": 87,
+      "bytes": 25749,
+      "sha256": "91ded12ca5634142f04320b5614de105369bbd4847830ef3651124d830a84354",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_9_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        9
+      ],
+      "sourceCityId": 5093,
+      "name": "军营",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_9_4.png",
+      "width": 132,
+      "height": 87,
+      "bytes": 22739,
+      "sha256": "4150eeb69bd8f6c852061d5e3356e0a427bf80ed28fcbc2f8406fbb299e4fc9d",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_9_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        9
+      ],
+      "sourceCityId": 5094,
+      "name": "聚义台",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_9_5.png",
+      "width": 116,
+      "height": 87,
+      "bytes": 22392,
+      "sha256": "0e1862d6f4e7b9a48952fc484ec88d4040b4aa77f572a16f8bf95bd6be5ba3ec",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_9_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        9
+      ],
+      "sourceCityId": 5095,
+      "name": "芦苇丛",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_9_6.png",
+      "width": 135,
+      "height": 87,
+      "bytes": 20213,
+      "sha256": "34f31f73ec3d6e625ad090182745c0f3ad44d2dfa99fa9f0e3eaf30b047403c5",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_9_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        9
+      ],
+      "sourceCityId": 5096,
+      "name": "洞窟",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_9_7.png",
+      "width": 118,
+      "height": 87,
+      "bytes": 21976,
+      "sha256": "45a2b5cbdf0d81e6bd6b500c9a43e87b8b4be62bc28b8a750378bd57ea8f9567",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_9_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        9
+      ],
+      "sourceCityId": 5097,
+      "name": "渡口",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_9_8.png",
+      "width": 155,
+      "height": 100,
+      "bytes": 32213,
+      "sha256": "e35ea67bad6c61d40dc982306f7ad0cd4764495741b7c7d08f4c576239dfd66d",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_9_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        9
+      ],
+      "sourceCityId": 5098,
+      "name": "小平津",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_10.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1485198,
+      "sha256": "bcd667881ffa0760b407a5e845b42137744b51621a0a738e30bf5cc034230394",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_10.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 10,
+      "sourceRegionName": "洛阳",
+      "visualVerification": "The original background was previewed. Region identity is mapped from frozen hd_roguelike Chapter.map, not inferred from landscape resemblance.",
+      "versionIndexListed": true,
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "sourceVersion": 317682980,
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_10_1.png",
+      "width": 155,
+      "height": 132,
+      "bytes": 45916,
+      "sha256": "c1a5432208c90ed938484f140ad4b6da6121cc7576134e034c38785eecc2313e",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_10_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        10
+      ],
+      "sourceCityId": 5101,
+      "name": "金市",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_10_2.png",
+      "width": 188,
+      "height": 100,
+      "bytes": 41246,
+      "sha256": "63ab4a5205a66c97b658b0f25d7416e459802d35380d7f56201677e8dd881c4c",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_10_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        10
+      ],
+      "sourceCityId": 5102,
+      "name": "华林园",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_10_3.png",
+      "width": 111,
+      "height": 108,
+      "bytes": 27742,
+      "sha256": "582c814c05a470e0a0d3719c2d43ab282961b14b5d8168d602fb2229b66ebac2",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_10_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        10
+      ],
+      "sourceCityId": 5103,
+      "name": "太仓",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_10_4.png",
+      "width": 173,
+      "height": 177,
+      "bytes": 63450,
+      "sha256": "f00113f3e750586bcf9c6a8f2f8ad9bf1f6467e48e73f4db86e854e039327d00",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_10_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        10
+      ],
+      "sourceCityId": 5104,
+      "name": "司马门",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_10_5.png",
+      "width": 180,
+      "height": 169,
+      "bytes": 67532,
+      "sha256": "ac300c694e93705afdcd2a1ff352df405c1667434081950b27daf94815b780b2",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_10_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        10
+      ],
+      "sourceCityId": 5105,
+      "name": "武库",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_10_6.png",
+      "width": 205,
+      "height": 133,
+      "bytes": 49506,
+      "sha256": "aa79bd341b6f64d8696431de688aa1457daca77e1201e27d31a5ea5f1dc8e3b9",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_10_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        10
+      ],
+      "sourceCityId": 5106,
+      "name": "石址",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG and independently reviewed; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_10_7.png",
+      "width": 204,
+      "height": 145,
+      "bytes": 55145,
+      "sha256": "8d237f9dce109388d7c5ed96932825ff8f93ec3929802e1e217834a134319196",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_10_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        10
+      ],
+      "sourceCityId": 5107,
+      "name": "碳墟",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG and independently reviewed; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_10_8.png",
+      "width": 174,
+      "height": 109,
+      "bytes": 44621,
+      "sha256": "8995b915b9dc19dec3cbb76e0c5b02c2714b7e1fcedfc6f19cb314e6d6daa389",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_10_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        10
+      ],
+      "sourceCityId": 5108,
+      "name": "凌云台",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_11.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1477574,
+      "sha256": "a67519859c6525947e915b6658df1ff86cb7e2d13c41d87851699589c4870b19",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_11.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 11,
+      "sourceRegionName": "河内",
+      "visualVerification": "The original background was previewed. Region identity is mapped from frozen hd_roguelike Chapter.map, not inferred from landscape resemblance.",
+      "versionIndexListed": false,
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_11_1.png",
+      "width": 127,
+      "height": 87,
+      "bytes": 23937,
+      "sha256": "1b900512656d121e44967f10dcffd16680a5be4670946cfb1925ec71a8e9bdda",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_11_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        11
+      ],
+      "sourceCityId": 5111,
+      "name": "山阳",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_11_2.png",
+      "width": 118,
+      "height": 93,
+      "bytes": 22713,
+      "sha256": "2bd10059e1aa76cfc4890abd83fd425d080ddfb666056bf9f12258a6ace8ba3e",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_11_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        11
+      ],
+      "sourceCityId": 5112,
+      "name": "重门",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_11_3.png",
+      "width": 131,
+      "height": 87,
+      "bytes": 23963,
+      "sha256": "6fb698bfcc360736615c84c300f300032220d988b5a722f2699bfb2862e29023",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_11_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        11
+      ],
+      "sourceCityId": 5113,
+      "name": "朝歌",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_11_4.png",
+      "width": 135,
+      "height": 87,
+      "bytes": 23753,
+      "sha256": "33bec3dd9f3defbaa3c1af57436106a29c3d115e145f193f1718edf23e4ab353",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_11_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        11
+      ],
+      "sourceCityId": 5114,
+      "name": "野王",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_11_5.png",
+      "width": 111,
+      "height": 87,
+      "bytes": 21538,
+      "sha256": "b685d2a305968633250de6cdcba88aef986f2e9e48160c56b3300db9ae28d758",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_11_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        11
+      ],
+      "sourceCityId": 5115,
+      "name": "汲县",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_11_6.png",
+      "width": 133,
+      "height": 87,
+      "bytes": 24949,
+      "sha256": "c8354004a6a53537a7c92b634a5f84e364706dc41df053a1e2a6cabf841beb75",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_11_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        11
+      ],
+      "sourceCityId": 5116,
+      "name": "温县",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_11_7.png",
+      "width": 135,
+      "height": 87,
+      "bytes": 25407,
+      "sha256": "8a8dfd2dfbdce19f73baf704936b2fec53c9b916b57657f6f4afa35c0d5e56e3",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_11_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        11
+      ],
+      "sourceCityId": 5117,
+      "name": "武德",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_11_8.png",
+      "width": 135,
+      "height": 89,
+      "bytes": 27340,
+      "sha256": "06862030c629ff145f524ef2a682e79d2d911750239b856acead164e89e50701",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_11_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        11
+      ],
+      "sourceCityId": 5118,
+      "name": "修武",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_12.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1323351,
+      "sha256": "1525742388d6e15457d86f12821a4e6f316114c4d2c0a8848308492ee95bf5d4",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_12.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 12,
+      "sourceRegionName": "酸枣",
+      "visualVerification": "The original background was previewed. Region identity is mapped from frozen hd_roguelike Chapter.map, not inferred from landscape resemblance.",
+      "versionIndexListed": false,
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_12_1.png",
+      "width": 141,
+      "height": 91,
+      "bytes": 27168,
+      "sha256": "94960d8f6c280cb4ca8bc8505cf5cbc105d36153a44249d5af7de0d96a50c182",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_12_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        12
+      ],
+      "sourceCityId": 5121,
+      "name": "朝歌",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_12_2.png",
+      "width": 137,
+      "height": 96,
+      "bytes": 28959,
+      "sha256": "5cb0f431967a0bebb26245626a27bd48bff8580c2e5bb04a3eb60228a5b8b07e",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_12_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        12
+      ],
+      "sourceCityId": 5122,
+      "name": "白马",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_12_3.png",
+      "width": 148,
+      "height": 98,
+      "bytes": 32817,
+      "sha256": "18abe96a25cc7489bc83ea5d3c8451a1837c9ff08d411d26e0c6c384b0afb30e",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_12_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        12
+      ],
+      "sourceCityId": 5123,
+      "name": "燕县",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_12_4.png",
+      "width": 126,
+      "height": 87,
+      "bytes": 26833,
+      "sha256": "a311d0701150fbe33c8abc281b7215b812e9d51dcf25a8e19b4b71f3674eb84c",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_12_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        12
+      ],
+      "sourceCityId": 5124,
+      "name": "延津",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_12_5.png",
+      "width": 128,
+      "height": 87,
+      "bytes": 23246,
+      "sha256": "c38f0401ce551cfa0aa902ec25835f9a71c0673eb3ba48da082a156b07fb5884",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_12_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        12
+      ],
+      "sourceCityId": 5125,
+      "name": "长垣",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_12_6.png",
+      "width": 161,
+      "height": 107,
+      "bytes": 34936,
+      "sha256": "6e7288aca740177bf08fcc58af8cdbec34291b8676de5af22b60db59b83287ad",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_12_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        12
+      ],
+      "sourceCityId": 5126,
+      "name": "原阳",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_12_7.png",
+      "width": 152,
+      "height": 87,
+      "bytes": 28651,
+      "sha256": "dc5b978e45a996e4f51d3ca4e1f851bf96a43cead1c6ae2fad44cd496d6d71d1",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_12_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        12
+      ],
+      "sourceCityId": 5127,
+      "name": "封丘",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_12_8.png",
+      "width": 152,
+      "height": 87,
+      "bytes": 29886,
+      "sha256": "c6acbb4a7fea829169fe7bdf22562739b7fc7575f19f021cba31c0f66350ae14",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_12_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        12
+      ],
+      "sourceCityId": 5128,
+      "name": "酸枣",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/map5_13.png",
+      "width": 1220,
+      "height": 732,
+      "bytes": 1420493,
+      "sha256": "35a7edbf02bad399d287f6b490f06ea8bf9992028319421c84b929ba12861340",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/map/map5_13.png",
+      "sourceSeasonId": 5,
+      "sourceRegionId": 13,
+      "sourceRegionName": "荥阳",
+      "visualVerification": "The original background was previewed. Region identity is mapped from frozen hd_roguelike Chapter.map, not inferred from landscape resemblance.",
+      "versionIndexListed": false,
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_13_1.png",
+      "width": 136,
+      "height": 87,
+      "bytes": 22159,
+      "sha256": "194c6b56102b7bdc41f2aebbc57f7d3393d08a6acd78934fa31a10dfeae73e12",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_13_1.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        13
+      ],
+      "sourceCityId": 5131,
+      "name": "广武",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_13_2.png",
+      "width": 135,
+      "height": 90,
+      "bytes": 24867,
+      "sha256": "b8e6789bead836292504508b603503959bb37d56eae689307656922c46ffb850",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_13_2.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        13
+      ],
+      "sourceCityId": 5132,
+      "name": "敖仓",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_13_3.png",
+      "width": 146,
+      "height": 90,
+      "bytes": 30608,
+      "sha256": "fe10066c64ebc30c08764b52742fac6cc80103f2642a598110ac46134363e462",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_13_3.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        13
+      ],
+      "sourceCityId": 5133,
+      "name": "虎牢关",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_13_4.png",
+      "width": 127,
+      "height": 87,
+      "bytes": 22244,
+      "sha256": "2d75101091d610c5532137fb16bc2e2a7215db662b862b58ae778536dee1c9de",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_13_4.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        13
+      ],
+      "sourceCityId": 5134,
+      "name": "冯池",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG and independently reviewed; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_13_5.png",
+      "width": 144,
+      "height": 92,
+      "bytes": 25215,
+      "sha256": "45ac0cd56cd764f144021eae2c48e4345e9d83f067cfa2289ab70fd2d489c5a1",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_13_5.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        13
+      ],
+      "sourceCityId": 5135,
+      "name": "故市",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_13_6.png",
+      "width": 145,
+      "height": 87,
+      "bytes": 25757,
+      "sha256": "2ae47e10d2c9bbd209bafe57a5e876e4e4b9e9ab0b5ebbb93b8d2bebf13b58d0",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_13_6.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        13
+      ],
+      "sourceCityId": 5136,
+      "name": "荥泽",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_13_7.png",
+      "width": 131,
+      "height": 91,
+      "bytes": 24048,
+      "sha256": "28783696021ca261b53b7b89b56fb4c5dceafe1c3d5d7f6328b694b6def45ea5",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_13_7.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        13
+      ],
+      "sourceCityId": 5137,
+      "name": "京县",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Map/city_13_8.png",
+      "width": 133,
+      "height": 87,
+      "bytes": 23078,
+      "sha256": "bf0f7b284df6109f0a9f2f827f610b748c5c2954add8cfcb575d65d161522981",
+      "sourceKind": "standalone",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/city/city_5/city_13_8.png",
+      "sourceSeasonId": 5,
+      "sourceRegionIds": [
+        13
+      ],
+      "sourceCityId": 5138,
+      "name": "荥阳",
+      "nameProvenance": "Manually read from Chinese text baked into the original PNG; Level.cityname is empty.",
+      "visualVerification": "The transparent original PNG contains a baked Chinese landmark label. Identity and position follow frozen Chapter.location and Level.citypic/citycoordinate.",
+      "copy": "Byte-for-byte original PNG; no rescaling, repainting or re-encoding."
+    }
+  ],
+  "layoutSource": {
+    "configUrl": "https://web.sanguosha.com/220/h5_2/res/config/Config.sgs",
+    "configSha256": "d663d5542f5a63a61611b5dbc1ae736e5e0328eedaab2c498e18c3287c289ce6",
+    "clientUrl": "https://web.sanguosha.com/220/h5_2/sgsGame_a.sgs",
+    "clientSha256": "96b7131953f758a30da44c9bdbbcd8a429174050ef7c16961216b90cd923ec31",
+    "table": "hd_roguelike.sgs",
+    "decodedTableSha256": "97dbdb465d902e771e575ed5165df3d193e1a689e3dae7ae67b9cb5033f18c72"
+  },
+  "layoutDataFile": "src/CardGame.Wpf/Assets/Data/shanhe-map-layouts.json",
+  "coordinateSystem": {
+    "referenceWidth": 1220,
+    "referenceHeight": 732,
+    "origin": [
+      610,
+      366
+    ],
+    "sourceYAxis": "up",
+    "imageAnchor": "topLeft",
+    "sourceToCanvas": "left = 610 + sourceX; top = 366 - sourceY",
+    "clientEvidence": [
+      "qRt.GAME_MIN_WIDTH=1220; qRt.GAME_MIN_HEIGHT=732",
+      "createcityView positions the parent at gameWidth/2, gameHeight/2",
+      "W6t.updateContent uses CityPos.x and negated CityPos.y",
+      "W6t.loadcityImgComplete retains original texture dimensions and local image origin"
+    ]
+  },
+  "layouts": [
+    {
+      "sourceRegionId": 1,
+      "sourceMap": "map5_1.png",
+      "cities": [
+        {
+          "sourceCityId": 5011,
+          "sourceCityPic": "city_1_1",
+          "sourceCityCoordinate": [
+            -493,
+            179
+          ],
+          "canvasTopLeft": [
+            117,
+            187
+          ]
+        },
+        {
+          "sourceCityId": 5012,
+          "sourceCityPic": "city_1_2",
+          "sourceCityCoordinate": [
+            421,
+            111
+          ],
+          "canvasTopLeft": [
+            1031,
+            255
+          ]
+        },
+        {
+          "sourceCityId": 5013,
+          "sourceCityPic": "city_1_3",
+          "sourceCityCoordinate": [
+            231,
+            56
+          ],
+          "canvasTopLeft": [
+            841,
+            310
+          ]
+        },
+        {
+          "sourceCityId": 5014,
+          "sourceCityPic": "city_1_4",
+          "sourceCityCoordinate": [
+            -287,
+            84
+          ],
+          "canvasTopLeft": [
+            323,
+            282
+          ]
+        },
+        {
+          "sourceCityId": 5015,
+          "sourceCityPic": "city_1_5",
+          "sourceCityCoordinate": [
+            227,
+            -61
+          ],
+          "canvasTopLeft": [
+            837,
+            427
+          ]
+        },
+        {
+          "sourceCityId": 5016,
+          "sourceCityPic": "city_1_6",
+          "sourceCityCoordinate": [
+            -130,
+            -63
+          ],
+          "canvasTopLeft": [
+            480,
+            429
+          ]
+        },
+        {
+          "sourceCityId": 5017,
+          "sourceCityPic": "city_1_7",
+          "sourceCityCoordinate": [
+            -506,
+            -53
+          ],
+          "canvasTopLeft": [
+            104,
+            419
+          ]
+        },
+        {
+          "sourceCityId": 5018,
+          "sourceCityPic": "city_1_8",
+          "sourceCityCoordinate": [
+            51,
+            172
+          ],
+          "canvasTopLeft": [
+            661,
+            194
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          -315,
+          -89
+        ],
+        "canvasTopLeft": [
+          295,
+          455
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 2,
+      "sourceMap": "map5_2.png",
+      "cities": [
+        {
+          "sourceCityId": 5021,
+          "sourceCityPic": "city_2_1",
+          "sourceCityCoordinate": [
+            -379,
+            181
+          ],
+          "canvasTopLeft": [
+            231,
+            185
+          ]
+        },
+        {
+          "sourceCityId": 5022,
+          "sourceCityPic": "city_2_2",
+          "sourceCityCoordinate": [
+            47,
+            144
+          ],
+          "canvasTopLeft": [
+            657,
+            222
+          ]
+        },
+        {
+          "sourceCityId": 5023,
+          "sourceCityPic": "city_2_3",
+          "sourceCityCoordinate": [
+            350,
+            54
+          ],
+          "canvasTopLeft": [
+            960,
+            312
+          ]
+        },
+        {
+          "sourceCityId": 5024,
+          "sourceCityPic": "city_2_4",
+          "sourceCityCoordinate": [
+            -475,
+            86
+          ],
+          "canvasTopLeft": [
+            135,
+            280
+          ]
+        },
+        {
+          "sourceCityId": 5025,
+          "sourceCityPic": "city_2_5",
+          "sourceCityCoordinate": [
+            -74,
+            -118
+          ],
+          "canvasTopLeft": [
+            536,
+            484
+          ]
+        },
+        {
+          "sourceCityId": 5026,
+          "sourceCityPic": "city_2_6",
+          "sourceCityCoordinate": [
+            -532,
+            -66
+          ],
+          "canvasTopLeft": [
+            78,
+            432
+          ]
+        },
+        {
+          "sourceCityId": 5027,
+          "sourceCityPic": "city_2_7",
+          "sourceCityCoordinate": [
+            152,
+            -83
+          ],
+          "canvasTopLeft": [
+            762,
+            449
+          ]
+        },
+        {
+          "sourceCityId": 5028,
+          "sourceCityPic": "city_2_8",
+          "sourceCityCoordinate": [
+            -131,
+            71
+          ],
+          "canvasTopLeft": [
+            479,
+            295
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          -264,
+          -102
+        ],
+        "canvasTopLeft": [
+          346,
+          468
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 3,
+      "sourceMap": "map5_3.png",
+      "cities": [
+        {
+          "sourceCityId": 5031,
+          "sourceCityPic": "city_3_1",
+          "sourceCityCoordinate": [
+            -384,
+            172
+          ],
+          "canvasTopLeft": [
+            226,
+            194
+          ]
+        },
+        {
+          "sourceCityId": 5032,
+          "sourceCityPic": "city_3_2",
+          "sourceCityCoordinate": [
+            15,
+            199
+          ],
+          "canvasTopLeft": [
+            625,
+            167
+          ]
+        },
+        {
+          "sourceCityId": 5033,
+          "sourceCityPic": "city_3_3",
+          "sourceCityCoordinate": [
+            398,
+            176
+          ],
+          "canvasTopLeft": [
+            1008,
+            190
+          ]
+        },
+        {
+          "sourceCityId": 5034,
+          "sourceCityPic": "city_3_4",
+          "sourceCityCoordinate": [
+            -380,
+            -48
+          ],
+          "canvasTopLeft": [
+            230,
+            414
+          ]
+        },
+        {
+          "sourceCityId": 5035,
+          "sourceCityPic": "city_3_5",
+          "sourceCityCoordinate": [
+            -94,
+            80
+          ],
+          "canvasTopLeft": [
+            516,
+            286
+          ]
+        },
+        {
+          "sourceCityId": 5036,
+          "sourceCityPic": "city_3_6",
+          "sourceCityCoordinate": [
+            216,
+            72
+          ],
+          "canvasTopLeft": [
+            826,
+            294
+          ]
+        },
+        {
+          "sourceCityId": 5037,
+          "sourceCityPic": "city_3_7",
+          "sourceCityCoordinate": [
+            193,
+            -85
+          ],
+          "canvasTopLeft": [
+            803,
+            451
+          ]
+        },
+        {
+          "sourceCityId": 5038,
+          "sourceCityPic": "city_3_8",
+          "sourceCityCoordinate": [
+            -101,
+            -81
+          ],
+          "canvasTopLeft": [
+            509,
+            447
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          -250,
+          36
+        ],
+        "canvasTopLeft": [
+          360,
+          330
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 4,
+      "sourceMap": "map5_4.png",
+      "cities": [
+        {
+          "sourceCityId": 5041,
+          "sourceCityPic": "city_4_1",
+          "sourceCityCoordinate": [
+            -428,
+            228
+          ],
+          "canvasTopLeft": [
+            182,
+            138
+          ]
+        },
+        {
+          "sourceCityId": 5042,
+          "sourceCityPic": "city_4_2",
+          "sourceCityCoordinate": [
+            -90,
+            242
+          ],
+          "canvasTopLeft": [
+            520,
+            124
+          ]
+        },
+        {
+          "sourceCityId": 5043,
+          "sourceCityPic": "city_4_3",
+          "sourceCityCoordinate": [
+            369,
+            222
+          ],
+          "canvasTopLeft": [
+            979,
+            144
+          ]
+        },
+        {
+          "sourceCityId": 5044,
+          "sourceCityPic": "city_4_4",
+          "sourceCityCoordinate": [
+            -556,
+            91
+          ],
+          "canvasTopLeft": [
+            54,
+            275
+          ]
+        },
+        {
+          "sourceCityId": 5045,
+          "sourceCityPic": "city_4_5",
+          "sourceCityCoordinate": [
+            -283,
+            -79
+          ],
+          "canvasTopLeft": [
+            327,
+            445
+          ]
+        },
+        {
+          "sourceCityId": 5046,
+          "sourceCityPic": "city_4_6",
+          "sourceCityCoordinate": [
+            261,
+            -6
+          ],
+          "canvasTopLeft": [
+            871,
+            372
+          ]
+        },
+        {
+          "sourceCityId": 5047,
+          "sourceCityPic": "city_4_7",
+          "sourceCityCoordinate": [
+            433,
+            59
+          ],
+          "canvasTopLeft": [
+            1043,
+            307
+          ]
+        },
+        {
+          "sourceCityId": 5048,
+          "sourceCityPic": "city_4_8",
+          "sourceCityCoordinate": [
+            -86,
+            52
+          ],
+          "canvasTopLeft": [
+            524,
+            314
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          117,
+          188
+        ],
+        "canvasTopLeft": [
+          727,
+          178
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 5,
+      "sourceMap": "map5_5.png",
+      "cities": [
+        {
+          "sourceCityId": 5051,
+          "sourceCityPic": "city_5_1",
+          "sourceCityCoordinate": [
+            -486,
+            191
+          ],
+          "canvasTopLeft": [
+            124,
+            175
+          ]
+        },
+        {
+          "sourceCityId": 5052,
+          "sourceCityPic": "city_5_2",
+          "sourceCityCoordinate": [
+            -115,
+            173
+          ],
+          "canvasTopLeft": [
+            495,
+            193
+          ]
+        },
+        {
+          "sourceCityId": 5053,
+          "sourceCityPic": "city_5_3",
+          "sourceCityCoordinate": [
+            228,
+            144
+          ],
+          "canvasTopLeft": [
+            838,
+            222
+          ]
+        },
+        {
+          "sourceCityId": 5054,
+          "sourceCityPic": "city_5_4",
+          "sourceCityCoordinate": [
+            -354,
+            -31
+          ],
+          "canvasTopLeft": [
+            256,
+            397
+          ]
+        },
+        {
+          "sourceCityId": 5055,
+          "sourceCityPic": "city_5_5",
+          "sourceCityCoordinate": [
+            390,
+            21
+          ],
+          "canvasTopLeft": [
+            1000,
+            345
+          ]
+        },
+        {
+          "sourceCityId": 5056,
+          "sourceCityPic": "city_5_6",
+          "sourceCityCoordinate": [
+            -64,
+            -122
+          ],
+          "canvasTopLeft": [
+            546,
+            488
+          ]
+        },
+        {
+          "sourceCityId": 5057,
+          "sourceCityPic": "city_5_7",
+          "sourceCityCoordinate": [
+            237,
+            -92
+          ],
+          "canvasTopLeft": [
+            847,
+            458
+          ]
+        },
+        {
+          "sourceCityId": 5058,
+          "sourceCityPic": "city_5_8",
+          "sourceCityCoordinate": [
+            -195,
+            44
+          ],
+          "canvasTopLeft": [
+            415,
+            322
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          -530,
+          -26
+        ],
+        "canvasTopLeft": [
+          80,
+          392
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 6,
+      "sourceMap": "map5_6.png",
+      "cities": [
+        {
+          "sourceCityId": 5061,
+          "sourceCityPic": "city_6_1",
+          "sourceCityCoordinate": [
+            306,
+            215
+          ],
+          "canvasTopLeft": [
+            916,
+            151
+          ]
+        },
+        {
+          "sourceCityId": 5062,
+          "sourceCityPic": "city_6_2",
+          "sourceCityCoordinate": [
+            14,
+            224
+          ],
+          "canvasTopLeft": [
+            624,
+            142
+          ]
+        },
+        {
+          "sourceCityId": 5063,
+          "sourceCityPic": "city_6_3",
+          "sourceCityCoordinate": [
+            -413,
+            227
+          ],
+          "canvasTopLeft": [
+            197,
+            139
+          ]
+        },
+        {
+          "sourceCityId": 5064,
+          "sourceCityPic": "city_6_4",
+          "sourceCityCoordinate": [
+            -445,
+            42
+          ],
+          "canvasTopLeft": [
+            165,
+            324
+          ]
+        },
+        {
+          "sourceCityId": 5065,
+          "sourceCityPic": "city_6_5",
+          "sourceCityCoordinate": [
+            238,
+            -90
+          ],
+          "canvasTopLeft": [
+            848,
+            456
+          ]
+        },
+        {
+          "sourceCityId": 5066,
+          "sourceCityPic": "city_6_6",
+          "sourceCityCoordinate": [
+            448,
+            86
+          ],
+          "canvasTopLeft": [
+            1058,
+            280
+          ]
+        },
+        {
+          "sourceCityId": 5067,
+          "sourceCityPic": "city_6_7",
+          "sourceCityCoordinate": [
+            -325,
+            -59
+          ],
+          "canvasTopLeft": [
+            285,
+            425
+          ]
+        },
+        {
+          "sourceCityId": 5068,
+          "sourceCityPic": "city_6_8",
+          "sourceCityCoordinate": [
+            -12,
+            39
+          ],
+          "canvasTopLeft": [
+            598,
+            327
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          202,
+          91
+        ],
+        "canvasTopLeft": [
+          812,
+          275
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 7,
+      "sourceMap": "map5_7.png",
+      "cities": [
+        {
+          "sourceCityId": 5071,
+          "sourceCityPic": "city_7_1",
+          "sourceCityCoordinate": [
+            -207,
+            174
+          ],
+          "canvasTopLeft": [
+            403,
+            192
+          ]
+        },
+        {
+          "sourceCityId": 5072,
+          "sourceCityPic": "city_7_2",
+          "sourceCityCoordinate": [
+            -528,
+            46
+          ],
+          "canvasTopLeft": [
+            82,
+            320
+          ]
+        },
+        {
+          "sourceCityId": 5073,
+          "sourceCityPic": "city_7_3",
+          "sourceCityCoordinate": [
+            -290,
+            -82
+          ],
+          "canvasTopLeft": [
+            320,
+            448
+          ]
+        },
+        {
+          "sourceCityId": 5074,
+          "sourceCityPic": "city_7_4",
+          "sourceCityCoordinate": [
+            93,
+            158
+          ],
+          "canvasTopLeft": [
+            703,
+            208
+          ]
+        },
+        {
+          "sourceCityId": 5075,
+          "sourceCityPic": "city_7_5",
+          "sourceCityCoordinate": [
+            62,
+            -61
+          ],
+          "canvasTopLeft": [
+            672,
+            427
+          ]
+        },
+        {
+          "sourceCityId": 5076,
+          "sourceCityPic": "city_7_6",
+          "sourceCityCoordinate": [
+            316,
+            -70
+          ],
+          "canvasTopLeft": [
+            926,
+            436
+          ]
+        },
+        {
+          "sourceCityId": 5077,
+          "sourceCityPic": "city_7_7",
+          "sourceCityCoordinate": [
+            341,
+            126
+          ],
+          "canvasTopLeft": [
+            951,
+            240
+          ]
+        },
+        {
+          "sourceCityId": 5078,
+          "sourceCityPic": "city_7_8",
+          "sourceCityCoordinate": [
+            -105,
+            25
+          ],
+          "canvasTopLeft": [
+            505,
+            341
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          -312,
+          39
+        ],
+        "canvasTopLeft": [
+          298,
+          327
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 8,
+      "sourceMap": "map5_8.png",
+      "cities": [
+        {
+          "sourceCityId": 5081,
+          "sourceCityPic": "city_8_1",
+          "sourceCityCoordinate": [
+            -498,
+            112
+          ],
+          "canvasTopLeft": [
+            112,
+            254
+          ]
+        },
+        {
+          "sourceCityId": 5082,
+          "sourceCityPic": "city_8_2",
+          "sourceCityCoordinate": [
+            65,
+            211
+          ],
+          "canvasTopLeft": [
+            675,
+            155
+          ]
+        },
+        {
+          "sourceCityId": 5083,
+          "sourceCityPic": "city_8_3",
+          "sourceCityCoordinate": [
+            313,
+            149
+          ],
+          "canvasTopLeft": [
+            923,
+            217
+          ]
+        },
+        {
+          "sourceCityId": 5084,
+          "sourceCityPic": "city_8_4",
+          "sourceCityCoordinate": [
+            -441,
+            -28
+          ],
+          "canvasTopLeft": [
+            169,
+            394
+          ]
+        },
+        {
+          "sourceCityId": 5085,
+          "sourceCityPic": "city_8_5",
+          "sourceCityCoordinate": [
+            -133,
+            -97
+          ],
+          "canvasTopLeft": [
+            477,
+            463
+          ]
+        },
+        {
+          "sourceCityId": 5086,
+          "sourceCityPic": "city_8_6",
+          "sourceCityCoordinate": [
+            121,
+            -77
+          ],
+          "canvasTopLeft": [
+            731,
+            443
+          ]
+        },
+        {
+          "sourceCityId": 5087,
+          "sourceCityPic": "city_8_7",
+          "sourceCityCoordinate": [
+            415,
+            -85
+          ],
+          "canvasTopLeft": [
+            1025,
+            451
+          ]
+        },
+        {
+          "sourceCityId": 5088,
+          "sourceCityPic": "city_8_8",
+          "sourceCityCoordinate": [
+            -112,
+            113
+          ],
+          "canvasTopLeft": [
+            498,
+            253
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          -317,
+          216
+        ],
+        "canvasTopLeft": [
+          293,
+          150
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 9,
+      "sourceMap": "map5_9.png",
+      "cities": [
+        {
+          "sourceCityId": 5091,
+          "sourceCityPic": "city_9_1",
+          "sourceCityCoordinate": [
+            -419,
+            170
+          ],
+          "canvasTopLeft": [
+            191,
+            196
+          ]
+        },
+        {
+          "sourceCityId": 5092,
+          "sourceCityPic": "city_9_2",
+          "sourceCityCoordinate": [
+            -144,
+            156
+          ],
+          "canvasTopLeft": [
+            466,
+            210
+          ]
+        },
+        {
+          "sourceCityId": 5093,
+          "sourceCityPic": "city_9_3",
+          "sourceCityCoordinate": [
+            2,
+            233
+          ],
+          "canvasTopLeft": [
+            612,
+            133
+          ]
+        },
+        {
+          "sourceCityId": 5094,
+          "sourceCityPic": "city_9_4",
+          "sourceCityCoordinate": [
+            361,
+            163
+          ],
+          "canvasTopLeft": [
+            971,
+            203
+          ]
+        },
+        {
+          "sourceCityId": 5095,
+          "sourceCityPic": "city_9_5",
+          "sourceCityCoordinate": [
+            129,
+            41
+          ],
+          "canvasTopLeft": [
+            739,
+            325
+          ]
+        },
+        {
+          "sourceCityId": 5096,
+          "sourceCityPic": "city_9_6",
+          "sourceCityCoordinate": [
+            -518,
+            -23
+          ],
+          "canvasTopLeft": [
+            92,
+            389
+          ]
+        },
+        {
+          "sourceCityId": 5097,
+          "sourceCityPic": "city_9_7",
+          "sourceCityCoordinate": [
+            142,
+            -109
+          ],
+          "canvasTopLeft": [
+            752,
+            475
+          ]
+        },
+        {
+          "sourceCityId": 5098,
+          "sourceCityPic": "city_9_8",
+          "sourceCityCoordinate": [
+            -315,
+            -10
+          ],
+          "canvasTopLeft": [
+            295,
+            376
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          225,
+          129
+        ],
+        "canvasTopLeft": [
+          835,
+          237
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 10,
+      "sourceMap": "map5_10.png",
+      "cities": [
+        {
+          "sourceCityId": 5101,
+          "sourceCityPic": "city_10_1",
+          "sourceCityCoordinate": [
+            -506,
+            177
+          ],
+          "canvasTopLeft": [
+            104,
+            189
+          ]
+        },
+        {
+          "sourceCityId": 5102,
+          "sourceCityPic": "city_10_2",
+          "sourceCityCoordinate": [
+            -100,
+            254
+          ],
+          "canvasTopLeft": [
+            510,
+            112
+          ]
+        },
+        {
+          "sourceCityId": 5103,
+          "sourceCityPic": "city_10_3",
+          "sourceCityCoordinate": [
+            272,
+            281
+          ],
+          "canvasTopLeft": [
+            882,
+            85
+          ]
+        },
+        {
+          "sourceCityId": 5104,
+          "sourceCityPic": "city_10_4",
+          "sourceCityCoordinate": [
+            -143,
+            84
+          ],
+          "canvasTopLeft": [
+            467,
+            282
+          ]
+        },
+        {
+          "sourceCityId": 5105,
+          "sourceCityPic": "city_10_5",
+          "sourceCityCoordinate": [
+            77,
+            100
+          ],
+          "canvasTopLeft": [
+            687,
+            266
+          ]
+        },
+        {
+          "sourceCityId": 5106,
+          "sourceCityPic": "city_10_6",
+          "sourceCityCoordinate": [
+            257,
+            92
+          ],
+          "canvasTopLeft": [
+            867,
+            274
+          ]
+        },
+        {
+          "sourceCityId": 5107,
+          "sourceCityPic": "city_10_7",
+          "sourceCityCoordinate": [
+            -363,
+            65
+          ],
+          "canvasTopLeft": [
+            247,
+            301
+          ]
+        },
+        {
+          "sourceCityId": 5108,
+          "sourceCityPic": "city_10_8",
+          "sourceCityCoordinate": [
+            -333,
+            181
+          ],
+          "canvasTopLeft": [
+            277,
+            185
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          -532,
+          26
+        ],
+        "canvasTopLeft": [
+          78,
+          340
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 11,
+      "sourceMap": "map5_11.png",
+      "cities": [
+        {
+          "sourceCityId": 5111,
+          "sourceCityPic": "city_11_1",
+          "sourceCityCoordinate": [
+            -168,
+            157
+          ],
+          "canvasTopLeft": [
+            442,
+            209
+          ]
+        },
+        {
+          "sourceCityId": 5112,
+          "sourceCityPic": "city_11_2",
+          "sourceCityCoordinate": [
+            180,
+            135
+          ],
+          "canvasTopLeft": [
+            790,
+            231
+          ]
+        },
+        {
+          "sourceCityId": 5113,
+          "sourceCityPic": "city_11_3",
+          "sourceCityCoordinate": [
+            371,
+            203
+          ],
+          "canvasTopLeft": [
+            981,
+            163
+          ]
+        },
+        {
+          "sourceCityId": 5114,
+          "sourceCityPic": "city_11_4",
+          "sourceCityCoordinate": [
+            -527,
+            6
+          ],
+          "canvasTopLeft": [
+            83,
+            360
+          ]
+        },
+        {
+          "sourceCityId": 5115,
+          "sourceCityPic": "city_11_5",
+          "sourceCityCoordinate": [
+            428,
+            99
+          ],
+          "canvasTopLeft": [
+            1038,
+            267
+          ]
+        },
+        {
+          "sourceCityId": 5116,
+          "sourceCityPic": "city_11_6",
+          "sourceCityCoordinate": [
+            -360,
+            -83
+          ],
+          "canvasTopLeft": [
+            250,
+            449
+          ]
+        },
+        {
+          "sourceCityId": 5117,
+          "sourceCityPic": "city_11_7",
+          "sourceCityCoordinate": [
+            245,
+            -115
+          ],
+          "canvasTopLeft": [
+            855,
+            481
+          ]
+        },
+        {
+          "sourceCityId": 5118,
+          "sourceCityPic": "city_11_8",
+          "sourceCityCoordinate": [
+            -31,
+            51
+          ],
+          "canvasTopLeft": [
+            579,
+            315
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          -328,
+          7
+        ],
+        "canvasTopLeft": [
+          282,
+          359
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 12,
+      "sourceMap": "map5_12.png",
+      "cities": [
+        {
+          "sourceCityId": 5121,
+          "sourceCityPic": "city_12_1",
+          "sourceCityCoordinate": [
+            -417,
+            197
+          ],
+          "canvasTopLeft": [
+            193,
+            169
+          ]
+        },
+        {
+          "sourceCityId": 5122,
+          "sourceCityPic": "city_12_2",
+          "sourceCityCoordinate": [
+            341,
+            193
+          ],
+          "canvasTopLeft": [
+            951,
+            173
+          ]
+        },
+        {
+          "sourceCityId": 5123,
+          "sourceCityPic": "city_12_3",
+          "sourceCityCoordinate": [
+            12,
+            170
+          ],
+          "canvasTopLeft": [
+            622,
+            196
+          ]
+        },
+        {
+          "sourceCityId": 5124,
+          "sourceCityPic": "city_12_4",
+          "sourceCityCoordinate": [
+            -152,
+            59
+          ],
+          "canvasTopLeft": [
+            458,
+            307
+          ]
+        },
+        {
+          "sourceCityId": 5125,
+          "sourceCityPic": "city_12_5",
+          "sourceCityCoordinate": [
+            383,
+            23
+          ],
+          "canvasTopLeft": [
+            993,
+            343
+          ]
+        },
+        {
+          "sourceCityId": 5126,
+          "sourceCityPic": "city_12_6",
+          "sourceCityCoordinate": [
+            -443,
+            -19
+          ],
+          "canvasTopLeft": [
+            167,
+            385
+          ]
+        },
+        {
+          "sourceCityId": 5127,
+          "sourceCityPic": "city_12_7",
+          "sourceCityCoordinate": [
+            179,
+            -45
+          ],
+          "canvasTopLeft": [
+            789,
+            411
+          ]
+        },
+        {
+          "sourceCityId": 5128,
+          "sourceCityPic": "city_12_8",
+          "sourceCityCoordinate": [
+            -44,
+            -73
+          ],
+          "canvasTopLeft": [
+            566,
+            439
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          -251,
+          -73
+        ],
+        "canvasTopLeft": [
+          359,
+          439
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 13,
+      "sourceMap": "map5_13.png",
+      "cities": [
+        {
+          "sourceCityId": 5131,
+          "sourceCityPic": "city_13_1",
+          "sourceCityCoordinate": [
+            -164,
+            204
+          ],
+          "canvasTopLeft": [
+            446,
+            162
+          ]
+        },
+        {
+          "sourceCityId": 5132,
+          "sourceCityPic": "city_13_2",
+          "sourceCityCoordinate": [
+            139,
+            258
+          ],
+          "canvasTopLeft": [
+            749,
+            108
+          ]
+        },
+        {
+          "sourceCityId": 5133,
+          "sourceCityPic": "city_13_3",
+          "sourceCityCoordinate": [
+            -487,
+            41
+          ],
+          "canvasTopLeft": [
+            123,
+            325
+          ]
+        },
+        {
+          "sourceCityId": 5134,
+          "sourceCityPic": "city_13_4",
+          "sourceCityCoordinate": [
+            -270,
+            -51
+          ],
+          "canvasTopLeft": [
+            340,
+            417
+          ]
+        },
+        {
+          "sourceCityId": 5135,
+          "sourceCityPic": "city_13_5",
+          "sourceCityCoordinate": [
+            90,
+            -23
+          ],
+          "canvasTopLeft": [
+            700,
+            389
+          ]
+        },
+        {
+          "sourceCityId": 5136,
+          "sourceCityPic": "city_13_6",
+          "sourceCityCoordinate": [
+            272,
+            59
+          ],
+          "canvasTopLeft": [
+            882,
+            307
+          ]
+        },
+        {
+          "sourceCityId": 5137,
+          "sourceCityPic": "city_13_7",
+          "sourceCityCoordinate": [
+            296,
+            -58
+          ],
+          "canvasTopLeft": [
+            906,
+            424
+          ]
+        },
+        {
+          "sourceCityId": 5138,
+          "sourceCityPic": "city_13_8",
+          "sourceCityCoordinate": [
+            -22,
+            58
+          ],
+          "canvasTopLeft": [
+            588,
+            308
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          -291,
+          78
+        ],
+        "canvasTopLeft": [
+          319,
+          288
+        ]
+      }
+    },
+    {
+      "sourceRegionId": 14,
+      "sourceMap": "map5_14.png",
+      "cities": [
+        {
+          "sourceCityId": 5141,
+          "sourceCityPic": "city_14_1",
+          "sourceCityCoordinate": [
+            -488,
+            218
+          ],
+          "canvasTopLeft": [
+            122,
+            148
+          ]
+        },
+        {
+          "sourceCityId": 5142,
+          "sourceCityPic": "city_14_2",
+          "sourceCityCoordinate": [
+            -192,
+            94
+          ],
+          "canvasTopLeft": [
+            418,
+            272
+          ]
+        },
+        {
+          "sourceCityId": 5143,
+          "sourceCityPic": "city_14_3",
+          "sourceCityCoordinate": [
+            -172,
+            -71
+          ],
+          "canvasTopLeft": [
+            438,
+            437
+          ]
+        },
+        {
+          "sourceCityId": 5144,
+          "sourceCityPic": "city_14_4",
+          "sourceCityCoordinate": [
+            78,
+            -84
+          ],
+          "canvasTopLeft": [
+            688,
+            450
+          ]
+        },
+        {
+          "sourceCityId": 5145,
+          "sourceCityPic": "city_14_5",
+          "sourceCityCoordinate": [
+            80,
+            24
+          ],
+          "canvasTopLeft": [
+            690,
+            342
+          ]
+        },
+        {
+          "sourceCityId": 5146,
+          "sourceCityPic": "city_14_6",
+          "sourceCityCoordinate": [
+            275,
+            54
+          ],
+          "canvasTopLeft": [
+            885,
+            312
+          ]
+        },
+        {
+          "sourceCityId": 5147,
+          "sourceCityPic": "city_14_7",
+          "sourceCityCoordinate": [
+            430,
+            91
+          ],
+          "canvasTopLeft": [
+            1040,
+            275
+          ]
+        },
+        {
+          "sourceCityId": 5148,
+          "sourceCityPic": "city_14_8",
+          "sourceCityCoordinate": [
+            -560,
+            -7
+          ],
+          "canvasTopLeft": [
+            50,
+            373
+          ]
+        }
+      ],
+      "arena": {
+        "sourceRingPic": "city_6_9_cdd",
+        "sourceRingXY": [
+          158,
+          126
+        ],
+        "canvasTopLeft": [
+          768,
+          240
+        ]
+      }
+    }
+  ],
+  "sourceNamePolicy": "Level.cityname is empty for all Season 5 landmarks. Layout names are manually read from baked PNG labels when clear; uncertain text uses the source region name plus location ordinal, as documented per asset."
+}

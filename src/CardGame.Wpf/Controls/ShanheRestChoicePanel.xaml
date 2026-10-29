@@ -1,0 +1,23 @@
+<UserControl x:Class="CardGame.Wpf.Controls.ShanheRestChoicePanel"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:controls="clr-namespace:CardGame.Wpf.Controls"
+ FontFamily="Microsoft YaHei UI" FocusManager.IsFocusScope="True" KeyboardNavigation.TabNavigation="Cycle" AutomationProperties.Name="营地成长二选一">
+ <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="ShanheRewardStyles.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
+ <UserControl.InputBindings><KeyBinding Key="Enter" Command="{Binding ConfirmShanheRestChoiceCommand}"/></UserControl.InputBindings>
+ <Grid Background="#B21F1A15">
+  <Grid MaxWidth="780" MaxHeight="690" Margin="28,20"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+   <StackPanel Margin="0,0,0,16">
+    <Image Source="pack://siteoforigin:,,,/Assets/Shanhe/rogue__camp_title.png" Width="167" Height="97" Stretch="Uniform"/>
+    <TextBlock Text="可以任选一项奖励获得" Foreground="#E9D7B4" FontFamily="KaiTi" FontSize="20" TextAlignment="Center" Margin="0,6,0,0"/>
+   </StackPanel>
+   <ListBox x:Name="RestChoiceList" Grid.Row="1" ItemsSource="{Binding ShanheRestChoices}" SelectedItem="{Binding SelectedShanheRestChoice, Mode=TwoWay}" Background="Transparent" BorderThickness="0" Padding="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" AutomationProperties.Name="选择营地成长">
+    <ListBox.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2"/></ItemsPanelTemplate></ListBox.ItemsPanel>
+    <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="VerticalContentAlignment" Value="Stretch"/><Setter Property="IsEnabled" Value="{Binding IsEnabled}"/><Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}"/><Setter Property="Margin" Value="10,4"/><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><ContentPresenter/></ControlTemplate></Setter.Value></Setter></Style></ListBox.ItemContainerStyle>
+    <ListBox.ItemTemplate><DataTemplate>
+     <controls:ShanheRewardChoiceCard Heading="道具" Title="{Binding Name}" Description="{Binding Description}" Footer="{Binding CurrentValue}" FallbackText="{Binding Glyph}" Artwork="{Binding Artwork}" Rarity="2" IsSelected="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"/>
+    </DataTemplate></ListBox.ItemTemplate>
+   </ListBox>
+   <Button x:Name="ConfirmRestChoiceButton" Grid.Row="2" Content="确定" Command="{Binding ConfirmShanheRestChoiceCommand}" Style="{StaticResource ShanheRewardConfirmButton}" HorizontalAlignment="Center" Width="175" Margin="0,17,0,0" AutomationProperties.Name="确认营地成长"/>
+  </Grid>
+ </Grid>
+</UserControl>

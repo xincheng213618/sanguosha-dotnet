@@ -75,11 +75,5 @@ public sealed partial class GameEngine
     private bool HasCaiMaoBeforeDamageObserver(long id)=>HasCaiMaoDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 710)]
     private bool IsCaiMaoDying()=>ActiveDying is{}dying&&CaiMaoObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==dying.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1280)]
-    private bool AllowsCaiMaoNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||CaiMaoObserverRoot()is not{}root||root.Id==f.Id)return false;
-        var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27250)]private bool AdvanceCaiMaoChildren()=>_pendingDecision is null&&CaiMaoObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

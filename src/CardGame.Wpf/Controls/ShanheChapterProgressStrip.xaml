@@ -1,0 +1,19 @@
+<UserControl x:Class="CardGame.Wpf.Controls.ShanheChapterProgressStrip"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Width="258" Height="19" Focusable="False" IsHitTestVisible="False"
+ AutomationProperties.Name="本章六格行军进度" AutomationProperties.HelpText="{Binding ShanheChapterProgressText}">
+ <Viewbox Stretch="Uniform">
+  <Grid Width="516" Height="38">
+   <Image x:Name="ProgressTrack" Source="pack://siteoforigin:,,,/Assets/Shanhe/Map/rogue_day_pro_bg.png" Stretch="Fill"/>
+   <Image x:Name="ProgressFill" Source="pack://siteoforigin:,,,/Assets/Shanhe/Map/rogue_day_pro_bar.png" Stretch="Fill"><Image.Clip><RectangleGeometry x:Name="FillClip" Rect="0,0,0,38"/></Image.Clip></Image>
+   <Canvas x:Name="ProgressDividers">
+    <Image Canvas.Left="84" Canvas.Top="6" Width="4" Height="26" Source="pack://siteoforigin:,,,/Assets/Shanhe/Map/rogue_day_split.png"/>
+    <Image Canvas.Left="170" Canvas.Top="6" Width="4" Height="26" Source="pack://siteoforigin:,,,/Assets/Shanhe/Map/rogue_day_split.png"/>
+    <Image Canvas.Left="256" Canvas.Top="6" Width="4" Height="26" Source="pack://siteoforigin:,,,/Assets/Shanhe/Map/rogue_day_split.png"/>
+    <Image Canvas.Left="342" Canvas.Top="6" Width="4" Height="26" Source="pack://siteoforigin:,,,/Assets/Shanhe/Map/rogue_day_split.png"/>
+    <Image Canvas.Left="428" Canvas.Top="6" Width="4" Height="26" Source="pack://siteoforigin:,,,/Assets/Shanhe/Map/rogue_day_split.png"/>
+   </Canvas>
+   <Canvas ClipToBounds="True"><Border x:Name="Frontier" Canvas.Top="6" Width="2" Height="26" Background="#FFF0AE" Visibility="Collapsed"><Border.Effect><DropShadowEffect Color="#FFDB61" BlurRadius="12" ShadowDepth="0" Opacity="0.85"/></Border.Effect></Border></Canvas>
+  </Grid>
+ </Viewbox>
+</UserControl>

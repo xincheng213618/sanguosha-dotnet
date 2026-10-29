@@ -95,12 +95,6 @@ public sealed partial class GameEngine
     private bool HasMouZhangXiuOlBeforeDamage(long id) => MouZhangXiuOlObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 33000)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33000)]
     private bool IsMouZhangXiuOlDying() => ActiveDying is { } d && MouZhangXiuOlObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 33000)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 33000)]
-    private bool AllowsMouZhangXiuOlNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || MouZhangXiuOlObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature && target == (e.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33000)] private bool AdvanceMouZhangXiuOlChildren() => _pendingDecision is null && MouZhangXiuOlObserverRoot() is not null && TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 33000)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 33000)]
     private bool ContinuePaidMouZhangXiuOl(ProgramSkillFrame f) => f.MouZhangXiuOl is { } r && ValidMouZhangXiuOl(f) && (r.PaidCardId is not null || r.Operation is SkillProgramEffectOp.ResolveMouZhangXiuZhuijiao or SkillProgramEffectOp.CompleteMouZhangXiuZhuijiao or SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash) ||

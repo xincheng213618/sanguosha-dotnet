@@ -158,6 +158,10 @@ public sealed partial class GameEngine
                 paid.RequestedCount == proof.RequestedCount && paid.Reason == proof.Reason;
         if (producer.NativeDraw is not null || producer.InstructionIndex < 1 ||
             !RuntimeSkills.RuntimeRules_Core_CommonRules.ProgramMovementReturnMatches(producer, movement)) return false;
+        // The native draw itself freezes its exact issuing instruction. This
+        // covers paid native operations without a per-skill damage exception.
+        if (proof.ProgramOrigin is { } origin)
+            return origin == CaptureNativeDrawProgramOrigin(producer) && ValidNativeDrawInvocation(proof);
         // Native operations retain their own completed draw receipt on the
         // producer frame, rather than pausing a generic JSON Draw instruction.
         if (MobileShiKuangguThresholdDrawMatches(producer, proof)) return true;
@@ -181,66 +185,4 @@ public sealed partial class GameEngine
                 : ResolveProgramEffectTarget(producer, draw.Target)) == proof.OwnerSeat;
     }
 
-    private long? NativeDrawThresholdSuspendedAttack(ProgramSkillFrame observer)
-    {
-        if (observer.WindowContext is not { MovementBatch: { NativeDrawInvocation: { } proof } batch } context ||
-            _resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(item => item.Id == context.ParentFrameId) is not { } moved ||
-            moved.Batch.Id != batch.Id || moved.CandidateIndex < 0 || moved.CandidateIndex >= moved.Candidates.Count ||
-            !MountObserverCandidateMatches(observer, moved.Candidates[moved.CandidateIndex]) ||
-            MatchingNativeDrawThresholdProgress(batch, moved.Candidates[moved.CandidateIndex]) is null ||
-            _resolutionStack.SingleOrDefault(item => item.Id == proof.ParentFrameId) is not ProgramSkillFrame producer ||
-            !NativeDrawThresholdProgramProducerMatches(producer, moved, proof)) return null;
-        var index = _resolutionStack.FindIndex(item => item.Id == producer.Id);
-        while (index > 0 && NativeDrawThresholdObserverEdge(_resolutionStack[index - 1], _resolutionStack[index])) index--;
-        if (index < 1 || _resolutionStack[index] is not ProgramSkillFrame root || root.WindowContext is not { } origin) return null;
-        if (origin.Window == SkillProgramTriggerWindow.CardUseCommitted && origin.CardUse is { } identity && index >= 2 &&
-            _resolutionStack[index - 1] is ProgramCardTriggerWindowFrame committed && committed.Id == origin.ParentFrameId &&
-            root.ParentFrameId == committed.Id && GetCardActionWindow(committed) == origin.Window &&
-            committed.CandidateIndex >= 0 && committed.CandidateIndex < committed.Candidates.Count &&
-            MountObserverCandidateMatches(root, ToSharedCandidate(committed.Candidates[committed.CandidateIndex])) &&
-            _resolutionStack[index - 2] is CardUseFrame { ProgramUseCommitted: true, Action: { Type: CardActionType.Use } action } use &&
-            use.Id == committed.ParentFrameId && identity.ParentCardUseFrameId == use.Id &&
-            action.ActionId == identity.CardActionId && committed.Action.ActionId == action.ActionId &&
-            action.ActorSeat == identity.ActorSeat && action.EffectiveKind == identity.EffectiveKind)
-            return use.Id;
-        if (origin.Window == SkillProgramTriggerWindow.BeforeDamageApplied &&
-            _resolutionStack[index - 1] is BeforeDamageProgramWindowFrame before && before.Id == origin.ParentFrameId &&
-            origin.SourceSeat == (BeforeDamageHasNoSource(before) ? (int?)null : before.SourceSeat) &&
-            origin.TargetSeat == before.TargetSeat && origin.Amount == before.Amount &&
-            before.CandidateIndex >= 0 && before.CandidateIndex < before.Candidates.Count &&
-            MountObserverCandidateMatches(root, before.Candidates[before.CandidateIndex].Candidate))
-            return before.ContinuationAttackResolutionId ?? before.ParentFrameId;
-        if (origin.Window is SkillProgramTriggerWindow.AfterDamageApplied or SkillProgramTriggerWindow.DamageAppliedBeforeDying &&
-            index >= 2 && _resolutionStack[index - 1] is DamageTriggerWindowFrame after &&
-            _resolutionStack[index - 2] is DamageFrame damage && after.Id == origin.ParentFrameId && after.ParentFrameId == damage.Id &&
-            origin.DamageFrameId == damage.Id && origin.TargetSeat == damage.TargetSeat && origin.Amount == damage.Amount &&
-            after.CandidateIndex >= 0 && after.CandidateIndex < after.Candidates.Count &&
-            MountObserverCandidateMatches(root, after.Candidates[after.CandidateIndex].ToProgramCandidate()))
-            return damage.ParentFrameId;
-        return null;
-    }
-
-    private bool NativeDrawThresholdObserverEdge(ResolutionFrame parent, ResolutionFrame child)
-    {
-        if (TypedDamagePostEventEdge(parent, child)) return true;
-        return parent is ProgramSkillFrame { NativeDraw: { RecipientApplied: true } paid } producer &&
-            child is CardsMovedTriggerWindowFrame moved && moved.Batch.NativeDrawInvocation is { } draw &&
-            draw.ParentFrameId == producer.Id && moved.Batch.ParentFrameId == producer.Id && draw.LastBatchId == moved.Batch.Id &&
-            paid.InstructionIndex == producer.InstructionIndex && paid.RecipientIndex >= 0 && paid.RecipientIndex < paid.Recipients.Count &&
-            paid.Recipients[paid.RecipientIndex] == draw.OwnerSeat && paid.RequestedCount == draw.RequestedCount && paid.Reason == draw.Reason &&
-            ValidNativeDrawInvocation(draw);
-    }
-
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 62022)]
-    private bool AllowsNativeDrawThresholdDamage(ProgramSkillFrame frame, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (source is not null || nature is not null || sourceLess || frame.AttackAttempt is not null || ActiveDying is not null ||
-            _resolutionStack.LastOrDefault()?.Id != frame.Id || frame.SelectedTargetSeats is not [var selected] || selected != target ||
-            !UsesNativeDrawThreshold(GetProgramTrigger(frame)) || GetProgramTrigger(frame).Effects[0].Amount != amount ||
-            NativeDrawThresholdSuspendedAttack(frame) is not { } originalAttack || CurrentDamageAttempt?.ResolutionId != originalAttack)
-            return false;
-        return ProgramEventHistory<NativeDrawThresholdTargetChosenEvent>().Where(item => item.ProgramFrameId == frame.Id).ToArray()
-            is [var chosen] && chosen.TargetSeat == target && chosen.OccurrenceIndex == frame.WindowContext!.OccurrenceIndex;
-    }
 }

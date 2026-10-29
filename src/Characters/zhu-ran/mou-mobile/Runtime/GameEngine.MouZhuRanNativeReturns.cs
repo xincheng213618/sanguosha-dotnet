@@ -49,17 +49,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant,34400)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime,34400)]
     private bool MouZhuRanDying()=>ActiveDying is{}d&&MouZhuRanNativeRoot()is{}f&&_resolutionStack.FindIndex(x=>x.Id==d.Id)>_resolutionStack.FindIndex(x=>x.Id==f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts,34400)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts,34400)]
-    private bool MouZhuRanNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||sourceLess)return false;
-        if(MouZhuRan.Valid(f)&&f.MouZhuRan is{Stage:MouZhuRanStage.Damage}r)return target==r.Recipient&&amount==1&&source is null&&nature is null;
-        if(MouZhuRanNativeRoot()is not{}root||root.Id==f.Id)return false;
-        var e=GetPausedPrivateOfferEffect(f);
-        return e is{Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&
-            target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor,34400)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor,34400)]
     private bool MouZhuRanRecoveryParent(ProgramSkillFrame f,RecoveryReplacementFrame recovery)

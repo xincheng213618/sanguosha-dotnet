@@ -71,15 +71,6 @@ public sealed partial class GameEngine
             p!=f.PendingMovementContinuation||p.SubjectSeat!=f.OwnerSeat||p.BeforeCount!=0||p.CoverageResultBind is not null)return false;
         RequireShenPt(f);return ShenPtPaidRemoval(f.Id,r.DeathId,r.RemovedCardId,r.Before,r.After,r.BatchId);
     }
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts,39200)]
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts,39200)]
-    private bool ShenPtNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if(f.ShenPangTong is not{Operation:SkillProgramEffectOp.ResolveShenPangTongFengliao,Stage:ShenPangTongStage.DamageChildren,Polarity:SkillPolarity.Yin}r||
-            f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||target!=r.TargetSeat||amount!=1||source is not null||nature!=DamageNature.Fire||sourceLess)return false;
-        RequireShenPt(f);return f.WindowContext is{Window:SkillProgramTriggerWindow.CardUseBeforeTargetEffects}w&&ShenPtUse(w) is{}window&&
-            CurrentDamageAttempt?.ResolutionId==window.ParentFrameId;
-    }
     private bool ShenPtFirstChild(ProgramSkillFrame f,ResolutionFrame child)
     {
         if(f.ShenPangTong is not{}r)return false;RequireShenPt(f);

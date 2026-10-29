@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "description": "Original OL Shanhe camp UI sprites: native atlas crops and byte-for-byte standalone reward icons. Atlas source padding is restored; no assets are resized.",
+  "assets": [
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/rogue__camp_title.png",
+      "width": 334,
+      "height": 194,
+      "sha256": "648a886f763fe46268ea72b41a3ce300ca45d5623bfa50173ca2888d7fa3bafa",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/rogueAward.atlas?v=1143738339",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/rogueAward.webp?v=466473424",
+      "sourceAtlasSha256": "f5c55790f23d2ac8bf208b0d41e66fd3e154f19e60229aa727353d3f92ff3f9d",
+      "sourceTextureSha256": "7428e3399a88be81005a3643e2c986fc5f54246f3ef0367d24967c6c682808a6",
+      "frameKey": "rogue__camp_title.png",
+      "frame": {
+        "idx": 0,
+        "x": 1574,
+        "y": 22,
+        "w": 334,
+        "h": 194
+      },
+      "sourceSize": {
+        "w": 334,
+        "h": 194
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 334,
+        "h": 194
+      },
+      "sourceScale": 2
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/reward_mopai.png",
+      "width": 100,
+      "height": 100,
+      "bytes": 17028,
+      "sha256": "8169ed18f9f8a88622da574680b19f4c4e3514445a30559e0c014a97fed3b70b",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/itempic/reward_mopai.png?v=27583841",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "sourceKind": "standalone",
+      "copy": "Byte-for-byte original transparent PNG, without rescaling or re-encoding.",
+      "usageNote": "Verified red octagonal camp reward box. The draw and maximum-health source variants use identical original image bytes."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/reward_tili.png",
+      "width": 100,
+      "height": 100,
+      "bytes": 17028,
+      "sha256": "8169ed18f9f8a88622da574680b19f4c4e3514445a30559e0c014a97fed3b70b",
+      "sourceUrl": "https://web.sanguosha.com/220/h5_2/res/runtime/pc/pattern/roguelike/itempic/reward_tili.png?v=-832778951",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "sourceKind": "standalone",
+      "copy": "Byte-for-byte original transparent PNG, without rescaling or re-encoding.",
+      "usageNote": "Verified red octagonal camp reward box. The draw and maximum-health source variants use identical original image bytes."
+    },
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/rog_ok_normal.png",
+      "width": 276,
+      "height": 90,
+      "sha256": "fdd9cd62bf42b247264848fadbecd0d7fa7d837a795d8ee4319179a3b330f809",
+      "sourceAtlasUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikeCommon.atlas?v=-693557390",
+      "sourceTextureUrl": "https://web.sanguosha.com/220/h5_2/res/assets/roguelike/roguelikeCommon.webp?v=568600303",
+      "sourceAtlasSha256": "b7350cacf9c6cbc1a59a0c5af3f97b84fdcb220afb0d6d7f4fc30a4230770b5c",
+      "sourceTextureSha256": "e7697d3b494b9d9a67a9392d6e0032c48222b6ae3a8c8ce4ecae7497765e34bd",
+      "sourceVersionIndexUrl": "https://web.sanguosha.com/220/h5_2/version.json",
+      "sourceVersionIndexSha256": "0b44e35c44a92704efa87b0c198a6d58ac81b6ca0c388252a9767ed1ce4aa70f",
+      "frameKey": "rog_ok_normal.png",
+      "frame": {
+        "idx": 0,
+        "x": 4,
+        "y": 300,
+        "w": 276,
+        "h": 90
+      },
+      "sourceSize": {
+        "w": 276,
+        "h": 90
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 276,
+        "h": 90
+      },
+      "sourceScale": 2
+    }
+  ],
+  "verifiedAtUtc": "2026-10-28T18:21:40.335031+00:00"
+}

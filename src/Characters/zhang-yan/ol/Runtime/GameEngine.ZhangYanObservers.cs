@@ -70,8 +70,5 @@ public sealed partial class GameEngine
  }
  [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 550)]
  private bool IsZhangYanDying()=>ActiveDying is{}d&&ZhangYanObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1190)]
- private bool AllowsZhangYanNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
- {if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||ZhangYanObserverRoot()is not{}root||root.Id==f.Id)return false;var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==source&&e.DamageNature==nature&&target==(e.TargetReference is{}reference?ResolveProgramParticipant(f,reference):ResolveProgramEffectTarget(f,e.Target));}
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27000)]private bool AdvanceZhangYanSubtree()=>_pendingDecision is null&&ZhangYanObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }

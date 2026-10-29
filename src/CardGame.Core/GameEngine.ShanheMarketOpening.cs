@@ -49,10 +49,4 @@ public sealed partial class GameEngine
         return _resolutionStack.FindIndex(f => f.Id == id) > _resolutionStack.FindIndex(f => f.Id == market.Id);
     }
 
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 62030)]
-    private bool AllowsShanheMarketChildDamage(ProgramSkillFrame program, int target, int amount,
-        ProgramParticipantReference? source, DamageNature? nature, bool sourceLess) =>
-        amount > 0 && _resolutionStack.LastOrDefault()?.Id == program.Id &&
-        program.SkillId != ShanheMarketPrograms.ExecutionSkillId &&
-        program.WindowContext is { } context && HasShanheMarketPurchaseObserver(context.ParentFrameId);
 }

@@ -249,6 +249,7 @@ public sealed partial class GameEngine
         {
             for (var index = _resolutionStack.Count - 1; index >= 0; index--)
                 if (_resolutionStack[index] is DyingFrame frame &&
+                    !IsOriginalDyingSuspendedByProgramInsertion(frame) &&
                     !(IsOriginalDyingSuspendedByDyingSuits(frame) || IsOriginalDyingSuspendedByRecipientCategoryMark(frame) || IsOriginalDyingSuspendedByAnniversaryYangBiao(frame)) &&
                     !IsOriginalDyingSuspendedByOwnedDeathBenefit(frame) && !IsOriginalDyingSuspendedByOwnerDeathDamage(frame) &&
                     !IsOriginalDyingSuspendedByHappyGuardElai(frame) &&

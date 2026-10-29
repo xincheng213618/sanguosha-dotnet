@@ -39,13 +39,6 @@ public sealed partial class GameEngine
     private bool MouSmBeforeDamage(long id) => MouSmRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 36200)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 36200)]
     private bool MouSmDying() => ActiveDying is { } d && MouSmRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 36200)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 36200)]
-    private bool MouSmNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess || MouSmRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f);
-        return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 36200)] [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 36200)]
     private bool MouSmRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
     {

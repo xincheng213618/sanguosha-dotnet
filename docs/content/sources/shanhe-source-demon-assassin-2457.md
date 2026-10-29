@@ -4,7 +4,9 @@
 
 `Fight.fightID=2457`、`Ggroup=2457`，`Text.ID=2457` 的战斗标题为擒拿刺客。完整阵容只有一行 `General.a=2457`：`b=4861`、`c=魔军刺客`、`d=1000299`、`f=0`、`h=100`。原始体力与上限3/3，通常摸牌2、随机起手4、护甲0、护甲回复0、护甲上限5、基础额外出杀0、额外伤害0。没有固定装备、随身牌、特殊 `att_*` 属性或隐藏成员。`NewbieGroup=22457` 为另一完整战斗组，`pvpspell=3189` 为另一模式字段，均不加入本配方。
 
-4861为士兵身份，角色统一使用 `character:shanhe-source-soldier-4861`。来源外观1000299暂未对应到已核本地肖像，使用 `supporter` 作为本地缺图回退，不借用马岱、周鲂或郭槐的身体、肖像及附带技能。
+4861为士兵身份，角色统一使用 `character:shanhe-source-soldier-4861`。2457第0行与2464第0行是两条独立来源记录，均明确 `b=4861`、`d=1000299`；PVE皮肤1000299的 `seatpic=generalface_1000299` 已核实为[官方原卡](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000299.png)，146×172原字节保存在 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000299.png`。完整源行、像素哈希与精确运行时身份见[美术核验记录](shanhe-demon-troops-art-2026-10-29.json)。内容定义的 `PortraitKey="supporter"`、`VariantId` 与身体、技能不变，桌面原卡按已核实的精确运行时身份绑定。
+
+两条来源记录的 `g` 均缺省为false，`hide=false`、`startChapter=1`、`Generalshow=0`；刺客不是主帅。遇敌介绍保留完整卡与技能，不将其缩成主帅的随从头像。
 
 完整源难度1—25按以下阈值累计技能：
 

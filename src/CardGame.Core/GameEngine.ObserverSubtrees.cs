@@ -97,12 +97,12 @@ public sealed partial class GameEngine
             RecipientCategoryMarkStructuralEdge(parent, current) || OffTurnUsedCardGiftStructuralEdge(parent, current) ||
             CardSupplyCompletionStructuralEdge(parent, current) || ResponseCompletionStructuralEdge(parent, current) ||
             OriginalHandEntityStructuralEdge(parent, current) || OutsidePhaseDrawDiscardStructuralEdge(parent, current) ||
-            HalfHandPaidDamageObserverEdge(child) || PaidTargetObserverEdge(child) || IsYanPuDyingExitEdge(child) || HappyDianWeiStructuralEdge(current, parent) || HappyPangTongStructuralEdge(current, parent) || HappyDiaoChanStructuralEdge(current, parent) || MuShunPindianStructuralEdge(current, parent);
+            HalfHandPaidDamageObserverEdge(child) || ProgramChildResolutionEdge(child) || IsYanPuDyingExitEdge(child) || HappyDianWeiStructuralEdge(current, parent) || HappyPangTongStructuralEdge(current, parent) || HappyDiaoChanStructuralEdge(current, parent) || MuShunPindianStructuralEdge(current, parent);
     }
 
     private bool HasHandGainDebtObserverSuffix(int rootIndex) => HasObserverSuffix(rootIndex,
         static (engine, child) => IsObserverSkillsChangedEdge(engine._resolutionStack[child - 1], engine._resolutionStack[child]) ||
-            engine.HalfHandPaidDamageObserverEdge(child) || engine.PaidTargetObserverEdge(child) || engine.IsYanPuDyingExitEdge(child) ||
+            engine.HalfHandPaidDamageObserverEdge(child) || engine.ProgramChildResolutionEdge(child) || engine.IsYanPuDyingExitEdge(child) ||
             engine.DyingSuitsStructuralEdge(engine._resolutionStack[child - 1], engine._resolutionStack[child]),
         static (engine, child, dying) => engine.IsPaidRescueObserverSuffix(child, dying) ||
             engine.TieredRoundZeroDyingRescueRide(child, dying) || (engine.DrawFundedDistinctBasicDyingRescueRide(child, dying) || engine.HuanpeiDyingRescueRide(child, dying)));
@@ -112,6 +112,6 @@ public sealed partial class GameEngine
     private bool HasPaidDamageObserverSuffix(int rootIndex) => HasObserverSuffix(rootIndex,
         static (engine, child) => IsObserverSkillsChangedEdge(engine._resolutionStack[child - 1], engine._resolutionStack[child]) ||
             engine.DyingSuitsStructuralEdge(engine._resolutionStack[child - 1], engine._resolutionStack[child]) ||
-            engine.HalfHandPaidDamageObserverEdge(child) || engine.PaidTargetObserverEdge(child) || engine.IsYanPuDyingExitEdge(child),
+            engine.HalfHandPaidDamageObserverEdge(child) || engine.ProgramChildResolutionEdge(child) || engine.IsYanPuDyingExitEdge(child),
         static (engine, child, dying) => engine.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
 }

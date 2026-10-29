@@ -33,17 +33,12 @@
       "triggers": [
         {
           "id": "zengou-nullify",
-          "window": "slashFullyDodged",
+          "window": "cardResponseCompleted",
           "ownerRelation": "observer",
           "optional": true,
-          "condition": {
-            "kind": "compare",
-            "left": { "kind": "ownerEventTargetDistance" },
-            "operator": "lessThanOrEqual",
-            "right": { "kind": "currentAttackRange" }
-          },
+          "cardKinds": ["dodge"],
           "effects": [
-            { "op": "zengouNullifyDodge", "target": "owner" }
+            { "op": "resolveWushuangZengou", "target": "owner" }
           ]
         }
       ]

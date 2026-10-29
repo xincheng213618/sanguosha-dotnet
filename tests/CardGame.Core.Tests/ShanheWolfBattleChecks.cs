@@ -30,7 +30,7 @@ internal static class ShanheWolfBattleChecks
             // every original route and elite-profile reference stays intact.
             // No win is simulated to reach a later chapter.
             var targeted = definition with
-            { StartingNodeIds = [.. definition.StartingNodeIds, ordinary.Id], RandomStartingNode = false };
+            { StartingNodeIds = definition.StartingNodeIds.Append(ordinary.Id).Distinct(StringComparer.Ordinal).ToArray(), RandomStartingNode = false };
             var session = ShanheCampaignSession.Create(targeted,
                 new(71, "classic:guan-yu") { SourceDifficultyId = 11, EquippedTacticIds = [wolf.Id, EliteBonus.RewardId] },
                 StandardShanheCampaignCatalog.CreateBattleRegistry);
@@ -43,7 +43,8 @@ internal static class ShanheWolfBattleChecks
             Move(session, ordinary.Id);
             var profile = session.Snapshot.CurrentBattleNode!;
             var setup = session.PendingBattleSetup!;
-            Need(profile is { Kind: ShanheNodeKind.EliteBattle, PrimaryTacticRarity: 2, PrimarySkillRarity: 2 } &&
+            Need(profile is { Kind: ShanheNodeKind.EliteBattle, PrimaryTacticRarity: 2, PrimaryCardRarity: 2 } &&
+                profile.PrimarySkillRarity == (chapter >= 2 ? 3 : 2) &&
                 profile.ChapterNumber == chapter && profile.Id == ordinary.Id && profile.NextNodeIds.SequenceEqual(ordinary.NextNodeIds) &&
                 profile.RewardIds!.SequenceEqual(elite.RewardIds!) && SameRoster(preview.Enemies, setup.EnemyRoster),
                 "Native entry fixes the same-chapter elite encounter and actual rare reward profile while keeping ordinary route links.");
@@ -79,7 +80,8 @@ internal static class ShanheWolfBattleChecks
             var offers = PrimaryOffers(session, profile);
             Need(offers.Any(reward => RewardCategory(reward) == ShanheRewardCategory.Tactic) &&
                 offers.Any(reward => RewardCategory(reward) == ShanheRewardCategory.Skill) &&
-                offers.Where(reward => RewardCategory(reward) is ShanheRewardCategory.Tactic or ShanheRewardCategory.Skill).All(reward => reward.Rarity == 2) &&
+                offers.Where(reward => RewardCategory(reward) is ShanheRewardCategory.Tactic or ShanheRewardCategory.Skill)
+                    .All(reward => reward.Rarity == (RewardCategory(reward) == ShanheRewardCategory.Skill ? profile.PrimarySkillRarity : 2)) &&
                 PlanBonuses(session, profile) is [{ IsBonus: true, OfferIds: var bonusIds }] && bonusIds.Count > 0 &&
                 bonusIds.All(id => definition.Rewards.Single(reward => reward.Id == id) is { Rarity: 2 } reward && RewardCategory(reward) == ShanheRewardCategory.Tactic),
                 "Each published chapter exposes its actual rare tactic/skill loot and the existing real elite-bonus planner supplies eligible rare tactics.");

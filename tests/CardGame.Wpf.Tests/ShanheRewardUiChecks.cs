@@ -1,10 +1,14 @@
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using CardGame.Content.Standard;
 using CardGame.Core;
@@ -37,47 +41,70 @@ internal static partial class ShanheRewardUiChecks
             var overlay = (FrameworkElement)panel.FindName("ShanheRewardOverlay");
             var rows = (ItemsControl)panel.FindName("ShanheRewardCardRows");
             var confirm = (Button)panel.FindName("ShanheConfirmRewardButton");
+            var objective = (TextBlock)panel.FindName("ShanheChapterObjective");
             var ordinaryRevision = Program.Engine(vm).Revision;
             Program.Assert(vm.IsShanheRewardOpen && overlay.Visibility == Visibility.Visible &&
                 vm.ShanheRewardCards.Count == 4 && vm.ShanheRewardCards.Count(card => card.IsSkip) == 1 &&
                 rows.Items.Count == 4 && !confirm.IsEnabled && !vm.ConfirmShanheRewardCommand.CanExecute(null),
                 "A real completed victory must show three reward cards and a separate decline card, with confirmation initially disabled.");
             var gold = session.Snapshot.Gold;
+            Program.Assert(session.Snapshot.CanSkipReward && session.Snapshot.RewardSkipGold == 100 &&
+                    objective.Text == vm.ShanheChapterObjectiveText &&
+                    objective.Text.Contains(session.Snapshot.RewardSkipGold.ToString(), StringComparison.Ordinal) &&
+                    objective.Text.Contains("放弃", StringComparison.Ordinal) && objective.Text.Contains("铜币", StringComparison.Ordinal) &&
+                    BindingOperations.GetBinding(objective, TextBlock.TextProperty)?.Path.Path == nameof(MainViewModel.ShanheChapterObjectiveText),
+                "The actual bound campaign header derives the normal reward's available decline action and exact compensation from its current snapshot.");
+            var mapGoldValue = (TextBlock)panel.FindName("ShanheMapGoldValue");
+            Program.Assert(gold == 17 && mapGoldValue.Text == vm.ShanheGoldText && mapGoldValue.Text == "铜币   17",
+                "The fixed map wallet immediately displays the actual seventeen coins from the validated native victory while its reward is still pending.");
             var beforeSelection = Snapshot(session);
             var revision = session.Revision;
             var skill = vm.ShanheRewardCards.Single(card => card.Id == "learned");
             var staleSkip = vm.ShanheRewardCards.Single(card => card.IsSkip);
             var staleSkipButton = Bound(panel, vm.SelectShanheRewardCardCommand, staleSkip);
+            AssertNativeRewardTooltip(vm, session, vm.SelectShanheRewardCardCommand, skill, skill.RuleTooltip,
+                output, "shanhe-reward-rule-tooltip");
             Click(Bound(panel, vm.SelectShanheRewardCardCommand, skill), panel);
             Program.Assert(skill.IsSelected && ReferenceEquals(vm.SelectedShanheRewardCard, skill) &&
-                confirm.IsEnabled && Snapshot(session) == beforeSelection,
+                confirm.IsEnabled && Snapshot(session) == beforeSelection && mapGoldValue.Text == "铜币   17",
                 "Clicking a skill card must only preview its selection; the real campaign journal and resources stay unchanged.");
             Click(staleSkipButton, panel);
             Program.Assert(staleSkip.IsSelected && !skill.IsSelected && vm.ShanheRewardCards.Count(card => card.IsSelected) == 1 &&
                 staleSkip.BonusText.Contains("100", StringComparison.Ordinal) && Snapshot(session) == beforeSelection &&
+                mapGoldValue.Text == "铜币   17" &&
                 panel.HandleEscape() && vm.IsShanheRewardOpen && session.Revision == revision,
                 "The decline card must show its 100-coin compensation, select exclusively, and retain the unresolved reward when Escape is pressed.");
+            Program.Assert(objective.Text == vm.ShanheChapterObjectiveText &&
+                    objective.Text.Contains(session.Snapshot.RewardSkipGold.ToString(), StringComparison.Ordinal) &&
+                    objective.Text.Contains("放弃", StringComparison.Ordinal),
+                "Selecting the decline card leaves the actual compensation objective pending until its separate confirmation.");
             Program.Render(panel, 1440, 880, Path.Combine(output, "shanhe-reward-choice.png"));
             Click(confirm, panel);
             Program.Assert(!vm.IsShanheRewardOpen && overlay.Visibility == Visibility.Collapsed &&
                 session.Revision == revision + 1 && session.Snapshot.Gold == gold + 100 &&
                 session.Snapshot.ExtraSkillIds.Count == 0 && session.Snapshot.TacticIds.Count == 0 &&
                 session.AcceptedCommands.OfType<SkipShanheRewardCommand>().Count() == 1 &&
+                mapGoldValue.Text == vm.ShanheGoldText && mapGoldValue.Text == "铜币   117" &&
                 Program.Engine(vm).Revision == ordinaryRevision,
                 "Only confirmation may grant exactly 100 extra coins, without learning a skill or touching the hidden ordinary game.");
+            Program.Assert(objective.Text == vm.ShanheChapterObjectiveText &&
+                    !objective.Text.Contains("放弃", StringComparison.Ordinal) && !objective.Text.Contains("100", StringComparison.Ordinal),
+                "The same header immediately retires the paid decline offer after its real confirmation rather than leaving stale reward instructions on the map.");
             var afterSkip = Snapshot(session);
             RawClick(confirm);
             RawClick(staleSkipButton);
             vm.SelectShanheRewardCardCommand.Execute(staleSkip);
             vm.ConfirmShanheRewardCommand.Execute(null);
             Layout(panel);
-            Program.Assert(Snapshot(session) == afterSkip && !vm.SelectShanheRewardCardCommand.CanExecute(staleSkip),
+            Program.Assert(Snapshot(session) == afterSkip && !vm.SelectShanheRewardCardCommand.CanExecute(staleSkip) &&
+                mapGoldValue.Text == "铜币   117",
                 "Repeated confirmation and retired card buttons cannot grant the decline payment again.");
 
             session = WinRewardSession();
             Attach(vm, session);
             Layout(panel);
-            Program.Assert(session.Revision == revision && !vm.SelectShanheRewardCardCommand.CanExecute(staleSkip),
+            Program.Assert(session.Revision == revision && !vm.SelectShanheRewardCardCommand.CanExecute(staleSkip) &&
+                mapGoldValue.Text == vm.ShanheGoldText && mapGoldValue.Text == "铜币   17",
                 "A previous run's same-id, same-revision card cannot select or claim the new run's reward.");
             var freshBefore = Snapshot(session);
             RawClick(staleSkipButton);
@@ -119,6 +146,8 @@ internal static partial class ShanheRewardUiChecks
                 replaceable.IsEnabled && !replaceable.IsLocked && !replacementConfirm.IsEnabled &&
                 !overlay.IsEnabled && !confirm.IsEnabled && Snapshot(session) == beforeReplacement,
                 "The real replacement modal must lock printed skills, permit the acquired skill, disable the reward underlay, and leave the journal and resources unchanged.");
+            AssertNativeRewardTooltip(vm, session, vm.SelectShanheSkillReplacementCommand, replaceable, replaceable.Description,
+                output, "shanhe-replacement-rule-tooltip");
             RawClick(lockedButton);
             vm.SelectShanheSkillReplacementCommand.Execute(locked);
             RawClick(confirm);
@@ -191,6 +220,8 @@ internal static partial class ShanheRewardUiChecks
                 alreadyOwned is { State: ShanheShopItemState.AlreadyOwned, Status: "已拥有", CanBuy: false } &&
                 !alreadyOwnedButton.IsEnabled && Program.Find<TextBlock>(alreadyOwnedButton).Any(text => text.Text == "已拥有"),
                 "A full-slot skill product must appear as one bound purchasable card rather than one card per replacement target.");
+            AssertMarketStateCard(item);
+            AssertMarketStateCard(alreadyOwned);
             Click(buy, panel);
             var replacementConfirm = (Button)replacement.FindName("ShanheConfirmSkillReplacementButton");
             var replacementCancel = (Button)replacement.FindName("ShanheCancelSkillReplacementButton");
@@ -206,6 +237,8 @@ internal static partial class ShanheRewardUiChecks
             Click(replacementCancel, panel);
             Program.Assert(!vm.IsShanheSkillReplacementOpen && vm.IsShanheMarketOpen && buy.IsEnabled && Snapshot(session) == beforePurchase,
                 "Canceling a selected shop replacement must spend no coins, consume no stock, and remove no skill.");
+            AssertMarketStateCard(SkillMarketProduct(vm, session, "learned"));
+            AssertMarketStateCard(SkillMarketProduct(vm, session, "guard"));
             Click(buy, panel);
             RawClick(oldOptionButton);
             vm.SelectShanheSkillReplacementCommand.Execute(oldOption);
@@ -250,6 +283,8 @@ internal static partial class ShanheRewardUiChecks
                 Program.Find<TextBlock>(purchasedButton).Any(text => text.Text == "已购") &&
                 Program.Engine(vm).Revision == ordinaryRevision,
                 "Confirming the shared shop modal must debit the unchanged price once, replace one acquired skill, and mark only that product purchased.");
+            AssertMarketStateCard(purchased);
+            Program.Render(panel, 1440, 880, Path.Combine(output, "shanhe-shop-skill-purchased-source-frame.png"));
             var afterPurchase = Snapshot(session);
             RawClick(buy);
             RawClick(replacementConfirm);
@@ -271,6 +306,35 @@ internal static partial class ShanheRewardUiChecks
             Program.Assert(!vm.IsShanheSkillReplacementOpen && session.Snapshot.Gold == gold - item.Price &&
                 session.Snapshot.ExtraSkillIds.SequenceEqual([Learned]) && session.Revision == revision + 1,
                 "With an unused skill slot, the same purchase command must learn the skill and charge its price directly without a replacement dialog.");
+            AssertMarketStateCard(SkillMarketProduct(vm, session, "learned"));
+
+            void AssertMarketStateCard(ShanheShopItem product)
+            {
+                var actual = session.Snapshot.ShopItems.Single(actual => actual.ChoiceId == product.Id);
+                var body = Program.Find<Border>(panel).Single(border => ReferenceEquals(border.DataContext, product) && border.ToolTip is ToolTip);
+                var shared = Program.Find<ShanheRewardChoiceCard>(body).Single();
+                var stamp = Program.Find<Image>(body).Single(image => image.Name == "MarketPurchasedStamp");
+                var purchase = Bound(panel, vm.RequestShanheShopPurchaseCommand, product);
+                AssertSharedRewardChoiceFrame(shared, product.Rarity);
+                Program.Assert(product.State == actual.State && product.Price == actual.GoldCost && product.HpCost == actual.HpCost &&
+                        product.Name == actual.Reward!.Name && product.CanBuy == actual.CanPurchase && purchase.IsEnabled == product.CanBuy &&
+                        shared.Heading == product.HeadingText && shared.Title == product.DisplayName && shared.Footer == product.CardStatusText &&
+                        shared.TypeIconIndex == 3 && ReferenceEquals(shared.TypeArtwork, WushuangArt.Get("rogue_award_type_icon_3.png")) &&
+                        body.IsEnabled && body.Focusable && body.ToolTip is ToolTip && shared.Opacity == 1 && body.Opacity == 1 &&
+                        ReferenceEquals(stamp.Source, product.PurchasedStampArtwork) &&
+                        ReferenceEquals(stamp.Source, WushuangArt.Get("rogue1v1_had_buy.png")) &&
+                        product.ShowPurchasedStamp == (actual.State == ShanheShopItemState.Purchased) &&
+                        stamp.Visibility == (actual.State == ShanheShopItemState.Purchased ? Visibility.Visible : Visibility.Collapsed),
+                    "The real shop skill retains its authoritative product identity, price and purchase permission while reusing the exact quality/type frame, readable status and a separate focusable rule body; the original purchased stamp follows only a completed purchase.");
+                if (actual.State == ShanheShopItemState.Purchased)
+                    Program.Assert(!purchase.IsEnabled && !vm.RequestShanheShopPurchaseCommand.CanExecute(product) &&
+                            stamp.ActualWidth > 0 && stamp.ActualHeight > 0 && stamp.Source is BitmapSource { PixelWidth: 156, PixelHeight: 72 },
+                        "Only an actual confirmed purchase displays the original 156-by-72 purchased stamp; its disabled buy control does not disable or dim the reading card.");
+                if (actual.State == ShanheShopItemState.AlreadyOwned)
+                    Program.Assert(!purchase.IsEnabled && !product.ShowPurchasedStamp && stamp.Visibility == Visibility.Collapsed &&
+                            shared.Footer == "已拥有" && !vm.RequestShanheShopPurchaseCommand.CanExecute(product),
+                        "The naturally pre-owned guard skill remains readable with its own already-owned status and never borrows the purchased stamp before spending coins.");
+            }
         }
         finally { panel.DataContext = null; }
     }
@@ -314,6 +378,7 @@ internal static partial class ShanheRewardUiChecks
         try
         {
             var session = CreateThreeBossSession();
+            var objective = (TextBlock)panel.FindName("ShanheChapterObjective");
             var ordinaryRevision = Program.Engine(vm).Revision;
             Button? lastContinue = null;
             for (var chapter = 1; chapter <= 2; chapter++)
@@ -339,6 +404,7 @@ internal static partial class ShanheRewardUiChecks
                     session.Snapshot.AvailableNodes.Count == 0 && vm.ShanheBossRewardGroups.Count == 2 &&
                     vm.ShanheChapterTitle == "第" + chapter + "章 · 渡口",
                     "The first two real chapter boss victories show the bound overview, credit 500 coins and one slot once, and keep the next chapter closed.");
+                AssertBossObjective(2);
                 var initial = Snapshot(session);
                 RawClick(finish);
                 vm.ConfirmShanheBossRewardCommand.Execute(null);
@@ -359,6 +425,7 @@ internal static partial class ShanheRewardUiChecks
                 Program.Assert(vm.IsShanheBossRewardOpen && Snapshot(session) == initial &&
                     vm.ShanheBossRewardGroups.All(group => !group.IsResolved),
                     "Returning from an unselected group must preserve both frozen boss groups without granting anything.");
+                AssertBossObjective(2);
 
                 foreach (var groupId in new[] { "tactics", "skills" })
                 {
@@ -381,11 +448,12 @@ internal static partial class ShanheRewardUiChecks
                     var boundSummary = Bound(panel, vm.OpenShanheBossRewardGroupCommand, resolved);
                     Program.Assert(vm.IsShanheBossRewardOpen && !vm.IsShanheRewardOpen && resolved.IsResolved &&
                         resolved.SelectedName == offered.Name && !boundSummary.IsEnabled &&
-                        Program.Find<TextBlock>(boundSummary).Any(text => text.Text == offered.Name) &&
+                        Program.Find<TextBlock>(boundSummary).Any(text => text.Text == resolved.DisplaySelectedName) &&
                         session.Revision == revision + 1 && session.Snapshot.Phase == ShanheCampaignPhase.Reward &&
                         session.Snapshot.AvailableNodes.Count == 0 && session.Snapshot.Gold == beforeGold + 500 &&
                         session.Snapshot.ExtraSkillSlots == beforeSlots + 1,
                         "Each group confirmation must grant exactly that reward and show its selected name on the actual overview, without advancing the chapter or repeating fixed credits.");
+                    AssertBossObjective(groupId == "tactics" ? 1 : 0);
                     var claimed = Snapshot(session);
                     RawClick(confirmCard);
                     RawClick(staleGroupButton);
@@ -411,8 +479,11 @@ internal static partial class ShanheRewardUiChecks
                 Program.Assert(session.Snapshot.Phase == ShanheCampaignPhase.Map &&
                         session.Snapshot.AvailableNodes.Single().Id == "boss" + (chapter + 1) &&
                         vm.ShanheMapNodes.Select(node => node.Node.Id).SequenceEqual(["boss" + (chapter + 1)]) &&
-                        vm.ShanheChapterTitle == "第" + (chapter + 1) + "章 · 渡口",
-                        "Only the completed overview may reveal the next numbered chapter, even when chapter nodes have adjacent graph depths.");
+                        vm.ShanheChapterTitle == "第" + (chapter + 1) + "章 · 渡口" &&
+                        vm.ShanheMapNodes.Count(node => node.IsPlayerLocation) == 1 &&
+                        vm.ShanheMapNodes.Single(node => node.IsPlayerLocation).IsAvailable &&
+                        vm.ShanheMapNodes.Single(node => node.IsPlayerLocation).Node.Id == "boss" + (chapter + 1),
+                        "Only the completed overview may reveal the next numbered chapter and move the single player pin to its newly available destination, even while the engine retains the previous boss as its current node.");
                 var finished = Snapshot(session);
                 RawClick(finish);
                 vm.ConfirmShanheBossRewardCommand.Execute(null);
@@ -440,6 +511,10 @@ internal static partial class ShanheRewardUiChecks
                 session.AcceptedCommands.OfType<ConfirmShanheBossRewardCommand>().Count() == 2 &&
                 Program.Engine(vm).Revision == ordinaryRevision,
                 "The third actual boss victory directly opens final settlement, pays copper once and grants no further tactic, skill, card or slot.");
+            Program.Assert(objective.Text == vm.ShanheChapterObjectiveText &&
+                    objective.Text.Contains("已完成", StringComparison.Ordinal) && !objective.Text.Contains("下一章", StringComparison.Ordinal) &&
+                    ((Border)panel.FindName("ShanheChapterObjectiveBanner")).Visibility == Visibility.Collapsed,
+                "The actual final boss enters its existing direct settlement path: the retained objective says the expedition is complete, and no next-chapter banner remains on the finished preparation screen.");
             var finalSnapshot = Snapshot(session);
             RawClick(lastContinue!); vm.ConfirmShanheBossRewardCommand.Execute(null); Layout(panel);
             Program.Assert(Snapshot(session) == finalSnapshot,
@@ -448,6 +523,22 @@ internal static partial class ShanheRewardUiChecks
             Program.Assert(vm.ShanheScenarioDetails == StandardShanheCampaignCatalog.CreateCodexDefinition(
                 vm.SelectedShanheDifficulty.Value, StandardShanheCampaignCatalog.Returning2026EditionId).IntroText,
                 "Completed preparation details follow the newly selected scenario rather than the retained finished session.");
+
+            void AssertBossObjective(int expectedUnresolved)
+            {
+                var checkpointBeforeReading = Snapshot(session);
+                var summary = session.Snapshot.BossRewardSummary!;
+                var unresolved = summary.Groups.Count(group => !group.IsResolved);
+                var target = summary.IsBonusOnly ? "继续行军" : summary.ChapterNumber >= 3 ? "完成征程" : "进入下一章";
+                var expected = unresolved > 0 ? $"还有{unresolved}组奖励待处理，完成后{target}" : $"本次奖励已处理，确认后{target}";
+                var finish = (Button)panel.FindName("ShanheConfirmBossRewardButton");
+                Program.Assert(vm.IsShanheBossRewardOpen && unresolved == expectedUnresolved &&
+                        objective.Text == expected && objective.Text == vm.ShanheChapterObjectiveText &&
+                        BindingOperations.GetBinding(objective, TextBlock.TextProperty)?.Path.Path == nameof(MainViewModel.ShanheChapterObjectiveText) &&
+                        finish.Content?.ToString()?.Replace(" ", "", StringComparison.Ordinal) == target &&
+                        finish.IsEnabled == (unresolved == 0) && Snapshot(session) == checkpointBeforeReading,
+                    "The actual boss overview header counts only unresolved snapshot groups and states its real confirmation destination without changing reward state.");
+            }
         }
         finally { panel.DataContext = null; }
     }
@@ -532,7 +623,7 @@ internal static partial class ShanheRewardUiChecks
         return session;
     }
 
-    private static void WinPendingBattle(ShanheCampaignSession session)
+    private static void WinPendingBattle(ShanheCampaignSession session, ContentRegistry? registry = null)
     {
         var setup = session.PendingBattleSetup!;
         var battle = GameEngine.CreateStandard(new()
@@ -541,7 +632,7 @@ internal static partial class ShanheRewardUiChecks
             HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId,
             ShanheBattle = setup, AdvanceAfterHumanCommands = false, UseInteractiveDiscard = false,
             AiPolicyVersion = AiDecisionPolicy.CurrentVersion, MaxTurns = 8
-        }, FixtureRegistry.Value);
+        }, registry ?? FixtureRegistry.Value);
         Accept(battle, new StartGameCommand());
         for (var step = 0; step < 40 && battle.PendingDecision is not { Kind: DecisionKind.PlayCard, PlayerSeat: 0 }; step++)
             Accept(battle, new AdvanceOneStepCommand(battle.Revision));
@@ -564,6 +655,106 @@ internal static partial class ShanheRewardUiChecks
         Program.Assert(completion.Accepted,
             $"Reward UI native victory at {setup.NodeId} failed validation: {completion.Error}");
     }
+
+    private static void AssertNativeRewardTooltip(MainViewModel vm, ShanheCampaignSession session, ICommand command,
+        object parameter, string expectedText, string output, string label)
+    {
+        var before = Snapshot(session);
+        var journal = ShanheCampaignJson.Serialize(session.CreateCheckpoint());
+        var ordinary = Program.Engine(vm);
+        var ordinaryCheckpoint = GameCheckpointJson.Serialize(ordinary.CreateCheckpoint());
+        using (var host = new NativeResponseStatusChecks.NativeHost(vm))
+        {
+            // The supplied live offer is already open. Reopening the campaign here
+            // would refresh its card identities and invalidate the caller's draft.
+            host.Root.Width = 1120; host.Root.Height = 780;
+            host.Window.SizeToContent = SizeToContent.WidthAndHeight;
+            Flush();
+            var panel = (ShanheCampaignPanel)host.Window.FindName("ShanhePanel");
+            var button = Bound(panel, command, parameter);
+            Program.Assert(button.IsVisible && button.IsEnabled && button.ToolTip is ToolTip,
+                "The actual enabled reward or replacement option must expose its own native complete-rule tooltip.");
+            if (parameter is ShanheRewardCard)
+            {
+                Program.Assert(vm.ShanheRewardCards.Count == 4 && session.Snapshot.RewardOffers.Count == 3 &&
+                        session.Snapshot.RewardOffers.Single(reward => reward.Id == "learned").SkillId == Learned &&
+                        session.Snapshot.RewardOffers.Single(reward => reward.Id == "draw").StartingEquipment?.Single().Kind == CardKind.Crossbow &&
+                        session.Snapshot.RewardOffers.Single(reward => reward.Id == "medicine").StartingCards?.Single().Kind == CardKind.Peach,
+                    "The existing native reward fixture retains its actual skill, Crossbow, Peach and separate decline offers while their category icons are inspected.");
+                foreach (var candidate in vm.ShanheRewardCards)
+                {
+                    var expectedIconIndex = candidate.Id switch
+                    {
+                        "learned" => 3,
+                        "draw" or "medicine" => 4,
+                        "reward:skip" => 0,
+                        _ => throw new InvalidOperationException("Unexpected reward in the existing native tooltip fixture: " + candidate.Id)
+                    };
+                    var expectedDisplayName = candidate.Id switch
+                    {
+                        "learned" => "振奋",
+                        "draw" => "战备连弩",
+                        "medicine" => "随身药囊",
+                        _ => candidate.Name
+                    };
+                    var owner = Bound(panel, vm.SelectShanheRewardCardCommand, candidate);
+                    var shared = Program.Find<ShanheRewardChoiceCard>(owner).Single();
+                    var originalIcon = WushuangArt.Get($"rogue_award_type_icon_{expectedIconIndex}.png");
+                    Program.Assert(originalIcon is BitmapSource { PixelWidth: > 0, PixelHeight: > 0 },
+                        "The actual native reward category must resolve its original type-icon PNG.");
+                    var icon = Program.Find<Image>(shared).Single(image => ReferenceEquals(image.Source, originalIcon));
+                    var retained = candidate.IsSkip ? null : session.Snapshot.RewardOffers.Single(reward => reward.Id == candidate.Id);
+                    Program.Assert(candidate.TypeIconIndex == expectedIconIndex && shared.TypeIconIndex == expectedIconIndex &&
+                            ReferenceEquals(shared.TypeArtwork, originalIcon) && icon.IsVisible &&
+                            icon.ActualWidth > 0 && icon.ActualHeight > 0 && PresentationSource.FromVisual(icon) is HwndSource &&
+                            candidate.DisplayName == expectedDisplayName && shared.Title == expectedDisplayName &&
+                            shared.FallbackText == expectedDisplayName &&
+                            (candidate.IsSkip || candidate.Name == retained!.Name && candidate.Id == retained.Id) &&
+                            ReferenceEquals(owner.Command, vm.SelectShanheRewardCardCommand) && ReferenceEquals(owner.CommandParameter, candidate),
+                        "The native skill, equipment, hand-card and generic-decline faces render their exact original 3/4/0 type icons and display-only names while retaining the actual reward identity and bound selection command: " +
+                        JsonSerializer.Serialize(new { candidate.Id, candidate.Name, candidate.DisplayName, candidate.Category,
+                            candidate.TypeIconIndex, ExpectedIconIndex = expectedIconIndex, shared.Title, shared.FallbackText,
+                            RetainedName = retained?.Name, icon.IsVisible, icon.ActualWidth, icon.ActualHeight }));
+                }
+            }
+            var tooltip = (ToolTip)button.ToolTip;
+            tooltip.PlacementTarget = button;
+            tooltip.Placement = PlacementMode.AbsolutePoint; tooltip.HorizontalOffset = -30000; tooltip.VerticalOffset = -30000;
+            tooltip.Opened += Conceal;
+            try
+            {
+                tooltip.IsOpen = true; Flush();
+                var visibleText = Program.Find<TextBlock>(tooltip).Where(text =>
+                    text.IsVisible && text.ActualWidth > 0 && text.ActualHeight > 0).ToArray();
+                Program.Assert(tooltip.IsOpen && tooltip.ContentTemplate is null &&
+                    PresentationSource.FromVisual(tooltip) is HwndSource &&
+                    visibleText.Any(text => text.Text == expectedText) &&
+                    visibleText.All(text => !text.Text.StartsWith("System.Windows.Controls.", StringComparison.Ordinal)),
+                    "The opened reward and replacement tooltips must visually render the full actual rule instead of their ScrollViewer or TextBlock type names.");
+                if (parameter is ShanheRewardCard)
+                    Program.Assert(tooltip.Content is ScrollViewer { MaxHeight: 480, Content: TextBlock rewardText } &&
+                        rewardText.Text == expectedText && rewardText.TextWrapping == TextWrapping.Wrap,
+                        "The actual reward tooltip retains its bounded scroll surface and complete wrapped RuleTooltip.");
+                else
+                    Program.Assert(tooltip.Content is TextBlock { MaxWidth: 360, TextWrapping: TextWrapping.Wrap } replacementText &&
+                        replacementText.Text == expectedText,
+                        "The explicit replacement tooltip retains the option's wrapped description and existing maximum text width.");
+                Program.Render(tooltip, (int)Math.Ceiling(tooltip.ActualWidth), (int)Math.Ceiling(tooltip.ActualHeight),
+                    Path.Combine(output, label + ".png"));
+            }
+            finally { tooltip.IsOpen = false; tooltip.Opened -= Conceal; }
+
+            void Flush() { host.Root.UpdateLayout(); host.Root.Dispatcher.Invoke(() => { }, DispatcherPriority.ContextIdle); host.Root.UpdateLayout(); }
+            void Conceal(object sender, RoutedEventArgs args)
+            { if (PresentationSource.FromVisual((ToolTip)sender) is HwndSource source) ShowRewardTooltipWindow(source.Handle, 0); }
+        }
+        Program.Assert(Snapshot(session) == before && ShanheCampaignJson.Serialize(session.CreateCheckpoint()) == journal &&
+            ReferenceEquals(Program.Engine(vm), ordinary) && GameCheckpointJson.Serialize(ordinary.CreateCheckpoint()) == ordinaryCheckpoint,
+            "Opening and closing the real rule tooltips must not issue a reward or replacement command or alter either live game's state.");
+    }
+
+    [DllImport("user32.dll", EntryPoint = "ShowWindow")]
+    private static extern bool ShowRewardTooltipWindow(nint handle, int command);
 
     private static void Attach(MainViewModel vm, ShanheCampaignSession session)
     {

@@ -28,12 +28,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 36600)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 36600)] private bool MouZhangXiuAnniversaryDying() => ActiveDying is { } d && MouZhangXiuAnniversaryRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 36600)] [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 36600)] private bool MouZhangXiuAnniversaryDamageWindow(long id) => MouZhangXiuAnniversaryRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 36600)] private bool MouZhangXiuAnniversaryBeforeDamage(long id) => MouZhangXiuAnniversaryRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 36600)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 36600)]
-    private bool MouZhangXiuAnniversaryNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess || MouZhangXiuAnniversaryRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f,p) : ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 36600)] [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 36600)] private bool MouZhangXiuAnniversaryRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
     {
         if (MouZhangXiuAnniversaryFirstChild(f, recovery)) return true;

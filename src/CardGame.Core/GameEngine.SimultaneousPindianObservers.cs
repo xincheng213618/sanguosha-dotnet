@@ -73,16 +73,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 150)]
     private bool IsSimultaneousProgramDying() => ActiveDying is { } dying && SimultaneousObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 730)]
-    private bool AllowsSimultaneousNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference? source,DamageNature? nature,bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || f.InstructionIndex < 1 || _resolutionStack.LastOrDefault()?.Id != f.Id ||
-            SimultaneousObserverRoot() is not { } root || root.Id == f.Id || f.WindowContext?.Window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or
-                SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged)) return false;
-        var e = GetPausedPrivateOfferEffect(f);
-        return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature &&
-            target == (e.TargetReference is { } reference ? ResolveProgramParticipant(f,reference) : ResolveProgramEffectTarget(f,e.Target));
-    }
     private IReadOnlyList<int> SimultaneousHeldProcessingCards() => Array.AsReadOnly(_resolutionStack.OfType<ProgramSkillFrame>()
         .Where(f => f.SimultaneousPindian is not null && IsSimultaneousReceiptSource(f)).SelectMany(f => f.SimultaneousPindian!.Cards.Where(c => f.SimultaneousPindian.Revealed || f.SimultaneousPindian.TopReceipts.Any(t => t.CardId == c.CardId)))
         .Select(c => c.CardId).Concat(_resolutionStack.Where(f => f.WuLuKangContest is not null).SelectMany(f => WuLuKangHeldProcessing(f))).Where(id => id > 0 && _cardZones.GetLocation(id) == CardLocation.Processing).Distinct().Order().ToArray());

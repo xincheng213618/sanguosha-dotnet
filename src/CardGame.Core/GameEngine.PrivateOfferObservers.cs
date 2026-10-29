@@ -49,7 +49,7 @@ public sealed partial class GameEngine
             var exact = true;
             for (var child = index + 2; child < _resolutionStack.Count; child++)
             {
-                if (!(HalfHandPaidDamageObserverEdge(child) || PaidTargetObserverEdge(child))) { exact = false; break; }
+                if (!(HalfHandPaidDamageObserverEdge(child) || ProgramChildResolutionEdge(child))) { exact = false; break; }
                 if (_resolutionStack[child] is DyingFrame dying && child + 1 < _resolutionStack.Count &&
                     (IsPaidHandRepaymentProgramAlcoholRide(child, dying) || IsPaidHandRepaymentRescueRide(child, dying) ||
                      PolicyCounterspellVirtualAlcoholRide(child, dying) || PaidObserverDamageVirtualAlcoholRide(child, dying) || (TieredRoundZeroDyingRescueRide(child, dying) || (DrawFundedDistinctBasicDyingRescueRide(child, dying) || HuanpeiDyingRescueRide(child, dying))))) break;

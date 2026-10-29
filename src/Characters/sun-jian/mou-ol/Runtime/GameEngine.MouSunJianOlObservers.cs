@@ -89,12 +89,6 @@ public sealed partial class GameEngine
     private bool HasMouSunJianOlBeforeDamage(long id) => MouSunJianOlObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 32500)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 32500)]
     private bool IsMouSunJianOlDying() => ActiveDying is { } d && MouSunJianOlObserverRoot() is { } root && _resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 32500)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 32500)]
-    private bool AllowsMouSunJianOlNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || MouSunJianOlObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature && target == (e.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 32500)]
     private bool AdvanceMouSunJianOlChildren() => _pendingDecision is null && MouSunJianOlObserverRoot() is not null && TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 32500)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 32500)]

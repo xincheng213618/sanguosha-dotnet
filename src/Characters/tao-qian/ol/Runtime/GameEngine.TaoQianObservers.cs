@@ -70,12 +70,5 @@ public sealed partial class GameEngine
     private bool HasTaoQianBeforeDamageObserver(long id) => HasZhaohuoBeforeDamageObserver(id) || TaoQianObserverRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1080)]
     private bool IsTaoQianDying() => IsZhaohuoDying() || ActiveDying is { } d && TaoQianObserverRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1650)]
-    private bool AllowsTaoQianNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (AllowsZhaohuoNestedDamage(f, target, amount, source, nature, sourceLess)) return true;
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || TaoQianObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature && !sourceLess && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28120)] private bool AdvanceTaoQianChildren() => _pendingDecision is null && TaoQianObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

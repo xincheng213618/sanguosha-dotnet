@@ -40,15 +40,6 @@ public sealed partial class GameEngine
     private bool MouJiangWeiAnniversaryBeforeDamage(long id) => MouJiangWeiAnniversaryRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 35200)] [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35200)]
     private bool MouJiangWeiAnniversaryDying() => ActiveDying is { } d && MouJiangWeiAnniversaryRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.BeforeFactionDebts, 35200)] [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 35200)]
-    private bool MouJiangWeiAnniversaryNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || sourceLess) return false;
-        if (MouJiangWeiAnniversary.Valid(f) && f.MouJiangWeiAnniversary is { Stage: MouJiangWeiAnniversaryStage.Damage } r) return target == r.Victim && amount == 1 && source is null && nature is null;
-        if (MouJiangWeiAnniversaryRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f);
-        return e is { Op: SkillProgramEffectOp.Damage } && amount == e.Amount && source == e.ActorReference && nature == e.DamageNature && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 35200)] [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 35200)]
     private bool MouJiangWeiAnniversaryRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
     {

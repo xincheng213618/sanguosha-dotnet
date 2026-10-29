@@ -21,7 +21,7 @@ public sealed partial class GameEngine
         static (e, root, child) => e.PrepPoisonFirstChild(root, child),
         static (e, index) => e.HasObserverSuffix(index,
             static (host, child) => NativeDrawAttemptRidesOn(host._resolutionStack[child], host._resolutionStack[child - 1]) ||
-                host.OrderedPrintedSkillLossObserverEdge(child) || host.PreventionDrawObserverEdge(child),
+                host.OrderedPrintedSkillLossObserverEdge(child) || host.ProgramChildResolutionEdge(child),
             static (host, child, dying) => host.IsSuspendedOrPaidRescueObserverSuffix(child, dying)), rootId);
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 1248)]
     private bool AdvancePrepPoisonObserver()

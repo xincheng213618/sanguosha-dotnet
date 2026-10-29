@@ -61,6 +61,22 @@
 
 地图位置、通关基础200铜币、每升一个本地档增加2体力上限和战后接回最终路线，均为本地编排。当前不添加未在攻略基础面板核齐的困难／噩梦额外技能。
 
+### 木鹿与象的精确原卡（2026-10-29核验）
+
+冻结 `hd_roguelike.sgs` 的2397组保留以下五条独立源行；它们并非五名同时可见的原始开场成员。只有木鹿 `g=1`，四象的 `g` 缺省为false，全部 `Generalshow` 缺省为0：
+
+| rawOrdinal | 原身体／名称 | d | hide／startChapter | 精确本地身份 |
+| --- | --- | --- | --- | --- |
+| 0 | 4871／木鹿大王 | 1000073 | false／1 | `shanhe:mulu-2026` |
+| 1 | 4861／暴怒巨象 | 1000001 | true／1 | `shanhe:mulu-rage-elephant-2026` |
+| 2 | 4866／愤怒巨象 | 1000001 | true／2 | `shanhe:mulu-angry-elephant-2026` |
+| 3 | 4862／暴怒巨象 | 1000001 | true／2 | `shanhe:mulu-rage-elephant-2026` |
+| 4 | 4867／愤怒巨象 | 1000001 | true／3 | `shanhe:mulu-angry-elephant-2026` |
+
+PVE皮肤表分别明确 `1000073→generalface_1000073`、`1000001→generalface_1000001`，不是根据名称或通用载体借图。[木鹿官方原卡](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000073.png)为146×172、53,269字节，SHA-256 `807454fedb47c8e851245ffe8c8f9267e1bc291496572d9a8b1a4f9d6a0a554e`；[两种象共用的官方原卡](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000001.png)为146×172、46,823字节，SHA-256 `89badb2ecbe9ba53598e1d9570fbd37cdd270fb1ac3221142d9ef4c39c2e0a4e`。原PNG保存于 `src/CardGame.Wpf/Assets/Shanhe/Npc/`，证据汇入[山河NPC素材清单](../shanhe-npc-art-sources.json)。
+
+这里只补三种既有运行时身体的美术。来源版2397仍采用原有五席实例和 `SourceVisibleEnemyCount=1`，原隐藏／后章节标记继续保留；不据这些美术记录新增开场成员、移除既有随从或强行添加主帅／前锋分组配置。内容的 `PortraitKey`、`VariantId`、技能与召唤生命周期均不变。
+
 ## 章节任务资料
 
 原图与[任务表](https://s.xiaochao.org/data/tasks.json)交叉确认两章六项，每项奖励10图册。目录保留原始任务、武将、关卡、城市及难度ID。四项非计分任务在新增的“2026配置复现（25档）”入口按实际战果累计、一次性结算；原有本地三档不计入这四项。评分任务原阈值40000／60000保留，用户于2026-10-27明确选择等待可靠计分依据，不采用本地自拟分数。

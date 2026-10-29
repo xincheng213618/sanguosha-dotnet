@@ -52,7 +52,7 @@ public sealed partial class GameEngine
                     SkillProgramEffectOp.RecoverOtherDyingVictimTo)) return false;
                 continue;
             }
-            if (!PaidMountObserverEdge(childIndex)) return false;
+            if (!ProgramChildResolutionEdge(childIndex)) return false;
         }
         return true;
     }

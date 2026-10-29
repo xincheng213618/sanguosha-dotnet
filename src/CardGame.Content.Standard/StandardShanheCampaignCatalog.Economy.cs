@@ -12,12 +12,19 @@ public static partial class StandardShanheCampaignCatalog
     public const string CurrentGamblerRewardId = "tactic-economy-2217";
     public const string CurrentGambler2RewardId = "tactic-economy-2218";
     public const string CurrentWolfBattlesRewardId = "tactic-economy-2015";
+    public const string CurrentDailyTravelRewardId = "tactic-economy-2024";
+    public const string CurrentDailyTravel2RewardId = "tactic-economy-2142";
+    public const string CurrentWolongMapRewardId = "tactic-economy-2253";
 
     // Public S5 tactics.json / tactic-tree.json, generated 2026-10-21.
     // 133 and 128 are random unlocks, not fixed grants of 2090 or 2181.
     // Only the higher interest variant has a fixed S5 tree node: 105.
     public static IReadOnlyList<ShanheEconomyTacticSource> CurrentEconomyTactics => Array.AsReadOnly(new[]
     {
+        new ShanheEconomyTacticSource(2024, CurrentDailyTravelRewardId, "日行千里Ⅰ", 2, 300,
+            "每个章节额外开放1场战斗，胜利照常获得铜币与战利品。", new(ExtraChapterBattles: 1)),
+        new(2142, CurrentDailyTravel2RewardId, "日行千里Ⅱ", 4, 700,
+            "升级至Ⅱ，每个章节合计额外开放2场战斗，胜利照常获得铜币与战利品。", new(ExtraChapterBattles: 2)),
         new ShanheEconomyTacticSource(2089, "tactic-economy-2089", "打秋风", 2, 300,
             "通过战斗获取的铜币增加20%。", new(BattleGoldPercent: 20)),
         new(2217, CurrentGamblerRewardId, "赌徒Ⅰ", 1, 200,
@@ -83,7 +90,9 @@ public static partial class StandardShanheCampaignCatalog
         new(2215, "tactic-economy-2215", "物资店铺", 1, 200,
             "商店有20%几率刷新出更高品质的卡牌和装备", new(ShopMaterialPromotionPercent: 20)),
         new(2216, "tactic-economy-2216", "蒸蒸日上", 2, 300,
-            "通过战斗关卡时，有20%几率获得更高品质的战法和技能奖励", new(BattlePrimaryPromotionPercent: 20))
+            "通过战斗关卡时，有20%几率获得更高品质的战法和技能奖励", new(BattlePrimaryPromotionPercent: 20)),
+        new(2253, CurrentWolongMapRewardId, "卧龙图", 2, 300,
+            "你将更容易获得你所在流派的战法", new(FavorOwnedSchoolRewards: true))
     });
 
     private static ShanheCampaignDefinition WithCurrentEconomyTactics(ShanheCampaignDefinition definition)

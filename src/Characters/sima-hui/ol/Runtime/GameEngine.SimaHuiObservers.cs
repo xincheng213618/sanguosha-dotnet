@@ -75,12 +75,5 @@ public sealed partial class GameEngine
     private bool HasSimaHuiBeforeDamageObserver(long id)=>_resolutionStack.Any(f=>f.Id==id && f is BeforeDamageProgramWindowFrame) && SimaHuiObserverRoot() is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 250)]
     private bool TryAdvanceSimaHuiSubtree()=>_pendingDecision is null && SimaHuiObserverRoot() is not null && TryAdvanceObserverSubtree(true);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 480)]
-    private bool AllowsSimaHuiNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference?source,DamageNature?nature,bool sourceLess)
-    {
-        if(sourceLess || f.AttackAttempt is not null || f.InstructionIndex<1 || _resolutionStack.LastOrDefault()?.Id!=f.Id || SimaHuiObserverRoot() is null ||
-            f.WindowContext?.Window is not(SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterDamageApplied or SkillProgramTriggerWindow.SkillsChanged))return false;
-        var e=SimaHuiPausedEffect(f)!;return e.Op==SkillProgramEffectOp.Damage && amount==e.Amount && source==e.ActorReference && nature==e.DamageNature && target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
-    }
     private IEnumerable<Card> SimaHuiPrivatelyViewedCards(int viewer)=>_resolutionStack.OfType<ProgramSkillFrame>().Where(f=>f.OwnerSeat==viewer && f.SimaHui is{OriginalCards.Count:>0}).SelectMany(f=>f.SimaHui!.OriginalCards).Where(id=>_cardZones.GetLocation(id)==CardLocation.Processing).Select(id=>_cardZones.CardsAt(CardLocation.Processing).Single(c=>c.Id==id));
 }

@@ -1,0 +1,5466 @@
+{
+  "schemaVersion": 1,
+  "description": "Explicit presentation whitelist for implemented source encounter rosters whose complete runtime membership and source commander flags have been verified. This data does not infer roles from node kind, name, portrait alias or first position.",
+  "layoutDataFile": "src/CardGame.Wpf/Assets/Data/shanhe-encounter-layouts.json",
+  "verifiedOnLocalDate": "2026-10-29",
+  "sourceConfiguration": {
+    "url": "https://web.sanguosha.com/220/h5_2/res/config/Config.sgs",
+    "archiveSha256": "d663d5542f5a63a61611b5dbc1ae736e5e0328eedaab2c498e18c3287c289ce6",
+    "member": "hd_roguelike.sgs",
+    "decodedMemberSha256": "97dbdb465d902e771e575ed5165df3d193e1a689e3dae7ae67b9cb5033f18c72",
+    "tables": [
+      "Root.Fight",
+      "Root.General",
+      "root.abbreviation"
+    ],
+    "abbreviations": {
+      "a": "generalgroup",
+      "b": "generalID",
+      "c": "generalname",
+      "d": "generalskin",
+      "g": "isboss"
+    },
+    "defaults": {
+      "hide": false,
+      "generalShow": 0
+    },
+    "selection": "The whitelisted Source2026 code uses the named main Ggroup. NewbieGroup is recorded by the source Fight table but is not selected automatically by this UI data."
+  },
+  "sourceClient": {
+    "url": "https://web.sanguosha.com/220/h5_2/sgsGame_a.sgs",
+    "sha256": "96b7131953f758a30da44c9bdbbcd8a429174050ef7c16961216b90cd923ec31",
+    "renderer": "Pos",
+    "behavior": "The source preview filters hidden and later-chapter members, then partitions the surviving roster by the per-NPC IsBoss flag. Commanders are large cards and other members are lower portraits. If there is no commander, all surviving NPCs are large cards. It has no portrait-click main-card selection.",
+    "identity": "For these groups Generalshow is zero, so the default figure_cool_master and figure_cool_winger identity images apply after successful matching. A different Generalshow value requires a separate verified mapping."
+  },
+  "runtimeMappingSources": [
+    "src/CardGame.Content.Standard/StandardShanheCampaignCatalog.Source2026.cs",
+    "src/CardGame.Content.Standard/StandardShanheCampaignCatalog.Source2026.EnemyData.cs",
+    "src/CardGame.Content.Standard/StandardShanheCampaignCatalog.S5LiGuoBosses.cs",
+    "src/CardGame.Content.Standard/StandardShanheCampaignCatalog.S5Dongshi.cs",
+    "src/CardGame.Content.Standard/StandardShanheCampaignCatalog.SourceOrdinaryTroops.cs",
+    "src/CardGame.Content.Standard/StandardShanheCampaignCatalog.MixedOrdinaryTroops.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceYulinOfficerPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceYulinGuardPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheS5MaSiblingsPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheS5DianweiWeiziPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheS5XuyouJushouPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheS5MoushiPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheS5CaoWeiPioneersPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheS5TaoyuanPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceRouteCatalog.cs",
+    "src/CardGame.Content.Standard/StandardShanheS5YuduPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheS5ZhangliangPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheS5XuncanCaoshiPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheS5YuanshuPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheS5GongsunZanPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheS5XiliangDarkPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheCampaignCatalog.S5LordGroups.cs",
+    "src/CardGame.Content.Standard/StandardShanheCampaignCatalog.S5ArmedSources.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceZhangYanPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheCampaignCatalog.S5VanguardGroups.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceCoalitionScoutPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceCoalitionSpyPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceCoalitionTrioPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceWhiteHorsePackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceWarElephantPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceVanguardPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceRangerPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceYouyanWarriorPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceArmoryCommanderPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceAgricultureOfficerPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceVeteranPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceWarriorPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceWuhuanRiderPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceQiangRaiderPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceJiangdongVeteranPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceLocalMagnatePackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceWuqueAssassinPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceExecutionerPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceMilitiaTrioPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceCaoSongTrioPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceGuardTrioPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceLiuYanTrioPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceLinZhongGuPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceQianZhaoPairPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceElementalTrioPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceBeigongDuoPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceBuHengPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceChengZhanPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceWuCongPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceLiuSandaoPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceXunYuePackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceArmorerPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceXinPingPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheCampaignCatalog.ReturningReinforcements.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceXuShengPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceSunCePackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceQiangWangPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceXunYuPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceMouDongZhuoPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheMuluPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheCampaignCatalog.Mulu.cs",
+    "src/CardGame.Content.Standard/StandardShanheBossPackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheSourceShenNuStagePackage.cs",
+    "src/CardGame.Content.Standard/StandardShanheCampaignCatalog.ReturningBossStages.cs",
+    "src/CardGame.Core/GameEngine.ShanheMulu.cs"
+  ],
+  "matchingContract": {
+    "campaign": "Require StandardShanheCampaignCatalog.IsSource2026Campaign(definition.Id, definition.SourceDifficultyId). The source difficulty must be in the explicit variant's inclusive interval.",
+    "source": "Require a non-null whitelisted SourceBattleId and the frozen source member SHA256. sourceGroupId is the verified main group, not an inferred or automatically substituted newbie group.",
+    "roster": "Require actual encounter.Enemies.Count and encounter.SourceVisibleEnemyCount to equal expectedVisibleEnemyCount. Compare every actual Enemies[index].GeneralId with the selected variant's full expectedRuntimeGeneralIds[index] using ordinal string equality.",
+    "members": "Require one source member per actual runtime member, with the recorded rawOrdinal. This first batch admits only Hide=false, StartChapter<=current chapter, and Generalshow=0.",
+    "projection": "Only after the entire roster matches, project each source IsBoss flag to its actual runtime seat, then partition the existing cards while preserving their relative runtime order and every actual enemy. Source members remain in raw source order. A verified non-positional roster records SourceOrdinalsInRuntimeOrder as a complete permutation paired with its full expected runtime ID sequence; an absent permutation uses raw ordinal order. Keep the complete roster and access to skill/rule descriptions available.",
+    "fallback": "Unknown battle, missing identity data, wrong campaign, wrong difficulty, wrong count, IDs reordered or replaced relative to the audited runtime sequence, later-chapter/hidden rows, and unsupported Generalshow all retain the original full large-card preview. Do not use prefix matching, localized names, source-ID dictionaries that discard duplicates, or the first N source rows.",
+    "localProfiles": "Local authored encounters, ordinary-to-elite replacement profiles and daily-travel extra encounters do not gain source roles merely because their artwork resembles a source NPC. Their absent SourceBattleId keeps the fallback behavior.",
+    "impact": "Presentation metadata only. It adds no Core fields, save commands, global version or campaign content-fingerprint input."
+  },
+  "verifiedGroups": [
+    {
+      "sourceBattleId": 2634,
+      "sourceGroupId": 2634,
+      "name": "其实难副",
+      "newbieGroupNotSelected": 22634,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 427,
+          "sourceName": "许靖",
+          "isBoss": false,
+          "skinId": null
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4871,
+          "sourceName": "徐璆",
+          "isBoss": true,
+          "skinId": 1000307
+        }
+      ],
+      "runtimeProof": "Source2026BossBindings selects dagu:xujing-xuqiu-s5. Its template is ordered XujingId then XuqiuId; Source2026BossEncounter has no difficulty-dependent replacement for2634, and Source2026EnemyDataByGroup[2634] has the same427,4871 order.",
+      "importantCase": "The commander is the second actual runtime member, not the first."
+    },
+    {
+      "sourceBattleId": 2685,
+      "sourceGroupId": 2685,
+      "name": "董氏乱朝",
+      "newbieGroupNotSelected": 22685,
+      "runtimeDifficultyRange": [
+        16,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 470,
+          "sourceName": "霸心毁朝",
+          "isBoss": true,
+          "skinId": null
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 366,
+          "sourceName": "巧笑董姬",
+          "isBoss": false,
+          "skinId": null
+        }
+      ],
+      "runtimeProof": "Source2026BossBindings selects luoyang:dongshi-s5. WithS5DongshiEncounter keeps DongZhuoBaxinId then DongJiQiaoxiaoId; no source-difficulty branch swaps these IDs. Region14 opens at source difficulty16, so earlier difficulty variants are intentionally omitted."
+    },
+    {
+      "sourceBattleId": 2499,
+      "sourceGroupId": 2499,
+      "name": "羽林卫尉与羽林军",
+      "newbieGroupNotSelected": 22499,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "sourceName": "羽林卫尉",
+          "isBoss": true,
+          "skinId": 1000318
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4861,
+          "sourceName": "羽林军",
+          "isBoss": false,
+          "skinId": 1000316
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops selects MixedOrdinaryMembers(2499,difficulty), which calls GetRosterGeneralIds and keeps officer then guard. The officer changes at difficulties11 and21, while the guard changes at11 and16. The four explicit ID sequences in the data therefore cannot be replaced by one shared tier threshold.",
+      "difficultyPairs": [
+        {
+          "range": [
+            1,
+            10
+          ],
+          "officer": "base",
+          "guard": "base"
+        },
+        {
+          "range": [
+            11,
+            15
+          ],
+          "officer": "hard",
+          "guard": "hard"
+        },
+        {
+          "range": [
+            16,
+            20
+          ],
+          "officer": "hard",
+          "guard": "hell"
+        },
+        {
+          "range": [
+            21,
+            25
+          ],
+          "officer": "hell",
+          "guard": "hell"
+        }
+      ]
+    },
+    {
+      "sourceBattleId": 2686,
+      "sourceGroupId": 2686,
+      "name": "凤仪情仇",
+      "newbieGroupNotSelected": 22686,
+      "runtimeDifficultyRange": [
+        16,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 319,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "霸戟雄英"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 470,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "覆銮凶影"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 445,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "闭月仙伶"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-dongzhuo-fengyi",
+        "shanhe:s5-lvbu-baji",
+        "shanhe:s5-diao-chan-biyue"
+      ],
+      "sourceOrdinalsInRuntimeOrder": [
+        1,
+        0,
+        2
+      ],
+      "runtimeProof": "Source2026BossBindings selects luoyang:fengyi-s5. Its existing runtime roster is DongZhuoFengyiId, LvbuBajiId, DiaoChanBiyueId. Source2026.EnemyData explicitly maps those exact IDs to470,319,445 and requires that complete seat sequence. The UI variant pairs that same full runtime sequence with source ordinals1,0,2. Raw source member order remains319,470,445, so only Dong Zhuo is a commander and both actual followers stay in runtime order.",
+      "artworkProof": "All three source rows omit generalskin. Frozen character319,470,445 rows have no AvatarUseId or AvatarUseId1 overrides; their native default seat cards are generalface_319, generalface_470 and generalface_445. A named parent character or another PVE skin is not substituted.",
+      "importantCase": "One actual commander and two independently selectable followers. Mapping source identity never reorders gameplay seats or mutates the complete runtime card list."
+    },
+    {
+      "sourceBattleId": 2642,
+      "sourceGroupId": 2642,
+      "name": "西凉兄妹",
+      "newbieGroupNotSelected": 22642,
+      "runtimeDifficultyRange": [
+        16,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 303,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "马超"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 346,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "马云騄"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-ma-chao-2642",
+        "shanhe:s5-ma-yun-lu-2642"
+      ],
+      "runtimeProof": "Source2026BossBindings selects the complete authored group registered by StandardShanheS5MaSiblingsPackage.cs. Every actual runtime member has been checked against the raw source row in the same order. Source2026BossEncounter has no difficulty-dependent member-ID replacement for this group; the selected difficulty changes quantities without changing this identity sequence. The regional minimum difficulty is16.",
+      "importantCase": "The complete source roster is retained; commander identity is read from each raw IsBoss flag, including commanders in the second seat."
+    },
+    {
+      "sourceBattleId": 2650,
+      "sourceGroupId": 2650,
+      "name": "忠烈双卫",
+      "newbieGroupNotSelected": 22650,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 229,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "典韦"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 501,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "卫兹"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-dian-wei-2650",
+        "shanhe:s5-wei-zi-2650"
+      ],
+      "runtimeProof": "Source2026BossBindings selects the complete authored group registered by StandardShanheS5DianweiWeiziPackage.cs. Every actual runtime member has been checked against the raw source row in the same order. Source2026BossEncounter has no difficulty-dependent member-ID replacement for this group; the selected difficulty changes quantities without changing this identity sequence. The regional minimum difficulty is1.",
+      "importantCase": "The complete source roster is retained; commander identity is read from each raw IsBoss flag, including commanders in the second seat."
+    },
+    {
+      "sourceBattleId": 2661,
+      "sourceGroupId": 2661,
+      "name": "谋臣双璧",
+      "newbieGroupNotSelected": 22661,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 406,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "许攸"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 330,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "沮授"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-xu-you-2661",
+        "shanhe:s5-ju-shou-2661"
+      ],
+      "runtimeProof": "Source2026BossBindings selects the complete authored group registered by StandardShanheS5XuyouJushouPackage.cs. Every actual runtime member has been checked against the raw source row in the same order. Source2026BossEncounter has no difficulty-dependent member-ID replacement for this group; the selected difficulty changes quantities without changing this identity sequence. The regional minimum difficulty is1.",
+      "importantCase": "The complete source roster is retained; commander identity is read from each raw IsBoss flag, including commanders in the second seat."
+    },
+    {
+      "sourceBattleId": 2674,
+      "sourceGroupId": 2674,
+      "name": "谋士争衡",
+      "newbieGroupNotSelected": 22674,
+      "runtimeDifficultyRange": [
+        11,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 460,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "荀谌"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 624,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "郭图"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 459,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "审配"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-xun-chen-2674",
+        "shanhe:s5-guo-tu-2674",
+        "shanhe:s5-shen-pei-2674"
+      ],
+      "runtimeProof": "Source2026BossBindings selects the complete authored group registered by StandardShanheS5MoushiPackage.cs. Every actual runtime member has been checked against the raw source row in the same order. Source2026BossEncounter has no difficulty-dependent member-ID replacement for this group; the selected difficulty changes quantities without changing this identity sequence. The regional minimum difficulty is11.",
+      "importantCase": "The complete source roster is retained; commander identity is read from each raw IsBoss flag, including commanders in the second seat."
+    },
+    {
+      "sourceBattleId": 2679,
+      "sourceGroupId": 2679,
+      "name": "曹魏先驱",
+      "newbieGroupNotSelected": 22679,
+      "runtimeDifficultyRange": [
+        11,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 321,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "曹真"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 311,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "曹操"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 114,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "曹洪"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-cao-zhen-2679",
+        "shanhe:s5-cao-cao-2679",
+        "shanhe:s5-cao-hong-2679"
+      ],
+      "runtimeProof": "Source2026BossBindings selects the complete authored group registered by StandardShanheS5CaoWeiPioneersPackage.cs. Every actual runtime member has been checked against the raw source row in the same order. Source2026BossEncounter has no difficulty-dependent member-ID replacement for this group; the selected difficulty changes quantities without changing this identity sequence. The regional minimum difficulty is11.",
+      "importantCase": "The complete source roster is retained; commander identity is read from each raw IsBoss flag, including commanders in the second seat."
+    },
+    {
+      "sourceBattleId": 2683,
+      "sourceGroupId": 2683,
+      "name": "桃园三英",
+      "newbieGroupNotSelected": 22683,
+      "runtimeDifficultyRange": [
+        11,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 301,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "张飞"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 299,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "刘备"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 300,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "关羽"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-zhang-fei-2683",
+        "shanhe:s5-liu-bei-2683",
+        "shanhe:s5-guan-yu-2683"
+      ],
+      "runtimeProof": "Source2026BossBindings selects the complete authored group registered by StandardShanheS5TaoyuanPackage.cs. Every actual runtime member has been checked against the raw source row in the same order. Source2026BossEncounter has no difficulty-dependent member-ID replacement for this group; the selected difficulty changes quantities without changing this identity sequence. The regional minimum difficulty is11.",
+      "importantCase": "The complete source roster is retained; commander identity is read from each raw IsBoss flag, including commanders in the second seat."
+    },
+    {
+      "sourceBattleId": 2633,
+      "sourceGroupId": 2633,
+      "name": "黑山匪害",
+      "newbieGroupNotSelected": 22633,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000098,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "于毒"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-yudu-2633"
+      ],
+      "runtimeProof": "Source2026BossBindings selects dagu:yudu-s5, using the exact dedicated forms registered by StandardShanheS5YuduPackage.cs. The complete authored runtime roster keeps the raw source member order. Source2026BossEncounter has no difficulty-dependent member-ID replacement or second-stage substitution for this group. Regional availability starts at source difficulty1.",
+      "importantCase": "A single source commander retains its full card and identity without an invented follower. In2657, Cao Shi remains an actual independently readable follower; its4876 carrier and skin1000051 are not a substitute for another named general."
+    },
+    {
+      "sourceBattleId": 2656,
+      "sourceGroupId": 2656,
+      "name": "末路残梁",
+      "newbieGroupNotSelected": 22656,
+      "runtimeDifficultyRange": [
+        11,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000367,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "隐士张梁"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-zhang-liang-2656"
+      ],
+      "runtimeProof": "Source2026BossBindings selects guangcheng:zhangliang-s5, using the exact dedicated forms registered by StandardShanheS5ZhangliangPackage.cs. The complete authored runtime roster keeps the raw source member order. Source2026BossEncounter has no difficulty-dependent member-ID replacement or second-stage substitution for this group. Regional availability starts at source difficulty11.",
+      "importantCase": "A single source commander retains its full card and identity without an invented follower. In2657, Cao Shi remains an actual independently readable follower; its4876 carrier and skin1000051 are not a substitute for another named general."
+    },
+    {
+      "sourceBattleId": 2657,
+      "sourceGroupId": 2657,
+      "name": "狂傲荀粲",
+      "newbieGroupNotSelected": 22657,
+      "runtimeDifficultyRange": [
+        11,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 525,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "荀粲"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4876,
+          "skinId": 1000051,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "曹氏"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-xun-can-2657",
+        "shanhe:s5-cao-shi-2657"
+      ],
+      "runtimeProof": "Source2026BossBindings selects huanyuan:xuncan-caoshi-s5, using the exact dedicated forms registered by StandardShanheS5XuncanCaoshiPackage.cs. The complete authored runtime roster keeps the raw source member order. Source2026BossEncounter has no difficulty-dependent member-ID replacement or second-stage substitution for this group. Regional availability starts at source difficulty11.",
+      "importantCase": "A single source commander retains its full card and identity without an invented follower. In2657, Cao Shi remains an actual independently readable follower; its4876 carrier and skin1000051 are not a substitute for another named general."
+    },
+    {
+      "sourceBattleId": 2654,
+      "sourceGroupId": 2654,
+      "name": "代汉涂高",
+      "newbieGroupNotSelected": 22654,
+      "runtimeDifficultyRange": [
+        6,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000339,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "袁耀"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 100,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "袁术"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4872,
+          "skinId": 1000338,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "袁胤"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-yuan-yao-2654",
+        "shanhe:s5-yuan-shu-2654",
+        "shanhe:s5-yuan-yin-2654"
+      ],
+      "runtimeProof": "Source2026BossBindings selects guangcheng:yuanshu-s5. The complete template and StandardShanheS5YuanshuPackage.cs retain the exact raw member order shown here. Source2026BossEncounter has no difficulty-dependent runtime-ID replacement for this group. Regional minimum difficulty is6.",
+      "importantCase": "In2654 Yuan Shu is the second member; in2663 only the second member Chen Wei is commander. Source2662 pairs Gongsun Zan with Gongsun Yue, whereas2681 pairs the same Gongsun Zan form with Zhao Yun. Portrait and role bindings must not swap those followers."
+    },
+    {
+      "sourceBattleId": 2662,
+      "sourceGroupId": 2662,
+      "name": "白马将军",
+      "newbieGroupNotSelected": 22662,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 320,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "公孙瓒"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4871,
+          "skinId": 1000165,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "公孙越"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-gong-sun-zan-2662",
+        "shanhe:s5-gong-sun-yue-2662"
+      ],
+      "runtimeProof": "Source2026BossBindings selects dagu:gongsun-zan-yue-s5. The complete template and StandardShanheS5GongsunZanPackage.cs retain the exact raw member order shown here. Source2026BossEncounter has no difficulty-dependent runtime-ID replacement for this group. Regional minimum difficulty is1.",
+      "importantCase": "In2654 Yuan Shu is the second member; in2663 only the second member Chen Wei is commander. Source2662 pairs Gongsun Zan with Gongsun Yue, whereas2681 pairs the same Gongsun Zan form with Zhao Yun. Portrait and role bindings must not swap those followers."
+    },
+    {
+      "sourceBattleId": 2663,
+      "sourceGroupId": 2663,
+      "name": "西凉暗军",
+      "newbieGroupNotSelected": 22663,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000413,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "秦谊"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4872,
+          "skinId": 1000121,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "陈卫"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4873,
+          "skinId": 1000414,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "李黑"
+        }
+      ],
+      "runtimeGeneralIdsInOrder": [
+        "shanhe:s5-qin-yi-2663",
+        "shanhe:s5-chen-wei-2663",
+        "shanhe:s5-li-hei-2663"
+      ],
+      "runtimeProof": "Source2026BossBindings selects huanyuan:xiliang-dark-s5. The complete template and StandardShanheS5XiliangDarkPackage.cs retain the exact raw member order shown here. Source2026BossEncounter has no difficulty-dependent runtime-ID replacement for this group. Regional minimum difficulty is1.",
+      "importantCase": "In2654 Yuan Shu is the second member; in2663 only the second member Chen Wei is commander. Source2662 pairs Gongsun Zan with Gongsun Yue, whereas2681 pairs the same Gongsun Zan form with Zhao Yun. Portrait and role bindings must not swap those followers."
+    },
+    {
+      "sourceBattleId": 2653,
+      "sourceGroupId": 2653,
+      "name": "黄巾余匪",
+      "newbieGroupNotSelected": 22653,
+      "runtimeDifficultyRange": [
+        6,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000367,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "张牛角"
+        }
+      ],
+      "runtimeVariants": [
+        {
+          "minDifficulty": 6,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-zhangniujiao-2653-medium"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-zhangniujiao-2653-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-zhangniujiao-2653-nightmare"
+          ]
+        }
+      ],
+      "runtimeProof": "Source2026BossBindings selects huanyuan:zhangniujiao-s5. The source region6 opens at difficulty6. Source2026BossEncounter selects the medium, hard or nightmare first-stage ID at the exact intervals above; the current maximum supported source difficulty is25. Each initial recipe contains the sole raw2653 member, with its source commander flag. No source-order permutation is needed.",
+      "importantCase": "Raw2653 General.w=265301;1 links the independent second-stage group265301, whose sole member is Zhang Yan4872, skin1000364. The transition is performed in the same seat by Core; the second stage is not an additional initial enemy or follower. The registered base Zhangniujiao and base ZhangYan IDs are not naturally selected by the current source/Returning selectors. Exact phase portrait bindings and the independent22653/2265301 newbie proofs are recorded in shanhe-npc-art-sources.json; the newbie group is not substituted by this role profile."
+    },
+    {
+      "sourceBattleId": 2455,
+      "sourceGroupId": 2455,
+      "name": "贪得无厌 · 联军斥候",
+      "nameOrigin": "Current OrdinaryTroopName display label; the source Fight.name is the numeric group ID, not an independently decoded localized battle title.",
+      "newbieGroupNotSelected": 22455,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000148,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "联军斥候"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-coalition-scout-2455-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-coalition-scout-2455-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-coalition-scout-2455-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops uses the exact main Fight-linked group only when the city potential pool includes it. OrdinaryTroopGeneral selects the full2455/2459 single body and explicitly reuses GetQuartermasterGeneralId for2456. MixedOrdinaryMembers(2465) retains all three independently defined members in source spy/scout/quartermaster order. The three package selectors determine the inclusive runtime-ID intervals above. WithSource2026EnemyData supplies the complete source visible count without changing these IDs. Existing compiled CreateSourceDefinition catalogs were inspected at all interval edges1/10/11/15/16/20/21/25: counts and ID sequences match these rows.",
+      "importantCase": "Every raw member has absent g and therefore IsBoss=false. There is no source commander in any of these four groups. The source no-commander presentation retains every actual member as a full card; no first-seat commander or small-follower row is invented. The repeated carrier4861 is not an identity or artwork key:2455 scout and2459/2465 spy have independently verified, different skin selections. The2456 solo quartermaster uses the same dedicated runtime forms as2465 raw2, but its single-member role profile is proved independently. Returning locally authored recipes carry no SourceBattleId and cannot match this source-role whitelist."
+    },
+    {
+      "sourceBattleId": 2456,
+      "sourceGroupId": 2456,
+      "name": "联军督运使",
+      "nameOrigin": "Current OrdinaryTroopName display label; the source Fight.name is the numeric group ID, not an independently decoded localized battle title.",
+      "newbieGroupNotSelected": 22456,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000175,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "联军督运使"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-coalition-trio-2465-quartermaster-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-coalition-trio-2465-quartermaster-hard"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops uses the exact main Fight-linked group only when the city potential pool includes it. OrdinaryTroopGeneral selects the full2455/2459 single body and explicitly reuses GetQuartermasterGeneralId for2456. MixedOrdinaryMembers(2465) retains all three independently defined members in source spy/scout/quartermaster order. The three package selectors determine the inclusive runtime-ID intervals above. WithSource2026EnemyData supplies the complete source visible count without changing these IDs. Existing compiled CreateSourceDefinition catalogs were inspected at all interval edges1/10/11/15/16/20/21/25: counts and ID sequences match these rows.",
+      "importantCase": "Every raw member has absent g and therefore IsBoss=false. There is no source commander in any of these four groups. The source no-commander presentation retains every actual member as a full card; no first-seat commander or small-follower row is invented. The repeated carrier4861 is not an identity or artwork key:2455 scout and2459/2465 spy have independently verified, different skin selections. The2456 solo quartermaster uses the same dedicated runtime forms as2465 raw2, but its single-member role profile is proved independently. Returning locally authored recipes carry no SourceBattleId and cannot match this source-role whitelist."
+    },
+    {
+      "sourceBattleId": 2459,
+      "sourceGroupId": 2459,
+      "name": "暗中破坏 · 联军细作",
+      "nameOrigin": "Current OrdinaryTroopName display label; the source Fight.name is the numeric group ID, not an independently decoded localized battle title.",
+      "newbieGroupNotSelected": 22459,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000304,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "联军细作"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-coalition-spy-2459-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-coalition-spy-2459-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-coalition-spy-2459-nightmare"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops uses the exact main Fight-linked group only when the city potential pool includes it. OrdinaryTroopGeneral selects the full2455/2459 single body and explicitly reuses GetQuartermasterGeneralId for2456. MixedOrdinaryMembers(2465) retains all three independently defined members in source spy/scout/quartermaster order. The three package selectors determine the inclusive runtime-ID intervals above. WithSource2026EnemyData supplies the complete source visible count without changing these IDs. Existing compiled CreateSourceDefinition catalogs were inspected at all interval edges1/10/11/15/16/20/21/25: counts and ID sequences match these rows.",
+      "importantCase": "Every raw member has absent g and therefore IsBoss=false. There is no source commander in any of these four groups. The source no-commander presentation retains every actual member as a full card; no first-seat commander or small-follower row is invented. The repeated carrier4861 is not an identity or artwork key:2455 scout and2459/2465 spy have independently verified, different skin selections. The2456 solo quartermaster uses the same dedicated runtime forms as2465 raw2, but its single-member role profile is proved independently. Returning locally authored recipes carry no SourceBattleId and cannot match this source-role whitelist."
+    },
+    {
+      "sourceBattleId": 2465,
+      "sourceGroupId": 2465,
+      "name": "联军三将",
+      "nameOrigin": "Current OrdinaryTroopName display label; the source Fight.name is the numeric group ID, not an independently decoded localized battle title.",
+      "newbieGroupNotSelected": 22465,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000304,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "联军细作"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4862,
+          "skinId": 1000148,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "联军斥候"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4871,
+          "skinId": 1000175,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "联军督运使"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-coalition-trio-2465-spy-base",
+            "shanhe:source-coalition-trio-2465-scout-base",
+            "shanhe:source-coalition-trio-2465-quartermaster-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-coalition-trio-2465-spy-hard",
+            "shanhe:source-coalition-trio-2465-scout-hard",
+            "shanhe:source-coalition-trio-2465-quartermaster-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-coalition-trio-2465-spy-nightmare",
+            "shanhe:source-coalition-trio-2465-scout-hard",
+            "shanhe:source-coalition-trio-2465-quartermaster-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-coalition-trio-2465-spy-nightmare",
+            "shanhe:source-coalition-trio-2465-scout-hell",
+            "shanhe:source-coalition-trio-2465-quartermaster-hard"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 10,
+          "chapterNumber": 3,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 11,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 12,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 14,
+          "chapterNumber": 3,
+          "minimumDifficulty": 16
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops uses the exact main Fight-linked group only when the city potential pool includes it. OrdinaryTroopGeneral selects the full2455/2459 single body and explicitly reuses GetQuartermasterGeneralId for2456. MixedOrdinaryMembers(2465) retains all three independently defined members in source spy/scout/quartermaster order. The three package selectors determine the inclusive runtime-ID intervals above. WithSource2026EnemyData supplies the complete source visible count without changing these IDs. Existing compiled CreateSourceDefinition catalogs were inspected at all interval edges1/10/11/15/16/20/21/25: counts and ID sequences match these rows.",
+      "importantCase": "Every raw member has absent g and therefore IsBoss=false. There is no source commander in any of these four groups. The source no-commander presentation retains every actual member as a full card; no first-seat commander or small-follower row is invented. The repeated carrier4861 is not an identity or artwork key:2455 scout and2459/2465 spy have independently verified, different skin selections. The2456 solo quartermaster uses the same dedicated runtime forms as2465 raw2, but its single-member role profile is proved independently. Returning locally authored recipes carry no SourceBattleId and cannot match this source-role whitelist."
+    },
+    {
+      "sourceBattleId": 2454,
+      "sourceGroupId": 2454,
+      "name": "白马义从",
+      "nameOrigin": "Source General raw0 name; source Fight.name is a numeric group ID.",
+      "newbieGroupNotSelected": 22454,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2454,
+        "useBg": "24",
+        "duration": 99,
+        "text": "245400",
+        "name": "2454",
+        "Ggroup": 2454,
+        "NewbieGroup": 22454,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "111",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2454,
+          "startChapter": 1,
+          "b": 4861,
+          "c": "白马义从",
+          "d": "1000128",
+          "f": 0,
+          "h": 100,
+          "k": 4,
+          "l": 4,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "1180",
+          "getspell_KN": "3153",
+          "getspell_LY": "204",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000128,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "白马义从"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-white-horse-2454-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-white-horse-2454-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-white-horse-2454-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 15,
+          "fightgroup": 2454,
+          "premisegroup": 1269
+        },
+        {
+          "fightID": 17,
+          "fightgroup": 2454,
+          "premisegroup": 1484
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops admits main group2454 only where GetPotentialBattleIds includes it. OrdinaryTroopGeneral calls StandardShanheSourceWhiteHorsePackage.GetGeneralId; its exact inclusive tier intervals are recorded above. Source2026.EnemyData supplies the single visible4861 member with source HP/draw/starting-hand attributes. Static source was inspected; this asset-only batch did not run builds or execute a new catalog scan.",
+      "importantCase": "The complete source group has one visible member and no g, hence no source commander; retain the full card rather than inventing a first-seat commander. Distinct explicit PVE d skin overrides generic carrier4861. Returning local recipes without this exact SourceBattleId cannot match this whitelist. UniversalGroup references prove candidate availability, not full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2453,
+      "sourceGroupId": 2453,
+      "name": "战象",
+      "nameOrigin": "Source General raw0 name; source Fight.name is a numeric group ID.",
+      "newbieGroupNotSelected": 22453,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2453,
+        "useBg": "24",
+        "duration": 99,
+        "text": "245300",
+        "name": "2453",
+        "Ggroup": 2453,
+        "NewbieGroup": 22453,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "101",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2453,
+          "startChapter": 1,
+          "b": 4861,
+          "c": "战象",
+          "d": "1000003",
+          "f": 0,
+          "h": 100,
+          "k": 5,
+          "l": 5,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "673",
+          "getspell_KN": "1136",
+          "getspell_LY": "414",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000003,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "战象"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-war-elephant-2453-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-war-elephant-2453-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-war-elephant-2453-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 15,
+          "fightgroup": 2453,
+          "premisegroup": 1268
+        },
+        {
+          "fightID": 17,
+          "fightgroup": 2453,
+          "premisegroup": 1483
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops admits main group2453 only where GetPotentialBattleIds includes it. OrdinaryTroopGeneral calls StandardShanheSourceWarElephantPackage.GetGeneralId; its exact inclusive tier intervals are recorded above. Source2026.EnemyData supplies the single visible4861 member with source HP/draw/starting-hand attributes. Static source was inspected; this asset-only batch did not run builds or execute a new catalog scan.",
+      "importantCase": "The complete source group has one visible member and no g, hence no source commander; retain the full card rather than inventing a first-seat commander. Distinct explicit PVE d skin overrides generic carrier4861. Returning local recipes without this exact SourceBattleId cannot match this whitelist. UniversalGroup references prove candidate availability, not full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2494,
+      "sourceGroupId": 2494,
+      "name": "先锋精骑",
+      "nameOrigin": "Source General raw0 name; source Fight.name is a numeric group ID.",
+      "newbieGroupNotSelected": 22494,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2494,
+        "useBg": "24",
+        "duration": 99,
+        "text": "249400",
+        "name": "2494",
+        "Ggroup": 2494,
+        "NewbieGroup": 22494,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "101",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2494,
+          "startChapter": 1,
+          "b": 4861,
+          "c": "先锋精骑",
+          "d": "1000236",
+          "f": 0,
+          "h": 100,
+          "k": 4,
+          "l": 4,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "t": "20546",
+          "v": "761",
+          "getspell_KN": "923",
+          "getspell_EM": "3123",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000236,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "先锋精骑"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-vanguard-2494-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-vanguard-2494-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-vanguard-2494-nightmare"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 14,
+          "fightgroup": 2494,
+          "premisegroup": 1488
+        },
+        {
+          "fightID": 16,
+          "fightgroup": 2494,
+          "premisegroup": 1837
+        },
+        {
+          "fightID": 18,
+          "fightgroup": 2494,
+          "premisegroup": 1852
+        },
+        {
+          "fightID": 19,
+          "fightgroup": 2494,
+          "premisegroup": 1847
+        },
+        {
+          "fightID": 20,
+          "fightgroup": 2494,
+          "premisegroup": 1833
+        },
+        {
+          "fightID": 21,
+          "fightgroup": 2494,
+          "premisegroup": 1847
+        },
+        {
+          "fightID": 22,
+          "fightgroup": 2494,
+          "premisegroup": 1847
+        },
+        {
+          "fightID": 26,
+          "fightgroup": 2494,
+          "premisegroup": 1833
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops admits main group2494 only where GetPotentialBattleIds includes it. OrdinaryTroopGeneral calls StandardShanheSourceVanguardPackage.GetGeneralId; its exact inclusive tier intervals are recorded above. Source2026.EnemyData supplies the single visible4861 member with source HP/draw/starting-hand attributes. Static source was inspected; this asset-only batch did not run builds or execute a new catalog scan.",
+      "importantCase": "The complete source group has one visible member and no g, hence no source commander; retain the full card rather than inventing a first-seat commander. Distinct explicit PVE d skin overrides generic carrier4861. Returning local recipes without this exact SourceBattleId cannot match this whitelist. UniversalGroup references prove candidate availability, not full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2481,
+      "sourceGroupId": 2481,
+      "name": "游侠",
+      "nameOrigin": "The full single-member General.c identity; source Fight.name is the numeric group ID, not an independently decoded localized battle title.",
+      "newbieGroupNotSelected": 22481,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000251,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "游侠"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-ranger-2481-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-ranger-2481-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-ranger-2481-nightmare"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-ranger-2481-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops admits group2481 only through exact source city potential pool references, and OrdinaryTroopGeneral calls StandardShanheSourceRangerPackage.GetGeneralId. Its complete one-member runtime roster matches the sole Fight-linked raw member at every listed interval. WithSource2026EnemyData preserves SourceVisibleEnemyCount=1. Existing compiled Source definitions were inspected at1/10/11/15/16/20/21/25; exact IDs, counts and available source regions match the owning selectors and current route minimum difficulties.",
+      "importantCase": "The sole source member has absent g and therefore IsBoss=false. The complete no-commander roster remains a full card; neither ordinal0 nor the localized name implies a commander. No hidden or later-chapter row is omitted. Returning locally authored recipes use these same runtime forms at local tiers1/11/21, but carry no SourceBattleId and remain outside this source role profile. Generic carrier IDs do not imply a shared portrait: the explicit per-group PVE skin link is required."
+    },
+    {
+      "sourceBattleId": 2466,
+      "sourceGroupId": 2466,
+      "name": "幽燕壮士",
+      "nameOrigin": "The full single-member General.c identity; source Fight.name is the numeric group ID, not an independently decoded localized battle title.",
+      "newbieGroupNotSelected": 22466,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000170,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "幽燕壮士"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-youyan-warrior-2466-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-youyan-warrior-2466-hard"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops admits group2466 only through exact source city potential pool references, and OrdinaryTroopGeneral calls StandardShanheSourceYouyanWarriorPackage.GetGeneralId. Its complete one-member runtime roster matches the sole Fight-linked raw member at every listed interval. WithSource2026EnemyData preserves SourceVisibleEnemyCount=1. Existing compiled Source definitions were inspected at1/10/11/15/16/20/21/25; exact IDs, counts and available source regions match the owning selectors and current route minimum difficulties.",
+      "importantCase": "The sole source member has absent g and therefore IsBoss=false. The complete no-commander roster remains a full card; neither ordinal0 nor the localized name implies a commander. No hidden or later-chapter row is omitted. Returning locally authored recipes use these same runtime forms at local tiers1/11/21, but carry no SourceBattleId and remain outside this source role profile. Generic carrier IDs do not imply a shared portrait: the explicit per-group PVE skin link is required."
+    },
+    {
+      "sourceBattleId": 2486,
+      "sourceGroupId": 2486,
+      "name": "武库统领",
+      "nameOrigin": "The full single-member General.c identity; source Fight.name is the numeric group ID, not an independently decoded localized battle title.",
+      "newbieGroupNotSelected": 22486,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000282,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "武库统领"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-armory-commander-2486-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-armory-commander-2486-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-armory-commander-2486-nightmare"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops admits group2486 only through exact source city potential pool references, and OrdinaryTroopGeneral calls StandardShanheSourceArmoryCommanderPackage.GetGeneralId. Its complete one-member runtime roster matches the sole Fight-linked raw member at every listed interval. WithSource2026EnemyData preserves SourceVisibleEnemyCount=1. Existing compiled Source definitions were inspected at1/10/11/15/16/20/21/25; exact IDs, counts and available source regions match the owning selectors and current route minimum difficulties.",
+      "importantCase": "The sole source member has absent g and therefore IsBoss=false. The complete no-commander roster remains a full card; neither ordinal0 nor the localized name implies a commander. No hidden or later-chapter row is omitted. Returning locally authored recipes use these same runtime forms at local tiers1/11/21, but carry no SourceBattleId and remain outside this source role profile. Generic carrier IDs do not imply a shared portrait: the explicit per-group PVE skin link is required."
+    },
+    {
+      "sourceBattleId": 2458,
+      "sourceGroupId": 2458,
+      "name": "魔军暴徒",
+      "nameOrigin": "Current OrdinaryTroopName display label; Fight.name is the numeric group ID, while individual names are explicit Root.General.c values.",
+      "newbieGroupNotSelected": 22458,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000303,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "魔军暴徒"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-raider-2458-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-raider-2458-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-raider-2458-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "runtimeProof": "The existing compiled CreateSourceCodexDefinition catalogs were inspected at every source difficulty1 through25. Every natural candidate of each of these four exact main Fight groups has the expected ordered IDs; Source2026KnownOrdinaryTroops and MixedOrdinaryMembers use the three existing package selectors. No rules, pool probabilities, content registration or version changed.",
+      "importantCase": "All g fields are absent and default false, so all members are proven front-line bodies and none is a source commander.2464 raw0 explicitly reuses the exact same assassin carrier4861/skin1000299/428+953+3113 source body and the same runtime IDs as2457. Its archer raw1 carrier4862 and raider raw2 carrier4863 remain distinct runtime bodies from their standalone carrier4861 forms; only the independently explicit matching skin IDs justify shared PNGs."
+    },
+    {
+      "sourceBattleId": 2461,
+      "sourceGroupId": 2461,
+      "name": "魔军弓骑",
+      "nameOrigin": "Current OrdinaryTroopName display label; Fight.name is the numeric group ID, while individual names are explicit Root.General.c values.",
+      "newbieGroupNotSelected": 22461,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000238,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "魔军弓骑"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-archer-2461-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-archer-2461-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-archer-2461-nightmare"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "runtimeProof": "The existing compiled CreateSourceCodexDefinition catalogs were inspected at every source difficulty1 through25. Every natural candidate of each of these four exact main Fight groups has the expected ordered IDs; Source2026KnownOrdinaryTroops and MixedOrdinaryMembers use the three existing package selectors. No rules, pool probabilities, content registration or version changed.",
+      "importantCase": "All g fields are absent and default false, so all members are proven front-line bodies and none is a source commander.2464 raw0 explicitly reuses the exact same assassin carrier4861/skin1000299/428+953+3113 source body and the same runtime IDs as2457. Its archer raw1 carrier4862 and raider raw2 carrier4863 remain distinct runtime bodies from their standalone carrier4861 forms; only the independently explicit matching skin IDs justify shared PNGs."
+    },
+    {
+      "sourceBattleId": 2457,
+      "sourceGroupId": 2457,
+      "name": "擒拿刺客 · 魔军刺客",
+      "nameOrigin": "Current OrdinaryTroopName display label; Fight.name is the numeric group ID, while individual names are explicit Root.General.c values.",
+      "newbieGroupNotSelected": 22457,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000299,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "魔军刺客"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-assassin-2457-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-assassin-2457-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-assassin-2457-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "runtimeProof": "The existing compiled CreateSourceCodexDefinition catalogs were inspected at every source difficulty1 through25. Every natural candidate of each of these four exact main Fight groups has the expected ordered IDs; Source2026KnownOrdinaryTroops and MixedOrdinaryMembers use the three existing package selectors. No rules, pool probabilities, content registration or version changed.",
+      "importantCase": "All g fields are absent and default false, so all members are proven front-line bodies and none is a source commander.2464 raw0 explicitly reuses the exact same assassin carrier4861/skin1000299/428+953+3113 source body and the same runtime IDs as2457. Its archer raw1 carrier4862 and raider raw2 carrier4863 remain distinct runtime bodies from their standalone carrier4861 forms; only the independently explicit matching skin IDs justify shared PNGs."
+    },
+    {
+      "sourceBattleId": 2464,
+      "sourceGroupId": 2464,
+      "name": "魔军三将",
+      "nameOrigin": "Current OrdinaryTroopName display label; Fight.name is the numeric group ID, while individual names are explicit Root.General.c values.",
+      "newbieGroupNotSelected": 22464,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000299,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "魔军刺客"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4862,
+          "skinId": 1000238,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "魔军弓骑"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4863,
+          "skinId": 1000303,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "魔军暴徒"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-assassin-2457-base",
+            "shanhe:source-demon-trio-2464-archer-base",
+            "shanhe:source-demon-trio-2464-raider-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-assassin-2457-hard",
+            "shanhe:source-demon-trio-2464-archer-hard",
+            "shanhe:source-demon-trio-2464-raider-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-assassin-2457-hard",
+            "shanhe:source-demon-trio-2464-archer-nightmare",
+            "shanhe:source-demon-trio-2464-raider-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-demon-assassin-2457-hell",
+            "shanhe:source-demon-trio-2464-archer-nightmare",
+            "shanhe:source-demon-trio-2464-raider-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 10,
+          "chapterNumber": 3,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 11,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 12,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 14,
+          "chapterNumber": 3,
+          "minimumDifficulty": 16
+        }
+      ],
+      "runtimeProof": "The existing compiled CreateSourceCodexDefinition catalogs were inspected at every source difficulty1 through25. Every natural candidate of each of these four exact main Fight groups has the expected ordered IDs; Source2026KnownOrdinaryTroops and MixedOrdinaryMembers use the three existing package selectors. No rules, pool probabilities, content registration or version changed.",
+      "importantCase": "All g fields are absent and default false, so all members are proven front-line bodies and none is a source commander.2464 raw0 explicitly reuses the exact same assassin carrier4861/skin1000299/428+953+3113 source body and the same runtime IDs as2457. Its archer raw1 carrier4862 and raider raw2 carrier4863 remain distinct runtime bodies from their standalone carrier4861 forms; only the independently explicit matching skin IDs justify shared PNGs."
+    },
+    {
+      "sourceBattleId": 2500,
+      "sourceGroupId": 2500,
+      "name": "农都尉",
+      "nameOrigin": "Source General raw0 name; source Fight.name is a numeric group ID.",
+      "newbieGroupNotSelected": 22500,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2500,
+        "useBg": "24",
+        "duration": 99,
+        "text": "250000",
+        "name": "2500",
+        "Ggroup": 2500,
+        "NewbieGroup": 22500,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "101",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2500,
+          "startChapter": 1,
+          "b": 4871,
+          "c": "农都尉",
+          "d": "1000213",
+          "f": 0,
+          "h": 100,
+          "k": 3,
+          "l": 3,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "959",
+          "getspell_KN": "51",
+          "getspell_LY": "380",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000213,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "农都尉"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-agriculture-officer-2500-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-agriculture-officer-2500-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-agriculture-officer-2500-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 14,
+          "fightgroup": 2500,
+          "premisegroup": 1491
+        },
+        {
+          "fightID": 16,
+          "fightgroup": 2500,
+          "premisegroup": 1840
+        },
+        {
+          "fightID": 18,
+          "fightgroup": 2500,
+          "premisegroup": 1490
+        },
+        {
+          "fightID": 19,
+          "fightgroup": 2500,
+          "premisegroup": 1850
+        },
+        {
+          "fightID": 20,
+          "fightgroup": 2500,
+          "premisegroup": 1836
+        },
+        {
+          "fightID": 21,
+          "fightgroup": 2500,
+          "premisegroup": 1850
+        },
+        {
+          "fightID": 22,
+          "fightgroup": 2500,
+          "premisegroup": 1850
+        },
+        {
+          "fightID": 26,
+          "fightgroup": 2500,
+          "premisegroup": 1836
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops admits main group2500 only where GetPotentialBattleIds includes it. OrdinaryTroopGeneral calls StandardShanheSourceAgricultureOfficerPackage.GetGeneralId; its exact inclusive tier intervals are recorded above. Source2026.EnemyData supplies the single visible4871 member with source HP/draw/starting-hand attributes. Static source was inspected; this art batch did not run builds or execute a new catalog scan.",
+      "importantCase": "The complete source group has one visible member and no g, hence no source commander; retain the full card rather than inventing a first-seat commander. Distinct explicit PVE d skin overrides the generic carrier. Returning local recipes without this exact SourceBattleId cannot match this whitelist. UniversalGroup references prove candidate availability, not full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2474,
+      "sourceGroupId": 2474,
+      "name": "百战老兵",
+      "nameOrigin": "Source General raw0 name; source Fight.name is a numeric group ID.",
+      "newbieGroupNotSelected": 22474,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2474,
+        "useBg": "24",
+        "duration": 99,
+        "text": "247400",
+        "name": "2474",
+        "Ggroup": 2474,
+        "NewbieGroup": 22474,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "101",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2474,
+          "startChapter": 1,
+          "b": 4861,
+          "c": "百战老兵",
+          "d": "1000129",
+          "f": 0,
+          "h": 100,
+          "k": 4,
+          "l": 4,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "736",
+          "getspell_ZD": "59",
+          "getspell_KN": "940",
+          "getspell_EM": "878",
+          "getspell_LY": "887",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000129,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "百战老兵"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 5,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-veteran-2474-base"
+          ]
+        },
+        {
+          "minDifficulty": 6,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-veteran-2474-medium"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-veteran-2474-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-veteran-2474-nightmare"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-veteran-2474-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 14,
+          "fightgroup": 2474,
+          "premisegroup": 1841
+        },
+        {
+          "fightID": 16,
+          "fightgroup": 2474,
+          "premisegroup": 1825
+        },
+        {
+          "fightID": 18,
+          "fightgroup": 2474,
+          "premisegroup": 1840
+        },
+        {
+          "fightID": 19,
+          "fightgroup": 2474,
+          "premisegroup": 1835
+        },
+        {
+          "fightID": 20,
+          "fightgroup": 2474,
+          "premisegroup": 1277
+        },
+        {
+          "fightID": 21,
+          "fightgroup": 2474,
+          "premisegroup": 1835
+        },
+        {
+          "fightID": 22,
+          "fightgroup": 2474,
+          "premisegroup": 1835
+        },
+        {
+          "fightID": 26,
+          "fightgroup": 2474,
+          "premisegroup": 1277
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops admits main group2474 only where GetPotentialBattleIds includes it. OrdinaryTroopGeneral calls StandardShanheSourceVeteranPackage.GetGeneralId; its exact inclusive tier intervals are recorded above. Source2026.EnemyData supplies the single visible4861 member with source HP/draw/starting-hand attributes. Static source was inspected; this art batch did not run builds or execute a new catalog scan.",
+      "importantCase": "The complete source group has one visible member and no g, hence no source commander; retain the full card rather than inventing a first-seat commander. Distinct explicit PVE d skin overrides the generic carrier. Returning local recipes without this exact SourceBattleId cannot match this whitelist. UniversalGroup references prove candidate availability, not full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2467,
+      "sourceGroupId": 2467,
+      "name": "乌桓骑手",
+      "nameOrigin": "Source General raw0 name; source Fight.name is a numeric group ID.",
+      "newbieGroupNotSelected": 22467,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2467,
+        "useBg": "24",
+        "duration": 99,
+        "text": "246700",
+        "name": "2467",
+        "Ggroup": 2467,
+        "NewbieGroup": 22467,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "101",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2467,
+          "startChapter": 1,
+          "b": 4861,
+          "c": "乌桓骑手",
+          "d": "1000107",
+          "f": 0,
+          "h": 100,
+          "k": 4,
+          "l": 4,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "747",
+          "getspell_KN": "722",
+          "getspell_LY": "1600",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000107,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "乌桓骑手"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-wuhuan-rider-2467-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-wuhuan-rider-2467-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-wuhuan-rider-2467-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 14,
+          "fightgroup": 2467,
+          "premisegroup": 1838
+        },
+        {
+          "fightID": 16,
+          "fightgroup": 2467,
+          "premisegroup": 1278
+        },
+        {
+          "fightID": 18,
+          "fightgroup": 2467,
+          "premisegroup": 1837
+        },
+        {
+          "fightID": 19,
+          "fightgroup": 2467,
+          "premisegroup": 1832
+        },
+        {
+          "fightID": 20,
+          "fightgroup": 2467,
+          "premisegroup": 1274
+        },
+        {
+          "fightID": 21,
+          "fightgroup": 2467,
+          "premisegroup": 1832
+        },
+        {
+          "fightID": 22,
+          "fightgroup": 2467,
+          "premisegroup": 1832
+        },
+        {
+          "fightID": 26,
+          "fightgroup": 2467,
+          "premisegroup": 1274
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops admits main group2467 only where GetPotentialBattleIds includes it. OrdinaryTroopGeneral calls StandardShanheSourceWuhuanRiderPackage.GetGeneralId; its exact inclusive tier intervals are recorded above. Source2026.EnemyData supplies the single visible4861 member with source HP/draw/starting-hand attributes. Static source was inspected; this asset-only batch did not run builds or execute a new catalog scan.",
+      "importantCase": "The complete source group has one visible member, startChapter1, and absent g/hide/generalShow, hence no source commander and no hidden/later/show-gated member. Retain the full card rather than inventing a first-seat commander. Distinct explicit PVE d skin overrides generic carrier4861. Returning local recipes without this exact SourceBattleId cannot match this whitelist. UniversalGroup references prove candidate availability, not full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2487,
+      "sourceGroupId": 2487,
+      "name": "武卫兵",
+      "nameOrigin": "Source General raw0 name; source Fight.name is a numeric group ID.",
+      "newbieGroupNotSelected": 22487,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2487,
+        "useBg": "24",
+        "duration": 99,
+        "text": "248700",
+        "name": "2487",
+        "Ggroup": 2487,
+        "NewbieGroup": 22487,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "131",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2487,
+          "startChapter": 1,
+          "b": 4861,
+          "c": "武卫兵",
+          "d": "1000230",
+          "f": 0,
+          "h": 100,
+          "k": 4,
+          "l": 4,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "290",
+          "getspell_KN": "488",
+          "getspell_LY": "723",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000230,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "武卫兵"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-warrior-2487-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-warrior-2487-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-warrior-2487-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 14,
+          "fightgroup": 2487,
+          "premisegroup": 1849
+        },
+        {
+          "fightID": 16,
+          "fightgroup": 2487,
+          "premisegroup": 1833
+        },
+        {
+          "fightID": 18,
+          "fightgroup": 2487,
+          "premisegroup": 1848
+        },
+        {
+          "fightID": 19,
+          "fightgroup": 2487,
+          "premisegroup": 1843
+        },
+        {
+          "fightID": 20,
+          "fightgroup": 2487,
+          "premisegroup": 1829
+        },
+        {
+          "fightID": 21,
+          "fightgroup": 2487,
+          "premisegroup": 1843
+        },
+        {
+          "fightID": 22,
+          "fightgroup": 2487,
+          "premisegroup": 1843
+        },
+        {
+          "fightID": 26,
+          "fightgroup": 2487,
+          "premisegroup": 1829
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops admits main group2487 only where GetPotentialBattleIds includes it. OrdinaryTroopGeneral calls StandardShanheSourceWarriorPackage.GetGeneralId; its exact inclusive tier intervals are recorded above. Source2026.EnemyData supplies the single visible4861 member with source HP/draw/starting-hand attributes. Static source was inspected; this art batch did not run builds or execute a new catalog scan.",
+      "importantCase": "The complete source group has one visible member and no g, hence no source commander; retain the full card rather than inventing a first-seat commander. Distinct explicit PVE d skin overrides the generic carrier. Returning local recipes without this exact SourceBattleId cannot match this whitelist. UniversalGroup references prove candidate availability, not full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2473,
+      "sourceGroupId": 2473,
+      "name": "羌人劫匪",
+      "nameOrigin": "Source General raw0 name; source Fight.name is a numeric group ID.",
+      "newbieGroupNotSelected": 22473,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2473,
+        "useBg": "24",
+        "duration": 99,
+        "text": "247300",
+        "name": "2473",
+        "Ggroup": 2473,
+        "NewbieGroup": 22473,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "112",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2473,
+          "startChapter": 1,
+          "b": 4861,
+          "c": "羌人劫匪",
+          "d": "1000125",
+          "f": 0,
+          "h": 100,
+          "k": 4,
+          "l": 4,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "276",
+          "getspell_KN": "939",
+          "getspell_EM": "864",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000125,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "羌人劫匪"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-qiang-raider-2473-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-qiang-raider-2473-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-qiang-raider-2473-nightmare"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 15,
+          "fightgroup": 2473,
+          "premisegroup": 1031
+        },
+        {
+          "fightID": 17,
+          "fightgroup": 2473
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops admits main group2473 only where GetPotentialBattleIds includes it. OrdinaryTroopGeneral calls StandardShanheSourceQiangRaiderPackage.GetGeneralId; its exact inclusive tier intervals are recorded above. Source2026.EnemyData supplies the single visible4861 member with source HP/draw/starting-hand attributes. Static source was inspected; this asset-only batch did not run builds or execute a new catalog scan.",
+      "importantCase": "The complete source group has one visible member, startChapter1, and absent g/hide/generalShow, hence no source commander and no hidden/later/show-gated member. Retain the full card rather than inventing a first-seat commander. Distinct explicit PVE d skin overrides generic carrier4861. Returning local recipes without this exact SourceBattleId cannot match this whitelist. UniversalGroup references prove candidate availability, not full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2497,
+      "sourceGroupId": 2497,
+      "name": "江东老兵",
+      "nameOrigin": "Source General raw0 name; source Fight.name is a numeric group ID.",
+      "newbieGroupNotSelected": 22497,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2497,
+        "useBg": "24",
+        "duration": 99,
+        "text": "249700",
+        "name": "2497",
+        "Ggroup": 2497,
+        "NewbieGroup": 22497,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "121",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2497,
+          "startChapter": 1,
+          "b": 4861,
+          "c": "江东老兵",
+          "d": "1000283",
+          "f": 0,
+          "h": 100,
+          "k": 4,
+          "l": 4,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "t": "20511",
+          "equip_KN": "20571",
+          "equip_LY": "20771",
+          "v": "409",
+          "getspell_KN": "396",
+          "getspell_EM": "397",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000283,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "江东老兵"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-jiangdong-veteran-2497-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-jiangdong-veteran-2497-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-jiangdong-veteran-2497-nightmare"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 14,
+          "fightgroup": 2497,
+          "premisegroup": 1489
+        },
+        {
+          "fightID": 16,
+          "fightgroup": 2497,
+          "premisegroup": 1838
+        },
+        {
+          "fightID": 18,
+          "fightgroup": 2497,
+          "premisegroup": 1488
+        },
+        {
+          "fightID": 19,
+          "fightgroup": 2497,
+          "premisegroup": 1848
+        },
+        {
+          "fightID": 20,
+          "fightgroup": 2497,
+          "premisegroup": 1834
+        },
+        {
+          "fightID": 21,
+          "fightgroup": 2497,
+          "premisegroup": 1848
+        },
+        {
+          "fightID": 22,
+          "fightgroup": 2497,
+          "premisegroup": 1848
+        },
+        {
+          "fightID": 26,
+          "fightgroup": 2497,
+          "premisegroup": 1834
+        }
+      ],
+      "runtimeProof": "Source2026KnownOrdinaryTroops admits main group2497 only where GetPotentialBattleIds includes it. OrdinaryTroopGeneral calls StandardShanheSourceJiangdongVeteranPackage.GetGeneralId; its exact inclusive tier intervals are recorded above. Source2026.EnemyData supplies the single visible4861 member with source HP/draw/starting-hand attributes. Static source was inspected; this asset-only batch did not run builds or execute a new catalog scan.",
+      "importantCase": "The complete source group has one visible member, startChapter1, and absent g/hide/generalShow, hence no source commander and no hidden/later/show-gated member. Retain the full card rather than inventing a first-seat commander. Distinct explicit PVE d skin overrides generic carrier4861. Returning local recipes without this exact SourceBattleId cannot match this whitelist. UniversalGroup references prove candidate availability, not full server prerequisite evaluation or random weights.",
+      "equipmentBoundary": "GetGeneralId uses the same nightmare runtime ID at16 through25. The source equip_LY20771 addition at21 is handled separately by JiangdongVeteranGear and does not change the portrait or seat identity."
+    },
+    {
+      "sourceBattleId": 2460,
+      "sourceGroupId": 2460,
+      "name": "LocalMagnate",
+      "nameOrigin": "Explicit technical family name; original per-member localized names are preserved below. No unverified localized Fight title is inferred.",
+      "newbieGroupNotSelected": 22460,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000320,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "本地豪强"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-local-magnate-2460-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-local-magnate-2460-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-local-magnate-2460-nightmare"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "runtimeProof": "OrdinaryTroopGeneral / MixedOrdinaryMembers select StandardShanheSourceLocalMagnatePackage exact difficulty forms. The existing compiled CreateSourceDefinition catalogs were inspected at every1..25 value: every actual recipe has the exact full ID sequence and SourceVisibleEnemyCount shown here. Fixed cards/equipment and source numeric growth do not replace IDs or membership.",
+      "importantCase": "Raw source commander flags are exactly[False]. They are not inferred from ordinal0, a shared carrier or the localized title. All independently authored runtime members remain in exact raw source order. Only complete groups with hide=false,startChapter1,generalShow0 are admitted. Named438/634 lack a skin override and use independently verified default avatar chains; generic troop skins remain per-row overrides. Returning local recipes carry no SourceBattleId and cannot match this source role whitelist."
+    },
+    {
+      "sourceBattleId": 2493,
+      "sourceGroupId": 2493,
+      "name": "WuqueAssassin",
+      "nameOrigin": "Explicit technical family name; original per-member localized names are preserved below. No unverified localized Fight title is inferred.",
+      "newbieGroupNotSelected": 22493,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000228,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "乌鹊暗杀者"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-wuque-assassin-2493-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-wuque-assassin-2493-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-wuque-assassin-2493-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 10,
+          "chapterNumber": 3,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 11,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 12,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 14,
+          "chapterNumber": 3,
+          "minimumDifficulty": 16
+        }
+      ],
+      "runtimeProof": "OrdinaryTroopGeneral / MixedOrdinaryMembers select StandardShanheSourceWuqueAssassinPackage exact difficulty forms. The existing compiled CreateSourceDefinition catalogs were inspected at every1..25 value: every actual recipe has the exact full ID sequence and SourceVisibleEnemyCount shown here. Fixed cards/equipment and source numeric growth do not replace IDs or membership.",
+      "importantCase": "Raw source commander flags are exactly[False]. They are not inferred from ordinal0, a shared carrier or the localized title. All independently authored runtime members remain in exact raw source order. Only complete groups with hide=false,startChapter1,generalShow0 are admitted. Named438/634 lack a skin override and use independently verified default avatar chains; generic troop skins remain per-row overrides. Returning local recipes carry no SourceBattleId and cannot match this source role whitelist."
+    },
+    {
+      "sourceBattleId": 2495,
+      "sourceGroupId": 2495,
+      "name": "Executioner",
+      "nameOrigin": "Explicit technical family name; original per-member localized names are preserved below. No unverified localized Fight title is inferred.",
+      "newbieGroupNotSelected": 22495,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000237,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "校事典刑官"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 5,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-executioner-2495-base"
+          ]
+        },
+        {
+          "minDifficulty": 6,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-executioner-2495-medium"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-executioner-2495-hard"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 10,
+          "chapterNumber": 3,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 11,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 12,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 14,
+          "chapterNumber": 3,
+          "minimumDifficulty": 16
+        }
+      ],
+      "runtimeProof": "OrdinaryTroopGeneral / MixedOrdinaryMembers select StandardShanheSourceExecutionerPackage exact difficulty forms. The existing compiled CreateSourceDefinition catalogs were inspected at every1..25 value: every actual recipe has the exact full ID sequence and SourceVisibleEnemyCount shown here. Fixed cards/equipment and source numeric growth do not replace IDs or membership.",
+      "importantCase": "Raw source commander flags are exactly[False]. They are not inferred from ordinal0, a shared carrier or the localized title. All independently authored runtime members remain in exact raw source order. Only complete groups with hide=false,startChapter1,generalShow0 are admitted. Named438/634 lack a skin override and use independently verified default avatar chains; generic troop skins remain per-row overrides. Returning local recipes carry no SourceBattleId and cannot match this source role whitelist."
+    },
+    {
+      "sourceBattleId": 2475,
+      "sourceGroupId": 2475,
+      "name": "MilitiaTrio",
+      "nameOrigin": "Explicit technical family name; original per-member localized names are preserved below. No unverified localized Fight title is inferred.",
+      "newbieGroupNotSelected": 22475,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000208,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "民兵"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4862,
+          "skinId": 1000249,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "民兵"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4863,
+          "skinId": 1000309,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "民兵"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-militia-trio-2475-first-base",
+            "shanhe:source-militia-trio-2475-second-base",
+            "shanhe:source-militia-trio-2475-third-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-militia-trio-2475-first-hard",
+            "shanhe:source-militia-trio-2475-second-base",
+            "shanhe:source-militia-trio-2475-third-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-militia-trio-2475-first-hard",
+            "shanhe:source-militia-trio-2475-second-nightmare",
+            "shanhe:source-militia-trio-2475-third-nightmare"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-militia-trio-2475-first-hell",
+            "shanhe:source-militia-trio-2475-second-nightmare",
+            "shanhe:source-militia-trio-2475-third-nightmare"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        }
+      ],
+      "runtimeProof": "OrdinaryTroopGeneral / MixedOrdinaryMembers select StandardShanheSourceMilitiaTrioPackage exact difficulty forms. The existing compiled CreateSourceDefinition catalogs were inspected at every1..25 value: every actual recipe has the exact full ID sequence and SourceVisibleEnemyCount shown here. Fixed cards/equipment and source numeric growth do not replace IDs or membership.",
+      "importantCase": "Raw source commander flags are exactly[False, True, False]. They are not inferred from ordinal0, a shared carrier or the localized title. All independently authored runtime members remain in exact raw source order. Only complete groups with hide=false,startChapter1,generalShow0 are admitted. Named438/634 lack a skin override and use independently verified default avatar chains; generic troop skins remain per-row overrides. Returning local recipes carry no SourceBattleId and cannot match this source role whitelist."
+    },
+    {
+      "sourceBattleId": 2485,
+      "sourceGroupId": 2485,
+      "name": "CaoSongTrio",
+      "nameOrigin": "Explicit technical family name; original per-member localized names are preserved below. No unverified localized Fight title is inferred.",
+      "newbieGroupNotSelected": 22485,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 438,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "曹嵩"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4861,
+          "skinId": 1000215,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "卫兵"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4862,
+          "skinId": 1000215,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "卫兵"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-caosong-trio-2485-caosong-base",
+            "shanhe:source-caosong-trio-2485-guard-4861-base",
+            "shanhe:source-caosong-trio-2485-guard-4862-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-caosong-trio-2485-caosong-hard",
+            "shanhe:source-caosong-trio-2485-guard-4861-hard",
+            "shanhe:source-caosong-trio-2485-guard-4862-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-caosong-trio-2485-caosong-hell",
+            "shanhe:source-caosong-trio-2485-guard-4861-hard",
+            "shanhe:source-caosong-trio-2485-guard-4862-hard"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        }
+      ],
+      "runtimeProof": "OrdinaryTroopGeneral / MixedOrdinaryMembers select StandardShanheSourceCaoSongTrioPackage exact difficulty forms. The existing compiled CreateSourceDefinition catalogs were inspected at every1..25 value: every actual recipe has the exact full ID sequence and SourceVisibleEnemyCount shown here. Fixed cards/equipment and source numeric growth do not replace IDs or membership.",
+      "importantCase": "Raw source commander flags are exactly[True, False, False]. They are not inferred from ordinal0, a shared carrier or the localized title. All independently authored runtime members remain in exact raw source order. Only complete groups with hide=false,startChapter1,generalShow0 are admitted. Named438/634 lack a skin override and use independently verified default avatar chains; generic troop skins remain per-row overrides. Returning local recipes carry no SourceBattleId and cannot match this source role whitelist."
+    },
+    {
+      "sourceBattleId": 2491,
+      "sourceGroupId": 2491,
+      "name": "GuardTrio",
+      "nameOrigin": "Explicit technical family name; original per-member localized names are preserved below. No unverified localized Fight title is inferred.",
+      "newbieGroupNotSelected": 22491,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000222,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "盾阵"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4871,
+          "skinId": 1000233,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "武卫骁勇"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4861,
+          "skinId": 1000222,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "盾阵"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-guard-trio-2491-guard-base",
+            "shanhe:source-guard-trio-2491-captain-base",
+            "shanhe:source-guard-trio-2491-guard-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-guard-trio-2491-guard-base",
+            "shanhe:source-guard-trio-2491-captain-hard",
+            "shanhe:source-guard-trio-2491-guard-base"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-guard-trio-2491-guard-hell",
+            "shanhe:source-guard-trio-2491-captain-hard",
+            "shanhe:source-guard-trio-2491-guard-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 10,
+          "chapterNumber": 3,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 11,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 12,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 14,
+          "chapterNumber": 3,
+          "minimumDifficulty": 16
+        }
+      ],
+      "runtimeProof": "OrdinaryTroopGeneral / MixedOrdinaryMembers select StandardShanheSourceGuardTrioPackage exact difficulty forms. The existing compiled CreateSourceDefinition catalogs were inspected at every1..25 value: every actual recipe has the exact full ID sequence and SourceVisibleEnemyCount shown here. Fixed cards/equipment and source numeric growth do not replace IDs or membership.",
+      "importantCase": "Raw source commander flags are exactly[False, False, False]. They are not inferred from ordinal0, a shared carrier or the localized title. The two shield guards in2491 deliberately repeat the same exact runtime ID in two separate seats; source carriers and full roster indices are not deduplicated. Only complete groups with hide=false,startChapter1,generalShow0 are admitted. Named438/634 lack a skin override and use independently verified default avatar chains; generic troop skins remain per-row overrides. Returning local recipes carry no SourceBattleId and cannot match this source role whitelist."
+    },
+    {
+      "sourceBattleId": 2463,
+      "sourceGroupId": 2463,
+      "name": "LiuYanTrio",
+      "nameOrigin": "Explicit technical family name; original per-member localized names are preserved below. No unverified localized Fight title is inferred.",
+      "newbieGroupNotSelected": 22463,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 1000181,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "东州兵"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 634,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "刘焉"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4862,
+          "skinId": 1000181,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "东州兵"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-liuyan-trio-2463-soldier-4861-base",
+            "shanhe:source-liuyan-trio-2463-liuyan-base",
+            "shanhe:source-liuyan-trio-2463-soldier-4862-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-liuyan-trio-2463-soldier-4861-hard",
+            "shanhe:source-liuyan-trio-2463-liuyan-hard",
+            "shanhe:source-liuyan-trio-2463-soldier-4862-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-liuyan-trio-2463-soldier-4861-hard",
+            "shanhe:source-liuyan-trio-2463-liuyan-hell",
+            "shanhe:source-liuyan-trio-2463-soldier-4862-hard"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 10,
+          "chapterNumber": 3,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 11,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 12,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 14,
+          "chapterNumber": 3,
+          "minimumDifficulty": 16
+        }
+      ],
+      "runtimeProof": "OrdinaryTroopGeneral / MixedOrdinaryMembers select StandardShanheSourceLiuYanTrioPackage exact difficulty forms. The existing compiled CreateSourceDefinition catalogs were inspected at every1..25 value: every actual recipe has the exact full ID sequence and SourceVisibleEnemyCount shown here. Fixed cards/equipment and source numeric growth do not replace IDs or membership.",
+      "importantCase": "Raw source commander flags are exactly[False, True, False]. They are not inferred from ordinal0, a shared carrier or the localized title. All independently authored runtime members remain in exact raw source order. Only complete groups with hide=false,startChapter1,generalShow0 are admitted. Named438/634 lack a skin override and use independently verified default avatar chains; generic troop skins remain per-row overrides. Returning local recipes carry no SourceBattleId and cannot match this source role whitelist."
+    },
+    {
+      "sourceBattleId": 2476,
+      "sourceGroupId": 2476,
+      "name": "林中鹘",
+      "nameOrigin": "Current runtime OrdinaryTroopName; member names are independently read from each General.c.",
+      "newbieGroupNotSelected": 22476,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000301,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "林中鹘"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": false,
+        "hide": false,
+        "Generalshow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-linzhonggu-2476-base"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-linzhonggu-2476-nightmare"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        }
+      ],
+      "runtimeProof": "All natural source catalogue candidates checked for each source tier 1..25, preserving authored member order. The catalogue is read from the existing build without starting games or test runners.",
+      "importantCase": "Every member has isBoss=false; keep complete main cards and do not invent a commander."
+    },
+    {
+      "sourceBattleId": 2471,
+      "sourceGroupId": 2471,
+      "name": "牵招与乌桓奇袭兵",
+      "nameOrigin": "Current runtime OrdinaryTroopName; member names are independently read from each General.c.",
+      "newbieGroupNotSelected": 22471,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 580,
+          "skinId": null,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "牵招"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4861,
+          "skinId": 1000297,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "乌桓奇袭兵"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": false,
+        "hide": false,
+        "Generalshow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-qianzhao-pair-2471-qianzhao-base",
+            "shanhe:source-qianzhao-pair-2471-wuhuan-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-qianzhao-pair-2471-qianzhao-hard",
+            "shanhe:source-qianzhao-pair-2471-wuhuan-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-qianzhao-pair-2471-qianzhao-hard",
+            "shanhe:source-qianzhao-pair-2471-wuhuan-nightmare"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        }
+      ],
+      "runtimeProof": "All natural source catalogue candidates checked for each source tier 1..25, preserving authored member order. The catalogue is read from the existing build without starting games or test runners.",
+      "importantCase": "Every member has isBoss=false; keep complete main cards and do not invent a commander."
+    },
+    {
+      "sourceBattleId": 2472,
+      "sourceGroupId": 2472,
+      "name": "水火与穷奇",
+      "nameOrigin": "Current runtime OrdinaryTroopName; member names are independently read from each General.c.",
+      "newbieGroupNotSelected": 22472,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4067,
+          "skinId": 4453,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "水神玄冥"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4028,
+          "skinId": 4446,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "火神祝融"
+        },
+        {
+          "rawOrdinal": 2,
+          "sourceGeneralId": 4038,
+          "skinId": 4481,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "穷奇"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": false,
+        "hide": false,
+        "Generalshow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-elemental-trio-2472-water-base",
+            "shanhe:source-elemental-trio-2472-fire-base",
+            "shanhe:source-elemental-trio-2472-qiongqi-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-elemental-trio-2472-water-base",
+            "shanhe:source-elemental-trio-2472-fire-hard",
+            "shanhe:source-elemental-trio-2472-qiongqi-base"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-elemental-trio-2472-water-base",
+            "shanhe:source-elemental-trio-2472-fire-hard",
+            "shanhe:source-elemental-trio-2472-qiongqi-nightmare"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-elemental-trio-2472-water-base",
+            "shanhe:source-elemental-trio-2472-fire-hell",
+            "shanhe:source-elemental-trio-2472-qiongqi-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 10,
+          "chapterNumber": 3,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 11,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 12,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 14,
+          "chapterNumber": 3,
+          "minimumDifficulty": 16
+        }
+      ],
+      "runtimeProof": "All natural source catalogue candidates checked for each source tier 1..25, preserving authored member order. The catalogue is read from the existing build without starting games or test runners.",
+      "importantCase": "Every member has isBoss=false; keep complete main cards and do not invent a commander."
+    },
+    {
+      "sourceBattleId": 2450,
+      "sourceGroupId": 2450,
+      "name": "北宫伯玉与镇关石像",
+      "nameOrigin": "Current runtime OrdinaryTroopName; member names are independently read from each General.c.",
+      "newbieGroupNotSelected": 22450,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4861,
+          "skinId": 449700,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "镇关石像"
+        },
+        {
+          "rawOrdinal": 1,
+          "sourceGeneralId": 4871,
+          "skinId": 1000355,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "北宫伯玉"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": false,
+        "hide": false,
+        "Generalshow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-beigong-duo-2450-statue",
+            "shanhe:source-beigong-duo-2450-beigong-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "expectedRuntimeGeneralIds": [
+            "shanhe:source-beigong-duo-2450-statue",
+            "shanhe:source-beigong-duo-2450-beigong-hard"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 10,
+          "chapterNumber": 3,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 11,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 12,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 14,
+          "chapterNumber": 3,
+          "minimumDifficulty": 16
+        }
+      ],
+      "runtimeProof": "All natural source catalogue candidates checked for each source tier 1..25, preserving authored member order. The catalogue is read from the existing build without starting games or test runners.",
+      "importantCase": "Second member is the only commander; do not omit its base/hard runtime IDs from the artwork inventory."
+    },
+    {
+      "sourceBattleId": 2451,
+      "sourceGroupId": 2451,
+      "name": "步珩",
+      "nameOrigin": "Source General raw0 name; Fight.name is a numeric group ID, not an independently localized title.",
+      "newbieGroupNotSelected": 22451,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2451,
+        "useBg": "24",
+        "duration": 99,
+        "text": "245100",
+        "name": "2451",
+        "Ggroup": 2451,
+        "NewbieGroup": 22451,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "121",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2451,
+          "startChapter": 1,
+          "b": 4871,
+          "c": "步珩",
+          "d": "1000333",
+          "f": 0,
+          "h": 100,
+          "k": 4,
+          "l": 4,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "826",
+          "getspell_KN": "2118",
+          "getspell_EM": "993",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000333,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "步珩"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-buheng-2451-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-buheng-2451-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-buheng-2451-nightmare"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 14,
+          "fightgroup": 2451,
+          "premisegroup": 1836
+        },
+        {
+          "fightID": 16,
+          "fightgroup": 2451,
+          "premisegroup": 1276
+        },
+        {
+          "fightID": 18,
+          "fightgroup": 2451,
+          "premisegroup": 1835
+        },
+        {
+          "fightID": 19,
+          "fightgroup": 2451,
+          "premisegroup": 1830
+        },
+        {
+          "fightID": 20,
+          "fightgroup": 2451,
+          "premisegroup": 1950
+        },
+        {
+          "fightID": 21,
+          "fightgroup": 2451,
+          "premisegroup": 1830
+        },
+        {
+          "fightID": 22,
+          "fightgroup": 2451,
+          "premisegroup": 1830
+        },
+        {
+          "fightID": 26,
+          "fightgroup": 2451,
+          "premisegroup": 1950
+        }
+      ],
+      "runtimeProof": "The previous actual compiled SourceCodexDefinition1..25 inventory includes this full single-member main group2451, with every exact runtime ID and difficulty interval recorded above. Those observations match current StandardShanheSourceBuHengPackage.GetGeneralId source. SourceOrdinaryTroops calls that selector; Source2026.EnemyData retains the single4871 member. This batch does not rebuild or load the shared test DLLs.",
+      "importantCase": "The complete source main group has one member and absent g, hence no commander. Retain a full enemy card without inventing first-seat command status. No hidden or later-chapter member is waived. NewbieGroup is independent. Explicit d identifies this NPC artwork, not carrier4871 or a borrowed named hero. Candidate pool references do not claim full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2462,
+      "sourceGroupId": 2462,
+      "name": "成湛",
+      "nameOrigin": "Source General raw0 name; Fight.name is a numeric group ID, not an independently localized title.",
+      "newbieGroupNotSelected": 22462,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2462,
+        "useBg": "24",
+        "duration": 99,
+        "text": "246200",
+        "name": "2462",
+        "Ggroup": 2462,
+        "NewbieGroup": 22462,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "131",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2462,
+          "startChapter": 1,
+          "b": 4871,
+          "c": "成湛",
+          "d": "1000191",
+          "f": 0,
+          "h": 100,
+          "k": 4,
+          "l": 4,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "3270",
+          "getspell_KN": "3150",
+          "getspell_LY": "923",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000191,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "成湛"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-chengzhan-2462-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-chengzhan-2462-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-chengzhan-2462-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 14,
+          "fightgroup": 2462,
+          "premisegroup": 1837
+        },
+        {
+          "fightID": 16,
+          "fightgroup": 2462,
+          "premisegroup": 1277
+        },
+        {
+          "fightID": 18,
+          "fightgroup": 2462,
+          "premisegroup": 1836
+        },
+        {
+          "fightID": 19,
+          "fightgroup": 2462,
+          "premisegroup": 1831
+        },
+        {
+          "fightID": 20,
+          "fightgroup": 2462,
+          "premisegroup": 1273
+        },
+        {
+          "fightID": 21,
+          "fightgroup": 2462,
+          "premisegroup": 1831
+        },
+        {
+          "fightID": 22,
+          "fightgroup": 2462,
+          "premisegroup": 1831
+        },
+        {
+          "fightID": 26,
+          "fightgroup": 2462,
+          "premisegroup": 1273
+        }
+      ],
+      "runtimeProof": "The previous actual compiled SourceCodexDefinition1..25 inventory includes this full single-member main group2462, with every exact runtime ID and difficulty interval recorded above. Those observations match current StandardShanheSourceChengZhanPackage.GetGeneralId source. SourceOrdinaryTroops calls that selector; Source2026.EnemyData retains the single4871 member. This batch does not rebuild or load the shared test DLLs.",
+      "importantCase": "The complete source main group has one member and absent g, hence no commander. Retain a full enemy card without inventing first-seat command status. No hidden or later-chapter member is waived. NewbieGroup is independent. Explicit d identifies this NPC artwork, not carrier4871 or a borrowed named hero. Candidate pool references do not claim full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2478,
+      "sourceGroupId": 2478,
+      "name": "吴琮",
+      "nameOrigin": "Source General raw0 name; Fight.name is a numeric group ID, not an independently localized title.",
+      "newbieGroupNotSelected": 22478,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2478,
+        "useBg": "24",
+        "duration": 99,
+        "text": "247800",
+        "name": "2478",
+        "Ggroup": 2478,
+        "NewbieGroup": 22478,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "125",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2478,
+          "startChapter": 1,
+          "b": 4871,
+          "c": "吴琮",
+          "d": "1000257",
+          "f": 0,
+          "h": 100,
+          "k": 3,
+          "l": 3,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "equip_EM": "20526",
+          "v": "14075",
+          "getspell_KN": "451",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000257,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "吴琮"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-wucong-2478-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-wucong-2478-hard"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 10,
+          "chapterNumber": 3,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 11,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 12,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 14,
+          "chapterNumber": 3,
+          "minimumDifficulty": 16
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 23,
+          "fightgroup": 2478,
+          "premisegroup": 1284
+        },
+        {
+          "fightID": 24,
+          "fightgroup": 2478,
+          "premisegroup": 1972
+        },
+        {
+          "fightID": 25,
+          "fightgroup": 2478,
+          "premisegroup": 1972
+        },
+        {
+          "fightID": 27,
+          "fightgroup": 2478,
+          "premisegroup": 1972
+        }
+      ],
+      "runtimeProof": "The previous actual compiled SourceCodexDefinition1..25 inventory includes this full single-member main group2478, with every exact runtime ID and difficulty interval recorded above. Those observations match current StandardShanheSourceWuCongPackage.GetGeneralId source. SourceOrdinaryTroops calls that selector; Source2026.EnemyData retains the single4871 member. This batch does not rebuild or load the shared test DLLs.",
+      "importantCase": "The complete source main group has one member and absent g, hence no commander. Retain a full enemy card without inventing first-seat command status. No hidden or later-chapter member is waived. NewbieGroup is independent. Explicit d identifies this NPC artwork, not carrier4871 or a borrowed named hero. Candidate pool references do not claim full server prerequisite evaluation or random weights.",
+      "equipmentBoundaryNote": "Source equip_EM20526 adds equipment at difficulty16, but both11..15 and16..25 retain the same hard runtime general ID and same skin1000257. Roster matching therefore remains the complete11..25 ID interval; no gameplay equipment field is changed."
+    },
+    {
+      "sourceBattleId": 2479,
+      "sourceGroupId": 2479,
+      "name": "刘三刀",
+      "nameOrigin": "Source General raw0 name; Fight.name is a numeric group ID, not an independently localized title.",
+      "newbieGroupNotSelected": 22479,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2479,
+        "useBg": "24",
+        "duration": 99,
+        "text": "247900",
+        "name": "2479",
+        "Ggroup": 2479,
+        "NewbieGroup": 22479,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "101",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2479,
+          "startChapter": 1,
+          "b": 4871,
+          "c": "刘三刀",
+          "d": "1000096",
+          "f": 0,
+          "h": 100,
+          "k": 5,
+          "l": 5,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "208;1612",
+          "getspell_ZD": "386;249",
+          "getspell_KN": "314",
+          "getspell_EM": "507",
+          "getspell_LY": "917",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000096,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "刘三刀"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 5,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-liusandao-2479-base"
+          ]
+        },
+        {
+          "minDifficulty": 6,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-liusandao-2479-medium"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-liusandao-2479-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-liusandao-2479-nightmare"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-liusandao-2479-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 2,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 4,
+          "chapterNumber": 1,
+          "minimumDifficulty": 1
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 15,
+          "fightgroup": 2479
+        },
+        {
+          "fightID": 17,
+          "fightgroup": 2479
+        }
+      ],
+      "runtimeProof": "The previous actual compiled SourceCodexDefinition1..25 inventory includes this full single-member main group2479, with every exact runtime ID and difficulty interval recorded above. Those observations match current StandardShanheSourceLiuSandaoPackage.GetGeneralId source. SourceOrdinaryTroops calls that selector; Source2026.EnemyData retains the single4871 member. This batch does not rebuild or load the shared test DLLs.",
+      "importantCase": "The complete source main group has one member and absent g, hence no commander. Retain a full enemy card without inventing first-seat command status. No hidden or later-chapter member is waived. NewbieGroup is independent. Explicit d identifies this NPC artwork, not carrier4871 or a borrowed named hero. Candidate pool references do not claim full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2480,
+      "sourceGroupId": 2480,
+      "name": "荀悦",
+      "nameOrigin": "Source General raw0 name; Fight.name is a numeric group ID, not an independently localized title.",
+      "newbieGroupNotSelected": 22480,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2480,
+        "useBg": "24",
+        "duration": 99,
+        "text": "248000",
+        "name": "2480",
+        "Ggroup": 2480,
+        "NewbieGroup": 22480,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "121",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2480,
+          "startChapter": 1,
+          "b": 4871,
+          "c": "荀悦",
+          "d": "1000195",
+          "f": 0,
+          "h": 100,
+          "k": 3,
+          "l": 3,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "484",
+          "getspell_KN": "3205",
+          "getspell_LY": "889",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000195,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "荀悦"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-xunyue-2480-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 20,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-xunyue-2480-hard"
+          ]
+        },
+        {
+          "minDifficulty": 21,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-xunyue-2480-hell"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 14,
+          "fightgroup": 2480,
+          "premisegroup": 1845
+        },
+        {
+          "fightID": 16,
+          "fightgroup": 2480,
+          "premisegroup": 1829
+        },
+        {
+          "fightID": 18,
+          "fightgroup": 2480,
+          "premisegroup": 1844
+        },
+        {
+          "fightID": 19,
+          "fightgroup": 2480,
+          "premisegroup": 1839
+        },
+        {
+          "fightID": 20,
+          "fightgroup": 2480,
+          "premisegroup": 1825
+        },
+        {
+          "fightID": 21,
+          "fightgroup": 2480,
+          "premisegroup": 1839
+        },
+        {
+          "fightID": 22,
+          "fightgroup": 2480,
+          "premisegroup": 1839
+        },
+        {
+          "fightID": 26,
+          "fightgroup": 2480,
+          "premisegroup": 1825
+        }
+      ],
+      "runtimeProof": "The previous actual compiled SourceCodexDefinition1..25 inventory includes this full single-member main group2480, with every exact runtime ID and difficulty interval recorded above. Those observations match current StandardShanheSourceXunYuePackage.GetGeneralId source. SourceOrdinaryTroops calls that selector; Source2026.EnemyData retains the single4871 member. This batch does not rebuild or load the shared test DLLs.",
+      "importantCase": "The complete source main group has one member and absent g, hence no commander. Retain a full enemy card without inventing first-seat command status. No hidden or later-chapter member is waived. NewbieGroup is independent. Explicit d identifies this NPC artwork, not carrier4871 or a borrowed named hero. Candidate pool references do not claim full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2488,
+      "sourceGroupId": 2488,
+      "name": "周昕",
+      "nameOrigin": "Source General raw0 name; Fight.name is a numeric group ID, not an independently localized title.",
+      "newbieGroupNotSelected": 22488,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2488,
+        "useBg": "24",
+        "duration": 99,
+        "text": "248800",
+        "name": "2488",
+        "Ggroup": 2488,
+        "NewbieGroup": 22488,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "125",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2488,
+          "startChapter": 1,
+          "b": 4871,
+          "c": "周昕",
+          "d": "1000204",
+          "f": 0,
+          "h": 100,
+          "k": 5,
+          "l": 5,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "14095",
+          "getspell_KN": "3414",
+          "getspell_EM": "14098",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000204,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "周昕"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 10,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-armorer-2488-base"
+          ]
+        },
+        {
+          "minDifficulty": 11,
+          "maxDifficulty": 15,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-armorer-2488-hard"
+          ]
+        },
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-armorer-2488-nightmare"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 10,
+          "chapterNumber": 3,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 11,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 12,
+          "chapterNumber": 3,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 14,
+          "chapterNumber": 3,
+          "minimumDifficulty": 16
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 23,
+          "fightgroup": 2488,
+          "premisegroup": 1855
+        },
+        {
+          "fightID": 24,
+          "fightgroup": 2488,
+          "premisegroup": 1280
+        },
+        {
+          "fightID": 25,
+          "fightgroup": 2488,
+          "premisegroup": 1280
+        },
+        {
+          "fightID": 27,
+          "fightgroup": 2488,
+          "premisegroup": 1280
+        }
+      ],
+      "runtimeProof": "The previous actual compiled SourceCodexDefinition1..25 inventory includes this full single-member main group2488, with every exact runtime ID and difficulty interval recorded above. Those observations match current StandardShanheSourceArmorerPackage.GetGeneralId source. SourceOrdinaryTroops calls that selector; Source2026.EnemyData retains the single4871 member. This batch does not rebuild or load the shared test DLLs.",
+      "importantCase": "The complete source main group has one member and absent g, hence no commander. Retain a full enemy card without inventing first-seat command status. No hidden or later-chapter member is waived. NewbieGroup is independent. Explicit d identifies this NPC artwork, not carrier4871 or a borrowed named hero. Candidate pool references do not claim full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2489,
+      "sourceGroupId": 2489,
+      "name": "辛评",
+      "nameOrigin": "Source General raw0 name; Fight.name is a numeric group ID, not an independently localized title.",
+      "newbieGroupNotSelected": 22489,
+      "runtimeDifficultyRange": [
+        1,
+        25
+      ],
+      "sourceFightRow": {
+        "fightID": 2489,
+        "useBg": "24",
+        "duration": 99,
+        "text": "248900",
+        "name": "2489",
+        "Ggroup": 2489,
+        "NewbieGroup": 22489,
+        "startnum": 0,
+        "itemgroup": 200,
+        "reward": "101",
+        "reward1": "401"
+      },
+      "sourceGeneralRows": [
+        {
+          "a": 2489,
+          "startChapter": 1,
+          "b": 4871,
+          "c": "辛评",
+          "d": "1000261",
+          "f": 0,
+          "h": 100,
+          "k": 4,
+          "l": 4,
+          "m": 0,
+          "n": 0,
+          "o": 5,
+          "p": 2,
+          "q": 4,
+          "r": 0,
+          "otherad": 0,
+          "v": "3252",
+          "pvpspell": "3189"
+        }
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 4871,
+          "skinId": 1000261,
+          "isBoss": false,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "辛评"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 1,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-xinping-2489"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 1,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 3,
+          "chapterNumber": 2,
+          "minimumDifficulty": 16
+        },
+        {
+          "regionId": 5,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 6,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 7,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        },
+        {
+          "regionId": 8,
+          "chapterNumber": 2,
+          "minimumDifficulty": 1
+        },
+        {
+          "regionId": 9,
+          "chapterNumber": 2,
+          "minimumDifficulty": 6
+        },
+        {
+          "regionId": 13,
+          "chapterNumber": 2,
+          "minimumDifficulty": 11
+        }
+      ],
+      "sourceUniversalGroupReferences": [
+        {
+          "fightID": 14,
+          "fightgroup": 2489,
+          "premisegroup": 1850
+        },
+        {
+          "fightID": 16,
+          "fightgroup": 2489,
+          "premisegroup": 1834
+        },
+        {
+          "fightID": 18,
+          "fightgroup": 2489,
+          "premisegroup": 1849
+        },
+        {
+          "fightID": 19,
+          "fightgroup": 2489,
+          "premisegroup": 1844
+        },
+        {
+          "fightID": 20,
+          "fightgroup": 2489,
+          "premisegroup": 1830
+        },
+        {
+          "fightID": 21,
+          "fightgroup": 2489,
+          "premisegroup": 1844
+        },
+        {
+          "fightID": 22,
+          "fightgroup": 2489,
+          "premisegroup": 1844
+        },
+        {
+          "fightID": 26,
+          "fightgroup": 2489,
+          "premisegroup": 1830
+        }
+      ],
+      "runtimeProof": "The previous actual compiled SourceCodexDefinition1..25 inventory includes this full single-member main group2489, with every exact runtime ID and difficulty interval recorded above. Those observations match current StandardShanheSourceXinPingPackage.GetGeneralId source. SourceOrdinaryTroops calls that selector; Source2026.EnemyData retains the single4871 member. This batch does not rebuild or load the shared test DLLs.",
+      "importantCase": "The complete source main group has one member and absent g, hence no commander. Retain a full enemy card without inventing first-seat command status. No hidden or later-chapter member is waived. NewbieGroup is independent. Explicit d identifies this NPC artwork, not carrier4871 or a borrowed named hero. Candidate pool references do not claim full server prerequisite evaluation or random weights."
+    },
+    {
+      "sourceBattleId": 2684,
+      "sourceGroupId": 2684,
+      "name": "MouDongZhuo",
+      "nameOrigin": "Explicit technical family name; the original localized member name is preserved below.",
+      "newbieGroupNotSelected": 22684,
+      "runtimeDifficultyRange": [
+        16,
+        25
+      ],
+      "sourceMembers": [
+        {
+          "rawOrdinal": 0,
+          "sourceGeneralId": 605,
+          "skinId": null,
+          "isBoss": true,
+          "hide": false,
+          "startChapter": 1,
+          "generalShow": 0,
+          "sourceName": "逆京枭雄"
+        }
+      ],
+      "sourceAbsentFieldDefaults": {
+        "g": 0,
+        "hide": false,
+        "generalShow": 0
+      },
+      "runtimeVariants": [
+        {
+          "minDifficulty": 16,
+          "maxDifficulty": 25,
+          "runtimeGeneralIdsInOrder": [
+            "shanhe:source-mou-dongzhuo-2684"
+          ]
+        }
+      ],
+      "sourceAvailability": [
+        {
+          "regionId": 14,
+          "chapterNumber": 3,
+          "minimumDifficulty": 16,
+          "sourceCityIds": [
+            5148
+          ]
+        }
+      ],
+      "runtimeProof": "Source2026BossEncounter explicitly selects the one dedicated2684 body. The recorded actual CreateSourceCodexDefinition catalogs contain this exact single member, SourceVisibleEnemyCount1, at every difficulty16..25; no transitionGeneralId exists in the source recipe. The frozen Fight.Ggroup2684 contains exactly this one nonhidden,startChapter1,generalShow0 raw member.",
+      "importantCase": "The sole explicit raw g=1 establishes commander status. Source2684 is single-stage. The local Returning candidate reuses the same body and adds its own later stage but has no SourceBattleId and cannot match this source roster profile."
+    }
+  ],
+  "exclusions": [
+    {
+      "sourceBattleId": 2425,
+      "name": "白波叛军",
+      "reason": "The original Yang Feng4871 commander and Xu Huang496 follower are verified, but current source route pool references do not create a playable2425 encounter. It cannot supply roles for an unrelated two-enemy local roster."
+    },
+    {
+      "case": "six-enemy local rosters",
+      "reason": "No Fight-linked frozen source starting group contains six simultaneous members. Larger unreferenced General groups include staged transformations, not a six-enemy starting roster. Local six-enemy previews keep all actual cards and are not assigned guessed source roles."
+    },
+    {
+      "case": "2397 hidden summoning roster",
+      "reason": "The source has hidden followers while Core retains the complete implemented enemy array. A visible-count mismatch must not hide actual Core enemies or take the first N source entries. It is outside this first whitelist."
+    },
+    {
+      "sourceBattleId": 2635,
+      "name": "徐盛",
+      "rawSourceMemberCount": 3,
+      "currentRuntimeMemberCount": 1,
+      "reason": "Source2026BossEncounter deliberately projects one supported dedicated combatant for this battle. It is not the complete raw source group, so this UI must not borrow the omitted members or assign whole-group source roles to that partial recipe. It keeps the existing full-card fallback.",
+      "portraitRestorationEvidence": {
+        "sourceBattleId": 2635,
+        "name": "徐盛",
+        "rawSourceMemberCount": 3,
+        "currentRuntimeMemberCount": 1,
+        "sourceMembers": [
+          {
+            "rawOrdinal": 0,
+            "sourceGeneralId": 307,
+            "skinId": null,
+            "isBoss": false,
+            "hide": false,
+            "startChapter": 1,
+            "generalShow": 0,
+            "sourceName": "黄盖"
+          },
+          {
+            "rawOrdinal": 1,
+            "sourceGeneralId": 458,
+            "skinId": null,
+            "isBoss": true,
+            "hide": false,
+            "startChapter": 1,
+            "generalShow": 0,
+            "sourceName": "孙坚"
+          },
+          {
+            "rawOrdinal": 2,
+            "sourceGeneralId": 587,
+            "skinId": null,
+            "isBoss": false,
+            "hide": false,
+            "startChapter": 1,
+            "generalShow": 0,
+            "sourceName": "徐盛"
+          }
+        ],
+        "runtimeVariants": [
+          {
+            "minDifficulty": 1,
+            "maxDifficulty": 5,
+            "runtimeGeneralIdsInOrder": [
+              "shanhe:source-xusheng-2635-base"
+            ]
+          },
+          {
+            "minDifficulty": 6,
+            "maxDifficulty": 25,
+            "runtimeGeneralIdsInOrder": [
+              "shanhe:source-xusheng-2635-pojun"
+            ]
+          }
+        ],
+        "reason": "Source2026BossEncounter deliberately projects one supported dedicated combatant, not the complete frozen raw source group. Exact portrait bindings are valid for this raw member, but no whole-group source role or layout profile is supplied; omitted members are not introduced and the existing full-card fallback remains."
+      }
+    },
+    {
+      "sourceBattleId": 2655,
+      "name": "孙策",
+      "rawSourceMemberCount": 3,
+      "currentRuntimeMemberCount": 1,
+      "reason": "Source2026BossEncounter deliberately projects one supported dedicated combatant for this battle. It is not the complete raw source group, so this UI must not borrow the omitted members or assign whole-group source roles to that partial recipe. It keeps the existing full-card fallback.",
+      "portraitRestorationEvidence": {
+        "sourceBattleId": 2655,
+        "name": "孙策",
+        "rawSourceMemberCount": 3,
+        "currentRuntimeMemberCount": 1,
+        "sourceMembers": [
+          {
+            "rawOrdinal": 0,
+            "sourceGeneralId": 442,
+            "skinId": null,
+            "isBoss": false,
+            "hide": false,
+            "startChapter": 1,
+            "generalShow": 0,
+            "sourceName": "孙权"
+          },
+          {
+            "rawOrdinal": 1,
+            "sourceGeneralId": 609,
+            "skinId": null,
+            "isBoss": true,
+            "hide": false,
+            "startChapter": 1,
+            "generalShow": 0,
+            "sourceName": "孙坚"
+          },
+          {
+            "rawOrdinal": 2,
+            "sourceGeneralId": 452,
+            "skinId": null,
+            "isBoss": false,
+            "hide": false,
+            "startChapter": 1,
+            "generalShow": 0,
+            "sourceName": "孙策"
+          }
+        ],
+        "runtimeVariants": [
+          {
+            "minDifficulty": 6,
+            "maxDifficulty": 25,
+            "runtimeGeneralIdsInOrder": [
+              "shanhe:source-sunce-2655"
+            ]
+          }
+        ],
+        "reason": "Source2026BossEncounter deliberately projects one supported dedicated combatant, not the complete frozen raw source group. Exact portrait bindings are valid for this raw member, but no whole-group source role or layout profile is supplied; omitted members are not introduced and the existing full-card fallback remains."
+      }
+    },
+    {
+      "sourceBattleId": 2669,
+      "name": "狂暴枪王",
+      "rawSourceMemberCount": 2,
+      "currentRuntimeMemberCount": 1,
+      "reason": "Source2026BossEncounter deliberately projects one supported dedicated combatant for this battle. It is not the complete raw source group, so this UI must not borrow the omitted members or assign whole-group source roles to that partial recipe. It keeps the existing full-card fallback.",
+      "portraitRestorationEvidence": {
+        "sourceBattleId": 2669,
+        "name": "狂暴枪王",
+        "rawSourceMemberCount": 2,
+        "currentRuntimeMemberCount": 1,
+        "sourceMembers": [
+          {
+            "rawOrdinal": 0,
+            "sourceGeneralId": 484,
+            "skinId": null,
+            "isBoss": true,
+            "hide": false,
+            "startChapter": 1,
+            "generalShow": 0,
+            "sourceName": "贾诩"
+          },
+          {
+            "rawOrdinal": 1,
+            "sourceGeneralId": 415,
+            "skinId": null,
+            "isBoss": false,
+            "hide": false,
+            "startChapter": 1,
+            "generalShow": 0,
+            "sourceName": "狂暴枪王"
+          }
+        ],
+        "runtimeVariants": [
+          {
+            "minDifficulty": 1,
+            "maxDifficulty": 25,
+            "runtimeGeneralIdsInOrder": [
+              "shanhe:source-qiangwang-2669"
+            ]
+          }
+        ],
+        "reason": "Source2026BossEncounter deliberately projects one supported dedicated combatant, not the complete frozen raw source group. Exact portrait bindings are valid for this raw member, but no whole-group source role or layout profile is supplied; omitted members are not introduced and the existing full-card fallback remains."
+      }
+    },
+    {
+      "sourceBattleId": 2675,
+      "name": "荀彧",
+      "rawSourceMemberCount": 3,
+      "currentRuntimeMemberCount": 1,
+      "reason": "Source2026BossEncounter deliberately projects one supported dedicated combatant for this battle. It is not the complete raw source group, so this UI must not borrow the omitted members or assign whole-group source roles to that partial recipe. It keeps the existing full-card fallback.",
+      "portraitRestorationEvidence": {
+        "sourceBattleId": 2675,
+        "name": "荀彧",
+        "rawSourceMemberCount": 3,
+        "currentRuntimeMemberCount": 1,
+        "sourceMembers": [
+          {
+            "rawOrdinal": 0,
+            "sourceGeneralId": 602,
+            "skinId": null,
+            "isBoss": false,
+            "hide": false,
+            "startChapter": 1,
+            "generalShow": 0,
+            "sourceName": "太史慈"
+          },
+          {
+            "rawOrdinal": 1,
+            "sourceGeneralId": 623,
+            "skinId": null,
+            "isBoss": true,
+            "hide": false,
+            "startChapter": 1,
+            "generalShow": 0,
+            "sourceName": "袁绍"
+          },
+          {
+            "rawOrdinal": 2,
+            "sourceGeneralId": 515,
+            "skinId": null,
+            "isBoss": false,
+            "hide": false,
+            "startChapter": 1,
+            "generalShow": 0,
+            "sourceName": "荀彧"
+          }
+        ],
+        "runtimeVariants": [
+          {
+            "minDifficulty": 11,
+            "maxDifficulty": 25,
+            "runtimeGeneralIdsInOrder": [
+              "shanhe:source-xunyu-2675"
+            ]
+          }
+        ],
+        "reason": "Source2026BossEncounter deliberately projects one supported dedicated combatant, not the complete frozen raw source group. Exact portrait bindings are valid for this raw member, but no whole-group source role or layout profile is supplied; omitted members are not introduced and the existing full-card fallback remains."
+      }
+    }
+  ]
+}

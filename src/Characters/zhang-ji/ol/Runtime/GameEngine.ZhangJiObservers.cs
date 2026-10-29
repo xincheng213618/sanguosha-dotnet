@@ -60,11 +60,4 @@ public sealed partial class GameEngine
  private bool HasZhangJiBeforeDamageObserver(long id)=>_resolutionStack.Any(x=>x.Id==id && x is BeforeDamageProgramWindowFrame) && ZhangJiObserverRoot() is not null;
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 280)]
  private bool TryAdvanceZhangJiSubtree()=>_pendingDecision is null && ZhangJiObserverRoot() is not null && TryAdvanceObserverSubtree(true);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 510)]
- private bool AllowsZhangJiNestedDamage(ProgramSkillFrame f,int target,int amount,ProgramParticipantReference?source,DamageNature?nature,bool sourceLess)
- {
-  if(sourceLess || f.AttackAttempt is not null || f.InstructionIndex<1 || _resolutionStack.LastOrDefault()?.Id!=f.Id)return false;
-  if(f.ZhangJi is{Stage:"damage"}r && ValidZhangJi(f))return target==r.Target && amount==2 && source is null && nature is null;
-  if(ZhangJiObserverRoot() is null)return false;var e=ZhangJiPausedEffect(f)!;return e.Op==SkillProgramEffectOp.Damage && e.Amount==amount && source==e.ActorReference && nature==e.DamageNature && target==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
- }
 }

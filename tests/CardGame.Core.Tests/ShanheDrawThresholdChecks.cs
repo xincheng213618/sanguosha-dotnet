@@ -10,6 +10,46 @@ internal static class ShanheDrawThresholdChecks
     private const string Owner = "fixture:draw-threshold-owner", Peer = "fixture:draw-threshold-peer";
     private const string Driver = "fixture:draw-threshold-driver", Quiet = "fixture:draw-threshold-quiet";
     private const string Deck = "fixture:draw-threshold-deck";
+    private const string CurrentTactic = "shanhe:current-shenlong-baiwei-2143", Jieming = "boundary:jieming-current";
+
+    public static void NativePaidDrawsInsertThresholdDamageAndReturnToOriginalDamageCold()
+    {
+        foreach (var profile in new[] { Profile.Capped, Profile.NativeBenefit })
+        foreach (var nestedVictimDies in new[] { false, true })
+        {
+            var s = Scene.Start(profile, nestedVictimDies);
+            Need(s.Hits().Length == 0, "The fixed opening stays below the real draw threshold.");
+            s.HitThroughNativePaidDraw(profile);
+            if (nestedVictimDies)
+                Need(s.Game.ResolutionStack.OfType<ProgramSkillFrame>().Any(frame =>
+                        frame.AttackAttempt is not null && frame.AttackReturn?.Insertion is not null),
+                    "The real inserted lethal hit uses the shared scheduler scope rather than a skill-specific permission.");
+            var reason = profile == Profile.Capped ? "program.capped-hand-refresh.draw" : "program.applied-damage-benefit.draw";
+            var invoice = s.OwnerInvoices().Single(item => item.Reason.Value == reason);
+            var target = s.Events<NativeDrawThresholdTargetChosenEvent>().Single();
+            Need(invoice.ProgramOrigin is { } origin && origin.Source.OwnerSeat == 0 &&
+                origin.Operation == (profile == Profile.Capped ? SkillProgramEffectOp.DrawThenDiscardHandToMaximumHp : SkillProgramEffectOp.DrawOwnerAtAppliedDamage),
+                "Every native draw retains its actual issuing skill instance, content hash and paused instruction.");
+            Need(invoice.ActualCount == (profile == Profile.Capped ? 5 : 4) && target.InvocationId == invoice.InvocationId &&
+                s.Hits() is [{ SourceSeat: 0, TargetSeat: 2 or 3, Amount: 1 }] &&
+                s.Events<DamageAppliedEvent>().Single(item => item.TargetSeat == 0) is { SourceSeat: 2, Amount: 1 },
+                "A paid native instruction's real draw inserts one enemy-only threshold hit inside the original sourced damage.");
+            s.Cold();
+            s.FinishNativePaidDraw();
+            Need(s.OwnerInvoices().Count(item => item.Reason.Value == reason) == 1 &&
+                s.Events<NativeDrawThresholdTargetChosenEvent>().Length == 1 && s.Hits().Length == 1 &&
+                s.Events<PlayerDiedEvent>().Length == (nestedVictimDies ? 1 : 0) &&
+                s.Game.ResolutionStack.All(frame => frame is not DamageFrame and not DamageTriggerWindowFrame and not ProgramSkillFrame) &&
+                !s.Game.IsFaulted,
+                "Cold recovery never repeats the paid draw or inserted hit, and every child returns to the original Play prompt.");
+            if (profile == Profile.Capped)
+                Need(s.View().HandCount == 5 && s.Events<ProgramCappedHandRefreshCompletedEvent>() is [{ Completed: true }],
+                    "Jieming's target-owned discard completes only after the inserted damage returns and retains the original five-card cap.");
+            s.AssertActualMaterials();
+            if (profile == Profile.NativeBenefit) s.AssertProgramOriginCannotBeReassigned(invoice);
+            s.Cold();
+        }
+    }
 
     public static void NiepanDyingDrawCrossesOneThresholdAndResumesOriginalDamage()
     {
@@ -54,11 +94,11 @@ internal static class ShanheDrawThresholdChecks
 
     private static void Need(bool value, string message, object? details = null)
     { if (!value) throw new InvalidOperationException(details is null ? message : message + " " + JsonSerializer.Serialize(details)); }
-    private enum Profile { Mixed, Large, Late, Niepan }
+    private enum Profile { Mixed, Large, Late, Niepan, Capped, NativeBenefit }
 
     private sealed class Scene(GameEngine game)
     {
-        public GameEngine Game { get; } = game;
+        public GameEngine Game { get; private set; } = game;
         public bool ReplaceNextNormalDraw { get; set; }
         private PendingDecision? Prompt => Game.PendingDecision;
         public PlayerSnapshot View(int seat = 0) => Game.CreateSnapshot(seat).Players[seat];
@@ -97,6 +137,59 @@ internal static class ShanheDrawThresholdChecks
         private void Play() => Reach(() => Prompt is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
         public void Use(string activation, int[]? targets = null)
         { Accept(new UseProgramSkillCommand(0, Driver, activation, [], targets ?? [], Game.Revision, Prompt!.PromptId)); Play(); }
+        public void HitThroughNativePaidDraw(Profile profile)
+        {
+            Accept(new UseProgramSkillCommand(0, Driver, "hit-me", [], [2], Game.Revision, Prompt!.PromptId));
+            if (profile == Profile.Capped)
+            {
+                Reach(() => Prompt?.SkillPrompt?.SkillId == Jieming &&
+                    Prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate"));
+                Answer(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate");
+                Reach(() => Prompt?.SkillPrompt?.SkillId == Jieming && Prompt.Choices.Any(choice => choice.Targets.SequenceEqual([0])));
+                Cold();
+                Answer(choice => choice.Targets.SequenceEqual([0]));
+            }
+            Reach(() => Events<NativeDrawThresholdTargetChosenEvent>().Length == 1);
+        }
+        public void FinishNativePaidDraw() => Play();
+        public void Cold()
+        {
+            var checkpoint = GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(Game.CreateCheckpoint()));
+            var registry = Game.ContentRegistry;
+            var restored = GameReplay.Restore(checkpoint, registry);
+            Need(SnapshotJson.Serialize(restored.CreateSnapshot(0)) == SnapshotJson.Serialize(Game.CreateSnapshot(0)) &&
+                GameCheckpointJson.Serialize(restored.CreateCheckpoint()) == GameCheckpointJson.Serialize(Game.CreateCheckpoint()),
+                "The native draw, pending target discard and nested damage return restore from the unchanged command prefix.");
+            Game = restored;
+        }
+        public void AssertProgramOriginCannotBeReassigned(NativeDrawInvocationRecordedEvent invoice)
+        {
+            var materials = Game.CardMovements.Where(move => move.Sequence > invoice.SequenceBefore && move.Sequence <= invoice.SequenceAfter &&
+                    move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(invoice.OwnerSeat) && move.Reason == invoice.Reason)
+                .Select(move => new NativeDrawMaterial(move.CardId, move.CardKind, move.Sequence)).ToArray();
+            var proof = new NativeDrawInvocationProof
+            {
+                InvocationId = invoice.InvocationId, ParentFrameId = invoice.ParentFrameId, OwnerSeat = invoice.OwnerSeat,
+                RequestedCount = invoice.Requested, ActualTurnNumber = invoice.TurnNumber, ActualTurnOwnerSeat = invoice.ActualTurnOwnerSeat,
+                PhaseActorSeat = invoice.PhaseActorSeat, Phase = invoice.Phase, DirectProducer = invoice.DirectProducer,
+                ProgramOrigin = invoice.ProgramOrigin, Reason = invoice.Reason, SequenceBefore = invoice.SequenceBefore,
+                SequenceAfter = invoice.SequenceAfter, LastBatchId = invoice.LastBatchId, Materials = materials,
+                ThresholdProgress = Events<NativeDrawThresholdProgressedEvent>().Where(item => item.InvocationId == invoice.InvocationId)
+                    .Select(item => new NativeDrawThresholdProgress(item.Source, item.GameplayHash, item.Threshold,
+                        item.RemainderBefore, item.ActualCount, item.Crossings, item.RemainderAfter)).ToArray()
+            };
+            var validate = typeof(GameEngine).GetMethod("ValidNativeDrawInvocation",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+            bool Valid(NativeDrawInvocationProof value) => (bool)validate.Invoke(Game, [value])!;
+            var origin = proof.ProgramOrigin!;
+            Need(Valid(proof) && !Valid(proof with { ProgramOrigin = null }) &&
+                !Valid(proof with { ProgramOrigin = origin with { InstructionIndex = origin.InstructionIndex + 1 } }) &&
+                !Valid(proof with { ProgramOrigin = origin with { GameplayHash = "forged" } }) &&
+                !Valid(proof with { ProgramOrigin = origin with { Source = origin.Source with { SkillInstanceId = "other-instance" } } }),
+                "The shared invoice accepts its real native producer and rejects removing or reassigning its instruction, content or instance.");
+        }
+        private void Answer(Func<PromptChoice, bool> choose) =>
+            Accept(new AnswerPromptCommand(0, Prompt!.PromptId, Prompt.Choices.First(choose).Id, Game.Revision));
         public long HitThroughNiepan()
         {
             Accept(new UseProgramSkillCommand(0, Driver, "hit-me", [], [2], Game.Revision, Prompt!.PromptId));
@@ -128,16 +221,16 @@ internal static class ShanheDrawThresholdChecks
         }
         public static Scene Start(Profile profile, bool nestedVictimDies = false)
         {
-            var registry = profile == Profile.Niepan
+            var registry = profile is Profile.Niepan or Profile.Capped
                 ? ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(includeJijiu: true),
                     new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(),
                     new StandardShanheS5YuduPackage(), new StandardShanheDrawThresholdPackage(), new Fixture(profile))
                 : ContentRegistry.Build(new StandardContentPackage(), new StandardShanheDrawThresholdPackage(), new Fixture(profile));
-            var setup = new ShanheBattleSetup(83, 1, "fixture:draw-threshold", Owner, profile == Profile.Niepan ? 1 : 30, 0, 0, 0, 0,
-                profile == Profile.Mixed ? [Tuxi] : profile == Profile.Niepan ? [Niepan] : [], [new(CardKind.Peach, Suit.Heart, 7)], [],
+            var setup = new ShanheBattleSetup(83, 1, "fixture:draw-threshold", Owner, profile == Profile.Niepan ? 1 : profile == Profile.Capped ? 5 : 30, 0, 0, 0, 0,
+                profile == Profile.Mixed ? [Tuxi] : profile == Profile.Niepan ? [Niepan] : profile == Profile.Capped ? [Jieming] : [], [new(CardKind.Peach, Suit.Heart, 7)], [],
                 [new(Peer, Hp: nestedVictimDies ? 1 : null) { StartingHand = [] }, new(Peer, Hp: nestedVictimDies ? 1 : null) { StartingHand = [] }],
                 [new(Peer) { StartingHand = [] }], new string('9', 64))
-                { TacticSkillIds = profile == Profile.Late ? [] : [Tactic] };
+                { TacticSkillIds = profile == Profile.Late ? [] : profile == Profile.Capped ? [CurrentTactic] : [Tactic] };
             var scene = new Scene(GameEngine.CreateStandard(new()
             {
                 Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,
@@ -153,10 +246,16 @@ internal static class ShanheDrawThresholdChecks
         public PackageManifest Manifest { get; } = new("fixture-shanhe-draw-threshold", new(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
-            if (profile != Profile.Niepan) CharacterFixtureContent.Register(builder, "classic:zhang-liao");
+            if (profile is not (Profile.Niepan or Profile.Capped)) CharacterFixtureContent.Register(builder, "classic:zhang-liao");
             var afterDamage = profile == Profile.Large ? "," + """
                 {"id":"draw-after-damage","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamage","optional":false,"usageScope":"game","usageLimit":1,
                  "effects":[{"op":"draw","target":"owner","amount":20}]}
+                """ : profile == Profile.NativeBenefit ? "," + """
+                {"id":"native-draw-after-damage","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamage","optional":false,"usageScope":"game","usageLimit":1,
+                 "effects":[{"op":"drawOwnerAtAppliedDamage","target":"owner","amount":4},
+                    {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},
+                     "cardOwnerRef":{"kind":"eventTarget"},"zones":["equipment","judgment"],"count":1,
+                     "destination":"discardPile","skipIfNoCards":true,"awaitMovementTriggers":true}]}
                 """ : "";
             var rules = $$$"""
                 {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[
@@ -180,7 +279,7 @@ internal static class ShanheDrawThresholdChecks
             }));
             foreach (var (id, program) in programs.Programs)
                 builder.AddSkill(new(id, id, id) { Program = program, ProgramPresentation = programs.Presentations[id] });
-            builder.AddGeneral(new(Owner, "独立神龙摆尾持有者", "supporter", Driver, "shu", 30));
+            builder.AddGeneral(new(Owner, "独立神龙摆尾持有者", "supporter", Driver, "shu", profile == Profile.Capped ? 5 : 30));
             builder.AddGeneral(new(Peer, "真实队伍成员", "supporter", Quiet, "wei", 30));
             builder.AddDeck(new(Deck, "固定真实实体闪", 2, 2, [])
             { PhysicalCards = Enumerable.Range(0, 128).Select(index => new ContentDeckPhysicalCard("standard:dodge", Suit.Diamond, index % 13 + 1)).ToArray() });

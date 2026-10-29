@@ -74,7 +74,7 @@ public sealed partial class GameEngine
     }
     private bool ZhangYiObserverSuffix(int root) => HasObserverSuffix(root,
         static (e, i) => e.IsMovementObserverEdge(i) || e.RecoveryReplacementFrameRidesOn(e._resolutionStack[i], e._resolutionStack[i - 1]) ||
-            e.PaidTargetObserverEdge(i), static (e, i, dying) => e.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
+            e.ProgramChildResolutionEdge(i), static (e, i, dying) => e.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     private ProgramSkillFrame? ZhangYiObserverRoot() => FindProgramObserverRoot(static (e, f, child) => e.ZhangYiFirstChild(f, child), static (e, i) => e.ZhangYiObserverSuffix(i));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1510)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1620)]
@@ -85,14 +85,6 @@ public sealed partial class GameEngine
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1480)]
     private bool IsZhangYiDying() => ActiveDying is { } dying && ZhangYiObserverRoot() is { } root &&
         _resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 2130)]
-    private bool AllowsZhangYiNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (sourceLess || f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id || ZhangYiObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var effect = GetPausedPrivateOfferEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature &&
-            target == (effect.TargetReference is { } participant ? ResolveProgramParticipant(f, participant) : ResolveProgramEffectTarget(f, effect.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26400)]
     private bool AdvanceZhangYiSubtree() => _pendingDecision is null && ZhangYiObserverRoot() is not null && TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

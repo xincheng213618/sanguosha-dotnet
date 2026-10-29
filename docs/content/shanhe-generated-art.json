@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "description": "Original local Shanhe artwork, kept separate from official NPC source assets.",
+  "assets": [
+    {
+      "file": "src/CardGame.Wpf/Assets/Shanhe/Npc/local-medic-original-v1.png",
+      "generalId": "shanhe:local-medic",
+      "origin": "original-ai-generated-artwork",
+      "tool": "image_gen.imagegen (built-in)",
+      "generationId": "exec-e47e4f45-939e-45b6-8c5e-a80e100e6761",
+      "createdOnLocalDate": "2026-10-29",
+      "width": 1161,
+      "height": 1355,
+      "bytes": 2688406,
+      "sha256": "9a81b1ae0673d3e88201713d2611599fafca26971b37ffa36276036cf7efa725",
+      "prompt": "Use case: stylized-concept. Asset type: one original NPC portrait for a Chinese Three Kingdoms card game. Create an original male military physician in his late thirties, not a famous named historical general. A hand-painted late-Han fantasy strategy-card illustration with visible painterly brushwork, realistic stylized anatomy and a restrained grey-blue, muted teal and warm brown palette, matching small classic Chinese game character cards. Three-quarter torso portrait, face centered in the upper third with breathing room above his tied black hair; serious but compassionate expression, practical blue-grey linen robe and light leather shoulder protection, a modest cloth head wrap, medicine satchel at his waist, one hand holding a roll of clean linen bandage and the other resting on a wooden medicine case with herbs. Subtle low-contrast military camp tent and distant hills behind him. Portrait canvas approximately 6:7 aspect ratio; keep face and profession-defining items clear when reduced to a 146 by 172 pixel card and allow a bottom nameplate overlay. A complete opaque painted background. No text, no card border, no logo, no watermark, no modern medical equipment or red cross, no imperial crown, no extra characters. This is a new original local-game NPC artwork, not an edit or reproduction of an existing portrait.",
+      "references": "Existing official generic soldier and guard cards were inspected for palette and framing; no image files were sent as edit targets or generation references.",
+      "reason": "The source database provides a female generic physician4415, while this locally authored medic is male. The original local illustration preserves the existing gameplay gender rather than substituting a named official general or changing rules to fit an image.",
+      "visualVerification": "Inspected the generated illustration: one male physician, bandage and medicine case, no labels or frame. The complete generated PNG is copied without image editing; runtime portrait rendering handles display scaling."
+    }
+  ]
+}

@@ -87,13 +87,5 @@ public sealed partial class GameEngine
     private bool HasZhaoZhongBeforeDamageObserver(long id) => ZhaoZhongObserverRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1070)]
     private bool IsZhaoZhongDying() => ActiveDying is { } d && ZhaoZhongObserverRoot() is { } f && _resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 1640)]
-    private bool AllowsZhaoZhongNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
-    {
-        if (f.AttackAttempt is not null || _resolutionStack.LastOrDefault()?.Id != f.Id) return false;
-        if (f.ZhaoZhong is { Paid: true, Stage: ZhaoZhongStage.NextDamageChildren } r) return target == r.TargetSeat && amount == 1 && source is null && nature == DamageNature.Thunder && !sourceLess && ProgramEventHistory<DiciThunderIssuedEvent>().Count(e => e.FrameId == f.Id && e.LeaseId == r.LeaseId && e.SourceSeat == f.OwnerSeat && e.TargetSeat == target) == 1;
-        if (ZhaoZhongObserverRoot() is not { } root || root.Id == f.Id) return false;
-        var e = GetPausedPrivateOfferEffect(f); return e is { Op: SkillProgramEffectOp.Damage } && e.Amount == amount && e.ActorReference == source && e.DamageNature == nature && target == (e.TargetReference is { } p ? ResolveProgramParticipant(f, p) : ResolveProgramEffectTarget(f, e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28110)] private bool AdvanceZhaoZhongChildren() => _pendingDecision is null && ZhaoZhongObserverRoot() is not null && TryAdvanceObserverSubtree(true);
 }

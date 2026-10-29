@@ -83,11 +83,6 @@ public sealed partial class GameEngine
  private bool IsLvQianDying()=>ActiveDying is{}d&&LvQianObserverRoot()is{}r&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 380)]
  private bool TryAdvanceLvQianSubtree()=>_pendingDecision is null&&LvQianObserverRoot()is not null&&TryAdvanceObserverSubtree(advanceRecoveryReplacement:true);
- [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 610)]
- private bool AllowsLvQianNestedDamage(ProgramSkillFrame observer,int target,int amount,ProgramParticipantReference?source,DamageNature?nature,bool sourceLess)
- {
-  if(sourceLess||observer.WindowContext?.Window is not(SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged)||observer.AttackAttempt is not null||observer.InstructionIndex<1||_resolutionStack.LastOrDefault()?.Id!=observer.Id||LvQianObserverRoot()is not{}r||r.Id==observer.Id)return false;var e=GetPausedPrivateOfferEffect(observer);return e is{Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&target==(e.TargetReference is{}p?ResolveProgramParticipant(observer,p):ResolveProgramEffectTarget(observer,e.Target));
- }
 
  private bool IsLvQianRecoveryCompletion(ProgramSkillFrame f,RecoveryAttempt attempt)=>f.LvQian is{Stage:LvQianStage.RecoveryChildren,HpProof:{Kind:HpChangeKind.Recovery}proof,Phase:{}phase}r&&phase==f.WindowContext?.WeiluPhase&&attempt.SourceSeat==f.OwnerSeat&&attempt.TargetSeat==proof.TargetSeat&&attempt.Amount==proof.Amount&&attempt.HpBefore==proof.HpBefore&&attempt.Completion.Producer==RecoveryAttemptProducer.Program&&attempt.Completion.InstructionIndex==f.InstructionIndex&&CompleteProgramEventHistory().OfType<WeiluDebtConsumedEvent>().Count(e=>e.FrameId==f.Id&&e.Phase==phase&&e.TargetSeat==proof.TargetSeat&&e.TargetAlive&&e.Amount>=proof.Amount)==1;
 

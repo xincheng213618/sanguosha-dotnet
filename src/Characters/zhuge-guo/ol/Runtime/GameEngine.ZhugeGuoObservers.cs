@@ -1,4 +1,4 @@
-﻿namespace CardGame.Core;
+namespace CardGame.Core;
 public sealed partial class GameEngine
 {
     private bool _hasIssuedZhugeGuoState;
@@ -38,12 +38,6 @@ public sealed partial class GameEngine
     private bool HasZhugeGuoBeforeDamageObserver(long id)=>ZhugeGuoObserverRoot()is{}r&&_resolutionStack.Any(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)&&_resolutionStack.FindIndex(f=>f.Id==id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 70)]
     private bool IsZhugeGuoDying()=>ActiveDying is{}dying&&ZhugeGuoObserverRoot()is{}r&&_resolutionStack.FindIndex(f=>f.Id==dying.Id)>_resolutionStack.FindIndex(f=>f.Id==r.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 440)]
-    private bool AllowsZhugeGuoNestedDamage(ProgramSkillFrame observer,int target,int amount,ProgramParticipantReference?source,DamageNature?nature,bool sourceLess)
-    {
-        if(sourceLess||observer.AttackAttempt is not null||observer.InstructionIndex<1||_resolutionStack.LastOrDefault()?.Id!=observer.Id||observer.WindowContext?.Window is not(SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.DiscardPileReceived or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged or SkillProgramTriggerWindow.SkillsChanged)||ZhugeGuoObserverRoot()is not{}root||root.Id==observer.Id)return false;
-        var e=GetPausedPrivateOfferEffect(observer);return e is{Op:SkillProgramEffectOp.Damage}&&amount==e.Amount&&source==e.ActorReference&&nature==e.DamageNature&&target==(e.TargetReference is{}reference?ResolveProgramParticipant(observer,reference):ResolveProgramEffectTarget(observer,e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 200)]
     private bool TryAdvanceZhugeGuoSubtree()=>_pendingDecision is null&&ZhugeGuoObserverRoot()is not null&&TryAdvanceObserverSubtree(advanceRecoveryReplacement:true);
 }

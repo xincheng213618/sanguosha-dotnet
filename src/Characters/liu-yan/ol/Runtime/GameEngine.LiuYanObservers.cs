@@ -36,11 +36,5 @@ public sealed partial class GameEngine
     private bool HasLiuYanBeforeDamageObserver(long id)=>HasLiuYanDamageObserver(id);
     [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 680)]
     private bool IsLiuYanDying()=>IsLiuYanOriginalDyingRide()||ActiveDying is{}d&&LiuYanObserverRoot()is{}root&&_resolutionStack.FindIndex(f=>f.Id==d.Id)>_resolutionStack.FindIndex(f=>f.Id==root.Id);
-    [ProgramNestedDamageProof(ProgramNestedDamageProofPhase.AfterFactionDebts, 2040)]
-    private bool AllowsLiuYanNestedDamage(ProgramSkillFrame f,int targetSeat,int amount,ProgramParticipantReference? sourceReference,DamageNature? nature,bool sourceLess)
-    {
-        if(sourceLess||f.AttackAttempt is not null||_resolutionStack.LastOrDefault()?.Id!=f.Id||LiuYanObserverRoot()is not{}root||root.Id==f.Id)return false;
-        var e=GetPausedPrivateOfferEffect(f);return e is{Op:SkillProgramEffectOp.Damage}&&e.Amount==amount&&e.ActorReference==sourceReference&&e.DamageNature==nature&&targetSeat==(e.TargetReference is{}p?ResolveProgramParticipant(f,p):ResolveProgramEffectTarget(f,e.Target));
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27230)]private bool AdvanceLiuYanChildren()=>_pendingDecision is null&&LiuYanObserverRoot()is not null&&TryAdvanceObserverSubtree(true);
 }
