@@ -11,7 +11,8 @@
       { "id": "self-dying-recovery", "window": "selfDyingResponse", "subject": "owner", "optional": true, "usageScope": "game", "usageLimit": 1,
         "effects": [
           { "op": "recoverTo", "target": "owner", "numberExpression": "livingFactionCount", "minimumValue": 1, "clampToMaxHp": true },
-          { "op": "turnOverBoundaryLiaoHuaIfUniqueHighestHp", "target": "owner" }
+          { "op": "turnOver", "target": "owner", "condition": { "kind": "expression", "expr":
+            ["and", ["hasHp", "owner"], ["all", "livingOthers", ["or", ["not", ["hasHp", "it"]], ["<", ["hp", "it"], ["hp", "owner"]]]]] } }
         ] }
     ] }
   ]

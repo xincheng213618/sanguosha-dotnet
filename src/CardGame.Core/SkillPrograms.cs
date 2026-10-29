@@ -26,7 +26,7 @@ public enum SkillRuleOperation { Add, Set, Unlimited }
 public enum SkillRuleRecipientScope { Owner = 0, OtherPublicTeamAllies = 1 }
 public enum SkillRuleValueExpression { LivingFactionCount, OwnedZoneCount, OwnerLostHp = 2, NegatedOwnedZoneCount = 3, NegatedOwnerLostHp = 900, EmptyCampaignSkillSlotCount = 2226, OwnerMarkerCount = 2600, CurrentTurnUsedHandSuitCount = 4600, PublicLivingFactionCount = 5200, OwnerMaxHp = 5600, NegatedLivingFemaleCount = 21400, NegatedCurrentRoundActualUseCount = 27260, PublicTeamEnemyCount = 27600, OtherPublicTeamAllyCount = 27602, CurrentTurnDrawPhaseDrawCountHalfFloor = 27900, OtherLivingPlayerCount = 27910 }
 public enum SkillRuleQueryDependency { MarkerState }
-public enum SkillProgramConditionKind { Always, OwnTurn, NotOwnTurn, Wounded, HpAtLeast, HandCountAtLeast, CardUseIsRed, SelectedTargetIsOther, SelectedTargetHandGreaterThanOwner, PindianWon, PindianNotWon, BooleanState, All, Any, Not, FaceDown, Chained, ChoiceIs, BoundCardsSameColor, BoundCardsMatchCategories, BoundCardsMatchKinds = 20, HasClaimableDamageCards = 21, AttackRangeCoverageDecreased = 22, HasOwnedCardCategory = 23, BoundCardCountAtLeast = 24, ActivationCardCountAtLeast = 25, ClassicIdentityMode = 26, BoundCardSuitMatchesChoice = 27, BoundCardsMatchSuits = 28, BoundCardCategoryMatchesCardAction = 29, EventTargetGenderIs = 30, EventSourceGenderIs = 31, EventSourceExists = 32, SelectedTargetWounded = 820, SelectedTargetHpGreaterThanOwner = 47200, RuntimeBooleanState = 450, PublicCounterAtLeast = 451, PublicCounterOdd = 452, HandCountGreaterThanHp = 1020, PositiveHandLimit = 1021, HasUsableHandCard = 1022, RequestedSlashDamagedOwner = 1023, PreviousPlayCardIsBasic = 1024, NoWeapon = 11300, NoArmor = 22501, NoMounts = 22502, NoTreasure = 22503, JudgmentOutcomeMatchesSuits = 14400, OwnPlayPhase = 27603 }
+public enum SkillProgramConditionKind { Always, OwnTurn, NotOwnTurn, Wounded, HpAtLeast, HandCountAtLeast, CardUseIsRed, SelectedTargetIsOther, SelectedTargetHandGreaterThanOwner, PindianWon, PindianNotWon, BooleanState, All, Any, Not, FaceDown, Chained, ChoiceIs, BoundCardsSameColor, BoundCardsMatchCategories, BoundCardsMatchKinds = 20, HasClaimableDamageCards = 21, AttackRangeCoverageDecreased = 22, HasOwnedCardCategory = 23, BoundCardCountAtLeast = 24, ActivationCardCountAtLeast = 25, ClassicIdentityMode = 26, BoundCardSuitMatchesChoice = 27, BoundCardsMatchSuits = 28, BoundCardCategoryMatchesCardAction = 29, EventTargetGenderIs = 30, EventSourceGenderIs = 31, EventSourceExists = 32, SelectedTargetWounded = 820, SelectedTargetHpGreaterThanOwner = 47200, RuntimeBooleanState = 450, PublicCounterAtLeast = 451, PublicCounterOdd = 452, HandCountGreaterThanHp = 1020, PositiveHandLimit = 1021, HasUsableHandCard = 1022, RequestedSlashDamagedOwner = 1023, PreviousPlayCardIsBasic = 1024, NoWeapon = 11300, NoArmor = 22501, NoMounts = 22502, NoTreasure = 22503, JudgmentOutcomeMatchesSuits = 14400, OwnPlayPhase = 27603, Expression = 70000 }
 public enum SkillProgramTriggerConditionKind
 {
     Always,
@@ -342,7 +342,6 @@ public enum SkillProgramEffectOp
     PrepareBoundaryCaoZhangJiangchi = 55500,
     ArmBoundaryCaoZhangJiangchi = 55501,
     ObtainBoundaryLiaoHuaDiscardSlash = 55600,
-    TurnOverBoundaryLiaoHuaIfUniqueHighestHp = 55601,
     ResolveBoundaryLiRuMieji = 55700,
     PrepareBoundaryBuLianShiAnxu = 55900,
     SelectBoundaryBuLianShiAnxuLeast = 55901,
@@ -367,7 +366,6 @@ public enum SkillProgramEffectOp
     DistributeBoundaryXiahouDunQingjian = 60011,
     GiveMobileYajiaoRevealedCard = 60501,
     ResolveMobileSunJianPolu = 65001,
-    DrawMobileJiemingOwnerIfRecipientShort = 65201,
     ConsumeMobileQiangxiTarget = 65301,
     ClaimBoundaryYanLiangWenChouDuelResponses = 65710,
     ResolveBoundarySunCeZhiba = 66300,
@@ -2055,9 +2053,11 @@ public sealed class SkillProgramCondition
         IReadOnlyList<Suit>? suits = null,
         IReadOnlyList<CardZoneKind>? zones = null,
         string? choiceBind = null,
-        GeneralGender? gender = null)
+        GeneralGender? gender = null,
+        ProgramExpression? expression = null)
     {
         Kind = kind;
+        Expression = expression;
         Value = value;
         Children = children;
         SourceBind = sourceBind;
@@ -2088,6 +2088,7 @@ public sealed class SkillProgramCondition
     public IReadOnlyList<CardZoneKind> Zones { get; }
     public string? ChoiceBind { get; }
     public GeneralGender? Gender { get; }
+    public ProgramExpression? Expression { get; }
 
     internal bool RequiresHandLimitContext { get; }
     internal bool ReferencesOwnerHp => Kind is SkillProgramConditionKind.Wounded or SkillProgramConditionKind.HpAtLeast or SkillProgramConditionKind.HandCountGreaterThanHp or SkillProgramConditionKind.SelectedTargetHpGreaterThanOwner || Children.Any(child => child.ReferencesOwnerHp);
@@ -2205,7 +2206,8 @@ public sealed class SkillProgramCondition
                 SkillProgramConditionKind.ActivationCardCountAtLeast or
                 SkillProgramConditionKind.BoundCardSuitMatchesChoice or
                 SkillProgramConditionKind.BoundCardCategoryMatchesCardAction or
-                SkillProgramConditionKind.RequestedSlashDamagedOwner or SkillProgramConditionKind.EventSourceExists =>
+                SkillProgramConditionKind.RequestedSlashDamagedOwner or SkillProgramConditionKind.EventSourceExists or
+                SkillProgramConditionKind.Expression =>
                 throw new InvalidOperationException($"Condition '{Kind}' requires a running program frame."),
             SkillProgramConditionKind.All => Children.All(child => child.Evaluate(context, cardUseIsRed,
                 eventTargetIsFemale, eventSourceIsFemale)),
@@ -2242,8 +2244,10 @@ public sealed class SkillProgramCondition
         bool? eventTargetIsFemale = null,
         bool? eventSourceIsFemale = null,
         bool? requestedSlashDamagedOwner = null,
-        bool? eventSourceExists = null) => Kind switch
+        bool? eventSourceExists = null,
+        Func<ProgramExpression, bool?>? expression = null) => Kind switch
         {
+            SkillProgramConditionKind.Expression => expression?.Invoke(Expression!) == true,
             SkillProgramConditionKind.EventSourceExists => eventSourceExists == true,
             SkillProgramConditionKind.RequestedSlashDamagedOwner => requestedSlashDamagedOwner == true,
             SkillProgramConditionKind.ActivationCardCountAtLeast => activationCardCount >= Value,
@@ -2273,9 +2277,9 @@ public sealed class SkillProgramCondition
                 selectedTarget is not null && selectedTarget.HandCount > context.HandCount,
             SkillProgramConditionKind.SelectedTargetHpGreaterThanOwner =>
                 !context.HpUndefined && selectedTarget is { HpUndefined: false } && selectedTarget.Hp > context.Hp,
-            SkillProgramConditionKind.All => Children.All(child => child.Evaluate(context, selectedTarget, pindianWon, booleanState, cardUseIsRed, choiceResult, boundCardsSameColor, boundCardsMatchCategories, boundCardsMatchKinds, attackRangeCoverageDecreased, boundCardCount, activationCardCount, boundCardSuitMatchesChoice, boundCardsMatchSuits, boundCardCategoryMatchesCardAction, eventTargetIsFemale, eventSourceIsFemale, requestedSlashDamagedOwner, eventSourceExists)),
-            SkillProgramConditionKind.Any => Children.Any(child => child.Evaluate(context, selectedTarget, pindianWon, booleanState, cardUseIsRed, choiceResult, boundCardsSameColor, boundCardsMatchCategories, boundCardsMatchKinds, attackRangeCoverageDecreased, boundCardCount, activationCardCount, boundCardSuitMatchesChoice, boundCardsMatchSuits, boundCardCategoryMatchesCardAction, eventTargetIsFemale, eventSourceIsFemale, requestedSlashDamagedOwner, eventSourceExists)),
-            SkillProgramConditionKind.Not => !(context.HpUndefined && ReferencesOwnerHp || selectedTarget?.HpUndefined == true && ReferencesSelectedTargetHp) && !MissingEquipmentPresence(context) && !Children[0].Evaluate(context, selectedTarget, pindianWon, booleanState, cardUseIsRed, choiceResult, boundCardsSameColor, boundCardsMatchCategories, boundCardsMatchKinds, attackRangeCoverageDecreased, boundCardCount, activationCardCount, boundCardSuitMatchesChoice, boundCardsMatchSuits, boundCardCategoryMatchesCardAction, eventTargetIsFemale, eventSourceIsFemale, requestedSlashDamagedOwner, eventSourceExists),
+            SkillProgramConditionKind.All => Children.All(child => child.Evaluate(context, selectedTarget, pindianWon, booleanState, cardUseIsRed, choiceResult, boundCardsSameColor, boundCardsMatchCategories, boundCardsMatchKinds, attackRangeCoverageDecreased, boundCardCount, activationCardCount, boundCardSuitMatchesChoice, boundCardsMatchSuits, boundCardCategoryMatchesCardAction, eventTargetIsFemale, eventSourceIsFemale, requestedSlashDamagedOwner, eventSourceExists, expression)),
+            SkillProgramConditionKind.Any => Children.Any(child => child.Evaluate(context, selectedTarget, pindianWon, booleanState, cardUseIsRed, choiceResult, boundCardsSameColor, boundCardsMatchCategories, boundCardsMatchKinds, attackRangeCoverageDecreased, boundCardCount, activationCardCount, boundCardSuitMatchesChoice, boundCardsMatchSuits, boundCardCategoryMatchesCardAction, eventTargetIsFemale, eventSourceIsFemale, requestedSlashDamagedOwner, eventSourceExists, expression)),
+            SkillProgramConditionKind.Not => !(context.HpUndefined && ReferencesOwnerHp || selectedTarget?.HpUndefined == true && ReferencesSelectedTargetHp) && !MissingEquipmentPresence(context) && !Children[0].Evaluate(context, selectedTarget, pindianWon, booleanState, cardUseIsRed, choiceResult, boundCardsSameColor, boundCardsMatchCategories, boundCardsMatchKinds, attackRangeCoverageDecreased, boundCardCount, activationCardCount, boundCardSuitMatchesChoice, boundCardsMatchSuits, boundCardCategoryMatchesCardAction, eventTargetIsFemale, eventSourceIsFemale, requestedSlashDamagedOwner, eventSourceExists, expression),
             _ => Evaluate(context, cardUseIsRed, eventTargetIsFemale, eventSourceIsFemale)
         };
 }
@@ -5186,7 +5190,7 @@ public sealed class SkillProgramCatalog
                 allowBoundCardCategories: true, allowBoundCardKinds: true,
                 allowClaimableDamageCards: true, allowAttackRangeCoverage: true,
                 allowBoundCardCount: true, allowOwnedCardCategory: true,
-                allowRequestedSlashDamage: true, allowEventSourceExists: true),
+                allowRequestedSlashDamage: true, allowEventSourceExists: true, allowExpression: true),
             allowZeroDraw);
         if ((effect.Condition.ContainsHasClaimableDamageCards() ||
              effect.Options.Any(option => option.Condition.ContainsHasClaimableDamageCards())) &&
@@ -6942,12 +6946,21 @@ public sealed class SkillProgramCatalog
         bool allowBoundCardKinds = false,
         bool allowClaimableDamageCards = false,
         bool allowAttackRangeCoverage = false, bool allowBoundCardCount = false, bool allowOwnedCardCategory = false,
-        bool allowRequestedSlashDamage = false, bool allowEventSourceExists = false)
+        bool allowRequestedSlashDamage = false, bool allowEventSourceExists = false, bool allowExpression = false)
     {
         if (depth >= MaximumDepth) Fail(path, $"condition nesting exceeds {MaximumDepth}");
         RequireObject(node, path);
-        CheckProperties(node, path, "kind", "value", "children", "sourceBind", "stateId", "expectedValue", "optionId", "cardCategories", "cardKinds", "suits", "zones", "choiceBind", "gender");
+        CheckProperties(node, path, "kind", "value", "children", "sourceBind", "stateId", "expectedValue", "optionId", "cardCategories", "cardKinds", "suits", "zones", "choiceBind", "gender", "expr");
         var kind = EnumValue<SkillProgramConditionKind>(node, "kind", path);
+        var expression = node.TryGetProperty("expr", out var expressionNode)
+            ? ProgramExpressions.Parse(expressionNode, path + ".expr") : null;
+        if (kind == SkillProgramConditionKind.Expression && !allowExpression)
+            Fail(path, "expression requires a composition instruction condition");
+        if ((kind == SkillProgramConditionKind.Expression) != (expression is not null))
+            Fail(path, kind == SkillProgramConditionKind.Expression
+                ? "expression requires expr" : "expr is accepted only by expression");
+        if (expression is not null && node.EnumerateObject().Any(property => property.Name is not ("kind" or "expr")))
+            Fail(path, "expression accepts only kind and expr");
         if (kind == SkillProgramConditionKind.EventSourceExists && !allowEventSourceExists)
             Fail(path, "eventSourceExists requires a composition instruction with trigger event context");
         var participantGenderIs = kind is SkillProgramConditionKind.EventTargetGenderIs or
@@ -7017,7 +7030,7 @@ public sealed class SkillProgramCatalog
                 children.Add(ParseCondition(child, $"{path}.children[{index++}]", depth + 1,
                     defaultPindianBind, allowChoice, allowBoundCards, allowBoundCardCategories,
                     allowBoundCardKinds, allowClaimableDamageCards, allowAttackRangeCoverage,
-                    allowBoundCardCount, allowOwnedCardCategory, allowRequestedSlashDamage, allowEventSourceExists));
+                    allowBoundCardCount, allowOwnedCardCategory, allowRequestedSlashDamage, allowEventSourceExists, allowExpression));
         }
         var needsValue = kind is SkillProgramConditionKind.HpAtLeast or SkillProgramConditionKind.HandCountAtLeast or
             SkillProgramConditionKind.BoundCardCountAtLeast or SkillProgramConditionKind.ActivationCardCountAtLeast or SkillProgramConditionKind.PublicCounterAtLeast;
@@ -7076,7 +7089,7 @@ public sealed class SkillProgramCatalog
             Fail(path + ".choiceBind", "choiceBind is required only for boundCardSuitMatchesChoice");
         return new SkillProgramCondition(kind, value, new ReadOnlyCollection<SkillProgramCondition>(children),
              sourceBind, stateId, expectedValue, optionId, cardCategories, cardKinds, suits, zones, choiceBind,
-             participantGenderIs ? EnumValue<GeneralGender>(node, "gender", path) : null);
+             participantGenderIs ? EnumValue<GeneralGender>(node, "gender", path) : null, expression);
     }
 
     private static bool ContainsCardUseColorCondition(SkillProgramCondition condition) =>
