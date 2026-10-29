@@ -1677,8 +1677,8 @@ static void StandardContentRegistryBuilds()
     Equal("standard", registry.Packages[0].Id);
     TrueWithMessage(!string.IsNullOrWhiteSpace(registry.ContentHash), "registry exposes a content hash");
     Equal(registry.ContentHash, secondRegistry.ContentHash);
-    Equal(34, registry.Cards.Count);
-    Equal(13, registry.Skills.Count);
+    Equal(35, registry.Cards.Count);
+    Equal(14, registry.Skills.Count);
     Equal(
         "装备至防具槽；成为普通/火/雷杀的直接目标时可选择公开判定，红色判定牌视为闪。",
         registry.GetCard("standard:bagua").Description);
@@ -1693,6 +1693,10 @@ static void StandardContentRegistryBuilds()
     Equal(CardKind.Slash, registry.GetCard("standard:slash").LegacyKind);
     Equal(CardKind.QizhengXiangsheng, registry.GetCard("mobile:qizheng-xiangsheng").LegacyKind);
     Equal(CardKind.DagongChe, registry.GetCard("anniversary:dagong-che-card").LegacyKind);
+    Equal("mobile:mantian-guohai", registry.GetCard("mobile:mantian-guohai").Id);
+    Equal(CardKind.MantianGuohai, registry.GetCard("mobile:mantian-guohai").LegacyKind);
+    TrueWithMessage(registry.GetSkill("mobile:mantian-guohai-gift") is { Program: not null },
+        "Mantian Guohai registers its native ordered-gift program alongside the card");
     Equal("standard:jianxiong", registry.Generals["standard:cao-cao"].SkillId);
     Equal("standard:wusheng", registry.Generals["standard:guan-yu"].SkillId);
     Equal("standard:longdan", registry.Generals["standard:zhao-yun"].SkillId);
