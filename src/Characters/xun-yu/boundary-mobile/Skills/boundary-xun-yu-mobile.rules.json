@@ -8,7 +8,8 @@
       "effects": [
         { "op": "selectTarget", "target": "owner", "targetKind": "anyLiving" },
         { "op": "draw", "target": "selectedTarget", "amount": 2 },
-        { "op": "drawMobileJiemingOwnerIfRecipientShort", "target": "owner" }
+        { "op": "draw", "target": "owner", "amount": 1, "condition": { "kind": "expression", "expr":
+          ["and", ["alive", "selectedTarget"], ["<", ["handCount", "selectedTarget"], ["maxHp", "selectedTarget"]]] } }
       ]
     }]
   }]

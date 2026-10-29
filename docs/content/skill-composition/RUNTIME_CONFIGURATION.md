@@ -33,6 +33,8 @@
 
 条件按其实际求值时点读取状态，不把当前 HP、手牌数量或目标资格写成一个会永久失真的绑定。`hasOwnedCardCategory` 仅用于拥有牌选项条件，要求非空 `zones`，且区域只能是 `hand`、`equipment`；不能把它作为裸主动或触发条件。它支持 `cardCategories` 与 `cardKinds`：至少一项非空，两者同时给出时取交集；支付步骤也必须使用相同牌过滤。选项可用不等于已经支付。
 
+效果步骤的 `condition` 还可以使用 `{"kind":"expression","expr":[...]}` 读取参与者的体力、手牌、装备与存活等当前状态并组合比较，见[表达式条件](RUNTIME_EXPRESSIONS.md)。只是判断“是否执行已有操作”时优先用它，不新增人物专用操作。
+
 `condition` 与触发器 `condition` 的可用种类不同。触发条件可读取冻结的 CardAction、Damage、Death、移动及实际阶段事实；不得把宿主输出事件或相邻移动拼成不存在的原生动作。
 
 ## 值与对象引用

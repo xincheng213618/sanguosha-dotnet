@@ -23,6 +23,7 @@
 | `contributions` | 由符合资格的其他角色向拥有者贡献实体手牌 | [牌动作与选择](RUNTIME_CARD_ACTIONS.md) |
 | `states`、`cardPolicies` | 结构化状态与特定牌策略 | [状态、阶段与规则修正](RUNTIME_STATE_AND_TURNS.md) |
 | 操作中的牌绑定/移动字段 | 私有与公开牌集合、实际来源、实体消费 | [移动与拥有牌区](RUNTIME_MOVEMENT_AND_ZONES.md) |
+| 效果步骤 `condition` 的 `expression` | 执行时读取参与者状态的类型化判断 | [表达式条件](RUNTIME_EXPRESSIONS.md) |
 
 人物专属操作也必须具备描述符、解析校验、资源声明、执行与 AI/交互适配，并通过现有注册协议接入。完整操作集合以 `SkillProgramEffectOp` 及当前操作目录为准；本组说明聚焦可复用合同。
 

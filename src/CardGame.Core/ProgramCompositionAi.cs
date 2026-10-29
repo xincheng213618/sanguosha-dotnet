@@ -160,7 +160,9 @@ internal static class ProgramCompositionAi
             attackRangeCoverageDecreased: context?.AttackRangeCoverageDecreased,
             activationCardCount: context?.ActivationCardCount,
             boundCardSuitMatchesChoice: (_, _) => false,
-            boundCardCategoryMatchesCardAction: (_, _) => false);
+            boundCardCategoryMatchesCardAction: (_, _) => false,
+            expression: expression => ProgramExpressions.EvaluateBool(expression,
+                new SkillContextExpressionWorld(player, context?.SelectedTarget)));
     }
 }
 

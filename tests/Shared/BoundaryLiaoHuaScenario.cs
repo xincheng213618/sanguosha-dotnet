@@ -10,7 +10,7 @@ internal static class BoundaryLiaoHuaScenario
         GainReason = "skill-program.boundary:liao-hua-mobile.discard-slash";
     private const string Hero = "boundary:liao-hua-mobile", Quiet = "fixture:boundary-liaohua-quiet", Seed = "fixture:boundary-liaohua-seed", Deck = "fixture:boundary-liaohua-deck";
 
-    internal static (ContentRegistry Registry, GameEngine Game) CreateScene(bool discardSlash = true, bool recovery = false, bool raisePeer = false)
+    internal static (ContentRegistry Registry, GameEngine Game) CreateScene(bool discardSlash = true, bool recovery = false, bool raisePeer = false, int weiHp = 3)
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
         var extras = new List<string> { Quiet, Driver };
@@ -18,7 +18,7 @@ internal static class BoundaryLiaoHuaScenario
         if (recovery) extras.Add(raisePeer ? RecoveryPeer : Recovery);
         var setup = new ShanheBattleSetup(52, 1, "boundary-liaohua", Hero, recovery ? 2 : 4, recovery ? 2 : 0, 0, 0, 0, extras,
             discardSlash ? [new(CardKind.Slash, Suit.Heart, 7), new(CardKind.Slash, Suit.Spade, 8)] : [], [],
-            [new("fixture:boundary-liaohua-wei", Hp: 3) { StartingHand = [] }, new("fixture:boundary-liaohua-wu", Hp: 3) { StartingHand = [] }],
+            [new("fixture:boundary-liaohua-wei", Hp: weiHp) { StartingHand = [] }, new("fixture:boundary-liaohua-wu", Hp: 3) { StartingHand = [] }],
             [new("fixture:boundary-liaohua-qun", Hp: 3) { StartingHand = [] }], new string('b', 64));
         var game = GameEngine.CreateStandard(new GameOptions {
             Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,

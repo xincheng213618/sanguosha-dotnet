@@ -2,14 +2,14 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
-    private const string BoundaryMobileDangxian = "boundary:dangxian-mobile", BoundaryMobileFuli = "boundary:fuli-mobile",
+    private const string BoundaryMobileDangxian = "boundary:dangxian-mobile",
         BoundaryLiaoHuaDiscardAction = "boundary-liao-hua-discard-slash", BoundaryLiaoHuaDiscardReason = "skill-program.boundary:liao-hua-mobile.discard-slash";
 
     [ProgramCapability]
     private sealed class BoundaryLiaoHuaMobileHost(GameEngine engine) : IBoundaryLiaoHuaMobileHost
     {
         public SkillProgramStepOutcome Execute(ProgramSkillFrame frame, SkillProgramEffectOp op) =>
-            op == SkillProgramEffectOp.ObtainBoundaryLiaoHuaDiscardSlash ? engine.BeginBoundaryLiaoHuaDiscardSlash(frame) : engine.TurnOverBoundaryLiaoHuaIfUniqueHighestHp(frame);
+            engine.BeginBoundaryLiaoHuaDiscardSlash(frame);
     }
 
     private SkillProgramStepOutcome BeginBoundaryLiaoHuaDiscardSlash(ProgramSkillFrame supplied)
@@ -111,17 +111,4 @@ public sealed partial class GameEngine
 
     [ProgramAiChoice(SkillProgramEffectOp.ObtainBoundaryLiaoHuaDiscardSlash)]
     private PromptChoice ChooseBoundaryLiaoHuaDiscard(PendingDecision prompt, ProgramSkillFrame frame) => prompt.Choices.First();
-
-    private SkillProgramStepOutcome TurnOverBoundaryLiaoHuaIfUniqueHighestHp(ProgramSkillFrame supplied)
-    {
-        var frame = GetActiveProgramFrame(supplied.Id);
-        if (frame.SkillId != BoundaryMobileFuli || frame.TriggerId != "self-dying-recovery" || frame.InstructionIndex != 2 ||
-            frame.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse, TargetSeat: { } target } || target != frame.OwnerSeat)
-            throw new InvalidOperationException("Mobile Fuli compares current HP only after its original self-dying recovery and child windows.");
-        var owner = _players[frame.OwnerSeat];
-        if (owner.IsAlive && owner.HasHpValue && _winner == Winner.None &&
-            _players.Where(player => player.IsAlive && player.HasHpValue && player.Seat != owner.Seat).All(player => player.Hp < owner.Hp))
-            SetProgramTargetFaceState(frame.Id, owner.Seat, owner.Seat, !owner.IsFaceDown);
-        return SkillProgramStepOutcome.Continue;
-    }
 }

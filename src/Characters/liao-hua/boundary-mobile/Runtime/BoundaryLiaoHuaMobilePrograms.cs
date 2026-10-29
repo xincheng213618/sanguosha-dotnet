@@ -11,19 +11,14 @@ internal abstract class BoundaryLiaoHuaMobileDescriptor : ProgramOperationDescri
 {
     public override ISkillProgramEffectHandler Handler => new BoundaryLiaoHuaMobileHandler(Op);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
-    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [new RequireTriggerWindow(
-        Op == SkillProgramEffectOp.ObtainBoundaryLiaoHuaDiscardSlash ? SkillProgramTriggerWindow.TurnStartBeforeNormalFlow : SkillProgramTriggerWindow.SelfDyingResponse)];
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
+        [new RequireTriggerWindow(SkillProgramTriggerWindow.TurnStartBeforeNormalFlow)];
 }
 internal sealed class ObtainBoundaryLiaoHuaDiscardSlashDescriptor : BoundaryLiaoHuaMobileDescriptor
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ObtainBoundaryLiaoHuaDiscardSlash;
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, _) => { });
-}
-internal sealed class TurnOverBoundaryLiaoHuaIfUniqueHighestHpDescriptor : BoundaryLiaoHuaMobileDescriptor
-{
-    public override SkillProgramEffectOp Op => SkillProgramEffectOp.TurnOverBoundaryLiaoHuaIfUniqueHighestHp;
-    public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.TurnOver, static (_, _) => { });
 }
 internal sealed class BoundaryLiaoHuaMobileHandler(SkillProgramEffectOp operation) : ISkillProgramEffectHandler
 {

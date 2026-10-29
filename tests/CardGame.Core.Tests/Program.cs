@@ -1135,6 +1135,8 @@ var tests = new (string Name, Action Body)[]
     ("standard package builds an immutable isolated registry", StandardContentRegistryBuilds),
     ("skill program loader separates canonical gameplay from presentation", SkillProgramChecks.LoaderCanonicalizationAndPresentationIsolation),
     ("skill program loader rejects malformed and unsupported definitions", SkillProgramChecks.LoaderRejectsMalformedUnsupportedDefinitions),
+    ("program expression conditions validate types and use three-valued reads", ProgramExpressionChecks.LoaderAndEvaluation),
+    ("program expression conditions gate mobile Fuli's flip on unique highest HP", ProgramExpressionChecks.FuliFlipsOnlyAsUniqueHighestHp),
     ("configured active sequences reject forged input and replay exact moves", SkillProgramChecks.ConfiguredActiveSequenceIsAtomicAndReplayable),
     ("program gameplay hashes control checkpoint compatibility independently of presentation", SkillProgramChecks.ProgramHashControlsCheckpointCompatibility),
     ("program dying checkpoints cancel a selected card spent on rescue", SkillProgramChecks.ProgramPausedDyingAndConsumedSelection),

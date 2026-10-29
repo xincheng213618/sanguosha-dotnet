@@ -80,7 +80,8 @@ public sealed partial class GameEngine
                 (bind, _) => engine.DoProgramBoundCardCategoryMatchAction(frame, bind),
                 requestedSlashDamagedOwner: frame.RequestedSlashDamagedOwner == true,
                 eventSourceExists: frame.WindowContext?.SourceSeat is { } sourceSeat &&
-                    engine.IsValidPlayerSeat(sourceSeat));
+                    engine.IsValidPlayerSeat(sourceSeat),
+                expression: expression => ProgramExpressions.EvaluateBool(expression, new ProgramExpressionWorld(engine, frame)));
         }
 
         public bool TryStartPostInstructionWindow(long frameId) =>
