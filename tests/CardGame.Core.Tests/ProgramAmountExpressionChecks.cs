@@ -195,6 +195,54 @@ internal static class ProgramAmountExpressionChecks
             Need(State(branch) == State(afterRecovery), "Cold replay at the paid recovery child preserves its exact health continuation.");
         }
         Need(State(game) == State(restored), "Cold replay at the paid HP-loss child preserves both health payments and observer returns.");
+
+        // A real Alcohol self-rescue offer keeps this no-Peach scene at the
+        // human rescue boundary; an empty hand is automatically passed by Core.
+        var (fatal, fatalRegistry) = Create(fatalRescue: true);
+        var requested = View(fatal, 0).Hp + 1;
+        Use(fatal, "fatal", skill: HealthSkill);
+        Reach(fatal, () => fatal.PendingDecision is { Kind: DecisionKind.RescueDying, PlayerSeat: 0 });
+        var losing = fatal.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == HealthSkill);
+        var fatalFrameId = losing.Id;
+        Need(ProgramExpressionAmounts.IssuedAmount(losing) == requested && View(fatal, 0).Hp == -1 &&
+            Events<ProgramSkillHpLostEvent>(fatal).Single(e => e.FrameId == fatalFrameId) is { Amount: var paid, RemainingHp: -1 } && paid == requested,
+            "The fatal expression freezes HP plus one and pays it once before the real rescue decision, retaining negative HP.");
+        var fatalRestored = Cold(fatal, fatalRegistry);
+        foreach (var branch in new[] { fatal, fatalRestored })
+        {
+            var producer = branch.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == fatalFrameId);
+            var dying = branch.ResolutionStack.OfType<DyingFrame>().Last();
+            // Exercise the typed proof with the real paid frames and history; this
+            // read-only bridge does not manufacture or replace any runtime state.
+            var proof = typeof(GameEngine).GetMethod("TypedRecoveryProgramDyingMatches",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+            Need(proof.Invoke(branch, [producer, dying, Events<IGameEvent>(branch)]) is true,
+                "The typed dying invoice must match the issued expression amount, including after cold replay.");
+            for (var step = 0; branch.State.Winner == Winner.None; step++)
+            {
+                Need(step < 80 && !branch.IsFaulted, "The no-Peach dying fixture must finish its native responder cycle.");
+                if (branch.PendingDecision is { } rescue)
+                {
+                    Need(rescue is { Kind: DecisionKind.RescueDying, PlayerSeat: 0 }, "Only the human rescue pass is expected.");
+                    var pass = rescue.Choices.SingleOrDefault(c => c.Parameters.GetValueOrDefault("response") == "let-die") ??
+                        rescue.Choices.Single(c => c.Parameters.GetValueOrDefault("response") == "pass");
+                    Accept(branch, new AnswerPromptCommand(0, rescue.PromptId, pass.Id, branch.Revision));
+                }
+                else Accept(branch, new AdvanceOneStepCommand(branch.Revision));
+            }
+            // Ordinary death normalizes stored HP to zero; its paid loss invoice
+            // must still retain the negative value observed at RescueDying.
+            Need(!View(branch, 0).IsAlive && View(branch, 0).Hp == 0 &&
+                Events<ProgramSkillHpLostEvent>(branch).Where(e => e.FrameId == fatalFrameId).Select(e => e.Amount).SequenceEqual([requested]) &&
+                Events<ProgramSkillHpLostEvent>(branch).Single(e => e.FrameId == fatalFrameId).RemainingHp == -1 &&
+                Events<ProgramAmountEvaluatedEvent>(branch).Where(e => e.FrameId == fatalFrameId).Select(e => e.Amount).SequenceEqual([requested]) &&
+                Events<PlayerDiedEvent>(branch).Count(e => e.VictimSeat == 0) == 1,
+                "Passing the real rescue cycle reaches death and game over without recomputing the now-negative HP operand or paying again. " +
+                JsonSerializer.Serialize(new { View(branch, 0).IsAlive, View(branch, 0).Hp, branch.State.Winner,
+                    Lost = Events<ProgramSkillHpLostEvent>(branch).Where(e => e.FrameId == fatalFrameId),
+                    Amounts = Events<ProgramAmountEvaluatedEvent>(branch).Where(e => e.FrameId == fatalFrameId), Deaths = Events<PlayerDiedEvent>(branch) }));
+        }
+        Need(State(fatal) == State(fatalRestored), "Cold replay at the fatal expression keeps the exact death, terminal views and committed event history.");
     }
 
     private static SkillProgram Load(string effect) => SkillProgramCatalog.Load($$"""
@@ -274,9 +322,9 @@ internal static class ProgramAmountExpressionChecks
         Need(State(game) == State(restored), "Amount-expression checkpoint replay must preserve views and committed facts.");
         return restored;
     }
-    private static (GameEngine, ContentRegistry) Create(bool nativeDraw = false)
+    private static (GameEngine, ContentRegistry) Create(bool nativeDraw = false, bool fatalRescue = false)
     {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(nativeDraw));
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(nativeDraw, fatalRescue));
         var game = GameEngine.CreateStandard(new GameOptions
         {
             Seed = 31, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord, ModeId = Mode,
@@ -286,7 +334,7 @@ internal static class ProgramAmountExpressionChecks
     }
     private static void Need(bool ok, string message) { if (!ok) throw new InvalidOperationException(message); }
 
-    private sealed class Fixture(bool nativeDraw) : IGameContentPackage
+    private sealed class Fixture(bool nativeDraw, bool fatalRescue) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-amount-expression", new(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
@@ -316,7 +364,9 @@ internal static class ProgramAmountExpressionChecks
                   {"id":"health-cold","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
                     {"op":"draw","target":"owner","amount":2},{"op":"grantSkills","target":"owner","skillIds":["{{HealthWatch}}"]},
                     {"op":"loseHp","target":"owner","amountExpr":["handCount","owner"]},
-                    {"op":"recover","target":"owner","amountExpr":["handCount","owner"]},{"op":"draw","target":"owner","amount":1}]}]},
+                    {"op":"recover","target":"owner","amountExpr":["handCount","owner"]},{"op":"draw","target":"owner","amount":1}]},
+                  {"id":"fatal","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
+                    {"op":"loseHp","target":"owner","amountExpr":["+",["hp","owner"],1]}]}]},
                  {"id":"{{HealthWatch}}","revision":1,"triggers":[
                   {"id":"paid-health-child","window":"afterHealthChanged","subject":"owner","optional":false,"hpChangeOccurrence":"perEvent","effects":[
                     {"op":"chooseOption","target":"owner","resultBind":"resume","options":[{"id":"resume"}]},{"op":"draw","target":"owner","amount":1}]}]},
@@ -336,7 +386,8 @@ internal static class ProgramAmountExpressionChecks
             var generals = Enumerable.Range(0, 4).Select(i => $"fixture:amount-general-{i}").ToArray();
             foreach (var id in generals) builder.AddGeneral(new(id, "数量验证", "supporter", Skill, "wei", 9,
                 nativeDraw ? [ColdSkill, Watch, HealthSkill, NativeGate] : [ColdSkill, Watch, HealthSkill]));
-            builder.AddDeck(new("fixture:amount-deck", "静默牌堆", 0, 0, [new("standard:dodge", 100)]));
+            builder.AddDeck(new("fixture:amount-deck", "静默牌堆", fatalRescue ? 1 : 0, 0,
+                [new(fatalRescue ? "standard:alcohol" : "standard:dodge", 100)]));
             builder.AddMode(new(Mode, "数量表达式验证", 4, 4,
                 new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Loyalist)] = 1, [nameof(Role.Rebel)] = 1, [nameof(Role.Renegade)] = 1 },
                 "fixture:amount-deck", GeneralCandidateCount: 1, GeneralPoolIds: generals));
