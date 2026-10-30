@@ -53,7 +53,7 @@ public sealed partial class GameEngine
   if(stage==HuaManStage.MansiDraw){var progress=_players[f.OwnerSeat].HuaManProgress??new(0);_players[f.OwnerSeat].HuaManProgress=progress with{MansiCards=checked(progress.MansiCards+ids.Count)};AdvanceEventRulesAndQueueFact(new MansiActualCardsObtainedEvent(f.Id,r.Source,progress.MansiCards,ids.Count,progress.MansiCards+ids.Count));}
   AdvanceRuntimeProgram(f.Id);
  }
- private bool DrainHuaMan(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+ private bool DrainHuaMan(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
  [ProgramContinuation(ProgramContinuationKind.Resume,25200)]private bool ResumeHuaMan(long id)
  {
   if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{HuaMan:{}r}f||f.Id!=id||r.Stage is HuaManStage.DiscardChoice or HuaManStage.MaleChoice)return false;AssertHuaManFrame(f);if(DrainHuaMan(f))return true;

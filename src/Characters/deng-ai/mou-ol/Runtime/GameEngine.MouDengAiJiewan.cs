@@ -92,7 +92,7 @@ public sealed partial class GameEngine
         if (r.Stage is MouDengAiOlStage.RemoveGu or MouDengAiOlStage.Material) return choices.OrderBy(c => GetKeepValue(GetAdvancedCard(c.Cards[0]), owner)).First();
         return choices.OrderBy(c => c.Targets.Count > 0 && AreProgramDistributionAllies(owner, _players[c.Targets[0]])).First();
     }
-    private bool DrainMouDengAiOl(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainMouDengAiOl(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void SealMouDengAiMovement(long id)
     { var f = GetActiveProgramFrame(id); ReplaceRuntimeTop(f with { MouDengAiOl = f.MouDengAiOl! with { After = _movementSequence } }); }
     private void ContinueMouDengAiOl(long id)

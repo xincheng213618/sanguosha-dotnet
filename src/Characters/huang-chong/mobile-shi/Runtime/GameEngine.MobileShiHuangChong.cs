@@ -321,10 +321,7 @@ public sealed partial class GameEngine
         FinishProgramSkill(GetActiveProgramFrame(f.Id), true);
     }
 
-    private bool DrainShiHc(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShiHc(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
 
     // ---- ledger ------------------------------------------------------------
 

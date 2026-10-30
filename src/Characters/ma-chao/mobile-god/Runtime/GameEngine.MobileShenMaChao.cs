@@ -151,9 +151,7 @@ public sealed partial class GameEngine
         }
         ContinueMobileMaChao(f.Id);
     }
-    private bool DrainMobileMaChao(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainMobileMaChao(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueMobileMaChao(long id)
     {
         while (_pendingDecision is null && _resolutionStack.LastOrDefault() is ProgramSkillFrame { MobileShenMaChao: { } r } f && f.Id == id)

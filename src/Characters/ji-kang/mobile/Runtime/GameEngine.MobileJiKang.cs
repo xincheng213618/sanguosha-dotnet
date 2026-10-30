@@ -64,9 +64,7 @@ public sealed partial class GameEngine
         });
         CompleteNativeLogicalDiscardInvocation(logical);
     }
-    private bool DrainMobileJiKang(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainMobileJiKang(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void StepMobileJiKang(ProgramSkillFrame f, MobileJiKangReceipt r)
     { ReplaceRuntimeTop(f with { MobileJiKang = r }); }
     private void FinishMobileJiKang(ProgramSkillFrame f)

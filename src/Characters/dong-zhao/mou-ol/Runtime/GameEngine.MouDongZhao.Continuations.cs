@@ -38,9 +38,7 @@ public sealed partial class GameEngine
             if (!ProgramEventHistory<MouDongZhaoMovementSignedEvent>().Contains(fact)) AdvanceEventRulesAndQueueFact(fact);
         }
     }
-    private bool DrainMouDongZhao(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainMouDongZhao(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueMouDongZhao(long frameId)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { MouDongZhao: { } r } f || f.Id != frameId) return;

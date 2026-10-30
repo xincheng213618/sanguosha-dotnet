@@ -142,8 +142,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(f = f with { ShiSunChen = r with { Stage = ShiScStage.DamageChildren, Target = choice.Targets.Single() } });
         AdvanceEventRulesAndQueueFact(new ShiScMomentumIssuedEvent(f.Id, choice.Targets.Single())); new ProgramSkillHost(this).Damage(f, choice.Targets.Single(), 1, nature: DamageNature.Fire);
     }
-    private bool DrainShiSc(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShiSc(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 49100)] private bool ContinueShiSc(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { ShiSunChen: { } r } f && f.Id == id && _pendingDecision is null)

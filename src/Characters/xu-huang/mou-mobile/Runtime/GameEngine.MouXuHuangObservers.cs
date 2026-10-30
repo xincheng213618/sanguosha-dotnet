@@ -91,9 +91,7 @@ public sealed partial class GameEngine
         e is not null && MouXuHuangComposition.Handles(e.Op) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null &&
         (f.MouXuHuangDuanliang is { Stage: MouXuHuangDuanliangStage.RefillChildren or MouXuHuangDuanliangStage.ObtainChildren or MouXuHuangDuanliangStage.NativeChildren } && MouXuHuangDuanliangRoot(f) ||
          f.MouXuHuangShipo is { Stage: MouXuHuangShipoStage.GiftChildren or MouXuHuangShipoStage.TransferChildren } && ValidMouXuHuangShipo(f));
-    private bool DrainMouXuHuangChildren(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouXuHuangChildren(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private bool MouXuHuangFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (!PermitAcceptedMouXuHuang(f)) return false;

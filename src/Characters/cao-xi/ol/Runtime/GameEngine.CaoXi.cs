@@ -83,9 +83,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(f = f with { CaoXiJianxuan = f.CaoXiJianxuan! with { RecipientSeat = recipient, Stage = CaoXiJianxuanStage.DrawChildren } });
         AdvanceEventRulesAndQueueFact(new CaoXiJianxuanRecipientEvent(f.Id, recipient)); IssueCaoXiDraw(f);
     }
-    private bool DrainCaoXiChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainCaoXiChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     [ProgramContinuation(ProgramContinuationKind.Resume, 26810)]
     private bool ResumeCaoXi(long id)
     {

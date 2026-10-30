@@ -26,9 +26,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new WeifuPaidEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwnerSeat, id, from, r.CostCategory, r.Before, _movementSequence));
         AdvanceRuntimeProgram(f.Id); return SkillProgramStepOutcome.AwaitChild;
     }
-    private bool DrainQianZhaoChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainQianZhaoChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 26620)]
     private bool ResumeWeifu(long id)
     {

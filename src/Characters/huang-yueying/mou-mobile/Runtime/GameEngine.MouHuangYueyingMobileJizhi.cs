@@ -53,9 +53,7 @@ public sealed partial class GameEngine
         _cardZones.GetLocation(cardId) == CardLocation.Hand(owner.Seat) && (_turnNumber == 0 || HasOngoingWholeActualUseTurn) &&
         ProgramEventHistory<MouHuangYueyingJizhiExemptEvent>().Any(e => e.Source.OwnerSeat == owner.Seat && e.CardId == cardId &&
             e.ActualTurn == _turnNumber && e.TurnOwnerSeat == _turnProgression.OwnerSeat);
-    private bool DrainMouHy(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouHy(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueMouHy(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { MouHuangYueyingMobile: { } r } f || f.Id != id) return;

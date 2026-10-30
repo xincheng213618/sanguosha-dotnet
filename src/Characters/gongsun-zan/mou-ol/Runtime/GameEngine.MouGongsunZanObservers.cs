@@ -19,9 +19,7 @@ public sealed partial class GameEngine
         foreach (var m in _cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= after).ToArray())
             AdvanceEventRulesAndQueueFact(new MouGongsunZanMovedEvent(id, purpose, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence));
     }
-    private bool DrainMouGsz(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouGsz(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 32700)]
     private bool MouGszMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.ResolveMouGongsunZanJiaodi && ValidMouGsz(f) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && f.MouGongsunZan!.Stage is MouGongsunZanStage.ObtainChildren or MouGongsunZanStage.DiscardChildren;
     private bool MouGszLionChild(ProgramSkillFrame f, ResolutionFrame child)

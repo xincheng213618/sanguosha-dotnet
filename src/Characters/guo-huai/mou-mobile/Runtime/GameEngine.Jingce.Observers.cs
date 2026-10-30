@@ -25,7 +25,7 @@ public sealed partial class GameEngine
             if (!ProgramEventHistory<MouGuoHuaiMovementEvent>().Contains(fact)) AdvanceEventRulesAndQueueFact(fact);
         }
     }
-    private bool DrainMouGh(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouGh(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 32000)]
     private bool IsMouGhMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op is SkillProgramEffectOp.ResolveMouGuoHuaiJingceStart or SkillProgramEffectOp.ResolveMouGuoHuaiJingcePrediction or SkillProgramEffectOp.ResolveMouGuoHuaiJingceReward && ValidMouGh(f) && f.MouGuoHuai!.Stage is MouGuoHuaiStage.StoreChildren or MouGuoHuaiStage.PlacingChildren or MouGuoHuaiStage.DrawChildren && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     private bool MouGhFirstChild(ProgramSkillFrame f, ResolutionFrame child)

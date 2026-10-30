@@ -124,9 +124,7 @@ public sealed partial class GameEngine
             GetHand(_players[f.OwnerSeat]).Count, GetHand(_players[r.OtherSeat]).Count));
         AdvanceRuntimeProgram(f.Id);
     }
-    private bool DrainZhenyingChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainZhenyingChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 26500)]
     private bool ResumeZhenying(long id)
     {

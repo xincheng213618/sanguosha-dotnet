@@ -73,9 +73,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new HeJinMouzhuAssaultIssuedEvent(origin));
         BeginHeJinMouzhuCard(f, origin);
     }
-    private bool DrainHeJinChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainHeJinChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     [ProgramContinuation(ProgramContinuationKind.Resume, 26710)]
     private bool ResumeHeJin(long id)
     {

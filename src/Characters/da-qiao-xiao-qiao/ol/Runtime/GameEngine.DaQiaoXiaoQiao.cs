@@ -63,7 +63,7 @@ public sealed partial class GameEngine
         if(cards.Count>0){if(discard)MoveProgramLogicalDiscard(f,f.OwnerSeat,cards.Select(c=>c.Id).ToArray(),new(reason),Paid);else MoveProgramCardsFromMultipleSources(cards.Select(c=>c.Id).ToArray(),to,new(reason),Paid);}
         f=GetActiveProgramFrame(f.Id);ReplaceRuntimeTop(f=f with{DaQiaoXiaoQiao=f.DaQiaoXiaoQiao! with{After=_movementSequence}});r=f.DaQiaoXiaoQiao!;AdvanceEventRulesAndQueueFact(new DaQiaoXiaoQiaoMovementPaidEvent(f.Id,r.MovementStep,stage,r.Before,r.After,cards.Count));
     }
-    private bool DrainDaQiaoXiaoQiao(long id)=>TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.Program)||TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(id,PostEventContinuation.Program)||TryBeginCardsMovedProgramWindow(id)||TryBeginAdvancedSkillsChanged(id);
+    private bool DrainDaQiaoXiaoQiao(long id)=>TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueDaQiaoXiaoQiao(long id)
     {
         if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{DaQiaoXiaoQiao:{}r}f||f.Id!=id)return;AssertDaQiaoXiaoQiao(f);

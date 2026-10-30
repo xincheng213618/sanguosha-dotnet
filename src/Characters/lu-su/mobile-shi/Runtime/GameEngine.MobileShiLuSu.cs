@@ -190,8 +190,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(current with { ShiLuSu = current.ShiLuSu! with { After = _movementSequence } });
         AdvanceEventRulesAndQueueFact(new ShiLsDiscardPaidEvent(f.Id, r.Cards.Count, GetActiveProgramFrame(f.Id).ShiLuSu!.Before, _movementSequence)); ContinueShiLs(f.Id);
     }
-    private bool DrainShiLs(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShiLs(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 48900)] private bool ContinueShiLs(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { ShiLuSu: { } r } f || f.Id != id) return false;

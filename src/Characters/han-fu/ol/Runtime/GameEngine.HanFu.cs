@@ -118,8 +118,7 @@ public sealed partial class GameEngine
         if (selected.Length<r.RequiredDiscard) { PublishHanFuChoice(f); return; }
         PayHanFuCards(f,selected.Select(id=>r.DiscardCandidates!.Single(m=>m.CardId==id)).ToArray(),CardLocation.DiscardPile,KuangshouDiscardReason,HanFuStage.DiscardChildren); ContinueHanFu(f.Id);
     }
-    private bool DrainHanFuChildren(long id)=>TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id,PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainHanFuChildren(long id)=>TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueHanFu(long id)
     {
         while(_resolutionStack.LastOrDefault() is ProgramSkillFrame { HanFu: { } r } f && f.Id==id)

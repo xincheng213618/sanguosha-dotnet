@@ -90,8 +90,7 @@ public sealed partial class GameEngine
         var plan = LiuLiPlans(f.OwnerSeat)[int.Parse(option[4..], CultureInfo.InvariantCulture)];
         ReplaceRuntimeTop(f = f with { AnniversaryLiuLi = r with { Stage = AnniversaryLiuLiStage.IssuingUse, Plan = plan } }); IssueLiuLiUse(f);
     }
-    private bool DrainLiuLi(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.Program) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainLiuLi(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.Program);
     [ProgramContinuation(ProgramContinuationKind.Resume, 43300)] private bool ContinueLiuLi(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { AnniversaryLiuLi: { } r } f || f.Id != id || _pendingDecision is not null || r.Stage == AnniversaryLiuLiStage.Completed) return false;

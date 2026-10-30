@@ -190,8 +190,7 @@ public sealed partial class GameEngine
         if (added.Length > 0) RefreshCurrentUseAddedTargetCandidates(LifecycleCardUse(use.Id)!, added);
         FinishShiZy(GetActiveProgramFrame(f.Id));
     }
-    private bool DrainShiZy(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainShiZy(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void SealShiZy(long id) { var f = GetActiveProgramFrame(id); ReplaceRuntimeFrame(id, f with { ShiZhangYan = f.ShiZhangYan! with { After = _movementSequence } }); }
     private void ContinueShiZy(long id)
     {

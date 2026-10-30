@@ -57,7 +57,7 @@ public sealed partial class GameEngine
         if(_cardZones.GetLocation(seal.CardId)!=seal.Location)throw new InvalidOperationException("Qushi removal cannot replace its original character-zone entity.");
         StartQushiMovement(ref f,QushiStage.RemoveChildren,seal.HolderSeat);MoveCard(GetAdvancedCard(seal.CardId),seal.Location,CardLocation.DiscardPile,new(QushiRemoveReason),m=>AdvanceEventRulesAndQueueFact(new QushiSealRemovedEvent(f.Id,seal.SealId,seal.HolderSeat,seal.CardId,m.Sequence,false)));CompleteQushiMovement(f.Id,1);
     }
-    private bool DrainQushi(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainQushi(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueQushi(long id)
     {
         if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{Qushi:{}r}f||f.Id!=id)return;AssertQushi(f);

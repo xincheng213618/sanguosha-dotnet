@@ -205,10 +205,7 @@ public sealed partial class GameEngine
     }
 
     private bool DrainMobileShiWeiYan(ProgramSkillFrame f) =>
-        TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+        TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
 
     private bool MobileShiKuangguThresholdDrawMatches(ProgramSkillFrame producer, NativeDrawInvocationProof proof) =>
         producer.SkillId is ShiWyKuanggu or ShiWyKuanggu2 && producer.TriggerId is not null &&

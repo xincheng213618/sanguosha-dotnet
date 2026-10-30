@@ -114,9 +114,7 @@ public sealed partial class GameEngine
         PublishParticipantHandChoice(f, f.OwnerSeat, choices, "已移除两个椎并完成摸牌：可以选择合法目标视为使用牌，或取消。", f.OwnerSeat);
         AdvanceRulesAndPublishState();
     }
-    private bool DrainMouLiuChengChildren(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouLiuChengChildren(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramAnswer("mou-liu-cheng-use")]
     private void AnswerMouLiuCheng(PromptChoice choice)
     {

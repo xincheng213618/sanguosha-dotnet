@@ -412,10 +412,7 @@ public sealed partial class GameEngine
         ContinueShiTz(f.Id);
     }
 
-    private bool DrainShiTz(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) ||
-        TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainShiTz(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
 
     private void FinishShiTzOperation(ProgramSkillFrame f)
     {

@@ -144,7 +144,7 @@ public sealed partial class GameEngine
     }
     private static bool IsDingShangWanDrawStage(DingShangWanStage stage) =>
         global::CardGame.Core.RuntimeSkills.RuntimeRules_ding_shang_wan_ol_DingShangWan.IsDingShangWanDrawStage(stage);
-    private bool DrainDingShangWan(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainDingShangWan(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueDingShangWan(long id)
     {
         if(_resolutionStack.LastOrDefault() is not ProgramSkillFrame{DingShangWan:{}r}f||f.Id!=id)return;

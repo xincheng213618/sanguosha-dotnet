@@ -14,9 +14,7 @@ public sealed partial class GameEngine
             if (!ProgramEventHistory<WuZhugeLiangMovementSignedEvent>().Contains(fact)) AdvanceEventRulesAndQueueFact(fact);
         }
     }
-    private bool DrainWuZgl(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainWuZgl(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 30300)]
     private bool IsWuZglMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect is not null && WuZhugeLiangComposition.Handles(effect.Op) &&
         ValidWuZgl(f) && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;

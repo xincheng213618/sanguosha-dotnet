@@ -171,8 +171,7 @@ public sealed partial class GameEngine
         throw new InvalidOperationException("Unknown Shi Deng Ai choice.");
     }
     private static CardKind ShiDaRewardKind(int index) => index switch { 0 => CardKind.DrawTwo, 1 => CardKind.Nullification, _ => CardKind.FiveGrains };
-    private bool DrainShiDa(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainShiDa(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueShiDa(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { ShiDengAi: { } r } f || f.Id != id) return;

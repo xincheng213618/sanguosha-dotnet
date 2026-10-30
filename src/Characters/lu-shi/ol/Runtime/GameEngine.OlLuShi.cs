@@ -188,9 +188,7 @@ public sealed partial class GameEngine
             fact.RequestedDeduction == r.Amount && appearance.Receipt.OwnerSeat == r.TargetSeat && appearance.Receipt.OriginalInstructionIndex == f.InstructionIndex)
             ReplaceRuntimeFrame(f.Id, f with { OlLuShi = r with { Stage = OlLuShiStage.Children } });
     }
-    private bool DrainOlLuShi(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainOlLuShi(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.Program);
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveOlLuShiZhuyan)] private void ReturnOlLuShiZhuyanDraw(ProgramSkillFrame f, NativeDrawOutcome o) => ReturnOlLuShiDraw(f, o);
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveOlLuShiLeijie)] private void ReturnOlLuShiLeijieDraw(ProgramSkillFrame f, NativeDrawOutcome o) => ReturnOlLuShiDraw(f, o);
     private void ReturnOlLuShiDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)

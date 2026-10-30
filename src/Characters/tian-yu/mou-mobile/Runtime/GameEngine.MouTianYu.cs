@@ -135,9 +135,7 @@ public sealed partial class GameEngine
         foreach (var m in _cardMovements.Where(m => m.Sequence > before)) AdvanceEventRulesAndQueueFact(new MouTianYuMovementSignedEvent(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence));
         ContinueMouTianYu(f.Id);
     }
-    private bool DrainMouTianYu(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainMouTianYu(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueMouTianYu(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { MouTianYu: { } r } f || f.Id != id) return;

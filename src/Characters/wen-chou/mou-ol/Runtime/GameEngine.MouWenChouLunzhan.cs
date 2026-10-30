@@ -98,7 +98,7 @@ public sealed partial class GameEngine
         if (options.Any(c => c.Parameters.GetValueOrDefault("branch") == "draw")) return options.First(c => c.Parameters["branch"] == "draw");
         return options.OrderBy(c => c.Cards.Count == 1 ? GetKeepValue(EntityAtCurrentLocation(c.Cards[0]), _players[pending.PlayerSeat]) : 0).First();
     }
-    private bool DrainMouWenChouOl(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainMouWenChouOl(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueMouWenChouOl(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { MouWenChouOl: { } r } f || f.Id != id) return;

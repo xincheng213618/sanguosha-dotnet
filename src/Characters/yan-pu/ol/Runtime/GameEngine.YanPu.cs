@@ -126,9 +126,7 @@ public sealed partial class GameEngine
         CommitYanPuMovement(f.Id, new(r.Movements.Count, subject, reason, before, _movementSequence, actual));
         ContinueYanPu(f.Id);
     }
-    private bool DrainYanPuChildren(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainYanPuChildren(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueYanPu(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { YanPu: { } r } f && f.Id == id)

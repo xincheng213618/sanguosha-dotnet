@@ -23,9 +23,7 @@ public sealed partial class GameEngine
     }
     private void SealShiXxy(long id)
     { var f = GetActiveProgramFrame(id); ReplaceRuntimeFrame(id, f with { ShiXinXianYing = f.ShiXinXianYing! with { After = _movementSequence } }); }
-    private bool DrainShiXxy(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainShiXxy(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueShiXxy(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { ShiXinXianYing: { } r } f && f.Id == id && _pendingDecision is null)

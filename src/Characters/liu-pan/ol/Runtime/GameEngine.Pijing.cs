@@ -31,7 +31,7 @@ public sealed partial class GameEngine
     {
         var r=f.Pijing!;var before=_movementSequence;ReplaceRuntimeTop(f=f with{Pijing=r with{Stage=PijingStage.DrawChildren,Before=before,After=before,Count=0},PendingMovementContinuation=new(r.ActorSeat,0,null)});var count=_players[r.ActorSeat].IsAlive?DrawCards(_players[r.ActorSeat],1,true,new(PijingDrawReason)).Count:0;f=GetActiveProgramFrame(f.Id);ReplaceRuntimeTop(f=f with{Pijing=f.Pijing! with{After=_movementSequence,Count=count}});AdvanceEventRulesAndQueueFact(new PijingMovementPaidEvent(f.Id,PijingStage.DrawChildren,0,r.ActorSeat,before,_movementSequence,count));ContinuePijing(f.Id);
     }
-    private bool DrainPijing(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainPijing(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinuePijing(long id)
     {
         if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{Pijing:{}r}f||f.Id!=id)return;AssertPijing(f);

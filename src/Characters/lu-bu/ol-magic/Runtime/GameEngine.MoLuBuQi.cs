@@ -118,9 +118,7 @@ public sealed partial class GameEngine
         f = GetActiveProgramFrame(f.Id); ReplaceRuntimeTop(f = f with { MoLuBu = f.MoLuBu! with { After = _movementSequence } });
         foreach (var m in _cardMovements.Where(m => m.Sequence > before)) AdvanceEventRulesAndQueueFact(new MoLuBuMovementSignedEvent(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence));
     }
-    private bool DrainMoLuBu(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMoLuBu(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueMoLuBu(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { MoLuBu: { } r } f || f.Id != id || _pendingDecision is not null) return;

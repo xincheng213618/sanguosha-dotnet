@@ -92,7 +92,7 @@ public sealed partial class GameEngine
         while(selected.Count<8){var eligible=pool.Where(c=>!names.Contains(c.Kind)&&(!EquipmentRules.IsEquipment(c.Kind)||!slots.Contains(EquipmentRules.Get(c.Kind).Slot))).ToArray();if(eligible.Length==0)break;var card=eligible[_random.Next(eligible.Length)];selected.Add(new(card.Id,card.Kind,_cardZones.GetLocation(card.Id)));names.Add(card.Kind);if(EquipmentRules.IsEquipment(card.Kind))slots.Add(EquipmentRules.Get(card.Kind).Slot);pool.Remove(card);}
         return Array.AsReadOnly(selected.ToArray());
     }
-    private bool DrainWenYang(long id)=>TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.Program)||TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(id,PostEventContinuation.Program)||TryBeginCardsMovedProgramWindow(id)||TryBeginAdvancedSkillsChanged(id);
+    private bool DrainWenYang(long id)=>TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueWenYang(long id)
     {
         if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{WenYang:{}r}f||f.Id!=id)return;AssertWenYang(f);

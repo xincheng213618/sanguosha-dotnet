@@ -76,9 +76,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new QingyuanTakePaidEvent(f.Id, holder, card.Id, before, _movementSequence, r.ActualTurn));
         AdvanceRuntimeProgram(f.Id);
     }
-    private bool DrainHuJinDingChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainHuJinDingChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 26820)]
     private bool ResumeQingyuan(long id)
     {

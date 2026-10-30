@@ -116,9 +116,7 @@ public sealed partial class GameEngine
         if (option == "hand") BeginOperationProgramDraw(f, f.OwnerSeat, amount, new(GuoZhaoZunweiDrawReason));
         else ContinueGuoZhao(f.Id);
     }
-    private bool DrainGuoZhao(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainGuoZhao(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueGuoZhao(long id)
     {
         while (_pendingDecision is null && _resolutionStack.LastOrDefault() is ProgramSkillFrame { AnniversaryGuoZhao: { } r } f && f.Id == id)

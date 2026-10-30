@@ -16,8 +16,7 @@ public sealed partial class GameEngine
             if (!ProgramEventHistory<WuHuangFuSongMovementSignedEvent>().Contains(fact)) AdvanceEventRulesAndQueueFact(fact);
         }
     }
-    private bool DrainWuHf(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainWuHf(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 381)]
     private bool IsWuHfMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect is not null && WuHuangFuSongComposition.Handles(effect.Op) &&
         ValidWuHf(f) && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;

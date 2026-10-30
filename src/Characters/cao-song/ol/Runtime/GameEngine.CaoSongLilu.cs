@@ -44,10 +44,7 @@ public sealed partial class GameEngine
     }
 
     private bool DrainCaoSongLiluChildren(long id) =>
-        TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+        TryBeginProgramChildWindows(id, PostEventContinuation.Program);
 
     private void ContinueCaoSongLilu(long id)
     {

@@ -42,8 +42,7 @@ public sealed partial class GameEngine
   return BeginProgramSkillDamage(f,f.OwnerSeat,w.Amount,explicitSourceSeat:w.TargetSeat.Value);
  }
  private static readonly CardMoveReason CaiYangJiaofengDrawReason=new("skill-program.anniversary:jiaofeng.draw");
- private bool DrainCaiYang(long id)=>TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.Program)||TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program)||
-  TryBeginHpChangedProgramWindow(id,PostEventContinuation.Program)||TryBeginCardsMovedProgramWindow(id)||TryBeginAdvancedSkillsChanged(id);
+ private bool DrainCaiYang(long id)=>TryBeginProgramChildWindows(id, PostEventContinuation.Program);
  private void ContinueCaiYang(long id)
  {
   if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{AnniversaryCaiYang:{}r}f||f.Id!=id)return;

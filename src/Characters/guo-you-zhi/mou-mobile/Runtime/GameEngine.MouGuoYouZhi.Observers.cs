@@ -17,7 +17,7 @@ public sealed partial class GameEngine
         foreach (var m in _cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= _movementSequence).ToArray())
         { var fact = new MouGuoYouZhiMovementEvent(id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence); if (!ProgramEventHistory<MouGuoYouZhiMovementEvent>().Contains(fact)) AdvanceEventRulesAndQueueFact(fact); }
     }
-    private bool DrainMouGyz(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouGyz(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 32400)]
     private bool MouGyzMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op is SkillProgramEffectOp.ResolveMouGuoYouZhiBique or SkillProgramEffectOp.ResolveMouGuoYouZhiZhongchun && ValidMouGyz(f) && p == f.PendingMovementContinuation && p.BeforeCount == 0 && p.CoverageResultBind is null && f.MouGuoYouZhi!.Stage is MouGuoYouZhiStage.GiftChildren or MouGuoYouZhiStage.ObtainChildren or MouGuoYouZhiStage.DiscardChildren or MouGuoYouZhiStage.DrawChildren;
     private bool MouGyzFirstChild(ProgramSkillFrame f, ResolutionFrame child)

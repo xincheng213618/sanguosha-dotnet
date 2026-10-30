@@ -120,9 +120,7 @@ public sealed partial class GameEngine
         });
         AdvanceRuntimeProgram(f.Id);
     }
-    private bool DrainRuanJi(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainRuanJi(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueRuanJi(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { RuanJi: { } r } f || f.Id != id) return;

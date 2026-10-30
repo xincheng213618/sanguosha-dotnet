@@ -160,10 +160,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new XiongmuPutTailCapturedEvent(id, r.PutBatchId, spill.Length, after));
     }
     private bool DrainWuXiongmu(ProgramSkillFrame f) =>
-        TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+        TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueWuXiongmu(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { Xiongmu: { } r } f || f.Id != id || _pendingDecision is not null || f.NativeDraw is not null) return;

@@ -111,8 +111,7 @@ public sealed partial class GameEngine
         var actual = count > 0 ? DrawCards(_players[f.OwnerSeat], count, true, new(reason)).Count : 0;
         RecordYuanHuanStep(f.Id, reason, before, actual);
     }
-    private bool DrainYuanHuanChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainYuanHuanChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueYuanHuan(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { YuanHuan: { } r } f && f.Id == id)

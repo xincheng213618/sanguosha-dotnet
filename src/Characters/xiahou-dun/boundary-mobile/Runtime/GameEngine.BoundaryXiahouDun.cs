@@ -100,9 +100,7 @@ public sealed partial class GameEngine
         if (count > 0) AdvanceEventRulesAndQueueFact(new BoundaryXiahouDunStoredEvent(f.Id, r.Source, r.Hash, location, count, before, _movementSequence));
         ContinueBoundaryXiahouDun(f.Id);
     }
-    private bool DrainBoundaryXiahouDun(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainBoundaryXiahouDun(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueBoundaryXiahouDun(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { BoundaryXiahouDun: { } r } f || f.Id != id) return;

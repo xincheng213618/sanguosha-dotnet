@@ -101,7 +101,7 @@ public sealed partial class GameEngine
         f = GetActiveProgramFrame(f.Id); ReplaceRuntimeTop(f = f with { CaoYing = f.CaoYing! with { MovementAfter = _movementSequence, DrawCount = drawn } });
         if (!DrainCaoYingChildren(f)) FinishCaoYing(GetActiveProgramFrame(f.Id));
     }
-    private bool DrainCaoYingChildren(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainCaoYingChildren(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void FinishCaoYing(ProgramSkillFrame f)
     {
         if (f.CaoYing is { Stage: CaoYingStage.DrawChildren, Policy: CaoYingRulePolicy.MobileOrdinary, Correct: 3 } r && _players[f.OwnerSeat].IsAlive)

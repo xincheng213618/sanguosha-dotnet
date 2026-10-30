@@ -41,9 +41,7 @@ public sealed partial class GameEngine
         }
         ReplaceRuntimeTop(f = f with { ShenMaChao = r }); ContinueShenMaChao(f.Id); return SkillProgramStepOutcome.AwaitChild;
     }
-    private bool DrainShenMc(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShenMc(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     [ProgramContinuation(ProgramContinuationKind.Resume, 39000)] private bool ResumeShenMc(long id)
     { if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { ShenMaChao: not null } f || f.Id != id) return false; ContinueShenMaChao(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 39000)] private bool ReturnShenMcMovement(ProgramSkillFrame f) => f.ShenMaChao is not null && ResumeShenMc(f.Id);

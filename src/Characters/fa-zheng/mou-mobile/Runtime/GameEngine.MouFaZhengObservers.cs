@@ -39,9 +39,7 @@ public sealed partial class GameEngine
         }
         return true;
     }
-    private bool DrainMouFaZhengChildren(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouFaZhengChildren(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 31800)]
     private bool IsMouFaZhengMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e is not null && MouFaZhengComposition.Handles(e.Op) && ValidMouFaZheng(f) &&
         f.MouFaZheng is { Accepted: true, Stage: MouFaZhengStage.MovementChildren or MouFaZhengStage.LosingHp or MouFaZhengStage.LossChildren or MouFaZhengStage.RecoveryChildren } &&

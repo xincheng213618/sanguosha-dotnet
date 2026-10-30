@@ -77,9 +77,7 @@ public sealed partial class GameEngine
         p.Choices.OrderByDescending(c => c.Cards.Count > 0 ? CardCatalog.Get(EntityAtCurrentLocation(c.Cards.Single()).Kind).HandKeepValue : 35)
             .ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
 
-    private bool DrainCaoShuangChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainCaoShuangChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueCaoShuangProgram(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame f || f.Id != id || f.CaoShuangTuogu is null && f.CaoShuangShanzhuan is null) return;

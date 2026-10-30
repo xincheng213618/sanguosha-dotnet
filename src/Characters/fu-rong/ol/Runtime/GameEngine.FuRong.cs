@@ -88,10 +88,7 @@ public sealed partial class GameEngine
         AdvanceRuntimeProgram(f.Id);
     }
     private bool DrainFuRongChildren(ProgramSkillFrame f) =>
-        TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+        TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 26310)]
     private bool ResumeFuRongPair(long id)
     {

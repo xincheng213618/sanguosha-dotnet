@@ -43,7 +43,7 @@ public sealed partial class GameEngine
  }
  private void IssueLvQianStarted(ProgramSkillFrame f){var r=f.LvQian!;AdvanceEventRulesAndQueueFact(new LvQianStartedEvent(f.Id,r.Source,r.GameplayHash,r.WindowId,r.ActualTurn,r.Stage));}
  private void IssueLvQianSegment(ProgramSkillFrame f){var r=f.LvQian!;AdvanceEventRulesAndQueueFact(new LvQianSegmentPaidEvent(f.Id,r.Source,r.GameplayHash,r.Stage,r.Before,r.After,r.ActualCount,r.Targets.Single()));}
- private bool DrainLvQian(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+ private bool DrainLvQian(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
  [ProgramContinuation(ProgramContinuationKind.Resume,24900)]private bool ResumeLvQian(long id)
  {
   if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{LvQian:{}r}f||f.Id!=id||r.Stage==LvQianStage.DamageChoice)return false;AssertLvQian(f);if(DrainLvQian(f))return true;

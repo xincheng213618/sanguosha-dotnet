@@ -123,10 +123,7 @@ public sealed partial class GameEngine
         FinishDiou(f);
     }
     private bool DrainDiouChildren(ProgramSkillFrame f) =>
-        TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+        TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveDiouTanbanUse)]
     private void ReturnDiouDraw(ProgramSkillFrame f, NativeDrawOutcome o)
     {

@@ -116,9 +116,7 @@ public sealed partial class GameEngine
                     ? NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, ids, before) : null, disclosure: CardMovementDisclosure.FaceUp);
         AddZhangWenSibianStep(f.Id, stage, before);
     }
-    private bool DrainZhangWenSibian(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainZhangWenSibian(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 45100)] private bool ContinueZhangWenSibian(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { ZhangWenSibian: not null } own || own.Id != id) return false;

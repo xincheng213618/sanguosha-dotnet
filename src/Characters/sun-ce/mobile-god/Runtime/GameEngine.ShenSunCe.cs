@@ -65,9 +65,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new MaximumHpChangedEvent(seat, p.MaxHp - before, p.MaxHp, f.SkillId) { HpBeforeClamp = hp });
         AdvanceEventRulesAndQueueFact(new ShenSunCeMaximumPaidEvent(f.Id, seat, before, p.MaxHp, hp, p.Hp));
     }
-    private bool DrainShenSunCe(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShenSunCe(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueShenSunCe(long id)
     {
         while (_pendingDecision is null && _resolutionStack.LastOrDefault() is ProgramSkillFrame { ShenSunCe: { } r } f && f.Id == id)

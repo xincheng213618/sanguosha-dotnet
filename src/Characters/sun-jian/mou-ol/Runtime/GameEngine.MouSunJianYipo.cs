@@ -134,8 +134,7 @@ public sealed partial class GameEngine
         { ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, MouSunJianOlYipo = r with { Stage = MouSunJianOlYipoStage.Discard } }); PublishMouSunJianOlYipo(f); return; }
         FinishMouSunJianOl(f);
     }
-    private bool DrainMouSunJianOlChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainMouSunJianOlChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void FinishMouSunJianOl(ProgramSkillFrame f)
     {
         AdvanceEventRulesAndQueueFact(new MouSunJianOlCompletedEvent(f.Id, f.SkillId));

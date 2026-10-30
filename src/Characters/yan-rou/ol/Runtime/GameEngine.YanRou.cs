@@ -92,7 +92,7 @@ public sealed partial class GameEngine
         foreach(var s in shuffles)AdvanceEventRulesAndQueueFact(new YanRouReshuffleCapturedEvent(id,s.BatchId,s.Before,s.After,s.Movements.Count));
         AdvanceEventRulesAndQueueFact(new YanRouMovementIssuedEvent(id,r.Stage,r.Payer,r.CardId,r.From,r.Before,after,count));
     }
-    private bool DrainYanRou(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainYanRou(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueYanRou(long id)
     {
         if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{YanRou:{}r}f||f.Id!=id)return;AssertYanRou(f);

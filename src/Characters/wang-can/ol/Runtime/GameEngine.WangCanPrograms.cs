@@ -65,7 +65,7 @@ public sealed partial class GameEngine
   {var nonbasic=r.Remaining.Where(id=>_cardZones.GetLocation(id)==r.Lease&&GetProgramCardCategory(GetAdvancedCard(id).Kind)!=SkillProgramCardCategory.Basic).ToArray();ReplaceRuntimeTop(f=f with{WangCan=r with{Remaining=r.Remaining.Except(nonbasic).ToArray()}});PayWangCanMove(f,nonbasic,CardLocation.Hand(f.OwnerSeat),WangCanStage.DenglouGain);return;}
   IssueDenglouNativeUse(f,BuildDenglouNativeBasicUseOptions(f)[int.Parse(choice.Parameters["option"])]);
  }
- private bool DrainWangCan(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+ private bool DrainWangCan(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
  [ProgramContinuation(ProgramContinuationKind.Resume,24600)] private bool ResumeWangCan(long id)
  {
   if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{WangCan:{}r}f||f.Id!=id||r.Stage is WangCanStage.QiaiChoose or WangCanStage.DenglouView or WangCanStage.DenglouChoose or WangCanStage.DenglouNative)return false;RequireIssuedWangCan(f);if(DrainWangCan(f))return true;

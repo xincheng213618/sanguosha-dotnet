@@ -74,7 +74,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new OrdinaryBingyiDrawReturnedEvent(f.Id, r.Cursor, outcome.RecipientSeat, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId));
         ContinueOrdinaryBingyi(f.Id);
     }
-    private bool DrainOrdinaryBingyi(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainOrdinaryBingyi(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueOrdinaryBingyi(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { OrdinaryBingyi: { } r } f && f.Id == id)

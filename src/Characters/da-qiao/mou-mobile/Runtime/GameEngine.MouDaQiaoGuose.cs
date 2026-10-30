@@ -64,9 +64,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(f = f with { MouDaQiaoGuose = r with { Stage = MouDaQiaoGuoseStage.MovementChildren, After = _movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         ContinueMouDaQiaoGuose(f.Id);
     }
-    private bool DrainMouDaQiao(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouDaQiao(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueMouDaQiaoGuose(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { MouDaQiaoGuose: { } r } f || f.Id != id) return;

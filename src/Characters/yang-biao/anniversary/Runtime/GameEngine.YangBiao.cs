@@ -133,7 +133,7 @@ public sealed partial class GameEngine
         { if (gift) MoveProgramCardsFromMultipleSources(r.Cards, CardLocation.Hand(r.Target), new(YangBiaoGiftReason), Paid); else MoveProgramLogicalDiscard(f, f.OwnerSeat, r.Cards, new(YangBiaoDiscardReason), Paid); }
         ContinueYangBiao(f.Id);
     }
-    private bool DrainYangBiao(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.Program) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainYangBiao(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.Program);
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveAnniversaryYangBiaoJinjie)] private void ReturnYangBiaoDraw(ProgramSkillFrame supplied, NativeDrawOutcome draw)
     {
         var f = GetActiveProgramFrame(supplied.Id); var r = f.AnniversaryYangBiao!;

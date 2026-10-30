@@ -226,9 +226,7 @@ public sealed partial class GameEngine
     }
     private void SealShiHz(long id)
     { var f = GetActiveProgramFrame(id); ReplaceRuntimeFrame(id, f with { ShiHuangZu = f.ShiHuangZu! with { After = _movementSequence } }); }
-    private bool DrainShiHz(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainShiHz(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueShiHz(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { ShiHuangZu: { } r } f || f.Id != id || _pendingDecision is not null) return;

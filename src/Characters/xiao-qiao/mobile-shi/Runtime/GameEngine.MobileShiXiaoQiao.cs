@@ -127,8 +127,7 @@ public sealed partial class GameEngine
         AdvanceRulesAndPublishState();
         f = GetActiveProgramFrame(id); ReplaceRuntimeTop(f with { ShiXiaoQiao = f.ShiXiaoQiao! with { After = _movementSequence } });
     }
-    private bool DrainShiXq(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShiXq(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueShiXq(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { ShiXiaoQiao: { } r } f || f.Id != id || _pendingDecision is not null || r.Stage == ShiXqStage.Drawing) return;

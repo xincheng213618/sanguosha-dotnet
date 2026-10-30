@@ -101,7 +101,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(f with{LuYuSheng=r with{After=after,ActualCount=count,Reshuffles=shuffles}});foreach(var s in shuffles)AdvanceEventRulesAndQueueFact(new LuYuShengReshuffleCapturedEvent(id,s.BatchId,s.Before,s.After,s.Movements.Count));
         AdvanceEventRulesAndQueueFact(new LuYuShengMovementIssuedEvent(id,r.Stage,r.Payer,r.Before,after,count));
     }
-    private bool DrainLuYuSheng(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainLuYuSheng(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueLuYuSheng(long id)
     {
         if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{LuYuSheng:{}r}f||f.Id!=id)return;AssertLuYuSheng(f);

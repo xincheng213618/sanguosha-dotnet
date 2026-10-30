@@ -161,8 +161,7 @@ public sealed partial class GameEngine
     }
     private void SealBoundaryZf(long id)
     { var frame = GetActiveProgramFrame(id); ReplaceRuntimeTop(frame with { BoundaryZhouFei = frame.BoundaryZhouFei! with { After = _movementSequence } }); }
-    private bool DrainBoundaryZf(ProgramSkillFrame frame) => TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(frame.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(frame.Id) || TryBeginAdvancedSkillsChanged(frame.Id);
+    private bool DrainBoundaryZf(ProgramSkillFrame frame) => TryBeginProgramChildWindows(frame.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueBoundaryZf(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { BoundaryZhouFei: { } receipt } frame || frame.Id != id) return;

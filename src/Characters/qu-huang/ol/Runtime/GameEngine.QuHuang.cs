@@ -70,7 +70,7 @@ public sealed partial class GameEngine
     {var f=GetActiveProgramFrame(id);var r=f.QuHuang!;var actual=count??ProgramEventHistory<QuHuangEntityMovedEvent>().Count(e=>e.FrameId==id&&e.Step==r.Step);ReplaceRuntimeTop(f=f with{QuHuang=r with{After=_movementSequence,ActualCount=actual}});AdvanceEventRulesAndQueueFact(new QuHuangMovementPaidEvent(f.Id,r.Step,r.Stage,r.Before,_movementSequence,actual));ContinueQuHuang(id);}
     private void PayQuHuangDraw(ProgramSkillFrame f,int seat,QuHuangStage stage)
     {PrepareQuHuangPayment(ref f,stage,[]);var actual=_players[seat].IsAlive&&_winner==Winner.None?DrawCards(_players[seat],1,true,new(QiejianDrawReason)).Count:0;CompleteQuHuangMovement(f.Id,actual);}
-    private bool DrainQuHuang(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainQuHuang(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueQuHuang(long id)
     {
         while(_resolutionStack.LastOrDefault()is ProgramSkillFrame{QuHuang:{}r}f&&f.Id==id)

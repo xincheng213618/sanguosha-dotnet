@@ -287,7 +287,5 @@ public sealed partial class GameEngine
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26100)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26100)]
     private bool ContinuePaidWoLongFengChu(ProgramSkillFrame frame) => frame.EquipmentSlotNamedUse?.Payment is not null || frame.Luanfeng is not null;
-    private bool DrainEquipmentSlotNamedChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainEquipmentSlotNamedChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
 }

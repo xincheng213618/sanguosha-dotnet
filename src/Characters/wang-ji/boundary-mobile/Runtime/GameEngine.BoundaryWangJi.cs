@@ -167,8 +167,7 @@ public sealed partial class GameEngine
         frame = GetActiveProgramFrame(frame.Id); ReplaceRuntimeTop(frame = frame with { BoundaryWangJi = frame.BoundaryWangJi! with { Payment = payment, After = _movementSequence } });
         AdvanceEventRulesAndQueueFact(payment); ContinueBoundaryWj(frame.Id);
     }
-    private bool DrainBoundaryWj(ProgramSkillFrame frame) => TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(frame.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(frame.Id) || TryBeginAdvancedSkillsChanged(frame.Id);
+    private bool DrainBoundaryWj(ProgramSkillFrame frame) => TryBeginProgramChildWindows(frame.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueBoundaryWj(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { BoundaryWangJi: { } receipt } frame || frame.Id != id) return;

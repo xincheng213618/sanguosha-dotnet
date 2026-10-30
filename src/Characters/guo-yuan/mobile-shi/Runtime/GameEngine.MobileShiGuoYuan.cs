@@ -146,8 +146,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new ShiGyDiscardPaidEvent(f.Id, paid)); ContinueShiGy(f.Id);
     }
     private void SealShiGy(long id) { var f = GetActiveProgramFrame(id); ReplaceRuntimeTop(f with { ShiGuoYuan = f.ShiGuoYuan! with { After = _movementSequence } }); }
-    private bool DrainShiGy(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShiGy(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 48100)] private bool ContinueShiGy(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { ShiGuoYuan: { } r } f || f.Id != id) return false;

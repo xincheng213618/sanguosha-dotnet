@@ -153,8 +153,7 @@ public sealed partial class GameEngine
         f = GetActiveProgramFrame(f.Id); ReplaceRuntimeTop(f = f with { WangKuangRenxia = f.WangKuangRenxia! with { After = _movementSequence } });
         AdvanceEventRulesAndQueueFact(new WangKuangRenxiaTailClosedEvent(f.Id, f.WangKuangRenxia!.Cursor, _movementSequence));
     }
-    private bool DrainWangKuangChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainWangKuangChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueWangKuang(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { WangKuangRenxia: { } r } f && f.Id == id)

@@ -119,8 +119,7 @@ public sealed partial class GameEngine
         ResumeMobileShenZhangLiao(f.Id);
     }
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileDuoruiBorrowedSkill, SkillProgramEffectOp.RestoreMobileZhitiEquipmentSlot)] private PromptChoice ChooseMobileShenZhangLiao(PendingDecision p, ProgramSkillFrame f) => p.Choices[0];
-    private bool DrainMobileShenZhangLiao(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainMobileShenZhangLiao(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     [ProgramContinuation(ProgramContinuationKind.Resume, 39950)] private bool ResumeMobileShenZhangLiao(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { MobileShenZhangLiao: { } r } f || f.Id != id) return false;

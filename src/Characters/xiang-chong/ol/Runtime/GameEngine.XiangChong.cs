@@ -140,7 +140,7 @@ public sealed partial class GameEngine
         f=GetActiveProgramFrame(f.Id);ReplaceRuntimeTop(f=f with{XiangChong=f.XiangChong! with{After=_movementSequence}});
         if(first)AdvanceEventRulesAndQueueFact(new XiangChongBranchPaidEvent(f.Id,f.OwnerSeat,r.Recipient,r.Branch,r.PhaseToken,f.XiangChong!.Before,f.XiangChong.After));
     }
-    private bool DrainXiang(long id)=>TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.Program)||TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(id,PostEventContinuation.Program)||TryBeginCardsMovedProgramWindow(id)||TryBeginAdvancedSkillsChanged(id);
+    private bool DrainXiang(long id)=>TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueXiang(long id)
     {
         if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{XiangChong:{}r}f||f.Id!=id)return;AssertXiang(f);

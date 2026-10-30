@@ -64,7 +64,7 @@ public sealed partial class GameEngine
         f = GetActiveProgramFrame(f.Id); r = r with { After = _movementSequence, Count = count }; ReplaceRuntimeTop(f with { LianZhu = r }); IssueLianZhuSegment(f.Id, r, f.OwnerSeat); AdvanceRuntimeProgram(f.Id);
     }
     private void FinishLianZhu(ProgramSkillFrame f) { ReplaceRuntimeTop(f = f with { LianZhu = null, PendingMovementContinuation = null }); FinishProgramSkill(f, true); }
-    private bool DrainLianZhu(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainLianZhu(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 22400)]
     private bool ResumeLianZhu(long id)
     {

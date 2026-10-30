@@ -176,9 +176,7 @@ public sealed partial class GameEngine
 
     private void SealShiCzMovement(long id)
     { var f = GetActiveProgramFrame(id); ReplaceRuntimeFrame(id, f with { MobileShiChenZhi = f.MobileShiChenZhi! with { AfterMovement = _movementSequence } }); }
-    private bool DrainShiCz(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainShiCz(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
 
     private void ContinueShiCz(long id)
     {

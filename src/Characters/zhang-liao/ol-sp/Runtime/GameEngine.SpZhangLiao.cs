@@ -50,9 +50,7 @@ public sealed partial class GameEngine
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    private bool DrainSpZhangLiaoChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainSpZhangLiaoChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
 
     private void ContinueSpZhangLiao(long id)
     {

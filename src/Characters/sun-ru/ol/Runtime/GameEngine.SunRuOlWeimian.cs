@@ -101,9 +101,7 @@ public sealed partial class GameEngine
         else throw new InvalidOperationException("Unknown Weimian choice.");
         ContinueSunRuOl(f.Id);
     }
-    private bool DrainSunRuOlChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainSunRuOlChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueSunRuOl(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame f && f.Id == id && (f.SunRuOlChishi is not null || f.SunRuOlWeimian is not null))

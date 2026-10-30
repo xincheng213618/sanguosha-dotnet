@@ -164,8 +164,7 @@ public sealed partial class GameEngine
         else MoveProgramCardsFromMultipleSources(ids, destination, HeYanMoveReason(kind), Paid, disclosure: CardMovementDisclosure.FaceUp);
         ContinueHeYan(f.Id);
     }
-    private bool DrainHeYan(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainHeYan(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 44200)] private bool ContinueHeYan(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { AnniversaryHeYan: { } r } f || f.Id != id) return false;

@@ -74,7 +74,7 @@ public sealed partial class GameEngine
  {
   var f=GetActiveProgramFrame(frameId);var r=f.Neifa!;ReplaceRuntimeTop(f with{Neifa=r with{Segments=r.Segments.Append(s).ToArray()}});AdvanceEventRulesAndQueueFact(new NeifaSegmentPaidEvent(frameId,r.Source,r.GameplayHash,r.ActualTurn,r.WindowId,s.Name,s.Before,s.After,s.Requested,s.Actual,s.BatchId));
  }
- private bool DrainNeifa(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+ private bool DrainNeifa(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
  private void FinishNeifa(ProgramSkillFrame f){ReplaceRuntimeTop(f=f with{Neifa=null,PendingMovementContinuation=null});FinishProgramSkill(f,true);}
  [ProgramContinuation(ProgramContinuationKind.Resume,24800)] private bool ResumeNeifa(long id)
  {

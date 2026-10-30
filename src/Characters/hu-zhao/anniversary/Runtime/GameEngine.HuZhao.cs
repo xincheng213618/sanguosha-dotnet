@@ -78,9 +78,7 @@ public sealed partial class GameEngine
         }
         f = GetActiveProgramFrame(f.Id); ReplaceRuntimeTop(f with { HuZhaoMidu = f.HuZhaoMidu! with { After = _movementSequence } }); ContinueHuZhaoMidu(f.Id);
     }
-    private bool DrainHuZhaoChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainHuZhaoChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueHuZhaoMidu(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { HuZhaoMidu: { } r } f || f.Id != id) return;

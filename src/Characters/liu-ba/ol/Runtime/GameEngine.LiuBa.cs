@@ -89,7 +89,7 @@ public sealed partial class GameEngine
     }
     private void CompleteLiuBaMovement(ProgramSkillFrame f,int count)
     {f=GetActiveProgramFrame(f.Id);var r=f.LiuBa!;ReplaceRuntimeTop(f with{LiuBa=r with{After=_movementSequence,ActualCount=count}});AdvanceEventRulesAndQueueFact(new LiuBaMovementIssuedEvent(f.Id,r.Step,r.Stage,r.Before,_movementSequence,count));ContinueLiuBa(f.Id);}
-    private bool DrainLiuBa(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainLiuBa(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueLiuBa(long id)
     {
         while(_resolutionStack.LastOrDefault()is ProgramSkillFrame{LiuBa:{}r}f&&f.Id==id)

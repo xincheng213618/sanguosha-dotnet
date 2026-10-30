@@ -53,7 +53,7 @@ public sealed partial class GameEngine
   MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(recipient), new(LiehouReason), NativeGiveCompletionRecords(f.Id,giver,recipient,[id],_movementSequence,(batch,moves)=>{
    if(moves is not[var m]||m.CardId!=id||m.From!=CardLocation.Hand(giver)||m.To!=CardLocation.Hand(recipient))throw new InvalidOperationException("Liehou failed its exact actual Hand-to-Hand payment.");var active=GetActiveProgramFrame(f.Id);var paid=new LiehouPayment(id,m.From,recipient,before,_movementSequence,batch);ReplaceRuntimeTop(active with{LvKuangLvXiang=active.LvKuangLvXiang!with{Payments=active.LvKuangLvXiang.Payments.Append(paid).ToArray()}});AdvanceEventRulesAndQueueFact(new LiehouHandPaidEvent(f.Id,r.Source,r.GameplayHash,active.LvKuangLvXiang.Payments.Count+1,giver,recipient,before,_movementSequence,batch));}));AdvanceRuntimeProgram(f.Id);
  }
- private bool DrainLvKuangLvXiang(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+ private bool DrainLvKuangLvXiang(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
  [ProgramContinuation(ProgramContinuationKind.Resume,25000)]private bool ResumeLvKuangLvXiang(long id)
  {
   if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{LvKuangLvXiang:{}r}f||f.Id!=id)return false;AssertLvKuangLvXiang(f);if(r.Stage=="native"&&!r.Returned)return false;

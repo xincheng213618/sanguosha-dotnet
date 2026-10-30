@@ -456,10 +456,7 @@ public sealed partial class GameEngine
         FinishProgramSkill(GetActiveProgramFrame(f.Id), true);
     }
 
-    private bool DrainShiCaoShuang(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) ||
-        TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainShiCaoShuang(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 67900)]
     private bool ResumeShiCaoShuang(long id)

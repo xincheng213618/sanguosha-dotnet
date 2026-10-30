@@ -150,9 +150,7 @@ public sealed partial class GameEngine
         f = GetActiveProgramFrame(f.Id); ReplaceRuntimeTop(f with { ShenTaishiCiPowei = f.ShenTaishiCiPowei! with { After = _movementSequence } });
         ContinueShenTscPowei(f.Id);
     }
-    private bool DrainShenTscPowei(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainShenTscPowei(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueShenTscPowei(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { ShenTaishiCiPowei: { } r } f || f.Id != id || _pendingDecision is not null) return;

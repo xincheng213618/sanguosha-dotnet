@@ -94,9 +94,7 @@ public sealed partial class GameEngine
         ContinueZhangYi(f.Id);
     }
 
-    private bool DrainZhangYiChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainZhangYiChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
 
     private void ContinueZhangYi(long id)
     {

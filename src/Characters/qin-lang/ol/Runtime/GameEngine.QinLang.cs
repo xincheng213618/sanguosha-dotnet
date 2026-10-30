@@ -129,7 +129,7 @@ public sealed partial class GameEngine
         var names=selected.Select(c=>c.EffectiveName!.Value).Distinct().ToArray();
         if(names is[var name]&&QinLangImitable(name))AdvanceEventRulesAndQueueFact(new QinLangXianyingGrantedEvent(f.Id,r.Source,r.GameplayHash,r.ActualTurn,r.TurnOwner,selected.Count,name));
     }
-    private bool DrainQinLang(long id)=>TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.Program)||TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(id,PostEventContinuation.Program)||TryBeginCardsMovedProgramWindow(id)||TryBeginAdvancedSkillsChanged(id);
+    private bool DrainQinLang(long id)=>TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueQinLang(long id)
     {
         if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{QinLangXianying:{}r}f||f.Id!=id)return;AssertQinLang(f);

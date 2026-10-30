@@ -105,8 +105,7 @@ public sealed partial class GameEngine
         }
         ContinueAnniversaryHz(f.Id);
     }
-    private bool DrainAnniversaryHz(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainAnniversaryHz(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueAnniversaryHz(long id)
     {
         while (_pendingDecision is null && _resolutionStack.LastOrDefault() is ProgramSkillFrame { AnniversaryHuangZhong: { } r } f && f.Id == id)

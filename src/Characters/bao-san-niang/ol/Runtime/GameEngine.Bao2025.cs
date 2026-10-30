@@ -184,9 +184,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(f = GetActiveProgramFrame(f.Id) with { Bao2025 = f.Bao2025! with { MovementAfter = _movementSequence } });
         AdvanceEventRulesAndQueueFact(new ProgramBao2025MovementIssuedEvent(f.Id, f.Bao2025!)); AdvanceRuntimeProgram(f.Id);
     }
-    private bool DrainBaoChildren(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainBaoChildren(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 21600)]
     private bool ResumeBao2025(long id)
     {

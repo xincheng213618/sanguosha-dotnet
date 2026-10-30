@@ -55,9 +55,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(f = f with { CardSetBindings = Array.AsReadOnly(f.CardSetBindings.Select(binding => binding.Name == LiuPiTableBind ? table : binding).ToArray()) });
         return f;
     }
-    private bool DrainLiuPiChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainLiuPiChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
 
     private void ContinueLiuPiExchange(long id)
     {

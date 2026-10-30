@@ -83,8 +83,7 @@ public sealed partial class GameEngine
         CompleteBeiMiHuTargetAddition(f);
     }
     private SkillProgramEffect? BeiMiHuPausedEffect(ProgramSkillFrame f)=>f.InstructionIndex<1?null:ProgramInstructionResolver.Default.Resolve(f,_contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-    private bool DrainBeiMiHuChildren(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.Program) || TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainBeiMiHuChildren(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.Program);
     [ProgramContinuation(ProgramContinuationKind.Resume,23200)]
     private bool ResumeBeiMiHu(long id)
     {

@@ -20,9 +20,7 @@ public sealed partial class GameEngine
         ValidMouXiahouShi(f) && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null &&
         (f.MouXiahouShiYanyu?.Stage is MouXiahouShiYanyuStage.DiscardChildren or MouXiahouShiYanyuStage.DrawChildren ||
          f.MouXiahouShiQiaoshi?.Stage is MouXiahouShiQiaoshiStage.RecoveryChildren or MouXiahouShiQiaoshiStage.DrawChildren);
-    private bool DrainMouXiahouShiChildren(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouXiahouShiChildren(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private bool MouXiahouShiFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (!ValidMouXiahouShi(f)) return false;

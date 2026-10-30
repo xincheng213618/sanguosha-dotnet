@@ -86,8 +86,7 @@ public sealed partial class GameEngine
         }
         ContinueShenJw(f.Id); return SkillProgramStepOutcome.AwaitChild;
     }
-    private bool DrainShenJw(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShenJw(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     [ProgramContinuation(ProgramContinuationKind.Resume, 38400)] private bool ResumeShenJw(long id)
     { if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { ShenJiangWei: not null } f || f.Id != id) return false; ContinueShenJw(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 38400)] private bool ReturnShenJwMovement(ProgramSkillFrame f) => f.ShenJiangWei is not null && ResumeShenJw(f.Id);

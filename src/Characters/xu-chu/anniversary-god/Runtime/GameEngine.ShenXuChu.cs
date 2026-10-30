@@ -80,9 +80,7 @@ public sealed partial class GameEngine
         }
         ContinueShenXuChu(f.Id); return SkillProgramStepOutcome.AwaitChild;
     }
-    private bool DrainShenXuChu(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShenXuChu(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     [ProgramContinuation(ProgramContinuationKind.Resume, 38800)] private bool ResumeShenXuChu(long id)
     { if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { ShenXuChu: not null } f || f.Id != id) return false; ContinueShenXuChu(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 38800)] private bool ReturnShenXuChuMovement(ProgramSkillFrame f) => f.ShenXuChu is not null && ResumeShenXuChu(f.Id);

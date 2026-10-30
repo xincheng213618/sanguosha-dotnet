@@ -123,7 +123,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new JiyunPreparationDrawReturnedEvent(f.Id, r.Cursor, outcome.RecipientSeat, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId));
         ContinueLiFeng(f.Id);
     }
-    private bool DrainLiFeng(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainLiFeng(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueLiFeng(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { LiFeng: { } r } f && f.Id == id)

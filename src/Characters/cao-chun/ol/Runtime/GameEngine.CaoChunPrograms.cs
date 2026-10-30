@@ -92,7 +92,7 @@ public sealed partial class GameEngine
  {
   var r=f.CaoChun!;var owner=_players[f.OwnerSeat];if(!owner.IsAlive)return;var marks=owner.Shanjia?.LossMarks??0;if(owner.Shanjia is not{}state)throw new InvalidOperationException("Shanjia activation has no real starting marker state.");var debt=new ShanjiaPhaseDebt(r.Source,r.GameplayHash,f.Id,r.ActualTurn,r.PhaseInstance,marks,marks);owner.Shanjia=state with{Debt=debt};AdvanceEventRulesAndQueueFact(new ShanjiaDebtArmedEvent(r.Source,r.GameplayHash,f.Id,r.ActualTurn,r.PhaseInstance,marks));
  }
- private bool DrainCaoChun(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+ private bool DrainCaoChun(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
  [ProgramContinuation(ProgramContinuationKind.Resume,24500)]private bool ResumeCaoChun(long id)
  {
   if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{CaoChun:{}r}f||f.Id!=id)return false;RequireCaoChun(f);

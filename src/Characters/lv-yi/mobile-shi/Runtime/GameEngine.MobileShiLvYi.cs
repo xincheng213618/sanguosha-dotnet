@@ -291,10 +291,7 @@ public sealed partial class GameEngine
         FinishProgramSkill(GetActiveProgramFrame(f.Id), true);
     }
 
-    private bool DrainShiLy(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) ||
-        TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainShiLy(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 68600)]
     private bool ResumeShiLy(long id)

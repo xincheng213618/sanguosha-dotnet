@@ -50,9 +50,7 @@ public sealed partial class GameEngine
         else PayShenZfPunishment(f);
         return SkillProgramStepOutcome.AwaitChild;
     }
-    private bool DrainShenZf(long id) => TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id,PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShenZf(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueShenZf(long id)
     {
         while (_pendingDecision is null && _resolutionStack.LastOrDefault() is ProgramSkillFrame { ShenZhangFei:{ } r } f && f.Id == id)

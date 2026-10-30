@@ -107,9 +107,7 @@ public sealed partial class GameEngine
         else throw new InvalidOperationException("Unknown Fenrui choice.");
         ContinueHuoJunFenrui(f.Id);
     }
-    private bool DrainHuoJunFenruiChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainHuoJunFenruiChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueHuoJunFenrui(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { HuoJunFenrui: { } r } f && f.Id == id)

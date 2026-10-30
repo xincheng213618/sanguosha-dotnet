@@ -101,8 +101,7 @@ public sealed partial class GameEngine
         f = GetActiveProgramFrame(f.Id); ReplaceRuntimeTop(f = f with { MouZhangXiuOl = f.MouZhangXiuOl! with { After = _movementSequence } });
         AdvanceEventRulesAndQueueFact(new MouZhangXiuOlDiscardPaidEvent(f.Id, payer, cardId, before, _movementSequence, defense)); ContinueMouZhangXiuOl(f.Id);
     }
-    private bool DrainMouZhangXiuOl(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainMouZhangXiuOl(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueMouZhangXiuOl(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { MouZhangXiuOl: { } r } f || f.Id != id) return;

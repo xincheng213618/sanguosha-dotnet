@@ -19,8 +19,7 @@ public sealed partial class GameEngine
     private bool IsWuLuKangMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null &&
         (e?.Op == SkillProgramEffectOp.ResolveWuLuKangShenduan && f.WuLuKangShenduan is { Stage: not WuLuKangShenduanStage.DiscardChoice and not WuLuKangShenduanStage.Drawing } && ValidWuLuKangShenduan(f) ||
          e?.Op == SkillProgramEffectOp.ResolveWuLuKangKegou && f.WuLuKangKegou is { Stage: WuLuKangKegouStage.GainChildren or WuLuKangKegouStage.NativeSlashChildren } && ValidWuLuKangKegou(f));
-    private bool DrainWuLuKangChildren(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainWuLuKangChildren(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private bool WuLuKangFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.WuLuKangShenduan is { } r && ValidWuLuKangShenduan(f))

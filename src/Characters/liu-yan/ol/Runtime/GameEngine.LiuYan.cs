@@ -37,7 +37,7 @@ public sealed partial class GameEngine
     }
     private void RecordLiuYanStart(ProgramSkillFrame f)
     {var r=f.LiuYan!;AdvanceEventRulesAndQueueFact(new LiuYanStartedEvent(f.Id,r.Source,r.GameplayHash,r.ActualTurn,r.TurnOwner,r.Operation,r.ParentWindowId,r.OriginalUseId,r.ActionId,string.Join(',',r.Targets)));}
-    private bool DrainLiuYan(long id)=>TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.Program)||TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(id,PostEventContinuation.Program)||TryBeginCardsMovedProgramWindow(id)||TryBeginAdvancedSkillsChanged(id);
+    private bool DrainLiuYan(long id)=>TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueLiuYan(long id)
     {
         if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{LiuYan:{}r}f||f.Id!=id)return;AssertLiuYan(f);

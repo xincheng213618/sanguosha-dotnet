@@ -157,9 +157,7 @@ public sealed partial class GameEngine
         if (r.Stage == MouLuXunStage.Distribution) { PayMouLuXunGift(f, choice.Targets.Single()); return; }
         throw new InvalidOperationException("Lu Xun's native child cannot accept another selection.");
     }
-    private bool DrainMouLuXun(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouLuXun(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void FinishMouLuXun(ProgramSkillFrame f)
     {
         AdvanceEventRulesAndQueueFact(new MouLuXunCompletedEvent(f.Id));

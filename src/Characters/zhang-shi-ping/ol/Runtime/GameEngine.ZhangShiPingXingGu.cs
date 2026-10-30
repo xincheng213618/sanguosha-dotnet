@@ -77,9 +77,7 @@ public sealed partial class GameEngine
         f = GetActiveProgramFrame(f.Id); ReplaceRuntimeTop(f with { ZhangShiPingXingGu = f.ZhangShiPingXingGu! with { SequenceAfter = _movementSequence } });
         ContinueXingGu(f.Id);
     }
-    private bool DrainXingGu(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainXingGu(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueXingGu(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { ZhangShiPingXingGu: { } r } f && f.Id == id)

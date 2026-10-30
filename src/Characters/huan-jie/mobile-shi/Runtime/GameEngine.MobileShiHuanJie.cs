@@ -106,9 +106,7 @@ public sealed partial class GameEngine
         GrantIssuedProgramTurnSkills(GetActiveProgramFrame(f.Id), r.Target, ["classic:kanpo"], expiry);
     }
 
-    private bool DrainShiHj(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShiHj(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueShiHj(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { MobileShiHuanJie: { } r } f || f.Id != id || _pendingDecision is not null) return;

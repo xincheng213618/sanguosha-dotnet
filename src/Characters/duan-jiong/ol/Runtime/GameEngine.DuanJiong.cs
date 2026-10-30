@@ -146,8 +146,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(f = f with { DuanJiongSaogu = f.DuanJiongSaogu! with { After = _movementSequence, DrawCount = drawn.Count } });
         AdvanceEventRulesAndQueueFact(new DuanJiongSaoguBranchPaidEvent(f.Id, r.ActorSeat, false, !r.Ending, drawn.Count, f.DuanJiongSaogu!.Before, _movementSequence)); ContinueSaogu(f.Id);
     }
-    private bool DrainSaoguChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainSaoguChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueSaogu(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { DuanJiongSaogu: { } r } f || f.Id != id) return;

@@ -83,7 +83,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(f with{FeiYi=f.FeiYi! with{After=after}});
         AdvanceEventRulesAndQueueFact(new FeiYiMovementIssuedEvent(id,stage,before,after,_cardMovements.Count(m=>m.Sequence>before&&m.Sequence<=after&&m.Reason.Value==(stage==FeiYiStage.DiscardChildren?FeiYiDiscardReason:FeiYiDrawReason)),minimum));
     }
-    private bool DrainFeiYiChildren(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainFeiYiChildren(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueFeiYi(long id)
     {
         if(_resolutionStack.LastOrDefault() is not ProgramSkillFrame{FeiYi:{}r}f||f.Id!=id)return;

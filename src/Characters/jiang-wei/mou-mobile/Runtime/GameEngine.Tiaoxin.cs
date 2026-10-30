@@ -108,7 +108,7 @@ public sealed partial class GameEngine
         var paid = new MouJiangWeiPayment(id, card.Kind, from, moved.To, moved.Sequence);
         f = GetActiveProgramFrame(f.Id); ReplaceRuntimeTop(f with { MouJiangWei = f.MouJiangWei! with { After = _movementSequence, Payment = paid } }); AdvanceEventRulesAndQueueFact(new MouJiangWeiGiftPaidEvent(f.Id, r.Cursor, actor, paid)); ContinueMouJw(f.Id);
     }
-    private bool DrainMouJw(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouJw(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueMouJw(long id)
     {
         var f = GetActiveProgramFrame(id); var r = f.MouJiangWei!;

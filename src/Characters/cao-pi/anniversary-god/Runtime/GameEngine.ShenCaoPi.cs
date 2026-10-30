@@ -102,8 +102,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new KemingEchoArmedEvent(f.Id, r.Source, r.GameplayHash, target, ProgramEventHistory<SkillInvocationStartedEvent>().Select(e => e.FrameId).DefaultIfEmpty().Max()));
         FinishShenCaoPi(f); return SkillProgramStepOutcome.AwaitChild;
     }
-    private bool DrainShenCaoPi(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShenCaoPi(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     [ProgramContinuation(ProgramContinuationKind.Resume, 39700)] private bool ResumeShenCaoPi(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { ShenCaoPi: { } r } f || f.Id != id) return false;

@@ -65,8 +65,7 @@ public sealed partial class GameEngine
         MoveCard(GetAdvancedCard(plan.CardId), AnniversaryBlyLease(f), CardLocation.Processing, AnniversaryBlyReason("use"), disclosure: CardMovementDisclosure.FaceUp);
         ReplaceRuntimeTop(f = GetActiveProgramFrame(f.Id) with { AnniversaryBly = GetActiveProgramFrame(f.Id).AnniversaryBly! with { After = _movementSequence } }); ContinueAnniversaryBly(f.Id);
     }
-    private bool DrainAnniversaryBly(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainAnniversaryBly(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 43600)] private bool ContinueAnniversaryBly(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { AnniversaryBly: { } r } f || f.Id != id) return false;

@@ -75,8 +75,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(f = f with { AnniversarySunHuan = r with { Stage = AnniversarySunHuanStage.IssuingUse, Native = n, Before = _movementSequence, After = _movementSequence } });
         ExecuteAction(_players[f.OwnerSeat], a);
     }
-    private bool DrainSunHuan(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainSunHuan(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 45400)] private bool ContinueSunHuan(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { AnniversarySunHuan: { } r } f || f.Id != id) return false;

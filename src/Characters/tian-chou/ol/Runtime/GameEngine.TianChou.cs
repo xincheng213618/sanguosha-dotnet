@@ -85,8 +85,7 @@ public sealed partial class GameEngine
         ContinueShandaoAfterPublicReveal(GetActiveProgramFrame(f.Id));
 
     }
-    private bool DrainTianChou(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainTianChou(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueTianChou(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { TianChouShandao: { } r } f && f.Id == id)

@@ -99,7 +99,7 @@ public sealed partial class GameEngine
         SealMouGszMobile(f.Id);ContinueMouGszMobile(f.Id);
     }
     private void SealMouGszMobile(long id){var f=GetActiveProgramFrame(id);ReplaceRuntimeTop(f with{MouGongsunZanMobile=f.MouGongsunZanMobile! with{After=_movementSequence}});}
-    private bool DrainMouGszMobile(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouGszMobile(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueMouGszMobile(long id)
     {
         if(_pendingDecision is not null||_resolutionStack.LastOrDefault() is not ProgramSkillFrame{MouGongsunZanMobile:{}r}f||f.Id!=id)return;

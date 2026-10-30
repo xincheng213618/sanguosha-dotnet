@@ -36,8 +36,7 @@ public sealed partial class GameEngine
             parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex].ToProgramCandidate()) &&
             parent.TriggerWindow == c.Window && c.DamageFrameId == parent.ParentFrameId;
     }
-    private bool DrainOlShenCaoPi(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainOlShenCaoPi(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     [ProgramNativeDrawReturn(SkillProgramEffectOp.StoreOlChuyuanAfterDamage)] private void ReturnOlChuyuanDraw(ProgramSkillFrame f, NativeDrawOutcome o)
     {
         var r = f.OlShenCaoPi ?? throw new InvalidOperationException("Chuyuan's native draw lost its original frame receipt.");

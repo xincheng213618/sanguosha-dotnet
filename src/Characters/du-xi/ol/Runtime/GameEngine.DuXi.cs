@@ -157,9 +157,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new DuXiQuxiMarkerMovedEvent(f.Id, r.Source, r.GameplayHash, _turnNumber, marker, previous, holder));
     }
 
-    private bool DrainDuXiChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainDuXiChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueDuXi(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { DuXiQuxi: { } r } f && f.Id == id)

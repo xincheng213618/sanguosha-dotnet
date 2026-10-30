@@ -68,10 +68,7 @@ public sealed partial class GameEngine
     }
 
     private bool DrainMoQiangang(ProgramSkillFrame f) =>
-        TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+        TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
 
     private void ContinueMoQiangang(long id)
     {

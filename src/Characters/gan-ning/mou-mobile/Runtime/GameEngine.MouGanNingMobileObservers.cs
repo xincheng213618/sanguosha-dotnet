@@ -23,7 +23,7 @@ public sealed partial class GameEngine
             if (!ProgramEventHistory<MouGanNingMovementEvent>().Contains(fact)) AdvanceEventRulesAndQueueFact(fact);
         }
     }
-    private bool DrainMouGn(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouGn(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 31900)]
     private bool IsMouGnMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op is SkillProgramEffectOp.ResolveMouGanNingQixi or SkillProgramEffectOp.ResolveMouGanNingFenwei or SkillProgramEffectOp.ResolveMouGanNingWeiTarget && ValidMouGn(f) && f.MouGanNing!.Stage is MouGanNingStage.MovementChildren or MouGanNingStage.DrawChildren && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     private bool MouGnLionChild(ProgramSkillFrame f, ResolutionFrame child)

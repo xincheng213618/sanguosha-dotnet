@@ -88,9 +88,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new MaWanHunjiangDrawIssuedEvent(f.Id, f.OwnerSeat, draw, before, _movementSequence));
         ContinueMaWan(f.Id);
     }
-    private bool DrainMaWan(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainMaWan(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueMaWan(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { MaWanHunjiang: { } r } f || f.Id != id) return;

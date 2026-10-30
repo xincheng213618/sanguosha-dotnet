@@ -81,7 +81,7 @@ public sealed partial class GameEngine
   if(from!=CardLocation.Hand(f.OwnerSeat))MoveProgramCardsFromMultipleSources([selected.Id],CardLocation.Hand(f.OwnerSeat),new(ZhangYanObtainReason));var current=GetActiveProgramFrame(f.Id);ReplaceRuntimeTop(f=current with{ZhangYan=current.ZhangYan! with{After=_movementSequence}});
   AdvanceEventRulesAndQueueFact(new ZhangYanRewardIssuedEvent(f.Id,r.NativeReturn!.UseId,r.DamageId!.Value,payer,selected.Id,from,current.ZhangYan!.Before,_movementSequence));ContinueZhangYan(f.Id);
  }
- private bool DrainZhangYan(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+ private bool DrainZhangYan(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
  private void ContinueZhangYan(long id)
  {
   if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{ZhangYan:{}r}f||f.Id!=id)return;AssertZhangYan(f);

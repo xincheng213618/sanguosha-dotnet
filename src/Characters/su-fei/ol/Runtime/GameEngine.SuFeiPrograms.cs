@@ -41,7 +41,7 @@ public sealed partial class GameEngine
   r=r with{Stage=SuFeiStage.GiftChildren,GiftTarget=target,GiftBefore=_movementSequence,GiftAfter=_movementSequence};ReplaceRuntimeTop(f with{SuFei=r,PendingMovementContinuation=new(f.OwnerSeat,0,null),Step=ResolutionFrameStep.ResolvingEffect});
   MoveProgramCardsFromMultipleSources([r.DrawnId.Value], CardLocation.Hand(target), new(SuFeiGiftReason), NativeGiveCompletionRecords(f.Id,f.OwnerSeat,target,[r.DrawnId.Value],_movementSequence,(_,moves)=>{var paid=r with{GiftAfter=moves.Single().Sequence};ReplaceRuntimeTop(GetActiveProgramFrame(f.Id)with{SuFei=paid});AdvanceEventRulesAndQueueFact(new LianpianGiftPaidEvent(f.Id,paid.Source,paid.GameplayHash,paid.Qualification.Current.NativeUseId,paid.Qualification.Current.Action.ActionId,target,paid.GiftBefore,paid.GiftAfter));}));AdvanceRuntimeProgram(f.Id);
  }
- private bool DrainSuFei(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+ private bool DrainSuFei(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
  private void FinishSuFei(ProgramSkillFrame f){ReplaceRuntimeTop(f=f with{SuFei=null,PendingMovementContinuation=null});FinishProgramSkill(f,true);}
  [ProgramContinuation(ProgramContinuationKind.Resume,23900)] private bool ResumeSuFei(long id)
  {

@@ -92,9 +92,7 @@ public sealed partial class GameEngine
         }));
         ContinueDuFuRen(f.Id);
     }
-    private bool DrainDuFuRenChildren(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainDuFuRenChildren(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueDuFuRen(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { DuFuRen: { } r } f || f.Id != id) return;

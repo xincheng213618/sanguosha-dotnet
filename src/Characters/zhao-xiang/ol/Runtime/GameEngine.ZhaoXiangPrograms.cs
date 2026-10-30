@@ -5,8 +5,7 @@ namespace CardGame.Core;
 public sealed partial class GameEngine
 {
     private const string ZhaoXiangDrawReason="program.zhao-xiang.conversion-draw";
-    private bool DrainZhaoXiangChildren(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainZhaoXiangChildren(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.Program);
     [ProgramContinuation(ProgramContinuationKind.Resume,22601)]
     private bool ResumeZhaoXiang(long id)
     {

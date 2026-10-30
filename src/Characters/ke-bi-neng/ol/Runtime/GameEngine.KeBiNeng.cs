@@ -121,8 +121,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new KeBiNengPingduanDrawPaidEvent(f.Id, item, recast, drawn.Count, f.KeBiNengPingduan!.Before, f.KeBiNengPingduan.After));
         if (recast) { AdvanceEventRulesAndQueueFact(new CardRecastEvent(r.ActorSeat, r.SelectedCard!.CardId, r.SelectedCard.EffectiveKind, drawn.Count)); CompleteFrameNativeRecastInvocation(GetActiveProgramFrame(f.Id), drawn.Count); }
     }
-    private bool DrainKeBiNeng(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainKeBiNeng(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueKeBiNeng(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { KeBiNengPingduan: { } r } f && f.Id == id)

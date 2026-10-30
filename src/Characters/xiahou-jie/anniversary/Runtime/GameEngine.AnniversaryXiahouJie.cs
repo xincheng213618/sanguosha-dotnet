@@ -65,9 +65,7 @@ public sealed partial class GameEngine
         }
         ContinueAnniversaryXiahouJie(f.Id); return SkillProgramStepOutcome.AwaitChild;
     }
-    private bool DrainAnniversaryXiahouJie(long id) => TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id,PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainAnniversaryXiahouJie(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueAnniversaryXiahouJie(long id)
     {
         while(_resolutionStack.LastOrDefault() is ProgramSkillFrame {AnniversaryXiahouJie:{} r} f && f.Id==id)

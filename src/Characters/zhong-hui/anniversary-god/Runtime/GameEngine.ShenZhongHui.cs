@@ -72,8 +72,7 @@ public sealed partial class GameEngine
         else if (op == SkillProgramEffectOp.ResolveLishiPhase && w.Window == SkillProgramTriggerWindow.DrawPhaseEnded) SettleLishiDrawPhase(f);
         ContinueShenZh(f.Id); return SkillProgramStepOutcome.AwaitChild;
     }
-    private bool DrainShenZh(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainShenZh(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     [ProgramContinuation(ProgramContinuationKind.Resume, 39300)] private bool ResumeShenZh(long id)
     { if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { ShenZhongHui: not null } f || f.Id != id) return false; ContinueShenZh(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 39300)] private bool ReturnShenZhMovement(ProgramSkillFrame f) => f.ShenZhongHui is not null && ResumeShenZh(f.Id);

@@ -45,7 +45,7 @@ public sealed partial class GameEngine
   if(id is{}paid)MoveProgramCardsFromMultipleSources([paid],CardLocation.Hand(f.OwnerSeat),new(TanbeiGainReason));f=GetActiveProgramFrame(f.Id);r=f.GuoSi!with{After=_movementSequence};ReplaceRuntimeTop(f with{GuoSi=r});AdvanceEventRulesAndQueueFact(new GuoSiPactPaidEvent(pact,before,r.After,id.HasValue?1:0,randomBefore,r.RandomAfter));AdvanceRuntimeProgram(f.Id);
  }
  private void FinishGuoSi(ProgramSkillFrame f){ReplaceRuntimeTop(f=f with{GuoSi=null,PendingMovementContinuation=null});FinishProgramSkill(f,true);}
- private bool DrainGuoSi(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+ private bool DrainGuoSi(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
  [ProgramContinuation(ProgramContinuationKind.Resume,24300)] private bool ResumeGuoSi(long id)
  {
   if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{GuoSi:{}r}f||f.Id!=id||r.Stage is GuoSiStage.TargetChoice or GuoSiStage.SidaoChoice or GuoSiStage.NativeUse)return false;RequireIssuedGuoSi(f);if(DrainGuoSi(f))return true;FinishGuoSi(f);return true;

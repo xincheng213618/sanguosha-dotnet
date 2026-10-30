@@ -63,7 +63,7 @@ public sealed partial class GameEngine
   if(take.Length>0)MoveProgramCardsFromMultipleSources(take,CardLocation.Hand(f.OwnerSeat),new(XiashuClaimReason));
   ReplaceRuntimeTop(f=GetActiveProgramFrame(f.Id)with{XiashuPaid=f.XiashuPaid!with{After=_movementSequence}});AdvanceEventRulesAndQueueFact(new XiashuClaimPaidEvent(f.Id,before,_movementSequence,take.Length,isShown));AdvanceRuntimeProgram(f.Id);
  }
- private bool DrainXiashu(ProgramSkillFrame f)=>TryBeginQueuedRecoveryReplacement(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(f.Id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(f.Id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(f.Id)||TryBeginAdvancedSkillsChanged(f.Id);
+ private bool DrainXiashu(ProgramSkillFrame f)=>TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
  [ProgramContinuation(ProgramContinuationKind.Resume,22800)]private bool ResumeXiashu(long id)
  {
   if(_resolutionStack.LastOrDefault() is not ProgramSkillFrame{XiashuPaid:{} r} f||f.Id!=id||r.Stage is XiashuStage.RecipientReveal or XiashuStage.OwnerClaim)return false;

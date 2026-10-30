@@ -42,9 +42,7 @@ public sealed partial class GameEngine
             RedCount = cards.Count(c => IsRedSuit(c.Suit)), SequenceAfter = _movementSequence } });
         ContinueQiaoZhouForecast(f.Id); return SkillProgramStepOutcome.AwaitChild;
     }
-    private bool DrainQiaoZhouChildren(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainQiaoZhouChildren(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueQiaoZhouForecast(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { QiaoZhouForecast: { } r } f && f.Id == id)

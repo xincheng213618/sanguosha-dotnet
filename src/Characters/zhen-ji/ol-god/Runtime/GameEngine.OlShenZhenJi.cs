@@ -110,9 +110,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeFrame(f.Id, f with { OlShenfu = r with { KilledByDamage = true } });
         AdvanceEventRulesAndQueueFact(new OlShenfuDeathConfirmedEvent(f.Id, r.Ordinal, r.TargetSeat, damage.Id, dying.Id));
     }
-    private bool DrainOlShenfu(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainOlShenfu(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueOlShenfu(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { OlShenfu: { } r } f || f.Id != id) return;

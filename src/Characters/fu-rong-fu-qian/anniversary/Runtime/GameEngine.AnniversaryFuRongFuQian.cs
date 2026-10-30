@@ -160,9 +160,7 @@ public sealed partial class GameEngine
         AdvanceEventRulesAndQueueFact(new AnniversaryFuRongFuQianTargetChosenEvent(f.Id, r.Targets.Count, seat)); PublishAnniversaryFuPair(f);
     }
 
-    private bool DrainAnniversaryFuPair(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainAnniversaryFuPair(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueAnniversaryFuPair(long id)
     {
         while (_resolutionStack.LastOrDefault() is ProgramSkillFrame { AnniversaryFuRongFuQian: { } r } f && f.Id == id)

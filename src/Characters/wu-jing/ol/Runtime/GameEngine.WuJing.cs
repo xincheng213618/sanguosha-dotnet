@@ -137,7 +137,7 @@ public sealed partial class GameEngine
             BeginJizhiOrNullificationWindow(id, cards[0], f.OwnerSeat, [r.TargetSeat], LegalActionKind.Duel, playedCardKind: CardKind.Duel);
         }
     }
-    private bool DrainWuJing(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainWuJing(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueWuJing(long id)
     {
         if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { WuJing: { } r } f || f.Id != id) return;

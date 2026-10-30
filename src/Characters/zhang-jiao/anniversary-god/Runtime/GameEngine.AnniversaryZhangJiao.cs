@@ -144,9 +144,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(GetActiveProgramFrame(f.Id) with { AnniversaryZhangJiao = r with { After = _movementSequence,
             HappySijunPayment = happyPayments is null ? null : new(r.Before, _movementSequence) { Movements = happyPayments } } });
     }
-    private bool DrainAnniversaryZj(long id) => TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(id) || TryBeginAdvancedSkillsChanged(id);
+    private bool DrainAnniversaryZj(long id) => TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueAnniversaryZj(long id)
     {
         while (_pendingDecision is null && _resolutionStack.LastOrDefault() is ProgramSkillFrame { AnniversaryZhangJiao: { } r } f && f.Id == id)

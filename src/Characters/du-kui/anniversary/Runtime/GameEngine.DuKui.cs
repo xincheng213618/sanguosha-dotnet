@@ -57,9 +57,7 @@ public sealed partial class GameEngine
         ContinueDuKui(f.Id);
     }
 
-    private bool DrainDuKui(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainDuKui(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 43200)]
     private bool ContinueDuKui(long id)

@@ -95,7 +95,7 @@ public sealed partial class GameEngine
         }
         f=GetActiveProgramFrame(f.Id);ReplaceRuntimeTop(f with{CaoTeng=f.CaoTeng! with{After=_movementSequence}});AdvanceEventRulesAndQueueFact(new CaoTengBenefitAppliedEvent(f.Id,r.Cursor,_movementSequence));ContinueCaoTeng(f.Id);
     }
-    private bool DrainCaoTeng(long id)=>TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.Program)||TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program)||TryBeginHpChangedProgramWindow(id,PostEventContinuation.Program)||TryBeginCardsMovedProgramWindow(id)||TryBeginAdvancedSkillsChanged(id);
+    private bool DrainCaoTeng(long id)=>TryBeginProgramChildWindows(id, PostEventContinuation.Program);
     private void ContinueCaoTeng(long id)
     {
         while(_resolutionStack.LastOrDefault()is ProgramSkillFrame{CaoTeng:{}r}f&&f.Id==id)

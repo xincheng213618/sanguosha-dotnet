@@ -351,9 +351,7 @@ public sealed partial class GameEngine
     private void SealShiLys(long id)
     { var f = GetActiveProgramFrame(id); ReplaceRuntimeTop(f with { MobileShiLuYuSheng = f.MobileShiLuYuSheng! with { After = _movementSequence } }); }
 
-    private bool DrainShiLysLuYuSheng(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainShiLysLuYuSheng(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
 
     // 霜怀：每回合限一次，与你距离1以内的其他角色受到伤害时可防止之或令其从弃牌堆获得【桃】，
     // 并按与上次发动的目标异同结算摸牌或失去体力。

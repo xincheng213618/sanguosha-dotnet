@@ -121,8 +121,7 @@ public sealed partial class GameEngine
         var f=GetActiveProgramFrame(id);var r=f.RuanHui!;var step=new RuanHuiStep(r.Steps.Count,stage,before,_movementSequence,count);
         ReplaceRuntimeTop(f with{RuanHui=r with{Steps=r.Steps.Append(step).ToArray()}});AdvanceEventRulesAndQueueFact(new RuanHuiStepEvent(id,step));
     }
-    private bool DrainRuanHui(long id)=>TryBeginQueuedRecoveryReplacement(id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCharacterStateProgramWindow(id,CharacterStateContinuation.Program)||
-        TryBeginHpChangedProgramWindow(id,PostEventContinuation.AwaitedProgramMovement)||TryBeginCardsMovedProgramWindow(id)||TryBeginAdvancedSkillsChanged(id);
+    private bool DrainRuanHui(long id)=>TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueRuanHui(long id)
     {
         while(_resolutionStack.LastOrDefault()is ProgramSkillFrame{RuanHui:{}r}f&&f.Id==id)

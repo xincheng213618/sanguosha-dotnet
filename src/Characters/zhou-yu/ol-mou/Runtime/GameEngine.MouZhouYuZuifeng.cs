@@ -149,9 +149,7 @@ public sealed partial class GameEngine
         });
         f = GetActiveProgramFrame(f.Id); ReplaceRuntimeTop(f with { MouZuifeng = f.MouZuifeng! with { After = _movementSequence } }); ContinueMouZuifeng(f.Id);
     }
-    private bool DrainMouZuifeng(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) ||
-        TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainMouZuifeng(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     private void ContinueMouZuifeng(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { MouZuifeng: { } r } f || f.Id != id || f.AttackAttempt is not null) return;

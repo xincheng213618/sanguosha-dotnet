@@ -83,8 +83,7 @@ public sealed partial class GameEngine
         ReplaceRuntimeTop(f = f with { AnniversaryZhangHuan = r with { Stage = AnniversaryZhangHuanStage.IssuingUse, Native = n, Returned = false, Before = _movementSequence, After = _movementSequence, NativeBatches = [] } });
         ExecuteAction(_players[f.OwnerSeat], a);
     }
-    private bool DrainZhangHuan(ProgramSkillFrame f) => TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) ||
-        TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || TryBeginCardsMovedProgramWindow(f.Id) || TryBeginAdvancedSkillsChanged(f.Id);
+    private bool DrainZhangHuan(ProgramSkillFrame f) => TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     [ProgramContinuation(ProgramContinuationKind.Resume, 46300)] private bool ContinueZhangHuan(long id)
     {
         if (_pendingDecision is not null || _resolutionStack.LastOrDefault() is not ProgramSkillFrame { AnniversaryZhangHuan: { } r } f || f.Id != id) return false;
