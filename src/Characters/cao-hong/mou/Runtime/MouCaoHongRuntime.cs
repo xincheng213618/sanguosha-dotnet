@@ -1,9 +1,14 @@
 using System.Globalization;
+using StageNode = CardGame.Core.ProgramStageNode<CardGame.Core.MouCaoHongRuntime, CardGame.Core.MouCaoHongReceipt, CardGame.Core.MouCaoHongStage>;
+using StagePlan = CardGame.Core.ProgramStagePlan<CardGame.Core.MouCaoHongRuntime, CardGame.Core.MouCaoHongReceipt, CardGame.Core.MouCaoHongStage>;
 namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class MouCaoHongRuntime(IMouCaoHongFacts facts, IMouCaoHongNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts) : IMouCaoHongRuntime
 {
     internal const string Action = "mou-cao-hong-anniversary", TakeReason = "skill-program.mou-cao-hong.obtain", GiveReason = "skill-program.mou:yingjia.return", DiscardReason = "skill-program.mou:xianju.ending-discard";
+    private IMouCaoHongNative Native => native;
+    private IMouCaoHongFacts Facts => facts;
+    private IProgramRuntimeEvents Events => events;
     internal static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 35900, SkillProgramEffectOp.ResolveMouCaoHongYingjia, SkillProgramEffectOp.SettleMouCaoHongXianju)]
     private bool Qualifies(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => t.Effects.Single().Op == SkillProgramEffectOp.ResolveMouCaoHongYingjia ? facts.Use(c, w) is { Targets.Count: > 0 } : facts.Debt(c, w) is not null;
@@ -88,38 +93,63 @@ internal sealed class MouCaoHongRuntime(IMouCaoHongFacts facts, IMouCaoHongNativ
     }
     private void StartMove(ProgramSkillFrame f, MouCaoHongReceipt r)
     {
-        frames.ReplaceTop(f = f with { MouCaoHong = r with { Before = facts.Sequence, After = facts.Sequence, Actual = 0 }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        if (r.Cards.Count > 0) native.Move(f); Continue(f.Id);
+        f = f with { MouCaoHong = r with { Before = facts.Sequence, After = facts.Sequence, Actual = 0 }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) };
+        ProgramStageRuntime.Issue(frames, f, paid => { if (r.Cards.Count > 0) native.Move(paid); });
+        Continue(f.Id);
     }
-    internal void Continue(long id)
+    internal void Continue(long id) => ProgramStageRuntime.Run(id, frames, prompts, this, Stages.Plan);
+    private ProgramStageResult ChooseObtainCard(ProgramSkillFrame f, MouCaoHongReceipt r)
     {
-        while (prompts.Current is null && frames.Top is ProgramSkillFrame { MouCaoHong: { } r } f && f.Id == id)
+        if (r.Cursor >= r.Targets.Count) { Complete(f); return ProgramStageResult.Yield; }
+        var target = r.Targets[r.Cursor]; frames.ReplaceTop(f = f with { MouCaoHong = r = r with { Target = target } });
+        if (!facts.Alive(target) || facts.Cards(f.OwnerSeat, target, false).Count == 0)
         {
-            if (!Valid(f)) throw new InvalidOperationException("Mou Cao Hong lost his original paid native parent, movement or phase cost.");
-            if (facts.Finished) { Complete(f); return; }
-            if (!facts.Alive(f.OwnerSeat) && r.Stage is MouCaoHongStage.ExchangeTarget or MouCaoHongStage.ObtainCard or MouCaoHongStage.ReturnCards or MouCaoHongStage.DiscardCards) { Complete(f); return; }
-            if (r.Stage == MouCaoHongStage.ObtainCard)
-            {
-                if (r.Cursor >= r.Targets.Count) { Complete(f); return; }
-                var target = r.Targets[r.Cursor]; frames.ReplaceTop(f = f with { MouCaoHong = r = r with { Target = target } });
-                if (!facts.Alive(target) || facts.Cards(f.OwnerSeat, target, false).Count == 0) { frames.ReplaceTop(f with { MouCaoHong = r with { Cursor = r.Cursor + 1 } }); continue; }
-            }
-            if (r.Stage is MouCaoHongStage.ReturnCards or MouCaoHongStage.DiscardCards)
-            {
-                if (r.Stage == MouCaoHongStage.ReturnCards && !facts.Alive(r.Target)) { Complete(f); return; }
-                var allowed = Payable(f).Select(c => c.Id).ToHashSet(); var selected = r.Selected.Where(allowed.Contains).Take(Need(f)).ToArray();
-                if (!selected.SequenceEqual(r.Selected)) frames.ReplaceTop(f = f with { MouCaoHong = r = r with { Selected = selected } });
-                if (Need(f) == 0) { StartMove(f, r with { Stage = r.Stage == MouCaoHongStage.ReturnCards ? MouCaoHongStage.ReturnChildren : MouCaoHongStage.DiscardChildren, Cards = [] }); return; }
-            }
-            if (r.Stage is MouCaoHongStage.ExchangeTarget or MouCaoHongStage.ObtainCard or MouCaoHongStage.ReturnCards or MouCaoHongStage.DiscardCards) { Publish(f); return; }
-            if (native.Drain(f)) return;
-            events.AdvanceFact(new MouCaoHongSegmentCompletedEvent(f.Id, r.Stage, r.Target, r.Requested, r.Actual)); frames.ReplaceTop(f = f with { PendingMovementContinuation = null });
-            if (r.Stage == MouCaoHongStage.ExchangeTakeChildren)
-            { frames.ReplaceTop(f with { MouCaoHong = r with { Stage = MouCaoHongStage.ReturnCards, Requested = r.Actual, Selected = [], Cards = [] } }); continue; }
-            if (r.Stage == MouCaoHongStage.ObtainChildren)
-            { frames.ReplaceTop(f with { MouCaoHong = r with { Stage = MouCaoHongStage.ObtainCard, Cursor = r.Cursor + 1, Cards = [], Selected = [] } }); continue; }
-            Complete(f); return;
+            frames.ReplaceTop(f with { MouCaoHong = r with { Cursor = r.Cursor + 1 } });
+            return ProgramStageResult.Continue;
         }
+        Publish(f); return ProgramStageResult.Yield;
+    }
+    private ProgramStageResult ChoosePayment(ProgramSkillFrame f, MouCaoHongReceipt r)
+    {
+        if (r.Stage == MouCaoHongStage.ReturnCards && !facts.Alive(r.Target)) { Complete(f); return ProgramStageResult.Yield; }
+        var allowed = Payable(f).Select(c => c.Id).ToHashSet(); var selected = r.Selected.Where(allowed.Contains).Take(Need(f)).ToArray();
+        if (!selected.SequenceEqual(r.Selected)) frames.ReplaceTop(f = f with { MouCaoHong = r = r with { Selected = selected } });
+        if (Need(f) == 0)
+            StartMove(f, r with { Stage = r.Stage == MouCaoHongStage.ReturnCards ? MouCaoHongStage.ReturnChildren : MouCaoHongStage.DiscardChildren, Cards = [] });
+        else Publish(f);
+        return ProgramStageResult.Yield;
+    }
+    private static class Stages
+    {
+        internal static readonly StagePlan Plan = new(
+            read: static f => f.MouCaoHong,
+            stage: static r => r.Stage,
+            validate: static (runtime, f, _) =>
+            { if (!runtime.Valid(f)) throw new InvalidOperationException("Mou Cao Hong lost his original paid native parent, movement or phase cost."); },
+            nodes:
+            [
+                StageNode.Prompt(MouCaoHongStage.ExchangeTarget, static (runtime, f, _) => runtime.Publish(f)),
+                StageNode.Run(MouCaoHongStage.ObtainCard, static (runtime, f, r) => runtime.ChooseObtainCard(f, r)),
+                StageNode.Run(MouCaoHongStage.ReturnCards, static (runtime, f, r) => runtime.ChoosePayment(f, r)),
+                StageNode.Run(MouCaoHongStage.DiscardCards, static (runtime, f, r) => runtime.ChoosePayment(f, r)),
+                StageNode.ChildrenTo(MouCaoHongStage.ExchangeTakeChildren, MouCaoHongStage.ReturnCards,
+                    update: static r => r with { Requested = r.Actual, Selected = [], Cards = [] }, clearMovement: true),
+                StageNode.ChildrenTo(MouCaoHongStage.ObtainChildren, MouCaoHongStage.ObtainCard,
+                    update: static r => r with { Cursor = r.Cursor + 1, Cards = [], Selected = [] }, clearMovement: true),
+                StageNode.ChildrenComplete(MouCaoHongStage.ReturnChildren, clearMovement: true),
+                StageNode.ChildrenComplete(MouCaoHongStage.DiscardChildren, clearMovement: true)
+            ],
+            stopBeforeStage: static (runtime, f, r) =>
+            {
+                if (runtime.Facts.Finished || !runtime.Facts.Alive(f.OwnerSeat) && r.Stage is MouCaoHongStage.ExchangeTarget or MouCaoHongStage.ObtainCard or MouCaoHongStage.ReturnCards or MouCaoHongStage.DiscardCards)
+                { runtime.Complete(f); return true; }
+                return false;
+            },
+            withStage: static (f, r, next) => f with { MouCaoHong = r with { Stage = next } },
+            drain: static (runtime, f, _) => runtime.Native.Drain(f),
+            complete: static (runtime, f) => runtime.Complete(f),
+            afterChildren: static (runtime, f, r) => runtime.Events.AdvanceFact(
+                new MouCaoHongSegmentCompletedEvent(f.Id, r.Stage, r.Target, r.Requested, r.Actual)));
     }
     private void Complete(ProgramSkillFrame f) { events.AdvanceFact(new MouCaoHongCompletedEvent(f.Id)); frames.ReplaceTop(f = f with { MouCaoHong = null, PendingMovementContinuation = null }); native.Finish(f); }
     [ProgramContinuation(ProgramContinuationKind.Resume, 35900)] private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouCaoHong: not null } f || f.Id != id) return false; Continue(id); return true; }

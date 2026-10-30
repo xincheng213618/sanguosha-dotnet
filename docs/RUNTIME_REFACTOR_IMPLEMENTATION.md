@@ -35,6 +35,8 @@ Checkpoint 保存初始化和接受命令，在当前实现中重放；恢复校
 
 程序先运行适用的 `[ProgramContinuation]`，再进入 `SkillProgramExecutor`。注册分为三个位置：
 
+复杂原生操作的内部步骤可复用 `ProgramStageRuntime`：静态配方声明运行、选择、等待子结算、外部返回及完成，实际账单与游标留在原程序帧。等待后的转阶段、移动续接清理及先保存阶段再执行动作由公共协议承担；窗口顺序和终止策略继续显式保留。节点与代表迁移见[原生阶段协议](content/skill-composition/PROGRAM_STAGE_PROTOCOLS.md)。
+
 | 位置 | 当前协议 |
 | --- | --- |
 | `Resume` | 活跃程序继续执行前；接受帧 ID 或程序帧，首个处理成功者结束分派。每次回调解析当前帧 |

@@ -2,88 +2,36 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
-    private const string HappyGuixinReason = "skill-program.happy:guixin.obtain";
-    private static CardConversionSource HappyGuixinSource(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
-    private static int HappyGuixinActualObtained(ProgramSkillFrame f) => f.HappyGuixin!.Payments.Sum(p =>
-        p.Movement.Movements.Count(m => m.To == CardLocation.Hand(f.OwnerSeat)));
     [ProgramCapability] private sealed class HappyGuixinCapability(GameEngine e) : IHappyGuixinHost
-    { public SkillProgramStepOutcome Resolve(ProgramSkillFrame f) => e.BeginHappyGuixin(f); }
-    private SkillProgramStepOutcome BeginHappyGuixin(ProgramSkillFrame supplied)
     {
-        var f = GetActiveProgramFrame(supplied.Id);
-        if (f.HappyGuixin is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 ||
-            !ExactOrderedPrintedSkillLossParent(f, out var window, out var damage, out _) || damage.TargetSeat != f.OwnerSeat ||
-            f.WindowContext!.OccurrenceIndex < 0 || f.WindowContext.OccurrenceIndex >= damage.Amount)
-            throw new InvalidOperationException("Happy Guixin requires its exact original positive damage-point candidate.");
-        if (!_players[f.OwnerSeat].IsAlive || _winner != Winner.None || !HasRuntimeSkillInstance(_players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
-            return SkillProgramStepOutcome.Continue;
-        var r = new HappyGuixinReceipt(HappyGuixinSource(f), f.GameplayHash, window.Id, damage.Id, f.WindowContext.OccurrenceIndex, damage.Amount)
-        { OtherSeats = _players.Where(p => p.Seat != f.OwnerSeat).OrderBy(p => RelativeTableOrder(f.OwnerSeat, p.Seat)).Select(p => p.Seat).ToArray() };
-        ReplaceRuntimeTop(f with { HappyGuixin = r });
-        AdvanceEventRulesAndQueueFact(new HappyGuixinStartedEvent(f.Id, r.Source, r.GameplayHash, window.Id, damage.Id, r.OccurrenceIndex, damage.Amount, string.Join(",", r.OtherSeats)));
-        ResumeHappyGuixin(f.Id); return SkillProgramStepOutcome.AwaitChild;
+        public IProgramSeatAcquisitionPolicy Policy { get; } = new HappyGuixinPolicy(e);
+        public SkillProgramStepOutcome Resolve(ProgramSkillFrame f) => e.SeatAcquisitions.Begin(f, Policy);
     }
-    [ProgramContinuation(ProgramContinuationKind.Resume, 41400)] private bool ResumeHappyGuixin(long id)
+    private sealed class HappyGuixinPolicy(GameEngine e) : IProgramSeatAcquisitionPolicy
     {
-        if (_resolutionStack.LastOrDefault() is not ProgramSkillFrame { HappyGuixin: not null } initial || initial.Id != id) return false;
-        while (_pendingDecision is null)
-        {
-            var f = GetActiveProgramFrame(id); RequireHappyGuixin(f); var r = f.HappyGuixin!;
-            if (r.Stage is HappyGuixinStage.MovementChildren or HappyGuixinStage.TurnoverChildren)
-            {
-                if (DrainMobileGuixinChildren(f)) return true;
-                if (r.Stage == HappyGuixinStage.TurnoverChildren) { FinishHappyGuixin(f, false); return true; }
-                ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null,
-                    HappyGuixin = r = r with { Stage = HappyGuixinStage.Visiting, Cursor = r.Cursor + 1 } });
-            }
-            if (_winner != Winner.None || !_players[f.OwnerSeat].IsAlive || r.Payments.Count == 0 &&
-                !HasRuntimeSkillInstance(_players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
-            { FinishHappyGuixin(f, true); return true; }
-            if (r.Cursor == r.OtherSeats.Count)
-            {
-                var obtained = HappyGuixinActualObtained(f);
-                var before = _players[f.OwnerSeat].IsFaceDown;
-                if (obtained <= 4 || before) { FinishHappyGuixin(f, false); return true; }
-                ReplaceRuntimeTop(f = f with { HappyGuixin = r with { Stage = HappyGuixinStage.TurnoverChildren, TurnoverIssued = true,
-                    FaceDownBefore = before, FaceDownAfter = ShenwuCannotTurnOver(_players[f.OwnerSeat]) ? before : !before } });
-                TurnOverProgramTarget(id, f.OwnerSeat, f.OwnerSeat);
-                AdvanceEventRulesAndQueueFact(new HappyGuixinTurnoverIssuedEvent(id, obtained, before, _players[f.OwnerSeat].IsFaceDown)); continue;
-            }
-            var target = r.OtherSeats[r.Cursor];
-            // The established HEJ obtain helper enforces current ownership, area access and pending-judgment exclusions.
-            var candidates = _players[target].IsAlive ? OlGuixinCandidates(f, target) : [];
-            if (candidates.Count == 0)
-            {
-                ReplaceRuntimeTop(f with { HappyGuixin = r with { Cursor = r.Cursor + 1 } });
-                AdvanceEventRulesAndQueueFact(new HappyGuixinSeatSkippedEvent(id, r.Cursor, target)); continue;
-            }
-            var randomBefore = _random.State;
-            var selected = candidates[_random.Next(candidates.Count)];
-            var randomAfter = _random.State;
-            var beforeMove = _movementSequence;
-            ReplaceRuntimeTop(f with { HappyGuixin = r with { Stage = HappyGuixinStage.MovementChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-            MoveProgramCardsFromMultipleSources([selected.CardId], CardLocation.Hand(f.OwnerSeat), new(HappyGuixinReason), (batch, records) =>
-            {
-                var parent = GetActiveProgramFrame(id);
-                var payment = new HappyGuixinPayment(new(r.Cursor, target, selected.CardId, selected.From, batch, beforeMove, _movementSequence)
-                    { Movements = records }, randomBefore, randomAfter) { Candidates = candidates };
-                ReplaceRuntimeTop(parent with { HappyGuixin = parent.HappyGuixin! with { Payments = parent.HappyGuixin.Payments.Append(payment).ToArray() } });
-                AdvanceEventRulesAndQueueFact(new HappyGuixinMovementPaidEvent(id, r.Cursor, target, batch, beforeMove, _movementSequence));
-            }, disclosure: selected.From.Zone == CardZoneKind.Hand ? CardMovementDisclosure.FaceDown : CardMovementDisclosure.FaceUp);
-        }
-        return true;
+        public ProgramSeatAcquisitionMode Mode => ProgramSeatAcquisitionMode.AllRegionsConditionalTurnover;
+        public string SkillId => "happy:guixin";
+        public SkillProgramEffectOp Operation => SkillProgramEffectOp.ResolveHappyShenCaoCaoGuixin;
+        public string Reason => "skill-program.happy:guixin.obtain";
+        public string InvalidReceiptMessage => "Happy Guixin lost its original damage point, private random selection, actual paid gain or conditional turnover.";
+        public void PublishPriority(ProgramSkillFrame f) => throw new InvalidOperationException("Happy Guixin has no priority-area choice.");
+        public bool ShouldTurnOver(ProgramSkillFrame f, ProgramSeatAcquisitionReceipt r, bool before) => ProgramRandomSeatAcquisitionRuntime.ActualObtained(f) > 4 && !before;
+        public IGameEvent Started(ProgramSkillFrame f, ProgramSeatAcquisitionReceipt r) => new HappyGuixinStartedEvent(f.Id, r.Source, r.GameplayHash, r.DamageWindowId, r.DamageFrameId, r.OccurrenceIndex, r.DamageAmount, string.Join(",", r.OtherSeats));
+        public IGameEvent Skipped(ProgramSkillFrame f, int cursor, int target) => new HappyGuixinSeatSkippedEvent(f.Id, cursor, target);
+        public IGameEvent Paid(ProgramSkillFrame f, ProgramSeatAcquisitionPayment p) => new HappyGuixinMovementPaidEvent(f.Id, p.Cursor, p.TargetSeat, p.BatchId, p.Before, p.After);
+        public IGameEvent Turned(ProgramSkillFrame f, int obtained, bool before, bool after) => new HappyGuixinTurnoverIssuedEvent(f.Id, obtained, before, after);
+        public IGameEvent Completed(ProgramSkillFrame f, ProgramSeatAcquisitionReceipt r, bool cancelled) => new HappyGuixinCompletedEvent(f.Id, r.Payments.Count, ProgramRandomSeatAcquisitionRuntime.ActualObtained(f), r.TurnoverIssued, cancelled);
+        public bool ValidStarted(ProgramSkillFrame f, ProgramSeatAcquisitionReceipt r) => e.ProgramEventHistory<HappyGuixinStartedEvent>().Where(x => x.FrameId == f.Id).ToArray() is [var fact] && Equals(fact, Started(f, r));
+        public bool ValidPriority(ProgramSkillFrame f, ProgramSeatAcquisitionReceipt r) => true;
+        public bool ValidSkipped(ProgramSkillFrame f, int cursor, int target) => e.ProgramEventHistory<HappyGuixinSeatSkippedEvent>().Count(x => Equals(x, Skipped(f, cursor, target))) == 1;
+        public bool HasSkipped(ProgramSkillFrame f, int cursor) => e.ProgramEventHistory<HappyGuixinSeatSkippedEvent>().Any(x => x.FrameId == f.Id && x.Cursor == cursor);
+        public bool ValidPaid(ProgramSkillFrame f, ProgramSeatAcquisitionPayment p) => e.ProgramEventHistory<HappyGuixinMovementPaidEvent>().Where(x => x.FrameId == f.Id && x.Cursor == p.Cursor).ToArray() is [var fact] && Equals(fact, Paid(f, p));
+        public bool ValidTurned(ProgramSkillFrame f, ProgramSeatAcquisitionReceipt r) => e.ProgramEventHistory<HappyGuixinTurnoverIssuedEvent>().Where(x => x.FrameId == f.Id).ToArray() is [var fact] && Equals(fact, Turned(f, ProgramRandomSeatAcquisitionRuntime.ActualObtained(f), false, r.FaceDownAfter!.Value));
+        public bool NoTurnoverEvent(ProgramSkillFrame f) => !e.ProgramEventHistory<HappyGuixinTurnoverIssuedEvent>().Any(x => x.FrameId == f.Id);
     }
-    private void FinishHappyGuixin(ProgramSkillFrame f, bool cancelled)
-    {
-        var r = f.HappyGuixin!;
-        if (f.PendingMovementContinuation is not null || r.Stage == HappyGuixinStage.MovementChildren)
-            throw new InvalidOperationException("Happy Guixin cannot retire a paid gain before its children return.");
-        ReplaceRuntimeTop(f = f with { HappyGuixin = r with { Stage = HappyGuixinStage.Finished } });
-        AdvanceEventRulesAndQueueFact(new HappyGuixinCompletedEvent(f.Id, r.Payments.Count, HappyGuixinActualObtained(f), r.TurnoverIssued, cancelled));
-        FinishProgramSkill(f, true);
-    }
-    [ProgramContinuation(ProgramContinuationKind.Movement, 41400)] private bool ReturnHappyGuixinMovement(ProgramSkillFrame f) => f.HappyGuixin is not null && ResumeHappyGuixin(f.Id);
+    [ProgramContinuation(ProgramContinuationKind.Resume, 41400)] private bool ResumeHappyGuixin(long id) => SeatAcquisitions.Resume(id, ProgramCapabilities.Get<IHappyGuixinHost>().Policy);
+    [ProgramContinuation(ProgramContinuationKind.Movement, 41400)] private bool ReturnHappyGuixinMovement(ProgramSkillFrame f) =>
+        f.SeatAcquisition?.Mode == ProgramSeatAcquisitionMode.AllRegionsConditionalTurnover && ResumeHappyGuixin(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 41400)]
-    [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 41400)] private bool RetainHappyGuixinPaid(ProgramSkillFrame f) =>
-        f.HappyGuixin is { } r && (r.Payments.Count > 0 || r.TurnoverIssued) && ValidHappyGuixin(f);
+    [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 41400)] private bool RetainHappyGuixinPaid(ProgramSkillFrame f) => SeatAcquisitions.RetainPaid(f, ProgramCapabilities.Get<IHappyGuixinHost>().Policy);
 }

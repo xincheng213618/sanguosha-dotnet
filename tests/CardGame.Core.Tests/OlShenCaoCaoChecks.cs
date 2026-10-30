@@ -30,12 +30,12 @@ internal static class OlShenCaoCaoChecks
             Zone(g, indulgence.CardId.Value) == CardLocation.Judgment(2), "The fixture creates two real distinct equipment slots and one real delayed trick before damage.");
         var hand = V(g).HandCount;
         Use(g, "damage"); Offer(g); Activate(g); Priority(g, CardZoneKind.Equipment); Paid(g);
-        var first = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.OlGuixin is not null);
-        var paid = first.OlGuixin!; var firstId = first.Id;
-        Need(paid is { Stage: OlGuixinStage.MovementChildren, Cursor: 0, PreferredZone: CardZoneKind.Equipment, Payments.Count: 1 } &&
-            paid.OtherSeats.SequenceEqual([1, 2, 3]) && paid.Payments[0].Movement.From == CardLocation.Equipment(1) &&
+        var first = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SeatAcquisition is not null);
+        var paid = first.SeatAcquisition!; var firstId = first.Id;
+        Need(paid is { Stage: ProgramSeatAcquisitionStage.MovementChildren, Cursor: 0, PreferredZone: CardZoneKind.Equipment, Payments.Count: 1 } &&
+            paid.OtherSeats.SequenceEqual([1, 2, 3]) && paid.Payments[0].From == CardLocation.Equipment(1) &&
             paid.Payments[0].Candidates.Count(c => c.From == CardLocation.Equipment(1)) == 2 &&
-            new[] { weapon, horse }.Contains(paid.Payments[0].Movement.CardId) && !V(g).IsFaceDown && V(g).HandCount == hand + 1 &&
+            new[] { weapon, horse }.Contains(paid.Payments[0].CardId) && !V(g).IsFaceDown && V(g).HandCount == hand + 1 &&
             Zone(g, indulgence.CardId.Value) == CardLocation.Judgment(2),
             "One unified equipment preference chooses randomly within the two equipped entities, then pauses its paid gain before the next seat and turnover.");
         g = Cold(g, r); Continue(g);
@@ -56,7 +56,7 @@ internal static class OlShenCaoCaoChecks
             E<OlGuixinTurnoverIssuedEvent>(g).Select(e => (e.Before, e.After)).SequenceEqual([(false, true), (true, false)]) &&
             E<OlGuixinCompletedEvent>(g) is [{ PaidCharacters: 3, TurnoverIssued: true, Cancelled: false }, { PaidCharacters: 3, TurnoverIssued: true, Cancelled: false }],
             "Two actual damage points issue two independent unified preferences; judgment priority falls back to hand before remaining equipment, and all six gains and both turnovers settle once.");
-        Need(g.CardMovements.Count(m => m.Reason.Value == Reason) == 6 && g.ResolutionStack.All(f => f is not ProgramSkillFrame { OlGuixin: not null }),
+        Need(g.CardMovements.Count(m => m.Reason.Value == Reason) == 6 && g.ResolutionStack.All(f => f is not ProgramSkillFrame { SeatAcquisition: not null }),
             "Cold return does not repeat a random draw or an already-paid native acquisition.");
     }
     private static PlayerSnapshot V(GameEngine g, int seat = 0) => g.CreateSnapshot(seat).Players.Single(p => p.Seat == seat);
