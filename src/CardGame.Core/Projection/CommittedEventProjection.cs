@@ -434,6 +434,8 @@ internal static class CommittedEventProjection
         { Policy = value.Policy with { CardKinds = FreezeList(value.Policy.CardKinds) } },
         DeferredPublicPileDepositedEvent value => value with
         { Deposit = value.Deposit with { CardIds = FreezeList(value.Deposit.CardIds) } },
+        ProgramPublicPileSelectedEvent value => value with
+        { CardIds = FreezeList(value.CardIds), PrintedSuits = FreezeList(value.PrintedSuits) },
         _ => payload
     };
 

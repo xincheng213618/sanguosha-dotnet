@@ -79,22 +79,23 @@ internal static class ProgramCompositionAi
         var facts = supplied with { ChoiceResult = name => choices.GetValueOrDefault(name) ?? supplied.ChoiceResult?.Invoke(name) };
         var context = new ProgramAiEstimateContext(player, faceDown, facts);
         if (handReturn) context.PricePindianHandReturnInputs();
-        // Only the new category-dependent current-use capability prices unknown
-        // discarded categories. The estimate uses a public half-basic prior.
-        foreach (var payment in instructions.Where(effect => effect is
-            { Op: SkillProgramEffectOp.SelectAndMoveOwnedCard, Destination: SkillProgramCardDestination.DiscardPile,
-              ResultBind: not null, CardOwnerRef.Kind: ProgramParticipantRef.EventTarget, Condition.Kind: SkillProgramConditionKind.Always }))
-        {
-            var branches = instructions.Where(effect => effect.Condition is
-                { Kind: SkillProgramConditionKind.BoundCardsMatchCategories } condition && condition.SourceBind == payment.ResultBind).ToArray();
-            var claim = branches.Any(effect => effect.Op == SkillProgramEffectOp.ClaimCurrentUsePhysicalCards);
-            var prevent = branches.Any(effect => effect.Op == SkillProgramEffectOp.PreventCurrentTargetSlashCancellationByRule);
-            if (claim || prevent) context.CurrentUseDiscardCategoryValue(claim, prevent,
-                branches.Any(effect => effect is { Op: SkillProgramEffectOp.GrantTurnRuleModifier, RuleQuery: SkillRuleQuery.SlashLimit, RuleOperation: SkillRuleOperation.Add, Amount: > 0 }));
-        }
         for (var index = 0; index < instructions.Length; index++)
         {
+            if (context.PathCancelled) break;
             var effect = instructions[index];
+            // Price this paid category prior only when execution reaches its step;
+            // a preceding cancelled expression cannot issue its future benefit.
+            if (effect is
+                { Op: SkillProgramEffectOp.SelectAndMoveOwnedCard, Destination: SkillProgramCardDestination.DiscardPile,
+                  ResultBind: not null, CardOwnerRef.Kind: ProgramParticipantRef.EventTarget, Condition.Kind: SkillProgramConditionKind.Always })
+            {
+                var branches = instructions.Where(next => next.Condition is
+                    { Kind: SkillProgramConditionKind.BoundCardsMatchCategories } condition && condition.SourceBind == effect.ResultBind).ToArray();
+                var claim = branches.Any(next => next.Op == SkillProgramEffectOp.ClaimCurrentUsePhysicalCards);
+                var prevent = branches.Any(next => next.Op == SkillProgramEffectOp.PreventCurrentTargetSlashCancellationByRule);
+                if (claim || prevent) context.CurrentUseDiscardCategoryValue(claim, prevent,
+                    branches.Any(next => next is { Op: SkillProgramEffectOp.GrantTurnRuleModifier, RuleQuery: SkillRuleQuery.SlashLimit, RuleOperation: SkillRuleOperation.Add, Amount: > 0 }));
+            }
             if (effect.Op == SkillProgramEffectOp.UseVirtualOrdinaryTrick &&
                 effect.Condition.Kind is SkillProgramConditionKind.PindianWon or SkillProgramConditionKind.PindianNotWon)
             {
@@ -107,7 +108,7 @@ internal static class ProgramCompositionAi
                     context.UseVirtualOrdinaryTrick(effect);
                 continue;
             }
-            if (!EvaluateCondition(effect.Condition, player, facts)) continue;
+            if (!context.EvaluateExpressionCondition(effect.Condition)) continue;
             if (effect.Op == SkillProgramEffectOp.AccumulateSelectedCardCount)
             {
                 var before = supplied.PhaseUsageCount?.Invoke(effect.StateId!) ?? 0;
@@ -150,7 +151,7 @@ internal static class ProgramCompositionAi
     }
 
     internal static bool EvaluateCondition(SkillProgramCondition condition, PlayerSkillContext player,
-        ProgramAiPublicContext? context)
+        ProgramAiPublicContext? context, Func<ProgramExpression, bool?>? expressionEvaluator = null)
     {
         if (condition.Kind == SkillProgramConditionKind.PindianWon && context?.PindianWon is null) return false;
         if (condition.Kind == SkillProgramConditionKind.BooleanState && context?.BooleanState is null) return false;
@@ -161,13 +162,24 @@ internal static class ProgramCompositionAi
             activationCardCount: context?.ActivationCardCount,
             boundCardSuitMatchesChoice: (_, _) => false,
             boundCardCategoryMatchesCardAction: (_, _) => false,
-            expression: expression => ProgramExpressions.EvaluateBool(expression,
-                new SkillContextExpressionWorld(player, context?.SelectedTarget, context?.EquipmentCardCount)));
+            expression: expressionEvaluator ?? (expression => ProgramExpressions.EvaluateBool(expression,
+                new SkillContextExpressionWorld(player, context?.SelectedTarget, context?.EquipmentCardCount))));
     }
 }
 
 internal sealed partial class ProgramAiEstimateContext
 {
+    private readonly Dictionary<string, int> _expressionNumbers = new(StringComparer.Ordinal);
+    internal bool PathCancelled { get; private set; }
+    internal bool EvaluateExpressionCondition(SkillProgramCondition condition) =>
+        ProgramCompositionAi.EvaluateCondition(condition, _player, _publicContext,
+            expression => ProgramExpressions.EvaluateBool(expression, CurrentExpressionWorld()));
+    internal void CaptureExpressionNumber(SkillProgramEffect effect)
+    {
+        if (ProgramExpressions.EvaluateInt(effect.ValueExpression!, CurrentExpressionWorld()) is { } value)
+            _expressionNumbers[effect.ResultBind!] = value;
+        else PathCancelled = true;
+    }
     private static readonly Suit[] EstimatedSuits = Enum.GetValues<Suit>();
     private sealed record CardSetEstimate(double Count, double[] Suits, bool OwnerHeld, bool TargetHeld = false,
         bool ActivationInput = false);
@@ -282,22 +294,14 @@ internal sealed partial class ProgramAiEstimateContext
             SkillProgramNumberExpression.CurrentHandEmptyTwoOtherwiseOne => _estimatedHandCount == 0 ? 2 : 1,
             // Zero is always tied for least; this composition estimate has no peer hand-count context.
             SkillProgramNumberExpression.OwnerLeastHandTwoOtherwiseOne => _estimatedHandCount == 0 ? 2 : 1,
-            SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne => (_publicContext.EquipmentCardCount + 1) / 2 + 1,
             SkillProgramNumberExpression.CurrentTurnUsedCardCategoryCount => _publicContext.CurrentTurnUsedCardCategoryCount ?? 0,
             SkillProgramNumberExpression.ActualTurnDeathBenefits => _publicContext.ActualTurnDeathBenefits ?? 0,
             SkillProgramNumberExpression.OwnerLostHp or SkillProgramNumberExpression.BoundaryWangYiMijiCount => Math.Max(0, _player.MaxHp - _player.Hp),
-            SkillProgramNumberExpression.LostHpMinusHandCount => Math.Max(0, _player.MaxHp - _player.Hp - _estimatedHandCount),
             SkillProgramNumberExpression.LivingFactionCount => _publicContext.LivingFactionCount,
             SkillProgramNumberExpression.LivingPlayersMinHp => _publicContext.LivingPlayersMinHp ?? _player.Hp,
             SkillProgramNumberExpression.TargetLostHp => TargetsOwner(effect)
                 ? Math.Max(0, _player.MaxHp - _player.Hp)
                 : _publicContext.SelectedTarget is { } wounded ? Math.Max(0, wounded.MaxHp - wounded.Hp) : 1d,
-            SkillProgramNumberExpression.TargetMaxHpMinusHandCount =>
-                TargetsOwner(effect)
-                    ? Math.Max(0, _player.MaxHp - _estimatedHandCount)
-                    : _publicContext.SelectedTarget is { } target
-                        ? Math.Max(0, target.MaxHp - target.HandCount)
-                        : 1d,
             SkillProgramNumberExpression.BoundCardCount => Binding(effect.SourceBind).Count,
             SkillProgramNumberExpression.CurrentAttackRange =>
                 Math.Max(1, _publicContext.AttackRange > 0 ? _publicContext.AttackRange : 1),
@@ -305,7 +309,7 @@ internal sealed partial class ProgramAiEstimateContext
         };
         if (effect.AmountExpression is { } expression)
         {
-            if (EvaluateAmount(expression) is not { } evaluated) return;
+            if (EvaluateAmount(expression, effect.OnUnknownAmount) is not { } evaluated) return;
             amount = evaluated;
         }
         if (TargetsOwner(effect))
@@ -425,7 +429,7 @@ internal sealed partial class ProgramAiEstimateContext
         };
         if (effect.AmountExpression is { } expression)
         {
-            if (EvaluateAmount(expression) is not { } evaluated) return;
+            if (EvaluateAmount(expression, effect.OnUnknownAmount) is not { } evaluated) return;
             amount = evaluated;
         }
         if (TargetsOwner(effect))
@@ -458,28 +462,39 @@ internal sealed partial class ProgramAiEstimateContext
     }
     internal void LoseHp(SkillProgramEffect effect)
     {
-        var amount = effect.AmountExpression is { } expression ? EvaluateAmount(expression) : effect.Amount;
+        var amount = effect.AmountExpression is { } expression ? EvaluateAmount(expression, effect.OnUnknownAmount) : effect.Amount;
         if (amount is null) return;
         if (TargetsOwner(effect)) ApplyOwnerHealth(new(PublicHealthEffectKind.HpLoss, amount.Value));
         else ApplyTargetHealth(new(PublicHealthEffectKind.HpLoss, amount.Value));
     }
 
-    private int? EvaluateAmount(ProgramExpression expression) =>
-        ProgramExpressions.EvaluateInt(expression, new SkillContextExpressionWorld(_player with
+    private IProgramExpressionWorld CurrentExpressionWorld() => new SkillContextExpressionWorld(_player with
         {
             Hp = Rounded(_estimatedHp), MaxHp = Rounded(_estimatedMaxHp),
             HandCount = Rounded(_estimatedHandCount), HpValueProvider = null
-        }, _publicContext.SelectedTarget, _publicContext.EquipmentCardCount)) is { } amount
-            ? Math.Max(0, amount) : null;
+        }, _publicContext.SelectedTarget, _publicContext.EquipmentCardCount,
+            (stat, name) => stat == "boundCount" && _bindings.TryGetValue(name, out var cards) ? Rounded(cards.Count) : null,
+            name => _expressionNumbers.TryGetValue(name, out var value) ? value : null);
+    private int? EvaluateAmount(ProgramExpression expression, SkillProgramUnknownAmountBehavior onUnknown)
+    {
+        if (ProgramExpressions.EvaluateInt(expression, CurrentExpressionWorld()) is { } amount)
+            return Math.Max(0, amount);
+        if (onUnknown == SkillProgramUnknownAmountBehavior.CancelBinding) PathCancelled = true;
+        return null;
+    }
 
     internal void Reveal(SkillProgramEffect effect)
     {
         var amount = effect.NumberExpression switch
         {
             SkillProgramNumberExpression.OwnerLostHp => Math.Max(0, _player.MaxHp - _player.Hp),
-            SkillProgramNumberExpression.OwnerLostHpPlusOne => checked(Math.Max(0, _player.MaxHp - _player.Hp) + 1),
             _ => effect.Amount
         };
+        if (effect.AmountExpression is { } expression)
+        {
+            if (EvaluateAmount(expression, effect.OnUnknownAmount) is not { } evaluated) return;
+            amount = evaluated;
+        }
         _bindings[effect.ResultBind!] = UnknownCards(amount, ownerHeld: false);
     }
 

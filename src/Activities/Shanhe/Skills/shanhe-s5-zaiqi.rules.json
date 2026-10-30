@@ -22,7 +22,7 @@
             {
               "op": "revealTopCards",
               "target": "owner",
-              "numberExpression": "ownerLostHpPlusOne",
+              "amountExpr":["+",["max",0,["lostHp","owner"]],1],"onUnknownAmount":"cancelBinding",
               "resultBind": "revealed",
               "visibility": "public"
             },

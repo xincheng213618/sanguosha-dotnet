@@ -51,6 +51,31 @@ internal static class ProgramAmountExpressionChecks
         Reject("""{"op":"draw","target":"owner","amountExpr":1,"resultBind":"drawn"}""");
         Reject("""{"op":"draw","target":"owner","amountExpr":["floorDiv",1,true]}""");
         Reject("""{"op":"draw","target":"owner","amountExpr":["handCount","it"]}""");
+        var captured = Load("""
+            {"op":"captureNumber","target":"owner","resultBind":"saved","valueExpr":["handCount","owner"]},
+            {"op":"draw","target":"owner","amountExpr":["number","saved"]}
+            """);
+        Need(captured.Activations.Single().Effects[0] is
+            { Op: SkillProgramEffectOp.CaptureNumber, ResultBind: "saved", ValueExpression.Type: ProgramExpressionType.Int },
+            "A captured integer is declared by its producer before a later expression reads it.");
+        _ = Load("""
+            {"op":"revealTopCards","target":"owner","amount":1,"resultBind":"shown","visibility":"public"},
+            {"op":"captureNumber","target":"owner","resultBind":"suits","valueExpr":["boundSuitCount","shown"]},
+            {"op":"draw","target":"owner","amountExpr":["number","suits"]},
+            {"op":"moveBoundCards","target":"owner","sourceBind":"shown","destination":"discardPile"}
+            """);
+        Reject("""{"op":"draw","target":"owner","amountExpr":["number","missing"]}""");
+        Reject("""{"op":"draw","target":"owner","amountExpr":["boundCount","missing"]}""");
+        Reject("""{"op":"draw","target":"owner","amountExpr":["boundSuitCount","missing"]}""");
+        Reject("""{"op":"captureNumber","target":"owner","resultBind":"saved","valueExpr":true}""");
+        Reject("""
+            {"op":"captureNumber","target":"owner","resultBind":"saved","valueExpr":1},
+            {"op":"captureNumber","target":"owner","resultBind":"saved","valueExpr":2}
+            """);
+        Reject("""
+            {"op":"revealTopCards","target":"owner","amount":1,"resultBind":"saved","visibility":"public"},
+            {"op":"captureNumber","target":"owner","resultBind":"saved","valueExpr":1}
+            """);
         foreach (var window in new[] { "dyingEntered", "dyingExited" })
         {
             var transition = $$"""
@@ -94,6 +119,41 @@ internal static class ProgramAmountExpressionChecks
                 "AI retains the known public equipment count, including expanded equipment capacity.");
         Need(ProgramCompositionAi.Estimate([Effect("""{"op":"loseHp","target":"owner","amountExpr":["hp","eventTarget"]}""")], owner).Hint.OwnerHpLoss == 0,
             "Unknown quantity facts do not invent a health payment in AI estimates.");
+    }
+
+    public static void AiCancellationPreservesPaidPrefixAndSkipFallback()
+    {
+        var owner = new PlayerSkillContext(0, 4, 4, 2, TurnPhase.Play);
+        const string unknown = """["hp","eventTarget"]""";
+        ProgramAiEstimate Estimate(params string[] middle)
+        {
+            var prefix = """{"op":"loseHp","target":"owner","amount":1},{"op":"draw","target":"owner","amount":1},""";
+            var tail = """,{"op":"draw","target":"owner","amount":2}""";
+            return ProgramCompositionAi.Estimate(Load(prefix + string.Join(",", middle) + tail).Activations.Single().Effects, owner);
+        }
+        string AmountStep(string op, string expression, string policy) =>
+            "{\"op\":\"" + op + "\",\"target\":\"owner\",\"amountExpr\":" + expression +
+            (policy.Length == 0 ? "" : ",\"onUnknownAmount\":\"" + policy + "\"") +
+            (op == "revealTopCards" ? ",\"resultBind\":\"shown\",\"visibility\":\"public\"" : "") + "}";
+        var capture = Estimate("""{"op":"captureNumber","target":"owner","resultBind":"saved","valueExpr":["hp","eventTarget"]}""");
+        Need(capture.Hint is { OwnerDraw: 1, OwnerHpLoss: 1 },
+            "An unknown capture cancels the estimate path without erasing its already paid HP loss or completed draw.");
+        foreach (var op in new[] { "draw", "recover", "loseHp", "revealTopCards" })
+        {
+            var cleanup = op == "revealTopCards"
+                ? new[] { """{"op":"moveBoundCards","target":"owner","sourceBind":"shown","destination":"discardPile"}""" }
+                : Array.Empty<string>();
+            var cancelled = Estimate([AmountStep(op, unknown, "cancelBinding"), .. cleanup]);
+            Need(cancelled.Hint is { OwnerDraw: 1, OwnerHpLoss: 1, OwnerRecovery: 0 },
+                "Unknown cancelBinding " + op + " must exclude the later draw while retaining the executed prefix.");
+            var zero = Estimate([AmountStep(op, "0", "cancelBinding"), .. cleanup]);
+            Need(zero.Hint is { OwnerDraw: 3, OwnerHpLoss: 1, OwnerRecovery: 0 },
+                "A known zero quantity is not a cancellation and must retain the later draw.");
+            if (op == "revealTopCards") continue; // Mandatory result bindings cannot use skip-on-unknown.
+            var skipped = Estimate(AmountStep(op, unknown, ""));
+            Need(skipped.Hint is { OwnerDraw: 3, OwnerHpLoss: 1, OwnerRecovery: 0 },
+                "Default skip only omits the unknown " + op + " and still estimates the following draw.");
+        }
     }
 
     public static void LiveAmountsSkipUnknownAndApplyHealth()
@@ -157,6 +217,27 @@ internal static class ProgramAmountExpressionChecks
                 "A child really changes the hand, but resuming the paid parent never recomputes the quantity, reissues its native request, or pays twice.");
         }
         Need(State(game) == State(restored), "Cold replay retains the exact paid draw, observer choices, native facts and all player views.");
+    }
+
+    public static void CapturedNumbersAndZeroCardBindingsRemainAvailableAndCold()
+    {
+        var (game, registry) = Create();
+        var initial = View(game, 0).HandCount;
+        Use(game, "capture-binding"); Play(game);
+        var captured = Events<ProgramExpressionNumberCapturedEvent>(game).Single(e => e.SkillId == Skill && e.Name == "saved-hand");
+        Need(captured.Value == initial && View(game, 0).HandCount == initial * 2 + 1 &&
+            Events<ProgramAmountEvaluatedEvent>(game).Single(e => e.FrameId == captured.FrameId).Amount == initial,
+            "Capturing the current hand before a real draw preserves the original number, including zero, for the later amount expression.");
+        _ = Cold(game, registry);
+        var hand = View(game, 0).HandCount; var movements = game.CardMovements.Count;
+        Use(game, "zero-bindings"); Play(game);
+        var completed = Events<ProgramSkillResolvedEvent>(game).Last(e => e.SkillId == Skill && e.ActivationId == "zero-bindings");
+        var counts = Events<ProgramExpressionNumberCapturedEvent>(game).Where(e => e.FrameId == completed.FrameId).ToArray();
+        Need(completed.Completed && View(game, 0).HandCount == hand + 1 && game.CardMovements.Count == movements + 1 &&
+            counts.Select(e => e.Name).SequenceEqual(["empty-draw-count", "empty-reveal-count", "empty-suit-count"]) &&
+            counts.All(e => e.Value == 0),
+            "Zero draw and zero reveal both produce real empty bindings; bound counts and suits remain readable and the following sentinel draw runs once.");
+        _ = Cold(game, registry);
     }
 
     public static void PaidHealthChildrenResumeColdWithoutReevaluation()
@@ -356,7 +437,19 @@ internal static class ProgramAmountExpressionChecks
                     {"op":"draw","target":"selectedTargets","amountExpr":["+",1,1]}]},
                   {"id":"limit","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
                     {"op":"grantTurnRuleModifier","target":"owner","ruleQuery":"handLimit","ruleOperation":"add","amount":6},
-                    {"op":"draw","target":"owner","amountExpr":["-",["handLimit","owner"],["handCount","owner"]]}]}]},
+                    {"op":"draw","target":"owner","amountExpr":["-",["handLimit","owner"],["handCount","owner"]]}]},
+                  {"id":"capture-binding","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
+                    {"op":"captureNumber","target":"owner","resultBind":"saved-hand","valueExpr":["handCount","owner"]},
+                    {"op":"draw","target":"owner","amount":1},{"op":"draw","target":"owner","amountExpr":["number","saved-hand"]}]},
+                  {"id":"zero-bindings","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
+                    {"op":"draw","target":"owner","amountExpr":0,"resultBind":"empty-draw","onUnknownAmount":"cancelBinding"},
+                    {"op":"revealTopCards","target":"owner","amountExpr":0,"resultBind":"empty-reveal","visibility":"public","onUnknownAmount":"cancelBinding"},
+                    {"op":"captureNumber","target":"owner","resultBind":"empty-draw-count","valueExpr":["boundCount","empty-draw"]},
+                    {"op":"captureNumber","target":"owner","resultBind":"empty-reveal-count","valueExpr":["boundCount","empty-reveal"]},
+                    {"op":"captureNumber","target":"owner","resultBind":"empty-suit-count","valueExpr":["boundSuitCount","empty-reveal"]},
+                    {"op":"moveBoundCards","target":"owner","sourceBind":"empty-reveal","destination":"discardPile"},
+                    {"op":"draw","target":"owner","amountExpr":["+",["number","empty-draw-count"],["number","empty-reveal-count"]]},
+                    {"op":"draw","target":"owner","amount":1}]}]},
                  {"id":"{{ColdSkill}}","revision":1,"activations":[
                   {"id":"cold","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
                     {"op":"draw","target":"owner","amountExpr":["-",6,["handCount","owner"]]}]}]},

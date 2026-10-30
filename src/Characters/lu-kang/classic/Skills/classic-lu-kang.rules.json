@@ -191,7 +191,7 @@
             {
               "op": "draw",
               "target": "owner",
-              "numberExpression": "targetMaxHpMinusHandCount"
+              "amountExpr":["when",["hasHp","owner"],["-",["maxHp","owner"],["handCount","owner"]]],"onUnknownAmount":"cancelBinding"
             },
             {
               "op": "replaceSkillsOnPreparation",

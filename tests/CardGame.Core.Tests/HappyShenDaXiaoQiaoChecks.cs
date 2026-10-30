@@ -39,6 +39,31 @@ public static class HappyShenDaXiaoQiaoChecks
         CheckFactsAndLimit(); s.Cold(); CheckFactsAndLimit();
     }
 
+    public static void ExpressionQuantitySelectsItsOriginalHealthPoolAndReturnsColdOnce()
+    {
+        foreach (var pool in Enum.GetValues<HappyQiaoPool>())
+        {
+            var s = Scene.Start(); s.Play();
+            s.Use("damage", [0]); s.PoolBoundary(); s.Pool(HappyQiaoPool.XiaoQiao); s.Play();
+            s.Need(s.Health == new HappyQiaoDualHealth(3, 2, 3), "The quantity query really has two different current HP values.");
+            var hand = s.V.HandCount; var expected = s.Health.Hp(pool);
+            var previousQueries = s.E<HappyQiaoHealthRequestedEvent>().Count(e => e.ReturnKind == HappyQiaoHealthReturnKind.Query);
+            s.Use("draw-current-hp", []); s.PoolBoundary();
+            var parent = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == Driver);
+            var frameId = parent.Id;
+            s.Need(s.E<ProgramAmountEvaluatedEvent>().All(e => e.FrameId != frameId) &&
+                s.E<HappyQiaoHealthRequestedEvent>().Count(e => e.ReturnKind == HappyQiaoHealthReturnKind.Query) == previousQueries + 1,
+                "A live HP amount requests the original owning pool before issuing any quantity or drawing cards.");
+            s.Cold(); s.Pool(pool); s.Play();
+            s.Need(s.V.HandCount == hand + expected && s.Health == new HappyQiaoDualHealth(3, 2, 3) &&
+                s.E<ProgramAmountEvaluatedEvent>().Where(e => e.FrameId == frameId).Select(e => e.Amount).SequenceEqual([expected]) &&
+                s.E<HappyQiaoHealthRequestedEvent>().Count(e => e.ReturnKind == HappyQiaoHealthReturnKind.Query) == previousQueries + 1 &&
+                s.E<ProgramSkillResolvedEvent>().Count(e => e.FrameId == frameId && e.Completed) == 1,
+                "Choosing either real pool yields its exact current HP once, preserving both pools and the single paid program after cold return.");
+            s.Cold();
+        }
+    }
+
     private sealed class Fixture(bool fullSkills = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-happy-qiao-health", new(1, 0, 0));
@@ -56,7 +81,7 @@ public static class HappyShenDaXiaoQiaoChecks
                 {"id":"damage","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"selectedTarget","amount":1}]},
                 {"id":"recover","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"recover","target":"owner","amount":1}]},
                 {"id":"recover-to-two","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"recoverTo","target":"owner","numberExpression":"integerConstant","minimumValue":2,"clampToMaxHp":true}]},
-                {"id":"draw-current-hp","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"draw","target":"owner","numberExpression":"currentHp"}]},
+                {"id":"draw-current-hp","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"draw","target":"owner","amountExpr":["hp","owner"],"onUnknownAmount":"cancelBinding"}]},
                 {"id":"loss-three","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"loseHp","target":"owner","amount":3}]},
                 {"id":"discard-two","minCards":2,"maxCards":2,"sourceZones":["hand"],"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"discardSelected","target":"owner","amount":2}]}
               ]}

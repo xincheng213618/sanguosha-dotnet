@@ -18,7 +18,8 @@
           "effects": [
             { "op": "freezeLivingFactionRecovery", "target": "owner" },
             { "op": "drawToFrozenFactionCount", "target": "owner" },
-            { "op": "turnOverIfFrozenFactionCountExceedsGameDamage", "target": "owner" }
+            { "op": "turnOver", "target": "owner", "condition": { "kind": "expression", "expr":
+              [">", ["number", "faction-count"], ["number", "game-damage-points"]] } }
           ] }
       ]
     }

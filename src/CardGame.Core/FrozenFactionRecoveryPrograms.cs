@@ -1,7 +1,6 @@
 namespace CardGame.Core;
 
-public sealed record FrozenFactionRecoveryReceipt(int InstructionIndex, long DyingFrameId,
-    int FactionCount, int GameDamagePoints, bool DrawIssued = false, bool FaceIssued = false);
+public sealed record FrozenFactionRecoveryReceipt(int InstructionIndex, long DyingFrameId, bool DrawIssued = false);
 public sealed record FrozenFactionRecoveryCapturedEvent(long FrameId, CardConversionSource Source,
     long DyingFrameId, int FactionCount, int GameDamagePoints) : IGameEvent;
 public sealed record FrozenFactionHandDrawIssuedEvent(long FrameId, int OwnerSeat, int FactionCount, int DrawCount) : IGameEvent;
@@ -9,7 +8,6 @@ internal interface IFrozenFactionRecoveryProgramHost
 {
     void FreezeLivingFactionRecovery(ProgramSkillFrame frame);
     void DrawToFrozenFactionCount(ProgramSkillFrame frame);
-    void TurnOverIfFrozenFactionCountExceedsGameDamage(ProgramSkillFrame frame);
 }
 internal abstract class FrozenFactionRecoveryDescriptor : ProgramOperationDescriptorBase
 {
@@ -27,9 +25,19 @@ internal sealed class FreezeLivingFactionRecoveryDescriptor : FrozenFactionRecov
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.FreezeLivingFactionRecovery;
     public override ISkillProgramEffectHandler Handler { get; } = new FreezeLivingFactionRecoveryHandler();
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.RecoverTo,
-        static (_, c) => c.RecoverTo(new(SkillProgramEffectOp.RecoverTo, SkillProgramEffectTarget.Owner, 0,
-            new(SkillProgramConditionKind.Always, 0, []), numberExpression: SkillProgramNumberExpression.LivingFactionCount,
-            minimumValue: 1, clampToMaxHp: true)));
+        static (_, c) =>
+        {
+            c.RecoverTo(new(SkillProgramEffectOp.RecoverTo, SkillProgramEffectTarget.Owner, 0,
+                new(SkillProgramConditionKind.Always, 0, []), numberExpression: SkillProgramNumberExpression.LivingFactionCount,
+                minimumValue: 1, clampToMaxHp: true));
+            // The frozen history is unknown to a draft estimate. Preserve the
+            // old conservative one-turnover prior, formerly priced by the tail op.
+            c.TurnOver(new(SkillProgramEffectOp.TurnOver, SkillProgramEffectTarget.Owner, 0,
+                new(SkillProgramConditionKind.Always, 0, [])));
+        });
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) =>
+        [.. base.Resources(e), new CreateNumberBinding(FrozenFactionRecoveryComposition.FactionNumber),
+            new CreateNumberBinding(FrozenFactionRecoveryComposition.DamageNumber)];
 }
 internal sealed class DrawToFrozenFactionCountDescriptor : FrozenFactionRecoveryDescriptor
 {
@@ -38,13 +46,8 @@ internal sealed class DrawToFrozenFactionCountDescriptor : FrozenFactionRecovery
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards,
         static (_, c) => c.Draw(new(SkillProgramEffectOp.Draw, SkillProgramEffectTarget.Owner, 3,
             new(SkillProgramConditionKind.Always, 0, []))));
-}
-internal sealed class TurnOverIfFrozenFactionCountExceedsGameDamageDescriptor : FrozenFactionRecoveryDescriptor
-{
-    public override SkillProgramEffectOp Op => SkillProgramEffectOp.TurnOverIfFrozenFactionCountExceedsGameDamage;
-    public override ISkillProgramEffectHandler Handler { get; } = new TurnOverIfFrozenFactionCountExceedsGameDamageHandler();
-    public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.TurnOver,
-        static (effect, context) => context.TurnOver(effect));
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) =>
+        [.. base.Resources(e), new ReadNumberBinding(FrozenFactionRecoveryComposition.FactionNumber)];
 }
 public sealed class FreezeLivingFactionRecoveryHandler : ISkillProgramEffectHandler
 {
@@ -58,24 +61,22 @@ public sealed class DrawToFrozenFactionCountHandler : ISkillProgramEffectHandler
     public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int s, ISkillProgramEffectHost h)
     { h.GetCapability<IFrozenFactionRecoveryProgramHost>().DrawToFrozenFactionCount(f); return SkillProgramStepOutcome.Continue; }
 }
-public sealed class TurnOverIfFrozenFactionCountExceedsGameDamageHandler : ISkillProgramEffectHandler
-{
-    public SkillProgramEffectOp Op => SkillProgramEffectOp.TurnOverIfFrozenFactionCountExceedsGameDamage;
-    public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int s, ISkillProgramEffectHost h)
-    { h.GetCapability<IFrozenFactionRecoveryProgramHost>().TurnOverIfFrozenFactionCountExceedsGameDamage(f); return SkillProgramStepOutcome.Continue; }
-}
 internal static class FrozenFactionRecoveryComposition
 {
+    internal const string FactionNumber = "faction-count", DamageNumber = "game-damage-points";
+
     internal static void Validate(string path, IReadOnlyList<SkillProgramEffect> effects,
         SkillProgramTriggerWindow window, SkillProgramTriggerSubject? subject,
         SkillUsageScope? usageScope, int? usageLimit)
     {
-        if (!effects.Any(e => e.Op is SkillProgramEffectOp.FreezeLivingFactionRecovery or SkillProgramEffectOp.DrawToFrozenFactionCount or SkillProgramEffectOp.TurnOverIfFrozenFactionCountExceedsGameDamage)) return;
+        if (!effects.Any(e => e.Op is SkillProgramEffectOp.FreezeLivingFactionRecovery or SkillProgramEffectOp.DrawToFrozenFactionCount)) return;
         if (window != SkillProgramTriggerWindow.SelfDyingResponse || subject != SkillProgramTriggerSubject.Owner ||
             usageScope != SkillUsageScope.Game || usageLimit != 1 || effects.Count != 3 ||
             effects[0].Op != SkillProgramEffectOp.FreezeLivingFactionRecovery ||
             effects[1].Op != SkillProgramEffectOp.DrawToFrozenFactionCount ||
-            effects[2].Op != SkillProgramEffectOp.TurnOverIfFrozenFactionCountExceedsGameDamage)
+            effects[2] is not { Op: SkillProgramEffectOp.TurnOver, Target: SkillProgramEffectTarget.Owner, TargetReference: null,
+                Condition: { Kind: SkillProgramConditionKind.Expression, Expression: { Op: ">", Args:
+                    [{ Op: "number", Name: FactionNumber }, { Op: "number", Name: DamageNumber }] } } })
             throw new InvalidOperationException($"Invalid skill program at {path}: frozen faction recovery requires one game-limited exact self-dying recover/draw/face sequence.");
     }
 }

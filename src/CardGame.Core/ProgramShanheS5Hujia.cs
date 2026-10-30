@@ -36,7 +36,9 @@ internal static class ShanheS5JianxiongComposition
                 Subject: SkillProgramTriggerSubject.Owner, DamageOccurrence: SkillProgramDamageOccurrence.PerDamage,
                 Optional: true, UsageLimit: null, MarkerCost: null, Condition.Kind: SkillProgramTriggerConditionKind.Always } trigger] ||
             trigger.Effects is not [{ Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.Owner,
-                    NumberExpression: SkillProgramNumberExpression.LiveOwnerLostHp, Condition.Kind: SkillProgramConditionKind.Always },
+                    NumberExpression: null, TargetReference: null, ReplacementSuits: [],
+                    AmountExpression: { Op: "lostHp", Args: [{ Name: "owner" }] },
+                    OnUnknownAmount: SkillProgramUnknownAmountBehavior.CancelBinding, Condition.Kind: SkillProgramConditionKind.Always },
                 { Op: SkillProgramEffectOp.ClaimShanheS5JianxiongCards, Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always }])
             throw new InvalidOperationException(path + ": S5 Jianxiong requires a real per-damage optional lost-HP Draw followed by its original native causal-card claim.");
     }

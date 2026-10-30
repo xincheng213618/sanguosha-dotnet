@@ -21,7 +21,7 @@
           { "kind": "compare", "left": { "kind": "currentMaxHp" }, "operator": "greaterThan", "right": { "kind": "livingPlayerCount" } }
         ] },
         "effects": [
-          { "op": "draw", "target": "owner", "numberExpression": "targetMaxHpMinusHandCount" },
+          { "op": "draw", "target": "owner", "amountExpr":["when",["hasHp","owner"],["-",["maxHp","owner"],["handCount","owner"]]],"onUnknownAmount":"cancelBinding" },
           { "op": "grantSkills", "target": "owner", "skillIds": ["classic:benghuai", "classic:weizhong"] }
         ]
       }]

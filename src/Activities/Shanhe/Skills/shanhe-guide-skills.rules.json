@@ -7,6 +7,6 @@
    {"op":"setChainedState","target":"owner","chained":false},
    {"op":"setFaceState","target":"owner","faceDown":false},
    {"op":"recoverShanheShuanghun","target":"owner"},
-   {"op":"draw","target":"owner","numberExpression":"targetMaxHpMinusHandCount"},
+   {"op":"draw","target":"owner","amountExpr":["when",["hasHp","owner"],["-",["maxHp","owner"],["handCount","owner"]]],"onUnknownAmount":"cancelBinding"},
    {"op":"restoreShanheShuanghunUse","target":"owner"}]}]}
 ]}

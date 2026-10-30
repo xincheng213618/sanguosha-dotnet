@@ -950,7 +950,7 @@ public enum SkillProgramEffectOp
     ClaimDiscardedEntityWithProvenance = 4500, UseVirtualAlcohol = 4501, OfferFaceUpForOutsideClaims = 4502,
     AwaitBoundCardMovements = 1484, UseVirtualDuel = 1486,
     InsertGrantedEntityPlayPhase = 4800, ClaimGrantedPhaseSlash = 4801,
-    FreezeLivingFactionRecovery = 4802, DrawToFrozenFactionCount = 4803, TurnOverIfFrozenFactionCountExceedsGameDamage = 4804,
+    FreezeLivingFactionRecovery = 4802, DrawToFrozenFactionCount = 4803,
     RevealTopCardsWithNextBooleanBonus = 3600, ObtainBoundCardsAndArmNextRevealBonus = 3601,
     RecoverOtherDyingVictimTo = 3602,
     SuppressOwnSkillAfterAlcoholSlashDamage = 3900,
@@ -1196,7 +1196,7 @@ public enum SkillProgramEffectOp
     GrowMaximumHpAndHp = 1020, ConsumeTargetPhaseLedger = 1021, GrantTurnBoundSuitUseProhibition = 1022, DiscardSelectedParticipantCards = 1023, OfferBoundCardsForDamagePrevention = 1024,
     SetTurnHandLimitFromPlayDamage = 944, GrantGameFactionAttackRangeTargets = 945,
     DrawTurnOwnerThenDiscardMaximumHandForDodge = 946,
-    StoreTopCardInPublicPile = 1140, ExchangePublicPile = 1141, DistributePublicPileIfAllSuits = 1142,
+    StoreTopCardInPublicPile = 1140, ExchangePublicPile = 1141,
     ExchangeOwnedCardThroughDeckEnd = 1220, UseDeckSlashesThenShuffle = 1221,
     SelectRelativeZoneDemandTarget = 1260, DrawOnFirstProgramTargetEncounter = 1261,
     GrantTurnRedSlashBenefits = 1680, UseDiamondDelayedOrDiscard = 1780, RevealOwnedBoundCardAppearance = 1860, IssueCurrentTurnNonLockedSkillSuppression = 1861, GrantCurrentTurnDirectedHeartSlashBonus = 1862,
@@ -1895,7 +1895,10 @@ public enum SkillProgramEffectOp
     ObtainMobileQirangTrick = 81800,
     InspectMobileYuhuaTop = 81801,
     ResolveMobileDuanfa = 82300,
-    PublishMobileYoudiBait = 82301
+    PublishMobileYoudiBait = 82301,
+    SelectPublicPile = 900001,
+    DistributeBoundCards = 900002,
+    CaptureNumber = 900003
 }
 public enum SkillProgramEffectTarget { Owner, Actor, SelectedTarget, SelectedTargets, HpPairHigher = 2000, HpPairLower = 2001, Activator = 2002 }
 public enum SkillProgramTurnPhase { Judgment, Draw, Play, Discard }
@@ -1973,11 +1976,11 @@ public enum SkillProgramHpChangeOccurrence { PerEvent, PerPoint }
 public enum SkillProgramDamageOccurrence { PerDamage, PerDamagePoint }
 public enum SkillProgramDrawPhaseMode { Additive, Replacement }
 public enum SkillProgramOldJudgmentCardDestination { DiscardPile, OwnerHand }
+public enum SkillProgramUnknownAmountBehavior { Skip, CancelBinding }
 public enum SkillProgramNumberExpression
 {
     LivingFactionCount,
-    TargetMaxHpMinusHandCount,
-    OwnerLostHp,
+    OwnerLostHp = 2,
     BoundCardCount,
     AllOwnedZoneCards,
     CurrentHandCount,
@@ -1990,16 +1993,12 @@ public enum SkillProgramNumberExpression
     HandHalfFloor = 12,
     SelectedPairHandDifference = 13,
     LivingPlayersMinHp = 14,
-    OwnerLostHpPlusOne = 16,
     RecipientCurrentHp = 17,
-    LostHpMinusHandCount = 600,
     CategoryTargetTurnUsage = 820, CurrentHp = 1020, SelectedTargetsHandGreaterThanLord = 1021,
     PhaseSkillUsage = 1022, EventMovedCardCount = 1700, CurrentTurnUsedCardCategoryCount = 4600, OwnerLostHpAtLeastOne = 7400,
     TurnOwnerDiscardPhaseHandDiscardCount = 3100, CurrentHandEmptyTwoOtherwiseOne = 8008,
     OwnerLeastHandTwoOtherwiseOne = 239,
-    EquipmentHalfCeilingPlusOne = 9000,
     ActualTurnDeathBenefits = 4721,
-    LiveOwnerLostHp = 40800,
     OwnerMaxHp = 43000,
     HandCountMinusFour = 47001,
     AfterDamageAmount = 56100,
@@ -3107,6 +3106,10 @@ public sealed partial class SkillProgramEffect
     public SkillProgramNumberExpression? NumberExpression { get; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public ProgramExpression? AmountExpression { get; internal init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public SkillProgramUnknownAmountBehavior OnUnknownAmount { get; internal init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramExpression? ValueExpression { get; internal init; }
     public int MinimumValue { get; }
     public bool ClampToMaxHp { get; }
     public string? SourceBind { get; }

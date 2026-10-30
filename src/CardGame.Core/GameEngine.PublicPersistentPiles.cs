@@ -37,22 +37,16 @@ public sealed partial class GameEngine
                 frame = frame with { PublicPileDraft = new(owner.Seat, effect.SkillIds.Single(), "source", -1, [], [], [], []) };
             else
             {
-                if (effect.Op == SkillProgramEffectOp.DistributePublicPileIfAllSuits && PublicPileCards(sources[0]).Select(c => c.Suit).Distinct().Count() != 4)
-                    return SkillProgramStepOutcome.Continue;
                 frame = frame with { PublicPileDraft = CreatePublicPileDraft(frame, effect, sources[0]) };
             }
             ReplaceRuntimeTop(frame);
         }
-        if (frame.PublicPileDraft!.Stage == "distribute" &&
-            (frame.PublicPileDraft.RemainingIds.Count == 0 || !GetProgramTargetSeats(owner.Seat, SkillProgramTargetKind.OtherLiving).Any()))
-        { ReplaceRuntimeTop(frame with { PublicPileDraft = null }); return SkillProgramStepOutcome.Continue; }
         PublishPublicPileChoice(frame);
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
     private ProgramPublicPileDraft CreatePublicPileDraft(ProgramSkillFrame frame, SkillProgramEffect effect, PublicPersistentPileSource source) =>
-        new(source.OwnerSeat, source.SkillId, effect.Op == SkillProgramEffectOp.DistributePublicPileIfAllSuits ? "distribute" : "owned", source.Capacity,
-            [], [], [], effect.Op == SkillProgramEffectOp.DistributePublicPileIfAllSuits ? PublicPileCards(source).Select(c => c.Id).ToArray() : [],
+        new(source.OwnerSeat, source.SkillId, "owned", source.Capacity, [], [], [], [],
             SupportsMultiplePublicPiles ? source.SkillInstanceId : null, SupportsMultiplePublicPiles ? source.Location : null);
 
     private bool PublicPileSourceSatisfiesFrozenTrigger(ProgramSkillFrame frame, PublicPersistentPileSource source)
@@ -94,7 +88,7 @@ public sealed partial class GameEngine
                 Add("card-" + card.Id, "取出【" + card.DisplayName + " " + GetSuitDisplayName(card.Suit) + card.RankText + "】", [card.Id], []);
         else
             foreach (var id in draft.RemainingIds)
-                foreach (var seat in GetProgramTargetSeats(draft.OwnerSeat, SkillProgramTargetKind.OtherLiving))
+                foreach (var seat in PublicPileDistributionTargets(frame))
                     Add($"card-{id}.target-{seat}", "将【" + PublicPileCardLabel(PublicPileDraftCards(draft).Single(card => card.Id == id)) + "】交给 " + _players[seat].Name, [id], [seat]);
         var skill = _contentRegistry.GetSkill(frame.SkillId);
         _pendingDecision = new(DecisionKind.ProgramTrigger, draft.OwnerSeat,
@@ -121,8 +115,13 @@ public sealed partial class GameEngine
             if (!PublicPileSourceSatisfiesFrozenTrigger(frame, source) || PublicPileCards(source).Count == 0 || selected.Cards.Count != 0 || selected.Targets.Count != 0)
                 throw new InvalidOperationException("Public pile source selection lost its frozen qualification.");
             ClearPendingDecision();
-            if (effect.Op == SkillProgramEffectOp.DistributePublicPileIfAllSuits && PublicPileCards(source).Select(c => c.Suit).Distinct().Count() != 4)
-            { ReplaceRuntimeTop(frame with { PublicPileDraft = null }); AdvanceRuntimeProgram(frame.Id); return; }
+            if (effect.Op == SkillProgramEffectOp.SelectPublicPile)
+            {
+                ReplaceRuntimeTop(frame with { PublicPileDraft = null });
+                BindSelectedPublicPile(GetActiveProgramFrame(frame.Id), effect, source);
+                AdvanceRuntimeProgram(frame.Id);
+                return;
+            }
             frame = frame with { PublicPileDraft = CreatePublicPileDraft(frame, effect, source) };
             ReplaceRuntimeTop(frame); PublishPublicPileChoice(frame); return;
         }
@@ -168,11 +167,11 @@ public sealed partial class GameEngine
             }
             else
             {
-                if (selected.Targets.Count != 1 || selected.Targets.Single() == draft.OwnerSeat || !_players[selected.Targets.Single()].IsAlive || !draft.RemainingIds.Contains(id) || location != PublicPileDraftLocation(draft)) throw new InvalidOperationException("Public pile requires all frozen cards to living other recipients.");
+                if (selected.Targets.Count != 1 || !PublicPileDistributionTargets(frame).Contains(selected.Targets.Single()) || !draft.RemainingIds.Contains(id) || location != PublicPileDraftLocation(draft)) throw new InvalidOperationException("Public pile requires all frozen cards to living other recipients.");
                 var card = PublicPileDraftCards(draft).Single(card => card.Id == id);
                 ClearPendingDecision();
                 ReplaceRuntimeTop(frame with { PublicPileDraft = draft with { RemainingIds = draft.RemainingIds.Where(cardId => cardId != id).ToArray() },
-                    ReexecuteParticipantInstruction = true, PendingMovementContinuation = new(draft.OwnerSeat, 0, null) });
+                    PendingMovementContinuation = new(draft.OwnerSeat, 0, null) });
                 MoveCard(card, location, CardLocation.Hand(selected.Targets.Single()), new("skill-program.public-pile.distribute"), NativeGiveCompletion(frame.Id,draft.OwnerSeat,selected.Targets.Single(),[id],_movementSequence,null));
                 if (!TryBeginCardsMovedProgramWindow()) ReturnRuntimeProgramMovement(frame.Id);
                 return;
@@ -191,7 +190,8 @@ public sealed partial class GameEngine
     [ProgramAiChoice(
         SkillProgramEffectOp.ExchangePublicPileHand,
         SkillProgramEffectOp.ExchangePublicPile,
-        SkillProgramEffectOp.DistributePublicPileIfAllSuits)]
+        SkillProgramEffectOp.SelectPublicPile,
+        SkillProgramEffectOp.DistributeBoundCards)]
     private PromptChoice SelectAiPublicPileChoice(PendingDecision decision, ProgramSkillFrame frame)
     {
         var draft = frame.PublicPileDraft!;
@@ -214,21 +214,34 @@ public sealed partial class GameEngine
         if (frame.PublicPileDraft is not { } draft) return;
         if (draft.Stage == "source")
         {
-            if (draft.OwnerSeat != frame.OwnerSeat || draft.SourceSkillId != paused.SkillIds.SingleOrDefault() || draft.SourceLocation is not null || draft.SourceSkillInstanceId is not null || draft.Capacity != -1 || draft.OwnedIds.Count + draft.PileIds.Count + draft.RemainingIds.Count != 0)
+            if (paused.Op is not (SkillProgramEffectOp.SelectPublicPile or SkillProgramEffectOp.ExchangePublicPile or SkillProgramEffectOp.ExchangePublicPileHand) ||
+                draft.OwnerSeat != frame.OwnerSeat || draft.SourceSkillId != paused.SkillIds.SingleOrDefault() ||
+                draft.SourceLocation is not null || draft.SourceSkillInstanceId is not null || draft.Capacity != -1 ||
+                draft.OwnedIds.Count + draft.PileIds.Count + draft.RemainingIds.Count != 0)
                 throw new InvalidOperationException("Public pile source draft is malformed.");
             return;
         }
         var source = PublicPileDraftSource(draft);
+        var distributing = paused.Op == SkillProgramEffectOp.DistributeBoundCards;
         if (draft.OwnerSeat != frame.OwnerSeat || source is null || source.SkillId != draft.SourceSkillId || source.Capacity != draft.Capacity ||
-            (paused.Op == SkillProgramEffectOp.ExchangePublicPileHand ? draft.Capacity < 0 : draft.Capacity is < 1 or > 16 || paused.Amount != draft.Capacity) || paused.SkillIds.SingleOrDefault() != draft.SourceSkillId ||
-            (draft.Stage == "distribute" ? paused.Op != SkillProgramEffectOp.DistributePublicPileIfAllSuits : paused.Op is not (SkillProgramEffectOp.ExchangePublicPile or SkillProgramEffectOp.ExchangePublicPileHand)) ||
-            draft.Stage is not ("owned" or "pile" or "distribute") || draft.OwnedIds.Count > (draft.Capacity==0?PublicPileDraftCards(draft).Count:draft.Capacity) || draft.OwnedIds.Count != draft.OwnedLocations.Count ||
+            (!distributing && ((paused.Op == SkillProgramEffectOp.ExchangePublicPileHand ? draft.Capacity < 0 : draft.Capacity is < 1 or > 16 || paused.Amount != draft.Capacity) ||
+                paused.SkillIds.SingleOrDefault() != draft.SourceSkillId)) ||
+            (draft.Stage == "distribute" ? !distributing : paused.Op is not (SkillProgramEffectOp.ExchangePublicPile or SkillProgramEffectOp.ExchangePublicPileHand)) ||
+            draft.Stage is not ("owned" or "pile" or "distribute") ||
+            draft.OwnedIds.Count > (draft.Capacity == 0 ? PublicPileDraftCards(draft).Count : draft.Capacity) || draft.OwnedIds.Count != draft.OwnedLocations.Count ||
             draft.OwnedIds.Distinct().Count() != draft.OwnedIds.Count || draft.PileIds.Distinct().Count() != draft.PileIds.Count || draft.PileIds.Count > draft.OwnedIds.Count ||
-            draft.RemainingIds.Distinct().Count() != draft.RemainingIds.Count || draft.RemainingIds.Count > (draft.Capacity==0?PublicPileDraftCards(draft).Count:draft.Capacity) ||
+            draft.RemainingIds.Distinct().Count() != draft.RemainingIds.Count || draft.RemainingIds.Count > (draft.Capacity == 0 ? PublicPileDraftCards(draft).Count : draft.Capacity) ||
             draft.OwnedLocations.Any(location => paused.Op == SkillProgramEffectOp.ExchangePublicPileHand && location.Zone != CardZoneKind.Hand) ||
-            draft.OwnedIds.Where((id, index) => draft.OwnedLocations[index].OwnerSeat != draft.OwnerSeat || draft.OwnedLocations[index].Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _cardZones.GetLocation(id) != draft.OwnedLocations[index]).Any() ||
-            draft.PileIds.Concat(draft.RemainingIds).Any(id => _cardZones.GetLocation(id) != PublicPileDraftLocation(draft)))
+            draft.OwnedIds.Where((id, index) => draft.OwnedLocations[index].OwnerSeat != frame.OwnerSeat || draft.OwnedLocations[index].Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _cardZones.GetLocation(id) != draft.OwnedLocations[index]).Any() ||
+            draft.PileIds.Concat(draft.RemainingIds).Any(id => _cardZones.GetLocation(id) != source.Location))
             throw new InvalidOperationException("Public pile draft lost capacity, physical ownership, equal cost or instruction provenance.");
+        if (distributing)
+        {
+            var binding = GetProgramCardSet(frame, paused.SourceBind!);
+            if (binding.Visibility != SkillProgramCardSetVisibility.Public || binding.CardIds.Count != binding.SourceLocations.Count ||
+                binding.SourceLocations.Any(location => location != source.Location) || draft.RemainingIds.Any(id => !binding.CardIds.Contains(id)))
+                throw new InvalidOperationException("A distribution lost its original selected source binding.");
+        }
         if (ReferenceEquals(frame, _resolutionStack.LastOrDefault()) && frame.PendingMovementContinuation is null &&
             (_pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != draft.OwnerSeat || prompt.IsPrivate != (draft.Stage == "owned")))
             throw new InvalidOperationException("Public pile draft lost its chooser and visibility.");

@@ -24,6 +24,10 @@ public sealed class ProgramExpression
     public string? Name { get; }
 
     internal bool Reads(string op) => Op == op || Args.Any(arg => arg.Reads(op));
+    internal IEnumerable<ProgramExpression> Nodes() => new[] { this }.Concat(Args.SelectMany(arg => arg.Nodes()));
+    internal bool StructurallyEquals(ProgramExpression other) => Op == other.Op && Type == other.Type &&
+        Literal == other.Literal && Name == other.Name && Args.Count == other.Args.Count &&
+        Args.Zip(other.Args).All(pair => pair.First.StructurallyEquals(pair.Second));
 }
 
 /// <summary>Read-only seat facts. Null means unknown or undefined.</summary>
@@ -33,6 +37,8 @@ internal interface IProgramExpressionWorld
     IReadOnlyList<int>? ParticipantSet(string name);
     int? Stat(string stat, int seat);
     bool? Flag(string flag, int seat);
+    int? BindingStat(string stat, string name) => null;
+    int? Number(string name) => null;
 }
 
 internal static class ProgramExpressions
@@ -104,6 +110,18 @@ internal static class ProgramExpressions
         if (op is "+" or "min" or "max") { Arity(2, 8); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
         if (op == "-") { Arity(2, 2); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
         if (op == "floorDiv") { Arity(2, 2); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
+        if (op == "when")
+        {
+            Arity(2, 2);
+            return new(op, ProgramExpressionType.Int, [Arg(0, ProgramExpressionType.Bool), Arg(1, ProgramExpressionType.Int)]);
+        }
+        if (op is "number" or "boundCount" or "boundSuitCount" or "boundDistinctSuitCount" or "boundRank" or "boundIsEquipment")
+        {
+            Arity(1, 1);
+            if (args[0].ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(args[0].GetString()) || args[0].GetString()!.Length > 128)
+                Fail(path, "a binding reference requires a nonempty identifier of at most 128 characters");
+            return new(op, op == "boundIsEquipment" ? ProgramExpressionType.Bool : ProgramExpressionType.Int, [], name: args[0].GetString());
+        }
         if (op is "all" or "any" or "count")
         {
             Arity(2, 2);
@@ -116,6 +134,7 @@ internal static class ProgramExpressions
     /// <summary>Three-valued result: null when a read fact is unknown or undefined.</summary>
     public static bool? EvaluateBool(ProgramExpression e, IProgramExpressionWorld world, int? it = null)
     {
+        if (e.Op == "boundIsEquipment") return world.BindingStat(e.Op, e.Name!) is { } value ? value != 0 : null;
         switch (e.Op)
         {
             case "bool": return e.Literal != 0;
@@ -177,6 +196,9 @@ internal static class ProgramExpressions
         switch (e.Op)
         {
             case "int": return e.Literal;
+            case "when": return EvaluateBool(e.Args[0], world, it) == true ? EvaluateInt(e.Args[1], world, it) : null;
+            case "number": return world.Number(e.Name!);
+            case "boundCount" or "boundSuitCount" or "boundDistinctSuitCount" or "boundRank": return world.BindingStat(e.Op, e.Name!);
             case "-":
                 return EvaluateInt(e.Args[0], world, it) is { } left && EvaluateInt(e.Args[1], world, it) is { } right ? left - right : null;
             case "floorDiv":
@@ -233,8 +255,11 @@ internal static class ProgramExpressions
 /// other participant or set is unknown, so expressions that need them are false.
 /// </summary>
 internal sealed class SkillContextExpressionWorld(PlayerSkillContext owner, PlayerSkillContext? selectedTarget,
-    int? ownerEquipmentCount = null) : IProgramExpressionWorld
+    int? ownerEquipmentCount = null, Func<string, string, int?>? bindingStat = null,
+    Func<string, int?>? number = null) : IProgramExpressionWorld
 {
+    public int? BindingStat(string stat, string name) => bindingStat?.Invoke(stat, name);
+    public int? Number(string name) => number?.Invoke(name);
     private PlayerSkillContext? Context(int seat) =>
         seat == owner.Seat ? owner : selectedTarget?.Seat == seat ? selectedTarget : null;
 

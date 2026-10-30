@@ -701,7 +701,7 @@ public sealed partial class GameEngine
         SkillProgramCardSetVisibility visibility)
     {
         var frame = GetActiveProgramFrame(frameId);
-        if (numberExpression is (SkillProgramNumberExpression.OwnerLostHp or SkillProgramNumberExpression.OwnerLostHpPlusOne) &&
+        if (numberExpression is (SkillProgramNumberExpression.OwnerLostHp) &&
             !_players[ownerSeat].HasHpValue)
         { CancelProgramBindingAndCleanup(frame, "体力值未定义，无法计算此效果。"); return; }
         var revealCount = numberExpression switch
@@ -709,8 +709,6 @@ public sealed partial class GameEngine
             null => amount,
             SkillProgramNumberExpression.OwnerLostHp =>
                 Math.Max(0, _players[ownerSeat].MaxHp - _players[ownerSeat].Hp),
-            SkillProgramNumberExpression.OwnerLostHpPlusOne =>
-                checked(Math.Max(0, _players[ownerSeat].MaxHp - _players[ownerSeat].Hp) + 1),
             _ => throw new InvalidOperationException(
                 $"Unsupported reveal number expression '{numberExpression}'.")
         };
@@ -796,8 +794,8 @@ public sealed partial class GameEngine
     {
         var target = _players[targetSeat];
         if ((numberExpression is SkillProgramNumberExpression.OwnerLostHp or SkillProgramNumberExpression.OwnerMaxHp or
-                SkillProgramNumberExpression.CurrentHp or SkillProgramNumberExpression.LiveOwnerLostHp or SkillProgramNumberExpression.BoundaryWangYiMijiCount) && !_players[frame.OwnerSeat].HasHpValue ||
-            (numberExpression is SkillProgramNumberExpression.TargetLostHp or SkillProgramNumberExpression.LostHpMinusHandCount or SkillProgramNumberExpression.TargetMaxHpMinusHandCount) && !target.HasHpValue ||
+                SkillProgramNumberExpression.CurrentHp or SkillProgramNumberExpression.BoundaryWangYiMijiCount) && !_players[frame.OwnerSeat].HasHpValue ||
+            (numberExpression is SkillProgramNumberExpression.TargetLostHp) && !target.HasHpValue ||
             numberExpression == SkillProgramNumberExpression.LivingPlayersMinHp && _players.Any(p => p.IsAlive && !p.HasHpValue) && !_players.Any(p => p.IsAlive && p.HasHpValue))
         { CancelProgramBindingAndCleanup(frame, "体力值未定义，无法计算此效果。"); return null; }
         return numberExpression switch
@@ -805,24 +803,18 @@ public sealed partial class GameEngine
             null => amount,
             SkillProgramNumberExpression.OwnerMaxHp => Math.Max(0, _players[frame.OwnerSeat].MaxHp),
             SkillProgramNumberExpression.CurrentHp => Math.Max(0, _players[frame.OwnerSeat].Hp),
-            SkillProgramNumberExpression.LiveOwnerLostHp => Math.Max(0,
-                _players[frame.OwnerSeat].MaxHp - _players[frame.OwnerSeat].Hp),
             SkillProgramNumberExpression.TargetLostHp => Math.Max(0, target.MaxHp - target.Hp),
             SkillProgramNumberExpression.CurrentHandEmptyTwoOtherwiseOne => GetHand(target).Count == 0 ? 2 : 1,
             SkillProgramNumberExpression.OwnerLeastHandTwoOtherwiseOne =>
                 _players.Where(player => player.IsAlive).All(player => GetHand(player).Count >= GetHand(target).Count) ? 2 : 1,
-            SkillProgramNumberExpression.EquipmentHalfCeilingPlusOne => (GetEquipment(target).Count + 1) / 2 + 1,
             SkillProgramNumberExpression.CurrentTurnUsedCardCategoryCount => CurrentTurnCategoryDrawCount(frame, targetSeat),
             SkillProgramNumberExpression.ActualTurnDeathBenefits => ActualTurnDeathDrawCount(frame, targetSeat),
             SkillProgramNumberExpression.CategoryTargetTurnUsage => GetProgramCategoryTargetTurnUsage(frame),
             SkillProgramNumberExpression.SelectedTargetsHandGreaterThanLord => CountSelectedTargetsHandGreaterThanLord(frame),
             SkillProgramNumberExpression.OwnerLostHp => GetProgramOwnerLostHp(frame),
             SkillProgramNumberExpression.BoundaryWangYiMijiCount => BoundaryWangYiMijiDrawCount(frame),
-            SkillProgramNumberExpression.LostHpMinusHandCount => Math.Max(0, target.MaxHp - target.Hp - GetHand(target).Count),
             SkillProgramNumberExpression.LivingFactionCount => GetLivingFactionCount(),
             SkillProgramNumberExpression.LivingPlayersMinHp => GetLivingPlayersMinHp(),
-            SkillProgramNumberExpression.TargetMaxHpMinusHandCount =>
-                Math.Max(0, target.MaxHp - GetHand(target).Count),
             SkillProgramNumberExpression.CurrentAttackRange =>
                 frame.WindowContext?.Facts is { } facts && facts.CurrentAttackRange > 0
                     ? facts.CurrentAttackRange

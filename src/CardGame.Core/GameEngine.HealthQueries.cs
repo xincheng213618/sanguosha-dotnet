@@ -35,17 +35,39 @@ public sealed partial class GameEngine
     {
         IEnumerable<int> subjects = [];
         if (effect.Condition.ReferencesOwnerHp || effect.NumberExpression is SkillProgramNumberExpression.CurrentHp or
-            SkillProgramNumberExpression.OwnerLostHp or SkillProgramNumberExpression.LiveOwnerLostHp or
-            SkillProgramNumberExpression.OwnerLostHpPlusOne or SkillProgramNumberExpression.OwnerLostHpAtLeastOne)
+            SkillProgramNumberExpression.OwnerLostHp or
+            SkillProgramNumberExpression.OwnerLostHpAtLeastOne)
             subjects = subjects.Append(frame.OwnerSeat);
         if (effect.Condition.ReferencesSelectedTargetHp) subjects = subjects.Concat(frame.SelectedTargetSeats);
         if (effect.NumberExpression == SkillProgramNumberExpression.LivingPlayersMinHp)
             subjects = subjects.Concat(_players.Where(player => player.IsAlive && player.HasHpValue).Select(player => player.Seat));
-        if (effect.NumberExpression is SkillProgramNumberExpression.LostHpMinusHandCount or SkillProgramNumberExpression.RecipientCurrentHp)
+        if (effect.NumberExpression is SkillProgramNumberExpression.RecipientCurrentHp)
             subjects = subjects.Concat(effect.Target == SkillProgramEffectTarget.Owner ? [frame.OwnerSeat] : frame.SelectedTargetSeats);
+        if (effect.OnUnknownAmount == SkillProgramUnknownAmountBehavior.CancelBinding && effect.AmountExpression is { } amount)
+            subjects = subjects.Concat(ExpressionHpSubjects(amount, frame));
+        if (effect.ValueExpression is { } captured) subjects = subjects.Concat(ExpressionHpSubjects(captured, frame));
         foreach (var seat in subjects.Distinct().Where(HasHappyQiaoHealth))
             if (TryBeginHappyQiaoQuery(GetActiveProgramFrame(frame.Id), seat, "instruction-hp")) return true;
         return false;
+    }
+
+    private IEnumerable<int> ExpressionHpSubjects(ProgramExpression expression, ProgramSkillFrame frame, int? iterator = null)
+    {
+        var world = new ProgramExpressionWorld(this, frame);
+        if (expression.Op is "hp" or "lostHp")
+        {
+            var name = expression.Args[0].Name!;
+            if ((name == "it" ? iterator : world.Participant(name)) is { } seat) yield return seat;
+            yield break;
+        }
+        if (expression.Op is "all" or "any" or "count")
+        {
+            foreach (var seat in world.ParticipantSet(expression.Args[0].Name!) ?? [])
+                foreach (var subject in ExpressionHpSubjects(expression.Args[1], frame, seat)) yield return subject;
+            yield break;
+        }
+        foreach (var child in expression.Args)
+            foreach (var subject in ExpressionHpSubjects(child, frame, iterator)) yield return subject;
     }
 
     private IReadOnlyList<LegalAction> HappyQiaoActionQueryUnion(Func<IReadOnlyList<LegalAction>> query)

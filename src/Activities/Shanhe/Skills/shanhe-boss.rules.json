@@ -36,7 +36,7 @@
             "right": {"kind": "currentMaxHp"}
           },
           "effects": [
-            {"op": "draw", "target": "owner", "numberExpression": "ownerMaxHp"}
+            {"op": "draw", "target": "owner", "amountExpr":["when",["hasHp","owner"],["maxHp","owner"]],"onUnknownAmount":"cancelBinding"}
           ]
         },
         {

@@ -65,6 +65,7 @@ internal static class ProgramCompositionValidator
             throw Error(path, "Declared deck criterion requires one standalone zero-input activation.");
         expandedCardDomain |= RequiresExpandedCardDomain(effects);
         var bindings = new Dictionary<string, Binding>(StringComparer.Ordinal);
+        var numberBindings = new HashSet<string>(StringComparer.Ordinal);
         var judgmentOutcomes = new HashSet<string>(StringComparer.Ordinal);
         var choiceGuardedBindings = new Dictionary<string, SkillProgramCondition>(StringComparer.Ordinal);
         var roots = new List<Root>();
@@ -188,7 +189,14 @@ internal static class ProgramCompositionValidator
                 throw Error(nodePath, "a replacement draw program cannot adjust the replaced normal draw");
             if (descriptor.RequiredCapabilities.HasFlag(ProgramContextCapability.PhaseInsertion) && bindings.Count != 0)
                 throw Error(nodePath, "card bindings cannot cross an independently interactive inserted phase");
-            foreach (var resource in descriptor.Resources(effect))
+            var expressions = Conditions(effect.Condition).Select(condition => condition.Expression)
+                .Append(effect.AmountExpression).Append(effect.ValueExpression).Where(expression => expression is not null)
+                .SelectMany(expression => expression!.Nodes()).ToArray();
+            var expressionReads = expressions.Where(expression => expression.Op.StartsWith("bound", StringComparison.Ordinal))
+                .Select(expression => (ProgramResourceOperation)new ReadCardSet(expression.Name!))
+                .Concat(expressions.Where(expression => expression.Op == "number")
+                    .Select(expression => (ProgramResourceOperation)new ReadNumberBinding(expression.Name!)));
+            foreach (var resource in expressionReads.Concat(descriptor.Resources(effect)))
             {
                 if (judgmentTargetGuard is not null && resource is (ReadSelectedTarget or RequireSelectedTargetKind or ReadVirtualDuelPair or
                         ReadTargetSet or ReplaceSingleTarget or NarrowTargetSetToSingle or ConsumeTargetSet or ReleaseTargetSet) &&
@@ -207,7 +215,7 @@ internal static class ProgramCompositionValidator
                 switch (resource)
                 {
                     case CreateJudgmentOutcome outcome:
-                        if (!judgmentOutcomes.Add(outcome.Name) || bindings.ContainsKey(outcome.Name) ||
+                        if (!judgmentOutcomes.Add(outcome.Name) || bindings.ContainsKey(outcome.Name) || numberBindings.Contains(outcome.Name) ||
                             choiceResults.ContainsKey(outcome.Name) || pindianResults.Contains(outcome.Name) || coverageResults.Contains(outcome.Name))
                             Fail($"duplicate judgment outcome binding '{outcome.Name}'");
                         break;
@@ -411,6 +419,15 @@ internal static class ProgramCompositionValidator
                         Add(partition.Leftover, new(source.Root, leftoverAtoms, source.MaximumCount, source.CardOwner));
                         break;
                     }
+                    case CreateNumberBinding number:
+                        if (!numberBindings.Add(number.Name) || bindings.ContainsKey(number.Name) ||
+                            choiceResults.ContainsKey(number.Name) || pindianResults.Contains(number.Name) ||
+                            coverageResults.Contains(number.Name) || judgmentOutcomes.Contains(number.Name))
+                            Fail($"duplicate number binding '{number.Name}'");
+                        break;
+                    case ReadNumberBinding number:
+                        if (!numberBindings.Contains(number.Name)) Fail($"unknown number binding '{number.Name}'");
+                        break;
                     case ReadCardSet read:
                         _ = Get(read.Name);
                         break;
@@ -540,7 +557,7 @@ internal static class ProgramCompositionValidator
                     case CreatePindianResult result:
                         if (roots.Any(root => root.NeedsCleanup && !root.Consumed.SetEquals(root.Atoms.Keys)))
                             Fail("pindian cannot start while an earlier revealed card binding still needs cleanup");
-                        if (!pindianResults.Add(result.Name) || bindings.ContainsKey(result.Name) ||
+                        if (!pindianResults.Add(result.Name) || bindings.ContainsKey(result.Name) || numberBindings.Contains(result.Name) ||
                             choiceResults.ContainsKey(result.Name) || coverageResults.Contains(result.Name) || judgmentOutcomes.Contains(result.Name))
                             Fail($"duplicate result binding '{result.Name}'");
                         break;
@@ -558,7 +575,7 @@ internal static class ProgramCompositionValidator
                         break;
                     case CreateChoiceResult choice:
                         if (!choiceResults.TryAdd(choice.Name, choice.Options) ||
-                            bindings.ContainsKey(choice.Name) || pindianResults.Contains(choice.Name) ||
+                            bindings.ContainsKey(choice.Name) || numberBindings.Contains(choice.Name) || pindianResults.Contains(choice.Name) ||
                             coverageResults.Contains(choice.Name) || judgmentOutcomes.Contains(choice.Name))
                             Fail($"duplicate result binding '{choice.Name}'");
                         if (effect is { Op: SkillProgramEffectOp.ChooseOption, Target: SkillProgramEffectTarget.Owner,
@@ -568,7 +585,7 @@ internal static class ProgramCompositionValidator
                                 choiceRequiredTargets.Add((choice.Name, option.Id), option.RequiredTargetKind!.Value);
                         break;
                     case CreateCoverageResult coverage:
-                        if (!coverageResults.Add(coverage.Name) || bindings.ContainsKey(coverage.Name) ||
+                        if (!coverageResults.Add(coverage.Name) || bindings.ContainsKey(coverage.Name) || numberBindings.Contains(coverage.Name) ||
                             choiceResults.ContainsKey(coverage.Name) || pindianResults.Contains(coverage.Name) || judgmentOutcomes.Contains(coverage.Name))
                             Fail($"duplicate result binding '{coverage.Name}'");
                         break;
@@ -770,7 +787,7 @@ internal static class ProgramCompositionValidator
             }
             void Add(string name, Binding value)
             {
-                if (!bindings.TryAdd(name, value) || choiceResults.ContainsKey(name) ||
+                if (!bindings.TryAdd(name, value) || numberBindings.Contains(name) || choiceResults.ContainsKey(name) ||
                     pindianResults.Contains(name) || coverageResults.Contains(name) || judgmentOutcomes.Contains(name))
                     Fail($"duplicate card binding '{name}'");
             }

@@ -34,12 +34,6 @@ internal sealed class ExchangePublicPileDescriptor : PublicPileOperationDescript
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ISkillProgramEffectHandler Handler { get; } = new ExchangePublicPileHandler();
 }
-internal sealed class DistributePublicPileIfAllSuitsDescriptor : PublicPileOperationDescriptor
-{
-    public override SkillProgramEffectOp Op => SkillProgramEffectOp.DistributePublicPileIfAllSuits;
-    public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
-    public override ISkillProgramEffectHandler Handler { get; } = new DistributePublicPileIfAllSuitsHandler();
-}
 public abstract class PublicPileHandler : ISkillProgramEffectHandler
 {
     public abstract SkillProgramEffectOp Op { get; }
@@ -48,7 +42,6 @@ public abstract class PublicPileHandler : ISkillProgramEffectHandler
 }
 public sealed class StoreTopCardInPublicPileHandler : PublicPileHandler { public override SkillProgramEffectOp Op => SkillProgramEffectOp.StoreTopCardInPublicPile; }
 public sealed class ExchangePublicPileHandler : PublicPileHandler { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ExchangePublicPile; }
-public sealed class DistributePublicPileIfAllSuitsHandler : PublicPileHandler { public override SkillProgramEffectOp Op => SkillProgramEffectOp.DistributePublicPileIfAllSuits; }
 
 public sealed record PublicPersistentPileSource(int OwnerSeat, string SkillId, string SkillInstanceId, int Capacity,
     [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] string? PublicPileId = null)

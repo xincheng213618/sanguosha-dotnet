@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
@@ -54,6 +55,14 @@ internal sealed class ShanheGuideSkillHandler(SkillProgramEffectOp op) : ISkillP
 }
 internal static class ShanheGuideSkillsComposition
 {
+    private static readonly ProgramExpression ShuanghunRefillAmount = CreateRefillAmount();
+
+    private static ProgramExpression CreateRefillAmount()
+    {
+        using var document = JsonDocument.Parse("""["when",["hasHp","owner"],["-",["maxHp","owner"],["handCount","owner"]]]""");
+        return ProgramExpressions.ParseInt(document.RootElement, "shuanghun-refill");
+    }
+
     [ProgramCatalogValidation(5409)]
     internal static void Validate(string path, SkillProgram program)
     {
@@ -67,8 +76,10 @@ internal static class ShanheGuideSkillsComposition
         if (program.Id == "shanhe:shuanghun-3366" && program.Triggers is [{ Window: SkillProgramTriggerWindow.SelfDyingResponse,
                 Optional: false, UsageScope: SkillUsageScope.Game, UsageLimit: 1, NamedUsageGroup: "shuanghun", Effects: [
                     { Op: SkillProgramEffectOp.SetChainedState, Chained: false }, { Op: SkillProgramEffectOp.SetFaceState, FaceDown: false },
-                    { Op: SkillProgramEffectOp.RecoverShanheShuanghun }, { Op: SkillProgramEffectOp.Draw, NumberExpression: SkillProgramNumberExpression.TargetMaxHpMinusHandCount },
-                    { Op: SkillProgramEffectOp.RestoreShanheShuanghunUse }] }]) return;
+                    { Op: SkillProgramEffectOp.RecoverShanheShuanghun },
+                    { Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.Owner, NumberExpression: null,
+                        AmountExpression: { } refill, OnUnknownAmount: SkillProgramUnknownAmountBehavior.CancelBinding },
+                    { Op: SkillProgramEffectOp.RestoreShanheShuanghunUse }] }] && refill.StructurallyEquals(ShuanghunRefillAmount)) return;
         throw new InvalidOperationException(path + ": guide skills require their exact damage or paid rebirth composition.");
     }
 }

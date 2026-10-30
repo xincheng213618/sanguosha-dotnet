@@ -107,6 +107,8 @@ public sealed partial class GameEngine
 
         public int? EvaluateAmountExpression(ProgramSkillFrame frame, ProgramExpression expression) =>
             engine.EvaluateProgramAmountExpression(frame.Id, expression);
+        public int? EvaluateAmountExpression(ProgramSkillFrame frame, ProgramExpression expression, SkillProgramUnknownAmountBehavior onUnknown) =>
+            engine.EvaluateProgramAmountExpression(frame.Id, expression, onUnknown);
 
         public void Draw(long frameId, int ownerSeat, int targetSeat, int amount,
             SkillProgramNumberExpression? numberExpression, string? resultBind,

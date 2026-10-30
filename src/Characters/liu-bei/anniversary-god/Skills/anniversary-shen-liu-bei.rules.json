@@ -52,7 +52,7 @@
             {
               "op": "draw",
               "target": "owner",
-              "numberExpression": "liveOwnerLostHp"
+              "amountExpr":["lostHp","owner"],"onUnknownAmount":"cancelBinding"
             },
             {
               "op": "setBooleanState",
@@ -87,7 +87,7 @@
             {
               "op": "draw",
               "target": "owner",
-              "numberExpression": "currentHp"
+              "amountExpr":["hp","owner"],"onUnknownAmount":"cancelBinding"
             },
             {
               "op": "setBooleanState",

@@ -272,7 +272,7 @@ public sealed partial class GameEngine
                 SkillProgramEffectOp.EscalatingDiscardOrDamageFromSelected or SkillProgramEffectOp.ChooseHandCountIntervention or
                 SkillProgramEffectOp.ChooseTrickOrAllHandDiscard or SkillProgramEffectOp.AllHandDiscardOrDifferenceDamageFromSelected or
                 SkillProgramEffectOp.RevealHandColorDiscardAndTake or SkillProgramEffectOp.DrawThenPutOwnedCardOnTopParticipants or
-                SkillProgramEffectOp.DrawTurnOwnerThenDiscardMaximumHandForDodge or SkillProgramEffectOp.DistributePublicPileIfAllSuits or
+                SkillProgramEffectOp.DrawTurnOwnerThenDiscardMaximumHandForDodge or
                 SkillProgramEffectOp.ObtainOneFromEachSelectedTarget or SkillProgramEffectOp.GiveShownCardToLeastOriginalTarget or
                 SkillProgramEffectOp.TongxieFollowUp or SkillProgramEffectOp.TongxieGuard or
                 SkillProgramEffectOp.YujueResolve or SkillProgramEffectOp.JieliePreventAndGift) &&

@@ -4,9 +4,9 @@ using System.Text.Json;
 
 internal static class Fame2017PublicPileChecks
 {
-    internal static (GameEngine Game, ContentRegistry Registry) CreateDistributionTableFixture()
+    internal static (GameEngine Game, ContentRegistry Registry) CreateDistributionTableFixture(string mode = "")
     {
-        var registry = Registry(); var game = Start(registry);
+        var registry = Registry(mode); var game = Start(registry);
         UseDriver(game, "supply"); Settle(game);
         var suppliedHand = game.CreateSnapshot(0, true).Players[0].Hand.ToDictionary(c => c.Id);
         var equipment = game.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Equip && suppliedHand[a.CardId!.Value].Suit != Suit.Spade);
@@ -148,7 +148,7 @@ internal static class Fame2017PublicPileChecks
             ]}
             ""","""{"schemaVersion":3,"skills":{"fixture:book-driver":{"name":"公开堆驱动","description":"真实实体补牌与边界"},"fixture:book-observer":{"name":"获牌观察","description":"暂停获牌","optionLabels":{"continue":"继续"}}}}""");
             foreach(var p in catalog.Programs)b.AddSkill(new(p.Key,p.Key,p.Key){Program=p.Value});
-            if (mode.Length == 0)
+            if (mode is "" or "none-suits")
             {
                 var idle = SkillProgramCatalog.Load($$"""{"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"fixture:book-idle","revision":1,"triggers":[{"id":"idle-play","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}]}""",
                     """{"schemaVersion":3,"skills":{"fixture:book-idle":{"name":"目标等待","description":"保留真实摸牌和得牌观察，省略无关出牌"}}}""");
@@ -173,8 +173,8 @@ internal static class Fame2017PublicPileChecks
                 b.AddSkill(new("fixture:response-freeze","花色冻结观察","响应支付后移除花色策略"){Program=freeze.Programs["fixture:response-freeze"]});
             }
             b.AddGeneral(new("fixture:book-owner","公开堆测试将","supporter",mode=="mobile-timing"?"mobile:bizhuan":"classic:bizhuan","qun",mode is "dodge-response" or "response-freeze"?3:20,[mode=="mobile-timing"?"mobile:tongbo":"classic:tongbo", ..(mode=="ai"?Array.Empty<string>():new[]{"fixture:book-driver"}), "fixture:book-observer", ..(mode=="response-freeze"?new[]{"classic:hongyan","fixture:response-freeze"}:Array.Empty<string>()), ..(mode is "normal" or "replacement-skip-play" or "skip-draw" ? new[]{"fixture:draw-boundary"}:Array.Empty<string>())]));
-            for(var i=1;i<4;i++)b.AddGeneral(new($"fixture:book-{i}",$"目标{i}","supporter","fixture:book-observer","wei",20,mode is "ai" or "response" or "dodge-response" or "response-freeze" or "borrowed" ? ["classic:bizhuan","classic:tongbo"]:mode.Length == 0 ? ["fixture:book-idle"] : []));
-            b.AddDeck(new("fixture:book-deck","公开堆牌堆",8,2,[]){PhysicalCards=Enumerable.Range(0,160).Select(i=>new ContentDeckPhysicalCard(mode=="response-freeze"?i%8==0?"classic:borrowed-sword":i%8==2?"standard:qinggang_sword":i%2==0?"standard:slash":"standard:dodge":mode=="borrowed"?i%3==0?"classic:borrowed-sword":i%3==1?"standard:qinggang_sword":"standard:dodge":mode=="null-response"?i%2==0?"standard:draw_two":"standard:nullification":mode is "dodge-response" or "response-freeze"?i%2==0?"standard:slash":"standard:dodge":mode=="response" ? i%8==0?"standard:duel":i%2==0?"standard:slash":"standard:dodge" : i%10==0?"standard:qinggang_sword":i%5==1?"standard:draw_two":"standard:dodge",mode=="response-freeze"?i%8==2?Suit.Club:Suit.Spade:mode=="borrowed"?i%3==1?Suit.Club:Suit.Spade:mode is "response" or "ai" or "dodge-response" or "response-freeze" or "null-response"?Suit.Spade:i%10==0?Suit.Club:i%5==1?Suit.Spade:(Suit)(i%4),i%13+1)).ToArray()});
+            for(var i=1;i<4;i++)b.AddGeneral(new($"fixture:book-{i}",$"目标{i}","supporter","fixture:book-observer","wei",20,mode is "ai" or "response" or "dodge-response" or "response-freeze" or "borrowed" ? ["classic:bizhuan","classic:tongbo"]:mode is "" or "none-suits" ? ["fixture:book-idle"] : []));
+            b.AddDeck(new("fixture:book-deck","公开堆牌堆",8,2,[]){PhysicalCards=Enumerable.Range(0,160).Select(i=>new ContentDeckPhysicalCard(mode=="response-freeze"?i%8==0?"classic:borrowed-sword":i%8==2?"standard:qinggang_sword":i%2==0?"standard:slash":"standard:dodge":mode=="borrowed"?i%3==0?"classic:borrowed-sword":i%3==1?"standard:qinggang_sword":"standard:dodge":mode=="null-response"?i%2==0?"standard:draw_two":"standard:nullification":mode is "dodge-response" or "response-freeze"?i%2==0?"standard:slash":"standard:dodge":mode=="response" ? i%8==0?"standard:duel":i%2==0?"standard:slash":"standard:dodge" : i%10==0?"standard:qinggang_sword":i%5==1?"standard:draw_two":"standard:dodge",mode=="response-freeze"?i%8==2?Suit.Club:Suit.Spade:mode=="borrowed"?i%3==1?Suit.Club:Suit.Spade:mode is "response" or "ai" or "dodge-response" or "response-freeze" or "null-response"?Suit.Spade:i%10==0?Suit.Club:i%5==1?Suit.Spade:mode=="none-suits"&&i%4==3?Suit.None:(Suit)(i%4),i%13+1)).ToArray()});
             b.AddMode(new("identity:classic-public-pile-check","公开堆机制",4,4,new Dictionary<string,int>{{nameof(Role.Lord),1},{nameof(Role.Loyalist),1},{nameof(Role.Rebel),2}},"fixture:book-deck",GeneralCandidateCount:4,GeneralPoolIds:["fixture:book-owner","fixture:book-1","fixture:book-2","fixture:book-3"]));
         }
     }

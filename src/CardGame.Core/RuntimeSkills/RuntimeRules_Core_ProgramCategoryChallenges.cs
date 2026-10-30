@@ -9,8 +9,8 @@ internal static class RuntimeRules_Core_ProgramCategoryChallenges
         foreach (var binding in frame.CardSetBindings.Where(item => item.FrozenSelectedSuits is not null))
         {
             var producers = plan.Instructions.Take(frame.InstructionIndex).Where(effect =>
-                effect.ResultBind == binding.Name && effect is
-                { Op: SkillProgramEffectOp.SelectOwnedCards, RequireExactCount: true, FreezeSelectedCardSuits: true }).ToArray();
+                effect.ResultBind == binding.Name && (effect.Op == SkillProgramEffectOp.SelectPublicPile || effect is
+                { Op: SkillProgramEffectOp.SelectOwnedCards, RequireExactCount: true, FreezeSelectedCardSuits: true })).ToArray();
             if (producers.Length != 1 || binding.FrozenSelectedSuits!.Count != binding.CardIds.Count ||
                 binding.FrozenSelectedSuits.Any(suit => !Enum.IsDefined(suit)))
                 throw new InvalidOperationException("Frozen selected suits lost their exact producer or aligned physical receipt.");

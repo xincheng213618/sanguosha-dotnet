@@ -63,8 +63,8 @@ internal static class EquipmentHalfDrawChecks
         }
         var (skipped, _) = Create(); Answer(skipped, SkillId, "skip"); ReachPlay(skipped);
         Require(DrawCount(skipped) == 0, "Declining the optional draw must preserve normal drawing without the skill gain.");
-        Reject(rules.Replace("\"target\":\"owner\",\"numberExpression\":\"equipmentHalfCeilingPlusOne\"",
-            "\"target\":\"selectedTarget\",\"numberExpression\":\"equipmentHalfCeilingPlusOne\""));
+        Reject(rules.Replace("\"target\":\"owner\",\"amountExpr\":[\"+\",[\"floorDiv\",[\"+\",[\"equipmentCount\",\"owner\"],1],2],1]",
+            "\"target\":\"selectedTarget\",\"amountExpr\":[\"+\",[\"floorDiv\",[\"+\",[\"equipmentCount\",\"owner\"],1],2],1]"));
     }
 
     private static int DrawCount(GameEngine game) => game.CardMovements.Count(move => move.Reason.Value == DrawReason);
@@ -119,7 +119,7 @@ internal static class EquipmentHalfDrawChecks
         Reach(game, SkillId); return (game, registry);
     }
     private static string Rules() => "{\"schemaVersion\":" + SkillProgramCatalog.RulesSchemaVersion + ",\"skills\":[" +
-        "{\"id\":\"" + SkillId + "\",\"revision\":1,\"triggers\":[{\"id\":\"gain\",\"window\":\"drawPhaseStarting\",\"subject\":\"owner\",\"optional\":true,\"effects\":[{\"op\":\"draw\",\"target\":\"owner\",\"numberExpression\":\"equipmentHalfCeilingPlusOne\"}]}]}," +
+        "{\"id\":\"" + SkillId + "\",\"revision\":1,\"triggers\":[{\"id\":\"gain\",\"window\":\"drawPhaseStarting\",\"subject\":\"owner\",\"optional\":true,\"effects\":[{\"op\":\"draw\",\"target\":\"owner\",\"amountExpr\":[\"+\",[\"floorDiv\",[\"+\",[\"equipmentCount\",\"owner\"],1],2],1]}]}]}," +
         "{\"id\":\"" + ObserverId + "\",\"revision\":1,\"triggers\":[{\"id\":\"pause\",\"window\":\"cardsGained\",\"subject\":\"owner\",\"optional\":true,\"movementOccurrence\":\"perBatch\",\"destinationZones\":[\"hand\"],\"movementReasons\":[\"" + DrawReason + "\"],\"effects\":[{\"op\":\"draw\",\"target\":\"owner\",\"amount\":1}]}]}]}";
     private const string Presentation = """
         {"schemaVersion":3,"skills":{"fixture:equipment-draw":{"name":"装备摸牌","description":"共享装备数量表达式。"},"fixture:equipment-observer":{"name":"摸牌观察","description":"等待已支付摸牌的子窗口。"}}}
@@ -127,7 +127,7 @@ internal static class EquipmentHalfDrawChecks
     private static void Reject(string rules)
     {
         try { SkillProgramCatalog.Load(rules, Presentation); }
-        catch (InvalidOperationException exception) when (exception.Message.Contains("equipment half-count draw", StringComparison.Ordinal)) { return; }
+        catch (InvalidOperationException exception) when (exception.Message.Contains("selectedTarget must be produced before it is read", StringComparison.Ordinal)) { return; }
         throw new InvalidOperationException("Equipment-count expressions must reject unrelated target contexts.");
     }
     private static void Require(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }

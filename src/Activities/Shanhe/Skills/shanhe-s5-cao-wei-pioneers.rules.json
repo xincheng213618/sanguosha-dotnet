@@ -7,7 +7,7 @@
         "id": "lost-hp-draw-then-claim", "window": "afterDamageApplied", "subject": "owner",
         "damageOccurrence": "perDamage", "optional": true,
         "effects": [
-          { "op": "draw", "target": "owner", "numberExpression": "liveOwnerLostHp" },
+          { "op": "draw", "target": "owner", "amountExpr":["lostHp","owner"],"onUnknownAmount":"cancelBinding" },
           { "op": "claimShanheS5JianxiongCards", "target": "owner" }
         ]
       }]

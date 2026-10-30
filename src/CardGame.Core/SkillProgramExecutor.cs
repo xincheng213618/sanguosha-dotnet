@@ -40,6 +40,9 @@ public interface ISkillProgramEffectHost
     /// <summary>Reads the current public expression facts; null skips this instruction.</summary>
     int? EvaluateAmountExpression(ProgramSkillFrame frame, ProgramExpression expression) =>
         throw new NotSupportedException("Amount expressions require a public expression world.");
+    int? EvaluateAmountExpression(ProgramSkillFrame frame, ProgramExpression expression, SkillProgramUnknownAmountBehavior onUnknown) =>
+        onUnknown == SkillProgramUnknownAmountBehavior.Skip ? EvaluateAmountExpression(frame, expression) :
+        throw new NotSupportedException("Cancelling unknown amounts requires the rules host.");
 
     /// <summary>Resolves a dedicated capability; existing custom hosts may implement it directly.</summary>
     T GetCapability<T>() where T : class => TryGetCapability<T>(out var capability)
@@ -410,8 +413,8 @@ public sealed class DrawSkillProgramEffectHandler : ISkillProgramEffectHandler
             throw new InvalidOperationException("Draw has no compiled operation instruction.");
         if (effect.AmountExpression is { } amountExpression)
         {
-            var amount = host.EvaluateAmountExpression(frame, amountExpression);
-            if (amount is null or <= 0) return SkillProgramStepOutcome.Continue;
+            var amount = host.EvaluateAmountExpression(frame, amountExpression, effect.OnUnknownAmount);
+            if (amount is null || amount <= 0 && instruction.ResultBind is null) return SkillProgramStepOutcome.Continue;
             instruction = instruction with { Amount = new FixedProgramAmount(amount.Value) };
         }
         if (host.TryGetCapability<IResumableProgramDrawHost>(out var resumable))
@@ -599,7 +602,7 @@ public sealed class RecoverSkillProgramEffectHandler : ISkillProgramEffectHandle
             throw new InvalidOperationException("Recover has no compiled operation instruction.");
         if (effect.AmountExpression is { } expression)
         {
-            var amount = host.EvaluateAmountExpression(frame, expression);
+            var amount = host.EvaluateAmountExpression(frame, expression, effect.OnUnknownAmount);
             if (amount is null or <= 0) return SkillProgramStepOutcome.Continue;
             instruction = instruction with { Amount = new FixedProgramAmount(amount.Value) };
         }
@@ -647,7 +650,7 @@ public sealed class LoseHpSkillProgramEffectHandler : ISkillProgramEffectHandler
         if (effect.CompiledInstruction is not LoseHpProgramInstruction instruction)
             throw new InvalidOperationException("HP loss has no compiled operation instruction.");
         var amount = effect.AmountExpression is { } expression
-            ? host.EvaluateAmountExpression(frame, expression) : instruction.Amount;
+            ? host.EvaluateAmountExpression(frame, expression, effect.OnUnknownAmount) : instruction.Amount;
         return amount is null or <= 0 ? SkillProgramStepOutcome.Continue :
             host.LoseHp(frame.Id, frame.SkillId, targetSeat, amount.Value);
     }
@@ -948,7 +951,10 @@ public sealed class RevealTopCardsSkillProgramEffectHandler : ISkillProgramEffec
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame,
         int targetSeat, ISkillProgramEffectHost host)
     {
-        host.RevealTopCards(frame.Id, frame.OwnerSeat, effect.Amount, effect.NumberExpression,
+        var amount = effect.AmountExpression is { } expression
+            ? host.EvaluateAmountExpression(frame, expression, effect.OnUnknownAmount) : effect.Amount;
+        if (amount is null) return SkillProgramStepOutcome.Continue;
+        host.RevealTopCards(frame.Id, frame.OwnerSeat, amount.Value, effect.NumberExpression,
             effect.ResultBind ?? throw new InvalidOperationException("revealTopCards has no result bind."),
             effect.Visibility);
         return SkillProgramStepOutcome.Continue;

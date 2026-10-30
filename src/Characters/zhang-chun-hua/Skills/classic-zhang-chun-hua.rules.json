@@ -33,7 +33,7 @@
           "movementOccurrence": "perBatch",
           "effects": [
             {
-              "numberExpression": "lostHpMinusHandCount",
+              "amountExpr":["-",["lostHp","owner"],["handCount","owner"]],"onUnknownAmount":"cancelBinding",
               "op": "draw",
               "target": "owner"
             }
@@ -57,7 +57,7 @@
           "optional": true,
           "effects": [
             {
-              "numberExpression": "lostHpMinusHandCount",
+              "amountExpr":["-",["lostHp","owner"],["handCount","owner"]],"onUnknownAmount":"cancelBinding",
               "op": "draw",
               "target": "owner"
             }
@@ -97,7 +97,7 @@
           },
           "effects": [
             {
-              "numberExpression": "lostHpMinusHandCount",
+              "amountExpr":["-",["lostHp","owner"],["handCount","owner"]],"onUnknownAmount":"cancelBinding",
               "op": "draw",
               "target": "owner"
             }
@@ -120,7 +120,7 @@
           },
           "effects": [
             {
-              "numberExpression": "lostHpMinusHandCount",
+              "amountExpr":["-",["lostHp","owner"],["handCount","owner"]],"onUnknownAmount":"cancelBinding",
               "op": "draw",
               "target": "owner"
             }
@@ -159,7 +159,7 @@
           },
           "effects": [
             {
-              "numberExpression": "lostHpMinusHandCount",
+              "amountExpr":["-",["lostHp","owner"],["handCount","owner"]],"onUnknownAmount":"cancelBinding",
               "op": "draw",
               "target": "owner"
             }
@@ -198,7 +198,7 @@
           },
           "effects": [
             {
-              "numberExpression": "lostHpMinusHandCount",
+              "amountExpr":["-",["lostHp","owner"],["handCount","owner"]],"onUnknownAmount":"cancelBinding",
               "op": "draw",
               "target": "owner"
             }

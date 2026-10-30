@@ -108,7 +108,7 @@ public sealed partial class GameEngine
             return _publicPersistentPiles.GetValueOrDefault((seat, skill, instance)) is { } exact
                 ? PublicPileCards(exact).Count : 0;
         var sourceSkills = program.Triggers.SelectMany(t => t.Effects).Concat(program.Activations.SelectMany(a => a.Effects))
-            .Where(e => e.Op is SkillProgramEffectOp.ExchangePublicPile or SkillProgramEffectOp.DistributePublicPileIfAllSuits or
+            .Where(e => e.Op is SkillProgramEffectOp.ExchangePublicPile or SkillProgramEffectOp.SelectPublicPile or
                 SkillProgramEffectOp.RemovePublicPileAfterAttackDamage or SkillProgramEffectOp.ResolvePreparationPublicPile or
                 SkillProgramEffectOp.ExchangePublicPileHand or SkillProgramEffectOp.ObtainPublicPileCard or SkillProgramEffectOp.PublicPileColorDamage or SkillProgramEffectOp.RewardDiscardedActionColor or SkillProgramEffectOp.ResolveFirstGameDomainCrossing or
                 SkillProgramEffectOp.OfferRiceAfterDamagePoint or SkillProgramEffectOp.ReplaceJudgmentFromPublicRice or

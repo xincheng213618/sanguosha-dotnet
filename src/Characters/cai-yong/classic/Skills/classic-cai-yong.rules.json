@@ -125,12 +125,30 @@
               ]
             },
             {
-              "op": "distributePublicPileIfAllSuits",
+              "op": "selectPublicPile",
               "target": "owner",
               "amount": 4,
               "skillIds": [
                 "classic:bizhuan"
-              ]
+              ],
+              "resultBind": "selected-books"
+            },
+            {
+              "op": "distributeBoundCards",
+              "target": "owner",
+              "sourceBind": "selected-books",
+              "targetKind": "otherLiving",
+              "condition": {
+                "kind": "expression",
+                "expr": [
+                  "==",
+                  [
+                    "boundDistinctSuitCount",
+                    "selected-books"
+                  ],
+                  4
+                ]
+              }
             }
           ],
           "condition": {
