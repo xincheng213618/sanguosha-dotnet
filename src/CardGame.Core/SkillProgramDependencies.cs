@@ -24,6 +24,7 @@ internal sealed class SkillProgramDependencies
         var definitions = skills.ToArray();
         var programs = definitions.Select(skill => skill.Program).OfType<SkillProgram>().ToArray();
         var triggers = programs.SelectMany(program => program.Triggers).ToArray();
+        UsesConsumedAlcoholSlash = triggers.Any(trigger => trigger.RequiresConsumedAlcoholSlash);
         HpSensitiveSkillIds = definitions.Where(skill => skill.SuppressionRule is not null || skill.Program?.HpSkillGrants.Count > 0)
             .Select(skill => skill.Id).ToFrozenSet(StringComparer.Ordinal);
         HpConditionalCapabilitySkillIds = definitions.Where(skill => skill.Program?.HpSkillGrants.Count > 0)
@@ -183,6 +184,7 @@ internal sealed class SkillProgramDependencies
     internal IReadOnlySet<string> HpConditionalCapabilitySkillIds { get; }
     internal bool UsesLordSkillProjection { get; }
     internal bool UsesGainPhaseQualification { get; }
+    internal bool UsesConsumedAlcoholSlash { get; }
     internal bool UsesAnyLivingTurnStart { get; }
     internal bool UsesActualTurnDeathBenefits { get; }
     internal bool UsesActualPlayPhaseUseLedger { get; }

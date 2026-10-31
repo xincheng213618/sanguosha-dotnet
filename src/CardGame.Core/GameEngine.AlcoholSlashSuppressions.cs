@@ -5,7 +5,3 @@ public sealed record CardUseAlcoholConsumptionCapturedEvent(long CardUseFrameId,
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public int? AlcoholBonus { get; init; }
 }
-
-public sealed record CurrentTurnOwnSkillSuppression(int TurnNumber, int TurnOwnerSeat, long ParentFrameId, int EffectIndex, CardUseEffectSource Source, string SuppressedSkillId, long CardUseFrameId, long CardActionId);
-public sealed record CurrentTurnOwnSkillSuppressionIssuedEvent(CurrentTurnOwnSkillSuppression Suppression) : IGameEvent;
-public sealed record CurrentTurnOwnSkillSuppressionsExpiredEvent(int TurnNumber, int TurnOwnerSeat) : IGameEvent;

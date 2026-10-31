@@ -63,8 +63,7 @@ internal sealed partial class CoreGameEngineCardUseModulesRuntime
     {
         _coreProgramBooleanStateExpirationOperations.ExpireProgramBooleanStateLeases2(turnNumber, turnSeat);
         _coreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess._currentTurnHeartSlashBonuses.RemoveAll(b => b.TurnNumber == turnNumber && b.TurnOwnerSeat == turnSeat);
-        _coreCurrentTurnSkillSuppressionsOperations.ExpireCurrentTurnNonLockedSkillSuppressions(turnNumber, turnSeat);
-        _coreAlcoholSlashSuppressionsOperations.Value.ExpireCurrentTurnOwnSkillSuppressions(turnNumber, turnSeat);
+        _stateChanges.ExpireCurrentTurnSkillStates(turnNumber, turnSeat);
         _coreNextSlashProgramsOperations.ExpireNextSlashDamage(turnNumber, turnSeat);
         _coreDirectedTurnCardPoliciesOperations.ExpireDirectedTurnCardPolicies(turnNumber, turnSeat);
         _coreOriginalTargetAdditionsOperations.ExpireOriginalTargetAdditionGrants(turnNumber, turnSeat);

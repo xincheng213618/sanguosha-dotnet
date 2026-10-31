@@ -951,7 +951,6 @@ public enum SkillProgramEffectOp
     FreezeLivingFactionRecovery = 4802, DrawToFrozenFactionCount = 4803,
     RevealTopCardsWithNextBooleanBonus = 3600, ObtainBoundCardsAndArmNextRevealBonus = 3601,
     RecoverOtherDyingVictimTo = 3602,
-    SuppressOwnSkillAfterAlcoholSlashDamage = 3900,
     StartOwnedDamagePointJudgment = 3901,
     ReplaceOwnSkillsAfterAlcoholSlashDamage = 3902,
     JudgeDamageTargetThenOfferSuitDiscard = 4200,
@@ -1088,8 +1087,7 @@ public enum SkillProgramEffectOp
     ClaimDeathCleanupCards,
     GrantTurnHandCardProhibition,
     AbolishOwnerAreas,
-    LoseDeathSourceSkills,
-    ChooseOwnCardDiscard,
+    ChooseOwnCardDiscard = 84,
     ExchangeSelectedTargetHands,
     RequestSlashByTarget,
     BindDiscardPhaseDiscards,
@@ -1197,7 +1195,7 @@ public enum SkillProgramEffectOp
     StoreTopCardInPublicPile = 1140, ExchangePublicPile = 1141,
     ExchangeOwnedCardThroughDeckEnd = 1220, UseDeckSlashesThenShuffle = 1221,
     SelectRelativeZoneDemandTarget = 1260, DrawOnFirstProgramTargetEncounter = 1261,
-    GrantTurnRedSlashBenefits = 1680, UseDiamondDelayedOrDiscard = 1780, RevealOwnedBoundCardAppearance = 1860, IssueCurrentTurnNonLockedSkillSuppression = 1861, GrantCurrentTurnDirectedHeartSlashBonus = 1862,
+    GrantTurnRedSlashBenefits = 1680, UseDiamondDelayedOrDiscard = 1780, RevealOwnedBoundCardAppearance = 1860, GrantCurrentTurnDirectedHeartSlashBonus = 1862,
     GiveShownBoundCardsAndGrantTurnHandLimit = 1960,
     PlaceSelectedEquipment = 2000, FreezeSelectedHpPair = 2001,
     PreventCurrentTargetSlashCancellation = 2100, AddCurrentTargetSlashDamage = 2101,
@@ -1895,7 +1893,8 @@ public enum SkillProgramEffectOp
     PublishMobileYoudiBait = 82301,
     SelectPublicPile = 900001,
     DistributeBoundCards = 900002,
-    CaptureNumber = 900003
+    CaptureNumber = 900003,
+    SkillState = 900004
 }
 public enum SkillProgramEffectTarget { Owner, Actor, SelectedTarget, SelectedTargets, HpPairHigher = 2000, HpPairLower = 2001, Activator = 2002 }
 public enum SkillProgramTurnPhase { Judgment, Draw, Play, Discard }
@@ -3349,6 +3348,8 @@ public sealed class SkillProgramTrigger
     public SkillProgramOwnerZoneLossQualification? OwnerZoneLoss { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? RequireDamageSource { get; internal init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool RequiresConsumedAlcoholSlash { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? RequireNoCardConversion { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -5239,7 +5240,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             "judgmentSource", "optional", "condition", "priority", "usageScope", "usageLimit",
             "drawPhaseMode", "choiceGroup", "orderGroup", "ownerRelation", "turnOwnerScope", "effects",
             "destinationZones", "movementReasons", "excludedMovementReasons", "ignoreOwnSkillMovements",
-            "hpChangeOccurrence", "markerCost", "evaluateConditionAtResolution", "allowNoEventTarget", "allowOwnDiscardPhaseEnded", "movementDiscardOnly", "discardOwnerScope", "includeResponseUses", "singleActionInstance", "onlyDesignatedCardTargets", "noDyingAtActivation", "deferredTurnEndOnly", "dynamicUsageLimit", "namedUsageGroup", "gainPhaseQualification", "ownerZoneLoss", "requireDamageSource", "requireNoCardConversion", "requiredPolarity");
+            "hpChangeOccurrence", "markerCost", "evaluateConditionAtResolution", "allowNoEventTarget", "allowOwnDiscardPhaseEnded", "movementDiscardOnly", "discardOwnerScope", "includeResponseUses", "singleActionInstance", "onlyDesignatedCardTargets", "noDyingAtActivation", "deferredTurnEndOnly", "dynamicUsageLimit", "namedUsageGroup", "gainPhaseQualification", "ownerZoneLoss", "requireDamageSource", "requiresConsumedAlcoholSlash", "requireNoCardConversion", "requiredPolarity");
         var id = Identifier(node, "id", path);
         var window = EnumValue<SkillProgramTriggerWindow>(node, "window", path);
         var requiredPolarity = node.TryGetProperty("requiredPolarity", out _)
@@ -5280,6 +5281,8 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                 Fail(path + ".requireDamageSource", "only true is supported");
             requireDamageSource = true;
         }
+        var requiresConsumedAlcoholSlash = node.TryGetProperty("requiresConsumedAlcoholSlash", out _) &&
+            RequiredBool(node, "requiresConsumedAlcoholSlash", path);
         var actorHandLimitInstruction = window == SkillProgramTriggerWindow.CardUseTargetsFinalized &&
             node.TryGetProperty("effects", out var actorHandLimitEffects) && actorHandLimitEffects.ValueKind == JsonValueKind.Array &&
             actorHandLimitEffects.EnumerateArray().Any(effect => effect.ValueKind == JsonValueKind.Object &&
@@ -6195,11 +6198,13 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                 SkillProgramTriggerWindow.DamageAppliedBeforeDying or
                 SkillProgramTriggerWindow.BeforeDamageApplied or
                 SkillProgramTriggerWindow.JudgmentFinalized or
+                SkillProgramTriggerWindow.OwnerDied or
+                SkillProgramTriggerWindow.CharacterDied or
                 SkillProgramTriggerWindow.DiscardPhaseEnded or
                 SkillProgramTriggerWindow.OtherActualUseTargeted) &&
             !(window == SkillProgramTriggerWindow.CardsGained && movementOccurrence == SkillProgramMovementOccurrence.PerSourceOwner) &&
             !contractedCommittedSingleAction)
-            Fail(path + ".effects", "eventSource requires a damage-applied, judgment or discard-phase-ended trigger");
+            Fail(path + ".effects", "eventSource requires a source-bearing damage, death, judgment, movement or actual-use trigger");
         if (window == SkillProgramTriggerWindow.JudgmentReplacing &&
             (effects[0].Op is not (SkillProgramEffectOp.ReplaceJudgment or SkillProgramEffectOp.DelegateJudgmentReplacement or SkillProgramEffectOp.ReplaceJudgmentFromPublicRice) ||
              !(skillId == "happy:jilue" && effects.Count == 4 && effects[0].Op == SkillProgramEffectOp.ReplaceJudgment &&
@@ -6303,10 +6308,6 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             Fail(path, "Damage-target suit payment requires a single optional any-subject per-damage actual damage binding.");
         if (effects.Count(effect => effect.Op == SkillProgramEffectOp.StartOwnedDamagePointJudgment) > 1)
             Fail(path, "A binding can own only one damage-point judgment producer.");
-        if (effects.Any(effect => effect.Op == SkillProgramEffectOp.SuppressOwnSkillAfterAlcoholSlashDamage) &&
-            (window != SkillProgramTriggerWindow.AfterDamageApplied || subject != SkillProgramTriggerSubject.DamageSource ||
-             optional || effects.Count != 1))
-            Fail(path, "Alcohol Slash suppression requires a single forced damage-source afterDamageApplied binding.");
         if (effects.Any(effect => effect.Op == SkillProgramEffectOp.ReplaceOwnSkillsAfterAlcoholSlashDamage) &&
             (window != SkillProgramTriggerWindow.AfterDamageApplied || subject != SkillProgramTriggerSubject.DamageSource ||
              optional || effects.Count != 1 || damageOccurrence != SkillProgramDamageOccurrence.PerDamage))
@@ -6408,6 +6409,9 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
         if (requireDamageSource is not null &&
             (window != SkillProgramTriggerWindow.AfterDamageApplied || subject != SkillProgramTriggerSubject.Owner))
             Fail(path + ".requireDamageSource", "requires an afterDamageApplied owner trigger");
+        if (requiresConsumedAlcoholSlash &&
+            (window != SkillProgramTriggerWindow.AfterDamageApplied || subject != SkillProgramTriggerSubject.DamageSource))
+            Fail(path + ".requiresConsumedAlcoholSlash", "requires an afterDamageApplied damage-source trigger");
         if (requiredPolarity is not null && !effects.Any(effect => effect.Op == SkillProgramEffectOp.CommitConversionPolarity))
             Fail(path + ".requiredPolarity", "requires a real conversion-polarity commitment in this trigger");
         if (effects.Any(effect => effect.Op == SkillProgramEffectOp.NullifyCurrentCardUse) &&
@@ -6421,6 +6425,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             cardCategories: cardCategories, damageCardKinds: damageCardKinds, turnOwnerScope: turnOwnerScope)
         {
             DynamicUsageLimit = dynamicLimit, NamedUsageGroup = namedUsage, GainPhaseQualification = gainPhase, RequireDamageSource = requireDamageSource,
+            RequiresConsumedAlcoholSlash = requiresConsumedAlcoholSlash,
             OwnerZoneLoss = ownerZoneLoss,
             IsSkillInvocation = !node.TryGetProperty("isSkillInvocation", out _) || RequiredBool(node, "isSkillInvocation", path),
             RequireNoCardConversion = requireNoCardConversion,
@@ -6945,6 +6950,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
         if (effect.ActorReference is not null) yield return effect.ActorReference;
         if (effect.TargetReference is not null) yield return effect.TargetReference;
         if (effect.SourceRef is not null) yield return effect.SourceRef;
+        if (effect.SkillState?.UntilTurnEndOf is not null) yield return effect.SkillState.UntilTurnEndOf;
     }
 
     private static SkillProgramTriggerValue ParseTriggerValue(JsonElement node, string path)

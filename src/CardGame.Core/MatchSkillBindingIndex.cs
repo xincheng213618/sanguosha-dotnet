@@ -37,8 +37,7 @@ internal sealed record IndexedSkillProgramModifier(
 /// </summary>
 internal sealed class SkillBindingShard
 {
-    private readonly IReadOnlySet<(string SkillId, string SkillInstanceId)> _activeInstances =
-        FrozenSet<(string, string)>.Empty;
+    private readonly SkillAvailabilitySnapshot _availability;
     private readonly IReadOnlyDictionary<SkillProgramCardPolicyKind,
         IReadOnlyList<(IndexedSkillProgramInstance Source, SkillProgramCardPolicy Policy)>> _cardPolicies =
         ReadOnlyDictionary<SkillProgramCardPolicyKind, IReadOnlyList<(IndexedSkillProgramInstance, SkillProgramCardPolicy)>>.Empty;
@@ -49,7 +48,6 @@ internal sealed class SkillBindingShard
         ReadOnlyDictionary<SkillProgramTriggerWindow, IReadOnlyList<ProgramTriggerCandidate>>.Empty;
     private readonly IReadOnlySet<(string SkillId, string BindingId)> _sharedUsageTriggerBindings =
         FrozenSet<(string, string)>.Empty;
-    private static readonly IReadOnlyList<SkillGrant> EmptyGrants = Array.Empty<SkillGrant>();
     private static readonly IReadOnlyList<SkillProgram> EmptyPrograms = Array.Empty<SkillProgram>();
     private static readonly IReadOnlyList<IndexedSkillProgramInstance> EmptyInstances =
         Array.Empty<IndexedSkillProgramInstance>();
@@ -63,8 +61,7 @@ internal sealed class SkillBindingShard
     internal SkillBindingShard(
         int ownerSeat,
         SkillBindingIndexStamp stamp,
-        IReadOnlyList<SkillGrant> activeGrants,
-        IReadOnlyDictionary<string, ContentSkillDefinition> definitions,
+        SkillAvailabilitySnapshot availability,
         IReadOnlyList<IndexedSkillProgramInstance> programInstances,
         IReadOnlyList<SkillProgram> programs,
         IReadOnlyDictionary<SkillProgramTriggerWindow, IReadOnlyList<IndexedSkillProgramTrigger>>
@@ -79,8 +76,7 @@ internal sealed class SkillBindingShard
         IReadOnlyList<SkillProgram> passiveRulePrograms)
     {
         Stamp = stamp;
-        ActiveGrants = activeGrants;
-        Definitions = definitions;
+        _availability = availability;
         ProgramInstances = programInstances;
         Programs = programs;
         InstanceTriggers = instanceTriggers;
@@ -113,9 +109,6 @@ internal sealed class SkillBindingShard
                 .ToArray()));
         }
         _triggerCandidates = new ReadOnlyDictionary<SkillProgramTriggerWindow, IReadOnlyList<ProgramTriggerCandidate>>(candidates);
-        _activeInstances = activeGrants
-            .Select(grant => (grant.SkillId, grant.SkillInstanceId))
-            .ToHashSet();
         _cardPolicies = programInstances.SelectMany(instance => instance.Program.CardPolicies
                 .SelectMany(policy => policy.Kind == SkillProgramCardPolicyKind.IgnoreUseDistanceBeforeDealingDamage
                     ? new[] { (Kind: policy.Kind, Source: instance, Policy: policy),
@@ -145,11 +138,11 @@ internal sealed class SkillBindingShard
     }
 
     internal SkillBindingIndexStamp Stamp { get; }
-    internal SkillBindingShard(SkillBindingIndexStamp stamp) => Stamp = stamp;
+    internal SkillBindingShard(SkillBindingIndexStamp stamp, SkillAvailabilitySnapshot availability) => (Stamp, _availability) = (stamp, availability);
 
-    internal IReadOnlyList<SkillGrant> ActiveGrants { get; } = EmptyGrants;
-    internal IReadOnlyDictionary<string, ContentSkillDefinition> Definitions { get; } =
-        ReadOnlyDictionary<string, ContentSkillDefinition>.Empty;
+    internal IReadOnlyList<SkillGrant> OwnedGrants => _availability.OwnedGrants;
+    internal IReadOnlyList<SkillGrant> ActiveGrants => _availability.EffectiveGrants;
+    internal IReadOnlyDictionary<string, ContentSkillDefinition> Definitions => _availability.EffectiveDefinitions;
     internal IReadOnlyList<IndexedSkillProgramInstance> ProgramInstances { get; } = EmptyInstances;
     internal IReadOnlyList<SkillProgram> Programs { get; } = EmptyPrograms;
     internal IReadOnlyDictionary<SkillProgramTriggerWindow, IReadOnlyList<IndexedSkillProgramTrigger>>
@@ -186,10 +179,12 @@ internal sealed class SkillBindingShard
     internal IReadOnlyList<IndexedSkillProgramModifier> GetNumericModifiers(SkillRuleQuery query) =>
         NumericModifiers.GetValueOrDefault(query, EmptyModifiers);
 
-    internal bool HasSkill(string skillId) => Definitions.ContainsKey(skillId);
+    internal bool HasOwnedSkill(string skillId) => _availability.HasOwnedSkill(skillId);
+    internal bool HasOwnedInstance(string skillId, string skillInstanceId) => _availability.HasOwnedInstance(skillId, skillInstanceId);
+    internal bool HasSkill(string skillId) => _availability.HasEffectiveSkill(skillId);
 
     internal bool HasInstance(string skillId, string skillInstanceId) =>
-        _activeInstances.Contains((skillId, skillInstanceId));
+        _availability.HasEffectiveInstance(skillId, skillInstanceId);
 
     internal bool HasProgram(string skillId, string? gameplayHash = null) =>
         Definitions.TryGetValue(skillId, out var definition) && definition.Program is { } program &&
@@ -215,13 +210,9 @@ internal sealed class SkillBindingShard
 /// </summary>
 internal sealed class MatchSkillBindingIndex
 {
-    private readonly Func<string, ContentSkillDefinition> _resolveDefinition;
-    private readonly bool _isNationalWarMode;
-    private readonly bool _allowsSecondaryGeneral;
+    private readonly SkillAvailability _availability;
     private readonly Func<CharacterState, bool>? _hasHpSensitiveSuppression;
-    private readonly Func<CharacterState, SkillGrant, bool>? _grantQualification;
-    private readonly Func<CharacterState, SkillGrant, bool>? _additionalPrintedLordQualification;
-    private readonly Func<CharacterState,IReadOnlySet<string>>? _suppressionInputs;
+    private readonly bool _tracksPrintedLordQualification;
     private readonly Func<long>? _projectionStamp;
     private readonly Func<CharacterState, long>? _derivedProjectionStamp;
     private readonly Dictionary<int, (SkillBindingShard Shard, int RebuildCount)> _shards = [];
@@ -235,13 +226,12 @@ internal sealed class MatchSkillBindingIndex
         Func<CharacterState, SkillGrant, bool>? additionalPrintedLordQualification = null)
     {
         ArgumentNullException.ThrowIfNull(resolveDefinition);
-        _resolveDefinition = resolveDefinition;
-        _isNationalWarMode = isNationalWarMode;
-        _allowsSecondaryGeneral = isNationalWarMode || dualGenerals;
+        _availability = new(resolveDefinition, isNationalWarMode, dualGenerals,
+            grantQualification, suppressionInputs, additionalPrintedLordQualification);
         _hasHpSensitiveSuppression = hasHpSensitiveSuppression;
-        _grantQualification = grantQualification; _projectionStamp = projectionStamp; _suppressionInputs = suppressionInputs;
+        _projectionStamp = projectionStamp;
         _derivedProjectionStamp = derivedProjectionStamp;
-        _additionalPrintedLordQualification = additionalPrintedLordQualification;
+        _tracksPrintedLordQualification = additionalPrintedLordQualification is not null;
     }
 
     internal int CachedSeatCount => _shards.Count;
@@ -259,7 +249,7 @@ internal sealed class MatchSkillBindingIndex
             DerivedProjectionRevision = _derivedProjectionStamp?.Invoke(player) ?? 0,
             OwnerRole = player.Role,
             OwnerAlive = player.IsAlive,
-            PrimaryGeneralId = _additionalPrintedLordQualification is null ? null : player.General.Id
+            PrimaryGeneralId = _tracksPrintedLordQualification ? player.General.Id : null
         };
         if (_shards.TryGetValue(player.Seat, out var existing) && existing.Shard.Stamp == stamp)
             return existing.Shard;
@@ -280,45 +270,12 @@ internal sealed class MatchSkillBindingIndex
 
     private SkillBindingShard BuildShard(CharacterState player, SkillBindingIndexStamp stamp)
     {
-        var activeGrants = new List<SkillGrant>();
-        var definitions = new Dictionary<string, ContentSkillDefinition>(StringComparer.Ordinal);
-        var resolvedDefinitions = new Dictionary<string, ContentSkillDefinition>(StringComparer.Ordinal);
-        foreach (var grant in player.SkillGrants.Grants)
-        {
-            if (!grant.IsEnabled || !CanUseSource(player, grant.SourceId) || _grantQualification?.Invoke(player, grant) == false) continue;
-            if (!resolvedDefinitions.TryGetValue(grant.SkillId, out var definition))
-            {
-                definition = _resolveDefinition(grant.SkillId);
-                resolvedDefinitions.Add(grant.SkillId, definition);
-            }
-            var isTemplate = grant.SourceId is CharacterState.PrimarySkillSource or
-                CharacterState.SecondarySkillSource;
-            if (isTemplate && definition.Tags.HasFlag(SkillTag.Lord) &&
-                player.Role != Role.Lord && !PrintedLordSkillQualifications.Matches(player, grant) &&
-                _additionalPrintedLordQualification?.Invoke(player, grant) != true)
-                continue;
-            activeGrants.Add(grant);
-            definitions.TryAdd(grant.SkillId, definition);
-        }
-
-        var suppressors = _suppressionInputs?.Invoke(player) ?? activeGrants.Where(grant =>
-                definitions[grant.SkillId].SuppressionRule is { } rule &&
-                player.Hp == rule.OwnerHpEquals)
-            .Select(grant => grant.SkillId).ToHashSet(StringComparer.Ordinal);
-        if (suppressors.Count > 0)
-        {
-            activeGrants.RemoveAll(grant =>
-                !grant.IsModeRule &&
-                !suppressors.Contains(grant.SkillId) &&
-                !grant.SourceId.StartsWith("equipment:", StringComparison.Ordinal));
-            var remainingSkillIds = activeGrants.Select(grant => grant.SkillId)
-                .ToHashSet(StringComparer.Ordinal);
-            foreach (var skillId in definitions.Keys.Where(id => !remainingSkillIds.Contains(id)).ToArray())
-                definitions.Remove(skillId);
-        }
+        var availability = _availability.Query(player);
+        var activeGrants = availability.EffectiveGrants;
+        var definitions = availability.EffectiveDefinitions;
 
         if (activeGrants.Count == 0)
-            return new SkillBindingShard(stamp);
+            return new SkillBindingShard(stamp, availability);
 
         var instances = activeGrants
             .GroupBy(grant => (grant.SkillId, grant.SkillInstanceId))
@@ -342,8 +299,7 @@ internal sealed class MatchSkillBindingIndex
         return new SkillBindingShard(
             player.Seat,
             stamp,
-            Array.AsReadOnly(activeGrants.ToArray()),
-            new ReadOnlyDictionary<string, ContentSkillDefinition>(definitions),
+            availability,
             Array.AsReadOnly(instances),
             Array.AsReadOnly(programs),
             BuildTriggerBuckets(instances),
@@ -356,16 +312,6 @@ internal sealed class MatchSkillBindingIndex
             Array.AsReadOnly(programs.Where(program => program.CardIdentities.Count != 0).ToArray()),
             Array.AsReadOnly(programs.Where(program =>
                 program.Modifiers.Count != 0 || program.ViewAs.Count != 0).ToArray()));
-    }
-
-    private bool CanUseSource(CharacterState player, string sourceId)
-    {
-        if (sourceId == CharacterState.PrimarySkillSource)
-            return !_isNationalWarMode || player.GeneralSelected && player.GeneralRevealed;
-        if (sourceId == CharacterState.SecondarySkillSource)
-            return _allowsSecondaryGeneral && player.SecondaryGeneral is not null &&
-                   player.SecondaryGeneralSelected && player.SecondaryGeneralRevealed;
-        return true;
     }
 
     private static IReadOnlyDictionary<SkillProgramTriggerWindow, IReadOnlyList<IndexedSkillProgramTrigger>>

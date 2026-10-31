@@ -1363,8 +1363,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries ProgramLifecycleEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries, EngineOwners.CoreGameEngineProgramLifecycleRuntime>(Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries.Create);
 
-    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreProgramLoseDeathSourceSkillsOperationRuntime> ProgramLoseDeathSourceSkillsOperationEntries => GetDeferredModule<EngineOwners.CoreProgramLoseDeathSourceSkillsOperationRuntime>();
-
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreProgramLostHpChainedPaymentsRuntime> ProgramLostHpChainedPaymentsEntries => GetDeferredModule<EngineOwners.CoreProgramLostHpChainedPaymentsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramMarkerPaymentsEntries ProgramMarkerPaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramMarkerPaymentsEntries, EngineOwners.CoreGameEngineProgramMarkerPaymentsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramMarkerPaymentsEntries.Create);

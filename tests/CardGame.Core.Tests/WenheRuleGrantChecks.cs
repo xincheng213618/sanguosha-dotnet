@@ -100,11 +100,11 @@ internal static class WenheRuleGrantChecks
             var catalog = SkillProgramCatalog.Load($$$"""
               {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[
                 {"id":"{{{Driver}}}","revision":1,"activations":[
-                  {"id":"suppress","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"issueCurrentTurnNonLockedSkillSuppression","target":"selectedTarget"}]},
+                  {"id":"suppress","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"skillState","target":"selectedTarget","action":"suppress","scope":"nonLocked","duration":"currentTurn","characterOnly":false}]},
                   {"id":"defeat","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"selectedTarget","amount":5}]}
                 ]},
                 {"id":"{{{Quiet}}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]},
-                {"id":"{{{Curse}}}","revision":1,"triggers":[{"id":"curse","window":"ownerDied","subject":"owner","optional":false,"effects":[{"op":"loseDeathSourceSkills","target":"owner"}]}]}
+                {"id":"{{{Curse}}}","revision":1,"triggers":[{"id":"curse","window":"ownerDied","subject":"owner","optional":false,"effects":[{"op":"skillState","target":"owner","targetRef":{"kind":"eventSource"},"action":"lose","scope":"all","duration":"permanent","characterOnly":true}]}]}
               ]}
               """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
                   skills = new[] { Driver, Quiet, Curse }.ToDictionary(id => id, id => new { name = id, description = "Actual mode grant boundary fixture." }) }));

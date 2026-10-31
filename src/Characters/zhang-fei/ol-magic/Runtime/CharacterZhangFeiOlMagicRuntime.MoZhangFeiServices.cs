@@ -37,7 +37,8 @@ internal sealed partial class CharacterZhangFeiOlMagicRuntime
     void IMoZhangFeiOperations.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     void IMoZhangFeiOperations.Recover(ProgramSkillFrame f, int amount) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, f.OwnerSeat, amount, null, null);
     void IMoZhangFeiOperations.LoseHp(ProgramSkillFrame f, int seat, int amount) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(f.Id, f.SkillId, seat, amount);
-    void IMoZhangFeiOperations.Suppress(ProgramSkillFrame f, int seat) => _coreCurrentTurnSkillSuppressionsOperations.IssueCurrentTurnNonLockedSkillSuppression(f, seat);
+    void IMoZhangFeiOperations.Suppress(ProgramSkillFrame f, int seat) => _coreProgramSkillChangesOperations.ApplyProgramSkillState(f, seat,
+        new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, []);
     void IMoZhangFeiOperations.ObserveSkillRevisions()
     {
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)

@@ -98,12 +98,9 @@ internal sealed partial class CharacterXunYuMouRuntime
             throw new InvalidOperationException("Bizuo suppression requires the exact claimed native extra actual turn.");
         foreach (var target in targets)
         {
-            var fact = new CurrentTurnNonLockedSkillSuppression(actualTurn, grant.Beneficiary, grant.FrameId, 0, new(grant.Source.SkillId, grant.Source.BindingId, grant.Source.OwnerSeat, grant.Source.SkillInstanceId), target);
-            if (_coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressions.Contains(fact))
-                throw new InvalidOperationException("Bizuo cannot issue the same suppression twice.");
-            _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressions.Add(fact);
-            _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressionRevision++;
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CurrentTurnNonLockedSkillSuppressionIssuedEvent(fact));
+            _coreProgramSkillChangesOperations.IssueSkillState(new(grant.FrameId, 0,
+                new(grant.Source.SkillId, grant.Source.BindingId, grant.Source.OwnerSeat, grant.Source.SkillInstanceId)), target,
+                new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, [], grant.Beneficiary);
         }
     }
 

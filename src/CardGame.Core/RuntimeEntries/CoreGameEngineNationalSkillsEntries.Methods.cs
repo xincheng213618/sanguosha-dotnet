@@ -10,6 +10,9 @@ internal sealed partial class CoreGameEngineNationalSkillsEntries
     internal string EnabledSkillNames(CharacterState player) => _resolve().EnabledSkillNames(player);
     internal string GetRuntimeSkillInstanceId(CharacterState player, string skillId) => _resolve().GetRuntimeSkillInstanceId(player, skillId);
     internal SkillBindingShard GetSkillBindingShard(CharacterState player) => _resolve().GetSkillBindingShard(player);
+    internal IReadOnlyList<SkillGrant> GetOwnedSkillGrants(CharacterState player) => _resolve().GetOwnedSkillGrants(player);
+    internal bool HasOwnedRuntimeSkill(CharacterState player, string skillId) => _resolve().HasOwnedRuntimeSkill(player, skillId);
+    internal bool HasOwnedRuntimeSkillInstance(CharacterState player, string skillId, string skillInstanceId) => _resolve().HasOwnedRuntimeSkillInstance(player, skillId, skillInstanceId);
     internal bool HasRuntimeSkill(CharacterState player, string skillId) => _resolve().HasRuntimeSkill(player, skillId);
     internal bool HasRuntimeSkillInstance(CharacterState player, string skillId, string skillInstanceId) => _resolve().HasRuntimeSkillInstance(player, skillId, skillInstanceId);
     internal void InitializeDualGeneralHealth() => _resolve().InitializeDualGeneralHealth();

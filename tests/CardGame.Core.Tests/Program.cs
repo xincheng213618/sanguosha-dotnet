@@ -518,6 +518,8 @@ var tests = new (string Name, Action Body)[]
     ("rule query distance runs both directions before clamping", RuleQueryReducerChecks.DirectionalDistanceRunsBothStagesBeforeClamping),
     ("rule query actual-round use distance requires captured outgoing count", RuleQueryReducerChecks.ActualRoundUseDistanceRequiresCapturedCountAndOutgoingAddition),
     ("character skills retain separate sources and stable ownership", CharacterSkillSetChecks.GrantsRetainSourcesAndStableOwnership),
+    ("skill availability separates possession from effective sources", CharacterSkillSetChecks.AvailabilitySeparatesPossessionFromEffectiveSources),
+    ("Skill state: ownership choices instances and expiry cold", SkillStateChecks.StateChangesPreserveOwnershipChoicesInstancesAndExpiryCold),
     ("character skills reject conflicting grants without partial state", CharacterSkillSetChecks.InvalidGrantsAndConflictsLeaveStateUnchanged),
     ("current turn nonlocked suppression host lifecycle audit", CurrentTurnSkillSuppressionChecks.HostLifecycleQualificationAudit),
     ("program card legality preserves ordered stages and live queries", ProgramCardLegalityChecks.OrderedStagesAndLiveQueries),

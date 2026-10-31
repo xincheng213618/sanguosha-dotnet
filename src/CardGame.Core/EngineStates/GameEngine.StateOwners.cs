@@ -50,7 +50,6 @@ public sealed partial class GameEngine
     private readonly EngineStates.CoreGameEngineAdvancedLifecycleState _advancedLifecycle = new();
     private readonly EngineStates.CoreGameEngineAdvancedPoliciesState _advancedPolicies = new();
     private readonly EngineStates.CoreGameEngineAdvancedWeaponsState _advancedWeapons = new();
-    private readonly EngineStates.CoreGameEngineAlcoholSlashSuppressionsState _alcoholSlashSuppressions = new();
     private readonly EngineStates.CoreGameEngineAlternatingSuitAndCompletedTopState _alternatingSuitAndCompletedTop = new();
     private readonly EngineStates.CoreGameEngineAlternativeViewAsCostsState _alternativeViewAsCosts = new();
     private readonly EngineStates.CoreGameEngineCardActionsState _cardActions = new();
@@ -215,7 +214,6 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess), _advancedWeapons),
         new(typeof(EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsUsedGeneralWeaponSourcesAccess), _advancedWeapons),
         new(typeof(EngineStates.Contracts.ICoreGameEngineAdvancedWeaponsCopiedWeaponSkillsGeneratedPhysicalCardIdsPermanentlyRemovedWeaponsUsedGeneralWeaponSourcesAccess), _advancedWeapons),
-        new(typeof(EngineStates.Contracts.ICoreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess), _alcoholSlashSuppressions),
         new(typeof(EngineStates.Contracts.ICoreGameEngineAlternatingSuitAndCompletedTopFirstTurnCategoryUsesAccess), _alternatingSuitAndCompletedTop),
         new(typeof(EngineStates.Contracts.ICoreGameEngineAlternativeViewAsCostsUsedProgramBasicCardNamesAccess), _alternativeViewAsCosts),
         new(typeof(EngineStates.Contracts.ICoreGameEngineCardActionsCardActionSequenceAccess), _cardActions),
@@ -234,7 +232,6 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICoreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess), _currentTurnShownCardBenefits),
         new(typeof(EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess), _currentTurnSkillSuppressions2),
         new(typeof(EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnQualificationDependenciesCurrentTurnQualificationStampCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess), _currentTurnSkillSuppressions2),
-        new(typeof(EngineStates.Contracts.ICoreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess), _currentTurnSkillSuppressions2),
         new(typeof(EngineStates.Contracts.ICoreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldSequenceBeneficiarySuitShieldsAccess), _deckEquipmentPrograms),
         new(typeof(EngineStates.Contracts.ICoreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldsAccess), _deckEquipmentPrograms),
         new(typeof(EngineStates.Contracts.ICoreGameEngineDeferredBenefitsProgramsProgramNextTurnRuleModifiersAccess), _deferredBenefitsPrograms),

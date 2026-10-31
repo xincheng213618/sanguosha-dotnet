@@ -28,18 +28,9 @@ internal sealed partial class CoreGameEngineNoDamageSkillDisableRuntime
         if (policy.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || policy.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
             throw new InvalidOperationException("A no-damage conversion cannot settle in another actual turn.");
         var source = policy.Source;
-        var issued = new CurrentTurnOwnSkillSuppression(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, use.Id, 0, new(source.SkillId, source.BindingId, source.OwnerSeat, source.SkillInstanceId), source.SkillId, use.Id, policy.ActionId);
-        var existing = _coreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess._currentTurnOwnSkillSuppressions.SingleOrDefault(s => s.ParentFrameId == use.Id && s.EffectIndex == 0);
-        if (existing is not null)
-        {
-            if (existing != issued)
-                throw new InvalidOperationException("A completed conversion disable changed identity.");
-            return;
-        }
-
-        _coreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess._currentTurnOwnSkillSuppressions.Add(issued);
-        _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CurrentTurnOwnSkillSuppressionIssuedEvent(issued));
+        _coreProgramSkillChangesOperations.IssueSkillState(new(use.Id, 0,
+            new(source.SkillId, source.BindingId, source.OwnerSeat, source.SkillInstanceId), use.Id, policy.ActionId), source.OwnerSeat,
+            new(SkillStateAction.Suppress, SkillStateScope.Named, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, [source.SkillId]);
     }
 
     internal void AssertNoDamageSkillDisablePolicy(CardUseFrame use)

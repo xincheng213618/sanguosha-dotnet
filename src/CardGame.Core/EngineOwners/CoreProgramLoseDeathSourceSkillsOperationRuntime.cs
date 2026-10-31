@@ -1,7 +1,0 @@
-#nullable enable
-
-namespace CardGame.Core.EngineOwners;
-[Core.ProgramRuntimeModule]
-internal sealed partial class CoreProgramLoseDeathSourceSkillsOperationRuntime(RuntimeEntries.CoreMatchLogEntries _coreMatchLogOperations, RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations, IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess)
-{
-}

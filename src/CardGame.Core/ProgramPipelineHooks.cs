@@ -28,7 +28,6 @@ internal enum ProgramPipelinePhase
     IncludeNativeDrawCandidates,
     SlashTargetDuelSource,
     IssuedTriggerCandidate,
-    AdmitTurnSuppression,
     RumoEntry,
     RumoOrigin,
     VirtualEquipment,
@@ -87,7 +86,6 @@ internal delegate IReadOnlyList<ProgramTriggerCandidate> ProgramHealthCandidateI
 internal delegate IReadOnlyList<ProgramTriggerCandidate> ProgramNativeDrawCandidateIncluder(int recipientSeat, IReadOnlyList<ProgramTriggerCandidate> candidates);
 internal delegate CardUseEffectSource? ProgramSlashTargetDuelSource(CardUseFrame use, int targetSeat);
 internal delegate bool ProgramIssuedTriggerCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
-internal delegate bool ProgramTurnSuppressionClaim(ProgramSkillFrame frame, int targetSeat);
 internal delegate bool ProgramRumoEntryClaim(ProgramSkillFrame frame);
 internal delegate bool ProgramRumoOriginClaim(long id, CardConversionSource source, string hash);
 internal delegate CardKind? ProgramVirtualEquipmentProvider(int seat, EquipmentSlot slot);
@@ -167,8 +165,6 @@ internal sealed class ProgramPipelineHookCatalog
                 [typeof(CardUseFrame), typeof(int)], typeof(CardUseEffectSource)),
             [ProgramPipelinePhase.IssuedTriggerCandidate] = (typeof(ProgramIssuedTriggerCandidate),
                 [typeof(ProgramTriggerCandidate), typeof(ProgramSkillWindowContext)], typeof(bool)),
-            [ProgramPipelinePhase.AdmitTurnSuppression] = (typeof(ProgramTurnSuppressionClaim),
-                [typeof(ProgramSkillFrame), typeof(int)], typeof(bool)),
             [ProgramPipelinePhase.ActualPhaseSkipped] = (typeof(Func<ProgramActualPhaseSkipContext, bool>),
                 [typeof(ProgramActualPhaseSkipContext)], typeof(bool)),
             [ProgramPipelinePhase.LifecycleWindowCompleted] = (typeof(Func<ProgramLifecycleTriggerWindowFrame, bool>),
@@ -280,7 +276,6 @@ internal sealed class ProgramPipelineHooks
     private readonly ProgramNativeDrawCandidateIncluder[] _includeNativeDrawCandidates;
     private readonly ProgramSlashTargetDuelSource[] _slashTargetDuelSource;
     private readonly ProgramIssuedTriggerCandidate[] _issuedTriggerCandidate;
-    private readonly ProgramTurnSuppressionClaim[] _admitTurnSuppression;
     private readonly ProgramRumoEntryClaim[] _rumoEntry;
     private readonly ProgramRumoOriginClaim[] _rumoOrigin;
     private readonly Func<ProgramActualPhaseSkipContext, bool>[] _actualPhaseSkipped;
@@ -328,7 +323,6 @@ internal sealed class ProgramPipelineHooks
         _includeNativeDrawCandidates = Bind<ProgramNativeDrawCandidateIncluder>(ProgramPipelinePhase.IncludeNativeDrawCandidates);
         _slashTargetDuelSource = Bind<ProgramSlashTargetDuelSource>(ProgramPipelinePhase.SlashTargetDuelSource);
         _issuedTriggerCandidate = Bind<ProgramIssuedTriggerCandidate>(ProgramPipelinePhase.IssuedTriggerCandidate);
-        _admitTurnSuppression = Bind<ProgramTurnSuppressionClaim>(ProgramPipelinePhase.AdmitTurnSuppression);
         _rumoEntry = Bind<ProgramRumoEntryClaim>(ProgramPipelinePhase.RumoEntry);
         _rumoOrigin = Bind<ProgramRumoOriginClaim>(ProgramPipelinePhase.RumoOrigin);
         _actualPhaseSkipped = Bind<Func<ProgramActualPhaseSkipContext, bool>>(ProgramPipelinePhase.ActualPhaseSkipped);
@@ -531,13 +525,6 @@ internal sealed class ProgramPipelineHooks
     {
         foreach (var hook in _issuedTriggerCandidate)
             if (hook(candidate, context)) return true;
-        return false;
-    }
-
-    internal bool AdmitTurnSuppression(ProgramSkillFrame frame, int targetSeat)
-    {
-        foreach (var hook in _admitTurnSuppression)
-            if (hook(frame, targetSeat)) return true;
         return false;
     }
 

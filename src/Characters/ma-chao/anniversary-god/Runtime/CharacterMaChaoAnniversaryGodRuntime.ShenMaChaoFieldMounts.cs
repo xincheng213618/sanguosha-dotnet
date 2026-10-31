@@ -82,13 +82,17 @@ internal sealed partial class CharacterMaChaoAnniversaryGodRuntime
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(originalOwner) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source.OwnerSeat) || _corePlayCardHistoryOperations.ViewAsRule(source)is not { FieldMountConversion: true } rule || !rule.InputKinds.Contains(cost.CardKind) || (rule.OutputKind == CardKind.Slash ? !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) : action.EffectiveKind != CardKind.Dodge) || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cost.CardId && m.CardKind == cost.CardKind && m.From == cost.From && m.To == CardLocation.Processing && m.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && m.Reason == (action.Type == CardActionType.Use ? CardMoveReasons.Use : CardMoveReasons.Respond)))
             throw new InvalidOperationException("Shouli debt requires its exact accepted real field-mount conversion payment.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShouliBorrowedMountEvent(action.ActionId, source, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, cost.CardId, cost.From));
-        if (!_coreMatchParticipantsPlayersAccess._players[originalOwner].IsAlive || _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressions.Any(s => s.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && s.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && s.TargetSeat == originalOwner))
+        if (!_coreMatchParticipantsPlayersAccess._players[originalOwner].IsAlive ||
+            _coreMatchParticipantsPlayersAccess._players[originalOwner].SkillGrants.Grants.Any(g => g.SkillState is
+                { Action: SkillStateAction.Suppress, Scope: SkillStateScope.NonLocked, Duration: SkillStateDuration.CurrentTurn,
+                    NamedSkill: null, PrintedOnly: false, CharacterOnly: false } state &&
+                state.IssuedTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber &&
+                state.EndSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat))
             return;
         var parentId = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(u => u.Action?.ActionId == action.ActionId)?.Id ?? _coreActiveNativeAttackQueriesOperations.ActiveCardAttack?.ResolutionId ?? throw new InvalidOperationException("Shouli's paid suppression lost its native original owner.");
-        var fact = new CurrentTurnNonLockedSkillSuppression(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, parentId, 0, new(source.SkillId, source.BindingId, source.OwnerSeat, source.SkillInstanceId), originalOwner);
-        _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressions.Add(fact);
-        _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressionRevision++;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CurrentTurnNonLockedSkillSuppressionIssuedEvent(fact));
+        _coreProgramSkillChangesOperations.IssueSkillState(new(parentId, 0,
+            new(source.SkillId, source.BindingId, source.OwnerSeat, source.SkillInstanceId), parentId, action.ActionId), originalOwner,
+            new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, []);
     }
 
     internal bool HasShouliDamageDebt(int target) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DealShouliStartingMounts) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShouliBorrowedMountEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && (e.Source.OwnerSeat == target || e.From.OwnerSeat == target));

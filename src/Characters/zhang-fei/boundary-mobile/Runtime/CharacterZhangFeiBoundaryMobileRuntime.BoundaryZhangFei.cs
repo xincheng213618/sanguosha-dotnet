@@ -67,7 +67,8 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
         else
         {
             var target = context.TargetSeat!.Value;
-            _coreCurrentTurnSkillSuppressionsOperations.IssueCurrentTurnNonLockedSkillSuppression(frame, target);
+            _coreProgramSkillChangesOperations.ApplyProgramSkillState(frame, target,
+                new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, []);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryLiyongTargetIssuedEvent(frame.Id, use.Id, use.Action!.ActionId, target));
         }
 
@@ -104,8 +105,6 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
 
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 58600)]
     internal bool IsIssuedBoundaryZhangFei(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => candidate.SkillId == BoundaryZhangFeiLiyong && (candidate.BindingId == BoundaryZhangFeiIssue && context.Window == SkillProgramTriggerWindow.CardUseCommitted && BoundaryZhangFeiReady(candidate.OwnerSeat, candidate.SkillInstanceId)is { } reserve && reserve.GameplayHash == candidate.GameplayHash && BoundaryZhangFeiWindowUse(context)?.Action?.ActorSeat == candidate.OwnerSeat || candidate.BindingId == BoundaryZhangFeiTargets && BoundaryZhangFeiWindowUse(context)?.BoundaryLiyong is { } right && BoundaryZhangFeiSourceMatches(right, candidate) || candidate.BindingId == BoundaryZhangFeiPenalty && BoundaryZhangFeiPenaltyUse(candidate, context)is not null);
-    [ProgramPipelineHook(ProgramPipelinePhase.AdmitTurnSuppression, 58600)]
-    internal bool AdmitBoundaryZhangFeiSuppression(ProgramSkillFrame frame, int target) => frame.SkillId == BoundaryZhangFeiLiyong && frame.TriggerId == BoundaryZhangFeiTargets && frame.WindowContext?.TargetSeat == target && BoundaryZhangFeiWindowUse(frame.WindowContext)?.BoundaryLiyong is { } right && right.Reserve.Source.SkillInstanceId == frame.SkillInstanceId;
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 58600)]
     internal void AssertBoundaryZhangFeiUses()
     {

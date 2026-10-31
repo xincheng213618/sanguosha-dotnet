@@ -26,7 +26,8 @@ internal sealed partial class CoreGameEngineSlashSuitDiscardRuntime
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(frame);
         _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, state => state!with { JudgmentSuitDodgeRestriction = new(frame.Id, attack.TargetSeat) });
-        _coreCurrentTurnSkillSuppressionsOperations.IssueCurrentTurnNonLockedSkillSuppression(frame, attack.TargetSeat);
+        _coreProgramSkillChangesOperations.ApplyProgramSkillState(frame, attack.TargetSeat,
+            new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, []);
         return _coreProgramLifecycleOperations.StartProgramJudgment(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id), frame.OwnerSeat, effect.JudgmentReason!, effect.ResultBind!, SkillProgramCardSetVisibility.Public, frame.OwnerSeat);
     }
 

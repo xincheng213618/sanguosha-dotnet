@@ -368,13 +368,6 @@ internal sealed partial class MoZhangFeiRuntime(IMoZhangFeiFacts facts, IMoZhang
             e.From == CardLocation.DrawPile && e.To == CardLocation.Hand(context.RecipientSeat) && e.Reason == replacement.Reason &&
             e.Sequence > replacement.SequenceBefore && e.Sequence <= replacement.SequenceAfter);
     }
-    [ProgramPipelineHook(ProgramPipelinePhase.AdmitTurnSuppression, 33700)]
-    internal bool IsIssuedYellow(ProgramSkillFrame f, int seat) => f.MoZhangFei is
-        { Op: SkillProgramEffectOp.ResolveMoZhangFeiZhuohun, Stage: MoZhangFeiStage.EffectChildren,
-            Modified: true, Color: MoZhangFeiColor.Yellow } r && r.TargetSeat == seat && Valid(f) &&
-        facts.History<MoZhangFeiColorEffectIssuedEvent>().Count(e => e.FrameId == f.Id &&
-            e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.TargetSeat == seat &&
-            e.Color == r.Color && e.ChangeId == r.ColorChangeId && e.ActualTurn == r.ActualTurn) == 1;
     private void GainGreenSlashes(ProgramSkillFrame f)
     {
         var r = f.MoZhangFei!;

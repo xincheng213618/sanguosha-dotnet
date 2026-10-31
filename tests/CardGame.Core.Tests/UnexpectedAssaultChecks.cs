@@ -68,7 +68,7 @@ internal static class UnexpectedAssaultChecks
             F<CardsRevealedEvent>(g).Single().Cards is System.Collections.IList { IsReadOnly: true },
             "One actual target hand card is publicly revealed without moving it; only a suited use with a different effective suit causes ordinary source-attributed damage.");
         Require(F<NoDamageSkillDisablePolicyIssuedEvent>(g).Length == (converted ? 1 : 0) &&
-            F<CurrentTurnOwnSkillSuppressionIssuedEvent>(g).Count(e => e.Suppression.SuppressedSkillId == Pochu) == (converted && !damaged ? 1 : 0),
+            F<SkillStateChangedEvent>(g).Count(e => e.Action == SkillStateAction.Suppress && e.SkillId == Pochu) == (converted && !damaged ? 1 : 0),
             "Whole-use damage controls the one accepted conversion disable; a naturally played card has no skill-disable policy.");
         PrivateAndFrozen(g); g = Cold(g, r); Continue(g); Play(g);
         Require(F<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == use.Id && e.CardId == action.CardId && e.CardKind == CardKind.UnexpectedAssault) == 1 &&
@@ -96,7 +96,7 @@ internal static class UnexpectedAssaultChecks
             F<UnexpectedAssaultRevealedEvent>(g).Length == 0 && F<TargetCardSelectionRequestedEvent>(g).Length == 0 &&
             F<CardsRevealedEvent>(g).Length == 0 && F<DamageAppliedEvent>(g).Length == 0 && V(g, 1).Hp == hp &&
             V(g, 1).Hand.Select(c => c.Id).SequenceEqual(targetHand) &&
-            F<CurrentTurnOwnSkillSuppressionIssuedEvent>(g).Single().Suppression.CardUseFrameId == use.Id,
+            F<SkillStateChangedEvent>(g).Single(e => e.Action == SkillStateAction.Suppress && e.SkillId == Pochu).Origin?.CardUseFrameId == use.Id,
             "A real paid native Nullification cancels the whole trick before any hand slot or reveal, and the converted non-damaging use settles its exact once-only disable.");
         g = Cold(g, r); Continue(g); Play(g);
         Require(F<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == use.Id) == 1 &&
@@ -127,7 +127,7 @@ internal static class UnexpectedAssaultChecks
                 Self = V(g, 0), Source = oldSource, Policy = use.NoDamageSkillDisablePolicy, Acquisitions = F<SkillsAcquiredEvent>(g) }));
         g = Cold(g, r); Answer(g, c => c.Parameters.GetValueOrDefault("slot-index") == "0"); Play(g);
         Require(F<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == use.Id) == 1 &&
-            F<CurrentTurnOwnSkillSuppressionIssuedEvent>(g).Single().Suppression.Source.SkillInstanceId == oldSource.SkillInstanceId,
+            F<SkillStateChangedEvent>(g).Single(e => e.Action == SkillStateAction.Suppress && e.SkillId == Pochu).Origin?.Source.SkillInstanceId == oldSource.SkillInstanceId,
             "The accepted use settles one no-damage disable even after losing its live conversion qualification.");
         Use(g, Suppress, "retire"); Play(g);
         Require(F<ProgramOwnerSkillsReplacedEvent>(g).Any(e => e.SkillId == Suppress && e.LostSkillIds.Contains(Pochu) && e.LostSkillIds.Contains(Suppress)),
@@ -136,6 +136,9 @@ internal static class UnexpectedAssaultChecks
         Require(F<SkillsAcquiredEvent>(g).Count(e => e.PlayerSeat == 0 && e.SourceSkillId == Driver && e.SkillIds.Contains(Pochu)) == 2 &&
             !g.GetHumanLegalActions().Any(a => a.ConversionSource?.SkillId == Pochu),
             "A physical loss and regrant cannot refresh the failed skill inside the same actual turn.");
+        var owner = ((IReadOnlyList<CharacterState>)FixtureRuntimeAccess.Engine.GetField("_players",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(g)!)[0];
+        var suppression = owner.SkillGrants.Grants.Single(grant => grant.SkillState?.Origin?.CardUseFrameId == use.Id).SkillState!;
         Use(g, Driver, "extra"); Play(g); End(g);
         Until(g, e => F<TurnStartedEvent>(e).Count(t => t.ActorSeat == 0) == 2 && P(e) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
         var restoredActions = g.GetHumanLegalActions().Where(a => a.ConversionSource?.SkillId == Pochu).ToArray();
@@ -145,8 +148,9 @@ internal static class UnexpectedAssaultChecks
         var stableSourceRestored = restoredActions.Any(a => a.Kind == LegalActionKind.UnexpectedAssault &&
             a.TargetSeats.SequenceEqual([1]) && a.ConversionSource == oldSource);
         var policy = use.NoDamageSkillDisablePolicy!;
-        var expiry = F<CurrentTurnOwnSkillSuppressionsExpiredEvent>(g);
-        var exactOldTurnExpired = expiry is [var ended] && ended.TurnNumber == policy.TurnNumber && ended.TurnOwnerSeat == policy.TurnOwnerSeat;
+        var expiry = F<SkillStateExpiredEvent>(g).Where(e => e.Origin?.CardUseFrameId == use.Id).ToArray();
+        var exactOldTurnExpired = expiry is [var ended] && ended.Origin == suppression.Origin &&
+            suppression.IssuedTurn == policy.TurnNumber && suppression.EndSeat == policy.TurnOwnerSeat;
         var newActualTurn = F<TurnStartedEvent>(g).Last(e => e.ActorSeat == 0).TurnNumber > policy.TurnNumber;
         Require(stableSourceRestored && exactOldTurnExpired && newActualTurn,
             "The same stable acquired source becomes usable only after the old actual turn ends, including an immediate extra turn: " +

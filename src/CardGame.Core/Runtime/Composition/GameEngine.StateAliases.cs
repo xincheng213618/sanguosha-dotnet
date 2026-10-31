@@ -24,7 +24,6 @@ public sealed partial class GameEngine
     private ref readonly HashSet<int> _generatedPhysicalCardIds => ref _advancedWeapons.ReferenceToGeneratedPhysicalCardIds;
     private ref readonly HashSet<string> _usedGeneralWeaponSources => ref _advancedWeapons.ReferenceToUsedGeneralWeaponSources;
     private ref readonly Dictionary<int, IReadOnlyList<string>> _copiedWeaponSkills => ref _advancedWeapons.ReferenceToCopiedWeaponSkills;
-    private ref readonly List<CurrentTurnOwnSkillSuppression> _currentTurnOwnSkillSuppressions => ref _alcoholSlashSuppressions.ReferenceToCurrentTurnOwnSkillSuppressions;
     private ref readonly Dictionary<(int Turn, int Actor, string Skill, SkillProgramCardCategory Category), long> _firstTurnCategoryUses => ref _alternatingSuitAndCompletedTop.ReferenceToFirstTurnCategoryUses;
     private ref readonly Dictionary<int, (int Turn, HashSet<CardKind> Kinds)> _usedProgramBasicCardNames => ref _alternativeViewAsCosts.ReferenceToUsedProgramBasicCardNames;
     private ref long _cardActionSequence => ref _cardActions.ReferenceToCardActionSequence;
@@ -41,7 +40,6 @@ public sealed partial class GameEngine
     private ref readonly List<GiftHandRetentionObligation> _giftHandRetentionObligations => ref _convertingGifts.ReferenceToGiftHandRetentionObligations;
     private ref long _giftHandRetentionSequence => ref _convertingGifts.ReferenceToGiftHandRetentionSequence;
     private ref readonly List<CurrentTurnDirectedHeartSlashBonus> _currentTurnHeartSlashBonuses => ref _currentTurnShownCardBenefits.ReferenceToCurrentTurnHeartSlashBonuses;
-    private ref readonly List<CurrentTurnNonLockedSkillSuppression> _currentTurnSkillSuppressions => ref _currentTurnSkillSuppressions2.ReferenceToCurrentTurnSkillSuppressions;
     private ref long _currentTurnSkillSuppressionRevision => ref _currentTurnSkillSuppressions2.ReferenceToCurrentTurnSkillSuppressionRevision;
     private ref long _currentTurnQualificationStamp => ref _currentTurnSkillSuppressions2.ReferenceToCurrentTurnQualificationStamp;
     private ref (long Projection, long Suppression) _currentTurnQualificationDependencies => ref _currentTurnSkillSuppressions2.ReferenceToCurrentTurnQualificationDependencies;

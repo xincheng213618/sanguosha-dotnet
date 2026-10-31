@@ -72,7 +72,8 @@ internal sealed partial class CharacterGuanPingMouRuntime
     {
         if (!MouGuanPing.Valid(f) || f.MouGuanPing is not { Stage: MouGuanPingStage.Children } r || !r.Targets.Contains(target))
             throw new InvalidOperationException("Wuwei suppression requires an actual original Slash target.");
-        _coreCurrentTurnSkillSuppressionsOperations.IssueCurrentTurnNonLockedSkillSuppression(f, target);
+        _coreProgramSkillChangesOperations.ApplyProgramSkillState(f, target,
+            new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, []);
     }
 
     [ProgramCardLegality(ProgramCardLegalityStage.ConfiguredConversionBan, 35000)]
@@ -101,6 +102,4 @@ internal sealed partial class CharacterGuanPingMouRuntime
     internal bool MouGuanPingIssuedDistance(ProgramSlashDistanceQuery q) => q.Conversion is { SkillId: MouGuanPingComposition.Skill, BindingId: MouGuanPingComposition.Binding } s && s.OwnerSeat == q.Actor.Seat && (q.ExistingUseFrameId is { } id ? _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.MouGuanPing?.Source == s : q.PhysicalCardIds is { } ids && _characterGuanPingMouOperations.CreateMouGuanPingFacts().WholeColor(q.Actor.Seat, ids));
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 35000)]
     internal int MouGuanPingDamage(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is NativeOwners.CardAttackHandle && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { Action: { } a, MouGuanPing: { OptionMask: 7 } r } u && r.UseId == u.Id && r.ActionId == a.ActionId && r.Source.OwnerSeat == a.ActorSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuanPingCompletedEvent>().Count(e => e.UseId == u.Id && e.Mask == 7 && e.Count == 3) == 1 ? 1 : 0;
-    [ProgramPipelineHook(ProgramPipelinePhase.AdmitTurnSuppression, 35000)]
-    internal bool MouGuanPingPaidSuppression(ProgramSkillFrame f, int seat) => f.MouGuanPing is { Stage: MouGuanPingStage.Children } r && r.Targets.Contains(seat) && MouGuanPing.Valid(f);
 }

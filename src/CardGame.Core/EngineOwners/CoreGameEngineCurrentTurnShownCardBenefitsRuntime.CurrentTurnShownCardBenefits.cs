@@ -56,7 +56,6 @@ internal sealed partial class CoreGameEngineCurrentTurnShownCardBenefitsRuntime
 
     internal bool HasSlashUseDistanceBySuit(CharacterState owner, CardKind kind, Suit? suit) => suit is { } value && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetCardPolicies(SkillProgramCardPolicyKind.IgnoreSlashUseDistanceBySuit).Any(item => item.Policy.InputSuit == value && ProgramCardKindMatch.Contains(item.Policy.CardKinds, kind) && item.Policy.Condition.Evaluate(_coreNativeSkillContextQueriesOperations.CreateSkillContext(owner)));
     void ICurrentTurnShownCardProgramHost.RevealOwnedBoundCardAppearance(ProgramSkillFrame f, string bind) => RevealOwnedBoundCardAppearance(f, bind);
-    void ICurrentTurnShownCardProgramHost.IssueCurrentTurnNonLockedSkillSuppression(ProgramSkillFrame f, int seat) => _coreCurrentTurnSkillSuppressionsOperations.IssueCurrentTurnNonLockedSkillSuppression(f, seat);
     void ICurrentTurnShownCardProgramHost.GrantCurrentTurnDirectedHeartSlashBonus(ProgramSkillFrame f, int seat) => GrantCurrentTurnDirectedHeartSlashBonus(f, seat);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 170)]
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPhysicalSlash, 60)]

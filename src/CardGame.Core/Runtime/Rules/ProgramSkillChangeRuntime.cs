@@ -11,11 +11,113 @@ internal enum ProgramSkillSourceRemoval
 /// children and expiry qualification remain with their original callers.
 /// </summary>
 [ProgramRuntimeModule, ProgramCapability]
-internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, IProgramSkillChangeOperations operations, ISkillGrantRevisionObservations observations, IMatchParticipantStateAccess participants) : IProgramSkillAcquisitions
+internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, IProgramSkillChangeOperations operations, ISkillGrantRevisionObservations observations, IMatchParticipantStateAccess participants, IProgramTurnQueries turn) : IProgramSkillAcquisitions
 {
     void IProgramSkillAcquisitions.Grant(ProgramSkillFrame frame, int recipientSeat, IReadOnlyList<string> skillIds) => Grant(frame, recipientSeat, skillIds);
     SkillGrant IProgramSkillAcquisitions.GrantOwnedSource(ProgramSkillFrame frame, string sourceId, string skillId) => GrantOwnedSource(frame, sourceId, skillId);
     internal ProgramSkillFrame Prepare(ProgramSkillFrame supplied) => facts.ActiveFrame(supplied.Id);
+
+    internal int ChangeState(ProgramSkillFrame supplied, int seat, SkillStateSpec spec, IReadOnlyList<string> skills, int? endSeat = null)
+    {
+        var frame = Prepare(supplied);
+        var origin = new SkillStateOrigin(frame.Id, frame.InstructionIndex - 1,
+            new(frame.SkillId, BindingId(frame), frame.OwnerSeat, frame.SkillInstanceId));
+        return IssueSkillState(origin, seat, spec, skills, endSeat);
+    }
+
+    // The issuer supplies an already accepted rule source. Native use and turn
+    // observers share this mutation without manufacturing a live program frame.
+    internal int IssueSkillState(SkillStateOrigin origin, int seat, SkillStateSpec spec, IReadOnlyList<string> skills, int? endSeat = null)
+    {
+        if (!facts.IsValidSeat(seat) || spec.Action != SkillStateAction.Lose && !facts.Alive(seat)) return 0;
+        if (spec.Duration == SkillStateDuration.UntilTurnEndOf && (endSeat is null || !facts.IsValidSeat(endSeat.Value))) return 0;
+        facts.RequireSkill(origin.Source.SkillId);
+        foreach (var skill in skills) facts.RequireSkill(skill);
+        observations.Capture(participants.Players);
+        var grants = facts.Grants(seat).Where(g => g.IsEnabled && !g.IsModeRule && g.SkillState is not { Acquisition: false } &&
+            (!spec.CharacterOnly || SkillStateQuery.IsCharacter(g)) && (!spec.PrintedOnly || SkillStateQuery.IsPrinted(g)) &&
+            (!(spec.ExcludeLocked || spec.Scope == SkillStateScope.NonLocked) || !facts.SkillTags(g.SkillId).HasFlag(SkillTag.Locked)) &&
+            (spec.Scope is SkillStateScope.All or SkillStateScope.NonLocked || skills.Contains(g.SkillId, StringComparer.Ordinal))).ToArray();
+        var ids = grants.Select(g => g.SkillId).Distinct(StringComparer.Ordinal).ToArray();
+        var source = $"skill-state:{origin.FrameId}:{origin.EffectIndex}:{seat}:{origin.Source.SkillInstanceId}";
+        var scope = spec.Action == SkillStateAction.Transfer ? SkillStateScope.Named : spec.Scope;
+        var owner = origin.Source.OwnerSeat;
+        if (spec.Action == SkillStateAction.Lose && spec.Duration == SkillStateDuration.Permanent && !spec.ExpireOnDeath)
+            foreach (var grant in grants) operations.SetGrantEnabled(seat, grant.GrantId, false);
+        else
+        {
+            var restrictions = spec.Action == SkillStateAction.Lose
+                ? grants.Select(g => (Name: (string?)g.SkillId, GrantId: (string?)g.GrantId))
+                : (scope is SkillStateScope.Named or SkillStateScope.ChosenFromTarget or SkillStateScope.Expression
+                    ? spec.Action == SkillStateAction.Suppress ? skills.Distinct(StringComparer.Ordinal).ToArray() : ids
+                    : new string?[] { null })
+                    .Select(name => (Name: name, GrantId: (string?)null));
+            foreach (var (name, grantId) in restrictions)
+            {
+                var key = $"{source}:{grantId ?? name ?? "*"}";
+                var state = new SkillStateLease(spec.Action == SkillStateAction.Transfer ? SkillStateAction.Suppress : spec.Action,
+                    scope, spec.Duration, turn.TurnNumber, endSeat ?? turn.CurrentSeat, name,
+                    spec.PrintedOnly, spec.ExcludeLocked, spec.ExpireOnDeath, CharacterOnly: spec.CharacterOnly,
+                    AfterCurrentTurn: spec.AfterCurrentTurn) { Origin = origin, DeathSeat = seat, TargetGrantId = grantId };
+                operations.Grant(seat, new SkillGrant(key, name ?? origin.Source.SkillId, key, source, false) { SkillState = state });
+            }
+        }
+        if (spec.Action == SkillStateAction.Transfer)
+        {
+            var previous = facts.OwnedGrants(owner);
+            var acquired = ids.Where(id => !previous.Any(g => g.SkillId == id)).ToArray();
+            foreach (var id in ids)
+            {
+                var key = $"{source}:acquire:{id}";
+                var instance = previous.Where(g => g.SkillId == id).OrderBy(g => g.SkillInstanceId, StringComparer.Ordinal)
+                    .FirstOrDefault()?.SkillInstanceId ?? $"skill-state-shared:{owner}:{id}";
+                operations.Grant(owner, new SkillGrant(key, id, instance, source)
+                {
+                    SkillState = new(SkillStateAction.Transfer, SkillStateScope.Named, spec.Duration,
+                        turn.TurnNumber, endSeat ?? turn.CurrentSeat, id, ExpireOnDeath: spec.ExpireOnDeath, Acquisition: true,
+                        AfterCurrentTurn: spec.AfterCurrentTurn) { Origin = origin, DeathSeat = seat }
+                });
+            }
+            foreach (var id in acquired) operations.RegisterTaggedConversionSkill(owner, id);
+            if (acquired.Length > 0)
+                operations.AdvanceFact(new SkillsAcquiredEvent(owner, origin.Source.SkillId, Array.AsReadOnly(acquired)));
+        }
+        var changed = spec.Action == SkillStateAction.Suppress && scope == SkillStateScope.Named ? skills : ids;
+        foreach (var id in changed.DefaultIfEmpty(origin.Source.SkillId))
+            operations.AdvanceFact(new SkillStateChangedEvent(seat, owner, id, spec.Action, source) { Origin = origin });
+        if (spec.Action == SkillStateAction.Lose)
+        {
+            operations.AdvanceFact(new CharacterSkillsLostEvent(seat, owner, Array.AsReadOnly(ids)));
+            if (spec is { Scope: SkillStateScope.All, Duration: SkillStateDuration.Permanent, CharacterOnly: true })
+                operations.Log("SkillTriggered", $"{facts.Name(seat)} 受到【{facts.SkillName(origin.Source.SkillId)}】影响，失去所有武将技能。", owner, seat);
+        }
+        return ids.Length;
+    }
+
+    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 25)]
+    internal void ExpireSkillStates(IGameEvent fact) => RemoveExpiredStates(s =>
+        fact is TurnEndedEvent e && EndsAtTurn(s, e.TurnNumber, e.ActorSeat) ||
+        s.ExpireOnDeath && fact is PlayerDiedEvent death && death.VictimSeat == (s.DeathSeat ?? s.EndSeat));
+
+    // Preserve the existing actual-turn cleanup boundary, before returned cards
+    // can open movement children. Other expiry windows keep their own ordering.
+    internal void ExpireCurrentTurnStates(int turnNumber, int turnSeat) => RemoveExpiredStates(s =>
+        s.Duration == SkillStateDuration.CurrentTurn && EndsAtTurn(s, turnNumber, turnSeat));
+
+    private static bool EndsAtTurn(SkillStateLease s, int turnNumber, int turnSeat) =>
+        s.Duration != SkillStateDuration.Permanent && turnSeat == s.EndSeat &&
+        (s.Duration == SkillStateDuration.CurrentTurn ? turnNumber == s.IssuedTurn :
+            s.AfterCurrentTurn ? turnNumber > s.IssuedTurn : turnNumber >= s.IssuedTurn);
+
+    private void RemoveExpiredStates(Func<SkillStateLease, bool> expired)
+    {
+        foreach (var player in participants.Players)
+            foreach (var grant in player.SkillGrants.Grants.Where(g => g.SkillState is { } s && expired(s)).ToArray())
+            {
+                operations.RemoveGrant(player.Seat, grant.GrantId);
+                operations.AdvanceFact(new SkillStateExpiredEvent(player.Seat, grant.SourceId, grant.SkillState!.Origin));
+            }
+    }
 
     internal bool TryUpgradeConversionTier(ProgramSkillFrame supplied, string state, int? expectedTier)
     {
@@ -243,6 +345,7 @@ internal interface IProgramSkillGrantQueries : IProgramSelectionQuery
 {
     IReadOnlyList<SkillGrant> Grants(int seat);
     IReadOnlyList<SkillGrant> ActiveGrants(int seat);
+    IReadOnlyList<SkillGrant> OwnedGrants(int seat);
 }
 
 internal interface IProgramSkillChangeFacts : IProgramSkillGrantQueries
@@ -251,6 +354,8 @@ internal interface IProgramSkillChangeFacts : IProgramSkillGrantQueries
     bool IsValidSeat(int seat);
     bool Alive(int seat);
     string Name(int seat);
+    string SkillName(string skillId);
+    SkillTag SkillTags(string skillId);
     int MaximumHp(int seat);
     int ConversionTier(int seat, string state);
     void RequireSkill(string skillId);
@@ -262,7 +367,7 @@ internal interface IProgramSkillChangeFacts : IProgramSkillGrantQueries
 internal interface IProgramSkillChangeOperations : IProgramRuntimeOperations
 {
     void WriteConversionTier(int seat, string state, int tier);
-    void Log(string kind, string message, int seat);
+    void Log(string kind, string message, int seat, int? target = null);
     void SetBooleanState(int seat, string skillId, string instanceId, string stateId, bool value);
     void Grant(int seat, SkillGrant grant);
     void RemoveGrant(int seat, string grantId);

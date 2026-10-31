@@ -28,10 +28,14 @@ internal sealed partial class CoreGameEngineProgramSkillChangesRuntime
     internal void CommitProgramSkillChangeFact(ProgramSkillFrame frame, IGameEvent fact) => ProgramSkillChanges.CommitFact(frame, fact);
     internal SkillGrant CommitProgramExplicitSkillSource(ProgramSkillFrame frame, SkillGrant grant, IReadOnlyList<string>? revokedGrantIds = null) => ProgramSkillChanges.CommitExplicitSource(frame, grant, revokedGrantIds);
     internal void RemoveProgramExplicitSkillSources(ProgramSkillFrame frame, IReadOnlyList<string> grantIds) => ProgramSkillChanges.RemoveExplicitSources(frame, grantIds);
+    internal int IssueSkillState(SkillStateOrigin origin, int seat, SkillStateSpec spec, IReadOnlyList<string> skills, int? endSeat = null) => ProgramSkillChanges.IssueSkillState(origin, seat, spec, skills, endSeat);
+    internal void ExpireCurrentTurnSkillStates(int turnNumber, int turnSeat) => ProgramSkillChanges.ExpireCurrentTurnStates(turnNumber, turnSeat);
     ProgramSkillFrame IProgramSkillChangeFacts.ActiveFrame(long id) => _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
     bool IProgramSkillChangeFacts.IsValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     bool IProgramSkillChangeFacts.Alive(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
     string IProgramSkillChangeFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;
+    string IProgramSkillChangeFacts.SkillName(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId).Name;
+    SkillTag IProgramSkillChangeFacts.SkillTags(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId).Tags;
     int IProgramSkillChangeFacts.MaximumHp(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].MaxHp;
     int IProgramSkillChangeFacts.ConversionTier(int seat, string state) => _coreGameEngineConfiguredConversionsConfiguredConversionTiersAccess._configuredConversionTiers.GetValueOrDefault((seat, state));
     void IProgramSkillChangeFacts.RequireSkill(string skillId) => _ = _contentRegistryOperations._contentRegistry.GetSkill(skillId);
@@ -40,8 +44,9 @@ internal sealed partial class CoreGameEngineProgramSkillChangesRuntime
     IReadOnlyList<string> IProgramSkillChangeFacts.EnabledSkillIds(int seat) => _coreNationalSkillsOperations.EnabledContentSkillIds(_coreMatchParticipantsPlayersAccess._players[seat]);
     IReadOnlyList<SkillGrant> IProgramSkillGrantQueries.Grants(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Grants;
     IReadOnlyList<SkillGrant> IProgramSkillGrantQueries.ActiveGrants(int seat) => _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[seat]).ActiveGrants;
+    IReadOnlyList<SkillGrant> IProgramSkillGrantQueries.OwnedGrants(int seat) => _coreNationalSkillsOperations.GetOwnedSkillGrants(_coreMatchParticipantsPlayersAccess._players[seat]);
     void IProgramSkillChangeOperations.WriteConversionTier(int seat, string state, int tier) => _coreGameEngineConfiguredConversionsConfiguredConversionTiersAccess._configuredConversionTiers[(seat, state)] = tier;
-    void IProgramSkillChangeOperations.Log(string kind, string message, int seat) => _coreMatchLogOperations.AddLog(kind, message, seat);
+    void IProgramSkillChangeOperations.Log(string kind, string message, int seat, int? target) => _coreMatchLogOperations.AddLog(kind, message, seat, target);
     void IProgramSkillChangeOperations.SetBooleanState(int seat, string skillId, string instanceId, string stateId, bool value) => _coreProgramPersistentStateOperations.SetProgramBooleanState(seat, skillId, instanceId, stateId, value);
     void IProgramSkillChangeOperations.Grant(int seat, SkillGrant grant) => _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Grant(grant);
     void IProgramSkillChangeOperations.RemoveGrant(int seat, string grantId) => _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.RemoveGrant(grantId);

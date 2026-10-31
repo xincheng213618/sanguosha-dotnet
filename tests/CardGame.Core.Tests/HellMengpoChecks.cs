@@ -151,7 +151,7 @@ internal static class HellMengpoChecks
             Add(Watch, "triggers", new[] { new { id = "actual-skills-changed", window = "skillsChanged", subject = "owner", optional = false,
                 effects = new[] { new { op = "chooseOption", target = "owner", resultBind = "continued", options = new[] { new { id = "continue" } } } } } });
             Add(Curse, "triggers", new[] { new { id = "separate-real-duanchang", window = "ownerDied", subject = "owner", optional = false,
-                effects = new[] { new { op = "loseDeathSourceSkills", target = "owner" } } } });
+                effects = new[] { new { op = "skillState", target = "owner", targetRef = new { kind = "eventSource" }, action = "lose", scope = "all", duration = "permanent", characterOnly = true } } } });
             foreach (var id in new[] { "hell:player-tier", "hell:boss-tier" })
                 Add(id, "modifiers", new[] { new { id = "internal-tier-host", query = "handLimit", operation = "add", value = 1, priority = 0 } });
             var fixture = SkillProgramCatalog.Load(JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills = definitions }),

@@ -2,6 +2,9 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramSkillChangesEntries
 {
+    internal void ExpireCurrentTurnSkillStates(int turnNumber, int turnSeat) => _resolve().ExpireCurrentTurnSkillStates(turnNumber, turnSeat);
+    internal void ApplyProgramSkillState(ProgramSkillFrame frame, int seat, SkillStateSpec spec, IReadOnlyList<string> skills, string? resultBind = null) => _resolve().ApplyProgramSkillState(frame, seat, spec, skills, resultBind);
+    internal void IssueSkillState(SkillStateOrigin origin, int seat, SkillStateSpec spec, IReadOnlyList<string> skills, int? endSeat = null) => _resolve().IssueSkillState(origin, seat, spec, skills, endSeat);
     internal IReadOnlyList<string> AcquireProgramSkillChange(GameEngine.ProgramSkillChangeContext context, IReadOnlyList<string> skillIds, bool announceAwakening) => _resolve().AcquireProgramSkillChange(context, skillIds, announceAwakening);
     internal bool CommitConfiguredConversionTier(CharacterState owner, string state, int tier) => _resolve().CommitConfiguredConversionTier(owner, state, tier);
     internal SkillGrant CommitProgramExplicitSkillSource(ProgramSkillFrame frame, SkillGrant grant, IReadOnlyList<string>? revokedGrantIds = default) => _resolve().CommitProgramExplicitSkillSource(frame, grant, revokedGrantIds);

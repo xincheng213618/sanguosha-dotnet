@@ -12,10 +12,10 @@
       "triggers": [
         {
           "id": "alcohol-slash-disables-own-decay", "window": "afterDamageApplied", "subject": "damageSource",
-          "optional": false, "priority": 100, "damageOccurrence": "perDamage",
+          "optional": false, "priority": 100, "damageOccurrence": "perDamage", "requiresConsumedAlcoholSlash": true,
           "condition": { "kind": "all", "children": [ { "kind": "damageSourceIsOwner" }, { "kind": "damageCardIsSlash" } ] },
           "effects": [
-            { "op": "suppressOwnSkillAfterAlcoholSlashDamage", "target": "owner", "skillIds": ["boundary:benghuai-current"] }
+            { "op": "skillState", "target": "owner", "action": "suppress", "scope": "named", "duration": "currentTurn", "characterOnly": false, "skillIds": ["boundary:benghuai-current"] }
           ]
         }
       ]

@@ -23,7 +23,9 @@ internal static class CurrentTurnSkillSuppressionChecks
             1, [], [1]) { SkillInstanceId = source.SkillInstanceId };
         Require(Enabled(g, target).Contains("fixture:ordinary"), "Initial ordinary binding.");
         global::FixtureRuntimeAccess.Engine.GetMethod("PushRuntimeFrame", Flags)!.Invoke(g, [frame]);
-        global::FixtureRuntimeAccess.Engine.GetMethod("IssueCurrentTurnNonLockedSkillSuppression", Flags)!.Invoke(g, [frame, 1]);
+        global::FixtureRuntimeAccess.Engine.GetMethod("ApplyProgramSkillState", Flags)!.Invoke(g,
+            [frame, 1, new SkillStateSpec(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn)
+                { CharacterOnly = false }, Array.Empty<string>(), null]);
         Require(!Enabled(g, target).Contains("fixture:ordinary") && Enabled(g, target).Contains("fixture:locked") &&
             !Enabled(g, target).Contains("fixture:limited"), "Tags preserve only Locked, not Limited.");
         Require(g.CreateSnapshot(0).Players[1].Skills!.All(s => s.ContentId != "fixture:ordinary"), "Public skill snapshot shares qualification.");
@@ -35,13 +37,14 @@ internal static class CurrentTurnSkillSuppressionChecks
         for (var i = 0; i < 4; i++) { Require(!Enabled(g, target).Contains("fixture:ordinary"), "Issued fact survives exact source loss."); g.CreateSnapshot(i); }
         Require(g.Revision == revision && g.Events.Count == count && target.SkillGrants.Revision == grants, "Qualification and snapshots are observational.");
         var turn = g.CreateSnapshot(0).TurnNumber;
-        global::FixtureRuntimeAccess.Engine.GetMethod("ExpireCurrentTurnNonLockedSkillSuppressions", Flags)!.Invoke(g, [turn, 2]);
+        global::FixtureRuntimeAccess.Engine.GetMethod("AdvanceEventRulesAndQueueFact", Flags)!.Invoke(g, [new TurnEndedEvent(turn, 2)]);
         Require(!Enabled(g, target).Contains("fixture:ordinary"), "Another seat's turn end cannot expire fact.");
-        global::FixtureRuntimeAccess.Engine.GetMethod("ExpireCurrentTurnNonLockedSkillSuppressions", Flags)!.Invoke(g, [turn, 0]);
+        global::FixtureRuntimeAccess.Engine.GetMethod("AdvanceEventRulesAndQueueFact", Flags)!.Invoke(g, [new TurnEndedEvent(turn, 0)]);
         Require(Enabled(g, target).Contains("fixture:ordinary") && !target.SkillGrants.Grants.Single(s => s.GrantId == "disabled").IsEnabled,
             "Actual owner expiry restores eligibility without changing local disable.");
-        Require(((System.Collections.ICollection)global::FixtureRuntimeAccess.Engine.GetField("_currentTurnSkillSuppressions", Flags)!.GetValue(g)!).Count == 0,
-            "Exact actual turn removes its issued scalar facts.");
+        Require(target.SkillGrants.Grants.All(grant => grant.SkillState is not
+            { Action: SkillStateAction.Suppress, Scope: SkillStateScope.NonLocked, Duration: SkillStateDuration.CurrentTurn }),
+            "Exact actual turn removes its issued restriction leases.");
     }
     private static IReadOnlyList<string> Enabled(GameEngine g, CharacterState p) =>
         (IReadOnlyList<string>)global::FixtureRuntimeAccess.Engine.GetMethod("EnabledContentSkillIds", Flags)!.Invoke(g, [p])!;

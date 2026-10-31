@@ -3,7 +3,6 @@ namespace CardGame.Core;
 internal interface ICurrentTurnShownCardProgramHost
 {
     void RevealOwnedBoundCardAppearance(ProgramSkillFrame frame, string bind);
-    void IssueCurrentTurnNonLockedSkillSuppression(ProgramSkillFrame frame, int targetSeat);
     void GrantCurrentTurnDirectedHeartSlashBonus(ProgramSkillFrame frame, int targetSeat);
 }
 internal abstract class CurrentTurnShownCardDescriptor : ProgramOperationDescriptorBase
@@ -25,8 +24,6 @@ internal abstract class CurrentTurnShownCardDescriptor : ProgramOperationDescrip
 }
 internal sealed class RevealOwnedBoundCardAppearanceDescriptor : CurrentTurnShownCardDescriptor
 { public override SkillProgramEffectOp Op => SkillProgramEffectOp.RevealOwnedBoundCardAppearance; }
-internal sealed class IssueCurrentTurnNonLockedSkillSuppressionDescriptor : CurrentTurnShownCardDescriptor
-{ public override SkillProgramEffectOp Op => SkillProgramEffectOp.IssueCurrentTurnNonLockedSkillSuppression; }
 internal sealed class GrantCurrentTurnDirectedHeartSlashBonusDescriptor : CurrentTurnShownCardDescriptor
 { public override SkillProgramEffectOp Op => SkillProgramEffectOp.GrantCurrentTurnDirectedHeartSlashBonus; }
 internal sealed class CurrentTurnShownCardHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
@@ -36,7 +33,6 @@ internal sealed class CurrentTurnShownCardHandler(SkillProgramEffectOp op) : ISk
     {
         var h = host.GetCapability<ICurrentTurnShownCardProgramHost>();
         if (op == SkillProgramEffectOp.RevealOwnedBoundCardAppearance) h.RevealOwnedBoundCardAppearance(f, e.SourceBind!);
-        else if (op == SkillProgramEffectOp.IssueCurrentTurnNonLockedSkillSuppression) h.IssueCurrentTurnNonLockedSkillSuppression(f, seat);
         else h.GrantCurrentTurnDirectedHeartSlashBonus(f, seat);
         return SkillProgramStepOutcome.Continue;
     }

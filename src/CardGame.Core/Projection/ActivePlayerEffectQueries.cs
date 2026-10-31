@@ -61,8 +61,6 @@ internal interface IActivePlayerEffectQueries
     bool HasLegacyNextCardTargetAdjustment(CharacterState player);
     IReadOnlyList<DirectedTurnCardPolicy> DirectedTurnCardPolicies { get; }
     bool HasRuntimeSkillInstance(int seat, string skillId, string skillInstanceId);
-    IReadOnlyList<CurrentTurnNonLockedSkillSuppression> CurrentTurnSkillSuppressions { get; }
-    IReadOnlyList<CurrentTurnOwnSkillSuppression> CurrentTurnOwnSkillSuppressions { get; }
     int SkillSuppressionCount { get; }
     ActiveSkillSuppressionFact SkillSuppressionAt(int index);
     IReadOnlyList<ProgramPhaseColorRestriction> PhaseColorRestrictions { get; }

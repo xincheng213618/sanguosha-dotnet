@@ -66,6 +66,58 @@ internal static class CharacterSkillSetChecks
             "Grant snapshots and effective skill identities must have deterministic ordering.");
     }
 
+    public static void AvailabilitySeparatesPossessionFromEffectiveSources()
+    {
+        var definitions = new Dictionary<string, ContentSkillDefinition>
+        {
+            ["fixture:plain"] = new("fixture:plain", "Plain", ""),
+            ["fixture:locked"] = new("fixture:locked", "Locked", "") { Tags = SkillTag.Locked },
+            ["fixture:mode"] = new("fixture:mode", "Mode", "")
+        };
+        var owner = Character(new GeneralDefinition("fixture:owner", "Owner", "", []));
+        owner.SkillGrants.Grant(new("printed", "fixture:plain", "printed-instance", CharacterState.PrimarySkillSource));
+        owner.SkillGrants.Grant(new("equipment", "fixture:plain", "equipment-instance", "equipment:fixture"));
+        owner.SkillGrants.Grant(new("locked", "fixture:locked", "locked-instance", "fixture:grant"));
+        owner.SkillGrants.Grant(new("mode", "fixture:mode", "mode-instance", "mode:fixture") { IsModeRule = true });
+        var index = new MatchSkillBindingIndex(id => definitions[id], isNationalWarMode: true);
+        var original = index.GetShard(owner);
+        owner.SkillGrants.Grant(new("suppress", "fixture:plain", "restriction", "fixture:restriction", false)
+        {
+            SkillState = new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn, 1, owner.Seat)
+        });
+        var suppressed = index.GetShard(owner);
+        Require(suppressed.HasOwnedInstance("fixture:plain", "printed-instance") &&
+                !suppressed.HasInstance("fixture:plain", "printed-instance") &&
+                suppressed.HasInstance("fixture:plain", "equipment-instance") &&
+                suppressed.HasInstance("fixture:locked", "locked-instance") && suppressed.HasInstance("fixture:mode", "mode-instance"),
+            "Suppression preserves possession, protects excluded sources, and never substitutes a different instance.");
+        owner.SkillGrants.Grant(new("lose", "fixture:plain", "loss-restriction", "fixture:restriction", false)
+        {
+            SkillState = new(SkillStateAction.Lose, SkillStateScope.Named, SkillStateDuration.CurrentTurn, 1, owner.Seat, "fixture:plain")
+        });
+        Require(!index.GetShard(owner).HasOwnedInstance("fixture:plain", "printed-instance") &&
+                index.GetShard(owner).HasOwnedInstance("fixture:plain", "equipment-instance"),
+            "Temporary loss removes possession for its matching source scope while equipment retains its independent grant.");
+        owner.SkillGrants.Grant(new("equipment-suppress", "fixture:plain", "equipment-restriction", "fixture:restriction", false)
+        {
+            SkillState = new(SkillStateAction.Suppress, SkillStateScope.Named, SkillStateDuration.CurrentTurn, 1, owner.Seat,
+                "fixture:plain", CharacterOnly: false)
+        });
+        Require(index.GetShard(owner).HasOwnedSkill("fixture:plain") && !index.GetShard(owner).HasSkill("fixture:plain"),
+            "An explicitly inclusive restriction can suppress equipment without losing that source's possession.");
+        owner.SkillGrants.RemoveGrant("suppress");
+        owner.SkillGrants.RemoveGrant("lose");
+        owner.SkillGrants.RemoveGrant("equipment-suppress");
+        owner.GeneralRevealed = false;
+        Require(index.GetShard(owner).HasOwnedInstance("fixture:plain", "printed-instance") &&
+                !index.GetShard(owner).HasInstance("fixture:plain", "printed-instance"),
+            "An unrevealed selected national-war general retains possession without making its printed skill effective.");
+        owner.GeneralRevealed = true;
+        Require(index.GetShard(owner).HasInstance("fixture:plain", "printed-instance") &&
+                original.HasInstance("fixture:plain", "printed-instance") && suppressed.OwnedGrants.Count == 4,
+            "Expiry and reveal restore the same instance while earlier availability snapshots remain frozen.");
+    }
+
     private static CharacterState Character(GeneralDefinition template) => new()
     {
         Seat = 0, Name = "Fixture", IsHuman = true, Role = Role.Rebel,

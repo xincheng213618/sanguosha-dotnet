@@ -249,6 +249,8 @@ internal sealed class ProgramOperationNodeReader
         if (!Has(name)) Fail(Path + "." + name, "is required");
         return ProgramExpressions.ParseInt(_node.GetProperty(name), Path + "." + name);
     }
+    internal ProgramExpression RequiredBoolExpression(string name) =>
+        ProgramExpressions.Parse(_node.GetProperty(name), Path + "." + name);
     internal SkillProgramUnknownAmountBehavior UnknownAmountBehavior()
     {
         if (!Has("onUnknownAmount")) return SkillProgramUnknownAmountBehavior.Skip;
@@ -458,7 +460,7 @@ internal abstract class ProgramOperationDescriptorBase : IProgramOperationDescri
                 new ProgramResourceOperation[] { new RequireAnyContext(ProgramContextCapability.CardAction |
                     ProgramContextCapability.Damage | ProgramContextCapability.Judgment | ProgramContextCapability.PhaseOwner | ProgramContextCapability.HealthChange) },
             ProgramParticipantRef.EventSource =>
-                new ProgramResourceOperation[] { new RequireAnyContext(ProgramContextCapability.Damage | ProgramContextCapability.MovementSource | ProgramContextCapability.ActualUseSource | ProgramContextCapability.CardAction) },
+                new ProgramResourceOperation[] { new RequireAnyContext(ProgramContextCapability.Damage | ProgramContextCapability.Death | ProgramContextCapability.MovementSource | ProgramContextCapability.ActualUseSource | ProgramContextCapability.CardAction) },
             ProgramParticipantRef.SelectedTarget =>
                 new ProgramResourceOperation[] { new ReadSelectedTarget() },
             ProgramParticipantRef.SelectedFirst =>

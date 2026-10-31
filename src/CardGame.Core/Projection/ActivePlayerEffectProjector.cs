@@ -137,12 +137,14 @@ internal sealed class ActivePlayerEffectProjector(IActivePlayerTurnEffectQueries
                 if (item.Effects.HasFlag(DirectedTurnCardPolicyEffect.IgnoreArmor)) details.Add("无视目标防具");
                 Add(item.Source.SkillId, item.Source.OwnerSeat, $"{actor}对{target}的{EffectCardNames(item.CardKinds)}：{string.Join("、", details)}。");
             }
-        foreach (var item in facts.CurrentTurnSkillSuppressions)
-            if (item.TargetSeat == player.Seat && Current(item.TurnNumber, item.TurnOwnerSeat))
-                Add(item.Source.SkillId, item.Source.OwnerSeat, "非锁定技失效。");
-        foreach (var item in facts.CurrentTurnOwnSkillSuppressions)
-            if (item.Source.OwnerSeat == player.Seat && Current(item.TurnNumber, item.TurnOwnerSeat))
-                Add(item.Source.SkillId, item.Source.OwnerSeat, $"【{content.Skill(item.SuppressedSkillId).Name}】失效。");
+        foreach (var grant in player.SkillGrants.Grants)
+            if (grant.SkillState is { Action: SkillStateAction.Suppress, Scope: SkillStateScope.NonLocked,
+                Duration: SkillStateDuration.CurrentTurn, Origin: { } origin } state && Current(state.IssuedTurn, state.EndSeat))
+                Add(origin.Source.SkillId, origin.Source.OwnerSeat, "非锁定技失效。");
+        foreach (var grant in player.SkillGrants.Grants)
+            if (grant.SkillState is { Acquisition: false, Action: SkillStateAction.Suppress, Scope: SkillStateScope.Named,
+                Duration: SkillStateDuration.CurrentTurn, NamedSkill: { } skill, Origin: { } origin } state && Current(state.IssuedTurn, state.EndSeat))
+                Add(origin.Source.SkillId, origin.Source.OwnerSeat, $"【{content.Skill(skill).Name}】失效。");
         for (var suppressionIndex = 0; suppressionIndex < facts.SkillSuppressionCount; suppressionIndex++)
         {
             var item = facts.SkillSuppressionAt(suppressionIndex);

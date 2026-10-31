@@ -764,7 +764,8 @@ public sealed partial class ContentRegistry
                         counted.Program?.Activations.Any(a => a.Id == awakening.StateId) != true)
                         throw new InvalidOperationException($"Skill '{skill.Id}' counts an unknown activation for awakening.");
                 foreach (var suppressedSkillId in skill.Program.Triggers.SelectMany(t => t.Effects)
-                    .Where(e => e.Op == SkillProgramEffectOp.SuppressOwnSkillAfterAlcoholSlashDamage).SelectMany(e => e.SkillIds))
+                    .Concat(skill.Program.Activations.SelectMany(a => a.Effects))
+                    .Where(e => e.Op == SkillProgramEffectOp.SkillState && e.SkillState!.Scope == SkillStateScope.Named).SelectMany(e => e.SkillIds))
                     if (!_skills.ContainsKey(suppressedSkillId))
                         throw new InvalidOperationException($"Skill '{skill.Id}' suppresses unknown skill '{suppressedSkillId}'.");
                 foreach (var exchange in skill.Program.Triggers.SelectMany(t => t.Effects)

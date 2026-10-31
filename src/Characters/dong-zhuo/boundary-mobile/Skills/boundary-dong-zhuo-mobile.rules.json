@@ -24,6 +24,7 @@
           "optional": false,
           "priority": 100,
           "damageOccurrence": "perDamage",
+          "requiresConsumedAlcoholSlash": true,
           "condition": {
             "kind": "all",
             "children": [
@@ -37,8 +38,9 @@
           },
           "effects": [
             {
-              "op": "suppressOwnSkillAfterAlcoholSlashDamage",
+              "op": "skillState",
               "target": "owner",
+              "action": "suppress", "scope": "named", "duration": "currentTurn", "characterOnly": false,
               "skillIds": [
                 "boundary:benghuai-current"
               ]

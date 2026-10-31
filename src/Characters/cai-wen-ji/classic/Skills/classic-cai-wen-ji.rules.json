@@ -209,8 +209,8 @@
           "priority": 0,
           "effects": [
             {
-              "op": "loseDeathSourceSkills",
-              "target": "owner"
+              "op": "skillState", "target": "owner", "targetRef": { "kind": "eventSource" },
+              "action": "lose", "scope": "all", "duration": "permanent", "characterOnly": true
             }
           ]
         }

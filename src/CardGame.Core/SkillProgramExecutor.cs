@@ -325,7 +325,6 @@ public interface ISkillProgramEffectHost
         int targetSeat, bool useFrozenSuit = false);
     void GrantTurnHandCardProhibition(ProgramSkillFrame frame, int targetSeat);
     void AbolishOwnerAreas(ProgramSkillFrame frame, IReadOnlyList<CardZoneKind> zones);
-    void LoseDeathSourceSkills(ProgramSkillFrame frame);
     void PreventCurrentDamage(ProgramSkillFrame frame);
     void NullifyCurrentCardEffect(ProgramSkillFrame frame);
     void NullifySelectedCardEffects(ProgramSkillFrame frame);

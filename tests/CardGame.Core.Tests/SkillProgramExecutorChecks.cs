@@ -934,9 +934,6 @@ internal static class SkillProgramExecutorChecks
         public void AbolishOwnerAreas(ProgramSkillFrame frame, IReadOnlyList<CardZoneKind> zones) =>
             throw new NotSupportedException("The executor fixture does not exercise AbolishOwnerAreas.");
 
-        public void LoseDeathSourceSkills(ProgramSkillFrame frame) =>
-            throw new NotSupportedException("The executor fixture does not exercise LoseDeathSourceSkills.");
-
         public void PreventCurrentDamage(ProgramSkillFrame frame) =>
             throw new NotSupportedException("The executor fixture does not exercise PreventCurrentDamage.");
 
