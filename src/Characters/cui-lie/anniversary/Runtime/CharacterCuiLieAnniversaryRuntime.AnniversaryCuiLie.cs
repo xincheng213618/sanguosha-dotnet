@@ -7,23 +7,6 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
 {
     internal const string CuiLieAction = "anniversary-cui-lie", CuiLieGive = "skill-program.anniversary:zijue.give", CuiLieDraw = "skill-program.anniversary:zijue.draw", CuiLieClaim = "skill-program.anniversary:chibi.claim", CuiLieContest = "anniversary-cui-lie-contest";
     internal static CardConversionSource CuiLieSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal bool CuiLieDisabled(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieDisabledEvent>().Any(d => d.Source.OwnerSeat == owner && d.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == d.Turn));
-    internal bool IsAnniversaryCuiLieGrantQualified(CharacterState owner, SkillGrant grant) => grant.SkillId != AnniversaryCuiLieComposition.Chibi || !CuiLieDisabled(owner.Seat);
-    internal long CaptureAnniversaryCuiLieQualificationStamp(long underlying)
-    {
-        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieDisabledEvent>().Count;
-        if (issued == 0)
-            return underlying;
-        var input = (underlying, issued, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnEndedEvent>().Count);
-        if (_characterCuiLieAnniversaryCuiLieQualificationInputsCuiLieQualificationStampAccess._cuiLieQualificationStamp == 0 || input != _characterCuiLieAnniversaryCuiLieQualificationInputsCuiLieQualificationStampAccess._cuiLieQualificationInputs)
-        {
-            _characterCuiLieAnniversaryCuiLieQualificationInputsCuiLieQualificationStampAccess._cuiLieQualificationInputs = input;
-            _characterCuiLieAnniversaryCuiLieQualificationInputsCuiLieQualificationStampAccess._cuiLieQualificationStamp++;
-        }
-
-        return long.MinValue / 128 + _characterCuiLieAnniversaryCuiLieQualificationInputsCuiLieQualificationStampAccess._cuiLieQualificationStamp;
-    }
-
     SkillProgramStepOutcome IAnniversaryCuiLieHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCuiLie(f, op);
     internal AnniversaryCuiLieLeaseEvent[] CuiLieLeases(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieLeaseEvent>().Where(l => l.Source.OwnerSeat == owner && l.Amount is >= 2 and <= 4 && l.Source.SkillId == AnniversaryCuiLieComposition.Zijue && l.Source.BindingId == "declare-number" && _contentRegistryOperations._contentRegistry.GetSkill(l.Source.SkillId).Program?.GameplayHash == l.Hash && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Any(t => t.ActorSeat == owner && t.TurnNumber > l.Turn) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieGiftEvent>().Count(g => g.FrameId == l.FrameId && g.Count == l.Amount) == 1).ToArray();
     internal int AnniversaryCuiLiePindianBonus(int owner) => CuiLieLeases(owner).Sum(l => l.Amount);
@@ -40,7 +23,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 46900, SkillProgramEffectOp.ResolveAnniversaryCuiLieChibi, SkillProgramEffectOp.ResolveAnniversaryCuiLieZijuePindianDraw)]
     internal bool CanOfferCuiLie(ProgramTriggerLegalityContext c) => c.SkillId == AnniversaryCuiLieComposition.Chibi ? CuiLieUse(c.WindowContext)is { } u && CuiLieContestEligible(c.OwnerSeat, u) : CuiLieLeases(c.OwnerSeat).Any(l => l.Source.SkillInstanceId == c.Candidate.SkillInstanceId);
     internal CardUseFrame? CuiLieUse(ProgramSkillWindowContext? w) => w is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } id } && _coreCardUseLifecycleOperations.LifecycleCardUse(id.ParentCardUseFrameId)is { Action: { } a } u && a.ActionId == id.CardActionId ? u : null;
-    internal bool CuiLieContestEligible(int owner, CardUseFrame use) => use.Action is { Type: CardActionType.Use } a && a.ActorSeat != owner && _coreMatchParticipantsPlayersAccess._players[a.ActorSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && !CuiLieDisabled(owner) && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[owner]) && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat]) && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(owner, a.ActorSeat) && CoreGameEngineOverflowTargetCancellationRuntime.OverflowPrimaryTargets(use.CardKind, a.EffectiveDesignatedTargetSeats).Any(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && _coreMatchParticipantsPlayersAccess._players[t].IsAlive && _coreNativeRuleQueriesOperations.GetCombatDistance(a.ActorSeat, t) > 1);
+    internal bool CuiLieContestEligible(int owner, CardUseFrame use) => use.Action is { Type: CardActionType.Use } a && a.ActorSeat != owner && _coreMatchParticipantsPlayersAccess._players[a.ActorSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[owner], AnniversaryCuiLieComposition.Chibi) && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[owner]) && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat]) && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(owner, a.ActorSeat) && CoreGameEngineOverflowTargetCancellationRuntime.OverflowPrimaryTargets(use.CardKind, a.EffectiveDesignatedTargetSeats).Any(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && _coreMatchParticipantsPlayersAccess._players[t].IsAlive && _coreNativeRuleQueriesOperations.GetCombatDistance(a.ActorSeat, t) > 1);
     internal SkillProgramStepOutcome BeginCuiLie(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

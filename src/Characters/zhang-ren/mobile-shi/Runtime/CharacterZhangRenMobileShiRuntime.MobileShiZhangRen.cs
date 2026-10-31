@@ -131,8 +131,11 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
         var r = f.ShiZhangRen!;
         if (r.TargetSeat < 0 || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive)
             throw new InvalidOperationException("FuAn sealed a lost strike target.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZrFuanSealedEvent(f.Id, f.OwnerSeat, r.TargetSeat, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber));
-        _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
+        var source = ShiZrSource(f);
+        _coreProgramSkillChangesOperations.IssueSkillState(new(f.Id, f.InstructionIndex - 1,
+            new(source.SkillId, source.BindingId, source.OwnerSeat, source.SkillInstanceId), r.UseId, r.ActionId), r.TargetSeat,
+            new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.UntilTurnEndOf)
+                { AfterCurrentTurn = true, CharacterOnly = false }, [], r.TargetSeat);
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Name)} 令 {(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].Name)} 的技能失效直至其下个回合结束前（伏暗）。", f.OwnerSeat, r.TargetSeat);
     }
 

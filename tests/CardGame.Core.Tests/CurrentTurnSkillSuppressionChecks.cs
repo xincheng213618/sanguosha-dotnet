@@ -45,6 +45,13 @@ internal static class CurrentTurnSkillSuppressionChecks
         Require(target.SkillGrants.Grants.All(grant => grant.SkillState is not
             { Action: SkillStateAction.Suppress, Scope: SkillStateScope.NonLocked, Duration: SkillStateDuration.CurrentTurn }),
             "Exact actual turn removes its issued restriction leases.");
+        target.IsAlive = false;
+        global::FixtureRuntimeAccess.Engine.GetMethod("ApplyProgramSkillState", Flags)!.Invoke(g,
+            [frame, 1, new SkillStateSpec(SkillStateAction.Suppress, SkillStateScope.Named, SkillStateDuration.CurrentTurn),
+                new[] { "fixture:ordinary" }, null]);
+        Require(target.SkillGrants.Grants.Any(grant => grant.SkillState is
+                { Action: SkillStateAction.Suppress, NamedSkill: "fixture:ordinary" }),
+            "A qualified native paid continuation may issue state after the participant dies; mutation does not re-qualify it.");
     }
     private static IReadOnlyList<string> Enabled(GameEngine g, CharacterState p) =>
         (IReadOnlyList<string>)global::FixtureRuntimeAccess.Engine.GetMethod("EnabledContentSkillIds", Flags)!.Invoke(g, [p])!;

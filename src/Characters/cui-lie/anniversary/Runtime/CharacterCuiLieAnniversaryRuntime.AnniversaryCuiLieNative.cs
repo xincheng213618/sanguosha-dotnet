@@ -40,7 +40,8 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
             return;
         }
 
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryCuiLieDisabledEvent(r.Source, r.Turn, f.Id));
+        _coreProgramSkillChangesOperations.ApplyProgramSkillState(f, f.OwnerSeat,
+            new(SkillStateAction.Suppress, SkillStateScope.Named, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, [AnniversaryCuiLieComposition.Chibi]);
         if (!CuiLieAdditionalEligible(use, f.OwnerSeat))
         {
             FinishCuiLie(f);
@@ -144,7 +145,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         if (e.Cancelled)
             return e.AfterTargets.Count == 0;
         var count = use.CardKind == CardKind.BorrowedSword ? 2 : 1;
-        return e.Materials.Count == 0 && !original.Contains(e.Source.OwnerSeat) && e.AfterTargets.Count == original.Count + count && e.AfterTargets.Take(original.Count).SequenceEqual(original) && e.AfterTargets[original.Count] == e.Source.OwnerSeat && e.AfterTargets.All(_coreTableSeatQueriesOperations.IsValidPlayerSeat) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieDisabledEvent>().Count(d => d.FrameId == e.FrameId && d.Source == e.Source && d.Turn == s.Turn) == 1;
+        return e.Materials.Count == 0 && !original.Contains(e.Source.OwnerSeat) && e.AfterTargets.Count == original.Count + count && e.AfterTargets.Take(original.Count).SequenceEqual(original) && e.AfterTargets[original.Count] == e.Source.OwnerSeat && e.AfterTargets.All(_coreTableSeatQueriesOperations.IsValidPlayerSeat);
     }
 
     internal bool HasAnniversaryCuiLieCancellation(CardUseFrame use) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieUseChangedEvent>().Any(e => e.UseId == use.Id && e.Cancelled && IsAnniversaryCuiLieTargetMutationFact(use, e, e.BeforeTargets));

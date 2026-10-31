@@ -29,7 +29,7 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
     // observers share this mutation without manufacturing a live program frame.
     internal int IssueSkillState(SkillStateOrigin origin, int seat, SkillStateSpec spec, IReadOnlyList<string> skills, int? endSeat = null)
     {
-        if (!facts.IsValidSeat(seat) || spec.Action != SkillStateAction.Lose && !facts.Alive(seat)) return 0;
+        if (!facts.IsValidSeat(seat)) return 0;
         if (spec.Duration == SkillStateDuration.UntilTurnEndOf && (endSeat is null || !facts.IsValidSeat(endSeat.Value))) return 0;
         facts.RequireSkill(origin.Source.SkillId);
         foreach (var skill in skills) facts.RequireSkill(skill);
@@ -84,7 +84,7 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
         }
         var changed = spec.Action == SkillStateAction.Suppress && scope == SkillStateScope.Named ? skills : ids;
         foreach (var id in changed.DefaultIfEmpty(origin.Source.SkillId))
-            operations.AdvanceFact(new SkillStateChangedEvent(seat, owner, id, spec.Action, source) { Origin = origin });
+            operations.AdvanceFact(new SkillStateChangedEvent(seat, owner, id, spec.Action, source) { Origin = origin, IssuedTurn = turn.TurnNumber });
         if (spec.Action == SkillStateAction.Lose)
         {
             operations.AdvanceFact(new CharacterSkillsLostEvent(seat, owner, Array.AsReadOnly(ids)));

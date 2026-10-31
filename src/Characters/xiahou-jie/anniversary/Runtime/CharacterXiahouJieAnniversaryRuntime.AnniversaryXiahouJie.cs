@@ -7,33 +7,6 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
 
     internal static CardConversionSource AnniversaryXiahouJieSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static ProgramTriggerCandidate AnniversaryXiahouJieCandidate(ProgramSkillFrame f) => new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0, f.WindowContext?.OccurrenceIndex ?? 0);
-    internal bool IsAnniversaryXiahouJieGrantQualified(CharacterState owner, SkillGrant grant) => grant.SkillId != AnniversaryXiahouJieComposition.Liedan || !HasAnniversaryXiahouJie || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Any(e => e.Source.OwnerSeat == owner.Seat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressionExpiredEvent>().Any(x => x.FrameId == e.FrameId));
-    internal long CaptureAnniversaryXiahouJieQualificationStamp(long underlying)
-    {
-        if (!HasAnniversaryXiahouJie)
-            return underlying;
-        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Count;
-        if (issued == 0)
-            return underlying;
-        var input = (underlying, issued, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressionExpiredEvent>().Count);
-        if (_characterXiahouJieAnniversaryAnniversaryXiahouJieQualificationInputsAnniversaryXiahouJieQualificationStampAccess._anniversaryXiahouJieQualificationStamp == 0 || input != _characterXiahouJieAnniversaryAnniversaryXiahouJieQualificationInputsAnniversaryXiahouJieQualificationStampAccess._anniversaryXiahouJieQualificationInputs)
-        {
-            _characterXiahouJieAnniversaryAnniversaryXiahouJieQualificationInputsAnniversaryXiahouJieQualificationStampAccess._anniversaryXiahouJieQualificationInputs = input;
-            _characterXiahouJieAnniversaryAnniversaryXiahouJieQualificationInputsAnniversaryXiahouJieQualificationStampAccess._anniversaryXiahouJieQualificationStamp++;
-        }
-
-        return long.MinValue / 16 + _characterXiahouJieAnniversaryAnniversaryXiahouJieQualificationInputsAnniversaryXiahouJieQualificationStampAccess._anniversaryXiahouJieQualificationStamp;
-    }
-
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 45500)]
-    internal void ExpireAnniversaryXiahouJie(TurnEndedEvent ended)
-    {
-        if (!HasAnniversaryXiahouJie || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Count == 0)
-            return;
-        foreach (var issued in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Where(e => e.Source.OwnerSeat == ended.ActorSeat && e.ActualTurn <= ended.TurnNumber && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressionExpiredEvent>().Any(x => x.FrameId == e.FrameId)).ToArray())
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryXiahouJieSuppressionExpiredEvent(issued.FrameId, ended.ActorSeat, ended.TurnNumber));
-    }
-
     internal bool IsAnniversaryXiahouJieUniqueHand(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner).All(p => _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count < _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Count);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 45500, SkillProgramEffectOp.ResolveAnniversaryXiahouJieLiedan, SkillProgramEffectOp.ResolveAnniversaryXiahouJieZhuangdan)]
     internal bool CanOfferAnniversaryXiahouJie(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
@@ -53,7 +26,9 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
         {
             if (_resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } ended || !_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(ended) || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(ended)))
                 throw new InvalidOperationException("Zhuangdan lost its actual end-of-turn candidate.");
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryXiahouJieSuppressedEvent(f.Id, AnniversaryXiahouJieSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat));
+            _coreProgramSkillChangesOperations.ApplyProgramSkillState(f, f.OwnerSeat,
+                new(SkillStateAction.Suppress, SkillStateScope.Named, SkillStateDuration.UntilTurnEndOf)
+                { CharacterOnly = false, UntilTurnEndOf = new(ProgramParticipantRef.Owner) }, [AnniversaryXiahouJieComposition.Liedan]);
             return SkillProgramStepOutcome.Continue;
         }
 

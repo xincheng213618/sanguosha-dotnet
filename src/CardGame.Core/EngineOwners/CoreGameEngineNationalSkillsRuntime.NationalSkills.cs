@@ -24,7 +24,7 @@ internal sealed partial class CoreGameEngineNationalSkillsRuntime
         if (skillId is null)
             return false;
         var source = general.Id == player.General.Id ? CharacterState.PrimarySkillSource : CharacterState.SecondarySkillSource;
-        return player.SkillGrants.Grants.Any(grant => grant.SourceId == source && grant.SkillId == skillId && SkillAvailability.IsEffectiveUnderRestrictions(player, grant, _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId)) && _coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(player, grant));
+        return player.SkillGrants.Grants.Any(grant => grant.SourceId == source && grant.SkillId == skillId && _coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(player, grant));
     }
 
     internal GeneralSkillDefinition ToRuntimeSkillDefinition(string skillId)

@@ -53,7 +53,5 @@ public sealed record AnniversaryXiahouJieDrawReturnedEvent(long FrameId,int Inde
 public sealed record AnniversaryXiahouJieMaximumEvent(long FrameId,int Before,int After) : IGameEvent;
 public sealed record AnniversaryXiahouJieHpPaidEvent(long FrameId,int Before,int After,int ActualLoss) : IGameEvent;
 public sealed record AnniversaryXiahouJieCompletedEvent(long FrameId) : IGameEvent;
-public sealed record AnniversaryXiahouJieSuppressedEvent(long FrameId,CardConversionSource Source,string Hash,int ActualTurn,int TurnOwner) : IGameEvent;
-public sealed record AnniversaryXiahouJieSuppressionExpiredEvent(long FrameId,int OwnerSeat,int ActualTurn) : IGameEvent;
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public AnniversaryXiahouJieReceipt? AnniversaryXiahouJie { get;init; } }

@@ -21,7 +21,6 @@ public sealed partial class GameEngine
     private readonly EngineStates.CorePlayerDecisionState _playerDecision = new();
     private readonly EngineStates.CharacterCaoPiMouState _characterCaoPiMou = new();
     private readonly EngineStates.CharacterCaoXiOlState _characterCaoXiOl = new();
-    private readonly EngineStates.CharacterCuiLieAnniversaryState _characterCuiLieAnniversary = new();
     private readonly EngineStates.CharacterDaQiaoXiaoQiaoOlState _characterDaQiaoXiaoQiaoOl = new();
     private readonly EngineStates.CharacterDingYuanOlState _characterDingYuanOl = new();
     private readonly EngineStates.CharacterDuXiOlState _characterDuXiOl = new();
@@ -34,7 +33,6 @@ public sealed partial class GameEngine
     private readonly EngineStates.CharacterLvKaiOlState _characterLvKaiOl = new();
     private readonly EngineStates.CharacterTaiShiCiMobileShiState _characterTaiShiCiMobileShi = new();
     private readonly EngineStates.CharacterWangGuanOlState _characterWangGuanOl = new();
-    private readonly EngineStates.CharacterXiahouJieAnniversaryState _characterXiahouJieAnniversary = new();
     private readonly EngineStates.CharacterYangWanOlState _characterYangWanOl = new();
     private readonly EngineStates.CharacterZhangLingOlState _characterZhangLingOl = new();
     private readonly EngineStates.CharacterZhangXunAnniversaryState _characterZhangXunAnniversary = new();
@@ -181,7 +179,6 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICorePlayerDecisionPendingDecisionBackingAccess), _playerDecision),
         new(typeof(EngineStates.Contracts.ICharacterCaoPiMouMouCaoPiControlsAccess), _characterCaoPiMou),
         new(typeof(EngineStates.Contracts.ICharacterCaoXiOlCaoXiActiveUnitsCaoXiHistoryCountCaoXiHistoryTailAccess), _characterCaoXiOl),
-        new(typeof(EngineStates.Contracts.ICharacterCuiLieAnniversaryCuiLieQualificationInputsCuiLieQualificationStampAccess), _characterCuiLieAnniversary),
         new(typeof(EngineStates.Contracts.ICharacterDaQiaoXiaoQiaoOlDaQiaoXiaoQiaoQualificationCacheDaQiaoXiaoQiaoQualificationRevisionSynchronizingDaQiaoXiaoQiaoLuoyanAccess), _characterDaQiaoXiaoQiaoOl),
         new(typeof(EngineStates.Contracts.ICharacterDingYuanOlSynchronizingAdoptedChildGrantsAccess), _characterDingYuanOl),
         new(typeof(EngineStates.Contracts.ICharacterDuXiOlDuXiSuitProjectionDuXiSuitProjectionEventCountDuXiSuitProjectionLastFactAccess), _characterDuXiOl),
@@ -194,7 +191,6 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICharacterLvKaiOlBijingMarkedCardIdsAccess), _characterLvKaiOl),
         new(typeof(EngineStates.Contracts.ICharacterTaiShiCiMobileShiShiTzLieScanSequenceAccess), _characterTaiShiCiMobileShi),
         new(typeof(EngineStates.Contracts.ICharacterWangGuanOlMiuyanQualificationDependenciesMiuyanQualificationStampAccess), _characterWangGuanOl),
-        new(typeof(EngineStates.Contracts.ICharacterXiahouJieAnniversaryAnniversaryXiahouJieQualificationInputsAnniversaryXiahouJieQualificationStampAccess), _characterXiahouJieAnniversary),
         new(typeof(EngineStates.Contracts.ICharacterYangWanOlZhuihuanArmChoicesAccess), _characterYangWanOl),
         new(typeof(EngineStates.Contracts.ICharacterZhangLingOlSynchronizingCategoryTalismansAccess), _characterZhangLingOl),
         new(typeof(EngineStates.Contracts.ICharacterZhangXunAnniversaryHasIssuedAnniversaryZhangXunAccess), _characterZhangXunAnniversary),

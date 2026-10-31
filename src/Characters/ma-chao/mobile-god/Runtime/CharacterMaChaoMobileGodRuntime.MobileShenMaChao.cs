@@ -6,7 +6,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaChaoMobileGodRuntime
 {
     internal const string MobileMaChaoYuli = "mobile-god:yuli", MobileMaChaoTingwei = "mobile-god:tingwei", MobileMaChaoJimie = "mobile-god:jimie";
-    internal bool HasMobileShenMaChao => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShenMaChaoTingwei);
 
     internal static CardConversionSource MobileMaChaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal DamageNature MobileMaChaoYuliNature(GameEngine.IDamageAttempt attack, DamageNature priorNature) => !attack.IsSourceLess && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], MobileMaChaoYuli) ? DamageNature.Thunder : priorNature;
@@ -14,19 +13,6 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
     internal int MobileMaChaoSourceDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && !attack.IsChainPropagation && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], MobileMaChaoYuli) && _coreNativeDamagePoliciesOperations.GetDamageNatureBeforeMobileMaChao(attack) == DamageNature.Thunder ? 1 : 0;
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 40626)]
     internal int MobileTingweiCardDamageBonus(GameEngine.IDamageAttempt attack) => attack.IsChainPropagation ? 0 : (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.MobileTingweiBoosts ?? []).Count(b => b.Target == attack.TargetSeat && b.UseId == attack.ResolutionId && _coreCardUseLifecycleOperations.LifecycleCardUse(b.UseId)?.Action?.ActionId == b.ActionId);
-    internal bool IsMobileMaChaoTingweiGrantQualified(CharacterState owner, SkillGrant grant) => !HasMobileShenMaChao || _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileTingweiSuppressedEvent>().Any(e => e.Target == owner.Seat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileTingweiExpiredEvent>().Any(x => x.FrameId == e.FrameId));
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 40625)]
-    internal void ExpireMobileTingwei(IGameEvent fact)
-    {
-        if (!HasMobileShenMaChao || fact is not (TurnEndedEvent or PlayerDiedEvent))
-            return;
-        foreach (var e in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileTingweiSuppressedEvent>().Where(e => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileTingweiExpiredEvent>().Any(x => x.FrameId == e.FrameId) && (fact is TurnEndedEvent t && t.ActorSeat == e.Target && t.TurnNumber > e.ActualTurn || fact is PlayerDiedEvent d && d.VictimSeat == e.Target)).ToArray())
-        {
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileTingweiExpiredEvent(e.FrameId, e.Target, _coreActualTurnProgressTurnNumberAccess._turnNumber));
-            _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
-        }
-    }
-
     internal long LastMobileJimieUse(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileMaChaoJimieUsedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner)?.FrameId ?? 0;
     internal bool CanMobileJimie(int owner) => LastMobileJimieUse(owner)is 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileMaChaoJimieRefreshedEvent>().Any(e => e.Owner == owner && e.UseFrameId == LastMobileJimieUse(owner));
     internal void RecordMobileYuli(ProgramSkillFrame f, int part)
@@ -244,8 +230,10 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
                     continue;
                 if (option == 1)
                 {
-                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileTingweiSuppressedEvent(f.Id, r.Source, r.Target, _coreActualTurnProgressTurnNumberAccess._turnNumber));
-                    _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
+                    _coreProgramSkillChangesOperations.IssueSkillState(new(f.Id, f.InstructionIndex - 1,
+                        new(r.Source.SkillId, r.Source.BindingId, r.Source.OwnerSeat, r.Source.SkillInstanceId), r.UseId, r.ActionId), r.Target,
+                        new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.UntilTurnEndOf)
+                            { AfterCurrentTurn = true, CharacterOnly = false, ExpireOnDeath = true }, [], r.Target);
                 }
                 else if (option == 2)
                     _coreRuntimeOperations.ReplaceRuntimeTop(f with { MobileShenMaChao = f.MobileShenMaChao!with { Stage = MobileMaChaoStage.Gift } });

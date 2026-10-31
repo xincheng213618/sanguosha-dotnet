@@ -7,14 +7,11 @@ internal sealed partial class CharacterXiahouJieAnniversaryEntries
     internal ProgramSkillFrame? AnniversaryXiahouJieObserverRoot() => _resolve().AnniversaryXiahouJieObserverRoot();
     internal SkillProgramStepOutcome BeginAnniversaryXiahouJie(ProgramSkillFrame supplied, SkillProgramEffectOp operation) => _resolve().BeginAnniversaryXiahouJie(supplied, operation);
     internal bool CanOfferAnniversaryXiahouJie(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => _resolve().CanOfferAnniversaryXiahouJie(c, t, w);
-    internal long CaptureAnniversaryXiahouJieQualificationStamp(long underlying) => _resolve().CaptureAnniversaryXiahouJieQualificationStamp(underlying);
     internal bool CompleteAnniversaryXiahouJiePreparation(ProgramLifecycleTriggerWindowFrame parent) => _resolve().CompleteAnniversaryXiahouJiePreparation(parent);
     internal void ContinueAnniversaryXiahouJie(long id) => _resolve().ContinueAnniversaryXiahouJie(id);
     internal bool DrainAnniversaryXiahouJie(long id) => _resolve().DrainAnniversaryXiahouJie(id);
-    internal void ExpireAnniversaryXiahouJie(TurnEndedEvent ended) => _resolve().ExpireAnniversaryXiahouJie(ended);
     internal void FinishAnniversaryXiahouJie(ProgramSkillFrame f) => _resolve().FinishAnniversaryXiahouJie(f);
     internal bool HasAnniversaryXiahouJieDying() => _resolve().HasAnniversaryXiahouJieDying();
-    internal bool IsAnniversaryXiahouJieGrantQualified(CharacterState owner, SkillGrant grant) => _resolve().IsAnniversaryXiahouJieGrantQualified(owner, grant);
     internal bool IsAnniversaryXiahouJieUniqueHand(int owner) => _resolve().IsAnniversaryXiahouJieUniqueHand(owner);
     internal bool KeepPaidAnniversaryXiahouJie(ProgramSkillFrame f) => _resolve().KeepPaidAnniversaryXiahouJie(f);
     internal bool ResumeAnniversaryXiahouJie(long id) => _resolve().ResumeAnniversaryXiahouJie(id);

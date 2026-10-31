@@ -85,17 +85,4 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
         }
     }
 
-    internal bool ShiZrFuanSealActive(int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZrFuanSealedEvent>().Any(stamped => stamped.TargetSeat == target && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZrFuanSealExpiredEvent>().Any(expired => expired.FrameId == stamped.FrameId));
-    internal bool ShiZrFuanGrantQualified(CharacterState owner, SkillGrant grant) => !HasShiZrCapability || grant.IsModeRule || _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked) || !ShiZrFuanSealActive(owner.Seat);
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 68201)]
-    internal void ExpireShiZrFuanSeals(IGameEvent payload)
-    {
-        if (!HasShiZrCapability || payload is not TurnEndedEvent turn)
-            return;
-        foreach (var sealedEntry in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZrFuanSealedEvent>().Where(entry => entry.TargetSeat == turn.ActorSeat && turn.TurnNumber > entry.GrantedTurn && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZrFuanSealExpiredEvent>().Any(expired => expired.FrameId == entry.FrameId)).ToArray())
-        {
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZrFuanSealExpiredEvent(sealedEntry.FrameId, sealedEntry.TargetSeat, turn.TurnNumber));
-            _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
-        }
-    }
 }

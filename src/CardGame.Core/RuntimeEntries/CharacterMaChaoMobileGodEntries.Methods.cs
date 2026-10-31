@@ -10,9 +10,7 @@ internal sealed partial class CharacterMaChaoMobileGodEntries
     internal PromptChoice ChooseMobileYuli(PendingDecision p, ProgramSkillFrame f) => _resolve().ChooseMobileYuli(p, f);
     internal void ContinueMobileMaChao(long id) => _resolve().ContinueMobileMaChao(id);
     internal bool DrainMobileMaChao(long id) => _resolve().DrainMobileMaChao(id);
-    internal void ExpireMobileTingwei(IGameEvent fact) => _resolve().ExpireMobileTingwei(fact);
     internal void FinishMobileMaChao(ProgramSkillFrame f) => _resolve().FinishMobileMaChao(f);
-    internal bool IsMobileMaChaoTingweiGrantQualified(CharacterState owner, SkillGrant grant) => _resolve().IsMobileMaChaoTingweiGrantQualified(owner, grant);
     internal long LastMobileJimieUse(int owner) => _resolve().LastMobileJimieUse(owner);
     internal CardActionContext? MobileMaChaoAction(ProgramSkillWindowContext? c) => _resolve().MobileMaChaoAction(c);
     internal PromptChoice MobileMaChaoChoice(ProgramSkillFrame f, string option, string text, int? target = default) => _resolve().MobileMaChaoChoice(f, option, text, target);
@@ -28,5 +26,4 @@ internal sealed partial class CharacterMaChaoMobileGodEntries
     internal bool RetainMobileMaChao(ProgramSkillFrame f) => _resolve().RetainMobileMaChao(f);
     internal void ReturnMobileMaChaoDraw(ProgramSkillFrame f, NativeDrawOutcome o) => _resolve().ReturnMobileMaChaoDraw(f, o);
     internal bool ReturnMobileMaChaoMovement(ProgramSkillFrame f) => _resolve().ReturnMobileMaChaoMovement(f);
-    internal bool HasMobileShenMaChao { get => _resolve().HasMobileShenMaChao; }
 }

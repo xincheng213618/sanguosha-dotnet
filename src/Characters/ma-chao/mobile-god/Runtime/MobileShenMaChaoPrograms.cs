@@ -40,8 +40,6 @@ public sealed partial record CardUseFrame
 }
 public sealed record MobileTingweiStartedEvent(long FrameId, CardConversionSource Source, long UseId, long ActionId) : IGameEvent;
 public sealed record MobileTingweiSelectedEvent(long FrameId, int Target, int Mask, int Paid) : IGameEvent;
-public sealed record MobileTingweiSuppressedEvent(long FrameId, CardConversionSource Source, int Target, int ActualTurn) : IGameEvent;
-public sealed record MobileTingweiExpiredEvent(long FrameId, int Target, int ActualTurn) : IGameEvent;
 public sealed record MobileTingweiBoostedEvent(MobileTingweiBoost Boost) : IGameEvent;
 public sealed record MobileMaChaoMovedEvent(long FrameId, string Mode, int Target, long Before, long After) : IGameEvent;
 public sealed record MobileMaChaoJimieUsedEvent(long FrameId, CardConversionSource Source, int Target, int Paid, int ActualTurn) : IGameEvent;

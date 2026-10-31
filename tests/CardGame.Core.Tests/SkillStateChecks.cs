@@ -16,6 +16,7 @@ internal static class SkillStateChecks
             ("suppression", SuppressionKeepsOwnershipAndExemptsLockedSkills),
             ("chosen return", ChosenLossReturnsToOrdinaryDrawCold),
             ("overlapping expiry", OverlappingExpiryPreservesTheExistingInstance),
+            ("next owner turn expiry", AfterCurrentTurnWaitsForTheNextOwnerTurnEnd),
             ("existing transfer", TransferReusesAnAlreadyOwnedInstance),
             ("named future source", NamedSuppressionCoversAnIndependentlyAcquiredSource),
             ("filter resources", FiltersShareExpressionResourcesAndReadSkillFacts),
@@ -35,6 +36,8 @@ internal static class SkillStateChecks
         Require(s.Owns(0, Counter) && s.Owns(0, Driver) && s.Owns(0, Locked) &&
             !s.CanUse(0, Counter, "pulse") && !s.CanUse(0, Driver, "choose") && s.CanUse(0, Locked, "pulse"),
             "Non-locked suppression retains owned printed skills while removing their activations; a locked skill remains effective.");
+        Require(!s.LegacyGrantQualified(0, Counter) && s.LegacyGrantQualified(0, Locked),
+            "The legacy grant-qualification entry shares the same restriction decision and locked exemption.");
         s.Cold();
         Require(s.Owns(0, Counter) && !s.CanUse(0, Counter, "pulse") && s.CanUse(0, Locked, "pulse"),
             "Cold replay retains the ownership/effectiveness distinction.");
@@ -88,6 +91,25 @@ internal static class SkillStateChecks
             "The nearest matching target turn end restores the same changed instance without resetting its game quota.");
         s.Cold();
         Require(s.CounterState(1) == restored && s.CanUse(1, Counter, "pulse"), "Expired state and original instance cold-replay together.");
+    }
+
+    private static void AfterCurrentTurnWaitsForTheNextOwnerTurnEnd()
+    {
+        var s = Scene.Start();
+        s.Use(0, Driver, "through-next-owner-end", 1); s.Play(0);
+        s.Play(1);
+        Require(s.E<TurnEndedEvent>().Count(e => e.ActorSeat == 0) == 1 &&
+            s.Owns(1, Counter) && !s.CanUse(1, Counter, "pulse") && s.CanUse(1, Locked, "pulse"),
+            "AfterCurrentTurn keeps the non-locked restriction through the issuing owner's current turn end.");
+        s.Cold();
+        Require(s.Owns(1, Counter) && !s.Effective(1, Counter) && s.StateLeases(1) == 1,
+            "Cold replay retains the restriction that deliberately skipped the first matching end.");
+        s.Play(0);
+        Require(!s.Effective(1, Counter), "The target's intervening turn end cannot expire the owner's next-turn restriction.");
+        s.Play(1);
+        Require(s.E<TurnEndedEvent>().Count(e => e.ActorSeat == 0) == 2 && s.StateLeases(1) == 0 &&
+            s.Owns(1, Counter) && s.CanUse(1, Counter, "pulse") && s.CanUse(1, Locked, "pulse"),
+            "The owner's next actual turn end removes the restriction and restores the original target abilities.");
     }
 
     private static void TransferReusesAnAlreadyOwnedInstance()
@@ -212,6 +234,12 @@ internal static class SkillStateChecks
             .GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(G)!)[seat];
         public bool Owns(int seat, string skill) => G.NationalSkillsEntries.HasOwnedRuntimeSkill(Player(seat), skill);
         public bool Effective(int seat, string skill) => G.NationalSkillsEntries.HasRuntimeSkill(Player(seat), skill);
+        public bool LegacyGrantQualified(int seat, string skill)
+        {
+            var player = Player(seat);
+            var grant = player.SkillGrants.Grants.Single(g => g.SkillId == skill && g.IsEnabled && g.SkillState is null);
+            return G.CurrentTurnSkillSuppressionsEntries.IsCurrentTurnSkillGrantQualified(player, grant);
+        }
         public int StateLeases(int seat) => Player(seat).SkillGrants.Grants.Count(g => g.SkillState is not null);
         public IReadOnlyList<SkillGrant> CounterGrants(int seat) => Player(seat).SkillGrants.Grants.Where(g => g.SkillId == Counter && g.SkillState is null).ToArray();
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
@@ -301,6 +329,8 @@ internal static class SkillStateChecks
                       {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"named","skillIds":["{{{Counter}}}"],"duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"owner"}}]},
                     {"id":"overlap-through-target","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
                       {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"named","skillIds":["{{{Counter}}}"],"duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"selectedTarget"}}]},
+                    {"id":"through-next-owner-end","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"nonLocked","duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"owner"},"afterCurrentTurn":true}]},
                     {"id":"transfer","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
                       {"op":"skillState","target":"selectedTarget","action":"transfer","scope":"named","skillIds":["{{{Counter}}}"],"duration":"currentTurn"}]},
                     {"id":"lose-own-counter","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[

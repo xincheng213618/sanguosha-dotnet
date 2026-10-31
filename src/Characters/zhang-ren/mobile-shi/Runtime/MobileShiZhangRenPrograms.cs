@@ -9,8 +9,6 @@ public sealed record ShiZrFuanSuitDiscardedEvent(int ActualTurn, int OwnerSeat, 
 public sealed record ShiZrFuanStrikeIssuedEvent(long FrameId, int OwnerSeat, int ActualTurn, long UseId, long ActionId,
     int TargetSeat, int DamageCountBefore) : IGameEvent;
 public sealed record ShiZrFuanStrikeSettledEvent(long FrameId, long UseId, int TargetSeat, bool Damaged, string Choice) : IGameEvent;
-public sealed record ShiZrFuanSealedEvent(long FrameId, int SourceSeat, int TargetSeat, int GrantedTurn) : IGameEvent;
-public sealed record ShiZrFuanSealExpiredEvent(long FrameId, int TargetSeat, int ActualTurn) : IGameEvent;
 public sealed record ShiZrYinXianBonusGainedEvent(int OwnerSeat, int ActualTurn, long ActionId, int Bonus) : IGameEvent;
 
 public enum ShiZrStage { FuanAsk = 0, FuanRecord = 1, StrikeAsk = 10, StrikeTarget = 11, StrikeIssued = 12, StrikeChoose = 13, RelaunchRecord = 14 }

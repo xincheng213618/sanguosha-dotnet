@@ -9,7 +9,6 @@ internal sealed partial class CharacterCuiLieAnniversaryEntries
     internal void ApplyCuiLieMutation(ProgramSkillFrame f, IReadOnlyList<int> added) => _resolve().ApplyCuiLieMutation(f, added);
     internal SkillProgramStepOutcome BeginCuiLie(ProgramSkillFrame supplied, SkillProgramEffectOp op) => _resolve().BeginCuiLie(supplied, op);
     internal bool CanOfferCuiLie(ProgramTriggerLegalityContext c) => _resolve().CanOfferCuiLie(c);
-    internal long CaptureAnniversaryCuiLieQualificationStamp(long underlying) => _resolve().CaptureAnniversaryCuiLieQualificationStamp(underlying);
     internal bool ContinueAnniversaryCuiLieDelayedPlacement(CardUseFrame use) => _resolve().ContinueAnniversaryCuiLieDelayedPlacement(use);
     internal void ContinueCuiLie(long id) => _resolve().ContinueCuiLie(id);
     internal bool CuiLieAdditionalEligible(CardUseFrame u, int seat) => _resolve().CuiLieAdditionalEligible(u, seat);
@@ -21,7 +20,6 @@ internal sealed partial class CharacterCuiLieAnniversaryEntries
     internal int CuiLieChooser(ProgramSkillFrame f) => _resolve().CuiLieChooser(f);
     internal bool CuiLieContestEligible(int owner, CardUseFrame use) => _resolve().CuiLieContestEligible(owner, use);
     internal bool CuiLieDelayedTargetLegal(CardUseFrame use, int target) => _resolve().CuiLieDelayedTargetLegal(use, target);
-    internal bool CuiLieDisabled(int owner) => _resolve().CuiLieDisabled(owner);
     internal bool CuiLieDying() => _resolve().CuiLieDying();
     internal bool CuiLieFinalizedWindow(ProgramTargetCardWindowQuery q) => _resolve().CuiLieFinalizedWindow(q);
     internal bool CuiLieFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().CuiLieFirstChild(f, child);
@@ -41,7 +39,6 @@ internal sealed partial class CharacterCuiLieAnniversaryEntries
     internal bool HasAnniversaryCuiLieDelayedTail(CardUseFrame use) => _resolve().HasAnniversaryCuiLieDelayedTail(use);
     internal bool IsAnniversaryCuiLieClaimedUseMaterial(long useId, int cardId) => _resolve().IsAnniversaryCuiLieClaimedUseMaterial(useId, cardId);
     internal bool IsAnniversaryCuiLieDelayedMaterialPlaced(CardUseFrame use) => _resolve().IsAnniversaryCuiLieDelayedMaterialPlaced(use);
-    internal bool IsAnniversaryCuiLieGrantQualified(CharacterState owner, SkillGrant grant) => _resolve().IsAnniversaryCuiLieGrantQualified(owner, grant);
     internal bool IsAnniversaryCuiLiePindianSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => _resolve().IsAnniversaryCuiLiePindianSettlementBatch(f, batch);
     internal bool IsAnniversaryCuiLieTargetMutationFact(CardUseFrame use, AnniversaryCuiLieUseChangedEvent e, IReadOnlyList<int> original, int? currentProofActor = default) => _resolve().IsAnniversaryCuiLieTargetMutationFact(use, e, original, currentProofActor);
     internal bool IsIssuedCuiLieDraw(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => _resolve().IsIssuedCuiLieDraw(c, w);

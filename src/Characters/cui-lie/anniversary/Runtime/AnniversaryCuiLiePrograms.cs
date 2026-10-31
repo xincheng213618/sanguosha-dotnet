@@ -56,7 +56,6 @@ public sealed record AnniversaryCuiLieLeaseEvent(long FrameId,CardConversionSour
 public sealed record AnniversaryCuiLieDrawReturnedEvent(long FrameId,int Recipient,int Requested,int Actual,long Before,long After):IGameEvent;
 public sealed record AnniversaryCuiLiePindianIssuedEvent(long FrameId,long ContestId,int Actor):IGameEvent;
 public sealed record AnniversaryCuiLiePindianReturnedEvent(long FrameId,long ContestId,int SourceRank,int OpponentRank,bool Won):IGameEvent;
-public sealed record AnniversaryCuiLieDisabledEvent(CardConversionSource Source,int Turn,long FrameId):IGameEvent;
 public sealed record AnniversaryCuiLieUseChangedEvent(long FrameId,CardConversionSource Source,string Hash,long UseId,long ActionId,int Actor,bool Cancelled):IGameEvent
 {
  public long MaterialSequenceBefore{get;init;}

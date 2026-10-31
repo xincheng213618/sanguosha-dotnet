@@ -54,6 +54,7 @@ public sealed record SkillStateChangedEvent(int Seat, int SourceSeat, string Ski
     SkillStateAction Action, string SourceId) : IGameEvent
 {
     public SkillStateOrigin? Origin { get; init; }
+    public int IssuedTurn { get; init; }
 }
 public sealed record SkillStateExpiredEvent(int Seat, string SourceId, SkillStateOrigin? Origin) : IGameEvent;
 

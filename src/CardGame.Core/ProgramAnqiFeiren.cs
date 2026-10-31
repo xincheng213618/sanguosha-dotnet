@@ -1,12 +1,5 @@
 namespace CardGame.Core;
 
-// Public skill identities and an equipped card are public; no random generator
-// state, hand identities or private card selections enter these scalar facts.
-public sealed record AnqiFeirenSuppressedEvent(long FrameId, CardConversionSource Source, string GameplayHash,
-    long DamageWindowId, long DamageFrameId, int WeaponCardId, int TargetSeat, int TurnNumber,
-    int TurnOwnerSeat, string SuppressedSkillId, int RandomIndex, int CandidateCount) : IGameEvent;
-public sealed record AnqiFeirenExpiredEvent(long SuppressionFrameId, int TargetSeat, int TurnNumber) : IGameEvent;
-
 internal interface IAnqiFeirenHost
 {
     SkillProgramStepOutcome ResolveAnqiFeiren(ProgramSkillFrame frame);

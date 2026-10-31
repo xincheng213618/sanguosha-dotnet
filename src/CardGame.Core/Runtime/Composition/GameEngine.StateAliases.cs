@@ -150,8 +150,6 @@ public sealed partial class GameEngine
     private ref IGameEvent? _caoXiHistoryTail => ref _characterCaoXiOl.ReferenceToCaoXiHistoryTail;
     private ref int _caoXiHistoryCount => ref _characterCaoXiOl.ReferenceToCaoXiHistoryCount;
     private ref IReadOnlyList<CaoXiGangshuIncreasedEvent> _caoXiActiveUnits => ref _characterCaoXiOl.ReferenceToCaoXiActiveUnits;
-    private ref (long Inner, int Issued, int Ended) _cuiLieQualificationInputs => ref _characterCuiLieAnniversary.ReferenceToCuiLieQualificationInputs;
-    private ref long _cuiLieQualificationStamp => ref _characterCuiLieAnniversary.ReferenceToCuiLieQualificationStamp;
     private ref readonly Dictionary<int, ((long Base, long Grant, long Movement, int Hp, bool Alive, bool Concealed) Key, long Stamp)> _daQiaoXiaoQiaoQualificationCache => ref _characterDaQiaoXiaoQiaoOl.ReferenceToDaQiaoXiaoQiaoQualificationCache;
     private ref long _daQiaoXiaoQiaoQualificationRevision => ref _characterDaQiaoXiaoQiaoOl.ReferenceToDaQiaoXiaoQiaoQualificationRevision;
     private ref bool _synchronizingDaQiaoXiaoQiaoLuoyan => ref _characterDaQiaoXiaoQiaoOl.ReferenceToSynchronizingDaQiaoXiaoQiaoLuoyan;
@@ -187,8 +185,6 @@ public sealed partial class GameEngine
     private ref int _shiTzLieScanSequence => ref _characterTaiShiCiMobileShi.ReferenceToShiTzLieScanSequence;
     private ref (long Base, int Round, int Count) _miuyanQualificationDependencies => ref _characterWangGuanOl.ReferenceToMiuyanQualificationDependencies;
     private ref long _miuyanQualificationStamp => ref _characterWangGuanOl.ReferenceToMiuyanQualificationStamp;
-    private ref (long Inner, int Issued, int Expired) _anniversaryXiahouJieQualificationInputs => ref _characterXiahouJieAnniversary.ReferenceToAnniversaryXiahouJieQualificationInputs;
-    private ref long _anniversaryXiahouJieQualificationStamp => ref _characterXiahouJieAnniversary.ReferenceToAnniversaryXiahouJieQualificationStamp;
     // Private 追还 arm choices: arm frame id → secretly chosen seat. The map is
     // runtime trusted state; replay rebuilds it from the accepted choice
     // commands exactly like the 闭境 marked-card map.
