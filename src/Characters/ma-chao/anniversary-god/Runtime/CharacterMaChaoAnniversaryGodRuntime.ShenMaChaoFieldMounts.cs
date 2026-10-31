@@ -84,7 +84,7 @@ internal sealed partial class CharacterMaChaoAnniversaryGodRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShouliBorrowedMountEvent(action.ActionId, source, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, cost.CardId, cost.From));
         if (!_coreMatchParticipantsPlayersAccess._players[originalOwner].IsAlive ||
             _coreMatchParticipantsPlayersAccess._players[originalOwner].SkillGrants.Restrictions.Any(r => r.Action == SkillStateAction.Suppress &&
-                r.Match.StructurallyEquals(SkillStateMatch.NonLocked) && r.Lifetime.Origin.IssuedTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber &&
+                r.Match.StructurallyEquals(SkillStateMatch.NonLocked) && r.Lifetime.Origin?.IssuedTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber &&
                 r.Lifetime.Until.Any(end => end.Event == SkillStateBoundaryEvent.TurnCleanup && end.Timing == SkillStateBoundaryTiming.Before &&
                     end.Seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat)))
             return;
