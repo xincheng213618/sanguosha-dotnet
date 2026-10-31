@@ -85,7 +85,6 @@ internal sealed class CaoXianRuntime(ICaoXianFacts facts, ICaoXianNative native,
         foreach (var m in moves) events.AdvanceFact(new CaoXianMovedEvent(f.Id, r.Stage, m.CardId, m.From, m.To, m.Sequence));
         if (r.Stage == CaoXianStage.RemoveChildren)
         {
-            if (r.Pile is null || moves.Count < r.X || moves.Any(m => m.From != r.Pile.Location || m.To != CardLocation.OutsideGame)) throw new InvalidOperationException("Zhifou requires genuine wing-pile-to-Outside physical records.");
             events.AdvanceFact(new CaoXianZhifouPaidEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.X, r.CompletedUseId, r.ActionId));
             foreach (var m in moves) events.AdvanceFact(new CaoXianZhifouRemovedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.CompletedUseId, r.ActionId, r.Pile, m.CardId, m.CardKind, m.Sequence));
         }

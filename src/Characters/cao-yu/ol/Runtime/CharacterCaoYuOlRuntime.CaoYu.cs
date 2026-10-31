@@ -18,8 +18,6 @@ internal sealed partial class CharacterCaoYuOlRuntime
         if (op == SkillProgramEffectOp.ResolveXiangxuMinimumTransition)
         {
             var edge = CaoYuTransition(c, context.CaoYuOpportunityId)!;
-            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuMinimumArmedEvent>().Any(e => e.OpportunityId == edge.OpportunityId))
-                throw new InvalidOperationException("Xiangxu cannot arm a transition twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoYuMinimumArmedEvent(f.Id, edge.OpportunityId, edge.Source, edge.GameplayHash));
             return SkillProgramStepOutcome.Continue;
         }

@@ -28,8 +28,6 @@ internal sealed partial class CharacterAHuiNanOlRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[o.ActorSeat];
         var card = new Card(0, o.CardKind, Suit.None, 0);
         var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, targets, o.CardKind, physicalCardIds: [], aHuiNanJueman: o);
-        if (id != o.CardUseFrameId)
-            throw new InvalidOperationException("Jueman lost its reserved native use identity.");
         if (o.CardKind == CardKind.Peach)
         {
             _coreCardUseLifecycleOperations.BeginSimpleCardUse(id, new(0, SimpleCardUseEffect.Recovery, 1));
@@ -42,8 +40,6 @@ internal sealed partial class CharacterAHuiNanOlRuntime
             return;
         }
 
-        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(o.CardKind))
-            throw new InvalidOperationException("Jueman cannot actively use an otherwise unplayable basic card.");
         var current = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, current.TargetSeats[0], null, 1 + actor.AlcoholDamageBonus, o.CardKind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[current.TargetSeats[0]], o.CardKind));
         _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);

@@ -46,8 +46,6 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
     internal SkillProgramStepOutcome BeginBeiMiHuOperation(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.BeiMiHu is not null || f.InstructionIndex != 1 || !IsBeiMiHuOp(op))
-            throw new InvalidOperationException("Bei Mi Hu lost its original unpaid instruction.");
         return op switch
         {
             SkillProgramEffectOp.MarkUnmarkedOtherBeforeActualTurn or SkillProgramEffectOp.MarkLowestHpUnmarkedOtherAtRoundStart => BeginBeiMiHuMark(f, op),
@@ -60,8 +58,6 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
     {
         var r = f.BeiMiHu!;
         var old = _coreMatchParticipantsPlayersAccess._players[target].Markers.GetValueOrDefault(PlayerMarkerKind.Kui);
-        if (delta == 1 ? old != 0 : old != 1)
-            throw new InvalidOperationException("The accepted public binary Kui payment changed.");
         _coreStrategicProgramsOperations.SetStrategicMarker(target, PlayerMarkerKind.Kui, f.OwnerSeat, old + delta, f);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BeiMiHuKuiPaidEvent(f.Id, r.Source, r.GameplayHash, r.ParentFrameId, r.Turn, r.Round, kind, target, delta, old + delta));
     }

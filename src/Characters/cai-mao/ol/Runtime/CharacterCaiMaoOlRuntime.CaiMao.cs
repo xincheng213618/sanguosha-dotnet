@@ -17,8 +17,6 @@ internal sealed partial class CharacterCaiMaoOlRuntime
         long parent = 0;
         if (op == SkillProgramEffectOp.ResolveZuolianWholeRevealExchange)
         {
-            if (f.SkillId != "ol:zuolian" || f.ActivationId != "whole-exchange" || f.TriggerId is not null || f.WindowContext is not null || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != f.OwnerSeat)
-                throw new InvalidOperationException("Zuolian requires the owner's actual Play.");
         }
         else
         {

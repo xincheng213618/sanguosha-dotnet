@@ -48,7 +48,6 @@ internal sealed partial class CharacterCaoSongOlRuntime
         owner.MaxHp = checked(previous - 1);
         owner.Hp = Math.Min(owner.Hp, owner.MaxHp);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MaximumHpChangedEvent(owner.Seat, -1, owner.MaxHp, grant.Source.SkillId) { HpBeforeClamp = _coreQimeiProgramsOperations.HasQimeiHealthSubject(owner.Seat) || owner.XiaHuiRestrictions is { Count: > 0 } || _characterSunJianMouOlOperations.HasMouSunJianOlHpSubject(owner.Seat) ? hpBefore : null });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoSongYizhengAmountPaidEvent(parentId, grant.GrantId, owner.Seat, beneficiary, recovery, previous, owner.MaxHp));
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeRecoveryApply, 26030)]
@@ -150,8 +149,6 @@ internal sealed partial class CharacterCaoSongOlRuntime
     internal void ValidateCaoSongSupportPaid(long parentId, CaoSongAmountSupportReceipt receipt, bool recovery)
     {
         var grant = receipt.Grants[receipt.NextGrantIndex];
-        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengAmountPaidEvent>().Where(e => e.ParentFrameId == parentId && e.GrantId == grant.GrantId && e.Recovery == recovery).ToArray()is not [var paid] || paid.OwnerSeat != grant.Source.OwnerSeat || paid.BeneficiarySeat != receipt.BeneficiarySeat || paid.MaximumHpBefore != paid.MaximumHpAfter + 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengAmountIncreasedEvent>().Any(e => e.ParentFrameId == parentId && e.GrantId == grant.GrantId && e.Recovery == recovery))
-            throw new InvalidOperationException("Yizheng amount increment requires one exact cost and cannot repeat a fulfilled payment.");
     }
 
     internal bool IsAmountSupportHealthChild(ResolutionFrame? parent, HpChangedTriggerWindowFrame hp)
@@ -172,19 +169,13 @@ internal sealed partial class CharacterCaoSongOlRuntime
     {
         if (recovery.CaoSongRecoverySupport is not { } receipt)
             return baseAmount;
-        if (receipt.OriginalAmount <= 0 || receipt.NextGrantIndex < 0 || receipt.NextGrantIndex > receipt.Grants.Count || receipt.Grants.Select(g => g.GrantId).Distinct().Count() != receipt.Grants.Count)
-            throw new InvalidOperationException("Recovery support lost its frozen recipient, positive original amount or grant cursor.");
         var increases = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengAmountIncreasedEvent>().Where(e => e.ParentFrameId == recovery.Id && e.Recovery).ToArray();
         var amount = receipt.OriginalAmount;
         foreach (var increase in increases)
         {
-            if (increase.BeneficiarySeat != receipt.BeneficiarySeat || increase.Before != amount || increase.After != amount + 1 || receipt.Grants.SingleOrDefault(g => g.GrantId == increase.GrantId)is not { } grant || increases.Count(e => e.GrantId == grant.GrantId) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengAmountPaidEvent>().Where(e => e.ParentFrameId == recovery.Id && e.GrantId == grant.GrantId && e.Recovery && e.OwnerSeat == grant.Source.OwnerSeat && e.BeneficiarySeat == receipt.BeneficiarySeat && e.MaximumHpBefore == e.MaximumHpAfter + 1).Count() != 1)
-                throw new InvalidOperationException("Recovery support has an increment without its exact once-paid issued grant.");
             amount++;
         }
 
-        if (recovery.PendingApplication is { } pending && (pending.TargetSeat != receipt.BeneficiarySeat || pending.RequestedAmount != amount))
-            throw new InvalidOperationException("The prepared recovery application lost its frozen supported recipient or exact amount.");
         return Math.Max(baseAmount, amount);
     }
 

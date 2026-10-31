@@ -53,8 +53,6 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
     internal SkillProgramStepOutcome BeginShiCaoShuang(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        if (f.ShiCaoShuang is not null)
-            throw new InvalidOperationException("Shi Cao Shuang restarted a running operation.");
         var r = f.SkillId switch
         {
             ShiCaoShuangSheQuanSkill when f.TriggerId is not null => StartShiCaoShuangSheQuan(f),
@@ -75,8 +73,6 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
 
     internal ShiCaoShuangReceipt StartShiCaoShuangSheQuan(ProgramSkillFrame f)
     {
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
-            throw new InvalidOperationException("SheQuan requires its living owner.");
         var windowKind = ShiCaoShuangComposition.WindowKind(f.TriggerId!);
         // A queued duplicate whose window already resolved this round settles silently.
         if (ShiCaoShuangRoundTriggers(false, f.OwnerSeat, windowKind) >= 1 + ShiCaoShuangTimings(ShiCaoShuangSheQuanSkill, windowKind))
@@ -99,8 +95,6 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
 
     internal ShiCaoShuangReceipt StartShiCaoShuangDianYi(ProgramSkillFrame f)
     {
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
-            throw new InvalidOperationException("DianYi requires its living owner.");
         var windowKind = ShiCaoShuangComposition.WindowKind(f.TriggerId!);
         if (ShiCaoShuangRoundTriggers(true, f.OwnerSeat, windowKind) >= 1 + ShiCaoShuangTimings(ShiCaoShuangDianYiSkill, windowKind))
             return new("dianyi", _coreActualTurnProgressTurnNumberAccess._turnNumber)
@@ -120,8 +114,6 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
 
     internal ShiCaoShuangReceipt StartShiCaoShuangJianZhuan(ProgramSkillFrame f)
     {
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
-            throw new InvalidOperationException("JianZhuan requires its living owner.");
         var windowKind = ShiCaoShuangComposition.WindowKind(f.TriggerId!);
         if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count >= ShiCaoShuangComposition.TimingCapacity || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Any(entry => entry.WindowKind == windowKind && entry.OwnerSeat == f.OwnerSeat))
             return new("jianzhuan-timing", _coreActualTurnProgressTurnNumberAccess._turnNumber)
@@ -140,8 +132,6 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
 
     internal ShiCaoShuangReceipt StartShiCaoShuangNiZunStash(ProgramSkillFrame f)
     {
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || ShiCaoShuangStashableIds(f.OwnerSeat).Count == 0)
-            throw new InvalidOperationException("NiZun stash requires used cards and discard-pile marked cards.");
         return new("nizun-stash", _coreActualTurnProgressTurnNumberAccess._turnNumber)
         {
             Source = ShiCaoShuangSource(f),
@@ -262,8 +252,6 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
     {
         var r = f.ShiCaoShuang!;
         var holder = r.Holders[r.Cursor];
-        if (_cardZonesOperations._cardZones.GetLocation(cardId).Zone != CardZoneKind.Hand || _cardZonesOperations._cardZones.GetLocation(cardId).OwnerSeat != holder)
-            throw new InvalidOperationException("SheQuan marked a card outside the choosing holder's hand.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiCaoShuangSheQuanMarkedEvent(f.Id, cardId, holder, r.Round));
         SyncShiCaoShuangMarker(holder);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
@@ -273,8 +261,6 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
 
     internal void ResolveShiCaoShuangTiming(ProgramSkillFrame f, string skillId)
     {
-        if (skillId is not (ShiCaoShuangComposition.SheQuanSkill or ShiCaoShuangComposition.DianYiSkill))
-            throw new InvalidOperationException("JianZhuan timing targeted an unsupported skill.");
         var r = f.ShiCaoShuang!;
         var ordinal = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count + 1;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiCaoShuangJianZhuanTimingEvent(f.Id, f.OwnerSeat, skillId, r.WindowKind, ordinal));
@@ -292,10 +278,6 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
 
     internal void ResolveShiCaoShuangAwakening(ProgramSkillFrame f, string lostSkillId)
     {
-        if (lostSkillId is not (ShiCaoShuangComposition.SheQuanSkill or ShiCaoShuangComposition.DianYiSkill))
-            throw new InvalidOperationException("JianZhuan awakening lost an unsupported skill.");
-        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count < ShiCaoShuangComposition.TimingCapacity)
-            throw new InvalidOperationException("JianZhuan awakening requires all three added timings.");
         var r = f.ShiCaoShuang!;
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         foreach (var grant in owner.SkillGrants.Grants.Where(grant => grant.IsEnabled && grant.SkillId == lostSkillId).ToArray())
@@ -322,8 +304,6 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
     {
         var r = f.ShiCaoShuang!;
         var stashed = ShiCaoShuangStashedIds(f.OwnerSeat);
-        if (!stashed.Contains(cardId))
-            throw new InvalidOperationException("NiZun use selected a card outside its stash.");
         var location = new CardLocation(CardZoneKind.PrivatePersistentPile, f.OwnerSeat, ShiCaoShuangComposition.NiZunPileId);
         _cardZonesOperations._cardZones.EnsurePrivatePersistentPile(location);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null) });

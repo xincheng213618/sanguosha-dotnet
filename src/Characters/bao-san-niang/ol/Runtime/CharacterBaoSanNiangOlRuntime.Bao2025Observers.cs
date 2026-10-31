@@ -74,8 +74,6 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
         var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(p => p.Id == ret.ProgramFrameId && p.InstructionIndex == ret.InstructionIndex);
         if (applied.SourceSeat != f.OwnerSeat)
             return;
-        if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ChosenAssaultActualDamageObservedEvent>().Any(x => x.DamageFrameId == damage.Id))
-            throw new InvalidOperationException("One native chosen-assault damage cannot be observed twice.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { Bao2025 = f.Bao2025!with { DamagedTargets = f.Bao2025.DamagedTargets.Append(applied.TargetSeat).Distinct().ToArray() } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChosenAssaultActualDamageObservedEvent(f.Id, use.Id, damage.Id, applied.SourceSeat, applied.TargetSeat, applied.Amount));
     }

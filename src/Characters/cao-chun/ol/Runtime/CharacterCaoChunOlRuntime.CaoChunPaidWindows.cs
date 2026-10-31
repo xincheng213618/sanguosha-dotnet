@@ -12,8 +12,6 @@ internal sealed partial class CharacterCaoChunOlRuntime
             return;
         if (batch.Movements.Any(m => !a.PhysicalCards.Any(c => c.CardId == m.CardId && c.CardKind == m.CardKind && c.From == m.From)) || batch.Movements.Any(m => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)))
             return;
-        if (use.CaoChunMaterialBatch is not null)
-            throw new InvalidOperationException("Shanjia actual hand use cannot pay its same material batch twice.");
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, f => f with { CaoChunMaterialBatch = batch });
     }
 

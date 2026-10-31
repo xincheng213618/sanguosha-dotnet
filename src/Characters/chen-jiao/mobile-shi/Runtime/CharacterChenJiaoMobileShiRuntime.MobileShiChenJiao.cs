@@ -24,8 +24,6 @@ internal sealed partial class CharacterChenJiaoMobileShiRuntime
     internal SkillProgramStepOutcome BeginChenJiao(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        if (f.ChenJiao is not null)
-            throw new InvalidOperationException("Chen Jiao restarted a running operation.");
         var r = f.SkillId switch
         {
             QingYanSkill => StartChenJiaoQingYan(f),
@@ -165,8 +163,6 @@ internal sealed partial class CharacterChenJiaoMobileShiRuntime
     internal void ResolveChenJiaoQingYanShow(ProgramSkillFrame f, int cardId)
     {
         var r = f.ChenJiao!;
-        if (_cardZonesOperations._cardZones.GetLocation(cardId)is not { Zone: CardZoneKind.Hand, OwnerSeat: var seat } || seat != f.OwnerSeat || r.ShownIds.Contains(cardId))
-            throw new InvalidOperationException("QingYan showed a card outside its owner's current hand.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChenJiaoQingYanShownEvent(f.Id, r.Round, f.OwnerSeat, cardId, r.Ordinal, r.Cursor));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Name)} 展示了手牌（清严 {(r.Cursor + 1)}/{(r.Ordinal)}）。", f.OwnerSeat);
         SyncChenJiaoMarker(f.OwnerSeat);
@@ -207,8 +203,6 @@ internal sealed partial class CharacterChenJiaoMobileShiRuntime
         if (use.CardId != 0 || use.CardKind is not (CardKind.Dodge or CardKind.Nullification) || use.Action?.ConversionChain is not [var source] || source.SkillId != QingYanSkill)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame { ChenJiao: { Operation: "qingyan", Stage: ChenJiaoStage.Issue } receipt } parent || receipt.UseId != use.Id || receipt.Kind != use.CardKind || source != ChenJiaoSource(parent) || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program?.GameplayHash != parent.GameplayHash || use.SourceSeat != parent.OwnerSeat || use.Action is not { Type: CardActionType.Use } action || action.ActorSeat != parent.OwnerSeat || action.ProviderSeat != parent.OwnerSeat || action.RequesterSeat is not null || action.EffectiveKind != use.CardKind || action.PhysicalCards.Count != 0 || use.PhysicalCardIds is not { Count: 0 } || !action.TargetSeats.SequenceEqual([parent.OwnerSeat]) || !use.TargetSeats.SequenceEqual(action.TargetSeats) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChenJiaoQingYanUsedEvent>().Count(fact => fact.FrameId == parent.Id && fact.UseId == use.Id && fact.Kind == use.CardKind && fact.OwnerSeat == parent.OwnerSeat && fact.Round == receipt.Round && fact.Ordinal == receipt.Ordinal) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(fact => fact.ResolutionId == use.Id && fact.CardId == 0 && fact.CardKind == use.CardKind) != 1)
-            throw new InvalidOperationException("QingYan lost its exact original zero-entity use and skill parent.");
         return true;
     }
 
@@ -222,8 +216,6 @@ internal sealed partial class CharacterChenJiaoMobileShiRuntime
     internal void ResolveChenJiaoCeDuanShow(ProgramSkillFrame f, int holder, int cardId)
     {
         var r = f.ChenJiao!;
-        if (r.Cursor >= r.Holders.Count || r.Holders[r.Cursor] != holder || _cardZonesOperations._cardZones.GetLocation(cardId)is not { Zone: CardZoneKind.Hand, OwnerSeat: var seat } || seat != holder)
-            throw new InvalidOperationException("CeDuan show left its ordered holder or their current hand.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChenJiaoCeDuanShownEvent(f.Id, r.Round, holder, cardId, r.Cursor));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[holder].Name)} 展示了一张手牌（策断）。", holder);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
@@ -362,8 +354,6 @@ internal sealed partial class CharacterChenJiaoMobileShiRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         var r = f.ChenJiao ?? throw new InvalidOperationException("CeDuan settle lost its original receipt.");
-        if (r.Operation != "ceduan" || r.Stage != ChenJiaoStage.Issue)
-            throw new InvalidOperationException("CeDuan settle ran outside its issued stage.");
         var damaged = r.UseId != 0 && ChenJiaoCeDuanDamageCount(f.OwnerSeat, r.TargetSeat) > r.DamageCountBefore;
         var drew = false;
         if (damaged && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None)

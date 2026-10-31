@@ -13,14 +13,10 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
     {
         if (!HasLeCaiWenJiShuangjiaCapability || window.Window != SkillProgramTriggerWindow.GameStarting || window.Continuation != ProgramLifecycleContinuation.CompleteGameStarting)
             return window;
-        if (window.ShuangjiaInitialEntities is not null)
-            throw new InvalidOperationException("Shuangjia's final opening Hand can only be frozen once.");
         var owners = window.Candidates.Where(candidate => _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is [{ Op: SkillProgramEffectOp.InitializeShuangjiaInitialEntities }]).Select(candidate => candidate.OwnerSeat).Distinct().Order();
         var entities = owners.SelectMany(owner => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Select(card =>
         {
             var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == card.Id && m.To == CardLocation.Hand(owner));
-            if (entry is null || entry.CardKind != card.Kind)
-                throw new InvalidOperationException("A Shuangjia initial entity requires its actual opening-Hand entry.");
             return new ShuangjiaInitialEntity(owner, card.Id, card.Kind, entry.Sequence);
         })).ToArray();
         return window with
@@ -54,8 +50,6 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
             throw new InvalidOperationException("Shuangjia requires its exact frozen opening mother and initializes once.");
         var parent = (ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == frame.WindowContext!.ParentFrameId);
         var entities = parent.ShuangjiaInitialEntities!.Where(e => e.OwnerSeat == frame.OwnerSeat).ToArray();
-        if (entities.Select(e => e.CardId).Distinct().Count() != entities.Length || entities.Any(e => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.DealSequence && m.CardId == e.CardId && m.CardKind == e.PrintedKind && m.To == CardLocation.Hand(e.OwnerSeat))))
-            throw new InvalidOperationException("Shuangjia cannot mark an entity without its exact opening-Hand provenance.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShuangjiaInitializedEvent(frame.Id, ShuangjiaSource(frame), frame.GameplayHash, entities.Length));
         foreach (var entity in entities)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShuangjiaInitialEntityMarkedEvent(frame.Id, entity.OwnerSeat, entity.CardId, entity.PrintedKind, entity.DealSequence));

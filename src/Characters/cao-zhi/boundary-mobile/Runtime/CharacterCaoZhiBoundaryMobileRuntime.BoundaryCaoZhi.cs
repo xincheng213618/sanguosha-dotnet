@@ -40,8 +40,6 @@ internal sealed partial class CharacterCaoZhiBoundaryMobileRuntime
     internal void UpgradeBoundaryCaoZhiJiushi(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != BoundaryCaoZhiComposition.Chengzhang || f.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || f.InstructionIndex != 3 || BoundaryCaoZhiGameDamage(f.OwnerSeat) < 7)
-            throw new InvalidOperationException("Chengzhang requires its original once-game preparation frame after native recovery and draw.");
         _coreProgramSkillChangesOperations.ReplaceProgramSkills(f, [BoundaryCaoZhiComposition.Jiushi], [BoundaryCaoZhiComposition.Upgraded], ProgramSkillSourceRemoval.Enabled, acquireFirst: false, announceAwakening: true);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryCaoZhiJiushiUpgradedEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), BoundaryCaoZhiGameDamage(f.OwnerSeat)));
     }

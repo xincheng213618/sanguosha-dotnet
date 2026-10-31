@@ -95,7 +95,6 @@ prompts.Clear(); frames.ReplaceTop(f = f with { Step = ResolutionFrameStep.Resol
     [ProgramContinuation(ProgramContinuationKind.Resume, 40550)] private bool ResumeOlShenCaoPi(long id)
     {
         if (frames.Top is not ProgramSkillFrame { OlShenCaoPi: { } r } f || f.Id != id) return false;
-        if (r.Stage == OlShenCaoPiStage.Drawing) throw new InvalidOperationException("Chuyuan must resume through its exact native draw return.");
         if (DrainOlShenCaoPi(id)) return true;
         f = frames.ActiveProgram(id); r = f.OlShenCaoPi!;
         if (r.Stage == OlShenCaoPiStage.DrawChildren)

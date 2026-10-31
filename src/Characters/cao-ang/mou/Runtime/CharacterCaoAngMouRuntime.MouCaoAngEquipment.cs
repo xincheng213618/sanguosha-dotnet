@@ -26,8 +26,6 @@ internal sealed partial class CharacterCaoAngMouRuntime
     {
         var m = frame.Batch.Movements[candidate.OccurrenceIndex];
         var loser = m.From.OwnerSeat!.Value;
-        if (m.From.Zone != CardZoneKind.Equipment || m.From == m.To || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m))
-            throw new InvalidOperationException("Fengmin requires a real equipment departure.");
         return new(SkillProgramTriggerWindow.CardsMoved, frame.Id, candidate.OwnerSeat, SourceSeat: loser, TargetSeat: candidate.OwnerSeat, OccurrenceIndex: candidate.OccurrenceIndex, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]), MovementBatch: frame.Batch, MovementIndex: candidate.OccurrenceIndex);
     }
 

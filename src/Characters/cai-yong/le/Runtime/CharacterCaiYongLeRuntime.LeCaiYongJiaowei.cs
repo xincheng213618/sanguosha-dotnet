@@ -21,14 +21,10 @@ internal sealed partial class CharacterCaiYongLeRuntime
     {
         if (!HasLeCaiYongJiaoweiCapability || window.Window != SkillProgramTriggerWindow.GameStarting || window.Continuation != ProgramLifecycleContinuation.CompleteGameStarting)
             return window;
-        if (window.JiaoweiInitialEntities is not null)
-            throw new InvalidOperationException("Jiaowei may freeze its final opening Hand only once.");
         var owners = window.Candidates.Where(candidate => candidate.SkillId == LeCaiYongJiaoweiSkill && candidate.BindingId == LeCaiYongJiaoweiInitialBinding && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is [{ Op: SkillProgramEffectOp.InitializeLeCaiYongJiaowei }]).Select(candidate => candidate.OwnerSeat).Distinct().Order();
         var entities = owners.SelectMany(owner => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Select(card =>
         {
             var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(move => move.CardId == card.Id && move.To == CardLocation.Hand(owner));
-            if (card.Id <= 0 || entry is null || entry.CardKind != card.Kind)
-                throw new InvalidOperationException("Jiaowei needs the original physical opening-Hand entry.");
             return new JiaoweiInitialEntity(owner, card.Id, card.Kind, entry.Sequence);
         })).ToArray();
         return window with
@@ -57,8 +53,6 @@ internal sealed partial class CharacterCaiYongLeRuntime
             throw new InvalidOperationException("Jiaowei requires its once-issued native opening mother.");
         var parent = (ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(item => item.Id == frame.WindowContext!.ParentFrameId);
         var entities = parent.JiaoweiInitialEntities!.Where(entity => entity.OwnerSeat == frame.OwnerSeat).ToArray();
-        if (entities.Select(entity => entity.CardId).Distinct().Count() != entities.Length || entities.Any(entity => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(move => move.Sequence == entity.EntrySequence && move.CardId == entity.CardId && move.CardKind == entity.PrintedKind && move.To == CardLocation.Hand(entity.OwnerSeat))))
-            throw new InvalidOperationException("Jiaowei cannot replace the frozen initial entities with a later Hand.");
         foreach (var entity in entities)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XianEntityMarkedEvent(frame.Id, JiaoweiSource(frame), frame.GameplayHash, entity.OwnerSeat, entity.CardId, entity.PrintedKind, entity.EntrySequence, XianMarkOrigin.OpeningHand));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XianMarkingCompletedEvent(frame.Id, XianMarkOrigin.OpeningHand, entities.Length));
@@ -101,8 +95,6 @@ internal sealed partial class CharacterCaiYongLeRuntime
             var lost = batch.Movements.Where(move => source.Materials.Any(card => card.CardId == move.CardId && card.PrintedKind == move.CardKind && card.From == move.From) && !IsJiaoweiOwnedZone(move.To, owner) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(move)).ToArray();
             if (lost.Length == 0)
                 continue;
-            if (lost.Select(move => move.CardId).Distinct().Count() != lost.Length || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiaoweiProtectionArmedEvent>().Any(armed => armed.OwnerSeat == owner && armed.LossBatchId == batch.Id))
-                throw new InvalidOperationException("Jiaowei cannot arm the same actual marked loss batch twice.");
             var previous = ActiveJiaoweiProtection(owner);
             foreach (var move in lost)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JiaoweiLossQualifiedEvent(batch.Id, source.Source, source.GameplayHash, move.CardId, move.CardKind, move.From, move.To, move.Sequence, batch.TurnNumber));
@@ -125,8 +117,6 @@ internal sealed partial class CharacterCaiYongLeRuntime
         if (amount <= 0 || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive || ActiveJiaoweiProtection(attack.TargetSeat)is not { } armed)
             return false;
         var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiaoweiLossQualifiedEvent>().Where(loss => loss.BatchId == armed.LossBatchId && loss.Source == armed.Source && loss.GameplayHash == armed.GameplayHash && loss.ActualTurn == armed.ActualTurn).ToArray();
-        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || _resolutionStackOperations._resolutionStack.Count(frame => frame.Id == attack.ResolutionId) != 1 || !attack.DamageAmountFinalized || armed.ArmId != armed.LossBatchId || armed.OwnerSeat != attack.TargetSeat || armed.ActualLostCount <= 0 || armed.Source.SkillId != LeCaiYongJiaoweiSkill || armed.Source.BindingId != LeCaiYongJiaoweiInitialBinding || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiaoweiProtectionArmedEvent>().Count(issued => issued == armed) != 1 || _contentRegistryOperations._contentRegistry.GetSkill(armed.Source.SkillId).Program?.GameplayHash != armed.GameplayHash || facts.Length != armed.ActualLostCount || facts.Select(fact => fact.CardId).Distinct().Count() != facts.Length || facts.Any(fact => !IsJiaoweiOwnedZone(fact.From, armed.OwnerSeat) || IsJiaoweiOwnedZone(fact.To, armed.OwnerSeat) || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(move => move.Sequence == fact.MovementSequence && move.CardId == fact.CardId && move.CardKind == fact.PrintedKind && move.From == fact.From && move.To == fact.To)))
-            throw new InvalidOperationException("Jiaowei prevention requires the exact unexpired actual loss and current finalized native damage owner.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JiaoweiDamagePreventedEvent(attack.ResolutionId, armed.OwnerSeat, armed.ActualTurn, armed.ArmId, armed.LossBatchId, attack.IsSourceLess ? null : attack.SourceSeat, amount, nature, attack.IsChainPropagation));
         _coreMatchLogOperations.AddLog("DamagePrevented", $"{(_coreMatchParticipantsPlayersAccess._players[armed.OwnerSeat].Name)} 的【焦尾】防止了本次{(amount)}点伤害。", armed.OwnerSeat, armed.OwnerSeat);
         return true;

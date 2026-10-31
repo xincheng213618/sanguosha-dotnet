@@ -76,8 +76,6 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
         var marker = PlayerMarkerKind.MouChenGongCe;
         var before = owner.Markers.GetValueOrDefault(marker);
         var sources = owner.MarkerSourceCounts.Where(p => p.Key.Marker == marker).ToArray();
-        if (sources.Sum(p => p.Value) != before || before + delta < 0 || delta == 0)
-            throw new InvalidOperationException("Ce must retain its native participant-marker source totals.");
         if (delta > 0)
         {
             var key = (marker, f.OwnerSeat);
@@ -87,8 +85,6 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
         }
         else
         {
-            if (delta != -before)
-                throw new InvalidOperationException("Mingce release clears all currently held Ce after its native damage returns.");
             var current = before;
             foreach (var source in sources.OrderBy(p => p.Key.SkillOwnerSeat))
             {

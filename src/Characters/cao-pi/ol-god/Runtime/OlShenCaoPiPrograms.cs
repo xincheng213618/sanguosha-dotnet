@@ -28,8 +28,6 @@ internal abstract class OlShenCaoPiDescriptor(SkillProgramEffectOp op) : Program
         if (op == SkillProgramEffectOp.StoreOlChuyuanAfterDamage) return ParseOwnerAlways(r);
         r.AllowOnly("op", "target", "skillIds", "condition");
         var ids = r.RequiredIdentifierArray("skillIds");
-        if (!ids.SequenceEqual(op == SkillProgramEffectOp.AwakenOlDengji ? ["ol:chuyuan"] : OlShenCaoPiComposition.TianxingReferences))
-            throw new InvalidOperationException(r.Path + ": the historical awakening requires its exact Chu source and named formal boundary skills.");
         var e = new SkillProgramEffect(op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(), skillIds: ids); RequireAlways(e, r.Path); return e;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new RequireTriggerWindow(op == SkillProgramEffectOp.StoreOlChuyuanAfterDamage

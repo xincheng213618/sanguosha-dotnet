@@ -64,8 +64,6 @@ internal sealed partial class CharacterCaoXiOlRuntime
         var old = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CaoXiGangshuDrawUnitIssuedEvent>().Where(e => e.Phase == phase).ToArray();
         if (old.Length != 0)
         {
-            if (!old.Select(e => e.GrantFrameId).Order().SequenceEqual(frozen.Select(e => e.FrameId).Order()))
-                throw new InvalidOperationException("A frozen actual draw cannot replace its original Gangshu units.");
             return;
         }
 

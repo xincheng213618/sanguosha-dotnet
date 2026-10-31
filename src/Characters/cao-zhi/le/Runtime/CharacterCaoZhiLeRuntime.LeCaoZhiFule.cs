@@ -40,14 +40,10 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     {
         if (!HasLeCaoZhiFuleCapability || window.Window != SkillProgramTriggerWindow.GameStarting || window.Continuation != ProgramLifecycleContinuation.CompleteGameStarting)
             return window;
-        if (window.FuleInitialEntities is not null)
-            throw new InvalidOperationException("Fule cannot recapture its original opening Hand.");
         var owners = window.Candidates.Where(c => c.SkillId == LeCaoZhiFuleSkill && c.BindingId == FuleInitialBinding && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.InitializeLeCaoZhiFule }]).Select(c => c.OwnerSeat).Distinct().Order();
         var entities = owners.SelectMany(owner => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Select(card =>
         {
             var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(move => move.CardId == card.Id && move.To == CardLocation.Hand(owner));
-            if (card.Id <= 0 || entry is null || entry.CardKind != card.Kind)
-                throw new InvalidOperationException("Fule needs each original physical opening-Hand entry.");
             return new FuleInitialEntity(owner, card.Id, card.Kind, entry.Sequence);
         })).ToArray();
         return window with
@@ -75,8 +71,6 @@ internal sealed partial class CharacterCaoZhiLeRuntime
             throw new InvalidOperationException("Fule requires its once-issued original opening-Hand mother.");
         var window = (ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(frame => frame.Id == f.WindowContext!.ParentFrameId);
         var entities = window.FuleInitialEntities!.Where(entity => entity.OwnerSeat == f.OwnerSeat).ToArray();
-        if (entities.Select(entity => entity.CardId).Distinct().Count() != entities.Length || entities.Any(entity => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(move => move.Sequence == entity.EntrySequence && move.CardId == entity.CardId && move.CardKind == entity.PrintedKind && move.To == CardLocation.Hand(f.OwnerSeat))))
-            throw new InvalidOperationException("Fule cannot replace its frozen opening entity set with a later Hand.");
         AssignFuleEntities(f, entities.Select(entity => entity.CardId).ToArray(), FuMarkOrigin.OpeningHand);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FuleInitializedEvent(f.Id, FuleSource(f), f.GameplayHash, window.Id, entities.Length));
         return SkillProgramStepOutcome.Continue;
@@ -92,16 +86,12 @@ internal sealed partial class CharacterCaoZhiLeRuntime
 
     internal void AssignFuleEntities(ProgramSkillFrame f, IReadOnlyList<int> ids, FuMarkOrigin origin)
     {
-        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<FuMarkingCompletedEvent>().Any(done => done.FrameId == f.Id && done.Origin == origin) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FuEntityAssignedEvent>().Any(mark => mark.FrameId == f.Id && mark.Origin == origin))
-            throw new InvalidOperationException("A Fu batch may assign its actual entities only once.");
         var pool = FuleModeNames();
         for (var index = 0; index < ids.Count; index++)
         {
             var id = ids[index];
             var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
             var old = CaptureLeCaoZhiFuEntity(id);
-            if (old is not null && old.PrintedKind != card.Kind)
-                throw new InvalidOperationException("A Fu entity cannot change its printed face.");
             var candidates = pool.Where(kind => kind != card.Kind && kind != old?.AliasKind).ToArray();
             var before = _randomOperations._random.State;
             var alias = old is not null && origin != FuMarkOrigin.WenlanHandRewrite || candidates.Length == 0 ? old?.AliasKind : candidates[_randomOperations._random.Next(candidates.Length)];

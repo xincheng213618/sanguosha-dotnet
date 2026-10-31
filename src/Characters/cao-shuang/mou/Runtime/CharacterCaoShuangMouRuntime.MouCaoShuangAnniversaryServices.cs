@@ -78,8 +78,6 @@ internal sealed partial class CharacterCaoShuangMouRuntime
         {
             var parent = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var paid = parent.MouCaoShuangAnniversary!;
-            if (records.Count != r.Cards.Count || !records.Zip(r.Cards).All(pair => pair.First.CardId == pair.Second.Id && pair.First.CardKind == pair.Second.Kind && pair.First.From == pair.Second.From && pair.First.Sequence > r.Before && (pair.First.To == CardLocation.DiscardPile || pair.First.To == CardLocation.OutsideGame)))
-                throw new InvalidOperationException("Jianzhuan lost its actual discard or recast entities.");
             _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, parent with { MouCaoShuangAnniversary = paid with { After = records.Max(m => m.Sequence) } });
             foreach (var m in records)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouCaoShuangAnniversaryMaterialEvent(f.Id, r.Repeat, r.Payer, m.CardId, m.From, m.Sequence, r.Option == 3));

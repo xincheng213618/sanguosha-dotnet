@@ -1,8 +1,7 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
-public sealed record AHuiNanBasicUseRecordedEvent(int ActualTurn,int TurnOwner,long OriginFrameId,long? ActionId,int ActorSeat,CardKind Kind,int Index):IGameEvent;
-public sealed record AHuiNanBasicUseSnapshot(AHuiNanBasicUseRecordedEvent Declaration,CardKind Kind);
+public sealed record AHuiNanBasicUseSnapshot(int ActorSeat,CardKind Kind);
 public enum AHuiNanJuemanStage { NoEffect,DrawChildren,UseChoice,NativeUse,NativeChildren }
 public sealed record AHuiNanJuemanUseOrigin(long ProgramFrameId,long CardUseFrameId,CardConversionSource Source,string GameplayHash,int ActualTurn,int ActorSeat,CardKind CardKind,string TargetSignature);
 public sealed record AHuiNanJuemanReceipt(CardConversionSource Source,string GameplayHash,int InstructionIndex,int ActualTurn,int TurnOwner,AHuiNanJuemanStage Stage)
@@ -26,6 +25,7 @@ public sealed record AHuiNanJuemanCompletedEvent(long FrameId,int DrawCount,bool
 internal interface IAHuiNanHost {SkillProgramStepOutcome Resolve(ProgramSkillFrame frame);}
 internal sealed class ResolveJuemanFirstBasicTurnEndDescriptor:ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.WholeActualUseDeclaration);
     public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveJuemanFirstBasicTurnEnd;
     public override ProgramOperationInteraction Interaction=>ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy{get;}=new(ProgramOperationAiSemantic.GainCards,static(_,c)=>c.PublicControlValue(1));

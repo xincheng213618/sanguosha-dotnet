@@ -405,6 +405,7 @@ var tests = new (string Name, Action Body)[]
     ("program interaction AI preserves published choices and conditional policies", ProgramInteractionChecks.AiSelectionPreservesPublishedOrderAndConditionalPolicies),
     ("composed paid effects preserve native HP children draw facts and source leases", ProgramComposedConsumerChecks.PaidMingceWaitsForHpChildrenAndResumesOrdinaryEffects),
     ("step receipts distinguish delivery source-loss rights and original child return cold", ProgramStepReceiptChecks.DeliveredStepsRetainPaidReturnsWithoutRepeatingMovement),
+    ("actual basic-use history shares native names order and the completed turn boundary", ActualTurnBasicUseHistoryChecks.BasicPrefixRetainsNativeOrderNamesAndTurnEndBoundary),
     ("composed choices read expressions and resume original paid draw cursors", ProgramLifecycleChecks.ComposedChoicesReadExpressionsAndResumePaidDraws),
     ("Happy first draw preserves accepted Ren and decline across cold source loss", ProgramLifecycleChecks.HappyFirstDrawKeepsAcceptedPaymentAndDecline),
     ("composed Liangzhu records help at native draw return including replacement zero", ProgramLiangzhuCompositionChecks.HelpedIsRecordedAtNativeDrawReturnIncludingReplacementZero),

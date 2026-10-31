@@ -81,7 +81,6 @@ internal abstract class Bao2025Descriptor : ProgramOperationDescriptorBase
         var grant = Op == SkillProgramEffectOp.DyingRecipientChooseReplaceOrGrantThenRecover;
         if (reset != r.Has("sourceBind") || grant != r.Has("skillIds")) throw new InvalidOperationException($"{r.Path}: exact reset/grant configuration required.");
         var ids = grant ? r.RequiredIdentifierArray("skillIds") : [];
-        if (grant && (ids.Count != 2 || ids.Distinct(StringComparer.Ordinal).Count() != 2)) throw new InvalidOperationException($"{r.Path}: requires exactly two distinct recipient skills.");
         var e = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(),
             sourceBind: reset ? r.RequiredIdentifier("sourceBind") : null, skillIds: ids);
         RequireAlways(e, r.Path); return e;

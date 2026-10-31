@@ -18,7 +18,6 @@ internal abstract class BoundaryCaoZhenDescriptor : ProgramOperationDescriptorBa
         if (Op == SkillProgramEffectOp.PrepareBoundaryCaoZhenSidi) return ParseOwnerAlways(reader);
         reader.AllowOnly("op", "target", "resultBind", "condition");
         var effect = new SkillProgramEffect(Op, reader.RequiredEnum<SkillProgramEffectTarget>("target"), 0, reader.Condition(), resultBind: reader.RequiredIdentifier("resultBind"));
-        if (effect.Target != SkillProgramEffectTarget.Owner) throw new InvalidOperationException("Sidi requires its owning observer.");
         RequireAlways(effect, reader.Path); return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
@@ -34,7 +33,6 @@ public enum BoundarySidiStage { Holder, Target, Benefit }
 public sealed record BoundarySidiDraft(int InstructionIndex, BoundarySidiStage Stage, long WindowId, long ActionId, int HolderSeat = -1, int PredictedSeat = -1, string? ResultBind = null);
 public sealed record BoundarySidiCancelledEvent(long ProgramFrameId, long UseFrameId, long ActionId, int OwnerSeat, string SkillInstanceId, string GameplayHash) : IGameEvent;
 public sealed record BoundarySidiForecastRecordedEvent(long FrameId, int OwnerSeat) : IGameEvent;
-public sealed record BoundarySidiResultEvent(long FrameId, int OwnerSeat, long ActionId, string ResultBind, string Outcome) : IGameEvent;
 public sealed partial record ProgramSkillFrame { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public BoundarySidiDraft? BoundarySidi { get; init; } }
 public sealed partial record CardUseFrame { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public BoundarySidiCancelledEvent? BoundarySidiCancellation { get; init; } }
 public sealed partial class CharacterState { internal IReadOnlyList<BoundarySidiPrediction>? BoundarySidiPredictions { get; set; } }

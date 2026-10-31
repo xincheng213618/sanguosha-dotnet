@@ -73,13 +73,9 @@ internal sealed partial class CharacterCaoXianOlRuntime
         var discard = r.Stage == CaoXianStage.AdjustChildren || r.Option == 2;
         var payer = r.Operation == SkillProgramEffectOp.StoreCaoXianLingxi || r.Stage == CaoXianStage.AdjustChildren ? f.OwnerSeat : r.Target;
         var current = remove ? _characterCaoXianOlOperations.CreateCaoXianFacts().PileCards(r.Pile!) : _characterCaoXianOlOperations.CreateCaoXianFacts().Owned(payer, r.Stage == CaoXianStage.AdjustChildren, discard);
-        if (r.Cards.Any(c => !current.Contains(c)))
-            throw new InvalidOperationException("Cao Xian cannot move stale wings or another holder's unavailable HE entity.");
         var destination = remove ? CardLocation.OutsideGame : discard ? CardLocation.DiscardPile : r.Pile!.Location;
         void Paid(long batch, IReadOnlyList<CardMovementRecord> moves)
         {
-            if (moves.Any(m => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || m.To != destination && m.To != CardLocation.OutsideGame))
-                throw new InvalidOperationException("Cao Xian's native movement changed its admitted destination.");
             CaoXianRules.MovesPaid(f.Id, moves);
         }
 

@@ -149,8 +149,6 @@ internal sealed partial class CharacterCaoCaoOlGodRuntime
     internal void FinishOlGuixin(ProgramSkillFrame f, bool cancelled)
     {
         var r = f.OlGuixin!;
-        if (f.PendingMovementContinuation is not null || r.Stage == OlGuixinStage.MovementChildren)
-            throw new InvalidOperationException("OL Guixin cannot retire a paid gain before its children return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { OlGuixin = r with { Stage = OlGuixinStage.Finished } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OlGuixinCompletedEvent(f.Id, r.Payments.Count, r.TurnoverIssued, cancelled));
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);

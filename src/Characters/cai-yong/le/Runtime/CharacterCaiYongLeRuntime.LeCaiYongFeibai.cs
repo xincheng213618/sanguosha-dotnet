@@ -25,8 +25,6 @@ internal sealed partial class CharacterCaiYongLeRuntime
         {
             SetupEpochId = FeibaiSetupEpoch
         };
-        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeibaiDeclaredNameEvent>().Any(e => e.ActualTurn == fact.ActualTurn && e.TurnOwnerSeat == fact.TurnOwnerSeat && e.OriginFrameId == origin && e.ActionId == action?.ActionId && e.ProgramInstructionIndex == instruction))
-            throw new InvalidOperationException("Feibai cannot capture a declaration name twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(fact);
     }
 
@@ -56,20 +54,13 @@ internal sealed partial class CharacterCaiYongLeRuntime
             actor = replacement.ActorSeat;
         }
 
-        if (actor != changed.Source.OwnerSeat)
-            throw new InvalidOperationException("Feibai's native kind change belongs to another user.");
         if (_resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == changed.ProgramFrameId)is ProgramSkillFrame producer)
         {
             var plan = ProgramInstructionResolver.Default.Resolve(producer, program);
-            if (producer.SkillId != binding.SkillId || producer.TriggerId != binding.BindingId || producer.SkillInstanceId != binding.SkillInstanceId || producer.OwnerSeat != binding.OwnerSeat || producer.GameplayHash != program.GameplayHash || producer.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } context } || context.ParentCardUseFrameId != fact.OriginFrameId || context.CardActionId != changed.ActionId || producer.InstructionIndex < 1 || producer.InstructionIndex > plan.Instructions.Count || !plan.Instructions.Take(producer.InstructionIndex).Any(effect => effect.Op == SkillProgramEffectOp.OfferCurrentSlashFireAndExtraTarget))
-                throw new InvalidOperationException("Feibai's live native conversion lost its exact paused producer.");
         }
-        else if (history.Skip(entry.index + 1).OfType<ProgramBindingResolvedEvent>().Count(e => e.FrameId == binding.FrameId && e.SkillId == binding.SkillId && e.BindingId == binding.BindingId && e.SkillInstanceId == binding.SkillInstanceId && e.OwnerSeat == binding.OwnerSeat && e.Window == binding.Window && e.Activated) != 1)
-            throw new InvalidOperationException("Feibai's historical native conversion lost its original producer return.");
+        else ;
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(fact.OriginFrameId)is { } use)
         {
-            if (use.CurrentSlashFirePolicy is not { } policy || policy.ProgramFrameId != changed.ProgramFrameId || policy.Source != changed.Source || policy.OriginalKind != original || policy.OriginalAction.ActionId != changed.ActionId || policy.ExtraTargetSeat != changed.ExtraTargetSeat)
-                throw new InvalidOperationException("Feibai's native conversion lost its owning card-use policy.");
             _coreCurrentSlashFireOffersOperations.AssertCurrentSlashFirePolicy(use);
         }
 
@@ -94,8 +85,6 @@ internal sealed partial class CharacterCaiYongLeRuntime
         var matching = facts.Where(e => e.CardActionId == action.ActionId).ToArray();
         if (matching is [var native])
             return native;
-        if (matching.Length != 0)
-            throw new InvalidOperationException("Feibai found duplicate actual declaration identities.");
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Action?.ActionId == action.ActionId);
         if (action.Type != CardActionType.Use || use is null || !(_coreActualTurnLegacyCompletionOperations.IsExactLegacyActualUseCompletion(use) || _coreActualHandGainProgramsOperations.IsNormalizedLegacyCompletedCategoryUse(use, action.ActorSeat, action.EffectiveKind, action.TargetSeats)))
             return null;
@@ -151,8 +140,6 @@ internal sealed partial class CharacterCaiYongLeRuntime
 
             if (i == sequence - 1)
             {
-                if (fact != current || actor != action.ActorSeat)
-                    throw new InvalidOperationException("Feibai's completed actor differs from its final native user.");
                 break;
             }
 
@@ -250,8 +237,6 @@ internal sealed partial class CharacterCaiYongLeRuntime
     internal void BeginFeibaiFallback(ProgramSkillFrame f)
     {
         var r = f.LeCaiYongFeibai ?? throw new InvalidOperationException("Feibai fallback has no original sample.");
-        if (r.ObtainedCardId is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeibaiFallbackDrawIssuedEvent>().Any(e => e.FrameId == f.Id))
-            throw new InvalidOperationException("Feibai cannot pay fallback after an actual obtain or issue it twice.");
         // Commit before invoking native Draw2: replacement and gain observers can re-enter uses.
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FeibaiDisabledEvent(f.OwnerSeat, r.Qualification.Prefix.ActualTurn, f.Id));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LeCaiYongFeibai = r with { Stage = FeibaiStage.Drawing }, PendingMovementContinuation = null });

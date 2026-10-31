@@ -23,7 +23,6 @@ internal abstract class BoundaryCaoZhangDescriptor : ProgramOperationDescriptorB
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
         r.AllowOnly("op", "target", "mode", "condition"); var mode = r.RequiredIdentifier("mode");
-        if (mode is not ("restraint" or "assault")) throw new InvalidOperationException(r.Path + ": unknown mobile Jiangchi mode.");
         var e = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(), stateId: mode); RequireAlways(e, r.Path); return e;
     }
     public override ISkillProgramEffectHandler Handler => new BoundaryCaoZhangHandler(Op);

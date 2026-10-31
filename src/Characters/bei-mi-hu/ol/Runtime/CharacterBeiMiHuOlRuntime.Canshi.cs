@@ -47,8 +47,6 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
         if (f.TriggerId is null || f.WindowContext is not { } context || op is null || !TryGetBeiMiHuCardUse(f.OwnerSeat, context, op.Value, out var use, out window) || !_coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0), context, window))
             throw new InvalidOperationException("Canshi lost its exact sole native designation parent.");
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (index < 2 || _resolutionStackOperations._resolutionStack[index - 1].Id != window.Id || _resolutionStackOperations._resolutionStack[index - 2].Id != use.Id || !window.Activated)
-            throw new InvalidOperationException("Canshi requires its immediate native window and source candidate.");
         return use;
     }
 

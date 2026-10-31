@@ -49,8 +49,6 @@ internal sealed partial class CharacterCaoAngMouRuntime
         if (!MouCaoAng.Valid(f) || f.MouCaoAng is not { Stage: MouCaoAngStage.IssuingUse, Native: { UseId: 0, ActionId: 0 } n })
             throw new InvalidOperationException("Zhiwang requires its issued real discard entity and actual other actor.");
         var action = MouCaPlans(f, n.Actor, n.CardId).SingleOrDefault(a => MouCaoAngRuntime.SameAction(a, n.Action));
-        if (action is null)
-            throw new InvalidOperationException("Zhiwang's material, actor or native legal target plan expired.");
         _coreNativeActionDispatchOperations.ExecuteAction(_coreMatchParticipantsPlayersAccess._players[n.Actor], action);
     }
 

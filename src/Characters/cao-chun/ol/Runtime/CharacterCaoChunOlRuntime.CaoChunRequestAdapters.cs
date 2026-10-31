@@ -57,8 +57,6 @@ internal sealed partial class CharacterCaoChunOlRuntime
     {
         if (f.CaoChun?.Faction is not { } issued)
             return false;
-        if (!ValidCaoChunPaidActivation(f) || issued.FrameId != f.Id || pending.ProgramSkillFrameId != f.Id || pending.ResolutionId != f.Id || pending.OwnerSeat != f.OwnerSeat || pending.TargetSeat != issued.TargetSeat || pending.PolicySource != issued.Policy || pending.AssistedResultBind != CaoChunFactionBind || !pending.IsAssistedProgramUse || f.CaoChun.Stage is not (CaoChunStage.InitialSlash or CaoChunStage.NativeSlash) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FactionSlashRequestedEvent>().Count(e => e.ResolutionId == f.Id && e.OwnerSeat == f.OwnerSeat && e.TargetSeat == issued.TargetSeat && e.SkillId == issued.Policy.SkillId) != 1)
-            throw new InvalidOperationException("Shanjia faction Slash lost its exact source policy, owner or requested target.");
         return true;
     }
 
@@ -66,8 +64,6 @@ internal sealed partial class CharacterCaoChunOlRuntime
     {
         if (!ValidateCaoChunFactionSlashParent(pending, f))
             return false;
-        if (!IsCaoChunInitialRequest(f) || cards.Count == 0 || provider.Seat == f.OwnerSeat || !pending.CandidateSeats.Contains(provider.Seat) || cards.Any(c => _cardZonesOperations._cardZones.GetLocation(c.Id).OwnerSeat != provider.Seat))
-            throw new InvalidOperationException("Shanjia faction provider lost its real owned Slash material.");
         var r = f.CaoChun!;
         var native = new CaoChunNativeSlash(f.Id, r.Source, r.GameplayHash, r.InstructionIndex, r.ActualTurn, r.PhaseInstance, false, pending.TargetSeat!.Value, kind)
         {

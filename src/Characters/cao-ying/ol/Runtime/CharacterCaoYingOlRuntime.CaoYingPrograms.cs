@@ -33,8 +33,6 @@ internal sealed partial class CharacterCaoYingOlRuntime
         }
         else
         {
-            if (context.Window is not (SkillProgramTriggerWindow.TurnStartBeforeNormalFlow or SkillProgramTriggerWindow.TurnEnding) || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat)
-                throw new InvalidOperationException("Fujian requires its own preparation or ending.");
             var living = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).ToArray();
             var mobile = effect.CaoYingPolicy == CaoYingRulePolicy.MobileOrdinary;
             var minimum = living.Min(p => _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count);

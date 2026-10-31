@@ -117,8 +117,6 @@ internal sealed partial class CharacterCaoCaoOlMagicRuntime
     {
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         var from = _cardZonesOperations._cardZones.GetLocation(id);
-        if (from.OwnerSeat != payer || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
-            throw new InvalidOperationException("Bachao/Baibi lost the actual HE payment.");
         _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), from, CardLocation.Hand(f.OwnerSeat), new CardMoveReason(reason), m =>
         {
             if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(p => p.Id == f.Id)is not { } parent || !MoCaoCaoBachao.Valid(parent) || m.CardId != id || m.From != from || m.Reason.Value != reason || m.Sequence <= before)

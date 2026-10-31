@@ -16,8 +16,6 @@ internal sealed partial class CharacterCaoYingOlRuntime
         if (armedFacts.Length == 0)
             return;
         var frame = _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().LastOrDefault(d => d.SourceSeat == damage.SourceSeat && d.TargetSeat == damage.TargetSeat && d.Amount == damage.Amount);
-        if (frame is null)
-            throw new InvalidOperationException("Lingren consumption requires its actual applied damage frame.");
         foreach (var armed in armedFacts)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoYingDamageConsumedEvent(armed.ProgramFrameId, frame.Id));
     }

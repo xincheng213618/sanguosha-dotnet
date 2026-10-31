@@ -14,7 +14,7 @@ internal sealed class MouCaoAngRuntime(IMouCaoAngFacts facts,IMouCaoAngNative na
         var r=new MouCaoAngReceipt(Source(f),f.GameplayHash,op,facts.Turn,facts.TurnOwner,f.WindowContext!.ParentFrameId){Before=facts.Sequence,After=facts.Sequence};
         if(op==SkillProgramEffectOp.ResolveMouCaoAngFengmin)
         {
-            var loser=facts.LostEquipmentOwner(f);if(loser<0)throw new InvalidOperationException("Fengmin lost the actual equipment departure owner.");
+            var loser=facts.LostEquipmentOwner(f);
             r=r with{Stage=MouCaoAngStage.Drawing,Loser=loser,Requested=facts.EmptySlots(loser)};
         }
         else if(op==SkillProgramEffectOp.ResolveMouCaoAngZhiwang)r=r with{Stage=MouCaoAngStage.DiscardChildren,Equipment=facts.Equipment(f.OwnerSeat)};

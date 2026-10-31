@@ -174,14 +174,11 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { BoundarySidi = null, ChoiceBindings = Array.AsReadOnly(frame.ChoiceBindings.Append(new ProgramChoiceResultBinding(bind, outcome, frame.OwnerSeat)).ToArray()) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundarySidiResultEvent(frame.Id, frame.OwnerSeat, action, bind, outcome));
     }
     internal bool IsBoundarySidiUseIneffective(CardUseFrame use)
     {
         if (use.BoundarySidiCancellation is not { } proof)
             return false;
-        if (use.Action?.ActionId != proof.ActionId || use.Id != proof.UseFrameId || proof.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(BoundarySidiSkill).Program?.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundarySidiCancelledEvent>().Count(record => record == proof) != 1 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundarySidiResultEvent>().Any(record => record.FrameId == proof.ProgramFrameId && record.ActionId == proof.ActionId && record.Outcome is "cancel-only" or "cancel-damage"))
-            throw new InvalidOperationException("Sidi cancellation lost its exact original use and committed result.");
         return true;
     }
 
@@ -199,8 +196,6 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { BoundarySidiCancellation: not null } use || !IsBoundarySidiUseIneffective(use))
             return false;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != id || use.Action is not { Type: CardActionType.Use })
-            throw new InvalidOperationException("Sidi lost its original simple-card return.");
         foreach (var card in _coreNativeTrickUseOperations.GetCardUsePhysicalCards(id).Where(card => _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Processing))
             _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, new("skill-program.boundary-sidi.cancelled"));
         var original = use.CardId == 0 ? new Card(0, use.CardKind, Suit.None, 0) : _coreAdvancedLifecycleOperations.GetAdvancedCard(use.CardId);

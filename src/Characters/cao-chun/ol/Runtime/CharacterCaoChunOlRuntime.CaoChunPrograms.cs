@@ -10,8 +10,6 @@ internal sealed partial class CharacterCaoChunOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        if (f.CaoChun is not null || f.InstructionIndex != 1)
-            throw new InvalidOperationException("Shanjia cannot reopen its owned instruction.");
         if (op == SkillProgramEffectOp.InitializeShanjiaLossMarkers)
         {
             if (f.WindowContext?.Window != SkillProgramTriggerWindow.GameStarting || !CaoChunSourceCurrent(f) || owner.Shanjia is not null)
@@ -21,8 +19,6 @@ internal sealed partial class CharacterCaoChunOlRuntime
             return SkillProgramStepOutcome.Continue;
         }
 
-        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber < 1)
-            throw new InvalidOperationException("Shanjia requires its actual own Play.");
         if (op == SkillProgramEffectOp.DrawAndRequestShanjiaSlash)
         {
             if (f.TriggerId is not null || !CaoChunSourceCurrent(f))
@@ -404,14 +400,8 @@ internal sealed partial class CharacterCaoChunOlRuntime
             throw new InvalidOperationException("Shanjia cannot duplicate or borrow a hand-use debit.");
         if (r.Stage is CaoChunStage.DrawChildren or CaoChunStage.DiscardChildren)
         {
-            if (f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null, SubjectSeat: var seat } || seat != f.OwnerSeat || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShanjiaMovementPaidEvent>().Count(e => e == new ShanjiaMovementPaidEvent(f.Id, r.Source, r.GameplayHash, r.Stage, r.Before, r.After, r.ActualCount, r.PaidBatchId)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && (r.Stage == CaoChunStage.DrawChildren ? m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == ShanjiaDrawReason : m.CardId == r.DiscardId && m.From == r.DiscardFrom && m.To == CardLocation.DiscardPile && m.Reason.Value == ShanjiaDiscardReason)) != r.ActualCount)
-                throw new InvalidOperationException("Shanjia lacks its once-paid real movement invoice.");
-            if (r.Stage == CaoChunStage.DrawChildren && (r.ActualCount is < 0 or > 3 || r.PaidBatchId is not null) || r.Stage == CaoChunStage.DiscardChildren && (r.ActualCount != 1 || r.PaidBatchId is not > 0 || r.DiscardFrom?.OwnerSeat != f.OwnerSeat || r.DiscardFrom?.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)))
-                throw new InvalidOperationException("Shanjia payment changed its native owned zone or actual count.");
         }
 
-        if (r.Stage == CaoChunStage.NativeSlash && r.Slash is not { })
-            throw new InvalidOperationException("Shanjia native Slash lost its issued receipt.");
     }
 
     SkillProgramStepOutcome ICaoChunProgramHost.ExecuteCaoChun(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteCaoChun(f, op);

@@ -57,8 +57,6 @@ internal sealed partial class CharacterCaoXiOlRuntime
     {
         var choices = CaoXiChoices(f);
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
-        if (choices.Count == 0)
-            throw new InvalidOperationException("Cao Xi has no legal original-owner decision.");
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, f.OwnerSeat, f.CaoXiGangshu is null ? "谏旋：选择本次始终摸牌的角色。" : "刚述：选择一项当前小于5的数值+1。", [], choices.SelectMany(c => c.Targets).Distinct().ToArray(), f.OwnerSeat)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),

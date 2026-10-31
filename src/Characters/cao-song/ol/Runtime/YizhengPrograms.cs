@@ -15,7 +15,5 @@ internal sealed class GrantYizhengSupportDescriptor : ProgramOperationDescriptor
 public sealed record CaoSongYizhengGrantedEvent(long GrantId, CardConversionSource Source,
     int RecipientSeat, int IssuedTurn) : IGameEvent;
 public sealed record CaoSongYizhengExpiredEvent(long GrantId, int OwnerSeat, int TurnNumber) : IGameEvent;
-public sealed record CaoSongYizhengAmountPaidEvent(long ParentFrameId, long GrantId, int OwnerSeat,
-    int BeneficiarySeat, bool Recovery, int MaximumHpBefore, int MaximumHpAfter) : IGameEvent;
 public sealed record CaoSongYizhengAmountIncreasedEvent(long ParentFrameId, long GrantId,
     int BeneficiarySeat, bool Recovery, int Before, int After) : IGameEvent;

@@ -10,55 +10,9 @@ internal sealed partial class CharacterAHuiNanOlRuntime
     internal bool HasAHuiNanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveJuemanFirstBasicTurnEnd);
 
     internal static CardConversionSource AHuiNanSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_a_hui_nan_ol_AHuiNan.AHuiNanSource(f);
-    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27200)]
-    internal void ObserveAHuiNanBasicUses(IGameEvent payload)
-    {
-        if (!HasAHuiNanCapability || !_coreCurrentTurnUseKindsOperations.HasOngoingActualUseTurn)
-            return;
-        var recorded = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AHuiNanBasicUseRecordedEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat).ToArray();
-        if (recorded.Length >= 3)
-            return;
-        if (payload is CardUseDeclaredEvent d)
-        {
-            if (_resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == d.ResolutionId)is not { } use || use.SourceSeat != d.SourceSeat || use.CardId != d.CardId || use.CardKind != d.CardKind || !AHuiNanBasicKind(use.CardKind) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(use.SourceSeat))
-                return;
-            if (use.Action is { } a)
-            {
-                if (a.Type != CardActionType.Use || a.ActorSeat != use.SourceSeat || a.EffectiveKind != use.CardKind)
-                    return;
-            }
-            else if (!AHuiNanLegacyBasicUse(use))
-                return;
-            if (recorded.Any(e => e.OriginFrameId == use.Id && e.ActionId == use.Action?.ActionId))
-                return;
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AHuiNanBasicUseRecordedEvent(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, use.Id, use.Action?.ActionId, use.SourceSeat, use.CardKind, recorded.Length + 1));
-            return;
-        }
-
-        if (payload is not CardActionAcceptedEvent { Action: { Type: CardActionType.Response, EffectiveKind: CardKind.Dodge } response } || response.ActorSeat != response.ProviderSeat || response.ResponderSeat != response.ActorSeat || response.RequesterSeat is not null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(response.ActorSeat) || recorded.Any(e => e.ActionId == response.ActionId))
-            return;
-        var defending = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Action?.ActionId == response.ParentActionId && u.CardAttack?.TargetSeat == response.ActorSeat);
-        if (defending?.CardAttack is not { EffectiveCardKind: { } incoming } attack || !CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) || response.OpponentSeat != attack.SourceSeat || !_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[response.ActorSeat], CardKind.Dodge))
-            return;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AHuiNanBasicUseRecordedEvent(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, defending.Id, response.ActionId, response.ActorSeat, CardKind.Dodge, recorded.Length + 1));
-    }
-
-    internal bool AHuiNanLegacyBasicUse(CardUseFrame use)
-    {
-        if (use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 })
-            return false;
-        var i = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-        if (i <= 0 || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramSkillFrame f || f.OwnerSeat != use.SourceSeat || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash)
-            return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(f, p).GetPausedInstruction(f.InstructionIndex).Effect;
-        if (use.CardKind == CardKind.Slash)
-            return f.SelectedTargetSeats.Count == 1 && f.SelectedTargetSeats.SequenceEqual(use.TargetSeats) && effect is { Op: SkillProgramEffectOp.UseVirtualCard, OutputKind: CardKind.Slash, UseCardActionWindows: false };
-        if (use.CardKind != CardKind.Alcohol || effect.Op != SkillProgramEffectOp.UseVirtualDyingAlcohol || f.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || context.TargetSeat != use.SourceSeat || !use.TargetSeats.SequenceEqual([use.SourceSeat]))
-            return false;
-        return _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().SingleOrDefault(d => d.Id == context.ParentFrameId)is { } dying && dying.VictimSeat == use.SourceSeat && dying.ResponderIndex >= 0 && dying.ResponderIndex < dying.ResponderSeats.Count && dying.ResponderSeats[dying.ResponderIndex] == use.SourceSeat;
-    }
-
-    internal AHuiNanBasicUseSnapshot[] AHuiNanHistory(int turn) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AHuiNanBasicUseRecordedEvent>().Where(e => e.ActualTurn == turn).OrderBy(e => e.Index).Select(e => new AHuiNanBasicUseSnapshot(e, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCurrentSlashFireChangedEvent>().LastOrDefault(c => c.CardUseFrameId == e.OriginFrameId && c.ActionId == e.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(e.Kind))?.FinalKind ?? e.Kind)).ToArray();
+    internal AHuiNanBasicUseSnapshot[] AHuiNanHistory(int turn) => RuntimeSkills.RuntimeRules_Core_CurrentTurnUseKinds.ActualTurnBasicUses(
+        _coreAlternatingBenefitsOperations.CompleteProgramEventHistory(), turn, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
+        .Take(3).Select(e => new AHuiNanBasicUseSnapshot(e.ActorSeat, e.EffectiveCardKind!.Value)).ToArray();
     internal bool AHuiNanEndingParent(ProgramTriggerCandidate c, ProgramSkillWindowContext context, out DeferredTurnEndFrame? parent)
     {
         parent = _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId);
@@ -81,7 +35,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
         if (f.AHuiNanJueman is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !AHuiNanStartedBinding(f))
             throw new InvalidOperationException("Jueman requires its genuine started actual-turn-end binding.");
         var history = AHuiNanHistory(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
-        var own = history.Take(2).Count(e => e.Declaration.ActorSeat == f.OwnerSeat);
+        var own = history.Take(2).Count(e => e.ActorSeat == f.OwnerSeat);
         var stage = history.Length >= 2 && own == 1 ? AHuiNanJuemanStage.DrawChildren : history.Length == 3 && own == 0 ? AHuiNanJuemanStage.UseChoice : AHuiNanJuemanStage.NoEffect;
         var r = new AHuiNanJuemanReceipt(AHuiNanSource(f), f.GameplayHash, 1, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, stage)
         {

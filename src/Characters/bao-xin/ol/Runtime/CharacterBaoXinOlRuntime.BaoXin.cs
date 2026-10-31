@@ -8,8 +8,6 @@ internal sealed partial class CharacterBaoXinOlRuntime
     internal SkillProgramStepOutcome BeginBaoXin(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.BaoXin is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
-            throw new InvalidOperationException("Bao Xin requires an exact native initial cursor.");
         var holder = op == SkillProgramEffectOp.ResolveBaoXinMutao ? f.SelectedTargetSeats.Single() : f.WindowContext!.TargetSeat!.Value;
         var r = new BaoXinReceipt(BaoXinSource(f), f.GameplayHash, op, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, holder, op == SkillProgramEffectOp.ResolveBaoXinMutao ? BaoXinStage.StoreChildren : BaoXinStage.Mode)
         {
@@ -18,8 +16,6 @@ internal sealed partial class CharacterBaoXinOlRuntime
         };
         if (op == SkillProgramEffectOp.ResolveBaoXinMutao)
         {
-            if (f.TriggerId is not null || f.SkillId != "ol:mutao" || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "public-slash-ring" || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[holder].IsAlive)
-                throw new InvalidOperationException("Mutao requires the actual one-role Play activation.");
             var materials = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[holder]).Where(c => CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[holder], c))).Select(c => new BaoXinEntity(c.Id, c.Kind, _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[holder], c), CardLocation.Hand(holder))).ToArray();
             r = r with
             {
@@ -218,8 +214,6 @@ internal sealed partial class CharacterBaoXinOlRuntime
             if (residue.Length > 0 && r.Stage != BaoXinStage.CleanupChildren)
             {
                 var own = r.Original.Select(c => c.CardId).ToHashSet();
-                if (residue.Any(c => !own.Contains(c.Id)))
-                    throw new InvalidOperationException("Mutao cannot clean an unrelated public-pile entity.");
                 MoveBaoXin(f, residue.Select(c => new BaoXinEntity(c.Id, c.Kind, c.Kind, pile.Location)).ToArray(), BaoXinStage.CleanupChildren, CardLocation.DiscardPile, BaoXinCleanup);
                 ContinueBaoXin(f.Id);
                 return;

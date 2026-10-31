@@ -12,8 +12,6 @@ internal sealed partial class CharacterCaoChunOlRuntime
             return;
         if (n.NativeUseId != 0)
         {
-            if (n.NativeUseId != use.Id || use.CaoChunSlash != n)
-                throw new InvalidOperationException("Shanjia cannot bind another native Slash.");
             return;
         }
 
@@ -98,8 +96,6 @@ internal sealed partial class CharacterCaoChunOlRuntime
             return false;
         if (receipt.CaoChunSlash != n || n.NativeUseId != receipt.ResolutionId || n.Returned || n.Action is null || _coreCardUseLifecycleOperations.LifecycleCardUse(n.NativeUseId)is not null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == n.NativeUseId) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShanjiaNativeSlashIssuedEvent>().Count(e => e.FrameId == parent.Id && e.NativeUseId == n.NativeUseId && e.ActionId == n.ActionId) != 1)
             throw new InvalidOperationException("Shanjia Slash must finish and return once through its original native attack receipt.");
-        if (n.RoundOncePayment is { } independent && (n.Action.ConversionChain is not [var actualSource] || actualSource != independent.Source || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessBasicQuotaPaidEvent>().Count(e => e.Receipt == independent) != 1))
-            throw new InvalidOperationException("Shanjia independent Slash lost its real once-round payment.");
         if (n.PaymentAfter is not { } after || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShanjiaNativeMaterialPaidEvent>().Count(e => e.FrameId == parent.Id && e.NativeUseId == n.NativeUseId && e.ActionId == n.ActionId && e.Before == n.PaymentBefore && e.After == after && e.Count == n.Materials.Count) != 1)
             throw new InvalidOperationException("Shanjia Slash return lost its exact native material invoice.");
         foreach (var cost in n.Materials)

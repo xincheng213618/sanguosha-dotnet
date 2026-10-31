@@ -60,8 +60,6 @@ internal sealed partial class CharacterBianFuRenOlRuntime
 
         var receipt = BianFuRenUsedDiscard(context, frame.OwnerSeat) ?? throw new InvalidOperationException("Yuejian lost the exact foreign used card's native finish invoice.");
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).ToArray();
-        if (hand.Length == 0)
-            throw new InvalidOperationException("Yuejian requires at least one hand card to reveal.");
         const string revealBind = "yuejian-entire-hand";
         _coreProgramLifecycleOperations.SetProgramCardSet(frame.Id, revealBind, hand.Select(card => card.Id).ToArray(), SkillProgramCardSetVisibility.Private, hand.Select(_ => CardLocation.Hand(frame.OwnerSeat)).ToArray());
         _coreProgramCategoryChallengesOperations.RevealProgramBoundCards(frame, revealBind);

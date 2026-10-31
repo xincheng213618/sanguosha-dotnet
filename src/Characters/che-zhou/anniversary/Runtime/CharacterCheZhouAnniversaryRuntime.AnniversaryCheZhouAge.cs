@@ -13,15 +13,11 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
             return;
         if (fact is RoundStartedEvent round)
         {
-            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCheZhouRoundBoundaryEvent>().Any(e => e.Round == round.RoundNumber))
-                throw new InvalidOperationException("Che Zhou cannot issue the same actual round boundary twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryCheZhouRoundBoundaryEvent(round.RoundNumber, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
         }
 
         if (fact is not CardUseDeclaredEvent declared || _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is not { Action: { Type: CardActionType.Use } action } use)
             return;
-        if (use.AnniversaryCheZhouAge is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCheZhouUseAgeCapturedEvent>().Any(e => e.UseId == use.Id))
-            throw new InvalidOperationException("Che Zhou cannot replace an accepted Use's original age receipt.");
         var r = new AnniversaryCheZhouUseAge(action.ActionId, action.ActorSeat, Math.Max(1, _coreActualRoundProgressRoundNumberAccess._roundNumber), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, action.PhysicalCards.Count, AnniversaryCheZhouAgeAt(use, Math.Max(1, _coreActualRoundProgressRoundNumberAccess._roundNumber), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, f => f with { AnniversaryCheZhouAge = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryCheZhouUseAgeCapturedEvent(use.Id, r.ActionId, r.Actor, r.Round, r.Cutoff, r.Materials, r.Age));

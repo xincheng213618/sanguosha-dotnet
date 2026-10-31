@@ -137,8 +137,6 @@ internal sealed partial class CharacterCaoCaoMobileGodRuntime
     internal void FinishMobileGuixin(ProgramSkillFrame f, bool cancelled)
     {
         var r = f.MobileGuixin!;
-        if (f.PendingMovementContinuation is not null || r.Stage == MobileGuixinStage.MovementChildren)
-            throw new InvalidOperationException("Mobile Guixin cannot retire before its paid movement child returns.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileGuixin = r with { Stage = MobileGuixinStage.Finished } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileGuixinCompletedEvent(f.Id, r.Payments.Count, r.TurnoverIssued, cancelled));
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);

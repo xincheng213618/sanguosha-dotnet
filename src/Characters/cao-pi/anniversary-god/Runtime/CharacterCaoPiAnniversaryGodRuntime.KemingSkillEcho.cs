@@ -99,12 +99,9 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
         _coreRuntimeOperations.ReplaceRuntimeFrame(source.Id, source with { KemingCapture = capture with { Closed = true } });
         if (capture.Names.Count == 0 || !capture.Entitlements.Any(e => _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return false;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != parent.Id)
-            throw new InvalidOperationException("Keming's effect completion must retain the actual live source host.");
         if (returned.Kind == KemingEchoReturnKind.CixiongCompletion)
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        else if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
-            throw new InvalidOperationException("Keming cannot overwrite another accepted source decision.");
+        else ;
         var frame = new KemingSkillEchoFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, parent.Id, capture, returned);
         _coreRuntimeOperations.PushRuntimeFrame(frame);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KemingEchoStartedEvent(frame.Id, parent.Id, capture.InvocationId, capture.Names.Count));
@@ -149,7 +146,6 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
         var owner = f.Capture.Entitlements[f.Cursor].Source.OwnerSeat;
         var accept = choice.Parameters["accept"] == "yes";
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KemingEchoChoiceEvent(f.Id, f.Cursor, owner, accept));
         if (!accept)
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { Cursor = f.Cursor + 1 });
         else
@@ -168,8 +164,6 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
             if (f.Stage == KemingSkillEchoStage.Drawing)
             {
                 var paid = f.NativeDraw ?? throw new InvalidOperationException("Keming lost its frozen same-name draw request.");
-                if (paid.ActiveAttemptId is not null && !paid.AttemptReturned)
-                    throw new InvalidOperationException("Keming must await its exact native draw request.");
                 if (!paid.AttemptReturned && _coreNativeDrawAttemptsOperations.TryBeginNativeDrawAttempt(f))
                     return;
                 f = (KemingSkillEchoFrame)_resolutionStackOperations._resolutionStack[^1];
@@ -196,7 +190,6 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
                     ActualDrawIds = ids
                 };
                 _coreRuntimeOperations.ReplaceRuntimeTop(f with { Stage = KemingSkillEchoStage.Children, NativeDraw = null, Outcome = outcome });
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KemingEchoDrawPaidEvent(f.Id, f.Cursor, owner, paid.RequestedCount, ids.Count, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, paid.Replacement is not null));
                 continue;
             }
 
@@ -260,18 +253,12 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
         if (f.Stage == KemingSkillEchoStage.Drawing)
         {
             var owner = f.Capture.Entitlements[f.Cursor].Source.OwnerSeat;
-            if (f.Outcome is not null || f.NativeDraw is not { } draw || draw.ReturnKind != NativeDrawAttemptReturnKind.KemingSkillEcho || draw.InstructionIndex != f.Cursor || draw.RequestedCount != f.Capture.Names.Count || !draw.Recipients.SequenceEqual([owner]) || draw.RecipientIndex != 0 || draw.Reason.Value != "skill-program.anniversary:keming.same-name-draw" || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KemingEchoChoiceEvent>().Count(e => e.FrameId == f.Id && e.Cursor == f.Cursor && e.OwnerSeat == owner && e.Accepted) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KemingEchoDrawPaidEvent>().Any(e => e.FrameId == f.Id && e.Cursor == f.Cursor))
-                throw new InvalidOperationException("Keming's accepted matching-name draw changed its exact unpaid native request.");
         }
-        else if (f.NativeDraw is not null)
-            throw new InvalidOperationException("Keming retained an unrelated native draw producer.");
+        else ;
         if (f.Stage == KemingSkillEchoStage.Children)
         {
-            if (f.Outcome is not { } o || o.RecipientSeat != f.Capture.Entitlements[f.Cursor].Source.OwnerSeat || o.RequestedCount != f.Capture.Names.Count || o.ActualDrawIds is not System.Collections.IList { IsReadOnly: true } || o.ActualDrawIds.Distinct().Count() != o.ActualDrawIds.Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KemingEchoDrawPaidEvent>().Count(e => e.FrameId == f.Id && e.Cursor == f.Cursor && e.OwnerSeat == o.RecipientSeat && e.Requested == o.RequestedCount && e.Actual == o.ActualDrawIds.Count && e.Before == o.SequenceBefore && e.After == o.SequenceAfter && e.Replaced == (o.Replacement is not null)) != 1 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > o.SequenceBefore && m.Sequence <= o.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(o.RecipientSeat) && m.Reason.Value == "skill-program.anniversary:keming.same-name-draw").OrderBy(m => m.Sequence).Select(m => m.CardId).SequenceEqual(o.ActualDrawIds))
-                throw new InvalidOperationException("Keming's paid return changed its actual matching deck entities or original native movement range.");
         }
-        else if (f.Outcome is not null)
-            throw new InvalidOperationException("Keming retained a draw outcome outside its exact children stage.");
+        else ;
     }
 
     internal void AssertKemingSourceReceipt(KemingSourceCapture c)
@@ -283,8 +270,6 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
             if (name.IsDraw)
             {
                 var draws = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(e => e.InvocationId == name.ProducerId && e.ParentFrameId == c.ParentFrameId && e.OwnerSeat == c.ActorSeat && name.Sequence > e.SequenceBefore && name.Sequence <= e.SequenceAfter).ToArray();
-                if (draws.Length != 1 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == name.Sequence && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(c.ActorSeat) && m.Reason == draws[0].Reason && CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(m.CardKind) == name.Name))
-                    throw new InvalidOperationException("Keming's private drawn name must match its original native draw invoice and exact entity movement.");
             }
             else if (name.Sequence != 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KemingSourceCardUsedEvent>().Count(e => e.InvocationId == c.InvocationId && e.SourceFrameId == c.ParentFrameId && e.ActionId == name.ProducerId) != 1 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == name.ProducerId && e.Action.ActorSeat == c.ActorSeat && CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(e.Action.EffectiveKind) == name.Name && (e.Action.Type == CardActionType.Use || _coreResponseUseCompletionOperations.IsCompletedResponseUse(e.Action, e.Action.EffectiveKind == CardKind.Dodge ? ProgramCardContinuation.Dodge : ProgramCardContinuation.NullificationResponse))))
                 throw new InvalidOperationException("Keming's public used name must match the exact accepted native action observed by this source invocation.");

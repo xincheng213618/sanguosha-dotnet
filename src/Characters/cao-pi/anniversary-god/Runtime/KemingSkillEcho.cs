@@ -27,8 +27,5 @@ public sealed partial record CardsMovedTriggerWindowFrame
 public sealed record KemingEchoReservedEvent(long IssueFrameId, long InvocationId, long ParentFrameId, int ActorSeat,
     string SkillKey, string OccurrenceKey) : IGameEvent;
 public sealed record KemingEchoStartedEvent(long FrameId, long ParentFrameId, long InvocationId, int Count) : IGameEvent;
-public sealed record KemingEchoChoiceEvent(long FrameId, int Cursor, int OwnerSeat, bool Accepted) : IGameEvent;
-public sealed record KemingEchoDrawPaidEvent(long FrameId, int Cursor, int OwnerSeat, int Requested, int Actual,
-    long Before, long After, bool Replaced) : IGameEvent;
 public sealed record KemingEchoFinishedEvent(long FrameId, long ParentFrameId, long InvocationId) : IGameEvent;
 public sealed record KemingSourceCardUsedEvent(long InvocationId, long SourceFrameId, long ActionId) : IGameEvent;

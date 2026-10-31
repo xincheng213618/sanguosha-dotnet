@@ -34,8 +34,6 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
     {
         if (!BeifenDeclarationIsTrueUse(parent) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(parent.ActorSeat) || payment.ActorSeat != parent.ActorSeat || payment.Claimed || payment.Beifen is not null || _cardZonesOperations._cardZones.GetLocation(payment.Cost.CardId) != payment.Cost.From || CaptureBeifenUseQualification(_coreMatchParticipantsPlayersAccess._players[parent.ActorSeat])is not { } q)
             return payment;
-        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BeifenDeclarationQualifiedEvent>().Any(e => e.DeclarationId == payment.DeclarationId))
-            throw new InvalidOperationException("Beifen cannot qualify the same declaration twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BeifenDeclarationQualifiedEvent(payment.DeclarationId, payment.OwnerFrameId, payment.ProviderSeat, payment.Cost.CardId, payment.Cost.From, payment.DeclaredKind, q));
         return payment with
         {
@@ -69,8 +67,6 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
     {
         if (!HasLeCaiWenJiBeifenCapability || use.Action is not { Type: CardActionType.Use } action)
             return;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != use.Id || use.BeifenUse is not null)
-            throw new InvalidOperationException("Beifen must bind the one accepted original native use mother.");
         var declaration = BeifenOriginalDeclaration(use);
         BeifenUseQualification? q;
         if (declaration is not null)

@@ -67,8 +67,6 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         if (CaptureWenlanMaterials(provider.Seat, ids, SkillProgramTriggerWindow.CardResponseCompleted)is not { } capture)
             return;
         var parent = _resolutionStackOperations._resolutionStack.LastOrDefault() ?? throw new InvalidOperationException("Wenlan response needs its actual payment owner.");
-        if (parent.LeCaoZhiWenlanResponse is not null)
-            throw new InvalidOperationException("Wenlan cannot prepare another unpaid response invoice.");
         var p = new WenlanResponseCapture(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, parent.Id, provider.Seat, kind, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, capture)
         {
             Materials = cards.Select(c => new CardActionCost(c.Id, c.Kind, _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(provider, c))).ToArray()
@@ -164,8 +162,6 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         if (all.Any(e => IsWenlanEntryClaimed(e.EntryId)))
             return;
         var prior = all.SingleOrDefault(e => !retired.Contains(e.EntryId));
-        if (prior is not null && prior.OwnerSeat != changed.PreviousActorSeat)
-            throw new InvalidOperationException("Wenlan cannot skip the native actor replacement chain.");
         var newId = capture.Source is null ? (long? )null : ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenlanActionReassignedEvent(use.Id, action.ActionId, changed.PreviousActorSeat, changed.ActorSeat, prior?.EntryId, newId));
         if (newId is { } entryId)
@@ -348,8 +344,6 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     internal void FinishWenlan(ProgramSkillFrame f)
     {
         var r = f.LeCaoZhiWenlan!;
-        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanCompletedEvent>().Any(e => e.FrameId == f.Id))
-            throw new InvalidOperationException("Wenlan pair cannot complete twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenlanCompletedEvent(f.Id, f.OwnerSeat, r.Qualification.FirstEntryId, r.Qualification.SecondEntryId, r.CommonName, r.CommonName ? r.ObtainedIds.Count : r.SelectedIds.Count));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { LeCaoZhiWenlan = null, PendingMovementContinuation = null });
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))

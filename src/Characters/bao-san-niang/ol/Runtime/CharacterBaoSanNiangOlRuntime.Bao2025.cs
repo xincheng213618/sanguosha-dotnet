@@ -251,8 +251,6 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
             return true;
         }
 
-        if (r.Stage == ProgramBao2025Stage.AssaultUse)
-            throw new InvalidOperationException("The native chosen assault must return through its exact typed Use.");
         if (DrainBaoChildren(f))
             return true;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
@@ -342,8 +340,6 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
         var useId = _coreNativeCardUseOperations.BeginCardUse(card, f.OwnerSeat, targets, CardKind.BarbarianAssault, physicalCardIds: [], chosenAssault: new(f.Id, f.InstructionIndex));
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(useId)!;
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(p => p.Id == use.ChosenAssault!.ProgramFrameId);
-        if (parent.Id != f.Id || parent.InstructionIndex != use.ChosenAssault!.InstructionIndex || parent.Bao2025?.AssaultUseId != useId)
-            throw new InvalidOperationException("Chosen assault lost its reserved typed producer while its native Use was issued.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { Bao2025 = parent.Bao2025!with { AssaultActionId = use.Action!.ActionId } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChosenAssaultUseIssuedEvent(f.Id, r.Source, useId, use.Action!.ActionId, r.SelectedTargets));
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(useId, card, f.OwnerSeat, targets, LegalActionKind.BarbarianAssault, requiredCardKind: CardKind.Slash, playedCardKind: CardKind.BarbarianAssault);

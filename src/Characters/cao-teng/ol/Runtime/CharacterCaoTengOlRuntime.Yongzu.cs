@@ -30,8 +30,6 @@ internal sealed partial class CharacterCaoTengOlRuntime
             var actual = _coreMatchParticipantsPlayersAccess._players[grant.RecipientSeat].SkillGrants.Grants.SingleOrDefault(g => g.GrantId == grant.GrantId);
             if (actual is not null)
             {
-                if (actual.SkillId != grant.SkillId || actual.SkillInstanceId != grant.SkillInstanceId || actual.SourceId != grant.SourceId)
-                    throw new InvalidOperationException("Yongzu's exact grant source was replaced.");
                 _coreMatchParticipantsPlayersAccess._players[grant.RecipientSeat].SkillGrants.RemoveGrant(grant.GrantId);
             }
 

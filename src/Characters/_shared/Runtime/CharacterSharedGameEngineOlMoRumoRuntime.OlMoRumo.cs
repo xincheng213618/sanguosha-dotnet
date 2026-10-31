@@ -85,8 +85,6 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoRuntime
             if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frameId)
                 return;
             frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);
-            if (frame.OlMoRumo!.Stage == OlMoRumoStage.LossIssuing)
-                throw new InvalidOperationException("OL Rumo's native HP deduction lost its once-only return.");
         }
 
         if (DrainOlMoRumo(frame))

@@ -14,8 +14,6 @@ internal sealed partial class CharacterCaoPiMouRuntime
     internal SkillProgramStepOutcome BeginMouCaoPi(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.MouCaoPi is not null || f.InstructionIndex != 1 || !MouCaoPiComposition.Handles(op))
-            throw new InvalidOperationException("Mou Cao Pi requires his exact owning instruction.");
         if (op is SkillProgramEffectOp.MouCaoPiGainSong or SkillProgramEffectOp.MouCaoPiSongwei)
         {
             var gain = op == SkillProgramEffectOp.MouCaoPiGainSong ? 2 : 2 * _coreMatchParticipantsPlayersAccess._players.Count(p => p.Seat != f.OwnerSeat && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(p) == "wei");

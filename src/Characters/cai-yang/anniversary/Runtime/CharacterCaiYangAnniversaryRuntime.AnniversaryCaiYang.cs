@@ -7,8 +7,6 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
     internal SkillProgramStepOutcome BeginCaiYang(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.InstructionIndex != 1 || f.AnniversaryCaiYang is not null)
-            throw new InvalidOperationException("Cai Yang requires his original unpaid instruction.");
         if (operation == SkillProgramEffectOp.ArmAnniversaryCaiYangXunji)
         {
             if (f.TriggerId is not null || f.ActivationId != AnniversaryCaiYangComposition.Arm || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaiYangXunjiArmedEvent>().Any(e => e.Grant.FrameId == f.Id))
@@ -80,8 +78,6 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
         {
             if (_coreCardUseLifecycleOperations.LifecycleCardUse(r.Duel!.UseId)is not null)
                 return;
-            if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null || _coreNativeCardContinuationCursorsOperations.ActiveDuel is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.Duel.UseId && e.CardKind == CardKind.Duel && e.CardId == 0) != 1)
-                throw new InvalidOperationException("Xunji must wait until its original native Duel is fully cleaned up.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaiYangXunjiReturnedEvent(f.Id, r.Duel.UseId, r.Duel.ActionId));
             FinishCaiYang(f);
             return;

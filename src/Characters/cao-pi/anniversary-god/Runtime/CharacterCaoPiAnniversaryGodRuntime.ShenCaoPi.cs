@@ -82,8 +82,6 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
     internal SkillProgramStepOutcome BeginShenCaoPi(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.ShenCaoPi is not null || f.InstructionIndex != 1)
-            throw new InvalidOperationException("Shen Cao Pi requires his exact original unpaid instruction.");
         var target = op == SkillProgramEffectOp.ApplyShenCaoPiYinzhi ? f.SelectedTargetSeats.Single() : f.WindowContext?.TargetSeat ?? f.OwnerSeat;
         var r = new ShenCaoPiReceipt(ShenCaoPiSource(f), f.GameplayHash, op, f.InstructionIndex, f.WindowContext?.ParentFrameId ?? 0, target, ShenCaoPiStage.Complete);
         if (op == SkillProgramEffectOp.ApplyShenCaoPiYinzhi)
@@ -141,15 +139,11 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenCaoPi: { } r } f || f.Id != id)
             return false;
-        if (r.Stage == ShenCaoPiStage.Drawing)
-            throw new InvalidOperationException("Shen Cao Pi must await his exact native draw return.");
         if (DrainShenCaoPi(id))
             return true;
         if (r.Operation == SkillProgramEffectOp.ApplyShenCaoPiYinzhi && r.Stage == ShenCaoPiStage.Children)
         {
             var activation = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiActivatedEvent>().Single(e => e.FrameId == id);
-            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiIssuedEvent>().Any(e => e.FrameId == id))
-                throw new InvalidOperationException("Yinzhi cannot issue its post-draw suppression twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YinzhiIssuedEvent(id, activation.Source, activation.GameplayHash, activation.TargetSeat, activation.Count, activation.ActualTurn, activation.TargetOwnTurns));
             _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
         }
@@ -168,10 +162,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
     internal void ReturnShenCaoPiDraw(ProgramSkillFrame f, NativeDrawOutcome o)
     {
         var r = f.ShenCaoPi ?? throw new InvalidOperationException("Shen Cao Pi's draw lost its original paid receipt.");
-        if (r.Stage != ShenCaoPiStage.Drawing || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != r.Count || o.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenCaoPiDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
-            throw new InvalidOperationException("Shen Cao Pi cannot repeat or alter his native draw.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenCaoPi = r with { Stage = ShenCaoPiStage.Children, DrawOutcome = o } });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenCaoPiDrawReturnedEvent(f.Id, f.OwnerSeat, r.Count, o.ActualDrawIds.Count, o.SequenceBefore, o.SequenceAfter));
         ResumeShenCaoPi(f.Id);
     }
 

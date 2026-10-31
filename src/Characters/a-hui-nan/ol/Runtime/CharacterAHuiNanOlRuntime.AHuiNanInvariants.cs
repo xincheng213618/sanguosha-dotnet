@@ -7,8 +7,8 @@ internal sealed partial class CharacterAHuiNanOlRuntime
     {
         if (f.AHuiNanJueman is not { } r || !HasAHuiNanCapability || !AHuiNanStartedBinding(f) || r.Source != AHuiNanSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != 1 || f.InstructionIndex != 1 || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.PendingMovementContinuation is not null || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.DrawCount is < 0 or > 1 || !r.History.SequenceEqual(AHuiNanHistory(r.ActualTurn)))
             return false;
-        var own = r.History.Take(2).Count(e => e.Declaration.ActorSeat == f.OwnerSeat);
-        if (r.History.Count > 3 || r.History.Where((e, i) => e.Declaration.Index != i + 1 || e.Declaration.ActualTurn != r.ActualTurn || e.Declaration.TurnOwner != r.TurnOwner || !AHuiNanBasicKind(e.Kind)).Any() || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AHuiNanJuemanStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var start] || start != new AHuiNanJuemanStartedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner, r.History.Count, own, r.History.Count == 3 ? r.History[2].Kind : null))
+        var own = r.History.Take(2).Count(e => e.ActorSeat == f.OwnerSeat);
+        if (r.History.Count > 3 || r.History.Any(e => !AHuiNanBasicKind(e.Kind)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AHuiNanJuemanStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var start] || start != new AHuiNanJuemanStartedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner, r.History.Count, own, r.History.Count == 3 ? r.History[2].Kind : null))
             return false;
         var drawn = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AHuiNanJuemanDrawnEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (r.Stage == AHuiNanJuemanStage.DrawChildren)

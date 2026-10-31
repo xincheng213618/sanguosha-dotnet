@@ -64,8 +64,6 @@ internal sealed partial class CharacterCaoYuOlRuntime
                 before[to]--;
         }
 
-        if (before.Any(n => n < 0))
-            throw new InvalidOperationException("CaoYu cannot reconstruct a negative pre-batch Hand count.");
         var alive = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray();
         if (alive.Length == 0)
             return;

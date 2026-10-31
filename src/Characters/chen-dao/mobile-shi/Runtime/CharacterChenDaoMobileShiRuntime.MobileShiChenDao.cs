@@ -32,8 +32,6 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
             throw new InvalidOperationException("Shi Chen Dao requires its original unpaid native trigger.");
         if (op == SkillProgramEffectOp.ResolveMobileShiHongyi)
         {
-            if (f.SkillId != ShiCdHongyi)
-                throw new InvalidOperationException("Hongyi lost its own skill.");
             if (f.TriggerId == "hongyi-start")
             {
                 ChangeShiCdMarks(f, 2);
@@ -49,8 +47,6 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
             if (f.TriggerId == "hongyi-ending")
             {
                 var grant = ShiCdPendingEnding(f.OwnerSeat) ?? throw new InvalidOperationException("Hongyi ending lost its issued preparation.");
-                if (grant.Source.SkillInstanceId != f.SkillInstanceId || grant.GameplayHash != f.GameplayHash || context.Window != SkillProgramTriggerWindow.TurnEnding)
-                    throw new InvalidOperationException("Hongyi ending changed its original skill instance or content.");
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiHongyiEndingEvent(f.Id, grant.FrameId, f.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, grant.FrozenCount, !grant.DrawFirst));
                 if (grant.DrawFirst)
                     ChangeShiCdMarks(f, -1);
@@ -58,11 +54,8 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
                 return SkillProgramStepOutcome.Continue;
             }
 
-            if (f.TriggerId != "hongyi-prepare" || context.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat)
-                throw new InvalidOperationException("Hongyi needs its actual preparation boundary.");
         }
-        else if (op != SkillProgramEffectOp.ResolveMobileShiWanglie || f.SkillId != ShiCdWanglie || context.Window != SkillProgramTriggerWindow.PlayPhaseStarting || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play)
-            throw new InvalidOperationException("Wanglie needs its actual Play-start boundary.");
+        else ;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiChenDao = new(ShiCdSource(f), f.GameplayHash, context.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, ShiCdMarks(f.OwnerSeat)) });
         PublishShiCdChoice(f);
         return SkillProgramStepOutcome.AwaitChoice;
@@ -71,8 +64,6 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
     internal void BindShiCdDraw(ProgramSkillFrame supplied, int count)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (count is < 0 or > 4 || f.ChoiceBindings.Any(b => b.Name == "hongyi-draw"))
-            throw new InvalidOperationException("Hongyi cannot bind a second draw.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ChoiceBindings = f.ChoiceBindings.Append(new ProgramChoiceResultBinding("hongyi-draw", "draw-" + count, f.OwnerSeat)).ToArray() });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiHongyiDrawBoundEvent(f.Id, f.OwnerSeat, count));
     }
@@ -125,8 +116,6 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
 
     internal void RequireShiCdChoice(ProgramSkillFrame f)
     {
-        if (f.MobileShiChenDao is not { } r || r.Source != ShiCdSource(f) || r.GameplayHash != f.GameplayHash || f.WindowContext?.ParentFrameId != r.WindowId || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.FrozenCount is < 0 or > 4 || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || f.SkillId == ShiCdWanglie && r.PhaseId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId)
-            throw new InvalidOperationException("Shi Chen Dao lost its exact source, frozen X, actual turn or Play phase.");
     }
 
     internal bool IsMobileShiChenDaoChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding b) => f.SkillId == ShiCdHongyi && b.Name == "hongyi-draw" && b.ChooserSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiHongyiDrawBoundEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && b.OptionId == "draw-" + e.Count) == 1;

@@ -101,8 +101,6 @@ internal sealed partial class CharacterCaoCaoHappyGodRuntime
     internal void FinishHappyGuixin(ProgramSkillFrame f, bool cancelled)
     {
         var r = f.HappyGuixin!;
-        if (f.PendingMovementContinuation is not null || r.Stage == HappyGuixinStage.MovementChildren)
-            throw new InvalidOperationException("Happy Guixin cannot retire a paid gain before its children return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyGuixin = r with { Stage = HappyGuixinStage.Finished } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyGuixinCompletedEvent(f.Id, r.Payments.Count, HappyGuixinActualObtained(f), r.TurnoverIssued, cancelled));
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);

@@ -27,7 +27,6 @@ public sealed record YinzhiActivatedEvent(long FrameId, CardConversionSource Sou
     int Count, int ActualTurn, int TargetOwnTurns) : IGameEvent;
 public sealed record YinzhiTurnRestrictionReleasedEvent(long IssueFrameId, long DamageFrameId) : IGameEvent;
 public sealed record YinzhiHandRewardRequestedEvent(long FrameId, long IssueFrameId, long ActionId, int Count) : IGameEvent;
-public sealed record ShenCaoPiDrawReturnedEvent(long FrameId, int OwnerSeat, int Requested, int Actual, long Before, long After) : IGameEvent;
 public sealed record KemingBorrowIssuedEvent(long WindowId, KemingBorrowReceipt Receipt) : IGameEvent;
 public sealed record KemingEchoArmedEvent(long FrameId, CardConversionSource Source, string GameplayHash, int TargetSeat, long InvocationCutoff) : IGameEvent;
 internal interface IShenCaoPiHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation); }

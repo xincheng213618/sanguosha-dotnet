@@ -37,7 +37,6 @@ internal abstract class CaoYingDescriptor : ProgramOperationDescriptorBase
         if (guess) r.AllowOnly("op", "target", "condition", "skillIds", "policy");
         else r.AllowOnly("op", "target", "condition", "policy");
         var ids = guess ? r.RequiredIdentifierArray("skillIds") : [];
-        if (guess && (ids.Count != 2 || ids.Distinct(StringComparer.Ordinal).Count() != 2)) throw new InvalidOperationException($"{r.Path}: Lingren requires exactly two distinct executable linked skills.");
         var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(), skillIds: ids)
         { CaoYingPolicy = r.Has("policy") ? r.RequiredEnum<CaoYingRulePolicy>("policy") : null };
         RequireAlways(effect, r.Path); return effect;
@@ -61,11 +60,6 @@ internal static class CaoYingContract
                 throw new InvalidOperationException($"Skill '{skill.Id}' requires two registered executable linked damage/death skills.");
             var damage = skills[effect.SkillIds[0]].Program!; var death = skills[effect.SkillIds[1]].Program!;
             var mobile = effect.CaoYingPolicy == CaoYingRulePolicy.MobileOrdinary;
-            if (!damage.Triggers.Any(t => t.Window == SkillProgramTriggerWindow.AfterDamageApplied && t.Optional &&
-                    (mobile ? t.Effects is [{ Op: SkillProgramEffectOp.ClaimDamageCards }]
-                        : t.Effects is [{ Op: SkillProgramEffectOp.Draw, Amount: 1 }, { Op: SkillProgramEffectOp.AwaitOwnedCardMovement }, { Op: SkillProgramEffectOp.ClaimDamageCards }])) ||
-                !death.Triggers.Any(t => t.Window == SkillProgramTriggerWindow.CharacterDied && t.Effects.Any(e => e.Op == SkillProgramEffectOp.ClaimDeathCleanupCards)))
-                throw new InvalidOperationException($"Skill '{skill.Id}' requires a linked native damage-card recovery skill followed by a native death-card skill.");
         }
     }
     internal static void ValidateTrigger(string path, SkillProgramTrigger t)

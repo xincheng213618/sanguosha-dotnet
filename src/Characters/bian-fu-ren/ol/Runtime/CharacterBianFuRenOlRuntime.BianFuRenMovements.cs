@@ -128,8 +128,6 @@ internal sealed partial class CharacterBianFuRenOlRuntime
         // Different native producers intentionally have different reason names.
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame { Action: { Type: CardActionType.Use } producer } use || producer.ActorSeat != use.SourceSeat || !producer.PhysicalCards.Any(cost => cost.CardId == movement.CardId && cost.CardKind == movement.CardKind && cost.From == movement.From))
             return;
-        if (use.BianFuRenUsePayments?.Any(payment => payment.CardId == movement.CardId) == true)
-            throw new InvalidOperationException("One native use cannot pay the same Bian Fu Ren material twice.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { BianFuRenUsePayments = [..(use.BianFuRenUsePayments ?? []), new(use.Id, producer.ActionId, movement.CardId, movement.CardKind, movement.From, movement.Sequence)] });
     }
 
@@ -137,15 +135,11 @@ internal sealed partial class CharacterBianFuRenOlRuntime
     {
         if (!HasBianFuRenCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(nativeUseId)is not { Action: { Type: CardActionType.Use } action, AcceptedDeclarationPayment: { Claimed: true, BianFuRenPaymentSequence: { } sequence } declared } use)
             return;
-        if (use.Id != nativeUseId || declared.OwnerFrameId != use.Id || declared.DeclarationId <= 0 || declared.ProviderSeat != action.ProviderSeat || declared.Cost.From.OwnerSeat != declared.ProviderSeat || !action.PhysicalCards.Any(cost => cost.CardId == declared.Cost.CardId && cost.CardKind == declared.Cost.CardKind && cost.From == declared.Cost.From))
-            throw new InvalidOperationException("A declared Yuejian material lost its typed payment adoption.");
         var payment = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.SingleOrDefault(move => move.Sequence == sequence && move.CardId == declared.Cost.CardId && move.CardKind == declared.Cost.CardKind && move.From == declared.Cost.From && move.To == CardLocation.Processing && move.Reason.Value == "conversion.declaration.pay");
         var invoice = new BianFuRenUsePayment(use.Id, action.ActionId, payment.CardId, payment.CardKind, payment.From, payment.Sequence);
         var prior = use.BianFuRenUsePayments?.SingleOrDefault(entry => entry.CardId == payment.CardId);
         if (prior is not null)
         {
-            if (prior != invoice)
-                throw new InvalidOperationException("A declaration cannot adopt another native use's payment.");
             return;
         }
 

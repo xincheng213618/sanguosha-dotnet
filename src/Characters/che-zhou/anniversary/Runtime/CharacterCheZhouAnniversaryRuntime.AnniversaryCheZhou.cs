@@ -97,8 +97,6 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
     internal void IssueCheZhouObtain(ProgramSkillFrame f)
     {
         var r = f.AnniversaryCheZhou!;
-        if (r.Stage != AnniversaryCheZhouStage.Selecting || r.Selected.Count is < 1 || r.Selected.Count > r.Round || r.Selected.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(r.Victim)))
-            throw new InvalidOperationException("Pigua cannot replace or pay its selected native Hand entities twice.");
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryCheZhou = r with { Stage = AnniversaryCheZhouStage.MovementChildren, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.Selected, CardLocation.Hand(f.OwnerSeat), new(CheZhouObtainReason), (batch, moves) =>

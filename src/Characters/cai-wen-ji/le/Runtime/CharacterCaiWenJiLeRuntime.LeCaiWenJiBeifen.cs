@@ -45,8 +45,6 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
     internal SkillProgramStepOutcome BeginBeifen(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.Beifen is not null)
-            throw new InvalidOperationException("Beifen cannot issue the same loss obtain twice.");
         if (f.WindowContext is not { } context || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.ActivationId != "lost-hujia-suits" || f.TriggerId != "lost-hujia-suits")
             throw new InvalidOperationException("Beifen requires its actual frozen original loss window.");
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);

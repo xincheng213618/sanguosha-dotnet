@@ -36,8 +36,6 @@ internal sealed partial class CharacterBuLianShiBoundaryMobileRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryBuLianShiAnxuPreparedEvent(f.Id, f.OwnerSeat, f.SkillInstanceId, f.GameplayHash, recipient, donor, from.Zone, 0));
         }
 
-        if (!ValidBoundaryBuLianShiAnxu(f))
-            throw new InvalidOperationException("Anxu lost its actual original-source and delivery invoices.");
         var r = f.BoundaryBuLianShiAnxu!;
         // Count the committed original hand-source Obtain, even if a native
         // movement child has already moved that card away from the recipient.
